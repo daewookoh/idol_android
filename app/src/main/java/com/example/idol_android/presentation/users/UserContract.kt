@@ -3,7 +3,7 @@ package com.example.idol_android.presentation.users
 import com.example.idol_android.base.UiEffect
 import com.example.idol_android.base.UiIntent
 import com.example.idol_android.base.UiState
-import com.example.idol_android.domain.model.User
+import com.example.idol_android.data.model.User
 
 /**
  * Contract class defining State, Intent, and Effect for Users screen.

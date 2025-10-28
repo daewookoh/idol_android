@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Base application theme with Splash Screen support -->
+    <!-- NoActionBar 설정: 코드 레벨에서 ActionBar 제어 -->
+    <style name="Theme.Idol_android" parent="Theme.SplashScreen">
+        <item name="android:statusBarColor">@color/purple_700</item>
+        <item name="android:windowBackground">@color/white</item>
+        <!-- Splash screen configuration -->
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.Idol_android.NoSplash</item>
+    </style>
 
-    <style name="Theme.Idol_android" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Theme after splash screen - NoActionBar -->
+    <style name="Theme.Idol_android.NoSplash" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:statusBarColor">@color/purple_700</item>
+    </style>
 </resources>

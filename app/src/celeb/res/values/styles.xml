@@ -1,0 +1,111 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="ProgressDialog" parent="@android:style/Theme.Dialog" >
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowTitleStyle">@null</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="CustomDialog" parent="@android:style/Theme.Translucent" >
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Activity</item>
+    </style>
+    
+    <style name="text_level_heart_order">
+        <item name="android:padding">3dp</item>
+		<item name="android:textSize">13sp</item>
+		<item name="android:textColor">@color/text_default</item>
+		<item name="android:gravity">center</item>
+		<item name="android:background">@color/gray100</item>
+	</style>    
+
+    <style name="text_level_heart_scroe">
+        <item name="android:padding">3dp</item>
+		<item name="android:textSize">13sp</item>
+		<item name="android:textColor">@color/main</item>
+		<item name="android:gravity">center</item>
+		<item name="android:background">@color/text_white_black</item>
+	</style>
+
+    <style name="text_gaon_guide_title">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#3F4E70</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="text_gaon_guide">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_default</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+    <style name="text_gaon_guide_special">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/main</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+    <style name="AppTheme.StatusBarTransparent" parent="AppTheme" />
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/text_white_black</item>
+        <item name="colorPrimaryDark">@color/text_white_black</item>
+        <item name="colorAccent">@color/gray1000</item>
+        <item name="colorControlActivated">@color/gray1000</item>
+        <item name="android:actionMenuTextColor">@color/gray1000</item>
+    </style>
+
+    <!-- 일반 바텀시트 -->
+    <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/bg_bottom_sheet_dialog_fragment</item>
+    </style>
+    <style name="BaseBottomSheetDialog" parent="@style/Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/BottomSheet</item>
+    </style>
+    <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog" />
+
+    <style name="RewardBottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
+    <item name="android:background">@drawable/bg_bottom_sheet_dialog_pop_up</item>
+    </style>
+
+    <style name="BaseBottomSheetDialogReward" parent="@style/Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/RewardBottomSheet</item>
+    </style>
+    <style name="BottomSheetDialogRewardTheme" parent="BaseBottomSheetDialogReward" />
+
+    <!--광고 바텀시트 -->
+    <style name="BottomSheetAd" parent="@style/Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/bg_bottom_sheet_dialog_ad_fragment</item>
+    </style>
+
+    <style name="BaseBottomSheetDialogAd" parent="@style/Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/BottomSheetAd</item>
+    </style>
+    <style name="BottomSheetDialogAdTheme" parent="BaseBottomSheetDialogAd" />
+
+    <style name="ToolbarTitleStyleParent">
+        <item name="android:fontFamily">casual</item>
+        <item name="android:shadowDx">0.5</item>
+        <item name="android:shadowDy">0.5</item>
+        <item name="android:shadowRadius">0.5</item>
+        <item name="android:shadowColor">#ffffff</item>
+    </style>
+
+    <!--CommunityActivity 스크롤 시 툴바 보일 때 사용 -->
+    <style name="CollapsingTitleStyle" parent="ToolbarTitleStyleParent">
+        <item name="android:textColor">@color/toolbar_default</item>
+    </style>
+
+    <!--CommunityActivity 맨 상단일 때, 툴바 안보일 때 사용 (글씨 안 보이게 하기 위함) -->
+    <style name="ExpandedTitleStyle" parent="ToolbarTitleStyleParent">
+        <item name="android:textColor">@color/toolbar_default</item>
+        <item name="android:textSize">0.1dp</item>
+    </style>
+</resources>

@@ -1,6 +1,5 @@
 package com.example.idol_android.data.model
 
-import com.example.idol_android.domain.model.User
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

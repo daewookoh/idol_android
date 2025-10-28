@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/border_gray100">
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_empty"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/lable_get_info"
+            android:textColor="@color/text_dimmed"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <RelativeLayout
+            android:id="@+id/rl_halloffame"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/btn_group"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_hall_aggregated"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible">
+
+                <RelativeLayout
+                    android:id="@+id/rl_hall_aggregated"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_hall_realtime"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:id="@+id/rl_hall_realtime"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </RelativeLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_aggregated_guide"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/btn_group"
+            android:background="@drawable/btn_cumulative_voting_fandom"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/btn_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent">
+            <View
+                android:id="@+id/view"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray110"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_tabbtn_aggregated"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                app:layout_constraintTop_toBottomOf="@id/view"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/cl_tabbtn_daily">
+
+                <View
+                    android:id="@+id/tabbtn_aggregated_underbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    app:layout_constraintBottom_toTopOf="@+id/tabbtn_aggregated"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:background="@color/background"/>
+                <Button
+                    android:id="@+id/tabbtn_aggregated"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:background="@color/background"
+                    android:text="@string/rank_accumulative"
+                    android:textColor="@color/main"
+                    android:textSize="15sp"
+                    app:autoSizeMaxTextSize="15sp"
+                    app:autoSizeMinTextSize="11sp"
+                    app:autoSizeStepGranularity="2sp"
+                    app:layout_constraintTop_toBottomOf="@id/tabbtn_aggregated_underbar"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:autoSizeTextType="uniform"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_tabbtn_daily"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                app:layout_constraintTop_toBottomOf="@id/view"
+                app:layout_constraintStart_toEndOf="@id/cl_tabbtn_aggregated"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <View
+                    android:id="@+id/tabbtn_daily_underbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    app:layout_constraintBottom_toTopOf="@+id/tabbtn_daily"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:background="@color/background"/>
+                <Button
+                    android:id="@+id/tabbtn_daily"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:background="@color/background"
+                    android:text="@string/rank_daily"
+                    android:textColor="@color/text_dimmed"
+                    android:textSize="15sp"
+                    app:autoSizeMaxTextSize="15sp"
+                    app:autoSizeMinTextSize="11sp"
+                    app:autoSizeStepGranularity="2sp"
+                    app:layout_constraintTop_toBottomOf="@id/tabbtn_daily_underbar"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:autoSizeTextType="uniform"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

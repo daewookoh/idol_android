@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation("androidx.appcompat:appcompat:1.7.0")
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))
@@ -82,6 +83,14 @@ dependencies {
 
     // Coil
     implementation(libs.coil.compose)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
+
+    // Splash Screen
+    implementation(libs.androidx.core.splashscreen)
 
     // Testing
     testImplementation(libs.junit)

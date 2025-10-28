@@ -2,18 +2,19 @@ package com.example.idol_android.presentation.users
 
 import androidx.lifecycle.viewModelScope
 import com.example.idol_android.base.BaseViewModel
-import com.example.idol_android.domain.model.Result
-import com.example.idol_android.domain.usecase.GetUsersUseCase
+import com.example.idol_android.data.model.Result
+import com.example.idol_android.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
  * ViewModel for Users screen implementing MVI pattern.
+ * Repository를 직접 사용하는 단순화된 구조.
  */
 @HiltViewModel
 class UserViewModel @Inject constructor(
-    private val getUsersUseCase: GetUsersUseCase
+    private val userRepository: UserRepository
 ) : BaseViewModel<UserContract.State, UserContract.Intent, UserContract.Effect>() {
 
     override fun createInitialState(): UserContract.State {
@@ -36,7 +37,7 @@ class UserViewModel @Inject constructor(
 
     private fun loadUsers() {
         viewModelScope.launch {
-            getUsersUseCase().collect { result ->
+            userRepository.getUsers().collect { result ->
                 when (result) {
                     is Result.Loading -> {
                         setState { copy(isLoading = true, error = null) }

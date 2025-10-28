@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="actionbar">@color/text_white_black</color>
+    <color name="gray1000">@color/gray900</color>
+</resources>

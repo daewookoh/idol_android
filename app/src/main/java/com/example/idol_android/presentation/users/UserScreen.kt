@@ -45,7 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.idol_android.domain.model.User
+import com.example.idol_android.data.model.User
 import kotlinx.coroutines.flow.collectLatest
 
 /**
@@ -54,6 +54,7 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserScreen(
+    modifier: Modifier = Modifier,
     viewModel: UserViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -73,23 +74,11 @@ fun UserScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Users") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            )
-        }
-    ) { paddingValues ->
-        UserContent(
-            state = state,
-            onIntent = viewModel::sendIntent,
-            modifier = Modifier.padding(paddingValues)
-        )
-    }
+    UserContent(
+        state = state,
+        onIntent = viewModel::sendIntent,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -98,27 +87,33 @@ private fun UserContent(
     onIntent: (UserContract.Intent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        when {
-            state.isLoading -> {
-                CircularProgressIndicator()
-            }
-            state.error != null && state.users.isEmpty() -> {
-                ErrorContent(
-                    error = state.error,
-                    onRetry = { onIntent(UserContract.Intent.RetryLoadUsers) }
-                )
-            }
-            state.users.isNotEmpty() -> {
-                UserList(
-                    users = state.users,
-                    onUserClick = { user ->
-                        onIntent(UserContract.Intent.OnUserClick(user))
-                    }
-                )
+    Scaffold(
+        modifier = modifier.fillMaxSize()
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
+        ) {
+            when {
+                state.isLoading -> {
+                    CircularProgressIndicator()
+                }
+                state.error != null && state.users.isEmpty() -> {
+                    ErrorContent(
+                        error = state.error,
+                        onRetry = { onIntent(UserContract.Intent.RetryLoadUsers) }
+                    )
+                }
+                state.users.isNotEmpty() -> {
+                    UserList(
+                        users = state.users,
+                        onUserClick = { user ->
+                            onIntent(UserContract.Intent.OnUserClick(user))
+                        }
+                    )
+                }
             }
         }
     }

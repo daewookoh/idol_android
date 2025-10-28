@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 라이트 버전   -->
+    <!-- 롤리팝(21~22) 버전은 로고 theme 적용은 안되지만  coldStart 화면 statusBar color 적용 가능
+         그래서 해당 기능만 추가   -->
+    <style name="Theme.Annie.SplashTheme" parent="@style/Theme.Annie.NoActionBar">
+        <item name="android:statusBarColor">@color/actionbar</item>
+        <item name="android:windowBackground" >@drawable/splash</item>
+    </style>
+</resources>
