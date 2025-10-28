@@ -9,6 +9,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.example.idol_android.navigation.NavGraph
 import com.example.idol_android.ui.theme.Idol_androidTheme
+import com.example.idol_android.util.SetupSystemBars
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -32,6 +33,12 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             Idol_androidTheme {
+                // 전체 앱에서 theme에 따라 status bar 아이콘 색상 자동 변경
+                SetupSystemBars(
+                    statusBarColor = androidx.compose.ui.graphics.Color.Transparent,
+                    navigationBarColor = androidx.compose.ui.graphics.Color.Transparent
+                )
+
                 val navController = rememberNavController()
                 NavGraph(navController = navController)
             }

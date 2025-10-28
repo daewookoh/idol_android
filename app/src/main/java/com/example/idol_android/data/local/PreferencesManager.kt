@@ -70,6 +70,10 @@ class PreferencesManager @Inject constructor(
         val KEY_DARK_MODE = intPreferencesKey(Constants.KEY_DARK_MODE)
         val KEY_IS_FIRST_LAUNCH = booleanPreferencesKey(Constants.KEY_IS_FIRST_LAUNCH)
 
+        // Login Info
+        val KEY_LOGIN_TIMESTAMP = longPreferencesKey("user_login_ts")
+        val KEY_LOGIN_DOMAIN = stringPreferencesKey("user_login_domain")
+
         // Config Data (JSON strings)
         val KEY_BAD_WORDS = stringPreferencesKey("bad_words_json")
         val KEY_BOARD_TAGS = stringPreferencesKey("board_tags_json")
@@ -222,6 +226,18 @@ class PreferencesManager @Inject constructor(
     suspend fun setEvents(events: Any) {
         context.dataStore.edit { preferences ->
             preferences[KEY_EVENTS] = gson.toJson(events)
+        }
+    }
+
+    suspend fun setLoginTimestamp(timestamp: Long) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_LOGIN_TIMESTAMP] = timestamp
+        }
+    }
+
+    suspend fun setLoginDomain(domain: String) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_LOGIN_DOMAIN] = domain
         }
     }
 

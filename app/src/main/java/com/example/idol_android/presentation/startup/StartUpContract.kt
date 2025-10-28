@@ -54,6 +54,11 @@ class StartUpContract {
         data object NavigateToMain : Effect()
 
         /**
+         * 로그인 화면으로 이동 (guest mode).
+         */
+        data object NavigateToLogin : Effect()
+
+        /**
          * 에러 표시.
          */
         data class ShowError(val message: String) : Effect()

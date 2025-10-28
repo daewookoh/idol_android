@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun StartUpScreen(
     onNavigateToMain: () -> Unit,
+    onNavigateToLogin: () -> Unit,
     viewModel: StartUpViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -54,6 +55,9 @@ fun StartUpScreen(
             when (effect) {
                 is StartUpContract.Effect.NavigateToMain -> {
                     onNavigateToMain()
+                }
+                is StartUpContract.Effect.NavigateToLogin -> {
+                    onNavigateToLogin()
                 }
                 is StartUpContract.Effect.ShowError -> {
                     // TODO: 에러 처리 (필요시 Toast 또는 Dialog)

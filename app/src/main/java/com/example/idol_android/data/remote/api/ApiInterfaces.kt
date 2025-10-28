@@ -54,6 +54,23 @@ interface UserApi {
         @Header("Authorization") authorization: String
     ): Response<BlockListResponse>
 
+    /**
+     * 사용자 검증 (회원 여부 확인)
+     * @param params Map with "type" (email, nickname), "value" (검증할 값), "app_id"
+     */
+    @POST("users/validate/")
+    suspend fun validate(
+        @Body params: Map<String, String?>
+    ): Response<ValidateResponse>
+
+    /**
+     * 이메일 로그인
+     */
+    @POST("users/email_signin/")
+    suspend fun signIn(
+        @Body body: SignInRequest
+    ): Response<SignInResponse>
+
     // TODO: Add more user endpoints
     // - POST /users/iab_verify/ - IAB 검증
     // - POST /users/payments/google_item/ - Google Play 아이템 검증

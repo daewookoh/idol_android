@@ -229,6 +229,89 @@ data class BlockedUser(
     val username: String
 )
 
+// ============================================================
+// /users/validate/ - 사용자 검증 (회원 여부 확인)
+// ============================================================
+data class ValidateResponse(
+    @SerializedName("success")
+    val success: Boolean,
+
+    @SerializedName("msg")
+    val message: String?,
+
+    @SerializedName("domain")
+    val domain: String?, // 가입된 도메인 (email, kakao, google 등)
+
+    @SerializedName("gcode")
+    val gcode: Int?,
+
+    @SerializedName("mcode")
+    val mcode: Int?
+)
+
+// ============================================================
+// /users/email_signin/ - 이메일 로그인
+// ============================================================
+data class SignInRequest(
+    @SerializedName("domain")
+    val domain: String?, // email, kakao, google, line, facebook
+
+    @SerializedName("email")
+    val email: String,
+
+    @SerializedName("passwd")
+    val passwd: String,
+
+    @SerializedName("push_key")
+    val deviceKey: String,
+
+    @SerializedName("gmail")
+    val gmail: String,
+
+    @SerializedName("device_id")
+    val deviceId: String,
+
+    @SerializedName("app_id")
+    val appId: String
+)
+
+data class SignInResponse(
+    @SerializedName("success")
+    val success: Boolean,
+
+    @SerializedName("msg")
+    val message: String?,
+
+    @SerializedName("data")
+    val data: SignInData?,
+
+    @SerializedName("gcode")
+    val gcode: Int?,
+
+    @SerializedName("mcode")
+    val mcode: Int?
+)
+
+data class SignInData(
+    @SerializedName("token")
+    val token: String,
+
+    @SerializedName("user_id")
+    val userId: Int,
+
+    @SerializedName("email")
+    val email: String,
+
+    @SerializedName("username")
+    val username: String,
+
+    @SerializedName("nickname")
+    val nickname: String?,
+
+    @SerializedName("profile_image")
+    val profileImage: String?
+)
+
 /*
  * ============================================================
  * TODO: 나머지 API Response 모델 추가

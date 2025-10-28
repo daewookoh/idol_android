@@ -87,6 +87,10 @@ class StartUpViewModel @Inject constructor(
                     android.util.Log.d(TAG, "✓ Access token loaded from DataStore")
                 } else {
                     android.util.Log.w(TAG, "⚠️  No saved token - user not logged in (guest mode)")
+                    // Guest mode - Navigate to Login screen
+                    setState { copy(isLoading = false, progress = 0f, currentStep = "Login required") }
+                    setEffect { StartUpContract.Effect.NavigateToLogin }
+                    return@launch
                 }
 
                 // Step 1: 기본 설정 확인 (0-20%)
@@ -151,7 +155,7 @@ class StartUpViewModel @Inject constructor(
 
                 // 메인 화면으로 이동
 //                delay(200)
-//                setEffect { StartUpContract.Effect.NavigateToMain }
+                setEffect { StartUpContract.Effect.NavigateToMain }
 
             } catch (e: Exception) {
                 handleError(e)

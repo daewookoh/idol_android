@@ -132,4 +132,23 @@ object Constants {
     const val IDOL_TYPE_SOLO = 1
     const val IDOL_TYPE_GROUP = 2
     const val IDOL_TYPE_ACTOR = 3 // CELEB flavor only
+
+    // ============================================================
+    // Authentication / Login
+    // ============================================================
+    const val APP_ID = "" // from old AppConst
+    const val CHANNEL_ID = "1474745561" // Line channel ID
+
+    // Login domains (old Const.kt)
+    const val DOMAIN_EMAIL = "email"
+    const val DOMAIN_KAKAO = "kakao"
+    const val DOMAIN_GOOGLE = "google"
+    const val DOMAIN_LINE = "line"
+    const val DOMAIN_FACEBOOK = "facebook"
+
+    // Email postfix for social login
+    const val POSTFIX_KAKAO = "@kakao.com"
+    const val POSTFIX_LINE = "@line.com"
+    const val POSTFIX_GOOGLE = "@google.com"
+    const val POSTFIX_FACEBOOK = "@facebook.com"
 }

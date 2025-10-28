@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">idol_android</string>
+
+    <!-- Login -->
+    <string name="hint_email">이메일</string>
+    <string name="hint_passwd">비밀번호</string>
+    <string name="btn_signin">로그인</string>
+    <string name="btn_signup">회원가입</string>
+    <string name="text_forgot_id">아이디 찾기</string>
+    <string name="text_forgot_passwd">비밀번호 찾기</string>
+    <string name="login_email">이메일로 로그인</string>
+    <string name="required_field">필수 입력 항목입니다</string>
+    <string name="invalid_email_form">올바른 이메일 형식이 아닙니다</string>
 </resources>

@@ -39,4 +39,40 @@ interface UserRepository {
      * @return Flow<ApiResult<BlockListResponse>>
      */
     fun getBlocks(): Flow<ApiResult<BlockListResponse>>
+
+    /**
+     * 사용자 검증 (회원 여부 확인)
+     *
+     * @param type 검증 타입 (email, nickname 등)
+     * @param value 검증할 값
+     * @param appId 앱 ID
+     * @return Flow<ApiResult<ValidateResponse>>
+     */
+    fun validateUser(
+        type: String,
+        value: String,
+        appId: String
+    ): Flow<ApiResult<ValidateResponse>>
+
+    /**
+     * 로그인
+     *
+     * @param domain 로그인 도메인 (email, kakao, google, line, facebook)
+     * @param email 이메일
+     * @param password 비밀번호
+     * @param deviceKey 푸시 키
+     * @param gmail Gmail 계정
+     * @param deviceId 디바이스 ID
+     * @param appId 앱 ID
+     * @return Flow<ApiResult<SignInResponse>>
+     */
+    fun signIn(
+        domain: String,
+        email: String,
+        password: String,
+        deviceKey: String,
+        gmail: String,
+        deviceId: String,
+        appId: String
+    ): Flow<ApiResult<SignInResponse>>
 }

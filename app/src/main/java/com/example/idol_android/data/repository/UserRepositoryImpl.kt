@@ -205,4 +205,104 @@ class UserRepositoryImpl @Inject constructor(
             ))
         }
     }
+
+    override fun validateUser(
+        type: String,
+        value: String,
+        appId: String
+    ): Flow<ApiResult<ValidateResponse>> = flow {
+        emit(ApiResult.Loading)
+
+        try {
+            val params = mapOf(
+                "type" to type,
+                "value" to value,
+                "app_id" to appId
+            )
+
+            val response = userApi.validate(params)
+
+            if (response.isSuccessful && response.body() != null) {
+                val body = response.body()!!
+                emit(ApiResult.Success(body))
+            } else {
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code(),
+                message = "HTTP ${e.code()}: ${e.message()}"
+            ))
+        } catch (e: IOException) {
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Network error: ${e.message}"
+            ))
+        } catch (e: Exception) {
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Unknown error: ${e.message}"
+            ))
+        }
+    }
+
+    override fun signIn(
+        domain: String,
+        email: String,
+        password: String,
+        deviceKey: String,
+        gmail: String,
+        deviceId: String,
+        appId: String
+    ): Flow<ApiResult<SignInResponse>> = flow {
+        emit(ApiResult.Loading)
+
+        try {
+            val request = SignInRequest(
+                domain = domain,
+                email = email,
+                passwd = password,
+                deviceKey = deviceKey,
+                gmail = gmail,
+                deviceId = deviceId,
+                appId = appId
+            )
+
+            val response = userApi.signIn(request)
+
+            if (response.isSuccessful && response.body() != null) {
+                val body = response.body()!!
+
+                // 서버가 정상 응답한 경우 body.success 여부와 관계없이 Success로 emit
+                // body.success=false는 비즈니스 로직상의 실패 (비밀번호 틀림, 점검 등)
+                // gcode, mcode를 포함한 응답을 ViewModel에서 처리하도록 함
+                emit(ApiResult.Success(body))
+            } else {
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code(),
+                message = "HTTP ${e.code()}: ${e.message()}"
+            ))
+        } catch (e: IOException) {
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Network error: ${e.message}"
+            ))
+        } catch (e: Exception) {
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Unknown error: ${e.message}"
+            ))
+        }
+    }
 }
