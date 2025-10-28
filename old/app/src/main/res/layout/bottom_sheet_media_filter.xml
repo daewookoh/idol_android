@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_bottom_sheet_board_filter"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minHeight="128dp"
+    android:background="@color/gray100"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="36dp"
+        android:layout_height="3dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
+        android:background="@color/gray150" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_img"
+        android:layout_width="match_parent"
+        android:minHeight="@dimen/bottom_sheet_min_height"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:text="@string/photo"
+        android:textColor="@color/gray900"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_video"
+        android:layout_width="match_parent"
+        android:minHeight="@dimen/bottom_sheet_min_height"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:text="@string/video"
+        android:textColor="@color/gray900"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

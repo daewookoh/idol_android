@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fl_onair_channel"
+    android:layout_width="97dp"
+    android:layout_height="97dp"
+    android:layout_marginRight="8dp">
+
+    <net.ib.mn.view.RoundRectCornerImageView
+        android:id="@+id/iv_channel_thumbnail"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_gravity="left|bottom"
+        android:src="@drawable/image_placeholder"
+        android:scaleType="centerCrop"/>
+
+    <TextView
+        android:id="@+id/tv_channel_title"
+        android:layout_width="90dp"
+        android:layout_height="30dp"
+        android:layout_gravity="left|bottom"
+        android:background="@drawable/bg_onair_title"
+        android:gravity="center"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:text="test"
+        android:textColor="@color/text_white_black"
+        android:textSize="10sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_channel_onair_mark"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="right|top"
+        android:gravity="center"
+        android:background="@drawable/round_shape"
+        android:singleLine="false"
+        android:text="ON\nAIR"
+        android:textColor="@color/text_white_black"
+        android:textSize="7sp"
+        android:textStyle="bold"/>
+
+</FrameLayout>

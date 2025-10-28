@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@android:color/transparent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_popup"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingBottom="10dp">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="13dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/image_angel"
+                        android:layout_width="30dp"
+                        android:layout_height="35dp"
+                        android:layout_marginTop="-8dp"
+                        android:layout_marginEnd="3dp"
+                        android:background="@drawable/charity_angel_badge"
+                        android:paddingTop="12dp"
+                        android:textAlignment="center"
+                        android:textColor="@color/text_angel"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:ignore="SmallSp"
+                        tools:visibility="visible"/>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/image_fairy"
+                        android:layout_width="30dp"
+                        android:layout_height="35dp"
+                        android:layout_marginTop="-8dp"
+                        android:layout_toEndOf="@+id/image_angel"
+                        android:background="@drawable/charity_fairy_badge"
+                        android:paddingTop="12dp"
+                        android:layout_marginEnd="3dp"
+                        android:textAlignment="center"
+                        android:textColor="@color/text_fairy"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:ignore="SmallSp"
+                        tools:visibility="visible"/>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/image_miracle"
+                        android:layout_width="30dp"
+                        android:layout_height="35dp"
+                        android:layout_marginTop="-8dp"
+                        android:layout_toEndOf="@+id/image_fairy"
+                        android:background="@drawable/charity_miracle_badge"
+                        android:paddingTop="12dp"
+                        android:textAlignment="center"
+                        android:textColor="@color/text_miracle"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:ignore="SmallSp"
+                        tools:visibility="visible"/>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/image_rookie"
+                        android:layout_width="30dp"
+                        android:layout_height="35dp"
+                        android:layout_marginTop="-8dp"
+                        android:layout_toEndOf="@+id/image_miracle"
+                        android:background="@drawable/charity_rookie_badge"
+                        android:paddingTop="12dp"
+                        android:textAlignment="center"
+                        android:textColor="@color/text_rookie"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:ignore="SmallSp"
+                        tools:visibility="visible"/>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/image_super_rookie"
+                        android:layout_width="30dp"
+                        android:layout_height="35dp"
+                        android:layout_marginTop="-8dp"
+                        android:layout_toEndOf="@+id/image_rookie"
+                        android:background="@drawable/charity_super_rookie_badge"
+                        android:paddingTop="12dp"
+                        android:textAlignment="center"
+                        android:textColor="@color/text_super_rookie"
+                        android:textSize="10sp"
+                        android:text="S"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:ignore="SmallSp"
+                        tools:visibility="visible"/>
+                </RelativeLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/rl_most_favorite"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginEnd="14dp">
+
+                    <androidx.appcompat.widget.AppCompatCheckBox
+                        android:id="@+id/btn_most"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:paddingStart="4.5dp"
+                        android:layout_marginEnd="9dp"
+                        app:layout_constraintHorizontal_bias="1"
+                        android:drawableStart="@drawable/btn_most"
+                        app:buttonCompat="@android:color/transparent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/btn_favorite" />
+
+                    <androidx.appcompat.widget.AppCompatCheckBox
+                        android:id="@+id/btn_favorite"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:paddingStart="4.5dp"
+                        android:drawableStart="@drawable/btn_favorite"
+                        app:buttonCompat="@android:color/transparent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </FrameLayout>
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <RelativeLayout
+                        android:id="@+id/img_container"
+                        android:layout_width="90dp"
+                        android:layout_height="90dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/favorite_title"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="20dp">
+
+                        <net.ib.mn.view.ExodusImageView
+                            android:id="@+id/photo"
+                            android:layout_width="90dp"
+                            android:layout_height="90dp"
+                            android:src="@drawable/menu_profile_default2" />
+
+                    </RelativeLayout>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/favorite_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        app:layout_constraintTop_toBottomOf="@+id/img_container"
+                        android:layout_marginTop="10dp"
+                        app:layout_constraintBottom_toTopOf="@id/birthday"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/favorite"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_default"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/group"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:text=""
+                            android:textColor="@color/text_dimmed"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/birthday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:text=""
+                        android:textColor="@color/text_gray"
+                        android:textSize="10sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/tv_most_count" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_most_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="10sp"
+                        android:textColor="@color/text_gray"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/menu_container"
+                        tools:text="100+" />
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/menu_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="14dp"
+                        android:layout_marginEnd="10dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_most_count"
+                        android:orientation="horizontal"
+                        android:paddingStart="5dp"
+                        android:paddingEnd="5dp">
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:id="@+id/title_vote"
+                            android:layout_width="90dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:layout_gravity="center_horizontal"
+                                android:src="@drawable/btn_community_menu_ranking" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="10dp"
+                                android:text="@string/title_heart_voting_ranking"
+                                android:textAlignment="center"
+                                android:textColor="@color/gray580"
+                                android:textSize="13sp" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:id="@+id/title_gallery"
+                            android:layout_width="90dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:layout_gravity="center_horizontal"
+                                android:src="@drawable/btn_community_menu_bannergram" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="10dp"
+                                android:text="@string/gallery_title"
+                                android:textAlignment="center"
+                                android:textColor="@color/gray580"
+                                android:textSize="13sp" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:id="@+id/title_rank"
+                            android:layout_width="90dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:layout_gravity="center_horizontal"
+                                android:src="@drawable/btn_community_menu_change_rank" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="10dp"
+                                android:text="@string/title_rank_history"
+                                android:textAlignment="center"
+                                android:textColor="@color/gray580"
+                                android:textSize="13sp" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/menu_container2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/menu_container"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginTop="14dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginBottom="14dp"
+                        android:orientation="horizontal"
+                        android:paddingStart="5dp"
+                        android:paddingEnd="5dp">
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:id="@+id/ll_community_share"
+                            android:layout_width="90dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:layout_gravity="center_horizontal"
+                                android:src="@drawable/btn_community_menu_share" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="10dp"
+                                android:text="@string/title_share"
+                                android:textAlignment="center"
+                                android:textColor="@color/gray580"
+                                android:textSize="13sp" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:id="@+id/title_burningday"
+                            android:layout_width="90dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:layout_gravity="center_horizontal"
+                                android:src="@drawable/btn_community_menu_allinday" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="10dp"
+                                android:text="@string/set_all_in_day"
+                                android:textAlignment="center"
+                                android:textColor="@color/gray580"
+                                android:textSize="13sp" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.core.widget.NestedScrollView>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/ll_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_marginStart="5dp"
+        android:gravity="bottom"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:background="@drawable/bg_small_talk_tag"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="5dp"
+            android:includeFontPadding="false"
+            android:textAlignment="center"
+            android:textColor="@drawable/text_small_talk_tag"
+            android:textSize="14dp"
+            tools:text="@string/all" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>

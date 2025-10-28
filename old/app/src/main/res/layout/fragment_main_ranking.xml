@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_main_ranking_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_tab_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- tabMaxWidth, tabMinWidth 지정해서 불필요한 여백이 생기지 않도록 함 -->
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tab_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/right_fade_out_white"
+                app:tabIndicatorFullWidth="false"
+                app:tabIndicatorColor="@color/main"
+                app:tabIndicatorHeight="2dp"
+                app:tabMode="scrollable"
+                app:tabPaddingStart="13dp"
+                app:tabPaddingEnd="13dp"
+                app:tabPadding="0dp"
+                app:tabMaxWidth="0dp"
+                app:tabMinWidth="0dp"
+                app:tabRippleColor="@android:color/transparent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <View
+                android:id="@+id/v_right_fade"
+                android:layout_width="40dp"
+                android:layout_height="0dp"
+                android:background="@drawable/right_fade_out_white"
+                app:layout_constraintBottom_toBottomOf="@+id/tab_container"
+                app:layout_constraintEnd_toEndOf="@+id/tab_container"
+                app:layout_constraintTop_toTopOf="@+id/tab_container"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <View
+                android:id="@+id/v_left_fade"
+                android:layout_width="40dp"
+                android:layout_height="0dp"
+                android:background="@drawable/left_fade_out_white"
+                app:layout_constraintBottom_toBottomOf="@+id/tab_container"
+                app:layout_constraintStart_toStartOf="@+id/tab_container"
+                app:layout_constraintTop_toTopOf="@+id/tab_container" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cl_tab_container" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:id="@+id/main_menu_group"
+        android:visible="true">
+        <item
+            android:id="@+id/action_search"
+            android:title="search"
+            app:actionLayout="@layout/menu_item_with_lottie"
+            app:showAsAction="always"/>
+        <item
+            android:id="@+id/action_friends"
+            android:title="friend"
+            app:actionLayout="@layout/menu_item_with_lottie"
+            app:showAsAction="always"/>
+
+        <item
+            android:id="@+id/action_myheart"
+            android:title="myheart"
+            app:actionLayout="@layout/menu_item_with_lottie"
+            app:showAsAction="always"/>
+    </group>
+</menu>

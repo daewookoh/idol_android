@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fl_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/gray50"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp"/>
+
+    <TextView
+        android:id="@+id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@color/gray50"
+        android:gravity="center"
+        android:text="@string/schedule_empty"
+        android:visibility="gone"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btn_write_background"
+        android:layout_width="53dp"
+        android:layout_height="53dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="35dp"
+        android:layout_marginEnd="16dp"
+        app:cardCornerRadius="27.5dp"
+        app:cardElevation="0dp"
+        android:background="@color/background_100"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/btn_schedule_write"
+        android:layout_width="53dp"
+        android:layout_height="53dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="35dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/btn_write_contents"
+        android:scaleX="@integer/locale_mirror_flip"/>
+
+</FrameLayout>

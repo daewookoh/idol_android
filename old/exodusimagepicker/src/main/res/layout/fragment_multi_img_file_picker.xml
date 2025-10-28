@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_100"
+        tools:ignore="MissingDefaultResource">
+
+        <FrameLayout
+            android:id="@+id/fl_multi_img_container"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/background_100"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+            android:id="@+id/iv_initial_selected_photo"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:background="@color/background_100"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:quickScaleEnabled="true" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_photos"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="2dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fl_multi_img_container"
+            app:spanCount="4" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_transfer_to_multi_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/ic_btn_multi_select_photo_off_pressed_36xp"
+            android:translationZ="10dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="@+id/fl_multi_img_container"
+            app:layout_constraintEnd_toEndOf="@+id/fl_multi_img_container"
+            app:layout_constraintVertical_bias="0.9" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_transfer_to_single_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/ic_btn_multi_select_photo_on_pressed_36xp"
+            android:translationZ="10dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/fl_multi_img_container"
+            app:layout_constraintEnd_toEndOf="@+id/fl_multi_img_container"
+            app:layout_constraintVertical_bias="0.9" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="20dp">
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="67dp"
+            android:layout_marginTop="10dp"
+            android:scaleX="@integer/locale_mirror_flip"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"
+            android:background="@color/gray110"
+            app:layout_constraintTop_toBottomOf="@id/chart" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_league"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="15dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/view">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_s_league"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:src="@drawable/s_circle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_s_league"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/s_league"
+                android:textColor="@color/text_dimmed"
+                android:textSize="10sp"
+                android:layout_marginStart="4dp"
+                app:layout_constraintStart_toEndOf="@id/iv_s_league"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_a_league"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:src="@drawable/a_circle"
+                android:layout_marginStart="10sp"
+                app:layout_constraintStart_toEndOf="@id/tv_s_league"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_a_league"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/a_league"
+                android:textColor="@color/text_dimmed"
+                android:textSize="10sp"
+                android:layout_marginStart="4dp"
+                app:layout_constraintStart_toEndOf="@+id/iv_a_league"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_vote_average_title"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:textColor="@color/main"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:layout_marginTop="7dp"
+            android:layout_height="wrap_content"
+            android:text="@string/rank_history_30_average"
+            app:layout_constraintTop_toBottomOf="@id/cl_league" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_vote_average"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:textColor="@color/gray900"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/vote_count_format"
+            app:layout_constraintTop_toBottomOf="@id/tv_vote_average_title" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

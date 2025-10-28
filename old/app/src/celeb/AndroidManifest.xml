@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:installLocation="auto">
+
+    <application
+        tools:replace="android:label"
+        android:label="@string/actor_app_name">
+        <meta-data
+            tools:replace="android:value"
+            android:name="naswall_app_key"
+            android:value="@string/actor_NAS_WALL_APP_KEY" />
+        <meta-data
+            tools:replace="android:value"
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBMRQ4qVV6O0VFXt81wIIrOoGszyb5W2xI" />
+        <meta-data
+            tools:replace="android:value"
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-4951070488234097~8280455763" />
+        <activity
+            android:name="net.ib.mn.activity.HallOfFameAggHistoryActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <meta-data
+            tools:replace="android:value"
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/actor_facebook_app_id" />
+        <meta-data
+            tools:replace="android:value"
+            android:name="tnkad_app_id"
+            android:value="@string/actor_tnkad_app_id"/>
+        <activity
+            tools:replace="android:label"
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/actor_app_name" />
+        <activity
+            android:name="net.ib.mn.activity.ContainerActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+    </application>
+
+</manifest>

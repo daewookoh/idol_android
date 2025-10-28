@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+    <item
+        android:id="@+id/action_friends_add"
+        android:title="@string/new_face"
+        app:actionLayout="@layout/menu_item_icon_with_lottie"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_friends_request"
+        android:icon="@drawable/btn_navigation_friend_waiting"
+        android:title="@string/cancel_friend_request"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_friends_remove"
+        android:icon="@drawable/btn_navigation_friend_delete"
+        android:title="@string/title_unfriend"
+        app:showAsAction="always"/>           
+</menu>

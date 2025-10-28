@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data></data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_chat_message_chat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_400">
+
+        <TextView
+            android:id="@+id/tv_day_chat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="2014. 02. 01."
+            android:textColor="@color/gray300"
+            android:textSize="10sp"
+            android:visibility="visible"
+            tools:ignore="MissingConstraints"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_level_chat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="10dp"
+            android:background="@android:color/transparent"
+            android:padding="0dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/icon_level_0"
+            app:layout_constraintStart_toEndOf="@+id/user_photo"
+            app:layout_constraintTop_toBottomOf="@id/tv_day_chat"
+            app:layout_constraintBottom_toTopOf="@+id/message_wrapper_chat"
+            app:layout_constraintVertical_chainStyle="packed"/>
+
+        <TextView
+            android:id="@+id/tv_nickname_chat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:ems="12"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="nickname"
+            android:textColor="@color/text_chat"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_level_chat"
+            app:layout_constraintStart_toEndOf="@+id/iv_level_chat"
+            app:layout_constraintTop_toTopOf="@+id/iv_level_chat"
+            />
+
+        <net.ib.mn.view.ExodusImageView
+            android:id="@+id/user_photo"
+            android:layout_width="37dp"
+            app:layout_constraintVertical_bias="0"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:src="@drawable/menu_profile_default2"
+            app:layout_constraintTop_toTopOf="@+id/tv_nickname_chat"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/message_wrapper_chat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_default="wrap"
+            android:layout_marginStart="10dp"
+            android:gravity="center"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_usertalk_start"
+            android:orientation="vertical"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintEnd_toStartOf="@id/date_chat"
+            app:layout_constraintStart_toEndOf="@+id/user_photo"
+            app:layout_constraintTop_toBottomOf="@id/tv_nickname_chat"
+            tools:ignore="MissingConstraints">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/photo_wrapper"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/photo_chat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/image_placeholder"
+                    android:adjustViewBounds="true"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/view_gif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:src="@drawable/icon_gif"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@+id/photo_chat"
+                    app:layout_constraintEnd_toEndOf="@+id/photo_chat"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <net.ib.mn.view.NoScrollingTextView
+                android:id="@+id/message_chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:textColorLink="@color/gray900"
+                android:maxWidth="203dp"
+                android:text="message contents"
+                android:textColor="@color/gray900"
+                android:textSize="13sp"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/ll_preview_wrapper_chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="223dp"
+                android:visibility="gone"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    >
+
+                    <net.ib.mn.view.TalkLinkImageView
+                        android:id="@+id/iv_preview_image_chat"
+                        android:layout_width="223dp"
+                        android:layout_height="100dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/image_placeholder" />
+
+                    <LinearLayout
+                        android:id="@+id/ll_preview_info_chat"
+                        android:layout_width="223dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:id="@+id/tv_preview_title_chat"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textColor="@color/gray580"
+                            android:textSize="12sp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:id="@+id/tv_preview_description_chat"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="2"
+                            android:textColor="@color/gray300"
+                            android:textSize="9sp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <TextView
+            android:id="@+id/date_chat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="30dp"
+            android:text="오전 12:00"
+            app:layout_constraintWidth_default="wrap"
+            android:textColor="@color/gray300"
+            android:textSize="10sp"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/message_wrapper_chat"
+            app:layout_constraintStart_toEndOf="@id/message_wrapper_chat"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

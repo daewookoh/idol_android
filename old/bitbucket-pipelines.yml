@@ -1,0 +1,162 @@
+image: alvrme/alpine-android:android-34-jdk17
+
+definitions:
+  services:
+    docker:
+      memory: 7128
+
+pipelines:
+  custom:
+    staging:
+      - step:
+          size: 8x # Double resources available for this step.
+          name: CHOEAEDOL
+          caches:
+            - gradle
+          script:
+            - curl -d "text=:aedol:최애돌 빌드를 시작합니다" -d "channel=${SLACK_CHANNEL}" -d "token=${SLACK_TOKEN}" https://slack.com/api/chat.postMessage
+            - java -version
+            - export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+            - export PATH=$JAVA_HOME/bin:$PATH
+
+            - apk add --no-cache jq make file
+
+            - APPLICATION_ID="net.ib.mn"
+            - export FIREBASE_TOKEN=$FIREBASE_TOKEN
+            - chmod a+x ./gradlew
+            - echo "Start assembleBundle"
+            - echo "$SIGNING_JKS_FILE" | base64 -d > ../mntalk.keystore
+            - ./gradlew unzipAppDistributionFiles
+            - ./gradlew task getCommitMessage -PapplicationId="${APPLICATION_ID}"
+            - ./gradlew task getJiraJsonFile -PapplicationId="${APPLICATION_ID}"
+            # baseArchivesName이 적용되게 한줄로 이어서 처리
+            - ./gradlew task setArchiveName -PapplicationId="${APPLICATION_ID}" bundleAppRelease
+            - ./gradlew task setArchiveName -PapplicationId="${APPLICATION_ID}" appDistributionUploadAppRelease
+            # 현재위치와 apk 파일 위치확인.
+            - CWD="$(pwd)"
+            - echo $CWD
+            - AWD="$(find ./app/build/outputs/bundle/appRelease -name '*.aab')"
+            - echo $AWD
+            - RELEASE_NOTE="$(cat ./release-notes.txt)"
+            - echo RELEASE_NOTE
+            - JIRA_FILE="$(find ./jira_issue.json)"
+            - echo $JIRA_FILE
+            - curl -s -u "${BITBUCKET_REPO_OWNER}:${BB_AUTH_STRING}" -X GET https://api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/pipelines/ -v
+
+            - chmod +x ./slack_upload.sh
+            - ./slack_upload.sh "${AWD}" "${RELEASE_NOTE}"
+
+            - curl -X POST -H "Content-Type:application/json" --data @"${JIRA_FILE}" https://automation.atlassian.com/pro/hooks/c8284fdb3591762200862a5c93ee74d08fc4cc99
+    onestore:
+      - step:
+          size: 8x # Double resources available for this step.
+          name: ONESTORE
+          caches:
+            - gradle
+          script:
+            - curl -d "text=1️⃣최애돌 원스토어 빌드를 시작합니다" -d "channel=${SLACK_CHANNEL}" -d "token=${SLACK_TOKEN}" https://slack.com/api/chat.postMessage
+            - java -version
+            - export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+            - export PATH=$JAVA_HOME/bin:$PATH
+
+            - apk add --no-cache jq make file
+
+            - APPLICATION_ID="com.exodus.myloveidol.twostore"
+            - export FIREBASE_TOKEN=$FIREBASE_TOKEN
+            - chmod a+x ./gradlew
+            - echo "Start assembleAPK"
+            - echo "$SIGNING_JKS_FILE" | base64 -d > ../mntalk.keystore
+            - ./gradlew unzipAppDistributionFiles
+            - ./gradlew task getCommitMessage -PapplicationId="${APPLICATION_ID}"
+            - ./gradlew task getJiraJsonFile -PapplicationId="${APPLICATION_ID}"
+            - ./gradlew task setArchiveName -PapplicationId="${APPLICATION_ID}" assembleOnestoreRelease
+            - ./gradlew task setArchiveName -PapplicationId="${APPLICATION_ID}" appDistributionUploadOnestoreRelease
+            # 현재위치와 apk 파일 위치확인.
+            - CWD="$(pwd)"
+            - echo $CWD
+            - AWD="$(find ./app/build/outputs/apk/onestore/release -name '*.apk')"
+            - echo $AWD
+            - RELEASE_NOTE="$(cat ./release-notes.txt)"
+            - echo RELEASE_NOTE
+            - JIRA_FILE="$(find ./jira_issue.json)"
+            - echo $JIRA_FILE
+            - curl -s -u "${BITBUCKET_REPO_OWNER}:${BB_AUTH_STRING}" -X GET https://api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/pipelines/ -v
+
+            - chmod +x ./slack_upload.sh
+            - ./slack_upload.sh "${AWD}" "${RELEASE_NOTE}"
+
+            - curl -X POST -H "Content-Type:application/json" --data @"${JIRA_FILE}" https://automation.atlassian.com/pro/hooks/c8284fdb3591762200862a5c93ee74d08fc4cc99
+    china:
+        - step:
+              size: 8x # Double resources available for this step.
+              name: CHINA
+              caches:
+                  - gradle
+              script:
+                  - curl -d "text=🇨🇳최애돌 차이나 빌드를 시작합니다" -d "channel=${SLACK_CHANNEL}" -d "token=${SLACK_TOKEN}" https://slack.com/api/chat.postMessage
+                  - java -version
+                  - export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+                  - export PATH=$JAVA_HOME/bin:$PATH
+
+                  - apk add --no-cache jq make file
+                  - APPLICATION_ID="com.exodus.myloveidol.china"
+                  - export FIREBASE_TOKEN=$FIREBASE_TOKEN
+                  - chmod a+x ./gradlew
+                  - echo "Start assembleAPK"
+                  - ./gradlew unzipAppDistributionFiles
+                  - ./gradlew task getCommitMessage -PapplicationId="${APPLICATION_ID}"
+                  - ./gradlew task getJiraJsonFile -PapplicationId="${APPLICATION_ID}"
+                  - ./gradlew task setArchiveName -PapplicationId="${APPLICATION_ID}" assembleChinaRelease
+                  - ./gradlew task setArchiveName -PapplicationId="${APPLICATION_ID}" appDistributionUploadChinaRelease
+                  # 현재위치와 apk 파일 위치확인.
+                  - CWD="$(pwd)"
+                  - echo $CWD
+                  - AWD="$(find ./app/build/outputs/apk/china/release -name '*.apk')"
+                  - echo $AWD
+                  - RELEASE_NOTE="$(cat ./release-notes.txt)"
+                  - echo RELEASE_NOTE
+                  - JIRA_FILE="$(find ./jira_issue.json)"
+                  - echo $JIRA_FILE
+                  - curl -s -u "${BITBUCKET_REPO_OWNER}:${BB_AUTH_STRING}" -X GET https://api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/pipelines/ -v
+
+                  - chmod +x ./slack_upload.sh
+                  - ./slack_upload.sh "${AWD}" "${RELEASE_NOTE}"
+
+                  - curl -X POST -H "Content-Type:application/json" --data @"${JIRA_FILE}" https://automation.atlassian.com/pro/hooks/c8284fdb3591762200862a5c93ee74d08fc4cc99
+    celeb:
+        - step:
+              size: 8x # Double resources available for this step.
+              name: CELEB
+              caches:
+                  - gradle
+              script:
+                  - curl -d "text=:celeb:최애돌셀럽 빌드를 시작합니다" -d "channel=${SLACK_CHANNEL}" -d "token=${SLACK_TOKEN}" https://slack.com/api/chat.postMessage
+                  - java -version
+                  - export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+                  - export PATH=$JAVA_HOME/bin:$PATH
+
+                  - apk add --no-cache jq make file
+                  - APPLICATION_ID="com.exodus.myloveactor"
+                  - export FIREBASE_TOKEN=$FIREBASE_TOKEN
+                  - chmod a+x ./gradlew
+                  - echo "Start assembleBundle"
+                  - ./gradlew unzipAppDistributionFiles
+                  - ./gradlew task getCommitMessage -PapplicationId="${APPLICATION_ID}"
+                  - ./gradlew task getJiraJsonFile -PapplicationId="${APPLICATION_ID}"
+                  - ./gradlew task setArchiveName -PapplicationId="${APPLICATION_ID}" bundleCelebRelease
+                  - ./gradlew task setArchiveName -PapplicationId="${APPLICATION_ID}" appDistributionUploadCelebRelease
+                  # 현재위치와 apk 파일 위치확인.
+                  - CWD="$(pwd)"
+                  - echo $CWD
+                  - AWD="$(find ./app/build/outputs/bundle/celebRelease -name '*.aab')"
+                  - echo $AWD
+                  - RELEASE_NOTE="$(cat ./release-notes.txt)"
+                  - echo RELEASE_NOTE
+                  - JIRA_FILE="$(find ./jira_issue.json)"
+                  - echo $JIRA_FILE
+                  - curl -s -u "${BITBUCKET_REPO_OWNER}:${BB_AUTH_STRING}" -X GET https://api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/pipelines/ -v
+
+                  - chmod +x ./slack_upload.sh
+                  - ./slack_upload.sh "${AWD}" "${RELEASE_NOTE}"
+
+                  - curl -X POST -H "Content-Type:application/json" --data @"${JIRA_FILE}" https://automation.atlassian.com/pro/hooks/c8284fdb3591762200862a5c93ee74d08fc4cc99

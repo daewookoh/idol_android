@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data></data>
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nsv_onepick_my_pick"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_100">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_onepick_my_pick"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/background_100">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_topic_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginEnd="24dp"
+                android:background="@drawable/bg_onepick_my_pick_topic"
+                android:gravity="center"
+                android:minHeight="34dp"
+                android:padding="6dp"
+                android:textAlignment="center"
+                android:textColor="@color/text_white_black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_my_pick_wrapper"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_topic_title">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="206dp"
+                    android:layout_height="92dp"
+                    android:src="@drawable/mypick_tongs"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_top_idol_photo"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginTop="60dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_nickname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="26dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/main_light"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@id/iv_top_idol_photo"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="52dp"
+                    android:layout_marginBottom="10dp"
+                    android:textColor="@color/text_gray"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@id/iv_top_idol_photo"
+                    app:layout_constraintTop_toBottomOf="@id/tv_nickname"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_group_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:textColor="@color/text_dimmed"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_name"
+                    app:layout_constraintStart_toEndOf="@id/tv_name"
+                    tools:ignore="SmallSp"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_result"
+                    android:layout_width="140dp"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_round_inactive_btn"
+                    android:text="@string/see_result"
+                    android:textAlignment="center"
+                    android:textColor="@color/text_white_black"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="@id/tv_name"
+                    app:layout_constraintTop_toBottomOf="@id/tv_name"/>
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/btn_mypick_capture"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_round_active_btn"
+                    android:src="@drawable/icon_capture"
+                    app:layout_constraintStart_toEndOf="@id/btn_result"
+                    app:layout_constraintTop_toTopOf="@id/btn_result"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginBottom="18dp"
+                android:background="@drawable/bg_onepick_my_pick"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cl_my_pick_wrapper">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_mypick"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="18dp"
+                    android:paddingBottom="14dp"
+                    android:text="@string/onepick_mypick"
+                    android:textAlignment="center"
+                    android:textColor="@color/gray250"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_mypick"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="8dp"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:spanCount="2"/>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_help_capture_enable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="160dp"
+                android:layout_marginEnd="3dp"
+                android:background="@drawable/bg_guide_end_top"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="8dp"
+                android:text="@string/onepick_capture"
+                android:textColor="@color/text_light"
+                android:textSize="12sp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@id/cl_my_pick_wrapper"
+                app:layout_constraintTop_toTopOf="@id/cl_my_pick_wrapper"
+                tools:ignore="RtlSymmetry"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+</layout>

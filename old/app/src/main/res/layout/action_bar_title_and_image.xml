@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_action_bar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_chat"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="이미지픽 예선" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_action_bar_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="14dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="16dp"
+            android:paddingStart="7dp"
+            android:src="@drawable/btn_info"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_action_bar_title"
+            app:layout_constraintStart_toEndOf="@+id/tv_action_bar_title"
+            app:layout_constraintTop_toTopOf="@+id/tv_action_bar_title" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

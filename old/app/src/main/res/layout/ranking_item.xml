@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:descendantFocusability="blocksDescendants"
+        android:background="@color/background_100">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/container_ranking"
+            android:layout_width="match_parent"
+            android:minHeight="70dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/ll1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_photo"
+                    android:layout_width="81dp"
+                    android:layout_height="match_parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/photo_border"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        android:layout_gravity="center_vertical|center_horizontal"
+                        android:layout_marginStart="20dp"
+                        android:src="@drawable/profile_round_off"
+                        android:visibility="visible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <net.ib.mn.view.ExodusImageView
+                        android:id="@+id/photo"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:layout_gravity="center_vertical|center_horizontal"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/menu_profile_default2"
+                        app:layout_constraintBottom_toBottomOf="@id/photo_border"
+                        app:layout_constraintEnd_toEndOf="@id/photo_border"
+                        app:layout_constraintStart_toStartOf="@id/photo_border"
+                        app:layout_constraintTop_toTopOf="@id/photo_border" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/badgeBirth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="3dp"
+                        android:background="@drawable/icon_anniversary_birth_medium"
+                        android:visibility="gone"
+                        android:scaleX="@integer/locale_mirror_flip"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/badgeDebut"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="3dp"
+                        android:background="@drawable/icon_anniversary_debut_medium"
+                        android:visibility="gone"
+                        android:scaleX="@integer/locale_mirror_flip"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/badgeComeback"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:background="@drawable/icon_anniversary_comeback_medium"
+                        android:visibility="gone"
+                        android:scaleX="@integer/locale_mirror_flip"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/badgeMemorialDay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/redbar_days"
+                        android:gravity="center"
+                        android:paddingStart="5dp"
+                        android:paddingTop="2dp"
+                        android:paddingEnd="5dp"
+                        android:paddingBottom="2dp"
+                        android:textColor="@color/text_white_black"
+                        android:textSize="7sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="@id/photo_border"
+                        app:layout_constraintEnd_toEndOf="@id/photo_border"
+                        tools:ignore="SmallSp"
+                        tools:text="9999일" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/badgeAllInDay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/icon_anniversary_allinday_medium"
+                        android:visibility="gone"
+                        android:scaleX="@integer/locale_mirror_flip"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottie_tutorial_ranking_profile"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="@+id/photo_border"
+                        app:layout_constraintEnd_toEndOf="@+id/photo_border"
+                        app:layout_constraintStart_toStartOf="@+id/photo_border"
+                        app:layout_constraintTop_toTopOf="@+id/photo_border"
+                        tools:visibility="visible" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/ll_ranking_heart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="10dp"
+                    tools:layout_editor_absoluteX="10dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/rank_index"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/main"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        tools:text="1위" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:gravity="center_vertical"
+                        android:singleLine="true"
+                        android:textColor="@color/text_default"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/rank_index"
+                        tools:text="YYYyy" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/group"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:ellipsize="end"
+                        android:gravity="bottom"
+                        android:singleLine="true"
+                        android:textColor="@color/text_dimmed"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:visibility="visible"
+                        app:layout_constraintBottom_toBottomOf="@+id/name"
+                        app:layout_constraintStart_toEndOf="@id/name"
+                        tools:text="TWICE" />
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottie_tutorial_ranking_name"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="@+id/name"
+                        app:layout_constraintEnd_toEndOf="@+id/name"
+                        app:layout_constraintStart_toStartOf="@+id/name"
+                        app:layout_constraintTop_toTopOf="@+id/name"
+                        tools:visibility="visible" />
+
+                    <FrameLayout
+                        android:id="@+id/progress_bar"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintTop_toTopOf="@id/progress"
+                        app:layout_constraintBottom_toBottomOf="@id/progress"
+                        app:layout_constraintEnd_toEndOf="@id/progress"
+                        app:layout_constraintStart_toStartOf="@id/progress"
+                        android:background="@drawable/progressbar_ranking" />
+
+                    <net.ib.mn.view.ProgressBarLayout
+                        android:id="@+id/progress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center_vertical"
+                        android:minHeight="17dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/name">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginEnd="10dp"
+                            android:singleLine="true"
+                            android:gravity="center_vertical"
+                            tools:text="0"
+                            android:textColor="@color/text_heart_votes"
+                            android:textSize="11sp" />
+
+                    </net.ib.mn.view.ProgressBarLayout>
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        app:layout_constraintHorizontal_bias="0"
+                        app:layout_constraintVertical_bias="0"
+                        app:layout_constraintTop_toBottomOf="@+id/name"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/image_angel"
+                                android:layout_width="13dp"
+                                android:layout_height="16dp"
+                                android:layout_marginEnd="3dp"
+                                android:background="@drawable/charity_angel_badge"
+                                android:paddingTop="4dp"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_angel"
+                                android:textSize="7dp"
+                                android:textStyle="bold"
+                                android:visibility="visible" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/image_fairy"
+                                android:layout_width="13dp"
+                                android:layout_height="16dp"
+                                android:layout_toEndOf="@+id/image_angel"
+                                android:background="@drawable/charity_fairy_badge"
+                                android:paddingTop="4dp"
+                                android:layout_marginEnd="3dp"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_fairy"
+                                android:textSize="7dp"
+                                android:textStyle="bold"
+                                android:visibility="visible" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/image_miracle"
+                                android:layout_width="13dp"
+                                android:layout_height="16dp"
+                                android:layout_marginEnd="3dp"
+                                android:layout_toEndOf="@+id/image_fairy"
+                                android:background="@drawable/charity_miracle_badge"
+                                android:paddingTop="4dp"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_miracle"
+                                android:textSize="7dp"
+                                android:textStyle="bold"
+                                android:visibility="visible" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/image_rookie"
+                                android:layout_width="13dp"
+                                android:layout_height="16dp"
+                                android:layout_marginEnd="3dp"
+                                android:layout_toEndOf="@+id/image_miracle"
+                                android:background="@drawable/charity_rookie_badge"
+                                android:paddingTop="4dp"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_rookie"
+                                android:textSize="7dp"
+                                android:textStyle="bold"
+                                android:visibility="gone"
+                                tools:visibility="visible" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/image_super_rookie"
+                                android:layout_width="13dp"
+                                android:layout_height="16dp"
+                                android:layout_toEndOf="@+id/image_rookie"
+                                android:background="@drawable/charity_super_rookie_badge"
+                                android:paddingTop="4dp"
+                                android:text="S"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_super_rookie"
+                                android:textSize="7dp"
+                                android:textStyle="bold"
+                                android:visibility="gone"
+                                tools:visibility="visible" />
+                        </RelativeLayout>
+
+                    </FrameLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_heart"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:padding="10dp"
+                android:tint="@color/main"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:src="@drawable/btn_ranking_vote_heart" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/container_photos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_below="@+id/container_ranking"
+            android:weightSum="3">
+
+            <RelativeLayout
+                android:id="@+id/rl_photo_wrapper1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/rl_photo_wrapper2"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.media3.ui.PlayerView
+                    android:id="@+id/playerview1"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_alignTop="@+id/photo1"
+                    android:layout_alignBottom="@+id/photo1"
+                    app:resize_mode="fill"
+                    android:visibility="gone" />
+
+                <net.ib.mn.view.ExodusImageView
+                    android:id="@+id/photo1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scaleType="fitXY"
+                    app:fixedAlong="width" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rl_photo_wrapper2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/rl_photo_wrapper1"
+                app:layout_constraintRight_toLeftOf="@id/rl_photo_wrapper3"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.media3.ui.PlayerView
+                    android:id="@+id/playerview2"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_alignTop="@+id/photo2"
+                    android:layout_alignBottom="@+id/photo2"
+                    app:resize_mode="fill"
+                    android:visibility="gone" />
+
+                <net.ib.mn.view.ExodusImageView
+                    android:id="@+id/photo2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scaleType="fitXY"
+                    app:fixedAlong="width" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rl_photo_wrapper3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/rl_photo_wrapper2"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.media3.ui.PlayerView
+                    android:id="@+id/playerview3"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_alignTop="@+id/photo3"
+                    android:layout_alignBottom="@+id/photo3"
+                    app:resize_mode="fill"
+                    android:visibility="gone" />
+
+                <net.ib.mn.view.ExodusImageView
+                    android:id="@+id/photo3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scaleType="fitXY"
+                    app:fixedAlong="width" />
+
+            </RelativeLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </RelativeLayout>
+</layout>

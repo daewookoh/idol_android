@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="start"
+        android:orientation="vertical"
+        android:background="@color/background_100">
+
+        <ImageView
+            android:id="@+id/iv_arrow_go"
+            android:layout_width="8dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/btn_go"
+            android:minHeight="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/cv_support_ad"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0" />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/support_ad_pick_check_box"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:clickable="false"
+            android:paddingStart="5dp"
+            android:textColor="@color/gray1000"
+            android:textSize="14sp"
+            app:buttonCompat="@drawable/support_checkbox"
+            app:layout_constraintEnd_toStartOf="@+id/iv_arrow_go"
+            app:layout_constraintBottom_toTopOf="@+id/cv_support_ad"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            tools:text="강남역 11출 계단 광고" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_support_ad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="11dp"
+            android:layout_marginEnd="10dp"
+            app:cardCornerRadius="6dp"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/support_ad_pick_check_box">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_support_ad_pick"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/support_ad_pick_photo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="142dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/gray_border_radius"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/ll_ad_pick_goal_diamond"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/support_ad_pick_radius"
+                    android:gravity="center"
+                    android:minHeight="24dp"
+                    android:orientation="horizontal"
+                    app:layout_constraintBottom_toBottomOf="@+id/support_ad_pick_photo"
+                    app:layout_constraintEnd_toEndOf="@id/support_ad_pick_photo">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="15dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/icon_diamond" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/support_ad_pick_goal_diamond"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:textColor="@color/quantum_white_100"
+                        android:textSize="12sp"
+                        tools:text="250,000" />
+
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/support_ad_pick_condition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/view_bottom_border"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cv_support_ad"
+            tools:text="노출 1일 100회 이상 / 30일" />
+
+        <View
+            android:id="@+id/view_bottom_border"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/border_gray100"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/cv_support_ad"
+            app:layout_constraintStart_toStartOf="@+id/cv_support_ad"
+            app:layout_constraintTop_toBottomOf="@+id/cv_support_ad"
+            app:layout_constraintVertical_bias="1" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

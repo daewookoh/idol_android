@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+    <item android:drawable="@drawable/loading_heart_00" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_01" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_02" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_03" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_04" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_05" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_06" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_07" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_08" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_09" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_10" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_11" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_12" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_13" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_14" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_15" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_16" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_17" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_18" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_19" android:duration="20" />
+    <item android:drawable="@drawable/loading_heart_20" android:duration="20" />
+</animation-list>

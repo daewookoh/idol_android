@@ -1,0 +1,648 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data></data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ll_header"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/background_100"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="13dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/btn_navigation_back"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:text="@string/my_info_list"
+                android:textSize="20sp"
+                android:textFontWeight="500"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btn_back"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:targetApi="28" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/tvtalk_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/background_100"
+            android:fillViewport="true"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ll_header">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_earn_heart"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/bg_radius_12_background200"
+                    android:elevation="4dp"
+                    android:minHeight="92dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_heart"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginStart="20dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/tv_today_earned_heart"
+                        app:layout_constraintBottom_toBottomOf="@id/tv_today_earned_heart"
+                        app:srcCompat="@drawable/icon_toast_heart" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_today_earned_heart"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:ellipsize="end"
+                        android:includeFontPadding="false"
+                        android:layout_marginTop="15dp"
+                        android:maxLines="1"
+                        android:text="@string/myheart_today_earn"
+                        android:textColor="@color/text_default"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/iv_heart"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_ever_heart"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="7dp"
+                        android:text="@string/ever_heart"
+                        android:textColor="@color/text_default"
+                        android:textSize="14sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/tv_daily_heart"
+                        app:layout_constraintTop_toBottomOf="@id/tv_today_earned_heart" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_ever_heart_count"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="7dp"
+                        android:layout_marginEnd="20dp"
+                        android:textAlignment="viewEnd"
+                        android:textColor="@color/text_default"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tv_ever_heart"
+                        app:layout_constraintTop_toBottomOf="@id/iv_heart"
+                        tools:text="1,111" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_daily_heart"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="5dp"
+                        android:text="@string/weak_heart"
+                        android:textColor="@color/text_default"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="15dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_ever_heart"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_daily_heart_count"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:textAlignment="viewEnd"
+                        android:textColor="@color/text_default"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tv_daily_heart"
+                        app:layout_constraintBottom_toBottomOf="@id/tv_daily_heart"
+                        app:layout_constraintTop_toTopOf="@id/tv_daily_heart"
+                        tools:text="1,111" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btn_heart_info"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="16dp"
+                        android:layout_marginTop="-6dp"
+                        android:layout_marginEnd="-6dp"
+                        android:src="@drawable/btn_info_black"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:visibility="visible" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:id="@+id/tv_heart_log"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/background_100"
+                    android:gravity="bottom"
+                    android:minHeight="40dp"
+                    android:paddingStart="20dp"
+                    android:paddingTop="23dp"
+                    android:paddingEnd="0dp"
+                    android:paddingBottom="7dp"
+                    android:text="@string/my_info_heart"
+                    android:textColor="@color/text_default"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toTopOf="@id/v_one"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/layout_earn_heart"
+                    app:layout_constraintVertical_bias="0"
+                    app:layout_constraintVertical_chainStyle="packed" />
+
+                <View
+                    android:id="@+id/v_one"
+                    android:layout_width="0dp"
+                    android:layout_height="0.3dp"
+                    android:background="@color/gray110"
+                    app:layout_constraintBottom_toTopOf="@+id/heart_used_history"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_heart_log" />
+
+                <LinearLayout
+                    android:id="@+id/heart_used_history"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:background="@color/background_100"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:paddingStart="10dp"
+                    android:paddingTop="3dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="3dp"
+                    app:layout_constraintBottom_toTopOf="@+id/rcy_heart_used_log"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/v_one">
+
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent">
+
+                        <ImageView
+                            android:id="@+id/ivArrowOpen"
+                            android:layout_width="12dp"
+                            android:layout_height="6dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="10dp"
+                            android:src="@drawable/btn_arrow_up_gray"
+                            android:visibility="gone"
+                            app:tint="@color/text_default" />
+
+                        <ImageView
+                            android:id="@+id/ivArrowClose"
+                            android:layout_width="12dp"
+                            android:layout_height="6dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="10dp"
+                            android:src="@drawable/btn_arrow_down_white"
+                            app:tint="@color/text_default" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:orientation="vertical"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp">
+
+                            <TextView
+                                android:id="@+id/tvHeadTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:singleLine="true"
+                                android:text="@string/lable_heart_vote"
+                                android:textColor="@color/text_default"
+                                android:textSize="15sp" />
+
+                            <TextView
+                                android:id="@+id/tvHeadSubTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:ellipsize="end"
+                                android:singleLine="true"
+                                android:text="@string/lable_heart_vote"
+                                android:textColor="@color/gray250"
+                                android:textSize="11sp"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcy_heart_used_log"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fadingEdge="none"
+                    android:groupIndicator="@null"
+                    android:listSelector="?android:attr/selectableItemBackground"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintBottom_toTopOf="@id/v_two"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/heart_used_history" />
+
+                <View
+                    android:id="@+id/v_two"
+                    android:layout_width="0dp"
+                    android:layout_height="0.3dp"
+                    android:background="@color/gray110"
+                    app:layout_constraintBottom_toTopOf="@+id/heart_acc_history"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/rcy_heart_used_log" />
+
+                <LinearLayout
+                    android:id="@+id/heart_acc_history"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:paddingStart="10dp"
+                    android:paddingTop="3dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="3dp"
+                    app:layout_constraintBottom_toTopOf="@+id/rcy_heart_acc_log"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/v_two">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent">
+
+                        <ImageView
+                            android:id="@+id/ivArrowOpen1"
+                            android:layout_width="12dp"
+                            android:layout_height="6dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="10dp"
+                            android:src="@drawable/btn_arrow_up_gray"
+                            android:visibility="gone"
+                            app:tint="@color/text_default" />
+
+                        <ImageView
+                            android:id="@+id/ivArrowClose1"
+                            android:layout_width="12dp"
+                            android:layout_height="6dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="10dp"
+                            android:src="@drawable/btn_arrow_down_white"
+                            app:tint="@color/text_default" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:orientation="vertical"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp">
+
+                            <TextView
+                                android:id="@+id/tvHeadTitle1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:singleLine="true"
+                                android:text="@string/lable_heart_save"
+                                android:textColor="@color/text_default"
+                                android:textSize="15sp" />
+
+                            <TextView
+                                android:id="@+id/tvHeadSubTitle1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:ellipsize="end"
+                                android:singleLine="true"
+                                android:text="@string/lable_heart_save"
+                                android:textColor="@color/gray250"
+                                android:textSize="11sp"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0.3dp"
+                    android:background="@color/gray110"
+                    app:layout_constraintBottom_toTopOf="@+id/rcy_heart_acc_log"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/heart_acc_history" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcy_heart_acc_log"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fadingEdge="none"
+                    android:groupIndicator="@null"
+                    android:listSelector="?android:attr/selectableItemBackground"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintBottom_toTopOf="@id/tv_dia_log"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/heart_acc_history" />
+
+                <TextView
+                    android:id="@+id/tv_dia_log"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    android:background="@color/background_100"
+                    android:minHeight="40dp"
+                    android:paddingStart="20dp"
+                    android:paddingTop="23dp"
+                    android:paddingEnd="0dp"
+                    android:paddingBottom="7dp"
+                    android:text="@string/diamond"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_default"
+                    app:layout_constraintBottom_toTopOf="@id/v_three"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rcy_heart_acc_log" />
+
+                <View
+                    android:id="@+id/v_three"
+                    android:layout_width="0dp"
+                    android:layout_height="0.3dp"
+                    android:background="@color/gray110"
+                    app:layout_constraintBottom_toTopOf="@+id/dia_used_history"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_dia_log" />
+
+                <LinearLayout
+                    android:id="@+id/dia_used_history"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:background="@color/background_100"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:paddingStart="10dp"
+                    android:paddingTop="3dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="3dp"
+                    app:layout_constraintBottom_toTopOf="@+id/rcy_dia_used_log"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/v_three">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent">
+
+                        <ImageView
+                            android:id="@+id/ivArrowOpen2"
+                            android:layout_width="12dp"
+                            android:layout_height="6dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="10dp"
+                            android:src="@drawable/btn_arrow_up_gray"
+                            android:visibility="gone"
+                            app:tint="@color/text_default" />
+
+                        <ImageView
+                            android:id="@+id/ivArrowClose2"
+                            android:layout_width="12dp"
+                            android:layout_height="6dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="10dp"
+                            android:src="@drawable/btn_arrow_down_white"
+                            app:tint="@color/text_default" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:orientation="vertical"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp">
+
+                            <TextView
+                                android:id="@+id/tvHeadTitle2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:singleLine="true"
+                                android:text="@string/label_diamond_vote"
+                                android:textColor="@color/text_default"
+                                android:textSize="15sp" />
+
+                            <TextView
+                                android:id="@+id/tvHeadSubTitle2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:ellipsize="end"
+                                android:singleLine="true"
+                                android:text="@string/label_diamond_vote"
+                                android:textColor="@color/gray250"
+                                android:textSize="11sp"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/v_five"
+                    android:layout_width="0dp"
+                    android:layout_height="0.3dp"
+                    android:background="@color/gray110"
+                    app:layout_constraintBottom_toTopOf="@+id/rcy_dia_used_log"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/dia_used_history" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcy_dia_used_log"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fadingEdge="none"
+                    android:groupIndicator="@null"
+                    android:listSelector="?android:attr/selectableItemBackground"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintBottom_toTopOf="@id/dia_acc_history"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/dia_used_history" />
+
+                <LinearLayout
+                    android:id="@+id/dia_acc_history"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:background="@color/background_100"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:paddingStart="10dp"
+                    android:paddingTop="3dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="3dp"
+                    app:layout_constraintBottom_toTopOf="@+id/rcy_dia_acc_log"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/v_five">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent">
+
+                        <ImageView
+                            android:id="@+id/ivArrowOpen3"
+                            android:layout_width="12dp"
+                            android:layout_height="6dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="10dp"
+                            android:src="@drawable/btn_arrow_up_gray"
+                            android:visibility="gone"
+                            app:tint="@color/text_default" />
+
+                        <ImageView
+                            android:id="@+id/ivArrowClose3"
+                            android:layout_width="12dp"
+                            android:layout_height="6dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="10dp"
+                            android:src="@drawable/btn_arrow_down_white"
+                            app:tint="@color/text_default" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:orientation="vertical"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp">
+
+                            <TextView
+                                android:id="@+id/tvHeadTitle3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:singleLine="true"
+                                android:text="@string/label_diamond_save"
+                                android:textColor="@color/text_default"
+                                android:textSize="15sp" />
+
+                            <TextView
+                                android:id="@+id/tvHeadSubTitle3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:ellipsize="end"
+                                android:singleLine="true"
+                                android:text="@string/label_diamond_save"
+                                android:textColor="@color/gray250"
+                                android:textSize="11sp"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+<!--                <View-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="0.3dp"-->
+<!--                    android:background="@color/gray110"-->
+<!--                    app:layout_constraintBottom_toBottomOf="@+id/dia_acc_history"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/dia_acc_history" />-->
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcy_dia_acc_log"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fadingEdge="none"
+                    android:groupIndicator="@null"
+                    android:listSelector="?android:attr/selectableItemBackground"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/dia_acc_history" />
+
+                <include
+                    android:id="@+id/in_my_info_bottom_tab"
+                    layout="@layout/layout_my_info_bottom_tab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_200"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_theme_pick_rank"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            app:cardCornerRadius="10dp"
+            android:layout_marginStart="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_blur"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:scaleType="fitXY" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/eiv_theme_pick_rank"
+                android:layout_width="90dp"
+                android:layout_height="90dp" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_1st"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:elevation="10dp"
+            android:layout_marginStart="-10dp"
+            android:src="@drawable/icon_heartpick_1st"
+            app:layout_constraintStart_toStartOf="@+id/cv_theme_pick_rank"
+            app:layout_constraintTop_toTopOf="@+id/cv_theme_pick_rank" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_theme_pick_rank"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            app:layout_goneMarginEnd="20dp"
+            app:layout_constraintBottom_toBottomOf="@+id/cv_theme_pick_rank"
+            app:layout_constraintEnd_toStartOf="@+id/btn_theme_pick_rank_vote"
+            app:layout_constraintStart_toStartOf="@+id/cv_theme_pick_rank"
+            app:layout_constraintTop_toTopOf="@+id/cv_theme_pick_rank">
+
+            <net.ib.mn.ui.RankingPickNameAndGroupLayout
+                android:id="@+id/in_ranking_pick_name_and_group"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="60dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <include
+                android:id="@+id/in_gradient_progress_bar"
+                layout="@layout/gradient_progress_bar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/in_ranking_pick_name_and_group" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_theme_pick_rank_vote"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="17dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/btn_themapick_vote_result"
+            app:layout_constraintBottom_toBottomOf="@+id/cl_theme_pick_rank"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/cl_theme_pick_rank" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

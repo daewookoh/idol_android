@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data></data>
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coorinator_feed"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_100">
+
+        <net.ib.mn.view.ControllableAppBarLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/main"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:id="@+id/collapse_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:contentScrim="@color/main"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:scrimAnimationDuration="200"
+                app:scrimVisibleHeightTrigger="120dp"
+                app:titleEnabled="false">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="?attr/actionBarSize"
+                    android:background="@color/background_100"
+                    android:paddingBottom="40dp"
+                    app:layout_collapseMode="none">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cl_myinfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:paddingStart="38dp"
+                        android:paddingTop="30dp"
+                        android:paddingEnd="38dp"
+                        android:paddingBottom="18dp">
+
+                        <net.ib.mn.view.ExodusImageView
+                            android:id="@+id/eiv_photo"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:src="@drawable/menu_profile_default2"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/iv_photo_modification"
+                            android:layout_width="21dp"
+                            android:layout_height="21dp"
+                            android:src="@drawable/btn_menu_profile_add_picture"
+                            app:layout_constraintBottom_toBottomOf="@id/eiv_photo"
+                            app:layout_constraintRight_toRightOf="@id/eiv_photo" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/iv_level"
+                            android:layout_width="wrap_content"
+                            android:layout_height="15dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="6dp"
+                            android:background="@android:color/transparent"
+                            android:padding="0dp"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/icon_level_0"
+                            app:layout_constraintBottom_toBottomOf="@id/tv_username"
+                            app:layout_constraintStart_toEndOf="@id/eiv_photo"
+                            app:layout_constraintTop_toTopOf="@id/tv_username" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/all_level"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:background="@android:color/transparent"
+                            android:padding="0dp"
+                            android:scaleType="fitXY"
+                            app:layout_constraintStart_toStartOf="@+id/iv_level"
+                            app:layout_constraintTop_toTopOf="@+id/tv_idol_name"
+                            app:layout_constraintBottom_toBottomOf="@id/tv_idol_name"/>
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_username"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginTop="18dp"
+                            android:textAlignment="viewStart"
+                            android:textColor="@color/text_default"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constrainedWidth="true"
+                            app:layout_constraintEnd_toStartOf="@id/iv_username_modification"
+                            app:layout_constraintHorizontal_bias="0"
+                            app:layout_constraintHorizontal_chainStyle="packed"
+                            app:layout_constraintHorizontal_weight="1"
+                            app:layout_constraintStart_toEndOf="@id/iv_level"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="가나다라마바사아자차카타파하가나다라마바사아자차카타파하12" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/iv_username_modification"
+                            android:layout_width="19dp"
+                            android:layout_height="19dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="5dp"
+                            android:adjustViewBounds="true"
+                            android:padding="4dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/icon_community_setting"
+                            app:layout_constraintBottom_toBottomOf="@id/tv_username"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/tv_username" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_idol_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:hint="@string/none"
+                            android:textAlignment="viewStart"
+                            android:textColor="@color/text_default"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            app:layout_constrainedWidth="true"
+                            app:layout_constraintEnd_toStartOf="@id/iv_idol_modification"
+                            app:layout_constraintHorizontal_bias="0"
+                            app:layout_constraintHorizontal_chainStyle="packed"
+                            app:layout_constraintHorizontal_weight="1"
+                            app:layout_constraintStart_toStartOf="@id/tv_username"
+                            app:layout_constraintTop_toBottomOf="@id/tv_username"
+                            tools:text="다현" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/iv_idol_modification"
+                            android:layout_width="19dp"
+                            android:layout_height="19dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="5dp"
+                            android:adjustViewBounds="true"
+                            android:padding="4dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/icon_community_setting"
+                            app:layout_constraintBottom_toBottomOf="@id/tv_idol_name"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/tv_idol_name"
+                            app:layout_constraintTop_toTopOf="@id/tv_idol_name" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cl_status_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constrainedWidth="true"
+                        app:layout_constraintHorizontal_bias="0"
+                        app:layout_constraintTop_toBottomOf="@id/cl_myinfo"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:paddingBottom="18dp">
+
+                        <net.ib.mn.view.NoScrollingTextView
+                            android:id="@+id/tv_status_message"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:autoLink="web"
+                            android:includeFontPadding="true"
+                            android:textAlignment="viewStart"
+                            android:textColor="@color/text_default"
+                            android:textColorHint="@color/text_dimmed"
+                            android:textColorLink="@color/text_light_blue"
+                            android:textSize="12sp"
+                            android:paddingStart="38dp"
+                            app:layout_constrainedWidth="true"
+                            app:layout_constraintEnd_toStartOf="@id/tv_view_more"
+                            app:layout_constraintHorizontal_bias="0"
+                            app:layout_constraintHorizontal_chainStyle="packed"
+                            app:layout_constraintHorizontal_weight="1"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_view_more"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:textColor="@color/text_dimmed"
+                            android:textSize="13sp"
+                            android:visibility="invisible"
+                            android:paddingEnd="38dp"
+                            app:layout_constraintBottom_toBottomOf="@id/tv_status_message"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/tv_status_message"
+                            app:layout_constraintTop_toTopOf="@id/tv_status_message" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:layout_gravity="top"
+                    android:layout_marginBottom="40dp"
+                    app:contentInsetStartWithNavigation="0dp"
+                    app:layout_collapseMode="pin"
+                    android:background="@color/navigation_bar"
+                    android:theme="@style/ToolBarStyle" />
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tl_tab"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/gray_border_bottom_gray100"
+                    app:tabIndicatorColor="@color/main"
+                    app:tabIndicatorHeight="2dp"
+                    app:tabMaxWidth="0dp"
+                    app:tabGravity="fill"
+                    app:tabMode="fixed"
+                    app:tabTextAppearance="@style/CustomTabText" />
+
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        </net.ib.mn.view.ControllableAppBarLayout>
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/vp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:background="@color/background_100"/>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

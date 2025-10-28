@@ -1,0 +1,1124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:installLocation="auto">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="com.google.android.gms.permission.ADID" />
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"
+        tools:node="replace" />
+    <uses-permission
+        android:name="android.permission.POST_NOTIFICATIONS"
+        android:minSdkVersion="33" />
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_IMAGES"
+        android:minSdkVersion="33" />
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_VIDEO"
+        android:minSdkVersion="33" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        tools:node="remove" />
+
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.android.vending.BILLING" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- Android11이상부터 다른앱 이동하려면 쿼리 추가해야됨.-->
+    <queries>
+        <package android:name="com.exodus.myloveactor" />
+        <package android:name="com.facebook.katana" />
+        <package android:name="com.kakao.talk" />
+        <package android:name="com.google.android.youtube" />
+        <package android:name="jp.naver.line.android" />
+    </queries>
+
+    <!-- adColony 요청으로 추가 -->
+    <queries>
+        <package android:name="com.android.vending" />
+        <package android:name="com.amazon.venezia" />
+        <package android:name="com.sec.android.app.samsungapps" />
+        <package android:name="com.huawei.appmarket" />
+    </queries>
+
+    <!-- NasWall요청으로 추가.-->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+        </intent>
+    </queries>
+
+    <!-- mezzo media requirement -->
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+
+    <!-- prevent density changing with local language setting -->
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true" />
+
+    <application
+        android:name="net.ib.mn.base.BaseApplication"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:hardwareAccelerated="true"
+        android:icon="@mipmap/ic_launcher"
+        android:largeHeap="true"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:requestLegacyExternalStorage="true"
+        android:supportsRtl="true"
+        android:theme="@style/CustomActionBarTheme"
+        android:usesCleartextTraffic="true"
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:replace="android:icon,android:allowBackup,android:theme,android:fullBackupContent">
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+        <!--    파베 자동 로깅 제외        -->
+        <meta-data
+            android:name="google_analytics_automatic_screen_reporting_enabled"
+            android:value="false" />
+
+        <receiver
+            android:name="net.ib.mn.utils.MidnightReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <service
+            android:name=".PresignedUrlService"
+            android:enabled="true"
+            android:exported="true"
+            android:stopWithTask="false" />
+
+        <!--        &lt;!&ndash; 아이언소스 팽글 mediation용 &ndash;&gt;-->
+        <!--        <provider-->
+        <!--            android:name="com.bytedance.sdk.openadsdk.multipro.TTMultiProvider"-->
+        <!--            android:authorities="${applicationId}.TTMultiProvider"-->
+        <!--            android:exported="false"/>-->
+        <activity
+            android:name="net.ib.mn.support.SupportInfoActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <meta-data
+            android:name="com.google.android.gms.ads.AD_MANAGER_APP"
+            android:value="true" />
+
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.1" />
+        <meta-data
+            android:name="applovin.sdk.key"
+            android:value="c2xH0hpWWOH7koOEDlfBOKlsse4EUPOfmczVOQdb_TE4-SHQhxpckcH-1oq2-LdS4LWtuiDL4J3CoXaA93xFAy" />
+
+        <activity
+            android:name="net.ib.mn.activity.StartupActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:taskAffinity="${applicationId}"
+            android:theme="@style/Theme.Annie.SplashTheme"
+            android:windowSoftInputMode="adjustPan">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="${devscheme}" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </activity> <!-- Used for Google Play Store Campaign Measurement -->
+        <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
+
+        <receiver
+            android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="net.ib.mn.service.PushMessageService"
+            android:exported="false"
+            android:stopWithTask="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
+
+        <meta-data
+            android:name="naswall_app_key"
+            android:value="@string/NAS_WALL_APP_KEY" />
+        <meta-data
+            android:name="MEZZO_WINDOW_ID"
+            android:value="banner" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDf-sQ7EbpbXKx1u8faHZaztFKPDZa-M0c" />
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-4951070488234097~3652536966" />
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="true" /> <!-- <meta-data -->
+        <!-- android:name="net.ib.mn.utils.ExodusGlideModule" -->
+        <!-- android:value="GlideModule"/> -->
+        <activity
+            android:name="net.ib.mn.activity.AuthActivity"
+            android:configChanges="locale"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="net.ib.mn.activity.MainActivity"
+            android:configChanges="orientation|keyboard"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Annie.NoActionBar"
+            android:windowSoftInputMode="adjustPan">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="net.ib.mn.support.SupportPhotoCertifyActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Annie.NoActionBar"
+            android:windowSoftInputMode="adjustResize"></activity>
+        <activity
+            android:name="net.ib.mn.feature.friend.FriendsActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Annie.NoActionBar"
+            android:windowSoftInputMode="adjustPan">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="kakaolink"
+                    android:scheme="kakaoaf8393b7479d304a88d740f2fb6cb546" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="net.ib.mn.activity.FriendSearchActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.NewFriendsActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.FriendDeleteActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.FriendsRequestActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.FavoriteSettingActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name="net.ib.mn.activity.SettingActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Annie.NoActionBar"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.CommunityActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:parentActivityName="net.ib.mn.activity.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Annie.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name="net.ib.mn.activity.WriteArticleActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:taskAffinity="net.ib.mn.affinity_share"
+            android:theme="@style/Theme.Annie.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
+
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            -->
+        </activity>
+
+        <activity
+            android:name="net.ib.mn.activity.WriteSmallTalkActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:taskAffinity="net.ib.mn.affinity_share"
+            android:theme="@style/Theme.Annie.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="net.ib.mn.activity.NoticeActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.InquiryActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.FaqActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.FaqWriteActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Annie.NoActionBar"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name="net.ib.mn.activity.HeartPickPrelaunchActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name="net.ib.mn.activity.MyInquiryActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.LanguageSettingActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.ChangePasswdActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.ServiceInfoActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.MyHeartInfoActivity"
+            android:configChanges="orientation|keyboard"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name="net.ib.mn.activity.EventActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.HeartPlusFreeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.PushStartActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="unspecified"
+            android:theme="@style/Theme.Annie.NoActionBar" />
+        <activity
+            android:name=".feature.halloffame.HallOfFameTopHistoryActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.HallOfFameAggHistoryLeagueActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.VotingGuideActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.LevelHeartGuideActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.HeartVoteRankingActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.GaonHistoryActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.AwardStatsActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.awards.AwardsBottomSheetActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.awards.StatsAwardsBottomSheetActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.awards.AwardsHistoryActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.MezzoPlayerActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@style/Theme.Annie.NoActionBar.Fullscreen" />
+        <activity
+            android:name="com.nextapps.naswall.NASWallBrowser"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="myloveidol" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.nextapps.naswall.NASWall"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop" /> <!-- <activity -->
+        <!-- android:name="com.vungle.publisher.FullScreenAdActivity" -->
+        <!-- android:configChanges="keyboardHidden|orientation|screenSize" -->
+        <!-- android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/> -->
+        <activity
+            android:name="com.mapps.android.view.InterstitialView"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="net.ib.mn.activity.BoardActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name="net.ib.mn.activity.FreeboardActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.SettingPushActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.StatsActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" /> <!-- Idol Quiz -->
+        <activity
+            android:name="net.ib.mn.activity.IdolQuizMainActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.IdolQuizSolveActivity"
+            android:launchMode="singleTop"
+            android:noHistory="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.IdolQuizReviewActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="net.ib.mn.activity.IdolQuizWriteActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.IdolQuizInfoActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.IdolQuizDenyActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.IdolQuizRankingActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.GalleryActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" /> <!-- delete my account -->
+        <activity
+            android:name="net.ib.mn.activity.DeleteAccountActivity"
+            android:configChanges="keyboard|orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.tapjoy.TJAdUnitActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
+            tools:replace="android:theme" /> <!-- For SDK 11.3+ -->
+        <activity
+            android:name="com.tapjoy.TJContentActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            tools:replace="android:theme" /> <!-- 2018.06.12 -->
+        <activity
+            android:name="net.ib.mn.activity.HighestVotesActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.CharityCountActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.Top1CountActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.UserVotesTop300Activity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" /> <!-- 2018.07.02 -->
+        <activity
+            android:name="net.ib.mn.activity.HeartsFromFriendsActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <!-- 나의 쿠폰 -->
+        <activity
+            android:name="net.ib.mn.activity.MyCouponActivity"
+            android:launchMode="singleTop"
+            android:parentActivityName="net.ib.mn.activity.MyHeartInfoActivity"
+            android:screenOrientation="portrait" /> <!-- 스케줄 -->
+        <activity
+            android:name="net.ib.mn.activity.ScheduleWriteActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="net.ib.mn.activity.ScheduleWriteCategoryActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.ScheduleWriteIdolActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.ScheduleWriteLocationActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.ScheduleDetailActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <!-- Required activities for playback of Vungle video Ads -->
+        <!-- <activity android:name="com.vungle.publisher.VideoFullScreenAdActivity" -->
+        <!-- android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize" -->
+        <!-- android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/> -->
+        <!-- <activity android:name="com.vungle.publisher.MraidFullScreenAdActivity" -->
+        <!-- android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize" -->
+        <!-- android:theme= -->
+        <!-- "@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/> -->
+        <!-- <activity -->
+        <!-- android:name="com.vungle.warren.ui.VungleActivity" -->
+        <!-- android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize" -->
+        <!-- android:launchMode="singleTop" -->
+        <!-- android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/> -->
+        <!-- <activity -->
+        <!-- android:name="com.vungle.warren.ui.VungleFlexViewActivity" -->
+        <!-- android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize" -->
+        <!-- android:hardwareAccelerated="true" -->
+        <!-- android:launchMode="singleTop" -->
+        <!-- android:theme="@android:style/Theme.Translucent.NoTitleBar"/> -->
+        <activity android:name="com.android.camera.CropImage" />
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
+        <meta-data
+            android:name="com.facebook.sdk.ClientToken"
+            android:value="${FACEBOOK_CLIENT_ID}" />
+
+        <meta-data
+            android:name="tnkad_app_id"
+            android:value="@string/tnkad_app_id" />
+
+        <activity
+            android:name="com.tnkfactory.ad.AdWallActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name" />
+
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- Redirect URI: "kakao${NATIVE_APP_KEY}://oauth" -->
+                <data
+                    android:host="oauth"
+                    android:scheme="kakao${KAKAO_APP_KEY_FOR_MANIFEST}" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.facebook.CustomTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" /> <!-- tvtalk chatroom screen -->
+        <activity
+            android:name="net.ib.mn.activity.SearchResultActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Annie.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name="net.ib.mn.feature.search.history.SearchHistoryActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Annie.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name="net.ib.mn.activity.SubscriptionDetailActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name="net.ib.mn.activity.AgreementActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name="com.adcolony.sdk.AdColonyInterstitialActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:hardwareAccelerated="true" /> <!-- Onepick -->
+        <activity
+            android:name="com.adcolony.sdk.AdColonyAdViewActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:hardwareAccelerated="true" />
+
+        <activity
+            android:name="net.ib.mn.onepick.OnepickMatchActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.onepick.OnepickMyPickActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.onepick.OnepickResultActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Annie.NoActionBar" />
+        <activity
+            android:name="net.ib.mn.activity.FeedActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Annie.NoActionBar" />
+        <activity
+            android:name="net.ib.mn.activity.StatusMessageModificationActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.StatusSettingActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.LaboratoryActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.FacedetectActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.WikiActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.NotificationActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.support.SupportWriteActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name="net.ib.mn.support.SupportDetailActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Annie.NoActionBar" />
+
+        <activity
+            android:name="net.ib.mn.support.SupportAdInfoActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="net.ib.mn.support.SupportAdPickActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider" />
+        </provider>
+
+        <!-- maio -->
+        <activity
+            android:name="jp.maio.sdk.android.AdFullscreenActivity"
+            android:configChanges="orientation|screenLayout|screenSize"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"></activity>
+        <activity
+            android:name="jp.maio.sdk.android.HtmlBasedAdActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"></activity>
+        <activity
+            android:name="com.facebook.ads.AudienceNetworkActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:hardwareAccelerated="true"
+            tools:replace="android:configChanges" />
+
+
+        <activity
+            android:name=".chatting.ChattingCreateActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+
+        </activity>
+
+        <activity
+            android:name="net.ib.mn.chatting.ChattingRoomActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Annie.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="com.unity3d.services.ads.adunit.AdUnitActivity"
+            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.unity3d.services.ads.adunit.AdUnitTransparentActivity"
+            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.unity3d.services.ads.adunit.AdUnitTransparentSoftwareActivity"
+            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
+            android:hardwareAccelerated="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.unity3d.services.ads.adunit.AdUnitSoftwareActivity"
+            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
+            android:hardwareAccelerated="false"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+
+        <activity
+            android:name="net.ib.mn.activity.StoreMainActivity"
+            android:configChanges="orientation|keyboard"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".activity.NewHeartPlusActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".support.SupportTop5Activity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activity.NewCommentActivity"
+            android:exported="true"
+            android:parentActivityName="net.ib.mn.activity.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Annie.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </activity>
+
+
+        <activity
+            android:name="net.ib.mn.support.SupportMainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".onepick.ThemePickRankActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".attendance.AttendanceActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".onepick.ThemePickResultActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Annie.NoActionBar" />
+
+        <activity
+            android:name=".liveStreaming.LiveStreamingActivity"
+            android:configChanges="orientation|screenSize|layoutDirection"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Annie.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".liveStreaming.LiveStreamingListActivity"
+            android:configChanges="orientation|screenSize|layoutDirection"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name="net.ib.mn.activity.UserBlockListActivity"
+            android:configChanges="orientation|screenSize|layoutDirection"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="net.ib.mn.activity.WebViewActivity"
+            android:configChanges="orientation|screenSize|layoutDirection"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".feature.friend.FriendInviteActivity"
+            android:configChanges="orientation|screenSize|layoutDirection"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Annie.NoActionBar" />
+
+        <activity
+            android:name="net.ib.mn.activity.WebViewGameActivity"
+            android:configChanges="orientation|screenSize|layoutDirection"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="net.ib.mn.link.AppLinkActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="unspecified"
+            android:theme="@style/Theme.Annie.NoActionBar">
+            <intent-filter>
+                <action android:name="APPLINK_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:scheme="http" />
+                <data android:host="${host_wildcard}" />
+
+                <data android:pathPrefix="/webview/invite_share" />
+
+                <!--커뮤-->
+                <data android:pathPrefix="/community" />
+
+                <!--아이돌-->
+                <data android:pathPrefix="/idol" />
+
+                <!--쿠폰-->
+                <data android:pathPrefix="/coupon" />
+
+                <!--게시글-->
+                <data android:pathPrefix="/articles" />
+
+                <!--서포트-->
+                <data android:pathPrefix="/supports" />
+
+                <!--테마픽-->
+                <data android:pathPrefix="/themepick" />
+
+                <!--라이브-->
+                <data android:pathPrefix="/live" />
+
+                <!--원픽-->
+                <data android:pathPrefix="/onepick" />
+
+                <!--하트픽-->
+                <data android:pathPrefix="/heartpick" />
+
+                <!--퀴즈-->
+                <data android:pathPrefix="/quizzes" />
+
+                <!--상점-->
+                <data android:pathPrefix="/store" />
+
+                <!--무료충전소-->
+                <data android:pathPrefix="/offerwall" />
+
+                <!--지식돓-->
+                <data android:pathPrefix="/qna" />
+
+                <!--자유게시판-->
+                <data android:pathPrefix="/board" />
+
+                <!--기록실-->
+                <data android:pathPrefix="/records" />
+
+                <!--닮은꼴-->
+                <data android:pathPrefix="/facedetect" />
+
+                <!--공지사항-->
+                <data android:pathPrefix="/notices" />
+
+                <!--이벤트-->
+                <data android:pathPrefix="/events" />
+
+                <!--메뉴-->
+                <data android:pathPrefix="/menu" />
+
+                <!--어워드-->
+                <data android:pathPrefix="/awards" />
+
+                <!--핫트렌드-->
+                <data android:pathPrefix="/hottrends" />
+
+                <!--이붙그램-->
+                <data android:pathPrefix="/bannergram" />
+
+                <!--출석체크-->
+                <data android:pathPrefix="/attendance" />
+
+                <!--친구-->
+                <data android:pathPrefix="/friends" />
+
+                <!--스케줄-->
+                <data android:pathPrefix="/schedules" />
+
+                <!--이달의 기적-->
+                <data android:pathPrefix="/miracle" />
+
+                <!--나의 피드-->
+                <data android:pathPrefix="/feed" />
+
+                <!--나의 정보-->
+                <data android:pathPrefix="/myinfo" />
+
+                <!--루키-->
+                <data android:pathPrefix="/rookie" />
+                <!-- 초대 링크 -->
+                <data android:pathPrefix="/invite" />
+
+                <!-- auth -->
+                <data android:pathPrefix="/auth" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="${scheme}" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="net.ib.mn.awards.AwardsActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="net.ib.mn.link.WebViewExternalLinkActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name="net.ib.mn.onepick.AlternateLinkFragmentActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+
+        <activity
+            android:name="net.ib.mn.activity.BoardCelebActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
+            tools:ignore="Instantiatable" />
+
+        <activity
+            android:name="net.ib.mn.activity.HeartPickActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name="net.ib.mn.activity.CommentOnlyActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name="net.ib.mn.feature.rookiehistory.RookieHistoryActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="net.ib.mn.feature.basichistory.BasicHistoryActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="net.ib.mn.awards.IdolAwardsActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="net.ib.mn.activity.VotingCertificateListActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".feature.votingcertificate.VotingCertificateActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+    </application>
+
+</manifest>

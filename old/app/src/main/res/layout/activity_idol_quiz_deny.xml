@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_100">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_deny_reason"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:paddingTop="40dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:text="@string/quiz_deny_reason_desc"
+            android:textSize="12sp"
+            android:lineSpacingExtra="16dp"
+            android:textColor="@color/text_default"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

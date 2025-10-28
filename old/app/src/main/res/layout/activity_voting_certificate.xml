@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ffffff">
+
+        <TextView
+            android:id="@+id/tv_tooltip"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="#F6F6F6"
+            android:minHeight="34dp"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="10dp"
+            android:text="@string/certificate_detail_info"
+            android:textColor="#666666"
+            android:textSize="12dp"
+            app:layout_constraintBottom_toTopOf="@id/sv_certificate"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ScrollView
+            android:id="@+id/sv_certificate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_tooltip">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_certificate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/img_votingcertificate"
+                    android:paddingBottom="2dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginTop="23dp"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:text="@string/certificate_title"
+                        android:textAlignment="center"
+                        android:textColor="#333333"
+                        android:textSize="22dp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <View
+                        android:id="@+id/v_bg_profile"
+                        android:layout_width="188dp"
+                        android:layout_height="188dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_certificate_profile"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_title" />
+
+                    <ImageView
+                        android:id="@+id/iv_profile"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_margin="4dp"
+                        android:src="@drawable/menu_profile_default2"
+                        app:layout_constraintBottom_toBottomOf="@id/v_bg_profile"
+                        app:layout_constraintEnd_toEndOf="@id/v_bg_profile"
+                        app:layout_constraintStart_toStartOf="@id/v_bg_profile"
+                        app:layout_constraintTop_toTopOf="@id/v_bg_profile" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="10dp"
+                        android:layout_marginTop="3dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textAlignment="center"
+                        android:textColor="#333333"
+                        android:textSize="20dp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/v_bg_profile"
+                        tools:text="HueningKai" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_group_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="10dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textAlignment="center"
+                        android:textColor="#666666"
+                        android:textSize="12dp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_name"
+                        tools:text="TOMMOROW" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layout_user_info"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="15dp"
+                        android:layout_marginTop="7dp"
+                        android:background="@drawable/bg_certificate_profile_info"
+                        android:paddingVertical="20dp"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="15dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_group_name">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_title_voter_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/certificate_username"
+                            android:textColor="#666666"
+                            android:textSize="12dp"
+                            app:layout_constraintBottom_toBottomOf="@id/tv_voter_name"
+                            app:layout_constraintEnd_toStartOf="@id/tv_voter_name"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/tv_voter_name" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_voter_name"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textAlignment="viewEnd"
+                            android:textColor="#333333"
+                            android:textSize="12dp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/tv_title_voter_name"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="쥐드래곤" />
+
+                        <View
+                            android:id="@+id/v_one"
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="8dp"
+                            android:background="#ffffff"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/tv_voter_name" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_title_vote_date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/certificate_time"
+                            android:textColor="#666666"
+                            android:textSize="12dp"
+                            app:layout_constraintBottom_toBottomOf="@id/tv_vote_date"
+                            app:layout_constraintEnd_toStartOf="@id/tv_vote_date"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/tv_vote_date" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_vote_date"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textAlignment="viewEnd"
+                            android:textColor="#333333"
+                            android:textSize="12dp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/tv_title_vote_date"
+                            app:layout_constraintTop_toBottomOf="@id/v_one"
+                            tools:text="2024년 11월 14일(KST)" />
+
+                        <View
+                            android:id="@+id/v_two"
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="8dp"
+                            android:background="#ffffff"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/tv_vote_date" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_title_heart"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/certificate_heart"
+                            android:textColor="#666666"
+                            android:textSize="12dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/tv_heart"
+                            app:layout_constraintBottom_toBottomOf="@id/tv_heart"/>
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_heart"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textColor="#333333"
+                            android:textSize="12dp"
+                            android:layout_marginTop="8dp"
+                            android:textStyle="bold"
+                            android:textAlignment="viewEnd"
+                            app:layout_constraintStart_toEndOf="@id/tv_title_heart"
+                            app:layout_constraintEnd_toStartOf="@id/iv_heart"
+                            app:layout_constraintTop_toBottomOf="@id/v_two"
+                            tools:text="3111" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/iv_heart"
+                            android:layout_width="13dp"
+                            android:layout_height="13dp"
+                            android:layout_marginStart="3dp"
+                            android:layout_marginTop="2dp"
+                            app:layout_constraintBottom_toBottomOf="@id/tv_heart"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/tv_heart"
+                            app:layout_constraintTop_toTopOf="@id/tv_heart"
+                            app:srcCompat="@drawable/filled" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_logo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="22dp"
+                        android:layout_marginVertical="22dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/layout_user_info"
+                        app:srcCompat="@drawable/img_logo_vote_en" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_medal"
+                        android:layout_width="78dp"
+                        android:layout_height="78dp"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginEnd="-20dp"
+                        app:layout_constraintEnd_toEndOf="@id/v_bg_profile"
+                        app:layout_constraintBottom_toBottomOf="@id/v_bg_profile"
+                        tools:src="@drawable/img_votingcertificate_platinum" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:id="@+id/tv_save"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="3dp"
+                    android:background="@drawable/bg_radius_12_main"
+                    android:gravity="center"
+                    android:text="@string/certificate_detail_save"
+                    android:textAlignment="center"
+                    android:textColor="#ffffff"
+                    android:textSize="14dp"
+                    app:layout_constraintEnd_toStartOf="@id/tv_share"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/layout_certificate"
+                    app:layout_constraintVertical_chainStyle="packed" />
+
+                <TextView
+                    android:id="@+id/tv_share"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/bg_radius_12_main"
+                    android:gravity="center"
+                    android:text="@string/certificate_detail_share"
+                    android:textAlignment="center"
+                    android:textColor="#ffffff"
+                    android:textSize="14dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tv_save"
+                    app:layout_constraintTop_toBottomOf="@id/layout_certificate" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

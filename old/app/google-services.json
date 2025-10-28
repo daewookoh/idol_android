@@ -1,0 +1,268 @@
+{
+  "project_info": {
+    "project_number": "444896554540",
+    "firebase_url": "https://trusty-equinox-771-389ba.firebaseio.com",
+    "project_id": "trusty-equinox-771",
+    "storage_bucket": "trusty-equinox-771.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444896554540:android:3c88450a3614bf66",
+        "android_client_info": {
+          "package_name": "com.exodus.myloveidol"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "444896554540-g8k5jvtnbme5fr00e2dp16a0evelif30.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDf-sQ7EbpbXKx1u8faHZaztFKPDZa-M0c"
+        },
+        {
+          "current_key": "AIzaSyA8shyNp47M40QukroFyENj7jQPZRf-Jis"
+        },
+        {
+          "current_key": "AIzaSyBuOYecuhAqosFrexoAOAQsSNkpfdRUcL8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "444896554540-e3b32htfhr8b0l5chgeacrvg7bbm5677.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "444896554540-8f9ea7e8e3tdfacfbpqfc0t2rpcjn5u0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.exodus.myloveidol",
+                "app_store_id": "1131995698"
+              }
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-4951070488234097~6520434962"
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444896554540:android:69512595327f39b7e66b89",
+        "android_client_info": {
+          "package_name": "com.exodus.myloveidol.china"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "444896554540-jpu73498438jjvtqfem7thegj6shn74n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.exodus.myloveidol.china",
+            "certificate_hash": "7c8125a91593384e9ab052fc035988ace404f3fc"
+          }
+        },
+        {
+          "client_id": "444896554540-g8k5jvtnbme5fr00e2dp16a0evelif30.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDf-sQ7EbpbXKx1u8faHZaztFKPDZa-M0c"
+        },
+        {
+          "current_key": "AIzaSyA8shyNp47M40QukroFyENj7jQPZRf-Jis"
+        },
+        {
+          "current_key": "AIzaSyBuOYecuhAqosFrexoAOAQsSNkpfdRUcL8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "444896554540-e3b32htfhr8b0l5chgeacrvg7bbm5677.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "444896554540-8f9ea7e8e3tdfacfbpqfc0t2rpcjn5u0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.exodus.myloveidol",
+                "app_store_id": "1131995698"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444896554540:android:8c6d5bc2b11bbdb3",
+        "android_client_info": {
+          "package_name": "com.exodus.myloveidol.twostore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "444896554540-sq5l6q4up4c3v41g91l5msnb658ce6oq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.exodus.myloveidol.twostore",
+            "certificate_hash": "2a4f491dadc88e8c73a20ea95caceef60883010e"
+          }
+        },
+        {
+          "client_id": "444896554540-g8k5jvtnbme5fr00e2dp16a0evelif30.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDf-sQ7EbpbXKx1u8faHZaztFKPDZa-M0c"
+        },
+        {
+          "current_key": "AIzaSyA8shyNp47M40QukroFyENj7jQPZRf-Jis"
+        },
+        {
+          "current_key": "AIzaSyBuOYecuhAqosFrexoAOAQsSNkpfdRUcL8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "444896554540-e3b32htfhr8b0l5chgeacrvg7bbm5677.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "444896554540-8f9ea7e8e3tdfacfbpqfc0t2rpcjn5u0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.exodus.myloveidol",
+                "app_store_id": "1131995698"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444896554540:android:12a0be743c254073",
+        "android_client_info": {
+          "package_name": "net.ib.mn"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "444896554540-63o7ogoffbrat76ve5ven52p4ivm87f7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.ib.mn",
+            "certificate_hash": "20c827b513fd8b8159efacfcd25d7fe384ab883d"
+          }
+        },
+        {
+          "client_id": "444896554540-r4c7ganafelics9co91hmu5hailf04pu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.ib.mn",
+            "certificate_hash": "fb854164ea5e11163f4bd3ad2c1cc907b386f338"
+          }
+        },
+        {
+          "client_id": "444896554540-s0v30vh76b955f49a9rrai8tduq28ehi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.ib.mn",
+            "certificate_hash": "2a4f491dadc88e8c73a20ea95caceef60883010e"
+          }
+        },
+        {
+          "client_id": "444896554540-g8k5jvtnbme5fr00e2dp16a0evelif30.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDf-sQ7EbpbXKx1u8faHZaztFKPDZa-M0c"
+        },
+        {
+          "current_key": "AIzaSyA8shyNp47M40QukroFyENj7jQPZRf-Jis"
+        },
+        {
+          "current_key": "AIzaSyBuOYecuhAqosFrexoAOAQsSNkpfdRUcL8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "444896554540-e3b32htfhr8b0l5chgeacrvg7bbm5677.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "444896554540-8f9ea7e8e3tdfacfbpqfc0t2rpcjn5u0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.exodus.myloveidol",
+                "app_store_id": "1131995698"
+              }
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-4951070488234097~3652536966"
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444896554540:android:53f996c57d832739e66b89",
+        "android_client_info": {
+          "package_name": "net.ib.mn.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "444896554540-g8k5jvtnbme5fr00e2dp16a0evelif30.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDf-sQ7EbpbXKx1u8faHZaztFKPDZa-M0c"
+        },
+        {
+          "current_key": "AIzaSyA8shyNp47M40QukroFyENj7jQPZRf-Jis"
+        },
+        {
+          "current_key": "AIzaSyBuOYecuhAqosFrexoAOAQsSNkpfdRUcL8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "444896554540-e3b32htfhr8b0l5chgeacrvg7bbm5677.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "444896554540-8f9ea7e8e3tdfacfbpqfc0t2rpcjn5u0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.exodus.myloveidol",
+                "app_store_id": "1131995698"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

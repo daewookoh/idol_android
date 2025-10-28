@@ -1,0 +1,674 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_100"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_my_heart_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingVertical="6dp">
+
+            <net.ib.mn.view.ExodusImageView
+                android:id="@+id/photo"
+                android:layout_width="61dp"
+                android:layout_height="61dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="12dp"
+                android:src="@drawable/menu_profile_1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/level"
+                android:layout_width="wrap_content"
+                android:layout_height="15dp"
+                android:layout_marginStart="12dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/level"
+                android:scaleType="fitXY"
+                app:layout_constraintBottom_toBottomOf="@+id/name"
+                app:layout_constraintStart_toEndOf="@+id/photo"
+                app:layout_constraintTop_toTopOf="@+id/name"
+                tools:src="@drawable/icon_level_30" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:paddingStart="0dp"
+                android:paddingEnd="8dp"
+                android:textAlignment="viewStart"
+                android:textColor="@color/text_default"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toTopOf="@+id/tv_favorite_name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/level"
+                app:layout_constraintTop_toTopOf="@id/photo"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="주황주황" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_favorite_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textAlignment="viewStart"
+                android:textColor="@color/text_default"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/photo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/level"
+                app:layout_constraintTop_toBottomOf="@id/name"
+                tools:text="아이유" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_level"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="17dp"
+                android:background="@drawable/bg_radius_12_main100"
+                android:minHeight="70dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/photo">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_level"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="12dp"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/main_light"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Lv. 30" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_all_exp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/main_light"
+                    android:textSize="10sp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_level"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tv_level"
+                    app:layout_constraintTop_toTopOf="@id/tv_level"
+                    tools:ignore="SmallSp"
+                    tools:text="총 615,163,485" />
+
+                <ProgressBar
+                    android:id="@+id/progress_level"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="15dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="3dp"
+                    android:max="100"
+                    android:progress="50"
+                    android:progressDrawable="@drawable/level_progress_bar"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_level" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_next_level"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="18dp"
+                    android:ellipsize="end"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/text_default"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/progress_level"
+                    tools:text="13,541" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/btn_level_info"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="-8dp"
+                    android:layout_marginEnd="-8dp"
+                    android:padding="16dp"
+                    android:src="@drawable/btn_info_black"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_coupon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_radius_12_background200"
+                android:elevation="4dp"
+                android:minHeight="60dp"
+                android:paddingHorizontal="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_level">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_coupon"
+                    android:layout_width="41dp"
+                    android:layout_height="41dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/icon_my_own_coupon" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_coupon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="11dp"
+                    android:includeFontPadding="false"
+                    android:text="@string/my_info_coupon_quantity"
+                    android:textColor="@color/text_gray"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/iv_coupon"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_coupon_count"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/text_default"
+                    android:textSize="19sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tv_coupon"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="1" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_currency"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_radius_12_background200"
+                android:elevation="4dp"
+                android:minHeight="278dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_coupon">
+
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_heart"
+                    android:layout_width="41dp"
+                    android:layout_height="41dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/icon_my_own_heart" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_my_heart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="11dp"
+                    android:includeFontPadding="false"
+                    android:text="@string/my_info_own_heart"
+                    android:textColor="@color/text_gray"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toEndOf="@id/iv_heart"
+                    app:layout_constraintTop_toTopOf="@id/iv_heart" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_my_heart_count"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginEnd="16dp"
+                    android:ellipsize="end"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:textColor="@color/text_default"
+                    android:textSize="19sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@id/iv_heart"
+                    app:layout_constraintTop_toBottomOf="@id/tv_my_heart"
+                    app:layout_constraintVertical_bias="1.0"
+                    tools:text="5,436" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/btn_currency_info"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="-8dp"
+                    android:layout_marginEnd="-8dp"
+                    android:padding="16dp"
+                    android:src="@drawable/btn_info_black"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_heart"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_radius_18_gray_50"
+                    android:paddingHorizontal="18dp"
+                    android:paddingVertical="19dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_my_heart_count">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_ever_heart_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:text="@string/ever_heart_short"
+                        android:textColor="@color/text_default"
+                        android:textSize="14sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_ever_heart"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:ellipsize="end"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:textAlignment="viewEnd"
+                        android:textColor="@color/text_default"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tv_ever_heart_title"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="1,1111" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_daily_heart_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:includeFontPadding="false"
+                        android:text="@string/daily_heart_short"
+                        android:textColor="@color/text_default"
+                        android:textSize="14sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_ever_heart_title" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_daily_heart"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:ellipsize="end"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:textAlignment="viewEnd"
+                        android:textColor="@color/text_default"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tv_daily_heart_title"
+                        app:layout_constraintTop_toTopOf="@+id/tv_daily_heart_title"
+                        tools:text="7,7777" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_dia"
+                    android:layout_width="41dp"
+                    android:layout_height="41dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/layout_heart"
+                    app:srcCompat="@drawable/icon_my_own_dia" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_my_dia"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="11dp"
+                    android:includeFontPadding="false"
+                    android:text="@string/my_info_own_diamond"
+                    android:textColor="@color/text_gray"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toEndOf="@id/iv_dia"
+                    app:layout_constraintTop_toTopOf="@id/iv_dia" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_my_dia_count"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginEnd="16dp"
+                    android:ellipsize="end"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:textColor="@color/text_default"
+                    android:textSize="19sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/iv_dia"
+                    app:layout_constraintTop_toBottomOf="@id/tv_my_dia"
+                    tools:text="7,7777" />
+
+                <View
+                    android:id="@+id/v_divider"
+                    android:layout_width="0dp"
+                    android:layout_height="0.3dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@color/gray110"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_my_dia_count" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_history"
+                    android:layout_width="0dp"
+                    android:layout_height="46dp"
+                    android:gravity="center"
+                    android:text="@string/my_info_heart_dia_detail"
+                    android:textColor="@color/text_gray"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/v_divider" />
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lottie_tutorial_history"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@+id/tv_history"
+                    app:layout_constraintEnd_toEndOf="@+id/tv_history"
+                    app:layout_constraintStart_toStartOf="@+id/tv_history"
+                    app:layout_constraintTop_toTopOf="@+id/tv_history"
+                    tools:visibility="visible" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_video_ad"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/bg_radius_12_background200"
+                android:elevation="4dp"
+                android:minHeight="76dp"
+                android:paddingHorizontal="9dp"
+                app:layout_constraintEnd_toStartOf="@id/layout_shop"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_currency">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_video_ad"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/icon_my_ad" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_video_ad"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:ellipsize="end"
+                    android:includeFontPadding="false"
+                    android:maxLines="2"
+                    android:textAlignment="center"
+                    android:text="@string/title_reward_video"
+                    android:textColor="@color/text_default"
+                    android:textSize="12dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/iv_video_ad" />
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lottie_tutorial_video_ad"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_shop"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="5dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_radius_12_background200"
+                android:elevation="4dp"
+                android:minHeight="76dp"
+                android:paddingHorizontal="9dp"
+                app:layout_constraintEnd_toStartOf="@id/layout_free_charge"
+                app:layout_constraintStart_toEndOf="@id/layout_video_ad"
+                app:layout_constraintTop_toBottomOf="@id/layout_currency">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_shop"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/icon_my_shop" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_shop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:ellipsize="end"
+                    android:includeFontPadding="false"
+                    android:maxLines="2"
+                    android:textAlignment="center"
+                    android:text="@string/label_store"
+                    android:textColor="@color/text_default"
+                    android:textSize="12dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/iv_shop" />
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lottie_tutorial_shop"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_free_charge"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/bg_radius_12_background200"
+                android:elevation="4dp"
+                android:minHeight="81dp"
+                android:paddingHorizontal="9dp"
+                app:layout_constraintBottom_toBottomOf="@id/layout_shop"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/layout_shop"
+                app:layout_constraintTop_toBottomOf="@id/layout_currency">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_free_charge"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/icon_my_free" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_free_charge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:ellipsize="end"
+                    android:includeFontPadding="false"
+                    android:maxLines="2"
+                    android:text="@string/btn_free_heart_charge"
+                    android:textColor="@color/text_default"
+                    android:textAlignment="center"
+                    android:textSize="12dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/iv_free_charge"
+                    tools:text="fefefefefefefefefwfweffewf" />
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lottie_tutorial_free_charge"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_video_ad_heart"
+                android:layout_width="wrap_content"
+                android:layout_height="18dp"
+                android:layout_marginBottom="-9dp"
+                android:elevation="8dp"
+                android:tint="@color/main_light"
+                app:layout_constraintBottom_toTopOf="@id/layout_video_ad"
+                app:layout_constraintEnd_toEndOf="@id/tv_video_heart"
+                app:layout_constraintStart_toStartOf="@id/tv_video_heart"
+                app:srcCompat="@drawable/icon_my_adheart" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_video_heart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:elevation="8dp"
+                android:includeFontPadding="false"
+                android:paddingHorizontal="10dp"
+                android:textColor="@color/text_white_black"
+                android:textSize="10dp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/iv_video_ad_heart"
+                app:layout_constraintEnd_toEndOf="@id/layout_video_ad"
+                app:layout_constraintStart_toStartOf="@id/layout_video_ad"
+                app:layout_constraintTop_toTopOf="@id/iv_video_ad_heart"
+                tools:text="♥400" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_shop_event"
+                android:layout_width="35dp"
+                android:layout_height="18dp"
+                android:layout_marginBottom="-9dp"
+                android:elevation="8dp"
+                android:src="@drawable/icon_menu_shop_event"
+                android:tint="@color/main_light"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/layout_shop"
+                app:layout_constraintEnd_toEndOf="@id/layout_shop"
+                app:layout_constraintStart_toStartOf="@id/layout_shop" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_free_charge_event"
+                android:layout_width="35dp"
+                android:layout_height="18dp"
+                android:layout_marginBottom="-9dp"
+                android:elevation="8dp"
+                android:src="@drawable/icon_menu_shop_event"
+                android:tint="@color/main_light"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/layout_free_charge"
+                app:layout_constraintEnd_toEndOf="@id/layout_free_charge"
+                app:layout_constraintStart_toStartOf="@id/layout_free_charge" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_subscription_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="-22dp"
+                android:background="@drawable/bg_daily_badge"
+                android:elevation="8dp"
+                android:textColor="@color/text_white_black"
+                android:textSize="10sp"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/layout_currency"
+                tools:ignore="SmallSp"
+                tools:visibility="visible" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="15dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_video_ad" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</layout>

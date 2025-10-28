@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/selected"
+    android:oneshot="true">
+    <item android:drawable="@drawable/quiz_right_01" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_02" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_03" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_04" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_05" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_06" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_07" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_08" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_09" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_10" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_11" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_12" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_13" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_14" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_15" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_16" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_17" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_18" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_19" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_20" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_21" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_22" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_23" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_24" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_25" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_26" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_27" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_28" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_29" android:duration="30" />
+    <item android:drawable="@drawable/quiz_right_30" android:duration="30" />
+    <item android:drawable="@android:color/transparent" android:duration="30" />
+</animation-list>

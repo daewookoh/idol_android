@@ -1,0 +1,48 @@
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="290dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:paddingStart="28dp"
+    android:paddingEnd="28dp"
+    android:paddingBottom="18dp"
+    android:background="@drawable/bg_popup"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:gravity="center"
+        android:textColor="@color/gray1000"
+        android:textSize="13sp"
+        android:text="@string/quiz_review_thankyou"
+        tools:text="@string/quiz_review_thankyou" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/quiz_review_more"
+        android:layout_marginTop="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_radius_brand500"
+        android:paddingBottom="14dp"
+        android:paddingTop="14dp"
+        android:text="@string/quiz_review_more"
+        android:textSize="13sp"
+        android:textColor="@color/text_white_black"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/go_quiz_main"
+        android:layout_marginTop="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_radius_brand500"
+        android:paddingBottom="14dp"
+        android:paddingTop="14dp"
+        android:text="@string/quiz_go_to_main"
+        android:textSize="13sp"
+        android:textColor="@color/text_white_black"/>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

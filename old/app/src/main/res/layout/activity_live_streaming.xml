@@ -1,0 +1,682 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data></data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.media3.ui.PlayerView
+            android:id="@+id/pv_live_streaming"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:animateLayoutChanges="true"
+            android:background="@color/fix_gray1000"
+            app:auto_show="true"
+            app:controller_layout_id="@layout/controller_live_streaming"
+            app:hide_on_touch="true"
+            app:layout_constraintDimensionRatio="16:9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0"
+            app:player_layout_id="@layout/exo_player_view"
+            app:resize_mode="fit"
+            app:use_artwork="true"
+            app:use_controller="true" />
+
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/top_guide_live_chat_rcy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.23" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcy_live_chatting_content_landscape"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@+id/message_input_live_chat_no_keyboard"
+            app:layout_constraintEnd_toEndOf="@id/right_guid_live_chatting_landscape"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/top_guide_live_chat_rcy"
+            app:layout_constraintVertical_bias="1"
+            app:reverseLayout="false"
+            app:stackFromEnd="true" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_streaming_like_full"
+            android:layout_width="57dp"
+            android:layout_height="57dp"
+            android:layout_marginBottom="47dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="@+id/pv_live_streaming"
+            app:layout_constraintEnd_toEndOf="@+id/pv_live_streaming"
+            app:layout_constraintHorizontal_bias="0.985"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/pv_live_streaming"
+            app:layout_constraintVertical_bias="0.9"
+            app:srcCompat="@drawable/img_streaming_like_full" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_streaming_like_end_full"
+            android:layout_width="57dp"
+            android:layout_height="57dp"
+            android:layout_marginBottom="47dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/pv_live_streaming"
+            app:layout_constraintEnd_toEndOf="@+id/pv_live_streaming"
+            app:layout_constraintHorizontal_bias="0.985"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/pv_live_streaming"
+            app:layout_constraintVertical_bias="0.9"
+            app:srcCompat="@drawable/img_streaming_like_end_full" />
+
+        <FrameLayout
+            android:id="@+id/ll_lottie_like_heart_full_container"
+            android:layout_width="0dp"
+            android:layout_height="138dp"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="40dp"
+            app:layout_constraintBottom_toBottomOf="@id/btn_streaming_like_full"
+            app:layout_constraintEnd_toEndOf="@id/btn_streaming_like_full"
+            app:layout_constraintStart_toStartOf="@id/btn_streaming_like_full"
+            app:layout_constraintTop_toTopOf="@+id/pv_live_streaming"
+            app:layout_constraintVertical_bias="1" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerInParent="true"
+            android:indeterminateDrawable="@drawable/img_streaming_loading"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="@id/pv_live_streaming"
+            app:layout_constraintEnd_toEndOf="@id/pv_live_streaming"
+            app:layout_constraintStart_toStartOf="@id/pv_live_streaming"
+            app:layout_constraintTop_toTopOf="@+id/pv_live_streaming" />
+
+        <TextView
+            android:id="@+id/tv_live_stalled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/live_stalled"
+            android:textColor="@color/fix_white"
+            android:textSize="11dp"
+            app:layout_constraintBottom_toBottomOf="@id/progress_bar"
+            app:layout_constraintEnd_toEndOf="@+id/progress_bar"
+            app:layout_constraintHorizontal_bias="0.6"
+            app:layout_constraintStart_toStartOf="@id/progress_bar"
+            app:layout_constraintTop_toBottomOf="@+id/progress_bar"
+            app:layout_constraintTop_toTopOf="@id/progress_bar"
+            app:layout_constraintVertical_bias="1" />
+
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/progress_bar_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="tv_live_stalled,progress_bar" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll_view_live_info"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/pv_live_streaming">
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_info_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/pv_live_streaming">
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_limit_level"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="5dp"
+                    android:background="@drawable/bg_round_live_ing"
+                    android:gravity="center"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:textColor="@color/text_white_black"
+                    android:textSize="12dp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/live_badge"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/live_badge"
+                    app:layout_constraintTop_toTopOf="@+id/live_badge"
+                    app:layout_constraintVertical_bias="0.0"
+                    tools:text="Lv.14" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/live_badge"
+                    android:layout_width="70dp"
+                    android:layout_height="19dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="18dp"
+                    android:background="@drawable/img_streaming_live"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0" />
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_live_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/text_default"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@+id/tv_live_time"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="@+id/live_badge"
+                    app:layout_constraintTop_toBottomOf="@+id/live_badge"
+                    app:layout_constrainedWidth="true"
+                    tools:text="신혜성 생일" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_live_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="10dp"
+                    android:textColor="@color/gray580"
+                    android:textSize="12dp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_live_title"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toEndOf="@+id/tv_live_title"
+                    app:layout_constraintTop_toTopOf="@+id/tv_live_title"
+                    app:layout_constraintVertical_bias="1"
+                    tools:text="15분전" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/icon_streaming_hits"
+                    android:layout_width="21dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="13dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_live_title"
+                    app:layout_constraintVertical_bias="0"
+                    app:srcCompat="@drawable/icon_streaming_hits" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_streaming_hits"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="10dp"
+                    android:text="0"
+                    android:textColor="@color/gray300"
+                    android:textSize="14dp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/icon_streaming_hits"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_live_title"
+                    app:layout_constraintVertical_bias="1" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/icon_streaming_heart"
+                    android:layout_width="21dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="13dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/barrier"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_live_title"
+                    app:layout_constraintVertical_bias="0"
+                    app:srcCompat="@drawable/icon_streaming_heart" />
+
+
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/barrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:barrierDirection="end"
+                    app:constraint_referenced_ids="tv_streaming_hits,tv_streaming_users" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_streaming_heart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="10dp"
+                    android:text="0"
+                    android:textColor="@color/gray300"
+                    android:textSize="14dp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/icon_streaming_heart"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_live_title"
+                    app:layout_constraintVertical_bias="1" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/icon_streaming_users"
+                    android:layout_width="21dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/icon_streaming_hits"
+                    app:layout_constraintVertical_bias="0"
+                    app:srcCompat="@drawable/icon_streaming_users" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_streaming_users"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="7dp"
+                    android:text="0"
+                    android:textColor="@color/gray300"
+                    android:textSize="14dp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/icon_streaming_users"
+                    app:layout_constraintTop_toBottomOf="@+id/icon_streaming_hits"
+                    app:layout_constraintVertical_bias="1" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/icon_streaming_users2"
+                    android:layout_width="21dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/barrier"
+                    app:layout_constraintTop_toBottomOf="@+id/icon_streaming_heart"
+                    app:layout_constraintVertical_bias="0"
+                    app:srcCompat="@drawable/icon_streaming_users_2" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_streaming_users2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="7dp"
+                    android:text="0"
+                    android:textColor="@color/gray300"
+                    android:textSize="14dp"
+                    android:textStyle="bold"
+
+                    app:layout_constraintStart_toEndOf="@+id/icon_streaming_users2"
+                    app:layout_constraintTop_toBottomOf="@+id/icon_streaming_heart"
+                    app:layout_constraintVertical_bias="1" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/btn_streaming_like"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintBottom_toTopOf="@+id/tv_live_desc"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_live_time"
+                    app:layout_constraintVertical_bias="0"
+                    app:srcCompat="@drawable/img_streaming_like" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/btn_streaming_like_end"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toTopOf="@+id/tv_live_desc"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_live_time"
+                    app:layout_constraintVertical_bias="0"
+                    app:srcCompat="@drawable/img_streaming_like_end" />
+
+                <FrameLayout
+                    android:id="@+id/ll_lottie_like_heart_container"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_centerInParent="true"
+                    app:layout_constraintBottom_toBottomOf="@id/btn_streaming_like"
+                    app:layout_constraintEnd_toEndOf="@id/btn_streaming_like"
+                    app:layout_constraintStart_toStartOf="@id/btn_streaming_like"
+                    app:layout_constraintTop_toTopOf="@+id/cl_info_container" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_live_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="12dp"
+                    android:maxLines="2"
+                    android:textColor="@color/gray900"
+                    android:textSize="13sp"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_streaming_like"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintWidth_max="wrap"
+                    app:layout_constraintWidth_percent="0.85"
+                    app:layout_goneMarginTop="77dp"
+                    tools:text="혜성처럼 전진하는 신화의 메인보컬 신혜성의 생일!
+우당탕탕 생일 미역국 끓이기 도전 중 무슨 일이 벌어질까?
+요리사망꾼 탄생 비화를 만나보세요! (1줄~최대 10줄)" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_live_chatting"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/gray_border_top_bottom_gray100"
+                    android:orientation="horizontal"
+                    android:paddingTop="18dp"
+                    android:paddingBottom="18dp"
+                    app:layout_constraintBottom_toTopOf="@id/ll_live_guide"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_live_desc">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_title_live_chat_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:gravity="center"
+                        android:text="@string/live_chat"
+                        android:textSize="14dp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_icon_live_chatting"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="4dp"
+                        android:src="@drawable/icon_streaming_chatting"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_bias="0"
+                        app:layout_constraintStart_toEndOf="@id/tv_title_live_chat_btn"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_icon_live_chatting_go"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="20dp"
+                        android:src="@drawable/icon_streaming_go"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="1"
+                        app:layout_constraintStart_toEndOf="@id/iv_icon_live_chatting"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/ll_live_guide"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/gray50"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toTopOf="@+id/adsa"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/cl_live_chatting"
+                    app:layout_constraintVertical_bias="0.0">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/gray50"
+                        android:orientation="vertical"
+                        android:paddingStart="20dp"
+                        android:paddingTop="20dp"
+                        android:paddingEnd="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="13dp"
+                            android:text="@string/award_guide_sub5"
+                            android:textColor="@color/gray580"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/agreement_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            android:background="@color/gray50"
+                            android:lineSpacingExtra="3.3sp"
+                            android:text="@string/live_disclaimer"
+                            android:textAlignment="viewStart"
+                            android:textColor="@color/gray580"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/adsa"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:background="@color/gray50"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/ll_live_guide" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/cd_live_chat_bottom_sheet"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/pv_live_streaming">
+
+            <include layout="@layout/live_chatting_bottom_sheet" />
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/right_guid_live_chatting_landscape"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.4" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/landscape_live_chat_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="
+        message_input_live_chat_no_keyboard,
+        submit_btn_live_chat_no_keyboard,
+        rcy_live_chatting_content_landscape"/>
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/scroll_to_bottom_btn_chat_landscape"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone"
+            android:background="@drawable/bg_btn_scroll_to_bottom"
+            app:layout_constraintEnd_toEndOf="@id/submit_btn_live_chat_no_keyboard"
+            app:layout_constraintBottom_toTopOf="@id/submit_btn_live_chat_no_keyboard"
+            android:contentDescription="scrollToBottomButton"  />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/submit_btn_live_chat_no_keyboard"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/icon_streaming_chatting_send"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="@+id/right_guid_live_chatting_landscape"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/message_input_live_chat_no_keyboard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/black_border_round"
+            android:imeOptions="flagNoExtractUi"
+            android:includeFontPadding="false"
+            android:maxHeight="100dp"
+            android:minHeight="32dp"
+            android:nextFocusLeft="@id/input_comment"
+            android:nextFocusUp="@id/input_comment"
+            android:paddingStart="10dp"
+            android:paddingTop="7dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="7dp"
+            android:scrollbars="none"
+            android:scrollHorizontally="true"
+            android:textAlignment="viewStart"
+            android:textColor="@color/fix_white"
+            android:textColorHint="@color/gray200"
+            android:textSize="15sp"
+            android:ellipsize="start"
+            android:singleLine="true"
+            android:windowSoftInputMode="adjustResize"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/right_guid_live_chatting_landscape"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1"
+            tools:ignore="RtlCompat" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/footer_live_chat_landscape"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="#222222"
+            android:fitsSystemWindows="true"
+            android:paddingStart="52dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="92dp"
+            android:paddingBottom="10dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/pv_live_streaming"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias="1">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/right_guide_live_chat_footer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.94" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/left_guide_live_chat_footer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.02" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/bottom_guide_live_chat_footer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.85" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/top_guide_live_chat_footer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.15" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/submit_btn_live_chat_landscape"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/icon_streaming_chatting_send"
+                app:layout_constraintBottom_toBottomOf="@+id/bottom_guide_live_chat_footer"
+                app:layout_constraintEnd_toEndOf="@+id/right_guide_live_chat_footer"
+                app:layout_constraintTop_toTopOf="@+id/left_guide_live_chat_footer" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/message_input_live_chat_landscape"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/black_border_round"
+                android:includeFontPadding="false"
+                android:inputType="textMultiLine"
+                android:maxHeight="100dp"
+                android:minHeight="32dp"
+                android:maxLength="100"
+                android:nextFocusLeft="@id/input_comment"
+                android:nextFocusUp="@id/input_comment"
+                android:paddingStart="10dp"
+                android:paddingTop="7dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="7dp"
+                android:scrollbars="none"
+                android:scrollHorizontally="true"
+                android:textAlignment="viewStart"
+                android:textColor="@color/fix_white"
+                android:textColorHint="@color/gray200"
+                android:textSize="15sp"
+                android:windowSoftInputMode="adjustResize"
+                app:layout_constraintBottom_toBottomOf="@+id/bottom_guide_live_chat_footer"
+                app:layout_constraintEnd_toStartOf="@+id/submit_btn_live_chat_landscape"
+                app:layout_constraintStart_toStartOf="@+id/left_guide_live_chat_footer"
+                app:layout_constraintTop_toTopOf="@+id/top_guide_live_chat_footer"
+                tools:ignore="RtlCompat" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

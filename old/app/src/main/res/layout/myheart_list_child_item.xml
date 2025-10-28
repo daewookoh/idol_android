@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data></data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/heartsFromFriends"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_100"
+        android:clickable="true"
+        android:focusable="true"
+        android:minHeight="60dp"
+        android:paddingHorizontal="20dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_type_icon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/icon_earn_heart" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_earn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="4dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_currency"
+            app:layout_constraintStart_toEndOf="@id/iv_type_icon"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tv_earn_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="@color/text_default"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="G-DRAGON_빅뱅" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_spend"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="4dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@id/tv_currency"
+            app:layout_constraintStart_toEndOf="@id/iv_type_icon"
+            app:layout_constraintTop_toTopOf="@id/iv_type_icon">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="@color/text_default"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@id/tv_sub_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="G-DRAGON_빅뱅G-DRAGON_빅뱅G-DRAGON_빅뱅G-DRAGON_빅뱅G-DRAGON_빅뱅G-DRAGON_빅뱅G-DRAGON_빅뱅" />
+
+            <TextView
+                android:id="@+id/tv_sub_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:textColor="@color/text_gray"
+                android:textSize="12dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_title"
+                tools:text="G-DRAGON_빅뱅" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_spend_only_title"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_currency"
+            app:layout_constraintStart_toEndOf="@id/iv_type_icon"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tv_title_only"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:maxLines="2"
+                android:breakStrategy="high_quality"
+                android:hyphenationFrequency="normal"
+                android:textColor="@color/text_default"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/iv_more_friend"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="G-DRAGON_빅뱅G-DRAGON_빅뱅G-DRAGON_빅뱅G-DRAGON_빅뱅G-DRAGON_빅뱅G-DRAGON_빅뱅" />
+
+            <ImageView
+                android:id="@+id/iv_more_friend"
+                android:layout_width="12dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="4dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/arrow_left_to_right"
+                app:layout_constraintBottom_toBottomOf="@id/tv_title_only"
+                app:layout_constraintStart_toEndOf="@id/tv_title_only"
+                app:layout_constraintTop_toTopOf="@id/tv_title_only"
+                app:tint="#cacaca" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/tv_currency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_gray"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@id/iv_type_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/iv_type_icon"
+            tools:text="test2" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

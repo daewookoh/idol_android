@@ -1,0 +1,462 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/support_main_frag"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_100"
+        tools:ignore="SmallSp">
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/support_main_cooridinator"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/support_main_li"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:elevation="0dp">
+
+                <com.google.android.material.appbar.CollapsingToolbarLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border_gray100">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/support_main_con"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border_gray100"
+                        android:minHeight="40dp"
+                        android:paddingTop="24dp">
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:id="@+id/support_info_li"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="20.3dp"
+                            android:layout_marginEnd="30dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="6dp"
+                            app:layout_constrainedWidth="true"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/support_main_li_filter"
+                            app:layout_constraintHorizontal_bias="0"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/support_info_iv"
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:src="@drawable/icon_camera"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toEndOf="@id/tv_accumulated_vote"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/support_success_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:text="@string/support_success_list"
+                                android:textColor="@color/main_light"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/lottie_tutorial_support"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="@+id/support_info_li"
+                            app:layout_constraintEnd_toEndOf="@+id/support_info_li"
+                            app:layout_constraintStart_toStartOf="@+id/support_info_li"
+                            app:layout_constraintTop_toTopOf="@+id/support_info_li"
+                            tools:visibility="visible" />
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:id="@+id/support_main_li_filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="17dp"
+                            android:gravity="center_vertical"
+                            android:minHeight="25dp"
+                            android:orientation="horizontal"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/support_main_li_filter2"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tv_filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:maxWidth="60dp"
+                                android:paddingTop="5dp"
+                                android:paddingBottom="5dp"
+                                android:text="@string/face_all"
+                                android:textColor="@color/text_gray"
+                                android:textSize="12sp" />
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="8dp"
+                                android:layout_height="4dp"
+                                android:layout_marginStart="5dp"
+                                android:src="@drawable/icon_btn_arrow_down" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:id="@+id/support_main_li_filter2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:gravity="center_vertical"
+                            android:minHeight="25dp"
+                            android:orientation="horizontal"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tv_filter2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="5dp"
+                                android:paddingBottom="5dp"
+                                android:text="@string/freeboard_order_newest"
+                                android:textColor="@color/text_gray"
+                                android:textSize="12sp" />
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="8dp"
+                                android:layout_height="4dp"
+                                android:layout_marginStart="5dp"
+                                android:src="@drawable/icon_btn_arrow_down" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:fillViewport="true"
+                    android:background="@color/background_100"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="20dp">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_all_tag"
+                            android:layout_width="wrap_content"
+                            android:layout_height="28dp"
+                            android:background="@drawable/bg_support_all_tag"
+                            android:gravity="center"
+                            android:paddingHorizontal="12dp"
+                            android:text="@string/all"
+                            android:textColor="@drawable/color_support_tag_text"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            tools:background="@color/main" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_domestic_tag"
+                            android:layout_width="wrap_content"
+                            android:layout_height="28dp"
+                            android:layout_marginStart="4dp"
+                            android:background="@drawable/bg_support_tag"
+                            android:gravity="center"
+                            android:paddingHorizontal="12dp"
+                            android:text="@string/adtype_korean"
+                            android:textColor="@drawable/color_support_tag_text"
+                            android:textSize="12sp"
+                            tools:background="@color/main" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_foreign_tag"
+                            android:layout_width="wrap_content"
+                            android:layout_height="28dp"
+                            android:layout_marginStart="4dp"
+                            android:background="@drawable/bg_support_tag"
+                            android:gravity="center"
+                            android:paddingHorizontal="12dp"
+                            android:text="@string/adtype_global"
+                            android:textColor="@drawable/color_support_tag_text"
+                            android:textSize="12sp"
+                            tools:background="@color/main" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_mobile_tag"
+                            android:layout_width="wrap_content"
+                            android:layout_height="28dp"
+                            android:layout_marginStart="4dp"
+                            android:background="@drawable/bg_support_tag"
+                            android:gravity="center"
+                            android:paddingHorizontal="12dp"
+                            android:text="@string/adtype_mobile"
+                            android:textColor="@drawable/color_support_tag_text"
+                            android:textSize="12sp"
+                            tools:background="@color/main" />
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <TextView
+                    android:id="@+id/support_title_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/border_gray100"
+                    android:gravity="center"
+                    android:text="@string/support_in_process"
+                    android:textColor="@color/text_default"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_month_choice"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/border_gray100"
+                    android:visibility="gone">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_prev"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:layout_marginEnd="20dp"
+                        android:paddingStart="18dp"
+                        android:paddingTop="16dp"
+                        android:paddingEnd="18dp"
+                        android:paddingBottom="16dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/tv_year"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/btn_arrow_left_state"
+                        tools:ignore="RtlHardcoded" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_year"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_gray"
+                        android:textSize="10sp"
+                        app:layout_constraintBottom_toTopOf="@+id/tv_month"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_chainStyle="packed" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_month"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_gray"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="@+id/tv_year"
+                        app:layout_constraintStart_toStartOf="@+id/tv_year"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_year" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_next"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:layout_marginStart="20dp"
+                        android:paddingStart="18dp"
+                        android:paddingTop="16dp"
+                        android:paddingEnd="18dp"
+                        android:paddingBottom="16dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/tv_year"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/btn_arrow_right_state"
+                        tools:ignore="RtlHardcoded" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefresh"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:focusableInTouchMode="true"
+                    android:orientation="vertical"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/emptyView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:background="@color/text_white_black"
+                        android:gravity="center"
+                        android:text="@string/support_empty"
+                        android:textAlignment="center"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/support_main_rv"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scrollbars="vertical"
+                        android:visibility="gone"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/loading"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:background="@color/background_100"
+                        android:gravity="center"
+                        android:text="@string/lable_get_info"
+                        android:textAlignment="center"
+                        android:textSize="16sp"
+                        android:visibility="visible" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+        <Button
+            android:id="@+id/support_info_btn"
+            android:layout_width="53dp"
+            android:layout_height="53dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/btn_cumulative_voting_fandom_support"
+            app:layout_constraintBottom_toTopOf="@+id/support_main_li"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/support_main_li"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border_top_gray100"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/support_main_li_mydia"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingTop="13dp"
+                android:paddingBottom="19dp">
+
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="18dp"
+                    android:layout_height="16dp"
+                    android:layout_above="@+id/tv_video2"
+                    android:src="@drawable/icon_my_diamond" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/my_diamonds"
+                    android:textAlignment="center"
+                    android:textColor="@color/btn_text_brand500"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/manage_diamonds"
+                    android:textAlignment="center"
+                    android:textColor="@color/text_dimmed"
+                    android:textSize="10sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="21.7dp"
+                android:layout_marginBottom="23.7dp"
+                android:background="?android:attr/listDivider" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/support_main_li_create"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingTop="13dp"
+                android:paddingBottom="19dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="18dp"
+                    android:layout_height="16dp"
+                    android:layout_above="@+id/tv_video2"
+                    android:src="@drawable/icon_add_diamond" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/support_create"
+                    android:textAlignment="center"
+                    android:textColor="@color/btn_text_brand500"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/support_main_tv_create"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/support_use_diamond"
+                    android:textAlignment="center"
+                    android:textColor="@color/text_dimmed"
+                    android:textSize="10sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

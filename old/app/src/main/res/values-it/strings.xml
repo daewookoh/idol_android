@@ -1,0 +1,1906 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="heart_store">Negozio di cuori</string>
+    <string name="normal_heart_shop">Acquisto una tantum</string>
+    <string name="regular_heart_shop">Acquisto regolare</string>
+    <string name="bonus">Bonus</string>
+    <string name="no_iap_products">Non ci sono prodotti disponibili per l\'acquisto.</string>
+    <string name="votes"></string>
+    <string name="postfix_rank"></string>
+    <string name="app_name">Choeaedol</string>
+    <string name="app_name_onestore">Choeaedol</string>
+    <string name="app_name_china">Choeaedol</string>
+    <string name="actor_app_name">Choeaedol Celeb</string>
+    <string name="app_name_upper">CHOEAEDOL</string>
+    <string name="app_name_onestore_upper">CHOEAEDOL</string>
+    <string name="app_name_china_upper">CHOEAEDOL</string>
+    <string name="actor_app_name_upper">CHOEAEDOL Celeb</string>
+    <string name="ios_permission_camera">Necessario per impostare le foto del profilo, caricare o salvare le foto</string>
+    <string name="ios_permission_photo">Necessario per impostare le foto del profilo, caricare o salvare le foto</string>
+    <string name="ios_permission_photo_add">Necessario per impostare le foto del profilo, caricare o salvare le foto</string>
+    <string name="X_DAILY_ALL">TUTTI giornalieri X</string>
+    <string name="photo_picker">Carica una foto</string>
+    <string name="Camera">Scatta una foto</string>
+    <string name="photo_library">Seleziona dall\'album</string>
+    <string name="push_notification">Allarme Push</string>
+    <string name="push_on">On</string>
+    <string name="push_off">Off</string>
+    <string name="image_save_error">Il download non è stato completato correttamente. Vai su Archiviazione dispositivo o Impostazioni dispositivo > CHOEAEDOL > Foto. Controlla le impostazioni dell\'autorizzazione e riprova.</string>
+    <string name="actor_image_save_error">Il download non è stato completato correttamente. Vai a Memoria dispositivo o Impostazioni dispositivo > Celeb CHOEAEDOL > Foto. Controlla le impostazioni dell\'autorizzazione e riprova.</string>
+    <string name="delete_comment">Vuoi cancellare questo commento?</string>
+    <string name="received_heart_history">Cuori ricevuti</string>
+    <string name="login_line">Accedi con il tuo account di LINEA.</string>
+    <string name="line_not_installed">LINEA non è installata su questo dispositivo.</string>
+    <string name="line_login_failed">Accesso fallito.</string>
+    <string name="loading">Caricamento in corso…</string>
+    <string name="opensource_license">Licenza Open Source</string>
+    <string name="kakaotalk_not_installed">KAKAOTALK non è installato su questo dispositivo.</string>
+    <string name="help_safari">Vuoi visualizzare il manuale su Safari?</string>
+    <string name="actor_help_safari">Vuoi visualizzare il manuale su Safari?</string>
+    <string name="processing_iap_receipt">Elaborazione in corso degli ordini per la ricarica del cuore.</string>
+    <string name="processing_iap_receipt_failed">La ricarica del cuore non è riuscita a causa di un errore di rete. Si prega di premere il pulsante \'RIPROVA\'.</string>
+    <string name="retry">Riprova</string>
+    <string name="iap_cancelled">Il pagamento è stato cancellato</string>
+    <string name="title_appstore_review">Lascia una recensione per CHOEAEDOL</string>
+    <string name="actor_title_appstore_review">Lascia una recensione per CHOEAEDOL Celeb</string>
+    <string name="no_my_articles">Non hai scritto nessun post.</string>
+    <string name="no_my_comments">Non hai scritto nessun commento.</string>
+    <string name="hint_email">indirizzo e-mail</string>
+    <string name="hint_passwd">Password</string>
+    <string name="hint_passwd_confirm">Controlla la password</string>
+    <string name="hint_name">Soprannome</string>
+    <string name="hint_recommender">Utente che raccomanda (soprannome)</string>
+    <string name="hint_recommender_1">Inserisci il codice di invito di 8 cifre. (Facoltativo)</string>
+    <string name="hint_search_idol">Inserisci il nome dell\'artista.</string>
+    <string name="actor_hint_search_idol">Inserisci il nome della celebrità.</string>
+    <string name="text_forgot_id">Hai dimenticato il tuo ID?</string>
+    <string name="text_forgot_passwd">Hai dimenticato la password?</string>
+    <string name="my_heart">Totale</string>
+    <string name="confirm">OK</string>
+    <string name="failed_to_load">Caricamento delle informazioni non riuscito</string>
+    <string name="title_tab_solo">Rango individuale</string>
+    <string name="title_tab_group">Rango del gruppo</string>
+    <string name="actor_title_tab_actors">Rango degli attori</string>
+    <string name="actor_title_tab_actresses">Rango attrice</string>
+    <string name="title_tab_favorite">Il mio idolo</string>
+    <string name="actor_title_tab_favorite">Mia Celeb</string>
+    <string name="title_tab_hall">Hall of fame</string>
+    <string name="title_tab_menu">Menu</string>
+    <string name="title_agreement">Termini e condizioni</string>
+    <string name="title_forgot_passwd">Trova la password</string>
+    <string name="title_favorite_setting">Le impostazioni del Mio Idolo</string>
+    <string name="actor_title_favorite_setting">Le impostazioni delle Mie Celebrità</string>
+    <string name="title_setting">Impostazioni</string>
+    <string name="title_coinplus">Registra il tuo account Cople</string>
+    <string name="title_write">Scrivi</string>
+    <string name="title_profile">Profilo</string>
+    <string name="title_info_more">Inserisci ulteriori informazioni.</string>
+    <string name="title_share">Condividi</string>
+    <string name="title_review">Scrivi una recensione per CHOEAEDOL</string>
+    <string name="actor_title_review">Scrivi una recensione per CHOEAEDOL Celeb</string>
+    <string name="title_show_option">Impostazioni della privacy</string>
+    <string name="title_signup">Registrazione soci</string>
+    <string name="title_level_heart">Cosa significa rango accumulato?</string>
+    <string name="actor_title_level_heart">Cosa significa rango accumulato?</string>
+    <string name="heart_count_format" formatted="false">%s</string>
+    <string name="vote_count_format" formatted="false">%s</string>
+    <string name="rank_count_format" formatted="false">%s</string>
+    <string name="need_agree1">Si prega di accettare i termini e le condizioni.</string>
+    <string name="need_agree2">Si prega di accettare l\'informativa sulla privacy.</string>
+    <string name="required_field">Questo è un campo obbligatorio.</string>
+    <string name="invalid_format_email">Si prega di digitare l\'indirizzo email.</string>
+    <string name="too_short_passwd">La password è troppo corta.</string>
+    <string name="passwd_confirm_not_match">Le password non corrispondono.</string>
+    <string name="title_vote_heart">Votazione</string>
+    <string name="favorite">Preferito</string>
+    <string name="agreement1">Termini e condizioni</string>
+    <string name="agreement2">politica sulla riservatezza</string>
+    <string name="agreement1_agree">Accetto Termini e Condizioni.</string>
+    <string name="agreement2_agree">Accetto l\'informativa sulla privacy.</string>
+    <string name="signup_desc1">La tua email verrà utilizzata per trovare la password. Pertanto, assicurarsi che sia accurata.</string>
+    <string name="signup_desc2" formatted="false">Inserisci il codice di invito del tuo referente per ottenere fino a %d Cuori e scambiarli con gli amici.</string>
+    <string name="heart_history_desc">*I cuori ricevuti verranno ripristinati ogni mezzanotte.</string>
+    <string name="same_nickname">Il soprannome è identico a quello che stai attualmente utilizzando.</string>
+    <string name="wait_signup">Registrazione in corso...</string>
+    <string name="wait_signin">Accesso in corso…</string>
+    <string name="desc_failed_to_connect_internet">La connessione di rete è instabile. Riprova più tardi.</string>
+    <string name="wait_userinfo">Caricamento in corso delle informazioni dell\'utente...</string>
+    <string name="btn_next">Passo successivo</string>
+    <string name="btn_signin">Accesso</string>
+    <string name="btn_signup">Iscriviti</string>
+    <string name="btn_signup_finish">Iscriviti</string>
+    <string name="btn_signup_finish_1">Iscrizione completata</string>
+    <string name="my_action">Attività</string>
+    <string name="my_vote">Voti accumulati</string>
+    <string name="menu_menu00">Eventi</string>
+    <string name="menu_menu01">Le impostazioni del Mio Idolo</string>
+    <string name="actor_menu_menu01">Le impostazioni delle Mie Celebrità</string>
+    <string name="menu_menu02">Stazione di ricarica del cuore</string>
+    <string name="menu_menu03"></string>
+    <string name="menu_menu04">CHOEAEDOL Guida per l\'utente</string>
+    <string name="menu_menu05">Impostazioni</string>
+    <string name="setting_menu01">Avvisi</string>
+    <string name="setting_menu02">Indagini</string>
+    <string name="setting_menu03"></string>
+    <string name="setting_menu04">Avvisi</string>
+    <string name="setting_menu05">Cambia la password</string>
+    <string name="setting_menu06">Cancella il mio account</string>
+    <string name="setting_menu07">Versione dell\'app</string>
+    <string name="setting_menu_heart_box_event">Impostazioni eventi Scatola di cuori</string>
+    <string name="most_favorite">Il mio idolo</string>
+    <string name="actor_most_favorite">La mia Celeb</string>
+    <string name="empty_most">Non c\'è ancora \"Il Mio Idolo\".</string>
+    <string name="actor_empty_most">Non c\'è ancora \"La Mia Celeb\".</string>
+    <string name="empty_vote">Voti accumulati (ultimi 30): 0</string>
+    <string name="favorite_format" formatted="false">Il mio idolo: %s</string>
+    <string name="actor_favorite_format" formatted="false">La mia celebrità: %s</string>
+    <string name="desc_empty_favorite1">Non hai ancora scelto Il Mio Idolo!</string>
+    <string name="actor_desc_empty_favorite1">Non hai ancora scelto La Mia Celeb!</string>
+    <string name="desc_empty_favorite2">Scegli Il Mio Idolo ora!</string>
+    <string name="actor_desc_empty_favorite2">Scegli La Mia Celeb ora!</string>
+    <string name="desc_empty_favorite3">Seleziona Idolo</string>
+    <string name="actor_desc_empty_favorite3">Seleziona Celeb</string>
+    <string name="hint_coinplus_email"></string>
+    <string name="coinplus_download"></string>
+    <string name="order_by_time">Ordine di tempo</string>
+    <string name="order_by_heart">Ordine dei cuori</string>
+    <string name="no_reporter">Non hai segnalato nessuno.</string>
+    <string name="nofriend1">Non hai ancora amici!</string>
+    <string name="nofriend2">Invita gli amici e inviate i cuori gli uni agli altri!</string>
+    <string name="invite_friend_kakao">Invita amico ></string>
+    <string name="write_content">Si prega di digitare i contenuti.</string>
+    <string name="btn_write">Invia</string>
+    <string name="upload_success">Caricato</string>
+    <string name="not_enough_heart">Non hai abbastanza cuori.</string>
+    <string name="sent_heart_friend__format" formatted="false">Hai inviato cuori a %s.</string>
+    <string name="sent_heart_all_friend__format" formatted="false">Hai inviato cuori a %d persone.</string>
+    <string name="already_sent_heart__format">Hai già inviato cuori a %1$s. (Puoi inviare di nuovo dopo %2$s secondi.)</string>
+    <string name="sending_heart">Invio di cuori.</string>
+    <string name="heart_history_format">Hai ricevuto i cuori da %1$s. (%2$s)</string>
+    <string name="sent_find_pw_mail">Le informazioni sulla password sono state inviate al tuo indirizzo email.</string>
+    <string name="title_report">Rapporto</string>
+    <string name="report_desc">Vuoi segnalare questo post?</string>
+    <string name="btn_cancel">Annulla</string>
+    <string name="empty_comment">Non ci sono commenti</string>
+    <string name="hint_comment">Per favore, inserisci un commento</string>
+    <string name="title_comment">Scrivi un commento</string>
+    <string name="title_friends">Gestisci gli amici</string>
+    <string name="title_unfriend">Elimina amico</string>
+    <string name="applied">La tua password è stata modificata.</string>
+    <string name="empty_event">Non ci sono eventi</string>
+    <string name="empty_notice">Non ci sono notifiche</string>
+    <string name="empty_inquiry">Non ci sono richieste.</string>
+    <string name="title_event">Eventi</string>
+    <string name="title_notice">Avvisi</string>
+    <string name="title_change_passwd">Cambia la password</string>
+    <string name="title_faq">FAQ</string>
+    <string name="title_inquiry">FAQ / Indagini</string>
+    <string name="title_myinquirylist">La mia cronologia delle richieste</string>
+    <string name="title_voting_guide">Voti accumulati</string>
+    <string name="hint_inquiry">Per favore, inserisci la tua domanda</string>
+    <string name="title_rename">Cambia soprannome</string>
+    <string name="hint_nickname">Soprannome</string>
+    <string name="rename_desc">Inserisci un nuovo soprannome.</string>
+    <string name="rename_confirm_desc">100 cuori verranno usati per cambiare il tuo soprannome.\nVuoi cambiare il tuo soprannome?</string>
+    <string name="registered">Registrazione completa</string>
+    <string name="inquiry_time_format">Questa domanda è stata inviata il %1$s.</string>
+    <string name="no_search_result">Nessun risultato.</string>
+    <string name="wait_upload_article">Pubblicazione in corso...</string>
+    <string name="remove_desc">Vuoi cancellare questo post?</string>
+    <string name="title_remove">Elimina</string>
+    <string name="button_close">Chiudi</string>
+    <string name="title_heart_voting_ranking">I 100 migliori elettori</string>
+    <string name="button_kakao">Accedi utilizzando l\'account KAKAOTALK.</string>
+    <string name="hint_passwd_current">Password attuale</string>
+    <string name="hint_new_passwd">Nuova password</string>
+    <string name="hint_new_passwd_confirm">Conferma la nuova password</string>
+    <string name="passwd_not_match">La password corrente non corrisponde.</string>
+    <string name="weak_heart">Cuori giornalieri</string>
+    <string name="weak_heart_desc">I Cuori giornalieri sono i cuori ripristinati a ogni mezzanotte. Sono cuori che ricevi per l\'accesso o quelli inviati/ricevuti da amici.</string>
+    <string name="btn_free_heart">Riempi i cuori liberi</string>
+    <string name="title_myheart">I miei cuori</string>
+    <string name="title_heartchage">Stazione di ricarica del cuore</string>
+    <string name="wait_kakao_signin">Recupero delle informazioni del tuo account KAKAOTALK.</string>
+    <string name="your_id_is1">Il tuo ID è</string>
+    <string name="your_id_is2"></string>
+    <string name="failed_to_find_id">Impossibile trovare l\'ID.</string>
+    <string name="title_find_id">Risultato della ricerca ID.</string>
+    <string name="failed_to_report">Non puoi segnalarlo.</string>
+    <string name="failed_to_report_2202">Puoi fare solo 3 segnalazioni al giorno.</string>
+    <string name="failed_to_report_2203">Puoi segnalare di nuovo dopo 3 minuti.</string>
+    <string name="failed_to_report__not_my_most">Non puoi segnalare. Solo i membri della comunità possono segnalare.</string>
+    <string name="actor_failed_to_report__not_my_most">Non puoi segnalare. Diritti di segnalazione riservati solo ai membri della comunità celeb.</string>
+    <string name="failed_to_report__already_reported">Questo post è già stato segnalato. I post possono essere segnalati una sola volta.</string>
+    <string name="no_writes">Non hai scritto alcun post o commento.</string>
+    <string name="signup_lock">Non è possibile registrarsi di nuovo entro 10 minuti da un singolo dispositivo.\nRiprova dopo 10 minuti.</string>
+    <string name="lable_invite_name">Utente che racommanda:</string>
+    <string name="lable_do_not_read">Non mostrare più</string>
+    <string name="lable_kakao_more_1">※ Puoi cambiare il tuo soprannome in quello che desideri.</string>
+    <string name="lable_kakao_more_2">Inserisci il tuo utente che raccomanda (soprannome) e potrete inviare/ricevere cuori l\'uno con l\'altro.</string>
+    <string name="lable_change_info">Modifica le informazioni sui membri</string>
+    <string name="lable_change_info_complete">Modifica le informazioni sui membri</string>
+    <string name="lable_individual_aggregated">Individuale 30 giorni</string>
+    <string name="actor_lable_individual_aggregated">Attore\n30 giorni</string>
+    <string name="lable_actors_aggregated">Attore\n30 giorni</string>
+    <string name="lable_actresses_aggregated">Attrice\n30 giorni</string>
+    <string name="lable_group_aggregated">Gruppo 30 giorni</string>
+    <string name="actor_lable_group_aggregated">Cantante-attore\n30 giorni</string>
+    <string name="label_individual_daily">Giornaliero Individuale</string>
+    <string name="label_group_daily">Gruppo Giornaliero</string>
+    <string name="lable_individual">Individuale</string>
+    <string name="actor_lable_individual">Attore</string>
+    <string name="lable_actors">Attore</string>
+    <string name="lable_actresses">Attrici</string>
+    <string name="lable_group">Gruppo</string>
+    <string name="actor_lable_group">Cantante-Attore</string>
+    <string name="lable_my_articles">I miei post</string>
+    <string name="lable_my_comments">I miei commenti</string>
+    <string name="lable_heart_vote">Cronologia d\'uso del cuore</string>
+    <string name="lable_heart_save">Cronologia dell\'accumulazione del cuore</string>
+    <string name="lable_count_unit"></string>
+    <string name="lable_final_result">Risultato finale</string>
+    <string name="lable_review_ok">Si prega di dare 5 stelle</string>
+    <string name="lable_review_no">Ignora a sangue freddo</string>
+    <string name="lable_review_info1">Lascia messaggi incoraggianti per il tuo idolo.</string>
+    <string name="actor_lable_review_info1">Lascia messaggi incoraggianti per la tua Celeb.</string>
+    <string name="lable_review_info2">CHOEAEDOL vale la pena ricevere 5 stelle, giusto?</string>
+    <string name="actor_lable_review_info2">CHOEAEDOL Celeb vale la pena ricevere 5 stelle, giusto?</string>
+    <string name="lable_get_info">Recupero dati in corso…</string>
+    <string name="lable_buy">Acquista</string>
+    <string name="lable_manager_warning">Modifica autorizzazione amministratore</string>
+    <string name="lable_show_range">Impostazioni della privacy</string>
+    <string name="lable_show_public">Aperto a tutti</string>
+    <string name="lable_show_private">Solo per i membri della comunità</string>
+    <string name="actor_lable_show_private">Solo per i membri della comunità</string>
+    <string name="lable_manager">[Admin]</string>
+    <string name="lable_save">Salva</string>
+    <string name="lable_surprise_heart">Vinti cuori a sorpresa</string>
+    <string name="lable_community_heart_vote">Votazione</string>
+    <string name="lable_community_comment">Commenti</string>
+    <string name="lable_community_report">Rapporto</string>
+    <string name="lable_coin_unit">Moneta</string>
+    <string name="lable_coinsplayer_buy"></string>
+    <string name="lable_coinsplayer_password"></string>
+    <string name="lable_coinsplayer_account_register"></string>
+    <string name="lable_day"></string>
+    <string name="lable_heart_box">Scatola di cuori</string>
+    <string name="lable_receive_no_heart">Peccato! La prossima volta sarai più fortunato.</string>
+    <string name="lable_aggree_heart_box_1_1"></string>
+    <string name="lable_aggree_heart_box_1_2"></string>
+    <string name="lable_aggree_heart_box_1_3"></string>
+    <string name="lable_aggree_heart_box_2"></string>
+    <string name="lable_aggree_heart_box_2_1"></string>
+    <string name="lable_aggree_heart_box_2_2"></string>
+    <string name="lable_aggree_heart_box_3"></string>
+    <string name="lable_aggree_heart_box_4"></string>
+    <string name="lable_agree">Accetta</string>
+    <string name="lable_no_agree">Non accettare</string>
+    <string name="lable_more_info_heart_box_event">Puoi ripristinare le impostazioni dell\'evento Scatola di cuori andando su \"Visualizza altro menu> Impostazioni\"</string>
+    <string name="lable_heart_box_ok">Hai vinto una Scatola di cuori!</string>
+    <string name="lable_heart_box_ok_1">Sìì! %1$s cuori!</string>
+    <string name="labe_giftcard_winner">Vedi l\'elenco dei vincitori delle carte regalo Google.</string>
+    <string name="msg_heart_received">I cuori sono stati ricaricati.</string>
+    <string name="msg_unable_use_write">I voti vengono tabulati; pertanto, non è possibile inviare nuovi post. \n[Tempo di tabulazione del voto\n%1$s - %2$s]</string>
+    <string name="msg_unable_use_vote">I voti vengono tabulati; pertanto, non puoi votare. \n[Tempo di tabulazione del voto\n%1$s - %2$s]</string>
+    <string name="msg_unable_use_send_heart">I voti vengono tabulati; pertanto, non è possibile inviare/ricevere cuori. \n[Tempo di tabulazione del voto\n%1$s - %2$s]</string>
+    <string name="msg_unable_use_capture_1">Non è possibile utilizzare la funzione di condivisione. Si prega di verificare le condizioni del dispositivo.</string>
+    <string name="msg_unable_use_capture_2">La funzione di condivisione non è stata completata normalmente. Controlla le condizioni e lo spazio di archiviazione del dispositivo e riprova.</string>
+    <string name="msg_save_ok">Salvato.</string>
+    <string name="msg_unable_use_download_1">Non è possibile utilizzare la funzione di download. Si prega di verificare le condizioni del dispositivo.</string>
+    <string name="msg_unable_use_download_2">Il download non è stato completato correttamente. Controlla le condizioni e lo spazio di archiviazione sul dispositivo e riprova.</string>
+    <string name="msg_no_heart">Non hai ricevuto alcun cuore.</string>
+    <string name="msg_error_ok">Spiacenti, si è verificato un errore. \nPer favore, riprova.</string>
+    <string name="msg_favorite_guide">Idoli di stelle! Puoi accedere comodamente alle comunità di artisti che ti interessano.\nPuoi anche aggiungere idoli speciali nel menu \"Il Mio idolo\". Non vi è alcun limite al numero di artisti che è possibile aggiungere all\'elenco.\n(Il Mio Idolo: Icona del Cuore / Preferiti: Icona della Stella)</string>
+    <string name="actor_msg_favorite_guide">Celebrità di Stelle! Puoi accedere comodamente alle comunità di celebrità a cui sei interessato.\nPuoi anche recitare le celebrità nel menu \"La Mia celebrità\". Non c\'è limite al numero di celebrità che è possibile aggiungere all\'elenco.\n(La mia celebrità: Icona del Cuore / Preferiti: Icona della Stella)</string>
+    <string name="msg_go_to_add_heart">Non hai abbastanza cuori. \nVuoi riempire i tuoi cuori?</string>
+    <string name="msg_no_data">Nessun dato è stato scritto.</string>
+    <string name="msg_no_enter_self">Non puoi inserire il tuo soprannome.</string>
+    <string name="msg_no_enter_self_1">Non puoi inserire il soprannome che stai usando.</string>
+    <string name="msg_change_nickname_guide">I membri a cui non piacciono i loro soprannomi originali possono cambiarli ora.\nVuoi passare a un soprannome raro?</string>
+    <string name="msg_drop_out">Vuoi davvero annullare la registrazione? T_T? \nSiamo spiacenti di non poterti soddisfare. \nFaremo del nostro meglio in futuro! \nDopo l\'annullamento della registrazione, tutti i post, i cuori e il tuo rarenick verranno ripristinati. \nVuoi veramente cancellare il tuo account?</string>
+    <string name="actor_msg_drop_out">Che cosa?! Vuoi davvero annullare la registrazione? :\'(\nSiamo spiacenti di non poterti soddisfare. \nFaremo del nostro meglio in futuro! \nIn caso di annullamento della registrazione, tutti i post, i cuori e il tuo soprannome raro verranno ripristinati. \nVuoi veramente cancellare il tuo account?</string>
+    <string name="msg_info_change_complete">Le informazioni sulla tua iscrizione sono state modificate.</string>
+    <string name="msg_not_able_vote">Non puoi votare.</string>
+    <string name="msg_favorite_guide_1">Dopo aver selezionato il tuo Idolo, puoi cambiarlo dopo 2 giorni.</string>
+    <string name="actor_msg_favorite_guide_1">Dopo aver impostato la tua Celeb, puoi cambiarlo dopo 2 giorni.</string>
+    <string name="msg_favorite_guide_2__" formatted="false">Desideri registrare %s come tuo idolo?</string>
+    <string name="actor_msg_favorite_guide_2__" formatted="false">Desideri registrare %s come tua Celeb?</string>
+    <string name="msg_favorite_guide_2">Vuoi registrarti?</string>
+    <string name="actor_msg_favorite_guide_2">Vuoi registrarti?</string>
+    <string name="actor_msg_favorite_guide_2_1">come la tua Celeb?</string>
+    <string name="msg_favorite_guide_3" formatted="false">Dopo aver selezionato il tuo idolo, puoi cambiarlo dopo 2 giorni. Desideri eliminare il tuo idolo attuale e impostare %s come idolo?</string>
+    <string name="actor_msg_favorite_guide_3" formatted="false">Dopo aver selezionato la tua Celeb, puoi cambiarlo dopo 2 giorni. Desideri eliminare la tua celebrità attuale e impostare %s come celebrità?</string>
+    <string name="msg_favorite_unregi_guide1">Vuoi ripristinare il tuo idolo?</string>
+    <string name="actor_msg_favorite_unregi_guide1">Vuoi ripristinare la tua celebrità?</string>
+    <string name="msg_favorite_unregi_guide2"></string>
+    <string name="actor_msg_favorite_unregi_guide2"></string>
+    <string name="msg_iab_error">Si è verificato un errore. Vi preghiamo di contattarci attraverso il menu delle impostazioni se i vostri cuori non vengono ricaricati anche dopo aver riavviato l\'app.</string>
+    <string name="msg_iab_purchase_error">L\'acquisto non è stato completato correttamente. Verifica se il pagamento è stato effettuato. Se l\'errore di pagamento persiste, contattaci utilizzando la funzione nel menu delle impostazioni.</string>
+    <string name="msg_manager_warning">*Se modifichi o elimini il tuo attuale Idolo, lo stato della tua iscrizione verrà ridotto dall\'amministratore al membro generale.</string>
+    <string name="actor_msg_manager_warning">*Se modifichi o elimini il tuo attuale attore, il tuo stato di abbonamento verrà ridotto dall\'amministratore al membro generale.</string>
+    <string name="msg_continue">Vuoi continuare?</string>
+    <string name="msg_manager_notice_guide">È stato inviato un avviso dall\'amministratore. Questo post verrà mostrato in alto indipendentemente dal numero di cuori ricevuti.</string>
+    <string name="msg_surprise_heart">Hai vinto un cuore a sorpresa! Congratulazioni!\nHai ricevuto +%1$s cuori a sorpresa.</string>
+    <string name="msg_no_history">I risultati dalla data selezionata non sono disponibili.</string>
+    <string name="msg_coinsplayer_ask_password"></string>
+    <string name="msg_heart_box_event_ok">Puoi partecipare all\'evento Scatola di cuori.</string>
+    <string name="msg_heart_box_event_fail">Non puoi partecipare all\'evento Scatola di cuori.</string>
+    <string name="msg_download_ok">È possibile utilizzare la funzione \"SALVA\".</string>
+    <string name="msg_download_fail">Non è possibile utilizzare la funzione \"SALVA\".</string>
+    <string name="msg_share_ok">È possibile utilizzare la funzione \"CONDIVIDI\".</string>
+    <string name="msg_share_fail">Non è possibile utilizzare la funzione \"CONDIVIDI\".</string>
+    <string name="msg_giftcard_guide">Hai inserito l\'evento Google Gift Card</string>
+    <string name="msg_link_image_guide">Non è possibile caricare un collegamento e un\'immagine contemporaneamente.</string>
+    <string name="response_v1_articles_ok">Post completo.</string>
+    <string name="response_v1_articles_ok_heart">Post completo.\n%1$s cuori sono stati premiati.</string>
+    <string name="response_users_is_active_time_over">Non puoi esprimere voti oltre il limite giornaliero.</string>
+    <string name="response_v1_articles_give_heart">Hanno votato %1$s cuori.\n%3$s + %4$s</string>
+    <string name="error_nextapps_error1">Impossibile recuperare l\'annuncio.</string>
+    <string name="error_nextapps_error2">Impossibile partecipare alla campagna.</string>
+    <string name="error_nextapps_error3">Questa campagna si è conclusa.</string>
+    <string name="error_nextapps_error4">Questa è una campagna a cui hai partecipato.</string>
+    <string name="error_nextapps_error5">Non puoi partecipare a questa campagna.</string>
+    <string name="error_abnormal">[%1$s] Si è verificato un errore. Riprova più tardi.</string>
+    <string name="error_abnormal_default">Si è verificato un errore. Riprova più tardi.</string>
+    <string name="error_abnormal_exception">Si è verificata un\'eccezione. Riprova più tardi.</string>
+    <string name="error_1001">Email già utilizzata.</string>
+    <string name="error_1002">Ti preghiamo di controllare nuovamente la tua email.</string>
+    <string name="error_1010">Per favore, inserisci il tuo soprannome.</string>
+    <string name="error_1011">Il soprannome è già in uso.</string>
+    <string name="error_1012">Impossibile trovare l\'utente che raccomanda.</string>
+    <string name="error_1030">Soprannome sbagliato.</string>
+    <string name="error_1031">Per favore, controlla la tua password.</string>
+    <string name="error_1145">Non puoi cambiare il tuo idolo entro 2 giorni!\nNel frattempo, pensa a chi vuoi cambiarlo! ^^</string>
+    <string name="actor_error_1145">Non puoi cambiare la tua Celeb entro 2 giorni!\nNel frattempo, pensa a chi vuoi cambiarlo! :-)</string>
+    <string name="error_1164">Il preferito è già stato cancellato.</string>
+    <string name="error_1200">Sembra che ci sia un problema con le informazioni sulla tua iscrizione.</string>
+    <string name="error_1201">Sembra che ci sia un problema con le informazioni sulla tua iscrizione.</string>
+    <string name="error_1912">Nessun account Cople è stato registrato. Si prega di registrare il proprio account Cople nel menu. ^^</string>
+    <string name="error_1991">Non hai abbastanza soldi.</string>
+    <string name="error_2090">C\'è un personaggio speciale che non è consentito.</string>
+    <string name="error_2091">Il tuo post è stato bloccato perché hai caricato contenuti espliciti.</string>
+    <string name="error_4010">Non è possibile esprimere un voto durante il periodo di presentazione della votazione.</string>
+    <string name="error_4011">Non puoi esprimere voti oltre il limite giornaliero.</string>
+    <string name="error_4020">Non hai abbastanza cuori.</string>
+    <string name="error_8000">Il tuo elenco di amici è piena. \n(sono ammessi fino a 300 amici)</string>
+    <string name="error_8001">L\'elenco di amici dell\'altra persona è pieno.</string>
+    <string name="error_8002">Hai già inviato una richiesta di amicizia. \nLa tua richiesta è attualmente in sospeso.</string>
+    <string name="error_8003">Siete già amici</string>
+    <string name="error_9997">Puoi inviare dopo 10 minuti.</string>
+    <string name="error_9998">Puoi inviare fino a 3 cuori per amico solo ogni giorno.</string>
+    <string name="voting_guide_title1">Quali sono i miei voti accumulati?</string>
+    <string name="voting_guide_title2">Condizioni per il rango</string>
+    <string name="voting_guide_desc1">- Questo è il numero di cuori che hai votato per il tuo Idolo.\n- Il tuo voto e i voti accumulati verranno ripristinati se non accedi per un certo periodo di tempo.\n(Tutto tornerà quando accedi e voterai di nuovo.)\n- Riceverai 100 cuori al giorno per l\'avvio dell\'app , così come i cuori premio di livello bonus in base al tuo stato di livello!</string>
+    <string name="actor_voting_guide_desc1">- Questo è il numero di cuori che hai votato per la tua celebrità.\n- Il tuo livello e i voti accumulati verranno ripristinati se non accedi per un certo periodo di tempo.\n(Tutto tornerà quando accedi e voterai di nuovo.)\n- Riceverai 100 cuori al giorno per l\'avvio dell\'app , così come i cuori premio di livello bonus in base al tuo stato di livello!</string>
+    <string name="level_heart_format" formatted="false">Voti accumulati: %s</string>
+    <string name="level_heart_guide_title1">Il 1° posto nel punteggio accumulato diventa l\'Angelo della carità👼</string>
+    <string name="actor_level_heart_guide_title1">Il 1° posto nel punteggio accumulato diventa l\'Angelo della carità👼</string>
+    <string name="level_heart_guide_title2">Punti per rango</string>
+    <string name="level_heart_guide_title3">Hall of Fame - Classifiche cumulative</string>
+    <string name="level_heart_guide_title4">Avviso</string>
+    <string name="level_heart_guide_desc1">Questo è il totale dei punteggi ottenuti dalle classifiche di votazione giornaliera negli ultimi 30 giorni. Espone i primi 100.\nSe fai clic sul nome di ciascun individuo e gruppo, puoi vedere il grafico del cambiamento di posizione.\nStiamo facendo donazioni a luoghi significativi nel nome di una idol e del suo fandom, che è stato classificato come il primo numero accumulato nella classifica di 30 giorni!\n\n✅ Metodo di aggregazione\n- Membro: n. 1 punteggio accumulato per i 30 giorni precedenti, compreso il 10 di ogni mese (annunciato l\'11)\n- Gruppo: n. 1 punteggio accumulato per i 30 giorni precedenti, compreso il 15 di ciascuno mese (annunciato il 16)\n- Altre categorie: Comunicate separatamente in fase di procedimento\n\n✅ Ricompensa\n- Donazione di 500.000 won alle Organizzazioni Welfare a nome dell\'Artista e del Fandom.\n- Pubblicare un annuncio di tabellone elettronico nella metropolitana di Seul</string>
+    <string name="level_heart_guide_desc3">I membri di ciascuna lega sono determinati in base ai criteri di cambio della lega l\'11 (individuale) e il 16 (gruppo).\nSe la lega viene cambiata, il punteggio cumulativo della classifica Hall of Fame inizia con 0 punti.</string>
+    <string name="level_heart_guide_desc4">-La lega degli individui e dei gruppi è separata. (Anche se il gruppo è nella Lega S, gli individui possono essere nella Lega A.)\n- In caso di pareggio, tutti i pareggi verranno assegnati in base alle regole di assegnazione della lega e verranno riassegnati al numero esistente di squadre o individui il mese successivo .\nes.) Se 3 squadre ottengono lo stesso punteggio nella Lega A, 3 squadre passeranno alla Lega S (modificando la quota della Lega S a 13). Tre squadre di basso livello verranno trasferite alla Lega A il mese successivo per mantenere 12 squadre nella Lega S.\n- Gli idoli appena aggiunti iniziano nella Lega A.\n- La cronologia delle classifiche prima dell\'introduzione del sistema di leghe nella Hall of Fame è contrassegnato come \'ALL\'.</string>
+    <string name="title_heart_vote_ranking__format" formatted="false">%s I primi 100 voti</string>
+    <string name="empty_heart_vote_ranking">Nessuno ha partecipato al voto del cuore.</string>
+    <string name="failed_to_get_vote_ranking">Impossibile recuperare i voti cardiaci.</string>
+    <string name="score_format" formatted="false">%s punti</string>
+    <string name="rank_format" formatted="false">%s</string>
+    <string name="title_agg_history_format" formatted="false">%s Modifiche alle classifiche accumulate</string>
+    <string name="first_rank">N. 1</string>
+    <string name="friend_request_sent">La richiesta di amicizia è stata inviata correttamente.\nDiventerai amici quando l\'altra persona accetta la tua richiesta.</string>
+    <string name="empty_friends">Tu non hai amici.</string>
+    <string name="btn_accept">Accetta</string>
+    <string name="btn_decline">Rifiuta</string>
+    <string name="friend_request_section_title">Elenco di richieste di amicizia</string>
+    <string name="friend_section_title">Elenco di amici</string>
+    <string name="title_friend_delete">Elimina amico</string>
+    <string name="friend_delete_msg_format" formatted="false">Vuoi eliminare %s dal tuo elenco degli amici?</string>
+    <string name="tiele_friend_delete_result">Eliminato.</string>
+    <string name="title_accept_friend_request">Accetta la richiesta di amicizia</string>
+    <string name="desc_accept_friend_request">Vuoi accettare questa richiesta di amicizia?</string>
+    <string name="desc_accepted_friend_request">Hai accettato questa richiesta di amicizia. \nOra puoi inviare e ricevere cuori.</string>
+    <string name="title_decline_friend_request">Rifiuta la richiesta di amicizia</string>
+    <string name="desc_decline_friend_request">Vuoi rifiutare la richiesta di amicizia?</string>
+    <string name="desc_declined_friend_request">Hai rifiutato la richiesta di amicizia.</string>
+    <string name="lable_burning_heart">Cuore per essere presente durante i momenti più richiesti.</string>
+    <string name="message_burning_heart">Ha partecipato con successo ai momenti più richiesti!\n30 cuori sono stati premiati!</string>
+    <string name="msg_comment_heart">5 cuori sono stati premiati. \n(1 volta al giorno)</string>
+    <string name="error_1013">Non è possibile registrarsi più di due volte entro 10 minuti.</string>
+    <string name="friend_request_format">Hai ricevuto una richiesta di amicizia.</string>
+    <string name="loading_profile">Recupero del profilo in corso...</string>
+    <string name="title_no_free_heart">Nessun cuore quotidiano</string>
+    <string name="desc_no_free_heart">Hai 0 cuori giornalieri T_T\nVuoi andare a prenderne ancora?</string>
+    <string name="title_no_heart">Non hai abbastanza cuori.</string>
+    <string name="desc_no_heart">Non hai abbastanza cuori T_T\nVuoi andare a prenderne ancora?</string>
+    <string name="btn_video_ad">Annuncio video (5 + 5 cuori)</string>
+    <string name="btn_free_heart_charge">Cuori Gratis</string>
+    <string name="btn_invite_friends">Invita amici tramite messaggio di testo.</string>
+    <string name="btn_invite_friends_reward">1.000 cuori per aver invitato un amico.</string>
+    <string name="btn_invite_friends_reward_burning">1.000 cuori per aver invitato un amico.</string>
+    <string name="btn_invite_friends_kakao">Invita un amico.</string>
+    <string name="btn_invite_friends_kakao_reward">%1$s Cuori al momento della registrazione.</string>
+    <string name="btn_invite_friends_kakao_reward_burning">1.000 cuori al momento della registrazione.</string>
+    <string name="btn_confirm">OK</string>
+    <string name="failed_to_load_page">Impossibile recuperare la pagina.</string>
+    <string name="btn_retry">Riprova</string>
+    <string name="error_1000_heart_give">Puoi inviare solo fino a 1.000 cuori al giorno.</string>
+    <string name="title_heart_earn">Come ottenere più cuori</string>
+    <string name="desc_bookmark">Non hai idoli preferiti!</string>
+    <string name="actor_desc_bookmark">Non hai Celeb preferite!</string>
+    <string name="desc_bookmark2">Aggiungi artisti che cerchi spesso nel tuo elenco dei preferiti!</string>
+    <string name="actor_desc_bookmark2">Star Celebs che cerchi spesso nel tuo elenco dei preferiti!</string>
+    <string name="desc_bookmark3">Imposta preferiti</string>
+    <string name="title_rank_history">Cambiamenti di classifica</string>
+    <string name="title_reward_video">Vedi annuncio video</string>
+    <string name="desc_reward_video" formatted="false">%s Cuori</string>
+    <string name="title_reward_invite">Invita un amico</string>
+    <string name="desc_reward_invite">Mai 1.000</string>
+    <string name="desc_reward_invite_burning">Mai 1.000</string>
+    <string name="title_reward_charge">Ricarica di cuore libera</string>
+    <string name="desc_reward_charge">Mai</string>
+    <string name="title_heart_send">Invia cuori</string>
+    <string name="video_ad_success">I cuori sono stati salvati.</string>
+    <string name="video_ad_cancelled">La riproduzione dell\'annuncio non è terminata.</string>
+    <string name="video_ad_failed">La rete è instabile. Impossibile riprodurre il video.</string>
+    <string name="video_ad_unable">Non ci sono più annunci da parte degli inserzionisti. Riprova più tardi.</string>
+    <string name="comment_push_format" formatted="false">\'%s\' ha lasciato un commento.</string>
+    <string name="btn_invite_friend">Invita un amico</string>
+    <string name="desc_login">Devi accedere per utilizzare questa funzione. \nVuoi entrare adesso?</string>
+    <string name="ever_heart">Cuori Sempre</string>
+    <string name="send_heart_desc">Puoi inviare Cuori Sempre solo agli amici. ^^</string>
+    <string name="send_heart_confirm_desc_format">I cuori %1$s verranno inviati a %2$s.</string>
+    <string name="lake_strong_heart">Non hai abbastanza Cuori Sempre.</string>
+    <string name="order_by_date">Per data</string>
+    <string name="order_by_vote">Per voto</string>
+    <string name="heart_receive_message" formatted="false">%s ha inviato cuori.</string>
+    <string name="heart_receive_message_with_num">%1$s ha inviato %2$s cuori.</string>
+    <string name="request_phone_state_permission">Per vedere ancora più annunci pubblicitari per le ricariche di cuori gratuite, seleziona \'Consenti\' per le due impostazioni delle autorizzazioni che seguono.</string>
+    <string name="deny_phone_state_permission">Se desideri tornare alle impostazioni precedenti, vai su \'Impostazioni di sistema &gt; Applicazioni &gt; CHOEAEDOL &gt; Autorizzazione\' e attivare Impostazioni di chiamata e Contatti</string>
+    <string name="actor_deny_phone_state_permission">Se desideri tornare alle impostazioni precedenti, vai su \"Impostazioni di sistema > Applicazioni > Celeb CHOEAEDOL > Autorizzazione\" e autorizza la \"chiamata\".</string>
+    <string name="level">Livello</string>
+    <string name="level_requirement">Condizione</string>
+    <string name="level_benefit">Vantaggio di livello</string>
+    <string name="level_requirement_format">%1$d voti</string>
+    <string name="level_benefit_format">❤ %1$s</string>
+    <string name="kakao_invite_new">Attualmente %1$s rango n. %2$d!</string>
+    <string name="drawer_open">Apri il menu</string>
+    <string name="drawer_close">Chiudi menu</string>
+    <string name="title_item_shop">Negozio di articoli</string>
+    <string name="title_item_buy">Acquista articoli</string>
+    <string name="register">Registrati</string>
+    <string name="send">Invia</string>
+    <string name="msg_item_purchased_1">Ora puoi eliminare post e commenti sulla community.</string>
+    <string name="msg_item_purchased_2">Inviato a %1$d persone.</string>
+    <string name="msg_item_purchased_2_unknown">Il messaggio è stato inviato.</string>
+    <string name="msg_item_purchased_3">È stato designato il giorno All-in.</string>
+    <string name="hint_community_push">Inserisci i contenuti (meno di 20 caratteri)</string>
+    <string name="item_title_1"></string>
+    <string name="item_title_2"></string>
+    <string name="item_title_3">Badge per il giorno All-in</string>
+    <string name="item_desc_1"></string>
+    <string name="item_desc_1_1"></string>
+    <string name="item_desc_2"></string>
+    <string name="item_desc_2_1"></string>
+    <string name="item_desc_3">Mostra il giorno all-in che è stato impostato nella Comunità di Idoli.</string>
+    <string name="actor_item_desc_3">Mostra il giorno all-in che è stato impostato nella Comunità delle Celeb.</string>
+    <string name="item_guide_1_1"></string>
+    <string name="item_guide_1_2"></string>
+    <string name="item_guide_2_1"></string>
+    <string name="item_guide_2_2"></string>
+    <string name="item_desc_3_1">(1 volta dopo l\'acquisto)\nMostra il badge per giorno All-in accanto al soprannome.</string>
+    <string name="item_guide_title_1"></string>
+    <string name="item_guide_title_2"></string>
+    <string name="item_guide_title_3">Funzione badge per il giorno all-in</string>
+    <string name="item_guide_3_1">- È possibile designare un giorno entro i prossimi 10 come giorno all-in (verrà visualizzato un avviso nell\'elenco dei ranghi e nella comunità)\n- Il badge verrà mantenuto per un giorno (fino al momento della votazione di oggi).\n- Solo i membri di livello %1$d+ possono acquistare questo oggetto. \nLa data può essere designata solo per il tuo idolo.</string>
+    <string name="actor_item_guide_3_1">- È possibile designare un giorno entro i prossimi 10 come giorno all-in (verrà visualizzato un avviso nell\'elenco dei ranghi e nella comunità)\n- Il badge verrà mostrato per un giorno (fino al momento della tabulazione del voto di oggi).\n- Solo i membri di livello %1$d+ possono acquistare questo oggetto. \nLa data può essere designata solo per la tua Celeb.</string>
+    <string name="item_guide_3_2">Seleziona la data che desideri designare come giorno all-in e \npremi \'REGISTRA\'.\n(%1$d diamanti verranno utilizzati)</string>
+    <string name="error_9901">Non abbastanza diamanti.</string>
+    <string name="error_9902">Può essere impostato solo entro i prossimi dieci giorni.</string>
+    <string name="error_9903">L\'articolo è già stato acquistato</string>
+    <string name="error_9904">È già stato impostato un giorno all-in. \nScegli una data successiva al giorno corrente e riprova.</string>
+    <string name="error_select_day">Seleziona una data</string>
+    <string name="error_9900">Questo articolo può essere acquistato solo dai membri di livello %1$d+.</string>
+    <string name="burning_day_format">M/d</string>
+    <string name="deleted_by">È stato eliminato da %1$s.</string>
+    <string name="deleted_by_unknown">Post cancellato.</string>
+    <string name="male">Ragazzi</string>
+    <string name="female">Ragazze</string>
+    <string name="all">Tutti</string>
+    <string name="wait_line_signin">Recupero delle informazioni del tuo account di LINEA.</string>
+    <string name="empty_friend_request">Non hai richieste di amicizia.</string>
+    <string name="cancel_friend_request">Annulla richiesta di amicizia</string>
+    <string name="last_login">Accesso recente</string>
+    <string name="settings_language">Impostazioni della lingua</string>
+    <string name="language_default">Predefinito del sistema</string>
+    <string name="view_more">Vedi altro</string>
+    <string name="post_limit">Max %1$d caratteri.</string>
+    <string name="msg_report_confirm">%1$s cuori saranno usati per segnalare.</string>
+    <string name="menu_change_app">Vai all\'attore coreano</string>
+    <string name="actor_menu_change_app">Vai a CHOEAEDOL</string>
+    <string name="copied_to_clipboard">Copiato negli appunti</string>
+    <string name="title_edit">Modifica</string>
+    <string name="error_9996">Non disponibile durante i momenti più richiesti</string>
+    <string name="title_tab_gaon">Premio Gaon Music</string>
+    <string name="gaon_guide_1">Come si usa CHOEAEDOL ></string>
+    <string name="gaon_guide_2">Premio Gaon Music ></string>
+    <string name="label_header_1">Voto popolare per il Premio Gaon Music</string>
+    <string name="label_header_2">Periodo : 12.01.2017 ~ 19.02</string>
+    <string name="label_header_3">Il voto popolare per i Premi Gaon Music conta.\nPremi sul cantante o sul gruppo per vedere i dettagli del cambio di classifica.</string>
+    <string name="label_header_result">Risultato</string>
+    <string name="label_header_1_final">Voto popolare per i Premi Gaon Music: risultato finale</string>
+    <string name="label_header_3_final">Il periodo di votazione è terminato.</string>
+    <string name="iab_restricted_title">Acquista cuori</string>
+    <string name="iab_restricted">Disponibile una volta al giorno</string>
+    <string name="label_not_verified_iap">Alcuni acquisti non sono stati completati. Per favore, vai alla stazione di ricarica del cuore.</string>
+    <string name="setting_menu_cache">Elimina cache</string>
+    <string name="are_you_sure">Sei sicuro?</string>
+    <string name="setting_menu_push_hearts">Cuori</string>
+    <string name="setting_menu_push_comments">Commento</string>
+    <string name="menu_menu_kin">Q&amp;A Idol</string>
+    <string name="actor_menu_menu_kin">Domande e risposte</string>
+    <string name="hint_search">Inserisci il testo di ricerca</string>
+    <string name="answer">Risposta</string>
+    <string name="offer_video_ad_desc" formatted="false">Ottieni %s Cuori (5 volte / 30 minuti)</string>
+    <string name="present_heart">Regalo di cuori</string>
+    <string name="present_heart_confirm">Vuoi presentare %1$s cuori?</string>
+    <string name="present_heart_done">Hai presentato i cuori.</string>
+    <string name="emoticon_badge">Badge con emoticon</string>
+    <string name="emoticon_badge_desc">Puoi mostrare il tuo umore</string>
+    <string name="emoticon_badge_buy">Acquista un badge con emoticon</string>
+    <string name="emoticon_badge_buy_guide">Seleziona l\'emoticon e premi il tasto \'Registrati\'. \n(Verranno utilizzati i cuori %1$d)</string>
+    <string name="purchased">Il tuo acquisto è stato completo</string>
+    <string name="newbie_info"></string>
+    <string name="report_done">Segnalato</string>
+    <string name="message_box">Casella dei messaggi</string>
+    <string name="message_expire_format">I messaggi verranno conservati per %1$d giorni.</string>
+    <string name="message_send">Invia un messaggio</string>
+    <string name="message_send_heart">Invia con i Cuori</string>
+    <string name="message_empty">Nessun messaggio</string>
+    <!-- permissoin (korean only) -->
+    <string name="permission_required">[Autorizzazione/i richiesta/e]</string>
+    <string name="permission_optional">[Autorizzazione/i facoltativa/e]</string>
+    <string name="permission_contact">Contatti : richiesti per la stazione di ricarica cardiaca libera. Richiesto per l\'accesso a Google.</string>
+    <string name="permission_phone">Telefono : richiesti per la stazione di ricarica cardiaca gratuita</string>
+    <string name="permission_storage">Spazio di archiviazione: necessario per caricare e salvare foto.</string>
+    <string name="permission_desc">Non è necessario consentire le autorizzazioni all\'accesso per utilizzare CHOEAEDOL. \n\nCHOEAEDOL non raccoglie alcuna informazione personale.</string>
+    <string name="actor_permission_desc">Non è necessario consentire le autorizzazioni all\'accesso per utilizzare CHOEAEDOL Celeb. \n\nCHOEAEDOL Celeb non raccoglie alcuna informazione personale.</string>
+    <string name="allow">Consenti</string>
+    <string name="deny">Nega</string>
+    <string name="label_see_video_for_heartbox">Guarda l\'annuncio video, ottieni altre Scatole di cuori</string>
+    <!-- bj app -->
+    <string name="profile_additional_info">Informazioni addizionali</string>
+    <string name="profile_birth">Data di nascita</string>
+    <string name="profile_birthday">Compleanno</string>
+    <string name="profile_intro">Intro</string>
+    <string name="profile_instagram">Instagram</string>
+    <string name="profile_facebook">Facebook</string>
+    <string name="profile_personal_broadcast">Trasmissione personale</string>
+    <string name="profile_modify_profile">Modifica profilo</string>
+    <string name="profile_delete_birth">Vuoi cancellare il compleanno?</string>
+    <string name="profile_no_birthday">Nessun compleanno</string>
+    <string name="profile_private">Privato</string>
+    <string name="invalid_url">L\'indirizzo del sito Web non è valido.</string>
+    <string name="format_reg_date" formatted="false">Iscrizione %s</string>
+    <string name="laboratory">Laboratorio</string>
+    <string name="use_internal_photo_editor">Usa l\'editor fotografico interno</string>
+    <string name="file_size_exceeded" formatted="false">Puoi caricare fino a %sMB.</string>
+    <string name="unsupported_format">Questo formato immagine non è supportato.</string>
+    <string name="cropper_not_found">Nessun editor di foto trovato. Installa l\'app Google Foto dal Play Store.</string>
+    <string name="comment_minimum_characters">Scrivi più di %1$d caratteri.</string>
+    <string name="gaon_welcome">Il 7° Premio Gaon Chart Music!</string>
+    <string name="gaon_guide1">Il gruppo maschile e femminile preferito è deciso dal tuo voto.</string>
+    <string name="gaon_guide2">Dai al tuo amato artista un trofeo per San Valentino.</string>
+    <string name="gaon_date_title">◆ Data dei Premi Gaon</string>
+    <string name="gaon_date_value">14 Feb 2018</string>
+    <string name="gaon_period_title">◆ Periodo di votazione</string>
+    <string name="gaon_period_value">%1$s ~ %2$s</string>
+    <string name="gaon_ratio_title">◆ Rapporto Sondaggio</string>
+    <string name="gaon_ratio_value">100% vvori riflettono la popolarità</string>
+    <string name="gaon_guide3">(I maschi e le femmine al primo posto nel rango cumulativo riceveranno il premio di gruppo preferito).</string>
+    <string name="gaon_howto_title">◆ Come si vota</string>
+    <string name="gaon_howto_value">Valgono le stesse regole originali di CHOEAEDOL</string>
+    <string name="gaon_special_rule_title">◆ Regola diversa dalle regole originali</string>
+    <string name="gaon_special_rule_value1">* Non individuale e di gruppo, ma gruppo preferito di maschi e femmine.</string>
+    <string name="gaon_special_rule_value2">* I candidati sono limitati ai gruppi specifici Gaon</string>
+    <string name="gaon_special_rule_value3">* Viene aggiunto anche il numero di voti per i membri del gruppo, al singolo tocco</string>
+    <string name="gaon_special_rule_value4">* Il pagamento in-app è limitato a uno al giorno per dispositivo</string>
+    <string name="gaon_special_rule_value5">* Limita le seguenti funzioni dalle 23:15 alle 00:15(KST)</string>
+    <string name="gaon_special_rule_value6">Invia un cuore agli amici</string>
+    <string name="gaon_special_rule_value7">Bonus di voto</string>
+    <string name="gaon_special_rule_value8">Bonus post popolare</string>
+    <string name="gaon_special_rule_value9">Bonus di invio</string>
+    <string name="gaon_goto_notice">Avviso CHOEAEDOL ></string>
+    <string name="gaon_goto_gaon">Pagina principale dei Premi Gaon ></string>
+    <string name="gaon_award_title_male">Rango maschile attuale</string>
+    <string name="gaon_award_title_female">Rango femminile attuale</string>
+    <string name="gaon_voting_period">Periodo di votazione : %1$s ~ %2$s</string>
+    <string name="gaon_current_guide1">Questa è la classifica in tempo reale (include voti individuali e di gruppo).</string>
+    <string name="gaon_current_guide2">Il rango cumulativo n.1 vince il premio per la popolarità.</string>
+    <string name="gaon_current_title">%1$s ranghi di OGGI</string>
+    <string name="gaon_accumulative_title_male">Classifica cumulativa\nGruppo di ragazzi</string>
+    <string name="gaon_accumulative_title_female">Classifica cumulativa\nGruppo di ragazze</string>
+    <string name="gaon_accumulative_guide1">Rango di voto cumulativo per il gruppo preferito</string>
+    <string name="gaon_accumulative_guide2">Il primo gruppo del rango cumulativo vincerà un premio.</string>
+    <string name="gaon_accumulative_title">%1$s ~ %2$s Risultato cumulativo</string>
+    <string name="gaon_award_title_male_final">[Gaon] Il gruppo maschile più amato</string>
+    <string name="gaon_award_title_female_final">[Gaon] Il gruppo femminile più amato</string>
+    <string name="gaon_final_guide">Il periodo di votazione è terminato.</string>
+    <string name="gaon_final_title">%1$s ~ %2$s Risultato finale</string>
+    <string name="signup_restricted">Si prega di utilizzare il proprio telefono.</string>
+    <string name="login_restricted">Si prega di utilizzare il proprio telefono.</string>
+    <string name="nas_heart_format">%1$d+ Cuori</string>
+    <string name="confirm_change_account">Sei già iscritto con la stessa email. Desideri modificare questo account con il metodo di accesso selezionato?</string>
+    <string name="facebook_no_email">Impossibile ottenere informazioni sull\'email da Facebook.</string>
+    <string name="menu_freeboard">Consiglio</string>
+    <string name="myheart_today_earn">Cuore Sempre raccolto oggi</string>
+    <string name="myheart_today_earn_help">Se raccogli %1$s Cuori Sempre, \nl\'immagine del profilo dell\'idolo al primo posto verrà modificata con il profilo del mio idolo. \nL\'immagine del profilo modificata verrà ripristinata domani.</string>
+    <string name="actor_myheart_today_earn_help">Se guadagni %1$s Cuori Sempre, \nle immagini del profilo al primo posto verranno cambiate nel profilo del mio attore. \nLe immagini del profilo modificate verranno ripristinate domani.</string>
+    <string name="label_image_option">Proporzioni foto</string>
+    <string name="label_image_option_title">Scegli le proporzioni della foto</string>
+    <string name="label_image_option_square">Quadrato (profilo e bannergramma)</string>
+    <string name="label_image_option_free">Libero / originale</string>
+    <string name="setting_lockscreen">Blocca schermo</string>
+    <string name="lockscreen_use">Usa la schermata di blocco</string>
+    <string name="lockscreen_background">La mia immagine di sfondo</string>
+    <string name="lockscreen_not_available">La schermata di blocco non è disponibile, se \"Il Mio Idolo\" non è impostato.\nPerché non imposti \"Il Mio Idolo\"?</string>
+    <string name="actor_lockscreen_not_available">La schermata di blocco non è disponibile se \"Il mio attore\" non è impostato.\nPerché non imposti \"Il mio attore\"?</string>
+    <string name="lockscreen_preview">Anteprima schermata di blocco</string>
+    <string name="lockscreen_preview_help">Collega due o più cerchi per sbloccare. Provalo.</string>
+    <string name="lockscreen_permission">Per utilizzare la schermata di blocco, attiva \"Consenti sovrapposizione su altre app\" nella pagina successiva.</string>
+    <string name="lockscreen_style">Stile</string>
+    <string name="lockscreen_style_pattern">Modello</string>
+    <string name="lockscreen_style_slide">Diapositiva</string>
+    <string name="lockscreen_show_clock">Mostra orologio</string>
+    <string name="lockscreen_preview_help_slide">Spostando l\'immagine dal cerchio sinistro a destra si sbloccherà lo schermo.\nFacciamolo.</string>
+    <string name="label_set_most">Se imposti \"Il Mio Idolo\", puoi salire di livello votando \"Il Mio Idolo\" e goderti di più \"CHOEAEDOL\"!\nImpostare \"Il Mio Idolo\" ora?</string>
+    <string name="actor_label_set_most">Se imposti \"La Mia Celeb\", puoi salire di livello votando \"La Mia Celeb\" e ottenere cuori di livello extra!\nConfigurare \"La Mia Celeb\" ora?</string>
+    <string name="setting_push">Premi Impostazioni allarme</string>
+    <string name="menu_board">Consiglio</string>
+    <string name="menu_stats">Registrazioni</string>
+    <string name="account_management">Gestione dell\'account</string>
+    <string name="stats_highest_votes">Top 100 dei voti più alti</string>
+    <string name="stats_donation">Numero dell\'angelo e della fata della carità</string>
+    <string name="stats_1st_place">Numero del primo posto</string>
+    <string name="stats_votes_top300">Top 300 delle votazioni cumulative</string>
+    <string name="charity_angel">Angelo della carità</string>
+    <string name="charity_fairy">Fata della carità</string>
+    <string name="stats_idol">Idolo</string>
+    <string name="stats_user">Utente</string>
+    <string name="none">Nessuna</string>
+    <string name="dropout_confirm">Se elimini il tuo account, non sarai in grado di recuperarlo. \nVuoi cancellare il tuo account?</string>
+    <string name="dropout_enter_captcha">Inserisci la seguente stringa</string>
+    <string name="dropout_done">Account eliminato</string>
+    <string name="dropout_placeholder">Inserisci la stringa di sopra.</string>
+    <string name="number_of_times" formatted="false">%s</string>
+    <string name="hearts_from_friends">Cuori dagli amici</string>
+    <string name="ad_show_fail">Riproduzione ANNUNCIO non riuscita.</string>
+    <string name="msg_use_internal_editor">Errore durante l\'avvio dell\'editor di immagini. Utilizza l\'editor di immagini interno (Impostazioni> Laboratorio)</string>
+    <string name="extension_login">Devi accedere per utilizzare questa funzione.</string>
+    <string name="actor">Celeb</string>
+    <string name="onestore_confirm_unconsumed"></string>
+    <string name="onestore_need_update"></string>
+    <string name="onestore_remote_exception"></string>
+    <string name="menu_quiz">Quiz sugli Idoli</string>
+    <string name="stats_quiz">Le prime 100 classifiche</string>
+    <string name="stats_quiz_today">Oggi</string>
+    <string name="stats_quiz_yesterday">Ieri</string>
+    <string name="stats_quiz_alltime">Sempre</string>
+    <string name="quiz_idol_all">TUTTI</string>
+    <string name="quiz_start">Inizio</string>
+    <string name="quiz_main_top">Puoi partecipare solo una volta al giorno.</string>
+    <string name="quiz_main_title">Metti alla prova quanto ami gli idoli!</string>
+    <string name="quiz_button_ranking">Classifica</string>
+    <string name="quiz_button_write">Crea un quiz</string>
+    <string name="quiz_button_my_quiz">Il mio quiz</string>
+    <string name="quiz_unavailable_time">Impossibile eseguire i quiz nel tempo di tabulazione (%1$s - %2$s).</string>
+    <string name="quiz_unavailable_done">Oops! Non si può fare altro per oggi! Riprova domani.</string>
+    <string name="quiz_unavailable_not_enough">Ooops. Non ci sono abbastanza quiz per l\'idolo scelto. Scegli altri idoli.</string>
+    <string name="quiz_write_help_title">Importante! Il quiz non verrà approvato quando :</string>
+    <string name="quiz_write_help_1">Ci sono variabili</string>
+    <string name="quiz_write_help_1_1">(indirizzo, età, peso, ecc.)</string>
+    <string name="quiz_write_help_2">La risposta non può essere scelta chiaramente.</string>
+    <string name="quiz_write_help_2_1">(altezza, corporatura, ecc.)</string>
+    <string name="quiz_write_help_3">Impossibile confermare la risposta.</string>
+    <string name="quiz_write_content">Quale sarà la domanda (meno di 100 lettere)</string>
+    <string name="quiz_write_image">Allega un\'immagine se necessario.</string>
+    <string name="quiz_write_choice">Quali saranno le risposte? (Meno di 20 lettere)</string>
+    <string name="quiz_write_answer">Risposta corretta</string>
+    <string name="quiz_write_difficulty">Difficoltà</string>
+    <string name="quiz_write_difficulty_high">Difficile</string>
+    <string name="quiz_write_difficulty_mid">Normale</string>
+    <string name="quiz_write_difficulty_low">Facile</string>
+    <string name="quiz_write_description">Perché è una risposta? Spiegalo per noi! (Meno di 100 lettere)</string>
+    <string name="quiz_write_submit">Invia</string>
+    <string name="quiz_write_delete_image">Elimina immagine</string>
+    <string name="quiz_write_empty">Riempi gli spazi vuoti.</string>
+    <string name="quiz_write_done">Inserito!\nRiceverai i cuori della ricompensa dopo che avremo superato il tuo quiz.</string>
+    <string name="quiz_test_idol">Quiz sugli Idoli</string>
+    <string name="quiz_test_all">TEST KDI (indice Kpop Dukhoo)</string>
+    <string name="quiz_writer">Esaminatore</string>
+    <string name="quiz_correct">Corretto!</string>
+    <string name="quiz_incorrect">Oops, sbagliato!</string>
+    <string name="quiz_confirm_exit">Vuoi uscire?</string>
+    <string name="quiz_fail">%1$d quiz hanno risposto correttamente!</string>
+    <string name="quiz_complete">Wow, hai risposto correttamente a tutti i %1$d quiz!</string>
+    <string name="quiz_my_quiz">Il mio quiz</string>
+    <string name="quiz_my_power">My KDI (indice Kpop Dukhoo)</string>
+    <string name="quiz_accepted">Quiz approvati</string>
+    <string name="quiz_delete_all">Cancella tutto</string>
+    <string name="quiz_get_heart">Ottieni Cuori come ricompensa</string>
+    <string name="quiz_get_heart_done">Hai guadagnato %1$d cuori.</string>
+    <string name="quiz_accepted_none">Non hai alcun quiz approvato o hai già ricevuto cuori.</string>
+    <string name="quiz_time_over">Tempo scaduto</string>
+    <string name="service_wait_please">Stiamo lavorando su questo servizio.</string>
+    <string name="quiz_main_title2">Sono il vero idolo Dukhoo!</string>
+    <string name="quiz_select_idol">Si prega di scegliere</string>
+    <string name="quiz_report">C\'è qualcosa di sbagliato in questo quiz?</string>
+    <string name="quiz_report_description">Facci sapere!\nLo correggeremo al più presto.</string>
+    <string name="quiz_report_hint">Cosa c\'è di sbagliato nello specifico? (Più di 10 lettere)</string>
+    <string name="quiz_confirm_exit2">Se esci adesso, perderai una possibilità di partecipare</string>
+    <string name="quiz_confirm_exit_highlight1">una possibilità</string>
+    <string name="quiz_confirm_exit_highlight2">cuori di ricompensa</string>
+    <string name="quiz_review_enter">Esamina i quiz</string>
+    <string name="quiz_review_in_review">Quiz in attesa di approvazione</string>
+    <string name="quiz_review_title">Esame del quiz</string>
+    <string name="quiz_review_thankyou">Grazie per aver esaminato i quiz.</string>
+    <string name="actor_quiz_review_thankyou">Grazie per aver esaminato i quiz sull\'intrattenimento.</string>
+    <string name="quiz_go_to_main">Vai al quiz principale</string>
+    <string name="quiz_content" formatted="false">Q. %s</string>
+    <string name="quiz_point" formatted="false">♡%d</string>
+    <string name="quiz_description" formatted="false">해설 : %s</string>
+    <string name="quiz_choice_one" formatted="false">1) %s</string>
+    <string name="quiz_choice_two" formatted="false">2) %s</string>
+    <string name="quiz_choice_three" formatted="false">3) %s</string>
+    <string name="quiz_choice_four" formatted="false">4) %s</string>
+    <string name="quiz_choice_one_rtl" formatted="false">%s (1</string>
+    <string name="quiz_choice_two_rtl" formatted="false">%s (2</string>
+    <string name="quiz_choice_three_rtl" formatted="false">%s (3</string>
+    <string name="quiz_choice_four_rtl" formatted="false">%s (4</string>
+    <string name="quiz_number" formatted="false">Quiz-%d</string>
+    <string name="actor_menu_quiz">Quiz di intrattenimento</string>
+    <string name="actor_quiz_main_top">Puoi partecipare solo una volta al giorno.</string>
+    <string name="quiz_power">KDI (indice Kpop Dukhoo)</string>
+    <string name="power_guide_title">Che cos\'è KDI?</string>
+    <string name="power_guide_desc">Metti alla prova il tuo KDI nel quiz sull\'idolo.\n-Ti viene assegnato 1 Punto ogni volta che risolvi il quiz del tuo idolo.\n-Solo il punteggio più alto si rifletterà sul KDI.\n-1 punto verrà detratto ogni giorno.(\nIl tuo KDI ora è -1)\n-Quando cambi idolo, KDI verrà resettato.</string>
+    <string name="power_guide_score">Punto</string>
+    <string name="power_guide_level">Classe</string>
+    <string name="my_coupon">Il mio coupon</string>
+    <string name="use_coupon">Uso</string>
+    <string name="expire_coupon">Validità</string>
+    <string name="my_info">Profilo</string>
+    <string name="my_info_vote">Voti accumulati</string>
+    <string name="my_info_reg_date">Iscritto</string>
+    <string name="used_coupon">Usato</string>
+    <string name="set_all_in_day">Imposta il giorno All-in</string>
+    <string name="actor_power_guide_desc"></string>
+    <string name="schedule_desp_anniversary">Anniversario</string>
+    <string name="schedule_desp_album">Rilascio dell\'album</string>
+    <string name="schedule_desp_concert">Concerto, incontro dei fan</string>
+    <string name="schedule_desp_sign">Cerimonia di firma</string>
+    <string name="schedule_desp_airport">Aeroporto</string>
+    <string name="schedule_desp_tv">TV</string>
+    <string name="schedule_desp_radio">Radio</string>
+    <string name="schedule_desp_video">Video dal vivo</string>
+    <string name="schedule_desp_awards">Premi</string>
+    <string name="schedule_desp_etc">Eccetera</string>
+    <string name="schedule_btn_yes">Corretto!</string>
+    <string name="schedule_btn_no">Sbagliato!!</string>
+    <string name="schedule_btn_dup">Sovrapposizione con il programma esistente!</string>
+    <string name="schedule">Programma</string>
+    <string name="schedule_write_level" formatted="false">Solo il livello %s o superiore può scrivere.</string>
+    <string name="schedule_yes">È questo il programma corretto?</string>
+    <string name="schedule_no">È questo il programma sbagliato?</string>
+    <string name="schedule_dupl">Questo si sovrappone al programma esistente?</string>
+    <string name="schedule_write">Fai un programma</string>
+    <string name="schedule_category">Categoria</string>
+    <string name="schedule_location">Posto</string>
+    <string name="schedule_require">Per favore riempi i campi richiesti(*).</string>
+    <string name="schedule_eval_most">Puoi valutare solo i programmi di Il Mio Idolo.</string>
+    <string name="schedule_eval_level" formatted="false">Può valutare solo il livello %s o superiore.</string>
+    <string name="schedule_eval_done">Già valutato.</string>
+    <string name="schedule_title">Titolo</string>
+    <string name="schedule_allday">Tutto il giorno</string>
+    <string name="schedule_info">Informazioni aggiuntive</string>
+    <string name="schedule_save">Salvato</string>
+    <string name="schedule_detail">Visualizza in dettaglio</string>
+    <string name="schedule_use_location">Usa questa posizione</string>
+    <string name="schedule_time">Tempo</string>
+    <string name="schedule_write_most">Puoi creare solo i programmi di Il Mio Idolo.</string>
+    <string name="schedule_empty">Non ci sono orari.</string>
+    <string name="schedule_desp_ticketing">Biglietteria</string>
+    <string name="schedule_write_stop">Smettere di fare il programma?</string>
+    <string name="setting_menu_push_schedule">Programma</string>
+    <string name="coming_soon">Prossimamente</string>
+    <string name="schedule_write_most_actor">Puoi scrivere solo il programma di La Mia Celeb.</string>
+    <string name="schedule_eval_most_actor">Puoi valutare solo il programma di La Mia Celeb.</string>
+    <string name="schedule_desp_movie">Film</string>
+    <string name="schedule_desp_production">Presentazione</string>
+    <string name="schedule_desp_previw">Anteprima</string>
+    <string name="bad_words">Incluse parole inappropriate.</string>
+    <string name="schedule_desp_concert_actor">Riunione dei fan</string>
+    <string name="tvtalk">Talk in TV</string>
+    <string name="idoltalk">Parla con l\'Idolo</string>
+    <string name="schedule_desp_event">Evento</string>
+    <string name="confirm_delete">Vuoi cancellare?</string>
+    <string name="idoltalk_write_most">Puoi solo scrivere Parla con l\'Idolo del mio idolo.</string>
+    <string name="image_permission_error">Vai su Archiviazione dispositivo o Impostazioni dispositivo > CHOEAEDOL > Foto. Controlla le impostazioni dell\'autorizzazione e riprova.</string>
+    <string name="boys_individual">Membro \ndel ragazzo</string>
+    <string name="girls_individual">Membro\ndella ragazza</string>
+    <string name="boys_group">Gruppo\ndi ragazzi</string>
+    <string name="girls_group">Gruppo\ndi ragazze</string>
+    <string name="my_idol">Il mio idolo</string>
+    <string name="enter_community">Entra nella community</string>
+    <string name="enter_schedule">Vedi programma</string>
+    <string name="post">Invia</string>
+    <string name="community_post">Posta della comunità</string>
+    <string name="coupon">Coupon</string>
+    <string name="friend">Amico</string>
+    <string name="add_favorites">Aggiunto ai preferiti.</string>
+    <string name="remove_favorites">Eliminato dai preferiti.</string>
+    <string name="bannergram_guide_landscape">È possibile passare alla modalità orizzontale.</string>
+    <string name="my_actor">La mia Celeb</string>
+    <string name="new_face">Nuova faccia</string>
+    <string name="tooltip_search">Cerca il tuo idolo preferito.</string>
+    <string name="tooltip_set_most">Imposta il mio idolo premendo sul Cuore.</string>
+    <string name="help_msg_change_gender_to_male">Clicca qui per vedere l\'idolo del ragazzo.</string>
+    <string name="help_msg_change_gender_to_female">Clicca qui per vedere l\'idolo della ragazza.</string>
+    <string name="help_msg_profile_picture_size">Solo le foto quadrate vengono applicate come profili e banner</string>
+    <string name="tooltip_search_actor">Cerca le tue celebrità coreane preferite.</string>
+    <string name="tooltip_set_most_actor">Imposta La Mia Celeb premendo sul Cuore.</string>
+    <string name="no_data">Nessun dato.</string>
+    <string name="title_tab_hof">Gruppo di personaggi famosi</string>
+    <string name="show_most_only">Questo post può essere visto solo se il \"mio idolo\" è lo stesso.</string>
+    <string name="actor_show_most_only">Questo post può essere visualizzato solo dai membri della comunità.</string>
+    <string name="restore_purchase">Ripristina acquisto</string>
+    <string name="restore_purchase_completed">Ripristino acquisto completato.</string>
+    <string name="restore_purchase_failed">Ripristino acquisto non riuscito.</string>
+    <string name="no_purchases">Nessuna cronologia acquisti</string>
+    <string name="regular_payment">Pagamento regolare</string>
+    <string name="purchasing_management">Gestisci acquisti\n(Annulla iscrizione)</string>
+    <string name="help_msg_month_free_trial" formatted="false">Prova gratuita di %d settimane</string>
+    <string name="month_free_trial" formatted="false">Prova gratuita di %d settimane</string>
+    <string name="next_billing_date">Prossima data di fatturazione</string>
+    <string name="subscription_auto_renewal">*Se non lo annulli direttamente, il pagamento verrà effettuato automaticamente ogni mese.</string>
+    <string name="warning_delete_account">Se elimini il tuo account, non sarai in grado di recuperarlo.\nInoltre, il pagamento regolare non viene annullato automaticamente.\nDovresti annullarlo se non desideri un ulteriore servizio.</string>
+    <string name="all_users_are_given">A tutti gli utenti viene assegnato</string>
+    <string name="daily_pack_modifier">Dai il cuore pieno al tuo idolo ogni giorno</string>
+    <string name="actor_daily_pack_modifier">Dai il cuore pieno alla tua celebrità ogni giorno</string>
+    <string name="describe_monthly_payment">Dopo %1$d settimana, ti verranno addebitati automaticamente %2$s/mese.\nPuoi annullare il pagamento quando vuoi.</string>
+    <string name="subscribed">Iscritto</string>
+    <string name="month">Mese</string>
+    <string name="important">Importante!</string>
+    <string name="purchase_incompleted">Acquisto non riuscito</string>
+    <string name="send_receipt">Invia ricevuta</string>
+    <string name="warning_subscription_platform_change_ios" formatted="false">Stai già iscrivendo il servizio \'%s\' su un\'altra piattaforma (Android, ecc.).\nNon potrai utilizzare il servizio acquistato da un\'altra piattaforma. Si prega di annullare il servizio e riacquistarlo.</string>
+    <string name="warning_subscription_platform_change_android" formatted="false">Stai già iscrivendo il servizio \'%s\' su un\'altra piattaforma (iOS, ecc.).\nNon potrai utilizzare il servizio acquistato da un\'altra piattaforma. Si prega di annullare il servizio e riacquistarlo.</string>
+    <string name="warning_subscription_only_original" formatted="false">\'%s\' I cuori vengono dati solo su CHOEAEDOL♡\nEffettua l\'accesso su CHOEAEDOL ♡</string>
+    <string name="service_information">Informazioni di servizio</string>
+    <string name="report">Rapporto</string>
+    <string name="already_reported">Messaggio segnalato</string>
+    <string name="remove">Elimina</string>
+    <string name="yes">Sì</string>
+    <string name="no">No</string>
+    <string name="reward_heart_title">Cuori di Ricompensa</string>
+    <string name="vote_heart_title">Ricompensa per aver votato</string>
+    <string name="attendance">Partecipazione</string>
+    <string name="hot_time">Orario di punta</string>
+    <string name="heart_reward_posting" formatted="false">Pubblica ricompensa %d cuori!</string>
+    <string name="heart_reward_vote" formatted="false">Premio per la votazione %d cuori!</string>
+    <string name="vote_posting">VOTATO</string>
+    <string name="commentary">Spiegazione</string>
+    <string name="login_required">Si prega di accedere.</string>
+    <string name="title_korea_drama_festival">Festival del Teatro della Corea</string>
+    <string name="kdf_before_notice">Festival del Teatro della Corea del 2017 !! I fan delle Star del Teatro della Corea votano per il voto popolare per i premi di attori e attrici. Il punteggio cumulativo verrà classificato durante il periodo di votazione.</string>
+    <string name="kdf_period_title">Periodo di votazione</string>
+    <string name="kdf_period_na">Sarà annunciato più tardi</string>
+    <string name="kdf_before_title_2">Rapporto Sondaggio</string>
+    <string name="kdf_before_notice_2">100% vvoti riflettono la popolarità\n(classifica per totale cumulativo dei conteggi giornalieri)</string>
+    <string name="kdf_before_title_3">Come si vota</string>
+    <string name="kdf_before_notice_3">Valgono le stesse regole originali dell\'attore coreano</string>
+    <string name="kdf_vote_status">Conteggio dei voti popolari del FESTIVAL DEL TEATRO DELLA COREA.\nSe clicchi sull\'attore, sarai in grado di vedere la modifica della classifica in dettaglio.</string>
+    <string name="kdf_final_title_1">Risultato finale del Festival del Teatro della Corea</string>
+    <string name="kdf_final_notice_1">Il periodo di votazione è terminato.</string>
+    <string name="kdf_how_to_use">Istruzioni per gli attori coreani</string>
+    <string name="onepick">One Pick</string>
+    <string name="actor_onepick">One Pick</string>
+    <string name="num_participants">Numero di partecipanti</string>
+    <string name="num_participants_format" formatted="false">%s</string>
+    <string name="see_current_ranking">CLASSIFICHE</string>
+    <string name="onepick_vote">VOTAZIONE!</string>
+    <string name="see_result">Risultati</string>
+    <string name="qualifying_round">Preliminari</string>
+    <string name="final_round">Finale</string>
+    <string name="my_onepick_is">La scelta è</string>
+    <string name="zzz_onepick_is">La scelta di ZZZ è</string>
+    <string name="my_onepick">La mia scelta</string>
+    <string name="onepick_hashtag">#Hashtag</string>
+    <string name="onepick_hashtag_desc">Pubblica le immagini di alta qualità nella comunità di idoli con il #Hashtag qui sotto! \nPotrebbe essere mostrato nel sondaggio.</string>
+    <string name="onepick_confirm_exit">Se esci adesso, non puoi più votare oggi.\nVuoi uscire?</string>
+    <string name="final_result">Risultati finali</string>
+    <string name="my_pick">La mia scelta</string>
+    <string name="onepick_period">Date</string>
+    <string name="onepick_mypick">Altri idoli che hai scelto</string>
+    <string name="actor_onepick_mypick">Altre celebrità che hai scelto</string>
+    <string name="onepick_capture">Tocca qui per catturare il risultato!</string>
+    <string name="onepick_current_ranking">CLASSIFICHE</string>
+    <string name="label_share">Condividi</string>
+    <string name="onepick_no_votes">Non ci sono ancora partecipanti.\nSii la prima persona a votare!</string>
+    <string name="onepick_already_voted">VOTATO OGGI</string>
+    <string name="feed_status_message_hint">Inserisci il tuo stato</string>
+    <string name="feed_my_feed">Il mio feed</string>
+    <string name="feed_edit_status">Modifica stato</string>
+    <string name="feed_no_posts">Non ci sono ancora messaggi.</string>
+    <string name="feed_no_comments">Non ci sono commenti scritti.</string>
+    <string name="feed_status_message">Stato</string>
+    <string name="btn_dailypack_format" formatted="false">Ottieni %s cuori in più ogni giorno</string>
+    <string name="uplus_idol_live">U+Idol Live</string>
+    <string name="feed_private">Rendi privato il mio feed</string>
+    <string name="feed_private_desc">Altri non possono vedere il tuo feed se lo rendi privato.</string>
+    <string name="feed_is_private">Questo feed è privato</string>
+    <string name="freeboard_order_newest">Più recente</string>
+    <string name="freeboard_order_comments">La maggior parte dei commenti</string>
+    <string name="label_tag">Etichetta</string>
+    <string name="no_coupons">Nessun coupon</string>
+    <string name="darkmode">Modalità scura</string>
+    <string name="automatic">Automatico</string>
+    <string name="status_settings">Impostazioni dello stato</string>
+    <string name="block_friend_req">Blocca le richieste di amicizia</string>
+    <string name="block_friend_req_desc">Non riceverai più richieste di amicizia se le blocchi.</string>
+    <string name="block_friend_msg">Questo utente non desidera richieste di amicizia.</string>
+    <string name="search_friend">Cerca amici</string>
+    <string name="my_friend">I miei amici</string>
+    <string name="search_result">Risultati</string>
+    <string name="new_friends">Nuovi amici</string>
+    <string name="participate_new_friends">Sii nell\'elenco dei nuovi amici ora</string>
+    <string name="participate_new_friends_desc">Provalo se vuoi più richieste di amicizia!</string>
+    <string name="apply_new_friends">Partecipa</string>
+    <string name="apply_new_friends_desp">Fai amicizia e ottieni cuori!\nTi piacerebbe fare amicizia in \"Nuovi amici\"?</string>
+    <string name="cancel_new_friends">Annulla</string>
+    <string name="apply_new_friends_blocked">Hai bloccato le richieste di amicizia.\nSblocca e riprova!</string>
+    <string name="none_participation_new_friends">Nessun utente partecipa a \"Nuovi amici\".</string>
+    <string name="data_save">Modalità di salvataggio dei dati</string>
+    <string name="data_save_desc">Quando la modalità di salvataggio dei dati è attivata, i video/gif non verranno caricati in anticipo e le dimensioni verranno ridotte.\n*Quando il WiFi è attivo, i video/gif verranno caricati automaticamente.</string>
+    <string name="order_by_name">Nome</string>
+    <string name="order_by_login_time">Data di accesso</string>
+    <string name="wechat_not_installed">WeChat non è installato.</string>
+    <string name="choeaedol_sns">Canali ufficiali</string>
+    <string name="friends_request">Richieste di amicizia</string>
+    <string name="notice_new_friend_request">Hai nuove richieste di amicizia.</string>
+    <string name="appleid_change_detected">Non è possibile ottenere il bonus del pacchetto giornaliero a causa della modifica dell\'ID Apple. Accedi ad AppStore con l\'ID che hai acquistato il pacchetto giornaliero.</string>
+    <string name="quiz_get_heart_title">Premi del quiz</string>
+    <string name="darkmode_system">Automatico</string>
+    <string name="darkmode_always">Sempre acceso</string>
+    <string name="darkmode_never">Sempre spento</string>
+    <string name="darkmode_help">Puoi fare in modo che la modalità oscura segua automaticamente le impostazioni di sistema, sempre attiva o disattivata.</string>
+    <string name="animation_mode">Modalità di animazione</string>
+    <string name="animation_mode_desc">Attiva la modalità animazione nella schermata di classifica.</string>
+    <string name="aggregating_time">Conteggio dei voti</string>
+    <string name="see_ranking" formatted="false">Mostra %s ranghi</string>
+    <string name="overall">Generale</string>
+    <string name="ranking">Classifica</string>
+    <string name="singer">Cantanti</string>
+    <string name="variety">Animatori</string>
+    <string name="rank_accumulative">Classifiche cumulative</string>
+    <string name="rank_daily">Classifiche giornaliere</string>
+    <string name="deadline_format_one">1 min prima</string>
+    <string name="deadline_format_few" formatted="false">%d min prima</string>
+    <string name="celeb">Celeb</string>
+    <string name="celeb_quiz_start">Inizio</string>
+    <string name="top_100">I PRIMI 100</string>
+    <string name="popup_no_heart_title">Hai finito i cuori :(</string>
+    <string name="popup_no_heart_desc">Tocca per spostare</string>
+    <string name="popup_video_ad">Annuncio video</string>
+    <string name="popup_video_ad_desc">Guarda gli annunci video e ottieni cuori.</string>
+    <string name="popup_heart_shop_desc">Puoi comprare cuori.</string>
+    <string name="popup_heartbox_desc">Trova le icone del cuore sulle immagini,\nle caselle del cuore casuali!</string>
+    <string name="popup_free_heart_desc">Esegui le missioni, ottieni cuori.</string>
+    <string name="guide_gender_title">Maschio o femmina?</string>
+    <string name="guide_gender">Passa da/a ranghi di idoli ragazzo/ragazza.</string>
+    <string name="guide_community_title">Comunità</string>
+    <string name="guide_community">Tocca il nome,\nvai alla comunità di idoli!</string>
+    <string name="guide_banner_title">Banner spiegato</string>
+    <string name="guide_banner">Tocca l\'immagine del profilo\nper aprire il banner.</string>
+    <string name="guide_vote_title">Votazione</string>
+    <string name="guide_vote">Tocca l\'icona per votare!</string>
+    <string name="guide_wiki_title">Wiki</string>
+    <string name="guide_wiki">Tocca il profilo dell\'idolo\nper vedere il wiki dell\'idolo.</string>
+    <string name="guide_write_title">Crea post</string>
+    <string name="guide_write">Tocca l\'icona\nper caricare foto o per scrivere!</string>
+    <string name="guide_skip">Salta</string>
+    <string name="menu_face">Idol Match del Viso</string>
+    <string name="face_limit">- Puoi creare Corrispondenze fino a 3 volte al giorno!</string>
+    <string name="face_title">Idol face match</string>
+    <string name="face_similarity">Somiglianza</string>
+    <string name="face_all">Tutti</string>
+    <string name="face_submit">Trova la mia corrispondenza</string>
+    <string name="time_just_now">Proprio adesso</string>
+    <string name="time_minute">m</string>
+    <string name="time_hour">h</string>
+    <string name="time_day">d</string>
+    <string name="title_notifications">Notifica</string>
+    <string name="label_no_notifications">Nessuna notifica</string>
+    <string name="label_delete_all_notifications">Cancellare tutto?</string>
+    <string name="actor_level_heart_guide_desc1">Le classifiche si basano sui punteggi accumulati combinati e aggregati negli ultimi 30 giorni da ciascun fandom nella Hall of Fame. Vengono visualizzati solo i primi 100.\nSe clicchi su ciascun fandom, verrà mostrato il corrispondente cambio di classifica.\nLe donazioni verranno effettuate a nome delle celebrità in base alla classifica accumulata negli ultimi 30 giorni!\n\n✅ Criteri di conseguimento\n- Condizione 1: una media di 3.000.000 di voti o più negli ultimi 30 giorni\n- Condizione 2: classificato 1° o 2° in ciascuna categoria negli ultimi 6 giorni nella Hall of Fame\n- Entrambe le condizioni devono essere soddisfatte per essere selezionati come Charity Angel.\n\n✅ Premio\n- Categoria 1° posto\n(1)Donazione di 500.000 KRW alla Miral Welfare Foundation\n(2)Pubblicità della metropolitana all\'ingresso della stazione di Hongdae\n(3) Banner pubblicitario a pagina intera\n(4)Annuncio scorrevole nel menu\n- Categoria 2° posto\n(1)Donazione di 500.000 KRW alla Miral Welfare Foundation\n(2)Pubblicità della metropolitana all\'ingresso della stazione di Hongdae.\n(3)Banner pubblicitario a tutta pagina</string>
+    <string name="AAA">AAA</string>
+    <string name="award_guide">Informazioni</string>
+    <string name="award_example">Formazione</string>
+    <string name="award_realtime">Ranghi in tempo reale</string>
+    <string name="award_shop_closed" formatted="false">[%s] In corso\n%s~%s (KST)\n\nDurante questo periodo la vendita dei prodotti sarà sospesa</string>
+    <string name="award_realtime_boy">Classifica in tempo reale\nGruppo di ragazzi</string>
+    <string name="award_realtime_girl">Classifica in tempo reale\nGruppo di ragazze</string>
+    <string name="award_accumulative_guide1">Questa è la classifica cumulativa (Include voti individuali e di gruppo).</string>
+    <string name="award_final_boy" formatted="false">%s\nPremio popolarità del gruppo ragazzi\nRisultato finale</string>
+    <string name="award_final_girl" formatted="false">%s\nPremio popolarità gruppo ragazze\nRisultato finale</string>
+    <string name="award_guide_title">&lt; 2020 Asia Artist Awards &gt;</string>
+    <string name="award_guide_sub1">Calendario dei premi</string>
+    <string name="award_guide_sub2">Periodo di votazione</string>
+    <string name="award_guide_sub3">Come funzionano i voti</string>
+    <string name="award_guide_sub4">Come si vota</string>
+    <string name="award_guide_sub5">Importante</string>
+    <string name="award_guide_sub6">Regole</string>
+    <string name="award_guide_title_desc">Il 5° premio AAA sta arrivando!\nI premi per la popolarità di ragazzi/ragazze vengono assegnati tramite voti in CHOEAEDOL.</string>
+    <string name="award_guide_desc1">- 2020.11.25 AAA</string>
+    <string name="award_guide_desc3">- Il vincitore è selezionato in base ai voti, 100%.\n- Somma tutti i punti durante il periodo di votazione\nper assegnare il premio di popolarità al rango cumulativo n.1 ciascuno.</string>
+    <string name="award_guide_desc4">Raccogli i cuori di CHOEAEDOL e vota!</string>
+    <string name="award_guide_desc5">I voti espressi ai membri del gruppo verranno automaticamente aggiunti ai voti del gruppo.\nNon è possibile acquistare nella nostra app fino alla fine del periodo di votazione.</string>
+    <string name="award_guide_desc6">-Per le regole che cambiano durante il periodo di votazione dei premi, controlla la bacheca nel menu in-app (≡).</string>
+    <string name="award_before_title">Non è ancora il periodo di votare!</string>
+    <string name="award_before_example">Questo è un esempio di votazione in cui vengono sommati i voti individuali e di gruppo.</string>
+    <string name="aggregation">Grado cumulativo</string>
+    <string name="actor_award_guide_title">2020 Asia Artist Awards</string>
+    <string name="actor_award_guide_title_desc">Sono iniziate le votazioni per gli Asia Artist Awards 2020!\n
+Votazione per attore uomo, acrot donna, premio di popolarità della sezione trotto\n
+Vota la tua celebrità preferita tramite CHOEAEDOL Celeb</string>
+    <string name="actor_award_guide_desc3">- Il vincitore viene selezionato in base ai voti, 100%.\n- Aggiungi tutti i punti durante il periodo di votazione\nper assegnare il Premio Popolarità</string>
+    <string name="actor_award_guide_desc4">Colleziona i cuori delle celebrità CHOEAEDOL e vota!</string>
+    <string name="actor_award_guide_desc5">L\'acquisto del cuore non è disponibile fino alla scadenza del premio AAA.</string>
+    <string name="actor_award_guide_desc6">-Per le regole che cambiano durante il periodo di votazione dei premi, controlla la bacheca nel menu in-app (≡).</string>
+    <string name="actor_award_realtime_trot">La popolarità della sezione trotto assegna ranghi in tempo reale</string>
+    <string name="actor_award_accumulative_title_trot">La popolarità della sezione trotto assegna ranghi cumulativi in tempo reale</string>
+    <string name="actor_award_current_guide1">Ecco i ranghi di OGGI per il premio di popolarità della sezione trotto</string>
+    <string name="actor_award_accumulative_guide1">Ecco i ranghi cumulativi per il premio di popolarità della sezione trotto</string>
+    <string name="actor_award_final_trot">Risultato finale del premio di popolarità della sezione trotto AAA</string>
+    <string name="actor_award_before_example">Questo è l\'esempio dei ranghi in tempo reale</string>
+    <string name="menu_video_ad">Vedi annuncio video</string>
+    <string name="choeaedol">CHOEAEDOL</string>
+    <string name="awards_history">Storia dei premi passati</string>
+    <string name="choeaedol_celeb">CHOEAEDOL_Celeb</string>
+    <string name="friend_api_block">La funzione Nuovi amici è disponibile solo nel periodo di tabulazione (23: 30 ~ 00: 00KST) durante il periodo di votazione dei premi.</string>
+    <string name="friend_api_block_all">La funzione amico non è disponibile durante il periodo del premio.</string>
+    <string name="friend_delete_limit">Elimina la funzione amico disponibile solo nel periodo di tabulazione dei voti (23: 30 ~ 00: 00KST) durante il periodo di votazione dei premi</string>
+    <string name="friend_api_limit">È possibile utilizzare la funzione amico tra le 05:00 e le 20:00 KST e l\'orario di tabulazione del voto (23:30 ~ 00:00 KST) durante il periodo di votazione dei premi</string>
+    <string name="support">Supporto Ads</string>
+    <string name="support_filter_favorites">Il mio idolo</string>
+    <string name="support_filter_due">Scadenza</string>
+    <string name="support_in_progress">In corso</string>
+    <string name="support_end">Fine</string>
+    <string name="support_end_2">Forse la prossima volta :(</string>
+    <string name="support_success">Successo</string>
+    <string name="support_create">Crea un nuovo evento di supporto</string>
+    <string name="support_use_diamond">Usa %1$s diamanti</string>
+    <string name="support_create_title">Crea evento di supporto</string>
+    <string name="support_create_contents">Supporto Titolo / Foto</string>
+    <string name="support_create_hint_title">Inserisci il titolo dell\'evento di supporto (obbligatorio)</string>
+    <string name="support_create_hint_photo">Carica foto evento supporto (richiesto)</string>
+    <string name="support_create_type">Tipo di evento di supporto</string>
+    <string name="support_create_hint_type">Seleziona il tipo di evento di supporto</string>
+    <string name="support_create_button">Creare</string>
+    <string name="support_create_confirm">Spendi %1$s di diamanti per creare supporto. \nAnche se la missione pubblicitaria non avrà successo, i diamanti non sono rimborsabili.</string>
+    <string name="support_date_start">Data di inizio dell\'evento di supporto</string>
+    <string name="support_period_vote">Periodo di raccolta fondi (KST)</string>
+    <string name="support_period_ad">Periodo di pubblicazione degli annunci (KST)</string>
+    <string name="support_agree">Ho letto tutto quanto sopra e accetto che i diamanti usati non sono rimborsabili.</string>
+    <string name="support_create_notice">[Precauzioni]\n
+-Una volta impostato un evento di supporto, non può essere annullato.\n
+-I diamanti verranno restituiti automaticamente come diamanti se la raccolta fondi dell\'evento di supporto fallisce.\n
+-I diamanti utilizzati quando si aggiunge un nuovo evento di raccolta fondi di supporto non sono rimborsabili.\n
+-La raccolta fondi deve essere completata 30 giorni prima dell\'inizio dell\'anniversario.\n
+-La raccolta fondi dell\'evento di supporto può essere aggiunta 100 giorni prima dell\'anniversario.\n
+-La pubblicità può essere interrotta a seconda dello stato dell\'affiliato.\n
+-Se il design non arriva durante il periodo di raccolta fondi, l\'annuncio procede con il design di base.\n
+-Il design dell\'annuncio può essere modificato arbitrariamente in base alla deliberazione.\n
+-Il progetto vincitore includerà un\'immagine del codice QR di CHOEAEDOL. Ciò rende difficile cancellare l\'annuncio o modificarne il design.\n
+-Se l\'annuncio è esaurito o annullato, verrà cambiato in un altro annuncio o rimborsato in diamanti.</string>
+    <string name="support_create_success">L\'evento di supporto è stato creato con successo.</string>
+    <string name="support_period">Periodo di raccolta fondi</string>
+    <string name="support_vote">partecipare al sostegno</string>
+    <string name="support_goal">Obbiettivo</string>
+    <string name="support_select_date">Seleziona la data dell\'anniversario per appendere il tuo annuncio basato su KST. (entro 100 giorni)</string>
+    <string name="support_select_month">Seleziona un mese per sospendere l\'annuncio o iniziare il tuo evento di supporto.</string>
+    <string name="date_format_day">1 giorno</string>
+    <string name="date_format_days" formatted="false">%d giorni</string>
+    <string name="date_format_week">1 settimana</string>
+    <string name="date_format_weeks" formatted="false">%d settimane</string>
+    <string name="date_format_hour">1 ora</string>
+    <string name="date_format_hours" formatted="false">%d ore</string>
+    <string name="my_diamonds">I miei diamanti</string>
+    <string name="manage_diamonds">Gestisci i miei diamanti</string>
+    <string name="my_support">Il mio sostegno a questo evento</string>
+    <string name="support_top5">TOP5</string>
+    <string name="shop_diamond">Negozio di diamanti</string>
+    <string name="shop_diamond_desc">Diamanti per eventi di supporto</string>
+    <string name="label_diamond_vote">Storia di utilizzo del diamante</string>
+    <string name="label_diamond_save">Storia dell\'accumulo di diamanti</string>
+    <string name="label_heart_diamond">Cuore, diamante</string>
+    <string name="label_store">Negozio</string>
+    <string name="label_select_ad">Elenco degli eventi di supporto</string>
+    <string name="label_button_select">Seleziona qui</string>
+    <string name="btn_support_top5">TOP5</string>
+    <string name="support_empty">Nessun evento di supporto</string>
+    <string name="support_failed">Fallire</string>
+    <string name="support_achievement" formatted="false">Rendimento del %d%%</string>
+    <string name="diamond_store_disclaimer">I diamanti non possono essere usati per votare. Acquista cuori dallo Store quando voti per il tuo idolo.\nI diamanti usati non sono rimborsabili.\nI diamanti verranno restituiti automaticamente come diamanti se la raccolta fondi dell\'evento di supporto fallisce. Fare riferimento a [Assistenza - Importante].</string>
+    <string name="diamond_spend" formatted="false">Sono stati utilizzati %s diamanti</string>
+    <string name="diamond_spend_1">È stato utilizzato 1 diamante</string>
+    <string name="label_friend_heart_empty">Nessun amico ti manda un cuore</string>
+    <string name="label_friend_heart_one">Ricevuto 1 cuore</string>
+    <string name="label_friend_heart_format" formatted="false">Ricevuto %d cuori</string>
+    <string name="label_tooltip_friend_heart">Ricevi i cuori inviati\ndai tuoi amici!</string>
+    <string name="label_about_support">Evento di supporto?</string>
+    <string name="support_about_subtitle">Eventi speciali nel giorno speciale del tuo idolo ~</string>
+    <string name="support_about_title">Evento di supporto CHOEAEDOL</string>
+    <string name="support_about_info1">Tutti gli idoli sono disponibili</string>
+    <string name="support_about_info2">Tutti possono aggiungere un nuovo evento di raccolta fondi!</string>
+    <string name="support_about_info_desc">È difficile organizzare un evento di supporto da soli! \n
+Unisci le forze con gli altri fan! \n
+Completa la raccolta fondi dell\'evento di supporto! \n
+Appendi un cartellone pubblicitario della metropolitana, banner in-app per il tuo idolo!</string>
+    <string name="support_about_precautions">-Una volta impostato un evento di supporto, non può essere annullato.\n
+-I diamanti verranno restituiti automaticamente come diamanti se la raccolta fondi dell\'evento di supporto fallisce.\n
+-I diamanti utilizzati quando si aggiunge un nuovo evento di raccolta fondi di supporto non sono rimborsabili.\n
+-La raccolta fondi deve essere completata 30 giorni prima dell\'inizio dell\'anniversario.\n
+-La raccolta fondi dell\'evento di supporto può essere aggiunta 100 giorni prima dell\'anniversario.\n
+-La pubblicità può essere interrotta a seconda dello stato dell\'affiliato.\n
+-Se il design non arriva durante il periodo di raccolta fondi, l\'annuncio procede con il design di base.\n
+-Il design dell\'annuncio può essere modificato arbitrariamente in base alla deliberazione.\n
+-Il progetto vincitore includerà un\'immagine del codice QR di CHOEAEDOL. Ciò rende difficile cancellare l\'annuncio o modificarne il design.\n
+-Se l\'annuncio è esaurito o annullato, verrà cambiato in un altro annuncio o rimborsato in diamanti.</string>
+    <string name="support_example">Esempio di pubblicità</string>
+    <string name="label_processing">In lavorazione...</string>
+    <string name="format_include_date">%2$s incluso %1$s</string>
+    <string name="date_format_month">un mese</string>
+    <string name="date_format_months" formatted="false">%d mesi</string>
+    <string name="label_support_design_competition">Volevo design pubblicitario</string>
+    <string name="label_support_design_guide">Guida alla creazione di pubblicità</string>
+    <string name="actor_support_about_title">Sostieni l\'evento di celebrità</string>
+    <string name="actor_support_about_subtitle">Eventi speciali nel giorno speciale della tua celebrità ~</string>
+    <string name="actor_support_about_info_desc">È difficile organizzare un evento di supporto da soli!\n
+Unisci le forze con gli altri fan!\n
+Completa la raccolta fondi dell\'evento di supporto!\n
+Appendi un cartellone pubblicitario della metropolitana, un banner in-app, ecc. Per la tua celebrità!</string>
+    <string name="actor_support_filter_favorites">My Celeb</string>
+    <string name="actor_diamond_store_disclaimer">I diamanti non possono essere usati per votare. Acquista cuori dallo Store quando voti per il tuo idolo.\nI diamanti usati non sono rimborsabili.\nI diamanti verranno restituiti automaticamente come diamanti se la raccolta fondi dell\'evento di supporto fallisce. Fare riferimento a [Assistenza - Importante].</string>
+    <string name="actor_support_about_info1">Che sia un tuo pregiudizio o meno,</string>
+    <string name="actor_support_about_info2">Tutte le celebrità sono disponibili</string>
+    <string name="subscription_account_holding">C\'è un problema con il tuo abbonamento. Fare clic qui per andare al
+Impostazioni dell\'abbonamento di Google Play per correggere il tuo metodo di pagamento.</string>
+    <string name="popup_no_diamond_title">Hai finito i diamanti :(</string>
+    <string name="popup_diamond_shop_desc">Puoi comprare diamanti</string>
+    <string name="secure_user_id">Codice utente</string>
+    <string name="soba2020_title">2020 SORIBADA Awards</string>
+    <string name="soba_final_boy">Risultato finale dei premi di popolarità SOBA (maschile)</string>
+    <string name="soba_final_girl">Risultato finale dei premi di popolarità SOBA (femminile)</string>
+    <string name="soba_final_trot">Risultato finale dei premi Soribada, Premio popolarità sezione trotto</string>
+    <string name="actor_aaa_realtime_male">La popolarità dell\'attore maschile premia la classifica in tempo reale</string>
+    <string name="actor_aaa_accumulative_male">Classifica cumulativa del premio per la popolarità dell\'attore maschile</string>
+    <string name="actor_aaa_male_current_guide">Ecco la classifica in tempo reale del premio di popolarità dell\'attore maschile OGGI</string>
+    <string name="actor_aaa_male_accumulative_guide">Ecco la classifica cumulativa del premio di popolarità dell\'attore maschile</string>
+    <string name="actor_aaa_male_fan_result">Voto AAA\nRisultato finale del premio di popolarità dell\'attore maschile</string>
+    <string name="actor_aaa_realtime_female">La popolarità dell\'attore femminile premia la classifica in tempo reale</string>
+    <string name="actor_aaa_accumulative_female">Classifica cumulativa per la popolarità dell\'attore famoso</string>
+    <string name="actor_aaa_female_current_guide">Ecco la classifica in tempo reale del premio di popolarità dell\'attore Famale OGGI</string>
+    <string name="actor_aaa_female_accumulative_guide">Ecco la classifica cumulativa del premio di popolarità dell\'attore femminile</string>
+    <string name="actor_aaa_female_fan_result">Voto AAA\nRisultato finale del premio di popolarità dell\'attore femminile</string>
+    <string name="popup_award_diamond_alert">Per riferimento, i diamanti non possono essere utilizzati per votare.</string>
+    <string name="popup_update_app">Vuoi provare nuove funzioni?\nAggiorna all\'ultima versione!</string>
+    <string name="actor_aaa_trot">TROT</string>
+    <string name="tapjoy">Gioca &amp; Prendi♡</string>
+    <string name="offerwall_empty">Hai completato tutte le missioni. \nAttendi la nuova missione!</string>
+    <string name="tooltip_select_my_favorite">Scegli il tuo "Il mio idolo" premendo il cuore♡</string>
+    <string name="tooltip_select_my_love_idol">Aggiungi nel segnalibro premendo la stella☆</string>
+    <string name="tooltip_select_my_favorite_actor">Scegli la tua "Mia Celeb" premendo il cuore♡</string>
+    <string name="support_sympathy">Piace</string>
+    <string name="support_ready_for_photo">Prossimamente! Ci stiamo preparando per il colpo di prova.</string>
+    <string name="support_success_list">Immagine di prova</string>
+    <string name="support_in_process">Supporto in corso</string>
+    <string name="support_main">Supporto principale</string>
+    <string name="aaa2020_final_boy">Risultato finale per il Premio di Popolarità AAA (Ragazzi)</string>
+    <string name="aaa2020_final_girl">Risultato finale per il Premio di Popolarità AAA (Ragazze)</string>
+    <string name="aaa2020_final_trot">Risultato finale del premio di popolarità della sezione trotto AAA</string>
+    <string name="aaa2020_final_male">Voto AAA\nRisultato finale del premio di popolarità dell\'attore maschile</string>
+    <string name="aaa2020_final_female">Voto AAA\nRisultato finale del premio di popolarità dell\'attore femminile</string>
+    <string name="report_user_desc">Vuoi segnalare questo utente?</string>
+    <string name="report_feed">Segnala utente</string>
+    <string name="msg_report_user_confirm">Sei sicuro che l\'utente abbia violato le regole?\n%1$s cuori verranno utilizzati per segnalare questo utente. Sei sicuro?</string>
+    <string name="failed_to_report_user__already_reported">Questo utente ha già segnalato. I rapporti sono limitati a un massimo di uno per utente.</string>
+    <string name="purchase_service_unavailable">La connessione di rete è interrotta</string>
+    <string name="purchase_billing_unavailable">Il servizio Play non è installato o l\'account Google non è configurato</string>
+    <string name="purchase_item_unavailable">Il prodotto non è stato attivato. Se il tuo acquisto continua a non funzionare, contattaci nelle impostazioni.</string>
+    <string name="purchase_error">Errore imprevisto del server.</string>
+    <string name="purchase_item_already_owned">Hai già acquistato questo prodotto. Controlla la cronologia degli acquisti sul Play Store.</string>
+    <string name="purchase_item_not_owned">Mancato consumo poiché l\'oggetto non è di proprietà</string>
+    <string name="quiz_review_desc">راجع سؤال Idol Quiz</string>
+    <string name="inquiry_notice">[Orari del servizio clienti]\nGiorni feriali 10:00 - 17:00(KST)\n(Tieni presente che le richieste al di fuori dell\'orario lavorativo riceveranno risposta in sequenza durante l\'orario lavorativo)\n\n- Se alleghi uno screenshot alla tua richiesta, assicurati per catturare l\'ora corrente sullo screenshot.\n- I file allegati verranno automaticamente eliminati dopo 30 giorni dalla data della richiesta.\n- Se il contenuto contiene linguaggio volgare, molestie sessuali o linguaggio minaccioso, potresti essere escluso dalla pubblicazione in modo permanente sospesi dal tuo account o sottoposti ad azioni previste dalle leggi applicabili.</string>
+    <string name="setting_menu_push_supports">Evento di supporto</string>
+    <string name="order_by_dday">D-day</string>
+    <string name="error_2200">Il tuo livello è troppo basso per utilizzare la funzione di report.</string>
+    <string name="invalid_email_form">Inserisci il formato e-mail corretto.</string>
+    <string name="label_rising" formatted="false">Salita di %d posti</string>
+    <string name="chat_many_talk_at">Attività</string>
+    <string name="chat_anonymous">Anonimo</string>
+    <string name="chat_list_all" formatted="false">Tutti (%d)</string>
+    <string name="chat_list_join" formatted="false">Partecipante (%d)</string>
+    <string name="chat_make">Crea una chat room</string>
+    <string name="chat_make_help_popup1">La chat room verrebbe eliminata se in seguito modifichi "Il mio idolo".</string>
+    <string name="chat_make_help_popup2">Ogni comunità può avere un massimo di 300 chat room</string>
+    <string name="chat_make_help_popup3">Maxium no. di partecipanti per una chat room è 300</string>
+    <string name="chat_make_help_popup4" formatted="false">Per creare una chat room sono necessari %d diamanti.</string>
+    <string name="chat_less_level_popup" formatted="false">Scusate. La chat room può essere creata solo dagli utenti di livello %d o superiore</string>
+    <string name="chat_room_title">Nome della chat room</string>
+    <string name="chat_room_title_placeholder">Inserisci il nome della chat room (5 caratteri min.)</string>
+    <string name="chat_room_desc">Descrizione della chat room</string>
+    <string name="chat_room_desc_placeholder">Inserisci la descrizione della chat room</string>
+    <string name="chat_room_disclose_most">Mostra il mio idolo?</string>
+    <string name="chat_room_disclose_nickname">Mostra nickname?</string>
+    <string name="chat_room_limit_level">Restrizione di livello</string>
+    <string name="chat_room_require">*Necessario</string>
+    <string name="chat_room_make_button" formatted="false">Crea\n(%d diamanti necessari)</string>
+    <string name="chat_room_make_popup1_title">Creare</string>
+    <string name="chat_room_make_popup1_desc">Hai bisogno di %1$s diamanti per creare questa chat room. Procedere?</string>
+    <string name="chat_room_make_popup2">Spiacenti.\nÈ stato raggiunto il numero massimo di 300 chat room, non è possibile creare una nuova chat room</string>
+    <string name="chat_room_join_popup1">Questa chat room non può essere unita a causa di differenze in My Idol</string>
+    <string name="chat_room_join_popup2">Non è possibile unirsi a questa chat room a causa della limitazione del livello</string>
+    <string name="chat_room_join_popup3">Non è possibile partecipare a questa chat room perché è piena (massimo 300 utenti)</string>
+    <string name="chat_room_number_of_person">No. di membri</string>
+    <string name="chat_room_status">Stato della chat room</string>
+    <string name="chat_room_owner">Creatrice di stanze</string>
+    <string name="chat_room_report">Chat room offensiva?\nPer evitare un uso improprio della funzione di segnalazione, vengono utilizzati %1$s cuori quando si invia una segnalazione. Vuoi segnalare questa chat room?</string>
+    <string name="chat_room_delete">Elimina</string>
+    <string name="chat_room_delete_popup">Sei sicuro di voler eliminare questa chat room?\nSe elimini questa chat room tutti i membri nella chat room verranno eliminati anche dalla chat room</string>
+    <string name="chat_room_leave">Partire</string>
+    <string name="chat_room_leave_desc1">Sei sicuro di voler partire?</string>
+    <string name="chat_room_leave_desc2">Un altro utente diventerebbe il creatore della stanza se lasci la chat. Dovresti volerlo lasciare?</string>
+    <string name="chat_room_most_only">Limitato agli utenti con lo stesso mio idolo</string>
+    <string name="chat_room_most_and_group">Limitato agli utenti con lo stesso idolo, gruppo e membri del gruppo.</string>
+    <string name="chat_room_nickname">Nickname chatroom</string>
+    <string name="chat_room_anonymous">Chat room anonima</string>
+    <string name="chat_room_level_limit" formatted="false">LV.%d superiore</string>
+    <string name="chat_room_create_success">Chat room creata</string>
+    <string name="chat_unknown_user">(utente sconosciuto)</string>
+    <string name="chat_level_select_limit">Non è possibile selezionare un limite di livello al di sopra del proprio livello.</string>
+    <string name="chat_make_tooltip">Si prega di creare una chat room.</string>
+    <string name="chat_deleted_message">Messaggio eliminato</string>
+    <string name="chat_photo">Foto</string>
+    <string name="chat">Chiacchierando</string>
+    <string name="setting_menu_push_chat">Chiacchierando</string>
+    <string name="chat_title_short">Il nome della chat room deve essere più lungo di 5 caratteri.</string>
+    <string name="chat_report_error_2401">Hai già segnalato questa chat room.</string>
+    <string name="google_store_error">Si è verificato un errore imprevisto nel Google Play Store. Conferma se il Google Play Store nel tuo dispositivo funziona correttamente e riprova.</string>
+    <string name="chat_first_join">Sei entrato nella chat room.</string>
+    <string name="china_payment_choice_title">Metodo di pagamento</string>
+    <string name="china_payment_choice_alipay">Alipay</string>
+    <string name="china_payment_choice_unionpay">UnionPay</string>
+    <string name="china_payment_choice_wechatpay">WeChat Pay</string>
+    <string name="chat_message_already_reported">Hai già segnalato questo messaggio.</string>
+    <string name="chat_connecting">Connessione in corso ... Attendi un momento.</string>
+    <string name="msg_favorite_guide_4" formatted="false">Lascerai la chat room di %s se cambi il tuo My Idol.\nPuoi cambiare il tuo My Idol di nuovo 48 ore dopo aver apportato questa modifica.\nVuoi cambiare il tuo My Idol in %s?</string>
+    <string name="actor_msg_favorite_guide_4" formatted="false">Lascerai la chat room di %s se cambi la tua My Celeb.\nPuoi cambiare nuovamente la tua My Celeb 48 ore dopo aver apportato questa modifica.\nVuoi cambiare la tua My Celeb in %s?</string>
+    <string name="msg_favorite_unregi_guide3" formatted="false">Lascerai la chat room di %s se cambi il tuo my idol.\nPuoi impostare il tuo nuovo my idol 48 ore dopo aver apportato l\'ultima modifica.</string>
+    <string name="actor_msg_favorite_unregi_guide3" formatted="false">Lascerai la chat room di %s se cambi la tua My Celeb\nPuoi impostare la tua nuova My Celeb 48 ore dopo aver apportato l\'ultima modifica.</string>
+    <string name="chat_title_bad_words">Il nome della chat room contiene parole inappropriate.</string>
+    <string name="chat_description_bad_words">La descrizione della chat room contiene parole inappropriate.</string>
+    <string name="chatpush_image">Immagine</string>
+    <string name="chat_leave_user">(Utente che ha lasciato la chat room)</string>
+    <string name="chat_group_create_fail">Non puoi creare una chat room per un gruppo quando il tuo My Idol è un idolo individuale.</string>
+    <string name="chat_unread_message">Messaggi non letti</string>
+    <string name="detect_auto_clicker">Abbiamo rilevato attività anomale, quindi l\'annuncio video non può essere riprodotto. Accedi normalmente agli annunci video.</string>
+    <string name="signup_age_limit">Ho 14 anni o più.</string>
+    <string name="signup_age_prohibited">Devi avere almeno 14 anni per partecipare.</string>
+    <string name="rank_history_30_average" formatted="false">Numero medio di voti in %s giorni</string>
+    <string name="chat_room_leave_desc3">La chat room verrà eliminata se decidi di andartene adesso.\nSei sicuro di voler lasciare la chat room?</string>
+    <string name="actor_main_set">Categoria ON/OFF</string>
+    <string name="actor_main_category_set">Si prega di selezionare le categorie che si desidera visualizzare</string>
+    <string name="actor_male_singer">Cantanti maschi</string>
+    <string name="actor_female_singer">Cantanti femminili</string>
+    <string name="necessarily_one_category">Devi selezionare almeno una categoria</string>
+    <string name="new_shop_heart">Negozio del cuore</string>
+    <string name="new_shop_package">Negozio di pacchi</string>
+    <string name="new_shop_subscription">Sottoscrizione</string>
+    <string name="diamond">Diamante</string>
+    <string name="diamonds">Diamanti</string>
+    <string name="new_shop_diamond">Negozio di diamanti</string>
+    <string name="ever_heart_short">Sempre</string>
+    <string name="daily_heart_short">Quotidiano</string>
+    <string name="support_see_ad_types">Visualizza i posizionamenti degli annunci</string>
+    <string name="support_ad_types">Posizionamenti pubblicitari</string>
+    <string name="auto_clicker_human_check_explain">Rispondi alla seguente domanda per dimostrare che non sei un robot.</string>
+    <string name="auto_clicker_human_check_fail">Spiacenti, hai fornito una risposta sbagliata.\nRiteniamo che tu stia utilizzando un clicker automatico.\nAccedi agli annunci video in modo normale.</string>
+    <string name="china_agreement_deny">Siamo spiacenti.\nNon hai accettato i nostri Termini e condizioni.\nNon potrai utilizzare l\'app.</string>
+    <string name="my_info_title">Il mio profilo</string>
+    <string name="my_info_info">Profilo</string>
+    <string name="my_info_list">Disco</string>
+    <string name="my_info_own_heart">Cuori che possedevi</string>
+    <string name="my_info_own_diamond">Diamante che possedevi</string>
+    <string name="my_info_heart">cuori</string>
+    <string name="more_faq">hai bisogno di più aiuto?</string>
+    <string name="chat_report_short">Si prega di fornire maggiori dettagli (almeno 10 caratteri)</string>
+    <string name="support_ad_type_detail">Dettagli del posizionamento dell\'annuncio</string>
+    <string name="video_ad_time_left">Tempo rimasto prima che la prossima collezione di cuori sia disponibile</string>
+    <string name="quiz_duplicated_answer">Hai inviato la stessa risposta più volte. Si prega di modificare e inviare di nuovo.</string>
+    <string name="quiz_review_more">Continua a rivedere altre domande?</string>
+    <string name="miracle_month">Miracolo del mese</string>
+    <string name="record_room">Stanza di registrazione</string>
+    <string name="charity_angel_count">Numero di titoli dell\'angelo della carità</string>
+    <string name="charity_fairy_count">Numero di titoli Fairy Fairy</string>
+    <string name="miracle_month_count">Numero di titoli Miracolo del mese</string>
+    <string name="search_hot_trend">Tendenza calda</string>
+    <string name="search_history">Cronologia delle ricerche</string>
+    <string name="search_recommended">Raccomandato per te</string>
+    <string name="report_comment">Per prevenire un uso improprio della funzione di segnalazione, durante la presentazione di una segnalazione verrebbero utilizzati %1$s cuori.\nDesideri segnalare questo commento?</string>
+    <string name="lunar_birthday">Calendario lunare</string>
+    <string name="comment_report_error_2501">Hai già segnalato questo commento.</string>
+    <string name="emoji">emoji</string>
+    <string name="emoji_content">(Emoji)</string>
+    <string name="chat_push_emoticon">Emoticon</string>
+    <string name="msg_daily_pack_cancel">Al momento sei abbonato al nostro pacchetto giornaliero.\nSe non annulli l\'abbonamento, verrà addebitato l\'abbonamento mensile.\nSe desideri annullare l\'abbonamento, premi %1$s</string>
+    <string name="withdraw">Ritirare</string>
+    <string name="cancel_subscription">Annullare l\'iscrizione</string>
+    <string name="order_by_get_heart">Ordine del cuore</string>
+    <string name="themepick">Scelta a tema</string>
+    <string name="imagepick">Scelta immagine</string>
+    <string name="themepick_confirm_vote" formatted="false">%s è l\'opzione per cui vuoi votare?</string>
+    <string name="themepick_first_reward" formatted="false">Premio per il n. 1\n%s</string>
+    <string name="themepick_total_votes">Voto totale</string>
+    <string name="photo_access_denied_icloud">Impossibile accedere all\'immagine originale. Si prega di verificare se si dispone dell\'immagine originale.</string>
+    <string name="menu_live">PLAY</string>
+    <string name="live_auto">Auto</string>
+    <string name="live_open" formatted="false">%s APERTO!</string>
+    <string name="live_coming_soon">Prossimamente.\nAttendere prego.</string>
+    <string name="live_coming_soon_list">Prossimamente</string>
+    <string name="live_level_limit" formatted="false">Spiacenti.\nSolo gli utenti di livello %d o superiore possono accedere a questo video.</string>
+    <string name="live_end">Questo live streaming è terminato.</string>
+    <string name="live_disclaimer">- Mostra ▶️ Visualizzazioni, ❤️ Mi piace, 👁 Conteggio visualizzazioni simultanee in tempo reale e 📈 Conteggi visualizzazioni simultanee di picco.\n- La disponibilità del live streaming dipende dai livelli degli utenti.\n- Potresti essere cambiato dal tuo operatore quando usi i dati cellulari.</string>
+    <string name="live_empty">Nessuno streaming programmato ancora</string>
+    <string name="live_stalled">Il flusso è in buffering</string>
+    <string name="live_quality">Qualità video</string>
+    <string name="live_share_title" formatted="false">#CHOEAEDOL #CHOEAEDOL_PLAY\n\n%s\n\nGuarda ora in CHOEAEDOL PLAY\n</string>
+    <string name="themepick_already_vote">Hai votato oggi.</string>
+    <string name="current_ranking">Classifica dal vivo</string>
+    <string name="vote_themepick_finished" formatted="false">Hai votato %s.\n\n%s voto(i) lontano dal primo posto.\n%s con i tuoi amici e combatti per il primo posto!</string>
+    <string name="vote_themepick_finished_first" formatted="false">Hai votato %s.\n\n%s questo con i tuoi amici!</string>
+    <string name="share_themepick" formatted="false">#CHOEAEDOL #ThemedPick\n\n%s\nClassifica %s %s\n%s %s\n%s %s\n\nMaggiori dettagli sull\'app CHOEAEDOL\n%s</string>
+    <string name="share_in_progress_support" formatted="false">#CHOEAEDOL #SupportEvent #SupportAds #%s %s\n\nEvento di supporto per \" %s \" in corso\n%s Vieni e unisciti a questo~\n%s</string>
+    <string name="share_success_support" formatted="false">#CHOEAEDOL #SupportEvent #SupportAds #%s %s\n\n\" %s \" l\'evento di supporto è SUCCESSO!\n%s Guarda le foto\n%s</string>
+    <string name="share_friend_invite" formatted="false">[Invito CHOEAEDOL💌]\n#%s Posizione attuale: #%d\nUnisciti a me nella votazione per #%s %s!\n\nInserisci un codice invito quando ti registri e ricevi Cuori!\nCodice invito: %s\n\n#KPOP #NO1_APP #CHOEAEDOL\n%s</string>
+    <string name="share_friend_invite_nomost" formatted="false">[Invito CHOEAEDOL💌]\nVotiamo e diventiamo fangirl/fanboy insieme!\nInserisci un codice invito quando ti registri e ricevi Cuori!\nCodice invito: %s\n\nAttualmente al 2° posto: #%s %s\n\nCurioso chi è il numero 1?\nScoprilo su #CHOEAEDOL\n%s</string>
+    <string name="award_realtime_rank"></string>
+    <string name="award_accumulate_rank"></string>
+    <string name="award_final_result" formatted="false">Risultato finale\n%s\n%s %s</string>
+    <string name="share_themepick_celeb" formatted="false">#CHOEAEDOL_Celeb #ThemedPick\n\n%s\nClassifica %s %s\n%s %s\n%s %s\n\nMaggiori dettagli sull\'app CHOEAEDOL Celeb\n%s</string>
+    <string name="share_in_progress_support_celeb" formatted="false">#CHOEAEDOL_Celeb #SupportEvent #SupportAds #%s %s\n\n\" %s \" l\'evento di supporto è in corso\n%s Vieni e unisciti a questo~\n%s</string>
+    <string name="share_success_support_celeb" formatted="false">#CHOEAEDOL_Celeb #SupportEvent #SupportAds #%s %s\n\n\" %s \" l\'evento di supporto è SUCCESSO!\n%s Guarda le foto\n%s</string>
+    <string name="share_friend_invite_celeb" formatted="false">[CHOEAEDOL Celeb Invitation💌]\n#%s Posizione attuale: #%d\nUnisciti a me nella votazione per #%s %s!\n\nInserisci un codice invito: quando ti registri e ricevi Cuori!\nCodice invito: %s\n\nIl tuo spazio fandom per connetterti #CHOEAEDOLCeleb\n%s</string>
+    <string name="share_friend_invite_nomost_celeb" formatted="false">[CHOEAEDOL Celeb Invitation💌]\nVotiamo e diventiamo fangirl/fanboy insieme!\nInserisci un codice invito: quando ti registri e ricevi Cuori!\nCodice invito: %s\n\nAttualmente al 2° posto: #%s %s\n\nCurioso chi è il numero 1?\nScoprilo su #CHOEAEDOLCeleb\n%s</string>
+    <string name="live_actionbar_title">CHOEAEDOL PLAY</string>
+    <string name="live_chat">Chat dal vivo</string>
+    <string name="live_share_title_celeb" formatted="false">#CHOEAEDOL_Celeb #CHOEAEDOLPLAY\n\n%s\n\nGuarda ora in CHOEAEDOL PLAY\n</string>
+    <string name="themepick_today_voted">VOTATO OGGI</string>
+    <string name="block">Bloccare</string>
+    <string name="unblock">Sbloccare</string>
+    <string name="block_question">Sei sicuro di voler bloccare questo utente?</string>
+    <string name="user_blocked">Utente bloccato</string>
+    <string name="themepick_additional_vote">Vuoi votare di nuovo usando 1 diamante?</string>
+    <string name="themepick_candidate_vote">Seleziona un candidato e vota</string>
+    <string name="user_blocked2">Utente bloccato</string>
+    <string name="share_image_pick" formatted="false">#CHOEAEDOL #ImagePick\n\n%s\nClassifica %s %s\n%s %s\n%s %s\n\nMaggiori dettagli sull\'app CHOEAEDOL\n%s</string>
+    <string name="share_image_pick_celeb" formatted="false">#CHOEAEDOL_Celeb #ImagePick\n\n%s\nClassifica %s %s\n%s %s\n%s %s\n\nMaggiori dettagli sull\'app CHOEAEDOL\n%s</string>
+    <string name="no_blocked_users">Non ci sono utenti bloccati.</string>
+    <string name="report_description">Per favore scrivi il motivo per cui hai segnalato l\'utente.</string>
+    <string name="msg_nickname_coupon">Hai un coupon per cambiare il nickname.\nVuoi utilizzare il coupon?</string>
+    <string name="msg_nickname_changed">Il tuo nickname è stato cambiato.</string>
+    <string name="no_search_result_community">Scrivi il primo post!</string>
+    <string name="surprise_dia">Diamante a sorpresa</string>
+    <string name="quiz_daily_posting_limit">Hai scritto domande il maggior numero possibile. Per favore riprova domani.</string>
+    <string name="quiz_in_screening">Quiz in proiezione</string>
+    <string name="quiz_denied">Quiz negato</string>
+    <string name="quiz_no_approved">Non ci sono quiz approvati.</string>
+    <string name="quiz_no_in_screening">Non ci sono quiz in screening.</string>
+    <string name="quiz_no_denied">Non c\'è nessun quiz negato.</string>
+    <string name="quiz_tutorial_get_heart">Ottieni Reward Hearts per il quiz approvato!</string>
+    <string name="quiz_deny_reason_title">Perché il quiz viene rifiutato?</string>
+    <string name="quiz_deny_reason_desc">- Quando hai fornito una risposta corretta con un carattere speciale o un\'emoji\n- Quando chiunque può selezionare la risposta corretta senza leggere la domanda\n- Quando la risposta corretta può essere modificata col passare del tempo\n- Quando la foto è difficile da riconoscere\n- Quando c\'è un errore di battitura\n- Quando imposti la risposta sbagliata alla risposta corretta\n- Quando la spiegazione non è sufficiente\n- Quando imposti l\'idolo sbagliato</string>
+    <string name="quiz_review">Quiz di ricapitolazione</string>
+    <string name="quiz_finish_today_review">Grazie per la revisione.\nRivedi il nuovo quiz domani.</string>
+    <string name="quiz_nothing_review">Non ci sono quiz da rivedere.</string>
+    <string name="quiz_ask_finish_review">Sei sicuro di voler uscire? Perderai la possibilità di recensire.</string>
+    <string name="quiz_start_short">Inizio</string>
+    <string name="quiz_already_report_review">Hai già segnalato questo quiz.</string>
+    <string name="another_account_daily_purchase">Non sei riuscito a ripristinare l\'acquisto. Verifica se ti stai abbonando a Daily Pack su un altro account.</string>
+    <string name="already_daily_purchase">Non sei riuscito a ripristinare l\'acquisto. Ti stai già abbonando a Daily Pack con questo account.</string>
+    <string name="welcome_pack_title">Pacchetto di benvenuto</string>
+    <string name="welcome_pack_desc">Grande vendita - solo una volta!</string>
+    <string name="attendance_check">Controllo delle presenze</string>
+    <string name="attendance_days_start" formatted="false">Da %s</string>
+    <string name="attendance_days_consecutive">Serie di giorni</string>
+    <string name="attendance_consecutive_heart_reward">%1$s giorni consecutivi! - Hai %2$s cuori.</string>
+    <string name="attendance_consecutive_dia_reward">%1$s giorni consecutivi! - Hai %2$s diamanti.</string>
+    <string name="attendance_consecutive_both_reward">%1$s giorni consecutivi! - Hai %2$s cuori e %3$s diamante/i.</string>
+    <string name="attendance_available_account_title">Puoi ottenere francobolli solo con un account.</string>
+    <string name="attendance_available_account_subtitle" formatted="false">Vuoi ottenere un francobollo con %s?</string>
+    <string name="go_to_attendance">Vai a prendere un francobollo</string>
+    <string name="update">Aggiornare</string>
+    <string name="attendance_with" formatted="false">Dal momento che hai incontrato %s</string>
+    <string name="recent">recente</string>
+    <string name="thirty_days">30 giorni</string>
+    <string name="support_design_period">Ricezione di progetti pubblicitari</string>
+    <string name="solo">Assolo</string>
+    <string name="solo_male">Solo maschile</string>
+    <string name="solo_female">Solo femminile</string>
+    <string name="award_solo_realtime_example">Questo è un esempio di voto di artisti solisti su CHOEAEDOL\ne CHOEAEDOL Celeb che non fanno parte di un gruppo.</string>
+    <string name="award_solo_realtime_info">Questa è una classifica in tempo reale degli artisti solisti su CHOEAEDOL e CHOEAEDOL Celeb che non fanno parte di un gruppo.</string>
+    <string name="award_solo_aggregated_info">Questa è la classifica cumulativa degli artisti solisti su CHOEAEDOL e CHOEAEDOL Celeb che non fanno parte di un gruppo.</string>
+    <string name="award_solo_male_realtime">Classifica in tempo reale\nArtista solista maschile</string>
+    <string name="award_solo_female_realtime">Classifica in tempo reale\nArtista solista femminile</string>
+    <string name="award_solo_male_aggregated">Classifica cumulativa\nArtista solista maschile</string>
+    <string name="award_solo_female_aggregated">Classifica cumulativa\nArtista solista femminile</string>
+    <string name="award_solo_male_final" formatted="false">%s\nRisultato finale del premio per la popolarità di solisti maschili</string>
+    <string name="award_solo_female_final" formatted="false">%s\nRisultato finale del Premio per la popolarità di solista femminile</string>
+    <string name="award_current_guide">Il vincitore finale sarà determinato in base al punteggio totale accumulato.</string>
+    <string name="group_male">Gruppo maschile</string>
+    <string name="group_female">Gruppo femminile</string>
+    <string name="award_trot_male">Maschio</string>
+    <string name="award_trot_female">Femmina</string>
+    <string name="award_trot_male_example">Questo è un esempio di voto di artisti solisti maschi su CHOEAEDOL e CHOEAEDOL Celeb.</string>
+    <string name="award_trot_female_example">Questo è un esempio di voto.</string>
+    <string name="award_trot_male_realtime_info">Questa è la classifica in tempo reale.</string>
+    <string name="award_trot_female_realtime_info">Questa è la classifica in tempo reale.</string>
+    <string name="award_trot_male_aggregated_info">Questa è la classifica cumulativa.</string>
+    <string name="award_trot_female_aggregated_info">Questa è la classifica cumulativa.</string>
+    <string name="award_trot_male_realtime">Classifica in tempo reale\nCantanti di trotto maschi</string>
+    <string name="award_trot_female_realtime">Classifica in tempo reale\nCantanti di trotto femminile</string>
+    <string name="award_trot_male_aggregated">Classifica cumulativa\nCantanti di trotto maschi</string>
+    <string name="award_trot_female_aggregated">Classifica cumulativa\nCantanti di trotto femminile</string>
+    <string name="award_trot_male_final" formatted="false">%s\nCantanti di trotto maschi\nPremio popolarità Risultato finale</string>
+    <string name="award_trot_female_final" formatted="false">%s\nCantanti di trotto femminile\nPremio popolarità Risultato finale</string>
+    <string name="award_trot_all_example">Questo è un esempio di voto.</string>
+    <string name="award_trot_all_realtime_info">Questa è la classifica in tempo reale.</string>
+    <string name="award_trot_all_realtime">Classifica in tempo reale\nCantanti di trotto</string>
+    <string name="award_trot_all_aggregated_info">Questa è la classifica cumulativa.</string>
+    <string name="award_trot_all_aggregated">Classifica cumulativa\nCantanti di trotto</string>
+    <string name="award_trot_all_final" formatted="false">%s\nRisultato finale\nPremio per la popolarità del cantante di trotto</string>
+    <string name="today">In data odierna</string>
+    <string name="earlier">Prima</string>
+    <string name="entrance_qrcode">Codice QR del biglietto</string>
+    <string name="auth_completed">Completato!\nGrazie.</string>
+    <string name="win_awards_ticket">Hai vinto il biglietto!</string>
+    <string name="already_set_stamp">Hai già il timbro. Riprova domani.</string>
+    <string name="ad_intend_guide" formatted="false">Se guardi un annuncio video, puoi ottenere %s Hearts.</string>
+    <string name="ad_start">Inizio</string>
+    <string name="skip">Saltare ></string>
+    <string name="extra_heart_received" formatted="false">Hai ricevuto %s cuori extra.</string>
+    <string name="hda_2022">2022 K Global Heart Dream Awards</string>
+    <string name="face_photo_not_saving">- Le foto caricate non verranno salvate ed eliminate immediatamente.</string>
+    <string name="are_you_sure_dia">Sei sicuro?</string>
+    <string name="onepick_confirm_exit2">Se esci ora, un voto è perso.\nSei sicuro di voler uscire?</string>
+    <string name="miracle">Miracolo</string>
+    <string name="cumulative_rankings">Graduatorie cumulative</string>
+    <string name="miracle_aggregating_period">Orario di tabulazione del voto</string>
+    <string name="unused_channels">Canali inutilizzati</string>
+    <string name="friends_delete_message">Vuoi rimuovere gli amici?</string>
+    <string name="essential">(essenziale)</string>
+    <string name="personal_agreement">Accordo sulla raccolta e l\'utilizzo delle informazioni personali</string>
+    <string name="msg_personal_information1" formatted="false">%s raccoglie le informazioni personali come segue per la registrazione, la richiesta/CS e l\'avviso.</string>
+    <string name="msg_personal_information2" formatted="false">Hai il diritto di non essere d\'accordo con l\'uso minimo della raccolta di informazioni personali necessarie per l\'uso di %s e, se rifiuti il ​​consenso, il servizio potrebbe essere limitato.</string>
+    <string name="id">ID</string>
+    <string name="recommender">Raccomandatore (codice invito)</string>
+    <string name="pwd_combination">La password deve contenere almeno 8 caratteri alfanumerici.</string>
+    <string name="agree_terms">Accetto di raccogliere e utilizzare le informazioni personali.</string>
+    <string name="warning_report_lose_heart" formatted="false">Se segnali, %s cuori verranno detratti e non sarai più in grado di visualizzare il post. Vuoi ancora segnalarlo?</string>
+    <string name="warning_report_hide_article">Se lo segnali, non potrai più vederlo. Vuoi ancora segnalarlo?</string>
+    <string name="check_pwd_requirement">Si prega di soddisfare il requisito della password.</string>
+    <string name="inquiry_category">Seleziona Tipo di richiesta</string>
+    <string name="inquiry_how_to_use">Come usare</string>
+    <string name="inquiry_report_bugs">Segnala bug</string>
+    <string name="inquiry_purchase_subs">Acquista/Abbonati</string>
+    <string name="inquiry_proposal">Proposta di idee</string>
+    <string name="inquiry_etc">Eccetera</string>
+    <string name="inquiry_send_files">Allegati</string>
+    <string name="choose_inquiry_category">Si prega di selezionare il tipo di richiesta.</string>
+    <string name="inquiry_files">Allegati</string>
+    <string name="delete_file_description">Il file allegato verrà cancellato dopo essere stato conservato per 30 giorni dalla data della richiesta.</string>
+    <string name="msg_file_uploading">Caricamento file. Si prega di riprovare tra un momento.</string>
+    <string name="msg_file_upload_failed">Caricamento file non riuscito. Per favore riprova.</string>
+    <string name="progressing_files">Elaborazione file</string>
+    <string name="msg_file_expired">Impossibile scaricare perché è stato eliminato.</string>
+    <string name="msg_invalid_file">Questo tipo di file non è supportato.</string>
+    <string name="photo">Foto</string>
+    <string name="video">video</string>
+    <string name="desc_quiz_denied_cases_celeb">- Quando hai fornito una risposta corretta con un carattere speciale o un\'emoji\n- Quando chiunque può selezionare la risposta corretta senza leggere la domanda\n- Quando la risposta corretta può essere modificata col passare del tempo\n- Quando la foto è difficile da riconoscere\n- Quando c\'è un errore di battitura\n- Quando imposti la risposta sbagliata alla risposta corretta\n- Quando la spiegazione non è sufficiente</string>
+    <string name="s_league">Lega S</string>
+    <string name="a_league">Lega A</string>
+    <string name="will_be_updated" formatted="false">Verrà aggiornato il %s.</string>
+    <string name="capital_all">TUTTO</string>
+    <string name="quiz_deny_reason_desc_celeb">- Quando hai fornito una risposta corretta con un carattere speciale o un\'emoji\n- Quando chiunque può selezionare la risposta corretta senza leggere la domanda\n- Quando la risposta corretta può essere cambiata col passare del tempo\n- Quando la foto è difficile da riconoscere\n- Quando c\'è un errore di battitura\n- Quando imposti la risposta sbagliata alla risposta corretta\n- Quando la spiegazione non è sufficiente</string>
+    <string name="select_category_field">Seleziona categoria</string>
+    <string name="select_category_toast">Seleziona una categoria.</string>
+    <string name="enter_title">Inserisci un titolo.</string>
+    <string name="enter_content">Inserisci il contenuto.</string>
+    <string name="idol_board_article">Inviare</string>
+    <string name="small_talk_empty">Nessun post ancora.\nPubblica il primo post!</string>
+    <string name="order_like">Popolare</string>
+    <string name="order_hit">Visualizzazione</string>
+    <string name="views" formatted="false">%s visualizzazioni</string>
+    <string name="format_recommend" formatted="false">%s consiglia</string>
+    <string name="format_comment" formatted="false">%s commenti</string>
+    <string name="recommend">Consiglia</string>
+    <string name="filter_all_language">Tutta la lingua</string>
+    <string name="filter_app_language">Lingua di default</string>
+    <string name="title_char_limit_placeholder" formatted="false">Titolo(Massimo %slettere)</string>
+    <string name="popup_request_auth_title">Richiesta di approvazione\nper il prossimo compito su %1$s.</string>
+    <string name="agree_and_continue">Accetta e continua</string>
+    <string name="reject">Rifiutare</string>
+    <string name="captured_qr_not_available">Non è possibile utilizzare il codice QR salvato come screenshot.</string>
+    <string name="captured_qr_not_available_popup">È stato rilevato uno screenshot. Non è possibile utilizzare il codice QR salvato come immagine.</string>
+    <string name="quiz_main_title2_celeb">Sono un appassionato fan delle celebrità!</string>
+    <string name="show_qr_staff">Mostra il tuo QR Code al bigliettaio in biglietteria.</string>
+    <string name="seconds" formatted="false">%s</string>
+    <string name="remaining_time">Tempo rimasto</string>
+    <string name="male_4th_gen_idol">4 karta</string>
+    <string name="female_4th_gen_idol">4 karta</string>
+    <string name="hda_2023">2023 K Global Heart Dream Awards</string>
+    <string name="award_4th_gen_male_final" formatted="false">%s\nRisultato finale del premio Hot Icon Male Group di quarta generazione</string>
+    <string name="award_4th_gen_female_final" formatted="false">%s\nRisultato finale del premio Hot Icon Female Group di quarta generazione</string>
+    <string name="award_4th_gen_male_aggregated">Classifica cumulativa del gruppo maschile Hot Icon di quarta generazione</string>
+    <string name="award_4th_gen_female_aggregated">Classifica cumulativa del gruppo femminile Hot Icon di quarta generazione</string>
+    <string name="award_4th_gen_male_realtime">Classifica in tempo reale del gruppo maschile Hot Icon di quarta generazione</string>
+    <string name="award_4th_gen_female_realtime">Classifica in tempo reale del gruppo femminile Hot Icon di quarta generazione</string>
+    <string name="award_4th_gen_realtime_example">Questo è un esempio di votazione che combina il numero di voti individuali e di gruppo dei candidati del gruppo di 4a generazione.</string>
+    <string name="award_4th_gen_aggregated_info">Questa classifica cumulativa combina il numero di voti individuali e di gruppo dei candidati del gruppo di 4a generazione.</string>
+    <string name="award_4th_gen_realtime_info">Questa classifica in tempo reale combina il numero di voti individuali e di gruppo dei candidati del gruppo di 4a generazione.</string>
+    <string name="award_solo_final" formatted="false">%s\nRisultato finale del Premio per la popolarità dell\'artista solista</string>
+    <string name="quiz_celeb_unavailable_not_enough">Scusa. Non ci sono abbastanza quiz in questa categoria.\nSelezionare un\'altra categoria.</string>
+    <string name="limited_photo_permission_desc">Non hai accesso alle foto selezionate.\nConsenti l\'accesso alle foto.</string>
+    <string name="set_photo_permission">Imposta l\'accesso alle foto</string>
+    <string name="try_daily_stamp">Controlla la partecipazione</string>
+    <string name="daily_stamp_already_done" formatted="false">Giorno %s - Partecipazione completa</string>
+    <string name="stamp_and_get_hearts" formatted="false">Controlla la partecipazione e ottieni %s cuori</string>
+    <string name="stamp_and_get_diamonds" formatted="false">Controlla la partecipazione e ottieni %s DIA</string>
+    <string name="stamp_warning_subtitle">- I cuori aggiuntivi sono cuori giornalieri e scompariranno al termine del conteggio.\n- Puoi ottenere cuori Hot Time dalle 20:00 alle 23:30 ogni giorno.\n- I cuori aggiuntivi vengono ripristinati ogni giorno all\'ora del conteggio.\n- Non puoi ricevi cuori aggiuntivi durante il conteggio.</string>
+    <string name="label_league_ended">Il sistema dei campionati individuali è terminato.</string>
+    <string name="receive_more_heart_after_attendance">Ottieni più cuori</string>
+    <string name="receive_more_heart_after_video_ads" formatted="false">Guarda l\'annuncio video +%s cuori</string>
+    <string name="reward_daily_connection">Apri il premio CHOEAEDOL</string>
+    <string name="reward_daily_connection_celeb">Apri il premio celebrità CHOEAEDOL</string>
+    <string name="reward_sorry_heart">Cuori bonus</string>
+    <string name="reward_daily_pack">Pacchetto giornaliero</string>
+    <string name="reward_level_heart">Premio di livello</string>
+    <string name="reward_buring_time">Orario di punta</string>
+    <string name="reward_post_article">Pubblica ricompensa</string>
+    <string name="reward_heartbox">Scatola del cuore</string>
+    <string name="reward_attendance_heart" formatted="false">Cuori premio per la partecipazione alla serie di %s giorni</string>
+    <string name="reward_attendance_diamond" formatted="false">Premio per la partecipazione consecutiva di %s giorni DIA</string>
+    <string name="receive">Ricevere</string>
+    <string name="complete">Completato</string>
+    <string name="before_opening">imminente</string>
+    <string name="attendance_heart_count_format" formatted="false">%s ♡</string>
+    <string name="dia_count_format" formatted="false">%s DIA</string>
+    <string name="more_hearts_section_title">Ottieni più cuori</string>
+    <string name="reward_quiz">Cuori di ricompensa del quiz</string>
+    <string name="reward_didnt_receive_quiz">Cuori di ricompensa del quiz non pagati</string>
+    <string name="reward_offerwall_heart" formatted="false">Ottieni %s cuori in più</string>
+    <string name="reward_offerwall_diamond" formatted="false">Ottieni %s DIA in più</string>
+    <string name="purchase_cancelled">Non è stato possibile completare l\'acquisto a causa di un errore temporaneo. Per favore riprova.</string>
+    <string name="purchase_refunded">Il tuo acquisto è stato annullato e rimborsato a causa di un errore temporaneo. Per favore riprova.</string>
+    <string name="purchase_pending">Il tuo pagamento è in sospeso. I tuoi articoli vengono offerti dopo aver completato il pagamento.</string>
+    <string name="label_rank_daily_no_data">Le classifiche giornaliere verranno aggiornate presto.</string>
+    <string name="label_rank_daily_m_no_data">Nessun dato sulla classifica mensile giornaliera ancora.</string>
+    <string name="label_stats_highest_votes_no_data">Nessun idol ha ancora ricevuto Heart Votes. Per favore vota per il tuo idolo!</string>
+    <string name="label_stats_1st_place_no_data">Nessun idol ha ancora vinto il 1° posto. Per favore vota per il tuo idolo!</string>
+    <string name="actor_label_stats_highest_votes_no_data">Nessuna celebrità ha ancora ricevuto Heart Votes. Per favore vota per la tua celebrità!</string>
+    <string name="actor_label_stats_1st_place_no_data">Nessuna celebrità ha ancora vinto il 1° posto. Per favore vota per la tua celebrità!</string>
+    <string name="label_award_aggregated_no_data">Le classifiche cumulative verranno aggregate da domani.</string>
+    <string name="reward_videoad">Cuori pubblicitari video</string>
+    <string name="reward_adopted_quiz">Cuori approvati dal quiz</string>
+    <string name="reward_surprise_dia">Congratulazioni! Sorpresa DIA</string>
+    <string name="agree_all">Accetto tutti i termini</string>
+    <string name="required">Necessario</string>
+    <string name="reward_heartbox1000_sub">Fortunato! Hai vinto il più grande vantaggio di Heart Box!</string>
+    <string name="aw_yend2023_title">2023 BEST CHOICE By CHOEAEDOL</string>
+    <string name="aw_yend2023_result">Risultati finali</string>
+    <string name="award_realtime_status">Questo stato di classifica in tempo reale di ciascun candidato.</string>
+    <string name="award_accumulate_status">Questo stato di classifica cumulativo di ciascun candidato.</string>
+    <string name="award_realtime_status_MDOL">Artista maschio (individuale/gruppo) che ha pubblicato un mini-album o un album completo tra il 1 gennaio e il 19 novembre 2023</string>
+    <string name="award_realtime_status_FDOL">Artista femminile (individuale/gruppo) che ha pubblicato un mini-album o un album completo tra il 1 gennaio e il 19 novembre 2023</string>
+    <string name="award_realtime_status_NEW">Artisti che hanno debuttato tra il 1 gennaio e il 19 novembre 2023</string>
+    <string name="award_realtime_status_IBD">Artisti nati nell\'Anno del Drago (2000, 1988)</string>
+    <string name="award_realtime_status_MA">Tutti attori nelle principali classifiche</string>
+    <string name="award_realtime_status_FA">Tutte le attrici nelle principali classifiche</string>
+    <string name="award_realtime_status_MS">Tutti gli artisti uomini nelle principali classifiche</string>
+    <string name="award_realtime_status_FS">Tutte le artiste nelle principali classifiche</string>
+    <string name="award_realtime_status_ENT">Tutti gli animatori nelle principali classifiche</string>
+    <string name="award_realtime_status_ABD">Artisti nati nell\'Anno del Drago (2000, 1988 o 1976).</string>
+    <string name="article_setting">Impostazioni postali</string>
+    <string name="download_ban">Blocca download</string>
+    <string name="article_cancel_title">Annulla pubblicazione</string>
+    <string name="article_cancel_msg">Il post che stai scrivendo verrà eliminato.</string>
+    <string name="over_maximum_video_duration">È possibile caricare video solo entro 3 minuti.</string>
+    <string name="uploading_thumb_error_msg">Impossibile estrarre una miniatura.</string>
+    <string name="title_trim_video">Modifica un video</string>
+    <string name="desc_trim_video">Sposta i controlli sottostanti per modificare il tuo video.\n(60 secondi o meno)</string>
+    <string name="all_videos">Tutti i video</string>
+    <string name="all_images">Tutte le foto</string>
+    <string name="title_cancel_trim_video">Annulla le modifiche video</string>
+    <string name="desc_cancel_trim_video">Se annulli la modifica di un video, le modifiche verranno eliminate.</string>
+    <string name="article_post">Inviare</string>
+    <string name="upload_in_progress">Attualmente sto caricando un altro post</string>
+    <string name="interstitial_ad_reward">Premio pubblicitario bonus</string>
+    <string name="article_uploading">Caricamento in corso</string>
+    <string name="complete_article_upload">Caricamento completato!</string>
+    <string name="retry_article_upload">Riprova il caricamento</string>
+    <string name="fail_article_upload">Caricamento fallito</string>
+    <string name="main_image_tooltip">Solo la foto principale quadrata verrà applicata come banner!</string>
+    <string name="main_image_icon_title">Principale</string>
+    <string name="label_image_option_gif">GIF</string>
+    <string name="attendance_transition">Visita</string>
+    <string name="stamp_already_done_and_retry">Hai già preso parte alla partecipazione oggi!\nRiprova domani.</string>
+    <string name="popup_burningtime_title">È un momento CALDO adesso!</string>
+    <string name="popup_burningtime_subtitle" formatted="false">Un\'opportunità per ottenere %s cuori in più!</string>
+    <string name="popup_burningtime_button">Vai per ottenere il premio HOT Time</string>
+    <string name="show_background_only">Solo carta da parati</string>
+    <string name="background">Sfondo</string>
+    <string name="order_by_like">Piace</string>
+    <string name="format_article_like" formatted="false">Mi piace %s</string>
+    <string name="retry_quiz">Riprova il quiz!</string>
+    <string name="video_ad_chance_solve_quiz">Avrai un\'altra possibilità di risolvere il quiz guardando gli annunci video!</string>
+    <string name="title_result_face_detect">Risultato della corrispondenza Idol Face</string>
+    <string name="title_retry">Riprova</string>
+    <string name="quiz_retry_ad_done">Hai finito di guardare l\'annuncio video!\nRispondi al quiz ancora una volta!</string>
+    <string name="continue_quiz">Continua</string>
+    <string name="quit">Esentato</string>
+    <string name="quiz_continue_ad_done">Hai finito di guardare l\'annuncio video!\nContinua con il quiz</string>
+    <string name="title_quit_quiz_popup">Esentato</string>
+    <string name="desc_quit_quiz_popup">Guarda un breve annuncio video per continuare il quiz!\nSei sicuro di voler uscire?</string>
+    <string name="desc_quit_quiz">Guarda un breve annuncio video per continuare il quiz!</string>
+    <string name="msg_confirm_burning_day">Vuoi impostarlo come All-In Day?\nI DIA non sono rimborsabili dopo la registrazione.</string>
+    <string name="chatroom_enter_warning_msg">Comportamenti dannosi come diffamazione, volgarità, oscenità e pubblicità saranno soggetti a sanzioni ai sensi della politica operativa,\n
+ e potrebbero verificarsi danni, pertanto ti invitiamo a non divulgare ad altri i tuoi dati di pagamento e i tuoi dati personali.</string>
+    <string name="desc_skip_ad_to_retry_quiz">Si prega di guardare l\'annuncio per riprovare il quiz!</string>
+    <string name="desc_skip_ad_to_continue_quiz">Si prega di guardare l\'annuncio per continuare il quiz!</string>
+    <string name="msg_empty_background_image">Non hai ancora un\'immagine di sfondo!\nProva a caricare un\'immagine con proporzioni 3:5 o superiori.</string>
+    <string name="heartpick">Heart Pick</string>
+    <string name="vote_finish">La votazione termina</string>
+    <string name="finish_at" formatted="false">Fino al %s</string>
+    <string name="finish">Uscita</string>
+    <string name="finish_popup_title" formatted="false">%s cuori giornalieri rimasti.</string>
+    <string name="result_heartpick">Risultato Heart Pick</string>
+    <string name="cheering_comments">Commenti</string>
+    <string name="view_number_of_comments" formatted="false">Visualizza %s commenti</string>
+    <string name="first_rank_reward">Premio per il n. 1</string>
+    <string name="finish_popup_subtitle" formatted="false">Vuoi uscire da %s?</string>
+    <string name="popup_title_heartpick">Cos\'è il Heart Pick?</string>
+    <string name="msg_heartpick_vote_result" formatted="false">%s cuori sono stati votati.\nCondividilo con i tuoi amici!</string>
+    <string name="heartpick_share_msg" formatted="false">💖La mia scelta! Heart Pick💖\n%s\n[#%s #HeartPick Ranking]\n\n%s %s\n%s %s\n%s %s\n\nFai un regalo speciale ai tuoi pregiudizi💖</string>
+    <string name="heartpick_tooltip_msg">Mancano %2$s voti al numero %1$s!</string>
+    <string name="most_in_picks_banner_msg" formatted="false">Sostieni il mio pregiudizio su %s!</string>
+    <string name="popup_title_themepick">Cos\'è la scelta a tema?</string>
+    <string name="popup_title_imagepick">Che cos\'è la selezione delle immagini?</string>
+    <string name="btn_complete_trim_video">Prossimo</string>
+    <string name="btn_view_post">Visualizzazione</string>
+    <string name="themepick_celeb">Themed Pick</string>
+    <string name="popup_title_themepick_celeb">Cos\'è la Themed Pick?</string>
+    <string name="daily_ad_exceeded_title">Per oggi è tutto!</string>
+    <string name="daily_ad_exceeded_subtitle_idol">Hai collezionato cuori per il tuo idolo!</string>
+    <string name="daily_ad_exceeded_subtitle_celeb">Hai collezionato cuori per la tua celebrità!</string>
+    <string name="daily_ad_exceeded_desc">Per favore, domani sostieni il tuo idolo con ancora più amore.\n\n*Puoi guardare di nuovo l\'annuncio video dopo che i voti saranno contati oggi.</string>
+    <string name="btn_more_video_ad">Visualizza più annunci</string>
+    <string name="miracle_share_msg">[Miracolo del mese🎂]\n#%2$s è attualmente #%3$s nella classifica cumulativa!\n\nVotazioni per il compleanno del mese in corso!\nVota per il tuo pregiudizio e pubblica un annuncio di compleanno per il tuo pregiudizio💖\n\nSupporta l\'idolo #Kpop su #CHOEAEDOL</string>
+    <string name="miracle_n_share_msg">[Miracolo del mese🎂]\nClassifica cumulativa attuale\n\n%2$s #%3$s\n%4$s #%5$s\n%6$s #%7$s\n\nFai un regalo di compleanno speciale al mio idolo su CHOEAEDOL!💖\n\nSupporta l\'idolo #Kpop su #CHOEAEDOL</string>
+    <string name="face_share_msg">#Idol Face Match #CHOEAEDOL\n
+Quale idolo mi somiglia?\n
+Dai un\'occhiata adesso a CHOEAEDOL!</string>
+    <string name="community_share_msg">%2$s Vedi il post!\n\n
+Supporta l\'idolo #Kpop su #CHOEAEDOL</string>
+    <string name="community_d_share_msg">%2$s Vedi il post sui tuoi pregiudizi!\n\n
+Supporta l\'idolo #Kpop su #CHOEAEDOL</string>
+    <string name="freeboard_share_msg">Chi è il tuo idolo #Kpop preferito?😳\n\n
+
+Parliamo del tuo pregiudizio su #CHOEAEDOL!</string>
+    <string name="qna_share_msg">Chiedi agli altri fan tutto su #Kpop e i tuoi pregiudizi!🥹\n
+Condividi le informazioni sul tuo idolo su #CHOEAEDOL</string>
+    <string name="celeb_miracle_share_msg">🎂Miracolo del mese\n\n#CHOEAEDOL_CELEB\n#%2$s è attualmente #%3$s nella classifica cumulativa!\n\nVotazioni per il compleanno del mese in corso! Un regalo di compleanno speciale per i miei pregiudizi💜</string>
+    <string name="celeb_miracle_n_share_msg">🎂Miracolo del mese\n\n[#CHOEAEDOL_CELEB Classifica cumulativa attuale]\n%2$s #%3$s\n%4$s #%5$s\n%6$s #%7$s\n\nVotazione del compleanno del mese in corso ! Un regalo di compleanno speciale per i miei pregiudizi💜</string>
+    <string name="celeb_community_share_msg">%2$s Vai alla comunità globale!\n\n
+%3$s Sostieni i tuoi pregiudizi su #CHOEAEDOL_CELEB</string>
+    <string name="celeb_community_d_share_msg">#%2$s Parla liberamente con gli altri fan delle tue celebrità preferite!\n\n
+%3$s Sostieni i tuoi pregiudizi su #CHOEAEDOL_CELEB</string>
+    <string name="celeb_freeboard_share_msg">#CHOEAEDOL_CELEB Tavola libera\n\n
+
+Parla liberamente con altri fan dei tuoi attori e celebrità preferiti!</string>
+    <string name="celeb_qna_share_msg">Domande su #K-Celeb? Chiedi agli altri fan tutto sulla tua celebrità!\n\n
+Condividi informazioni sulla tua celebrità su #CHOEAEDOL_CELEB</string>
+    <string name="top_toggle_male">M</string>
+    <string name="top_toggle_female">F</string>
+    <string name="rookie_month_title">CHOEAEDOL Esordiente</string>
+    <string name="super_rookie_history_tab">Super novellino</string>
+    <string name="title_rookie_month">Cos\'è un Rookie CHOEAEDOL?</string>
+    <string name="record_super_rookie">Un elenco di tutti gli idol che hanno raggiunto il livello Super Rookie</string>
+    <string name="record_super_rookie_info_title">Cos\'è il SuperRookie?</string>
+    <string name="record_super_rookie_info_body">Idoli di gruppo e solisti che sono stati\nCHOEAEDOL Rookie tre volte.\nSuper Rookie ricevono ricompense migliori\ne si diplomano come Rookie.</string>
+    <string name="record_rookie_month_default">Nessun idolo è stato ancora raggiunto come Rookie of the Month.\nVota cuori per il tuo idolo e rendi il tuo idolo il primo Rookie of the Month!</string>
+    <string name="record_super_rookie_default">Nessun idolo è stato ancora raggiunto come Super Rookie.\nVota cuori per il tuo idolo e rendi il tuo idolo il primo Super Rookie</string>
+    <string name="record_super_rookie_number" formatted="false">%s</string>
+    <string name="rookie">Principiante</string>
+    <string name="title_miracle_month">Cos\'è il miracolo del mese?</string>
+    <string name="community_main_share_msg">Vai alla community globale di #%1$s per sostenere i tuoi idoli!\n\n
+
+Supporta l\'idolo #Kpop su #CHOEAEDOL</string>
+    <string name="celeb_community_main_share_msg">Vai alla community globale di #%1$s per sostenere i tuoi idoli!\n\n
+
+Sostieni attori e celebrità coreani su #CHOEAEDOL_CELEB</string>
+    <string name="rookie_share_msg">Supporta #Kpop #Rookie_Idol su #CHOEAEDOL!\n\n
+[CHOEAEDOL Rookie👼🏻]\n
+L\'attuale 1° posto cumulativo è #%2$s!\n\n
+
+Fai un regalo speciale al mio idolo su CHOEAEDOL!💖</string>
+    <string name="banner_go_myidol_title">Vai alla classifica dei miei idoli</string>
+    <string name="banner_go_myidol_btn">ANDARE!</string>
+    <string name="purchase_loading_title">Pagamento in corso</string>
+    <string name="purchase_loading_msg">Se esci dalla pagina, potrebbe trattarsi di un acquisto duplicato.</string>
+    <string name="filter_actor">Attore/Attrice</string>
+    <string name="setting_haptic">Feedback tattile</string>
+    <string name="date_deadline">Scadenza</string>
+    <string name="adtype_korean">🇰🇷Pubblicità nazionale coreana</string>
+    <string name="adtype_global">🌎Annuncio globale</string>
+    <string name="adtype_mobile">📱Annuncio mobile</string>
+    <string name="veiw_support_location">Controlla la posizione</string>
+    <string name="popup_diavote_title">Supporto Diamante completato</string>
+    <string name="popup_diavote_desc" formatted="false">%sDIAs è stato supportato.\nRiunisci i tuoi amici e realizzalo!</string>
+    <string name="sort_by_achievement">Tasso di raggiungimento</string>
+    <string name="tab_support_detail">dettagli</string>
+    <string name="adtype_icon_korean">🇰🇷</string>
+    <string name="adtype_icon_global">🌎</string>
+    <string name="adtype_icon_mobile">📱</string>
+    <string name="menu_sub_board">Comunità di conversazione gratuita</string>
+    <string name="menu_sub_store">Acquista cuori e diamanti</string>
+    <string name="menu_sub_notice">Notifiche importanti</string>
+    <string name="menu_sub_record">Record di risultati di idoli</string>
+    <string name="menu_sub_quiz">Ottieni fino a 500 cuori</string>
+    <string name="menu_sub_face_matching">Quale idolo mi somiglia</string>
+    <string name="welcome_mission_desc">Riceverai una ricompensa ogni volta che una missione verrà completata!\nSe completi tutte le missioni ti daremo una ricompensa più grande.</string>
+    <string name="welcome_mission_sign_up_title">Iscrizione</string>
+    <string name="welcome_mission_sign_up_desc">Benvenuto! Puoi finire la missione!</string>
+    <string name="welcome_mission_set_most_title">Scegli l\'idolo</string>
+    <string name="welcome_mission_set_most_desc">Vai e scegli il mio idolo</string>
+    <string name="welcome_mission_vote_title">Votare</string>
+    <string name="welcome_mission_vote_desc">Invia cuori al tuo idolo</string>
+    <string name="welcome_mission_community_title">Scrivi un post nella community</string>
+    <string name="welcome_mission_community_desc">Comunica con gli amici che hanno lo stesso idolo</string>
+    <string name="welcome_mission_video_ad_title">Guarda l\'annuncio video</string>
+    <string name="welcome_mission_video_ad_desc">Guarda gli annunci e colleziona cuori</string>
+    <string name="go">Andare</string>
+    <string name="welcome_mission_add_friend_title">Aggiungi amici</string>
+    <string name="welcome_mission_add_friend_desc">Fai più amici per raccogliere cuori insieme</string>
+    <string name="welcome_mission_complete">Missione completata</string>
+    <string name="impossible_write_message">È richiesta l\'impostazione dell\'idolo</string>
+    <string name="impossible_all_clear">Puoi ottenerlo una volta completate tutte le missioni</string>
+    <string name="retry_all_clear">La tua ricompensa è già stata pagata</string>
+    <string name="welcome_mission_all_clear_reward_title">Ricompensa per la missione</string>
+    <string name="welcome_mission_title">Benvenuta Missione 💝</string>
+    <string name="hof_cumulative_tab">30 giorni</string>
+    <string name="hof_daily_tab">Quotidiano</string>
+    <string name="celeb_welcome_mission_set_most_title">Scegli celebrità</string>
+    <string name="celeb_welcome_mission_set_most_desc">Vai e scegli la mia celebrità</string>
+    <string name="celeb_welcome_mission_vote_desc">Invia cuori alla tua celebrità</string>
+    <string name="celeb_welcome_mission_community_desc">Comunica con gli amici che hanno la stessa celebrità</string>
+    <string name="celeb_impossible_write_message">È richiesta l\'ambientazione di una celebrità</string>
+    <string name="share_awards_ready" formatted="false">[%s]\n🚀 Presto inizieranno le votazioni su CHOEAEDOL! 🏆\nPreparati a tifare affinché il tuo preferito raggiunga il primo posto!\n⏰ Inizio votazioni: %s(KST)\n\n#최애돌 #CHOEAEDOL</string>
+    <string name="share_awards_run" formatted="false">[%s]\n🔥 È in corso una votazione feroce per CHOEAEDOL 🗳️\nSostieni il tuo preferito con i cuori adesso! 💖\n\n#최애돌 #CHOEAEDOL</string>
+    <string name="share_awards_result" formatted="false">[%s]\n🏆 Chi sarà il vincitore della gloria?! 🫣\nDai un\'occhiata subito a CHOEAEDOL!\n\n#최애돌 #CHOEAEDOL</string>
+    <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 Presto inizieranno le votazioni su CHOEAEDOL Celeb! 🏆\nPreparati a tifare affinché il tuo preferito raggiunga il primo posto!\n⏰ Inizio votazioni: %s\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
+    <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 È in corso una votazione feroce per CHOEAEDOL Celeb 🗳️\nSostieni il tuo preferito con i cuori adesso! 💖\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
+    <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 Chi sarà il vincitore della gloria?! 🫣\nDai un\'occhiata subito a CHOEAEDOL Celeb!\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
+    <string name="login_desc">Inizia in 5 secondi!</string>
+    <string name="login_email">iniziare con l\'e-mail</string>
+    <string name="hometab_title_rank">Ranking</string>
+    <string name="hometab_title_myidol">My Idol</string>
+    <string name="hometab_title_profile">Profile</string>
+    <string name="hometab_title_freeboard">Free Talk</string>
+    <string name="hometab_title_menu">Menu</string>
+    <string name="hometab_title_myceleb">My Celeb</string>
+    <string name="hometab_title_miracle">Miracle</string>
+    <string name="hometab_title_onepick">One Pick</string>
+    <string name="hometab_title_hof">Hall of Fame</string>
+    <string name="vote_certificate_popup_button">Controlla il certificato</string>
+    <string name="certificate_title">Certificato di voto</string>
+    <string name="certificate_menu_desc">Controlla i certificati di oggi</string>
+    <string name="certificate_none">Non hai nessun certificato oggi🥲\nVota il mio idolo e controlla i certificati!</string>
+    <string name="certificate_none_button">Andate a votare</string>
+    <string name="certificate_info_title">Cos\'è il certificato di voto?</string>
+    <string name="certificate_info_desc">◇ Il Certificato verrà creato quando voterai più di 100❤️\n◇ Il Certificato verrà conservato fino alla fine della giornata di votazione\n◇ Criteri del livello di certificazione\n\t- Bronzo: 100❤️\n\t- Argento: 1.000❤️\n\t- Oro: 10.000❤️\n\t- Platino: 100.000❤️</string>
+    <string name="certificate_detail_title">Dettagli del certificato di voto</string>
+    <string name="certificate_detail_info">* Il certificato di oggi può essere visualizzato nuovamente in [Menu > Certificato di votazione]</string>
+    <string name="certificate_username">Nome dell\'elettore</string>
+    <string name="certificate_heart">Votato Cuori</string>
+    <string name="certificate_time">Data della votazione</string>
+    <string name="certificate_detail_save">Salva immagine</string>
+    <string name="certificate_detail_share">Condividere</string>
+    <string name="certificate_detail_share_msg">Votazione completata oggi💝\nFacciamo %1$s insieme!\n\n#%1$s #%2$s #VotingProof</string>
+    <string name="certificate_detail_save_fail">Impossibile salvare l\'immagine</string>
+    <string name="certificate_detail_save_succ">Immagine salvata con successo</string>
+    <string name="themepick_vote_again">Vota ancora</string>
+    <string name="themepick_vote_with_ad">Vota [AD]</string>
+    <string name="imagepick_vote_with_ad">Vota ancora [AD]</string>
+    <string name="see_translate">Vedi la traduzione</string>
+    <string name="translating">Traduzione...</string>
+    <string name="see_original">Vedi originale</string>
+    <string name="freeboard_hotposts">Post caldi</string>
+    <string name="freeboard_search">Inserisci il termine di ricerca.</string>
+    <string name="see_translate_fail">Traduzione fallita.</string>
+    <string name="see_translate_to_english">Tradurre in inglese</string>
+    <string name="total_amount" formatted="false">Totale %s</string>
+    <string name="next_level_progress" formatted="false">Next level %s</string>
+    <string name="freeboard_empty">Non ci sono ancora post da mostrare🥲\nProva a pubblicare qualcosa di nuovo!</string>
+    <string name="my_info_heart_dia_detail">Visualizza i dettagli</string>
+    <string name="my_info_coupon_quantity">I miei coupon</string>
+    <string name="video_image_picker_not_found">La selezione di video e immagini non è supportata</string>
+    <string name="push_setting_guide_head">Tempi di Dukjil</string>
+    <string name="push_setting_guide_body">Attiva le notifiche e non perdere mai le tue notizie preferite!</string>
+    <string name="setting_menu_push_likes">Mi piace</string>
+    <string name="setting_menu_push_hotposts">Post caldi</string>
+    <string name="levelheart_bonus_yes">🎬 Guarda AD</string>
+    <string name="freeboard_nobias_title">Devi impostare il tuo bias per vederlo!</string>
+    <string name="freeboard_nobias_subtitle">Trova il tuo bias nella ricerca 🔍 in alto a alto a destra!</string>
+    <string name="freeboard_nobias_subtitle_celeb">Trova il tuo bias nella "Ricerca🔍" nella parte superiore della pagina principale!</string>
+    <string name="community_feed">Feed</string>
+    <string name="community_board">Fan Talk</string>
+    <string name="community_chat">Chat</string>
+    <string name="community_schedule">Agenda</string>
+    <string name="community_board2" formatted="false">%s Talk</string>
+    <string name="post_detail">Dettagli Post</string>
+    <string name="vote_dday" formatted="false">Voto tra D-%s</string>
+    <string name="vote_preview">Anteprima Voto</string>
+    <string name="vote_alert_before">Promemoria Voto</string>
+    <string name="vote_alert_after">Notifica a inizio voto</string>
+    <string name="upcoming">A breve</string>
+    <string name="onepick_preview_title" formatted="false">Anteprima %s</string>
+    <string name="alert_ready_vote">Promemoria attivo!\nNotifica a inizio voto</string>
+    <string name="alert_ready_videoad">Promemoria attivo!\nNotifica quando pronto</string>
+    <string name="push_induct_head">Attiva le notifiche!</string>
+    <string name="push_induct_body">Notifiche disattivate\nPer favore, attivale</string>
+    <string name="push_induct_button">Impostazioni</string>
+    <string name="ios_att_title">"Consenti" per più bonus</string>
+    <string name="ios_att_title_agree">"Consenti"</string>
+    <string name="ios_att_body_1">Accettando</string>
+    <string name="ios_att_body_2">Più annunci, più cuori</string>
+    <string name="ios_att_body_3">Annunci su misura per te</string>
+    <string name="ios_att_outro">Modificabile in qualsiasi momento\n[Impostazioni > Privacy > Tracciamento ON/OFF]</string>
+    <string name="video_ad_timer_title">Caricamento...</string>
+    <string name="video_ad_timer_body">Preparo annuncio bonus</string>
+    <string name="video_ad_timer_time">Tempo rimasto</string>
+    <string name="video_ad_timer_bonus" formatted="false">Prossimo annuncio: fino a %s❤️</string>
+    <string name="video_ad_timer_alert">Ti avvisiamo?</string>
+    <string name="video_ad_timer_alert_done">Promemoria impostato</string>
+    <string name="reward_videoad_bonus">Bonus casuale</string>
+    <string name="aos_web_image_save_title">Salva immagine</string>
+    <string name="aos_web_image_save_body">Salvare questa immagine?</string>
+    <string name="aos_web_image_save_yes">Salva</string>
+    <string name="share_heartpick_upcoming">💖Prossimo Heart Pick: Dimostra il tuo amore con i cuori💖\n[%1$s]\n🎁[%2$s]\nChi sarà il vincitore finale? 👀\n\n📌 Preparati a votare per %3$s %4$s\n🔗%5$s</string>
+    <string name="share_themepick_upcoming">💖Prossimo Themed Pick: un\'accesa battaglia quotidiana!💖\n[%1$s]\n🎁[%2$s]\nIl 1° posto sarà...?👀\n\n📌 Preparati a votare per %3$s %4$s\n🔗%5$s</string>
+    <string name="share_onepick_upcoming_nobias">your bias</string>
+    <string name="ios_store_purchase_restricted_cn">Gli acquisti non sono disponibili con un account App Store della Cina continentale.\n
+Passa a un altro Paese o a un\'altra regione e riprova.</string>
+    <string name="title_daily_rank">Classifica</string>
+    <string name="menu_minigame">Heart Arcade</string>
+    <string name="popup_game_start_title">Inizia il gioco</string>
+    <string name="popup_game_start_desc" formatted="false">Guadagna ❤️Ever Hearts\nin base al tuo punteggio di gioco!\n\nUserai %shearts per iniziare il gioco.\nIniziare ora?</string>
+    <string name="reward_game_result">Ricompense di gioco</string>
+    <string name="menu_invite_friend">Invita amici</string>
+    <string name="friend_tooltip_invite_friend">Ottieni fino a 110.000 cuori!</string>
+    <string name="friend_bnr_invite_friend_title">Invita gli amici\nricevi cuori</string>
+    <string name="invite_friend_detail_title">Invita amici</string>
+    <string name="reward_invite_mission_bonus">Bonus ricompensa missione invito amico</string>
+    <string name="reward_invite_mission_completion">Ricompensa per il completamento della missione di invito di un amico</string>
+    <string name="signup_desc2_noreward">Inserisci il codice di invito del tuo referente per scambiare Cuori come amici.</string>
+    <string name="signup_toast_auto_fill_recommender">Il codice di invito copiato è stato inserito automaticamente.</string>
+</resources>

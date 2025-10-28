@@ -1,0 +1,1937 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="heart_store">Toko Heart</string>
+    <string name="normal_heart_shop">Pembelian Satu Kali</string>
+    <string name="regular_heart_shop">Pembelian Reguler</string>
+    <string name="bonus">Bonus</string>
+    <string name="no_iap_products">Tidak ada produk yang tersedia untuk saat ini</string>
+    <string name="votes"></string>
+    <string name="postfix_rank"></string>
+    <string name="app_name">Choeaedol</string>
+    <string name="app_name_onestore">Choeaedol</string>
+    <string name="app_name_china">Choeaedol</string>
+    <string name="actor_app_name">Choeaedol Seleb</string>
+    <string name="app_name_upper">CHOEAEDOL</string>
+    <string name="app_name_onestore_upper">CHOEAEDOL</string>
+    <string name="app_name_china_upper">CHOEAEDOL</string>
+    <string name="actor_app_name_upper">CHOEAEDOL Seleb</string>
+    <string name="ios_permission_camera">Diperlukan untuk mengatur foto profil, mengunggah atau menyimpan foto.</string>
+    <string name="ios_permission_photo">Diperlukan untuk mengatur foto profil, mengunggah atau menyimpan foto.</string>
+    <string name="ios_permission_photo_add">Diperlukan untuk mengatur foto profil, mengunggah atau menyimpan foto.</string>
+    <string name="X_DAILY_ALL">X Daily ALL</string>
+    <string name="photo_picker">Unggah Foto</string>
+    <string name="Camera">Ambil Foto</string>
+    <string name="photo_library">Pilih dari Album</string>
+    <string name="push_notification">Push Pemberitahuan</string>
+    <string name="push_on">On</string>
+    <string name="push_off">Off</string>
+    <string name="image_save_error">Download gagal. Pergi ke Penyimpanan Perangkat atau Pengaturan Perangkat&gt;CHOEAEDOL&gt;Foto. Periksa Authorization Setting Pengaturan Otorisasi dan coba lagi.</string>
+    <string name="actor_image_save_error">Download gagal. Pergi ke Penyimpanan Perangkat atau Pengaturan Perangkat>CHOEAEDOL Celeb>Foto. Periksa Authorization Setting Pengaturan Otorisasi dan coba lagi.</string>
+    <string name="delete_comment">Apa Anda ingin menghapus komen ini?</string>
+    <string name="received_heart_history">Heart yang diterima</string>
+    <string name="login_line">Masuk dengan akun LINE Anda.</string>
+    <string name="line_not_installed">LINE tidak terpasang pada perangkat ini.</string>
+    <string name="line_login_failed">Gagal masuk</string>
+    <string name="loading">Memuat….</string>
+    <string name="opensource_license">Open Source License</string>
+    <string name="kakaotalk_not_installed">KAKAOTALK tidak terpasang pada perangkat ini.</string>
+    <string name="help_safari">Apakah Anda ingin melihat manual CHOEAEDOL di Safari?</string>
+    <string name="actor_help_safari">Apakah Anda ingin melihat manual CHOEAEDOL Seleb di Safari?</string>
+    <string name="processing_iap_receipt">Proses pengisian Heart</string>
+    <string name="processing_iap_receipt_failed">Pengisian Heart gagal karena kesalahan jaringan. Tekan tombol \'COBA LAGI\'</string>
+    <string name="retry">Coba lagi</string>
+    <string name="iap_cancelled">Pembayaran telah dibatalkan.</string>
+    <string name="title_appstore_review">Berikan review untuk CHOEAEDOL</string>
+    <string name="actor_title_appstore_review">Berikan review untuk CHOEAEDOL Seleb</string>
+    <string name="no_my_articles">Anda belum menulis posting</string>
+    <string name="no_my_comments">Anda belum menulis komentar</string>
+    <string name="hint_email">alamat email</string>
+    <string name="hint_passwd">Kata Sandi</string>
+    <string name="hint_passwd_confirm">Periksa Kata Sandi</string>
+    <string name="hint_name">Nickname</string>
+    <string name="hint_recommender">Rekomendasi (nickname)</string>
+    <string name="hint_recommender_1">Silakan masukkan kode undangan 8 digit. (Opsional)</string>
+    <string name="hint_search_idol">Masukkan nama Idol</string>
+    <string name="actor_hint_search_idol">Masukkan nama Seleb</string>
+    <string name="text_forgot_id"><i>Lupa ID Anda?</i></string>
+    <string name="text_forgot_passwd"><i>Lupa Kata Sandi Anda?</i></string>
+    <string name="my_heart">Heart Saya</string>
+    <string name="confirm">OK</string>
+    <string name="failed_to_load">Gagal mendapatkan informasi</string>
+    <string name="title_tab_solo">Peringkat Individu</string>
+    <string name="title_tab_group">Peringkat Grup</string>
+    <string name="actor_title_tab_actors">Peringkat Aktor</string>
+    <string name="actor_title_tab_actresses">Peringkat Aktris</string>
+    <string name="title_tab_favorite">Idol Saya</string>
+    <string name="actor_title_tab_favorite">Seleb saya</string>
+    <string name="title_tab_hall">Reputasi</string>
+    <string name="title_tab_menu">Menu</string>
+    <string name="title_agreement">Syarat dan Ketentuan</string>
+    <string name="title_forgot_passwd">Cari Kata Sandi</string>
+    <string name="title_favorite_setting">Pengaturan Idol Saya</string>
+    <string name="actor_title_favorite_setting">Pengaturan Seleb saya</string>
+    <string name="title_setting">Pengaturan</string>
+    <string name="title_coinplus">Daftarkan akun Cople Anda</string>
+    <string name="title_write">Tulis</string>
+    <string name="title_profile">Profil</string>
+    <string name="title_info_more">Masukkan informasi tambahan.</string>
+    <string name="title_share">Bagikan</string>
+    <string name="title_review">Tulis ulasan untuk CHOEAEDOL</string>
+    <string name="actor_title_review">Tulis ulasan untuk CHOEAEDOL Seleb</string>
+    <string name="title_show_option">Pengaturan Privasi</string>
+    <string name="title_signup">Daftar</string>
+    <string name="title_level_heart">Apa itu Akumulasi peringkat?</string>
+    <string name="actor_title_level_heart">Apa itu Akumulasi peringkat?</string>
+    <string name="heart_count_format" formatted="false">%s buah</string>
+    <string name="vote_count_format" formatted="false">%s suara</string>
+    <string name="rank_count_format" formatted="false">%s</string>
+    <string name="need_agree1">Setuju dengan Syarat dan Ketentuan</string>
+    <string name="need_agree2">Setuju dengan Kebijakan Privasi</string>
+    <string name="required_field">Wajib diisi</string>
+    <string name="invalid_format_email">Masukkan e-mail Anda</string>
+    <string name="too_short_passwd">Kata Sandi terlalu pendek.</string>
+    <string name="passwd_confirm_not_match">Kata Sandi tidak sesuai.</string>
+    <string name="title_vote_heart">Pilih Heart</string>
+    <string name="favorite">Favorit</string>
+    <string name="agreement1">Syarat dan Ketentuan</string>
+    <string name="agreement2">Kebijakan pribadi</string>
+    <string name="agreement1_agree">Saya setuju dengan Syarat dan Ketentuan</string>
+    <string name="agreement2_agree">Saya setuju dengan Kebijakan Privasi</string>
+    <string name="signup_desc1">E-mail Anda akan digunakan untuk mendapatkan kata sandi. Tulislah dengan akurat.</string>
+    <string name="signup_desc2" formatted="false">Masukkan kode undangan rekomendasi Anda untuk mendapatkan hingga %d Hati dan tukarkan Hati sebagai teman.</string>
+    <string name="heart_history_desc">Heart akan direset pada jam 24:00 (KST)</string>
+    <string name="same_nickname">Nickname ini sudah digunakan</string>
+    <string name="wait_signup">Pendaftaran sedang diproses..</string>
+    <string name="wait_signin">Sedang masuk…</string>
+    <string name="desc_failed_to_connect_internet">Koneksi jaringan tidak stabil. Coba lagi nanti.</string>
+    <string name="wait_userinfo">Sedang menerima informasi pengguna…..</string>
+    <string name="btn_next">Langkah selanjutnya</string>
+    <string name="btn_signin">Masuk</string>
+    <string name="btn_signup">Pendaftaran Anggota</string>
+    <string name="btn_signup_finish">Mendaftar</string>
+    <string name="btn_signup_finish_1">Pendaftaran Selesai</string>
+    <string name="my_action">Aktivitas Saya</string>
+    <string name="my_vote">Akumulasi suara saya</string>
+    <string name="menu_menu00">Event</string>
+    <string name="menu_menu01">Pengaturan Idol Saya</string>
+    <string name="actor_menu_menu01">Pengaturan Seleb Saya</string>
+    <string name="menu_menu02">Isi Ulang Heart</string>
+    <string name="menu_menu03"></string>
+    <string name="menu_menu04">Penggunaan CHOEAEDOL</string>
+    <string name="menu_menu05">Pengaturan</string>
+    <string name="setting_menu01">Pemberitahuan</string>
+    <string name="setting_menu02">Pertanyaan</string>
+    <string name="setting_menu03"></string>
+    <string name="setting_menu04">Pemberitahuan</string>
+    <string name="setting_menu05">Ubah Kata Sandi</string>
+    <string name="setting_menu06">Hapus Akun Saya</string>
+    <string name="setting_menu07">Versi Aplikasi</string>
+    <string name="setting_menu_heart_box_event">Pengaturan Heartbox Event</string>
+    <string name="most_favorite">Idol Saya</string>
+    <string name="actor_most_favorite">Seleb saya</string>
+    <string name="empty_most">Idol Saya\' kosong</string>
+    <string name="actor_empty_most">Seleb saya\' kosong</string>
+    <string name="empty_vote">Akumulasi suara(terakhir 30):0 buah</string>
+    <string name="favorite_format" formatted="false">Idol Saya: %s</string>
+    <string name="actor_favorite_format" formatted="false">Seleb saya: %s</string>
+    <string name="desc_empty_favorite1">Anda belum memilih \'Idol Saya\'</string>
+    <string name="actor_desc_empty_favorite1">Anda belum memilih \'Seleb Saya\'</string>
+    <string name="desc_empty_favorite2">Pilih Idol Anda sekarang!</string>
+    <string name="actor_desc_empty_favorite2">Pilih Seleb Anda sekarang!</string>
+    <string name="desc_empty_favorite3">Pilih Idol</string>
+    <string name="actor_desc_empty_favorite3">Pilih \'Seleb\'</string>
+    <string name="hint_coinplus_email"></string>
+    <string name="coinplus_download"></string>
+    <string name="order_by_time">Waktu</string>
+    <string name="order_by_heart">Heart</string>
+    <string name="no_reporter">Tidak ada orang yang Anda laporkan.</string>
+    <string name="nofriend1">Anda belum memiliki teman!</string>
+    <string name="nofriend2">Undang teman dan terima heart!</string>
+    <string name="invite_friend_kakao">Undang teman&gt;</string>
+    <string name="write_content">Masukkan konten</string>
+    <string name="btn_write">Posting</string>
+    <string name="upload_success">Selesai</string>
+    <string name="not_enough_heart">Heart Anda tidak cukup</string>
+    <string name="sent_heart_friend__format" formatted="false">Mengirim heart kepada %s.</string>
+    <string name="sent_heart_all_friend__format" formatted="false">Telah mengirim heart ke %d orang</string>
+    <string name="already_sent_heart__format">Telah mengirim heart ke %1$s. (Anda dapat mengirim ulang setelah %2$s detik.)</string>
+    <string name="sending_heart">Sedang mengirim heart</string>
+    <string name="heart_history_format">Telah menerima heart dari %1$s. (%2$s)</string>
+    <string name="sent_find_pw_mail">Kata sandi telah dikirim ke alamat e-mail Anda.</string>
+    <string name="title_report">Laporkan</string>
+    <string name="report_desc">Apakah Anda ingin melaporkan postingan ini?</string>
+    <string name="btn_cancel">Batal</string>
+    <string name="empty_comment">Tidak ada komentar.</string>
+    <string name="hint_comment">Masukkan komentar</string>
+    <string name="title_comment">Tulis komentar</string>
+    <string name="title_friends">Atur Pertemanan</string>
+    <string name="title_unfriend">Hapus Pertemanan</string>
+    <string name="applied">Kata sandi telah diubah</string>
+    <string name="empty_event">Tidak ada event</string>
+    <string name="empty_notice">Tidak ada pemberitahuan</string>
+    <string name="empty_inquiry">Tidak ada pertanyaan</string>
+    <string name="title_event">Event</string>
+    <string name="title_notice">Pemberitahuan</string>
+    <string name="title_change_passwd">Ubah Kata Sandi</string>
+    <string name="title_faq">FAQ</string>
+    <string name="title_inquiry">FAQ / Pertanyaan</string>
+    <string name="title_myinquirylist">Histori Pertanyaan Saya</string>
+    <string name="title_voting_guide">Akumulasi suara saya</string>
+    <string name="hint_inquiry">Masukkan pertanyaan</string>
+    <string name="title_rename">Ganti Nickname</string>
+    <string name="hint_nickname">Nickname</string>
+    <string name="rename_desc">Masukkan nickname yang baru</string>
+    <string name="rename_confirm_desc">Butuh 100 heart untuk ganti Nickname \n Ingin mengubah nickname Anda?</string>
+    <string name="registered">Berhasil</string>
+    <string name="inquiry_time_format">Rincian pertanyaan %1$s</string>
+    <string name="no_search_result">Tidak ada hasil temuan.</string>
+    <string name="wait_upload_article">Posting…</string>
+    <string name="remove_desc">Apakah Anda ingin menghapus posting ini?</string>
+    <string name="title_remove">Hapus</string>
+    <string name="button_close">Tutup</string>
+    <string name="title_heart_voting_ranking">Voting Top 100</string>
+    <string name="button_kakao">Masuk dengan akun KAKAOTALK</string>
+    <string name="hint_passwd_current">Kata Sandi Saat Ini</string>
+    <string name="hint_new_passwd">Kata Sandi Baru</string>
+    <string name="hint_new_passwd_confirm">Konfirmasi Kata Sandi Baru</string>
+    <string name="passwd_not_match">Kata Sandi saat ini tidak sesuai</string>
+    <string name="weak_heart">Daily Heart</string>
+    <string name="weak_heart_desc">Daily Heart direset setiap jam 12 malam (KST). Daily Heart akan Anda terima saat masuk atau dari teman.</string>
+    <string name="btn_free_heart">Heart gratis</string>
+    <string name="title_myheart">Heart Saya</string>
+    <string name="title_heartchage">Isi Ulang Heart</string>
+    <string name="wait_kakao_signin">Sedang menerima informasi dari akun KAKAOTALK</string>
+    <string name="your_id_is1">ID Anda adalah</string>
+    <string name="your_id_is2"></string>
+    <string name="failed_to_find_id">Tidak dapat menemukan ID</string>
+    <string name="title_find_id">Hasil pencarian ID</string>
+    <string name="failed_to_report">Anda tidak dapat melaporkan ini</string>
+    <string name="failed_to_report_2202">Diperbolehkan membuat 3 laporan dalam sehari.</string>
+    <string name="failed_to_report_2203">Dapat melaporkan kembali setelah 3 menit.</string>
+    <string name="failed_to_report__not_my_most">Tidak dapat melapor jika bukan \'Idol Saya\'</string>
+    <string name="actor_failed_to_report__not_my_most">Tidak dapat melapor jika bukan \'Seleb saya\'</string>
+    <string name="failed_to_report__already_reported">Postingan ini telah dilaporkan. Dan hanya dapat dilaporkan sekali</string>
+    <string name="no_writes">Anda belum menulis postingan atau komentar.</string>
+    <string name="signup_lock">Tidak dapat mendaftar melalui perangkat yang sama. \nCoba lagi setelah 10 menit.</string>
+    <string name="lable_invite_name">Recommender:</string>
+    <string name="lable_do_not_read">Jangan tunjukkan lagi</string>
+    <string name="lable_kakao_more_1">※ Anda dapat mengubah nickname Anda</string>
+    <string name="lable_kakao_more_2">Masukkan nama rekomender  (nickname) dan saling terima heart.</string>
+    <string name="lable_change_info">Ubah Informasi</string>
+    <string name="lable_change_info_complete">Ubah Informasi</string>
+    <string name="lable_individual_aggregated">Akumulasi Individu</string>
+    <string name="actor_lable_individual_aggregated">Akumulasi Aktor</string>
+    <string name="lable_actors_aggregated">Akumulasi Aktor</string>
+    <string name="lable_actresses_aggregated">Akumulasi Aktris</string>
+    <string name="lable_group_aggregated">Akumulasi Grup</string>
+    <string name="actor_lable_group_aggregated">Akumulasi Penyanyi-aktor</string>
+    <string name="label_individual_daily">Individu Daily</string>
+    <string name="label_group_daily">Grup Daily</string>
+    <string name="lable_individual">Individu</string>
+    <string name="actor_lable_individual">Aktor</string>
+    <string name="lable_actors">Aktor</string>
+    <string name="lable_actresses">Aktris</string>
+    <string name="lable_group">Grup</string>
+    <string name="actor_lable_group">Penyanyi-aktor</string>
+    <string name="lable_my_articles">Postingan Saya</string>
+    <string name="lable_my_comments">Komentar Saya</string>
+    <string name="lable_heart_vote">Histori Heart Saya</string>
+    <string name="lable_heart_save">Histori Akumulasi Heart</string>
+    <string name="lable_count_unit">buah</string>
+    <string name="lable_final_result">Hasil Akhir</string>
+    <string name="lable_review_ok">Berikan 5 bintang dengan senang hati</string>
+    <string name="lable_review_no">Abaikan dengan hati dingin</string>
+    <string name="lable_review_info1">Tinggalkan pesan penyemangat untuk idol Anda.</string>
+    <string name="actor_lable_review_info1">Tinggalkan pesan penyemangat untuk Seleb Anda.</string>
+    <string name="lable_review_info2">CHOEAEDOL! Layak dapat 5 bintang kan?</string>
+    <string name="actor_lable_review_info2">CHOEAEDOL Seleb! Layak dapat 5 bintang kan?</string>
+    <string name="lable_get_info">Sedang mencari data...</string>
+    <string name="lable_buy">Beli</string>
+    <string name="lable_manager_warning">Ubah Otorisasi Admin</string>
+    <string name="lable_show_range">Pengaturan Privasi</string>
+    <string name="lable_show_public">Terbuka untuk Semua</string>
+    <string name="lable_show_private">Hanya untuk Idol Saya</string>
+    <string name="actor_lable_show_private">Hanya untuk \'Seleb Saya\'</string>
+    <string name="lable_manager">[Admin]</string>
+    <string name="lable_save">Simpan</string>
+    <string name="lable_surprise_heart">Anda menang Kejutan Heart!</string>
+    <string name="lable_community_heart_vote">Voting</string>
+    <string name="lable_community_comment">Komentar</string>
+    <string name="lable_community_report">Lapor</string>
+    <string name="lable_coin_unit">Koin</string>
+    <string name="lable_coinsplayer_buy"></string>
+    <string name="lable_coinsplayer_password"></string>
+    <string name="lable_coinsplayer_account_register"></string>
+    <string name="lable_day"></string>
+    <string name="lable_heart_box">Heartbox</string>
+    <string name="lable_receive_no_heart">Anda belum beruntung! Silakan coba lain kali.</string>
+    <string name="lable_aggree_heart_box_1_1"></string>
+    <string name="lable_aggree_heart_box_1_2"></string>
+    <string name="lable_aggree_heart_box_1_3"></string>
+    <string name="lable_aggree_heart_box_2"></string>
+    <string name="lable_aggree_heart_box_2_1"></string>
+    <string name="lable_aggree_heart_box_2_2"></string>
+    <string name="lable_aggree_heart_box_3"></string>
+    <string name="lable_aggree_heart_box_4"></string>
+    <string name="lable_agree">Setuju</string>
+    <string name="lable_no_agree">Tidak Setuju</string>
+    <string name="lable_more_info_heart_box_event">Anda dapat mereset Heartbox Event dengan \"Lihat Menu Lain&gt;Setting\"</string>
+    <string name="lable_heart_box_ok">Anda menang Heartbox!</string>
+    <string name="lable_heart_box_ok_1">%1$s Heart telah diterima</string>
+    <string name="labe_giftcard_winner">Lihat daftar pemenang Google Gift Card</string>
+    <string name="msg_heart_received">Heart telah diisi ulang</string>
+    <string name="msg_unable_use_write">Sedang perhitungan suara, tidak dapat mengirimkan posting baru. \n[Waktu perhitungan suara\n%1$s <![CDATA[-]]> %2$s]</string>
+    <string name="msg_unable_use_vote">Sedang perhitungan suara, tidak dapat melakukan voting. \n[Waktu perhitungan suara\n%1$s <![CDATA[-]]> %2$s]</string>
+    <string name="msg_unable_use_send_heart">Sedang perhitungan suara, tidak dapat memberi/menerima heart. \n[Waktu perhitungan suara\n%1$s <![CDATA[-]]> %2$s]</string>
+    <string name="msg_unable_use_capture_1">Anda tidak dapat memakai fitur berbagi. Periksa kembali kondisi perangkat Anda.</string>
+    <string name="msg_unable_use_capture_2">Fitur berbagi Anda tidak berfungsi normal. Periksa kondisi ruang penyimpanan perangkat lalu coba lagi.</string>
+    <string name="msg_save_ok">Tersimpan.</string>
+    <string name="msg_unable_use_download_1">Tidak dapat menggunakan fitur unduh. Periksa kembali kondisi perangkat Anda.</string>
+    <string name="msg_unable_use_download_2">Unduhan tidak dapat dilakukan. Periksa kondisi ruang penyimpanan perangkat lalu coba lagi.</string>
+    <string name="msg_no_heart">Anda tidak menerima Heart.</string>
+    <string name="msg_error_ok">Maaf, terjadi kesalahan.\nCoba lagi.</string>
+    <string name="msg_favorite_guide">Daftar Favorit\' adalah fitur untuk mengakses komunitas Idol yang Anda sukai \n
+Anda juga dapat memilih \'Daftar Favorit\' dari \'Pengaturan Idol Saya\' dan tidak ada batasan \n 
+Idol Saya:Heart Icon/Daftar Favorit:Star Icon)</string>
+    <string name="actor_msg_favorite_guide">Daftar Favorit adalah fitur untuk mengakses komunitas Seleb yang Anda sukai. \n
+Anda juga dapat memilih \'Daftar Favorit\' dari \'Pengaturan Seleb Saya\' dan tidak ada batasan \n
+ Seleb Saya:Heart Icon/Daftar Favorit:Star Icon)</string>
+    <string name="msg_go_to_add_heart">Heart tidak cukup.\nApakah Anda ingin mengisi ulang heart Anda?</string>
+    <string name="msg_no_data">Tidak ada data yang ditulis.</string>
+    <string name="msg_no_enter_self">Tidak bisa memakai nickname Anda</string>
+    <string name="msg_no_enter_self_1">Tidak bisa memakai nickname yang lama</string>
+    <string name="msg_change_nickname_guide">Anda dapat mengubah nickname Anda. \nApakah Anda ingin mengubahnya?</string>
+    <string name="msg_drop_out">Berhenti menjadi anggota! Apakah Anda ingin keluar?T_T?\n
+Kami mohon maaf tidak dapat memuaskan Anda.\n 
+Untuk kedepannya, kami akan lebih meningkatkan pelayanan kami! \n
+Berhubung dengan keluarnya Anda dari keanggotaan kami, semua postingan, heart dan nickname Anda akan direset. \n
+Apakah Anda yakin  ingin menghapus akun Anda?</string>
+    <string name="actor_msg_drop_out">Berhenti menjadi anggota! Apakah Anda ingin keluar?T_T?\n
+Kami mohon maaf tidak dapat memuaskan Anda.\n 
+Untuk kedepannya, kami akan lebih meningkatkan pelayanan kami! \n
+Berhubung dengan keluarnya Anda dari keanggotaan kami, semua postingan, heart dan nickname Anda akan direset. \n
+Apakah Anda yakin  ingin menghapus akun Anda?</string>
+    <string name="msg_info_change_complete">Informasi keanggotaan Anda telah diubah.</string>
+    <string name="msg_not_able_vote">Tidak dapat melakukan voting.</string>
+    <string name="msg_favorite_guide_1">Idol yang dipilih, dapat ganti setelah 2 hari</string>
+    <string name="actor_msg_favorite_guide_1">Seleb yang dipilih, dapat ganti setelah 2 hari</string>
+    <string name="msg_favorite_guide_2__" formatted="false">Daftarkan %s sebagai Idol Anda?</string>
+    <string name="actor_msg_favorite_guide_2__" formatted="false">Daftarkan %s sebagai Seleb Anda?</string>
+    <string name="msg_favorite_guide_2">Dimasukkan sebagai Idol Anda?</string>
+    <string name="actor_msg_favorite_guide_2">Dimasukkan sebagai Seleb Anda?</string>
+    <string name="actor_msg_favorite_guide_2_1"></string>
+    <string name="msg_favorite_guide_3" formatted="false">Idol yang dipilih dapat diganti setelah 2 hari. 
+Hapus%s dan masukkan %s sebagai idol Anda?</string>
+    <string name="actor_msg_favorite_guide_3" formatted="false">Seleb yang dipilih dapat diganti setelah 2 hari. 
+Hapus%s dan masukkan %s sebagai seleb Anda?</string>
+    <string name="msg_favorite_unregi_guide1">Apakah Anda ingin menghapus Idol Anda?</string>
+    <string name="actor_msg_favorite_unregi_guide1">Apakah Anda ingin menghapus Seleb Anda?</string>
+    <string name="msg_favorite_unregi_guide2"></string>
+    <string name="actor_msg_favorite_unregi_guide2"></string>
+    <string name="msg_iab_error">Terjadi kesalahan. 
+Jika heart tidak terisi ulang walau telah di restart,
+silahkan hubungi kami melalui Menu \'Pengaturan > Pertanyaan\'</string>
+    <string name="msg_iab_purchase_error">Pembelian belum selesai. 
+Jika kesalahan pembayaran terus berlangsung,
+Silahkan hubungi kami melalui Menu \'Pengaturan > Pertanyaan\'</string>
+    <string name="msg_manager_warning">*Jika Anda mengubah atau menghapus Idol Anda sekarang, status keanggotaan Anda akan diturunkan dari admin menjadi anggota umum.</string>
+    <string name="actor_msg_manager_warning">*Jika Anda mengubah atau menghapus Seleb Anda sekarang, status keanggotaan Anda akan diturunkan dari admin menjadi anggota umum.</string>
+    <string name="msg_continue">Lanjutkan?</string>
+    <string name="msg_manager_notice_guide">Pemberitahuan telah diposting oleh admin. Postingan ini akan ditampilkan di bagian atas, terlepas dari jumlah heart yang Anda diterima.</string>
+    <string name="msg_surprise_heart">Anda telah memenangkan kejutan heart! Selamat!\nAnda telah menerima kejutan heart +%1$s buah.</string>
+    <string name="msg_no_history">Hasil dari tanggal yang Anda pilih tidak tersedia.</string>
+    <string name="msg_coinsplayer_ask_password"></string>
+    <string name="msg_heart_box_event_ok">Anda dapat berpartisipasi dalam Heartbox Event.</string>
+    <string name="msg_heart_box_event_fail">Anda tidak dapat berpartisipasi dalam Heartbox Event</string>
+    <string name="msg_download_ok">Gunakan fitur \'SIMPAN\'</string>
+    <string name="msg_download_fail">Tidak dapat menggunakan fitur \'SIMPAN\'</string>
+    <string name="msg_share_ok">Gunakan fitur \'BERBAGI\'</string>
+    <string name="msg_share_fail">Tidak dapat menggunakan fitur \'BERBAGI\'</string>
+    <string name="msg_giftcard_guide">Anda telah mengikuti Google Gift Card Event\n</string>
+    <string name="msg_link_image_guide">Tidak dapat mengunggah tautan dan foto pada saat yang bersamaan.</string>
+    <string name="response_v1_articles_ok">Postingan selesai.</string>
+    <string name="response_v1_articles_ok_heart">Postingan selesai.\n%1$s heart telah diterima</string>
+    <string name="response_users_is_active_time_over">Tidak dapat mengikuti voting melebihi dari batas harian.</string>
+    <string name="response_v1_articles_give_heart">%1$s Heart telah digunakan untuk voting.\n[%2$s Jumlah heart Anda saat ini : %3$s + %4$s]</string>
+    <string name="error_nextapps_error1">Gagal membuka iklan</string>
+    <string name="error_nextapps_error2">Tidak dapat berpartisipasi dalam kampanye.</string>
+    <string name="error_nextapps_error3">Kampanye ini telah berakhir.</string>
+    <string name="error_nextapps_error4">Anda telah berpartisipasi dalam kampanye ini</string>
+    <string name="error_nextapps_error5">Anda tidak dapat berpartisipasi dalam kampanye ini.</string>
+    <string name="error_abnormal">[%1$s] Telah terjadi kesalahan. Cobalah sesaat lagi.</string>
+    <string name="error_abnormal_default">Telah terjadi kesalahan. Cobalah sesaat lagi.</string>
+    <string name="error_abnormal_exception">Telah terjadi pengecualian. Cobalah sesaat lagi.</string>
+    <string name="error_1001">E-mail ini telah digunakan.</string>
+    <string name="error_1002">Periksalah e-mail Anda sekali lagi.</string>
+    <string name="error_1010">Masukkan nickname Anda.</string>
+    <string name="error_1011">Nickname ini telah digunakan.</string>
+    <string name="error_1012">Tidak dapat menemukan rekomendator</string>
+    <string name="error_1030">Nickname Anda salah</string>
+    <string name="error_1031">Periksa kata sandi Anda.</string>
+    <string name="error_1145">Tidak bisa mengganti Idol dalam 2 hari ini!\n
+Coba pikirkan lagi Idol yang akan diganti^^</string>
+    <string name="actor_error_1145">Tidak bisa mengganti Seleb dalam 2 hari ini!\n
+Coba pikirkan lagi Idol yang akan diganti^^</string>
+    <string name="error_1164">Favorit telah dihapus.</string>
+    <string name="error_1200">Sepertinya ada masalah dengan informasi keanggotaan Anda.</string>
+    <string name="error_1201">Sepertinya ada masalah dengan informasi keanggotaan Anda.</string>
+    <string name="error_1912">Tidak ada akun Cople yang terdaftar. Silahkan daftarkan akun Cople Anda di \'Menu\'.^^</string>
+    <string name="error_1991">Dana Anda tidak cukup</string>
+    <string name="error_2090">Ada karakter khusus yang tidak bisa digunakan</string>
+    <string name="error_2091">Posting telah diblokir karena mengandung konten yang tidak pantas</string>
+    <string name="error_4010">Tidak dapat mengikuti voting selama masa perhitungan suara</string>
+    <string name="error_4011">Tidak dapat mengikuti voting melebihi batas harian.</string>
+    <string name="error_4020">Tidak memiliki cukup heart</string>
+    <string name="error_8000">Daftar pertemanan penuh. \n(Diizinkan hanya sampai 300 teman)</string>
+    <string name="error_8001">Daftar pertemanan orang tersebut telah penuh,</string>
+    <string name="error_8002">Permintaan teman telah dikirim.\n 
+Sedang menunggu untuk disetujui</string>
+    <string name="error_8003">Anda telah berteman.</string>
+    <string name="error_9997">Dapat dikirim setelah 10 menit.</string>
+    <string name="error_9998">Dalam sehari hanya dapat mengirimkan 3 heart/teman</string>
+    <string name="voting_guide_title1">Apa itu akumulasi suara saya?</string>
+    <string name="voting_guide_title2">Syarat Level</string>
+    <string name="voting_guide_desc1">- Ini adalah jumlah hati yang kamu pilih untuk Idolamu.\n- Nilai dan akumulasi suaramu akan diatur ulang jika kamu tidak masuk dalam jangka waktu tertentu.\n(Semuanya akan kembali saat kamu masuk dan memberikan suara lagi.)\n- Kamu akan menerima 100 hati setiap hari saat meluncurkan aplikasi , serta hadiah level bonus hati berdasarkan status level Anda!</string>
+    <string name="actor_voting_guide_desc1">- Ini adalah jumlah hati yang kamu pilih untuk Selebritimu.\n- Level dan akumulasi suaramu akan diatur ulang jika kamu tidak masuk dalam jangka waktu tertentu.\n(Semuanya akan kembali saat kamu masuk dan memberikan suara lagi.)\n- Kamu akan menerima 100 hati setiap hari saat meluncurkan aplikasi , serta hadiah level bonus hati berdasarkan status level Anda!</string>
+    <string name="level_heart_format" formatted="false">Akumulasi suara:%s</string>
+    <string name="level_heart_guide_title1">Tempat pertama dalam akumulasi skor menjadi Malaikat Amal👼</string>
+    <string name="actor_level_heart_guide_title1">Tempat pertama dalam akumulasi skor menjadi Malaikat Amal👼</string>
+    <string name="level_heart_guide_title2">Point berdasarkan peringkat</string>
+    <string name="level_heart_guide_title3">Hall of Fame - Peringkat Kumulatif</string>
+    <string name="level_heart_guide_title4">Melihat</string>
+    <string name="level_heart_guide_desc1">Ini adalah total skor yang diperoleh dari peringkat voting harian dalam 30 hari terakhir. Ini memperlihatkan 100 teratas.\nJika Anda mengklik setiap nama individu dan grup, Anda dapat melihat grafik perubahan peringkat.\nKami memberikan donasi ke tempat-tempat bermakna atas nama idola dan fandomnya, yang menduduki peringkat akumulasi teratas nomor satu dalam peringkat 30 hari!\n\n✅ Metode agregasi\n- Anggota: #1 akumulasi skor selama 30 hari sebelumnya, termasuk tanggal 10 setiap bulannya (diumumkan pada tanggal 11)\n- Grup: #1 akumulasi skor selama 30 hari sebelumnya, termasuk tanggal 15 setiap bulannya bulan (diumumkan pada tanggal 16)\n- Kategori lainnya: Diberitahu secara terpisah saat melanjutkan\n\n✅ Hadiah\n- Donasi sebesar 500.000 won kepada Organisasi Kesejahteraan atas nama Artis dan Fandom.\n- Memasang Iklan Papan Elektronik di Kereta Bawah Tanah Seoul</string>
+    <string name="level_heart_guide_desc3">Setiap anggota liga ditentukan berdasarkan kriteria perubahan liga pada tanggal 11 (Perorangan) dan tanggal 16 (Grup).\nJika liga diubah, skor peringkat kumulatif Hall of Fame dimulai dengan 0 poin.</string>
+    <string name="level_heart_guide_desc4">-Liga individu dan kelompok terpisah. (Bahkan jika grup berada di Liga S, individu dapat berada di Liga A.)\n- Jika seri terjadi, semua seri akan ditetapkan sesuai dengan aturan alokasi liga dan akan dialokasikan kembali ke jumlah tim atau individu yang ada pada bulan berikutnya .\ne.g.) Jika 3 tim mendapatkan skor yang sama di Liga A, 3 tim akan pindah ke Liga S (Mengubah kuota Liga S menjadi 13). Tiga tim berperingkat rendah akan dipindahkan ke Liga A pada bulan berikutnya untuk mempertahankan 12 tim di Liga S.\n- Idola yang baru ditambahkan mulai di Liga A.\n- Sejarah peringkat sebelum pengenalan sistem liga di Hall of Fame ditandai sebagai \'SEMUA\'.</string>
+    <string name="title_heart_vote_ranking__format" formatted="false">%s Top 100</string>
+    <string name="empty_heart_vote_ranking">Tidak ada yang berpartisipasi dalam voting</string>
+    <string name="failed_to_get_vote_ranking">Gagal untuk melakukan voting</string>
+    <string name="score_format" formatted="false">%s point</string>
+    <string name="rank_format" formatted="false">%s</string>
+    <string name="title_agg_history_format" formatted="false">%s Perubahan akumulasi peringkat</string>
+    <string name="first_rank">No 1</string>
+    <string name="friend_request_sent">Permintaan teman telah terkirim.\n 
+Akan berteman bila permintaan diterima</string>
+    <string name="empty_friends">Anda tidak memiliki teman.</string>
+    <string name="btn_accept">Terima</string>
+    <string name="btn_decline">Tolak</string>
+    <string name="friend_request_section_title">Daftar Permintaan teman</string>
+    <string name="friend_section_title">Daftar Pertemanan</string>
+    <string name="title_friend_delete">Hapus Pertemanan</string>
+    <string name="friend_delete_msg_format" formatted="false">Hapus %s dari list pertemanan Anda?</string>
+    <string name="tiele_friend_delete_result">Telah Dihapus</string>
+    <string name="title_accept_friend_request">Terima permintaan teman</string>
+    <string name="desc_accept_friend_request">Terima permintaan teman\n?</string>
+    <string name="desc_accepted_friend_request">Permintaan teman diterima.\nAnda dapat mengirim dan menerima Heart sekarang.</string>
+    <string name="title_decline_friend_request">Tolak permintaan teman.</string>
+    <string name="desc_decline_friend_request">Tolak permintaan teman \n?</string>
+    <string name="desc_declined_friend_request">Permintaan teman ditolak</string>
+    <string name="lable_burning_heart">Heart diberikan selama Hot Time.</string>
+    <string name="message_burning_heart">Hot Time SUKSES!\n30 Heart telah diterima!</string>
+    <string name="msg_comment_heart">5 Heart telah diterima. \n(1 kali per hari)</string>
+    <string name="error_1013">Tidak dapat mendaftar lebih dari dua kali dalam 10 menit.</string>
+    <string name="friend_request_format">Terima permintaan teman</string>
+    <string name="loading_profile">Sedang menerima profil…</string>
+    <string name="title_no_free_heart">Gunakan Daily Heart</string>
+    <string name="desc_no_free_heart">Anda memiliki 0 Daily Heart T_T\n
+Apakah Anda ingin mendapatkan Heart?</string>
+    <string name="title_no_heart">Heart tidak cukup</string>
+    <string name="desc_no_heart">Tidak memiliki cukup Heart T_T\n
+Apakah Anda ingin mendapatkan Heart?</string>
+    <string name="btn_video_ad">Iklan Video (5+5 heart)</string>
+    <string name="btn_free_heart_charge">Hati Gratis</string>
+    <string name="btn_invite_friends">Undang teman via teks pesan</string>
+    <string name="btn_invite_friends_reward">1.000 heart untuk undang teman</string>
+    <string name="btn_invite_friends_reward_burning">1.000 heart untuk undang teman</string>
+    <string name="btn_invite_friends_kakao">Apakah Anda ingin mendapatkan Heart?</string>
+    <string name="btn_invite_friends_kakao_reward">%1$s Heart untuk mendaftar</string>
+    <string name="btn_invite_friends_kakao_reward_burning">1.000 Heart untuk mendaftar</string>
+    <string name="btn_confirm">OK</string>
+    <string name="failed_to_load_page">Tidak dapat membuka laman</string>
+    <string name="btn_retry">Coba Lagi</string>
+    <string name="error_1000_heart_give">Anda hanya dapat mengirim 1.000 Heart per hari</string>
+    <string name="title_heart_earn">Cara mendapatkan lebih banyak Heart</string>
+    <string name="desc_bookmark">Anda tidak memiliki \'Idol Favorit\'!</string>
+    <string name="actor_desc_bookmark">Anda tidak memiliki \'Seleb Favorit\'!</string>
+    <string name="desc_bookmark2">Tambahkan Idol yang sering Anda cari dalam \'Daftar Favorit\' Anda!</string>
+    <string name="actor_desc_bookmark2">Tambahkan Seleb yang sering Anda cari dalam \'Daftar Favorit\' Anda!</string>
+    <string name="desc_bookmark3">Atur Favorit</string>
+    <string name="title_rank_history">Perubahan Peringkat</string>
+    <string name="title_reward_video">Lihat Video Iklan</string>
+    <string name="desc_reward_video" formatted="false">%s Hearts</string>
+    <string name="title_reward_invite">Undang teman</string>
+    <string name="desc_reward_invite">Ever 1.000</string>
+    <string name="desc_reward_invite_burning">Ever 1.000</string>
+    <string name="title_reward_charge">Heart Gratis</string>
+    <string name="desc_reward_charge">Ever</string>
+    <string name="title_heart_send">Kirim Heart</string>
+    <string name="video_ad_success">Heart telah disimpan</string>
+    <string name="video_ad_cancelled">Iklan belum selesai diputar.</string>
+    <string name="video_ad_failed">Jaringan tidak stabil. Gagal memutar video</string>
+    <string name="video_ad_unable">Tidak ada lagi iklan dari pengiklan.\nCoba lagi nanti.</string>
+    <string name="comment_push_format" formatted="false">\'%s\' telah meninggalkan komentar</string>
+    <string name="btn_invite_friend">Undang teman</string>
+    <string name="desc_login">Anda harus masuk untuk menggunakan fitur ini. \n Masuk sekarang?</string>
+    <string name="ever_heart">Ever Heart</string>
+    <string name="send_heart_desc">Hanya bisa mengirimkan Ever Heart pada teman</string>
+    <string name="send_heart_confirm_desc_format">%1$s heart akan dikirim kepada %2$s.</string>
+    <string name="lake_strong_heart">Ever Heart Anda tidak cukup</string>
+    <string name="order_by_date">Berdasarkan Tanggal</string>
+    <string name="order_by_vote">Berdasarkan Voting</string>
+    <string name="heart_receive_message" formatted="false">%s telah mengirimkan Heart</string>
+    <string name="heart_receive_message_with_num">%1$s telah mengirimkan %2$s heart.</string>
+    <string name="request_phone_state_permission">Untuk lihat lebih banyak iklan, Silahkan pilih \'setuju\' untuk (2 buah) otorisasi pengaturan yang terhubung.</string>
+    <string name="deny_phone_state_permission">Jika Anda ingin kembali ke pengaturan sebelumnya, buka \'Pengaturan Sistem &gt; Aplikasi &gt; CHOEAEDOL &gt; Otorisasi\' dan aktifkan Pengaturan Panggilan dan Kontak</string>
+    <string name="actor_deny_phone_state_permission">Jika ingin kembali ke pengaturan sebelumnya, pergilah ke \'Pengaturan Sistem > Aplikasi > CHOEAEDOL Seleb > Otorisasi\' dan aktifkan Pengaturan Telepon</string>
+    <string name="level">Level</string>
+    <string name="level_requirement">Syarat Level Up</string>
+    <string name="level_benefit">Tingkat Manfaat</string>
+    <string name="level_requirement_format">%1$d suara</string>
+    <string name="level_benefit_format">&#10084; %1$s</string>
+    <string name="kakao_invite_new">Peringkat %1$s Real time No.%2$d</string>
+    <string name="drawer_open">Buka Menu</string>
+    <string name="drawer_close">Tutup Menu</string>
+    <string name="title_item_shop">Toko</string>
+    <string name="title_item_buy">Barang Yang Dibeli</string>
+    <string name="register">Daftar</string>
+    <string name="send">Kirim</string>
+    <string name="msg_item_purchased_1">Anda dapat menghapus posting dan komentar di Komunitas</string>
+    <string name="msg_item_purchased_2">Kirim ke %1$d orang</string>
+    <string name="msg_item_purchased_2_unknown">Pesan telah dikirim</string>
+    <string name="msg_item_purchased_3">All-in day telah ditetapkan</string>
+    <string name="hint_community_push">Masukkan konten (dibawah 20 karakter)</string>
+    <string name="item_title_1"></string>
+    <string name="item_title_2"></string>
+    <string name="item_title_3">All-in day</string>
+    <string name="item_desc_1"></string>
+    <string name="item_desc_1_1"></string>
+    <string name="item_desc_2"></string>
+    <string name="item_desc_2_1"></string>
+    <string name="item_desc_3">Tampilkan All-In Day yang telah ditetapkan dalam Komunitas Idol</string>
+    <string name="actor_item_desc_3">Tampilkan All-In Day yang telah ditetapkan dalam Komunitas Seleb</string>
+    <string name="item_guide_1_1"></string>
+    <string name="item_guide_1_2"></string>
+    <string name="item_guide_2_1"></string>
+    <string name="item_guide_2_2"></string>
+    <string name="item_desc_3_1">(1 kali penggunaan setelah pembelian)\nTampilkan All-in day disebelah nickname</string>
+    <string name="item_guide_title_1"></string>
+    <string name="item_guide_title_2"></string>
+    <string name="item_guide_title_3">Fitur all-in day</string>
+    <string name="item_guide_3_1">- Anda dapat menetapkan 1 hari dalam 10 hari ke depan sebagai All-In Day (Pemberitahuan di daftar perangkat dan komunitas) \n- Keep All-In  \n-Hanya anggota dengan Level %1$d+ dapat membeli barang ini.\n Hanya dapat digunakan untuk Idol Saya</string>
+    <string name="actor_item_guide_3_1">- Anda dapat menetapkan 1 hari dalam 10 hari ke depan sebagai All-In Day (Pemberitahuan ada di daftar perangkat dan komunitas) \n- Keep All-in  \n-Hanya anggota dengan Level %1$d+ dapat membeli barang ini.\n Hanya dapat digunakan untuk \'Seleb Saya\'</string>
+    <string name="item_guide_3_2">Pilih tanggal  sebagai All-In Day dan \ntekan \'DAFTAR\'.\n(%1$d berlian akan habis)</string>
+    <string name="error_9901">Berlian tidak cukup.</string>
+    <string name="error_9902">Hanya dapat diatur dalam 10 hari kedepan</string>
+    <string name="error_9903">Barang ini telah dibeli</string>
+    <string name="error_9904">All-In Day telah diatur.\nPilihlah tanggal setelah All-In Day saat ini dan coba lagi.</string>
+    <string name="error_select_day">Pilih tanggal</string>
+    <string name="error_9900">Item ini hanya dapat dibeli anggota dengan level %1$d+</string>
+    <string name="burning_day_format">d/M</string>
+    <string name="deleted_by">Telah dihapus oleh %1$s.</string>
+    <string name="deleted_by_unknown">Posting yang telah dihapus</string>
+    <string name="male">Laki-laki</string>
+    <string name="female">Perempuan</string>
+    <string name="all">Semua</string>
+    <string name="wait_line_signin">Mengambil informasi dari akun LINE Anda</string>
+    <string name="empty_friend_request">Anda tidak punya permintaan teman</string>
+    <string name="cancel_friend_request">Batalkan permintaan teman</string>
+    <string name="last_login">Terakhir masuk</string>
+    <string name="settings_language">Pengaturan bahasa</string>
+    <string name="language_default">Sistem awal</string>
+    <string name="view_more">Lihat lebih</string>
+    <string name="post_limit">Max %1$d karakter.</string>
+    <string name="msg_report_confirm">%1$s heart akan dipakai untuk melaporkan. Tetap ingin melanjutkan laporan?</string>
+    <string name="menu_change_app">Pergi ke Seleb</string>
+    <string name="actor_menu_change_app">Pergi ke CHOEAEDOL</string>
+    <string name="copied_to_clipboard">Disalin ke clipboard</string>
+    <string name="title_edit">Mengedit</string>
+    <string name="error_9996">Tidak dapat mengirim Heart pada Hot time</string>
+    <string name="title_tab_gaon">Gaon Music Award</string>
+    <string name="gaon_guide_1">Manual CHOEAEDOL &gt;</string>
+    <string name="gaon_guide_2">Gaon Chart Music Award</string>
+    <string name="label_header_1">Gaon Music Award Popular Vote</string>
+    <string name="label_header_2">Periode Voting : 01/12~02/19/2017</string>
+    <string name="label_header_3">Perhitungan hasil voting Popularitas Gaon Music Award saat ini. Klik Penyanyi dan lihat  detail peringkatnya.</string>
+    <string name="label_header_result">Hasil</string>
+    <string name="label_header_1_final">Hasil Akhir Popularitas Gaon Chart Music Award</string>
+    <string name="label_header_3_final">Masa Voting telah berakhir.</string>
+    <string name="iab_restricted_title">Beli Heart</string>
+    <string name="iab_restricted">Bisa membeli 1kali/hari</string>
+    <string name="label_not_verified_iap">Pembelian yang belum selesai. Silahkan kunjungi Toko Heart</string>
+    <string name="setting_menu_cache">Menghapus cache</string>
+    <string name="are_you_sure">Apakah Anda yakin?</string>
+    <string name="setting_menu_push_hearts">Heart</string>
+    <string name="setting_menu_push_comments">Komentar</string>
+    <string name="menu_menu_kin">Q &amp; A Idol</string>
+    <string name="actor_menu_menu_kin">Q &amp; A</string>
+    <string name="hint_search">Masukkan pencarian</string>
+    <string name="answer">Jawaban</string>
+    <string name="offer_video_ad_desc" formatted="false">Heart %s Buah (5 kali / 30 menit)</string>
+    <string name="present_heart">Memberi hadiah Heart</string>
+    <string name="present_heart_confirm">Apakah Anda ingin memberi hadiah %1$s heart?</string>
+    <string name="present_heart_done">Heart telah diberikan</string>
+    <string name="emoticon_badge">Lencana Emoticon</string>
+    <string name="emoticon_badge_desc">Anda bisa menunjukkan mood</string>
+    <string name="emoticon_badge_buy">Beli Emoticon</string>
+    <string name="emoticon_badge_buy_guide">Pilih Emoticon dan tekan tombol \'Register\'. \n(%1$d Heart akan digunakan)</string>
+    <string name="purchased">Pembelian berhasil</string>
+    <string name="newbie_info"></string>
+    <string name="report_done">Telah dilaporkan</string>
+    <string name="message_box">Kotak masuk</string>
+    <string name="message_expire_format">Pesan akan tersimpan selama %1$d hari</string>
+    <string name="message_send">Kirim pesan</string>
+    <string name="message_send_heart">Kirim dengan Heart</string>
+    <string name="message_empty">Tidak ada pesan</string>
+    <!-- permissoin (korean only) -->
+    <string name="permission_storage">Penyimpanan: Diperlukan untuk mengunggah dan menyimpan foto.</string>
+    <string name="permission_desc"></string>
+    <string name="actor_permission_desc"></string>
+    <string name="allow">Izinkan</string>
+    <string name="deny">Tolak</string>
+    <string name="label_see_video_for_heartbox">Dapatkan Heart Box dengan melihat Video Iklan</string>
+    <!-- bj app -->
+    <string name="profile_additional_info">Infomasi tambahan</string>
+    <string name="profile_birth">Tahun, Bulan, Tanggal lahir</string>
+    <string name="profile_birthday">Ulang Tahun</string>
+    <string name="profile_intro">Sapa</string>
+    <string name="profile_instagram">Instagram</string>
+    <string name="profile_facebook">Facebook</string>
+    <string name="profile_personal_broadcast">Akun prbadi</string>
+    <string name="profile_modify_profile">Pengaturan Profil</string>
+    <string name="profile_delete_birth">Apa Anda ingin menghapus hari ulang tahun?</string>
+    <string name="profile_no_birthday">Tidak ada ulang tahun</string>
+    <string name="profile_private">Tertutup</string>
+    <string name="invalid_url">Alamat site tidak sesuai</string>
+    <string name="format_reg_date" formatted="false">Bergabung sejak %s</string>
+    <string name="laboratory">Laboratorium</string>
+    <string name="use_internal_photo_editor">Pakai editor foto internal</string>
+    <string name="file_size_exceeded" formatted="false">Anda dapat mengunggah hingga %sMB.</string>
+    <string name="unsupported_format">Format ini tidak tersedia</string>
+    <string name="cropper_not_found">Foto editor tidak ditemukan. Silahkan unduh aplikasi di Play Store</string>
+    <string name="comment_minimum_characters">Silahkan tulis lebih dari %1$d karakter.</string>
+    <string name="gaon_welcome">Penghargaan Musik Gaon Ke-7!</string>
+    <string name="gaon_guide1">Grup Pria dan Wanita Terfavorit diputuskan berdasarkan pilihanmu.</string>
+    <string name="gaon_guide2">Berikan Piala Hari Valentine kepada artis favoritmu.</string>
+    <string name="gaon_date_title">◆ Tanggal Penghargaan Gaon</string>
+    <string name="gaon_date_value">14 Feb 2018:</string>
+    <string name="gaon_period_title">◆ Masa pemberian suara</string>
+    <string name="gaon_period_value">%1$s ~ %2$s</string>
+    <string name="gaon_ratio_title">◆ Rasio Polling</string>
+    <string name="gaon_ratio_value">100% suara mencerminkan popularitas</string>
+    <string name="gaon_guide3">(Pria dan Wanita yang setiap hari berperingkat tinggi dalam peringkat akumulatif akan menerima penghargaan grup terfavorit.)</string>
+    <string name="gaon_howto_title">◆ Cara Voting</string>
+    <string name="gaon_howto_value">Sama dengan aturan asli CHOEAEDOL</string>
+    <string name="gaon_special_rule_title">◆ Aturan berbeda dari aturan asli</string>
+    <string name="gaon_special_rule_value1">* Tidak ada penghargaan perorangan, tetapi grup favorit pria dan wanita.</string>
+    <string name="gaon_special_rule_value2">* Kandidat dibatasi pada grup yang ditentukan oleh Gaon</string>
+    <string name="gaon_special_rule_value3">* Jumlah suara untuk grup, perorangan, juga ditambahkan</string>
+    <string name="gaon_special_rule_value4">* Pembayaran dalam aplikasi dibatasi hingga satu/hari/perangkat</string>
+    <string name="gaon_special_rule_value5">* Membatasan fungsi mulai 23:15 hingga 00:15(KST)</string>
+    <string name="gaon_special_rule_value6">Kirimkan heart kepada teman</string>
+    <string name="gaon_special_rule_value7">Bonus Voting</string>
+    <string name="gaon_special_rule_value8">Bonus postingan populer</string>
+    <string name="gaon_special_rule_value9">Bonus Posting</string>
+    <string name="gaon_goto_notice">Pemberitahuan CHOEAEDOL ></string>
+    <string name="gaon_goto_gaon">Beranda Penghargaan Gaon ></string>
+    <string name="gaon_award_title_male">Peringkat Pria Saat Ini</string>
+    <string name="gaon_award_title_female">Peringkat Wanita Saat Ini</string>
+    <string name="gaon_voting_period">Periode Voting: %1$s ~ %2$s</string>
+    <string name="gaon_current_guide1">Ini adalah peringkat waktu nyata (Termasuk suara individu dan grup).</string>
+    <string name="gaon_current_guide2">Akumulatif peringkat pertama memenangkan penghargaan popularitas</string>
+    <string name="gaon_current_title">Status peringkat hari ini %1$s</string>
+    <string name="gaon_accumulative_title_male">Peringkat Akumulatif\nGrup Laki-Laki</string>
+    <string name="gaon_accumulative_title_female">Peringkat Akumulatif\nGirl Group</string>
+    <string name="gaon_accumulative_guide1">Akumulasi Peringkat untuk grup terfavorit</string>
+    <string name="gaon_accumulative_guide2">Akumulatif peringkat pertama penghargaan popularitas</string>
+    <string name="gaon_accumulative_title">Hasil Akumulatif %1$s ~ %2$s</string>
+    <string name="gaon_award_title_male_final">[Gaon] Hasil Akhir Pria</string>
+    <string name="gaon_award_title_female_final">[Gaon] Hasil Akhir Wanita</string>
+    <string name="gaon_final_guide">Masa Voting telah berakhir.</string>
+    <string name="gaon_final_title">Hasil Akhir %1$s ~ %2$s</string>
+    <string name="signup_restricted">Pendaftaran hanya melalui handphone</string>
+    <string name="login_restricted">Masuk hanya melalui handphone</string>
+    <string name="nas_heart_format">%1$d+ Heart</string>
+    <string name="confirm_change_account">Telah terdaftar dengan e-mail ini. Ganti metode log-in dengan akun yang sudah dipilih?</string>
+    <string name="facebook_no_email">Tidak bisa mendapatkan informasi e-mail dari FACEBOOK</string>
+    <string name="menu_freeboard">Papan</string>
+    <string name="myheart_today_earn">Ever Heart hari ini</string>
+    <string name="myheart_today_earn_help">Jika mengumpulkan %1$s Heart, \n Foto Profil Idol peringkat pertama akan diubah dengan foto Profil Idol saya. \n
+Gambar profil yang diubah akan disetel ulang keesokan harinya.</string>
+    <string name="actor_myheart_today_earn_help">Jika mengumpulkan %1$s Heart, \n Foto Profil Seleb peringkat pertama akan diubah dengan foto Profil Seleb saya. \nGambar profil yang diubah akan disetel ulang keesokan harinya.</string>
+    <string name="label_image_option">Rasio foto</string>
+    <string name="label_image_option_title">Pilih rasio foto</string>
+    <string name="label_image_option_square">Kotak (Profil &amp; Spanduk)</string>
+    <string name="label_image_option_free">Ukuran Bebas/ Asli</string>
+    <string name="setting_lockscreen">Pengaturan Layar kunci</string>
+    <string name="lockscreen_use">Gunakan layar kunci</string>
+    <string name="lockscreen_background">Gambar latar belakangku</string>
+    <string name="lockscreen_not_available">Layar kunci dapat digunakan dengan mengatur Idol Saya. Apakah Anda ingin mengatur \"Idol Saya\"?</string>
+    <string name="actor_lockscreen_not_available">Layar kunci dapat digunakan dengan mengatur Seleb Saya. Apakah Anda ingin mengatur \"Seleb Saya\"?</string>
+    <string name="lockscreen_preview">Pratinjau layar Kunci</string>
+    <string name="lockscreen_preview_help">Hubungkan dua lingkaran atau lebih untuk \nmembuka kunci. \nCobalah.</string>
+    <string name="lockscreen_permission">Untuk menggunakan layar kunci, aktifkan \"Mengizinkan menggambar di atas aplikasi lain\" di halaman berikutnya.</string>
+    <string name="lockscreen_style">Gaya</string>
+    <string name="lockscreen_style_pattern">Pola</string>
+    <string name="lockscreen_style_slide">Slide</string>
+    <string name="lockscreen_show_clock">Tampilkan jam</string>
+    <string name="lockscreen_preview_help_slide">Memindahkan gambar dari lingkaran kiri ke kanan akan membuka kunci layar.\nAyo lakukan.</string>
+    <string name="label_set_most">Pilih \'Idol Saya\', bisa voting &amp; naik level\n 
+Pilih \'Idol Saya\' sekarang?</string>
+    <string name="actor_label_set_most">Pilih \'Seleb Saya\', bisa voting &amp; naik level\n 
+Pilih \'Seleb Saya\' sekarang?</string>
+    <string name="setting_push">Pengaturan Push Pemberitahuan</string>
+    <string name="menu_board">Papan</string>
+    <string name="menu_stats">Statistik</string>
+    <string name="account_management">Pengelola akun</string>
+    <string name="stats_highest_votes">TOP 100 Peringkat tertinggi</string>
+    <string name="stats_donation">Jumlah Malaikat Amal &amp; Peri Amal</string>
+    <string name="stats_1st_place">Jumlah peringkat pertama</string>
+    <string name="stats_votes_top300">Hasil Akumulasi Voting TOP 300</string>
+    <string name="charity_angel">Malaikat Amal</string>
+    <string name="charity_fairy">Peri Amal</string>
+    <string name="stats_idol">Idol</string>
+    <string name="stats_user">Pengguna</string>
+    <string name="none">Tidak ada</string>
+    <string name="dropout_confirm">Akun yang terhapus tidak dapat dipulihkan kembali/. \nTetap ingin menghapus akun Anda?</string>
+    <string name="dropout_enter_captcha">Silakan masukkan string berikut</string>
+    <string name="dropout_done">Akun Dihapus</string>
+    <string name="dropout_placeholder">Silakan masukkan string di atas.</string>
+    <string name="hearts_from_friends">Heart dari teman</string>
+    <string name="ad_show_fail">Pemutaran iklan tidak berhasil.</string>
+    <string name="msg_use_internal_editor">Tidak dapat membuka foto editor. Silahkan gunakan internal foto editor (Pengaturan > Laboratorium)</string>
+    <string name="extension_login">Anda harus masuk untuk menggunakan fitur ini.</string>
+    <string name="actor">Seleb</string>
+    <string name="onestore_confirm_unconsumed"></string>
+    <string name="onestore_need_update">Onestore service perlu di upgrade</string>
+    <string name="onestore_remote_exception">Onestore Service tidak dapat disambungkan</string>
+    <string name="menu_quiz">Quiz Idol</string>
+    <string name="stats_quiz">Quiz Ranking Top 100</string>
+    <string name="stats_quiz_today">Ranking Hari ini</string>
+    <string name="stats_quiz_yesterday">Ranking Kemarin</string>
+    <string name="stats_quiz_alltime">Ranking Terbaru</string>
+    <string name="quiz_idol_all">ALL</string>
+    <string name="quiz_start">Mulai</string>
+    <string name="quiz_main_top">Idol Quiz hanya dapat dilakukan sekali/hari</string>
+    <string name="quiz_main_title">Test seberapa besar cintaku pada Idol</string>
+    <string name="quiz_button_ranking">Lihat Peringkat Quiz</string>
+    <string name="quiz_button_write">Menulis Quiz</string>
+    <string name="quiz_button_my_quiz">Pengaturan QuizKu</string>
+    <string name="quiz_unavailable_time">Tidak dapat melakukan quiz saat ini  (%1$s-%2$s)</string>
+    <string name="quiz_unavailable_done">Quiz hari ini selesai! \n Silahkan coba lagi besok ya</string>
+    <string name="quiz_unavailable_not_enough">Maaf, Quiz untuk Idol ini masih kurang.\nSilahkan pilih Idol yang lain</string>
+    <string name="quiz_write_help_title">Perhatikan! \n Kami memiliki kesulitan dalam kondisi berikut</string>
+    <string name="quiz_write_help_1">Akan ada perubahan jawaban dengan berjalannya waktu</string>
+    <string name="quiz_write_help_1_1">(Alamat, Umur, Berat  Badan, dll)</string>
+    <string name="quiz_write_help_2">Tidak bisa diketahui dengan jelas</string>
+    <string name="quiz_write_help_2_1">(Tinggi, ukuran tubuh, dll)</string>
+    <string name="quiz_write_help_3">Sulit bagi Admin untuk memastikan jawaban yang benar</string>
+    <string name="quiz_write_content">Silahkan tulis soal Quiz. (dalam 100 karakter)</string>
+    <string name="quiz_write_image">Masukkan gambar bila diperlukan</string>
+    <string name="quiz_write_choice">Silahkan masukkan jawabannya (dalam 20 karaker)</string>
+    <string name="quiz_write_answer">Benar Sekali</string>
+    <string name="quiz_write_difficulty">Tingkat kesulitan</string>
+    <string name="quiz_write_difficulty_high">Sulit</string>
+    <string name="quiz_write_difficulty_mid">Sedang</string>
+    <string name="quiz_write_difficulty_low">Mudah</string>
+    <string name="quiz_write_description">Silahkan tulis alasan/penjelasan dari jawaban tersebut (dalam 100 karakter)</string>
+    <string name="quiz_write_submit">Selesai</string>
+    <string name="quiz_write_delete_image">Hapus gambar</string>
+    <string name="quiz_write_empty">Isi kolom kosong</string>
+    <string name="quiz_write_done">Selesai!\nAnda dapat menerima hati jika diterima setelah tinjauan pengguna.</string>
+    <string name="quiz_test_idol">Quiz Idol</string>
+    <string name="quiz_test_all">TEST Bucin Kpop Idol (Test BKI)</string>
+    <string name="quiz_writer">Penulis</string>
+    <string name="quiz_correct">Bener banget!</string>
+    <string name="quiz_incorrect">Aduduh.. Salah!</string>
+    <string name="quiz_confirm_exit">Anda yakin ingn keluar?</string>
+    <string name="quiz_fail">%1$ dkuis dijawab dengan benar!</string>
+    <string name="quiz_complete">WOW Anda menjawab  %1$d soal dengan benar! Anda adalah the real \'Bucin Idol\'</string>
+    <string name="quiz_my_quiz">QuizKu</string>
+    <string name="quiz_my_power">Tingkat BucinKu</string>
+    <string name="quiz_accepted">Quiz yang diterima</string>
+    <string name="quiz_delete_all">Hapus semua</string>
+    <string name="quiz_get_heart">Terima Heart</string>
+    <string name="quiz_get_heart_done">Telah mendapatkan %1$d Heart sebagai hadiah Quiz</string>
+    <string name="quiz_accepted_none">Tidak ada Quiz yang diterima \n Anda telah menerima hadiah</string>
+    <string name="quiz_time_over">Waktu habis</string>
+    <string name="service_wait_please">Pelayanan ini sedang diproses</string>
+    <string name="quiz_main_title2">Saya adalah Bucin Idol sejati</string>
+    <string name="quiz_select_idol">Silahkan pilih</string>
+    <string name="quiz_report">Apakah ada yang aneh dengan quiz ini?</string>
+    <string name="quiz_report_description">Beritahu kami\n Kami akan memperbaikinya secepat mungkin</string>
+    <string name="quiz_report_hint">Tolong berikan detailnya (Lebih dari 10 karakter)</string>
+    <string name="quiz_confirm_exit2">Jika Anda keluar sekarang, Anda akan kehilangan satu kesempatan untuk berpartisipasi</string>
+    <string name="quiz_confirm_exit_highlight1">Satu kesempatan</string>
+    <string name="quiz_confirm_exit_highlight2">Hadiah Heart</string>
+    <string name="quiz_review_enter">Menilai Quiz</string>
+    <string name="quiz_review_in_review">Quiz sedang diperiksa</string>
+    <string name="quiz_review_title">Pemeriksaan Quiz</string>
+    <string name="quiz_review_thankyou">Terima kasih telah membantu pemeriksaan Quiz Idol</string>
+    <string name="actor_quiz_review_thankyou">Terima kasih telah membantu pemeriksaan Quiz Seleb</string>
+    <string name="quiz_go_to_main">Kembali ke Laman Utama Quiz</string>
+    <string name="quiz_content"></string>
+    <string name="quiz_point"></string>
+    <string name="quiz_description"></string>
+    <string name="quiz_choice_one"></string>
+    <string name="quiz_choice_two"></string>
+    <string name="quiz_choice_three"></string>
+    <string name="quiz_choice_four"></string>
+    <string name="quiz_choice_one_rtl"></string>
+    <string name="quiz_choice_two_rtl"></string>
+    <string name="quiz_choice_three_rtl"></string>
+    <string name="quiz_choice_four_rtl"></string>
+    <string name="quiz_number"></string>
+    <string name="gallery_title">Bannergram</string>
+    <string name="actor_menu_quiz">Seleb Quiz</string>
+    <string name="actor_quiz_main_top">Anda hanya dapat berpartisipasi satu kali/hari</string>
+    <string name="quiz_power">TEST Bucin Kpop Idol (Test BKI)</string>
+    <string name="power_guide_title">Apa itu TEST Bucin Kpop Idol (Test BKI)?</string>
+    <string name="power_guide_desc">Cobalah Test BKI \n-  dapatkan 1 point disetiap menyelesaikan 1 soal Quiz Idol \n-  Hanya untuk Bucin yang mendapat nilai tinggi \n- 1 Point akan dipotong setiap hari (Bucin hari ini -1) Test BKI akan direset ulang bila Anda mengganti Idol.</string>
+    <string name="power_guide_score">Skor</string>
+    <string name="power_guide_level">Level</string>
+    <string name="my_coupon">Kupon Saya</string>
+    <string name="use_coupon">Gunakan</string>
+    <string name="expire_coupon">Masa berlaku</string>
+    <string name="my_info">Profil Saya</string>
+    <string name="my_info_vote">Akumulasi suara</string>
+    <string name="my_info_reg_date">Bergabung</string>
+    <string name="used_coupon">Telah digunakan</string>
+    <string name="set_all_in_day">Set All-in day</string>
+    <string name="actor_power_guide_desc">Cobalah Test BKI \n-  dapatkan 1 point disetiap menyelesaikan 1 soal Quiz Seleb \n-  Hanya untuk Bucin yang mendapat nilai tinggi \n- 1 Point akan dipotong setiap hari (Bucin hari ini -1)</string>
+    <string name="schedule_desp_anniversary">Hari Anniversary</string>
+    <string name="schedule_desp_album">Rilis album</string>
+    <string name="schedule_desp_concert">Konser, Fan Meeting</string>
+    <string name="schedule_desp_sign">Fan Signing</string>
+    <string name="schedule_desp_airport">Bandara</string>
+    <string name="schedule_desp_tv">Televisi</string>
+    <string name="schedule_desp_radio">Radio</string>
+    <string name="schedule_desp_video">Video (Live)</string>
+    <string name="schedule_desp_awards">Upacara penghargaan</string>
+    <string name="schedule_desp_etc">Dll</string>
+    <string name="schedule_btn_yes">Benar</string>
+    <string name="schedule_btn_no">Salah</string>
+    <string name="schedule_btn_dup">Timpa</string>
+    <string name="schedule">Jadwal</string>
+    <string name="schedule_write_level" formatted="false">Hanya level %s atau lebih tinggi yang bisa menulis.</string>
+    <string name="schedule_yes">Apakah ini jadwal yang benar?</string>
+    <string name="schedule_no">Apakah ini jadwal yang salah?</string>
+    <string name="schedule_dupl">Apakah ini jadwal yang tertimpa?</string>
+    <string name="schedule_write">Tulis jadwal</string>
+    <string name="schedule_category">Kategori</string>
+    <string name="schedule_location">Tempat</string>
+    <string name="schedule_require">Bagian wajib diisi (*).</string>
+    <string name="schedule_eval_most">Dapat mengevaluasi jadwal \'Idol Saya\' saja.</string>
+    <string name="schedule_eval_level" formatted="false">Hanya level %s atau lebih tinggi dapat mengevaluasi.</string>
+    <string name="schedule_eval_done">Sudah dievaluasi.</string>
+    <string name="schedule_title">Judul</string>
+    <string name="schedule_allday">Sepanjang hari</string>
+    <string name="schedule_info">Informasi tambahan</string>
+    <string name="schedule_save">Disimpan</string>
+    <string name="schedule_detail">Lihat jadwal lebih detail</string>
+    <string name="schedule_use_location">Gunakan lokasi ini</string>
+    <string name="schedule_time">Waktu</string>
+    <string name="schedule_write_most">Hanya dapat menulis jadwal \'Idol Saya\' saja.</string>
+    <string name="schedule_empty">Tidak ada jadwal.</string>
+    <string name="schedule_desp_ticketing">Ticketing</string>
+    <string name="schedule_write_stop">Berhenti menulis jadwal?</string>
+    <string name="setting_menu_push_schedule">Jadwal</string>
+    <string name="coming_soon">Sedang disiapkan</string>
+    <string name="schedule_write_most_actor">Dapat mengevaluasi jadwal \'Seleb Saya\' saja.</string>
+    <string name="schedule_eval_most_actor">Dapat menulis jadwal \'Seleb Saya\' saja.</string>
+    <string name="schedule_desp_movie">Film</string>
+    <string name="schedule_desp_production">Konferensi Pers</string>
+    <string name="schedule_desp_previw">Premiere Film</string>
+    <string name="bad_words">Mengandung kata-kata yang kurang pantas</string>
+    <string name="schedule_desp_concert_actor">Fan Meeting</string>
+    <string name="tvtalk">TV Talk</string>
+    <string name="idoltalk">Idol Talk</string>
+    <string name="schedule_desp_event">Event</string>
+    <string name="confirm_delete">Anda ingin menghapus?</string>
+    <string name="idoltalk_write_most">Anda hanya dapat menulis Idol Chat  \'Idol Saya\'.</string>
+    <string name="image_permission_error">Pergi ke Penyimpanan Perangkat atau Pengaturan Perangkat&gt;CHOEAEDOL&gt;Foto. Periksa Pengaturan Otorisasi dan coba lagi.</string>
+    <string name="boys_individual">Pria\n Individu</string>
+    <string name="girls_individual">Wanita\n Individu</string>
+    <string name="boys_group">Pria\nGrup</string>
+    <string name="girls_group">Wanita\nGrup</string>
+    <string name="my_idol">Idol\nSaya</string>
+    <string name="enter_community">Masuk ke komunitas</string>
+    <string name="enter_schedule">Lihat jadwal</string>
+    <string name="post">Posting</string>
+    <string name="community_post">Postingan komunitas</string>
+    <string name="coupon">Kupon</string>
+    <string name="friend">Teman</string>
+    <string name="add_favorites">Ditambahkan ke favorit.</string>
+    <string name="remove_favorites">Dihapus dari favorit.</string>
+    <string name="bannergram_guide_landscape">Anda dapat beralih ke mode lanskap.</string>
+    <string name="my_actor">Seleb saya</string>
+    <string name="new_face">New Face</string>
+    <string name="tooltip_search">Cari idol favorit</string>
+    <string name="tooltip_set_most">Pilih idola dengan menekan Heart</string>
+    <string name="help_msg_change_gender_to_male">Klik di sini untuk melihat Idol Pria</string>
+    <string name="help_msg_change_gender_to_female">Klik di sini untuk melihat Idol Wanita</string>
+    <string name="help_msg_profile_picture_size">Hanya foto persegi yang diterapkan sebagai profil dan spanduk</string>
+    <string name="tooltip_search_actor">Cari Seleb favorit</string>
+    <string name="tooltip_set_most_actor">Pilih Seleb dengan menekan Heart</string>
+    <string name="no_data">Tidak ada data.</string>
+    <string name="title_tab_hof">Reputasi</string>
+    <string name="show_most_only">Posting ini hanya dapat dilihat jika \'Idol Saya\' sama.</string>
+    <string name="actor_show_most_only">Posting ini hanya dapat dilihat jika \'Seleb Saya\' sama.</string>
+    <string name="restore_purchase">Kembalikan Pembelian</string>
+    <string name="restore_purchase_completed">Kembalikan Pembelian\' selesai.</string>
+    <string name="restore_purchase_failed">Kembalikan Pembelian\' gagal.</string>
+    <string name="no_purchases">Tidak Ada Riwayat Pembelian</string>
+    <string name="regular_payment">Pembayaran Reguler</string>
+    <string name="purchasing_management">Kelola Pembelian\n(Berhenti Berlangganan)</string>
+    <string name="help_msg_month_free_trial" formatted="false">Uji coba gratis %d minggu</string>
+    <string name="month_free_trial" formatted="false">Uji coba gratis %d minggu</string>
+    <string name="next_billing_date">Tanggal penagihan berikutnya</string>
+    <string name="subscription_auto_renewal">*Jika Anda tidak membatalkannya secara langsung, pembayaran akan dilakukan secara otomatis setiap bulan.</string>
+    <string name="warning_delete_account">Akun tidak dapat dipulihkan bila dihapus.\Dan pembayaran reguler tidak dibatalkan secara otomatis.\nAnda harus membatalkannya secara langsung.</string>
+    <string name="all_users_are_given">Semua pengguna pertama</string>
+    <string name="daily_pack_modifier">Berikan sepenuh hati pada \'Idol Saya\' setiap hari</string>
+    <string name="actor_daily_pack_modifier">Berikan sepenuh hati kepada \'Seleb Saya\'  setiap hari</string>
+    <string name="describe_monthly_payment">Setelah %1$d minggu, Anda akan ditagih sebesar %2$s/bulan secara otomatis.\nAnda dapat membatalkan pembayaran kapan pun Anda mau.</string>
+    <string name="subscribed">Dibeli</string>
+    <string name="month">bulan</string>
+    <string name="important">Harus dibaca</string>
+    <string name="purchase_incompleted">Pembelian gagal</string>
+    <string name="send_receipt">Kirim tanda terima</string>
+    <string name="warning_subscription_platform_change_ios" formatted="false">Anda sudah berlangganan %s\' di platform lain (Android, dll.). \nTidak akan dapat menggunakan layanan dari platform lain. Harap batalkan dan beli kembali.</string>
+    <string name="warning_subscription_platform_change_android" formatted="false">Anda sudah berlangganan \'%s\' di platform lain (ios, dll.). \n Tidak akan dapat menggunakan layanan dari platform lain. Harap batalkan dan beli kembali.</string>
+    <string name="warning_subscription_only_original" formatted="false">\'%s\' Heart hanya diberikan di CHOEAEDOL&#9825;\nSilakan masuk di CHOEAEDOL&#9825;</string>
+    <string name="service_information">Informasi Layanan</string>
+    <string name="report">Laporkan</string>
+    <string name="already_reported">Pesan yang dilaporkan</string>
+    <string name="remove">Hapus</string>
+    <string name="yes">Iya</string>
+    <string name="no">Tidak</string>
+    <string name="reward_heart_title">Bonus Heart</string>
+    <string name="vote_heart_title">Bonus Heart Voting</string>
+    <string name="attendance">Hadir</string>
+    <string name="hot_time">Hot time</string>
+    <string name="heart_reward_posting" formatted="false">Tulis postingan dan dapatkan %d Heart!</string>
+    <string name="heart_reward_vote" formatted="false">Voting dan dapatkan %d Heart!</string>
+    <string name="vote_posting">Voting</string>
+    <string name="commentary">Penjelasan</string>
+    <string name="login_required">Silahkan masuk.</string>
+    <string name="title_korea_drama_festival">Korean Drama Festival</string>
+    <string name="kdf_before_notice">Korean Drama Festival 2017! Voting Penghargaan Popularitas bagi Aktor dan Aktris. Pemenang akan ditentukan melalui peringkat dan akumulasi suara selama masa perhitungan berlangsung. Pemenang Penghargaan Popularitas ada di tangan Anda.</string>
+    <string name="kdf_period_title">Periode Voting</string>
+    <string name="kdf_period_na">Belum ditentukan</string>
+    <string name="kdf_before_title_2">Perbandingan Polling</string>
+    <string name="kdf_before_notice_2">Penghargaan Popularitas 100% dari Voting.\n (Berdasarkan peringkat akumulasi suara setiap hari)</string>
+    <string name="kdf_before_title_3">Cara voting</string>
+    <string name="kdf_before_notice_3">Peraturan yang sama dengan sebelumnya</string>
+    <string name="kdf_vote_status">Korean Drama Festival Perhitungan voting Real Time \n Klik Seleb dan lihat peringkat dengan detail</string>
+    <string name="kdf_final_title_1">Korean Drama Festival Hasil akhir Penghargaan Populer</string>
+    <string name="kdf_final_notice_1">Voting  telah ditutup</string>
+    <string name="kdf_how_to_use">Cara mengunakan Seleb</string>
+    <string name="onepick">One Pick</string>
+    <string name="actor_onepick">One Pick</string>
+    <string name="num_participants">Peserta</string>
+    <string name="num_participants_format" formatted="false">%s orang</string>
+    <string name="see_current_ranking">Peringkat saat ini</string>
+    <string name="onepick_vote">Ikut</string>
+    <string name="see_result">Hasil</string>
+    <string name="qualifying_round">Babak penyisihan</string>
+    <string name="final_round">Final</string>
+    <string name="my_onepick_is">Pilihannya adalah</string>
+    <string name="zzz_onepick_is">Pilihan ZZZ adalah</string>
+    <string name="my_onepick">Pilihan saya</string>
+    <string name="onepick_hashtag">#Hashtag</string>
+    <string name="onepick_hashtag_desc">Posting gambar berkualitas tinggi ke komunitas idol dengan tagar #Hashtag di bawah ini! \n
+Mungkin ditampilkan dalam polling.</string>
+    <string name="onepick_confirm_exit">Jika keluar sekarang, tidak dapat memilih lagi hari ini. \nTetap ingin keluar?</string>
+    <string name="final_result">Hasil akhir</string>
+    <string name="my_pick">Pick Saya</string>
+    <string name="onepick_period">Masa voting</string>
+    <string name="onepick_mypick">Idol yang Saya pilih</string>
+    <string name="actor_onepick_mypick">Seleb yang saya pilih</string>
+    <string name="onepick_capture">Klik di sini untuk melihat hasilnya!</string>
+    <string name="onepick_current_ranking">Peringkat saat ini</string>
+    <string name="label_share">Bagikan</string>
+    <string name="onepick_no_votes">Belum ada peserta. \nJadilah orang pertama yang memberikan suara!</string>
+    <string name="onepick_already_voted">Terpilih</string>
+    <string name="feed_status_message_hint">Masukkan pesan status Anda</string>
+    <string name="feed_my_feed">Beranda saya</string>
+    <string name="feed_edit_status">Edit pesan status</string>
+    <string name="feed_no_posts">Belum ada postingan</string>
+    <string name="feed_no_comments">Belum ada komentar.</string>
+    <string name="feed_status_message">Pesan status</string>
+    <string name="btn_dailypack_format" formatted="false">Dapatkan lebih dari %s Heart setiap hari</string>
+    <string name="feed_private">Ubah beranda menjadi private</string>
+    <string name="feed_private_desc">Orang lain tidak dapat melihat profil Anda jika diubah menjadi private</string>
+    <string name="feed_is_private">Profil diprivate</string>
+    <string name="freeboard_order_newest">Terbaru</string>
+    <string name="freeboard_order_comments">Sebagian besar komentar</string>
+    <string name="label_tag">Menandai</string>
+    <string name="no_coupons">Tidak ada kupon</string>
+    <string name="darkmode">Mode gelap</string>
+    <string name="automatic">Otomatis</string>
+    <string name="status_settings">Pengaturan Status</string>
+    <string name="block_friend_req">Blokir permintaan teman</string>
+    <string name="block_friend_req_desc">Tidak akan menerima permintaan teman lagi jika Anda memblokirnya.</string>
+    <string name="block_friend_msg">Pengguna ini tidak ingin ada permintaan pertemanan.</string>
+    <string name="search_friend">Cari teman</string>
+    <string name="my_friend">Teman-temanku</string>
+    <string name="search_result">Hasil pencarian</string>
+    <string name="new_friends">Teman baru</string>
+    <string name="participate_new_friends">Ikut daftar teman baru</string>
+    <string name="participate_new_friends_desc">Klik jika kamu ingin lebih banyak teman</string>
+    <string name="apply_new_friends">Ikut</string>
+    <string name="apply_new_friends_desp">Cari teman dan dapatkan Heart! \nApakah Anda ingin berteman di \'Teman Baru\'?</string>
+    <string name="cancel_new_friends">Batalkan</string>
+    <string name="apply_new_friends_blocked">Anda menggunakan fitur blok permintaan teman.\nBuka pemblokiran dan coba lagi!</string>
+    <string name="none_participation_new_friends">Tidak ada pengguna yang berpartisipasi dalam \'Teman Baru\'.</string>
+    <string name="data_save">Mode Hemat Daya</string>
+    <string name="data_save_desc">Dalam penggunaan data, secara otomatis akan mengurangi muatan gambar dan video. \n* Sambungkan dengan Wifi dan muatan gambar/video akan kembali.</string>
+    <string name="order_by_name">Nama</string>
+    <string name="order_by_login_time">Tanggal masuk</string>
+    <string name="wechat_not_installed">WeChat tidak terpasang.</string>
+    <string name="choeaedol_sns">SNS CHOEAEDOL</string>
+    <string name="friends_request">Permintaan pertemanan</string>
+    <string name="notice_new_friend_request">Anda memiliki permintaan teman baru.</string>
+    <string name="appleid_change_detected">Apple ID Anda telah diganti, Anda tidak bisa menerima DailyPack. Silahkan Log-in menggunakan ID yang sudah membeli DailyPack di AppStore</string>
+    <string name="quiz_get_heart_title">Hadiah Quiz</string>
+    <string name="darkmode_system">Otomatis</string>
+    <string name="darkmode_always">Selalu Aktif</string>
+    <string name="darkmode_never">Selalu Mati</string>
+    <string name="darkmode_help">Memasang \'Mode Gelap\' dan memilih selalu aktif, atau nonaktif.</string>
+    <string name="animation_mode">Mode animasi</string>
+    <string name="animation_mode_desc">Aktifkan mode animasi di layar peringkat.</string>
+    <string name="aggregating_time">Voting selesai</string>
+    <string name="see_ranking" formatted="false">Lihat Peringkat %s</string>
+    <string name="overall">Semua</string>
+    <string name="ranking">Peringkat</string>
+    <string name="singer">Penyanyi</string>
+    <string name="variety">Penghibur</string>
+    <string name="rank_accumulative">Akumulasi Peringkat</string>
+    <string name="rank_daily">Peringkat Harian</string>
+    <string name="deadline_format_one">1 menit sebelum</string>
+    <string name="deadline_format_few" formatted="false">%d menit sebelum</string>
+    <string name="celeb">Seleb</string>
+    <string name="celeb_quiz_start">Mulai</string>
+    <string name="top_100">TOP 100</string>
+    <string name="popup_no_heart_title">Anda kehabisan Heart:(</string>
+    <string name="popup_no_heart_desc">Sentuh untuk bergerak</string>
+    <string name="popup_video_ad">Iklan video</string>
+    <string name="popup_video_ad_desc">Tonton iklan video dan dapatkan Heart</string>
+    <string name="popup_heart_shop_desc">Anda bisa membeli Heart</string>
+    <string name="popup_heartbox_desc">Dapatkan random Heart dengan menyentuh ikon hati di gambar> komunitas.</string>
+    <string name="popup_free_heart_desc">Tuntaskan misi iklan dan terima heart</string>
+    <string name="guide_gender_title">Ubah ke Laki-laki / perempuan</string>
+    <string name="guide_gender">Anda dapat mengetuk ikon \n dan beralih dari / ke idol pria/wanita</string>
+    <string name="guide_community_title">Komunitas</string>
+    <string name="guide_community">Ketuk nama Idol \ndan pergi ke Komunitas Idol!</string>
+    <string name="guide_banner_title">Buka lipatan spanduk</string>
+    <string name="guide_banner">Klik foto profil \ndan buka spanduk.</string>
+    <string name="guide_vote_title">Voting</string>
+    <string name="guide_vote">Klik ikon \n dan pilih!</string>
+    <string name="guide_wiki_title">Wiki</string>
+    <string name="guide_wiki">Klik foto profil \ndan lihat \'Wiki Idol\'</string>
+    <string name="guide_write_title">Menulis</string>
+    <string name="guide_write">Ketuk ikon, \n unggah foto atau tulis sesuatu!</string>
+    <string name="guide_skip">Lewatkan</string>
+    <string name="menu_face">Pencocokan Wajah</string>
+    <string name="face_limit">- Anda dapat mencocokkan 3 kali sehari!</string>
+    <string name="face_title">Pertandingan wajah idola</string>
+    <string name="face_similarity">Kesamaan</string>
+    <string name="face_all">Semua</string>
+    <string name="face_submit">Cocokkan bias</string>
+    <string name="time_just_now">Baru saja</string>
+    <string name="time_minute">menit</string>
+    <string name="time_hour">jam</string>
+    <string name="time_day">hari</string>
+    <string name="title_notifications">Pemberitahuan</string>
+    <string name="label_no_notifications">Tidak ada pemberitahuan.</string>
+    <string name="label_delete_all_notifications">Bersihkan semua?</string>
+    <string name="actor_level_heart_guide_desc1">Pemeringkatan didasarkan pada akumulasi skor yang digabungkan dan dikumpulkan selama 30 hari terakhir dari setiap fandom di Hall of Fame. Hanya 100 teratas yang ditampilkan.\nJika Anda mengklik setiap fandom, perubahan peringkat yang sesuai akan ditampilkan.\nSumbangan akan diberikan atas nama selebriti berdasarkan akumulasi peringkat selama 30 hari terakhir!\n\n✅ Kriteria pencapaian\n- Kondisi1 : rata-rata 3.000.000 suara atau lebih selama 30 hari terakhir\n- Kondisi2 : peringkat 1 atau 2 di setiap kategori selama 6 hari terakhir di Hall of Fame\n- Kedua kondisi tersebut harus dipenuhi untuk dapat dipilih sebagai Malaikat Amal.\n\n✅ Hadiah\n- Kategori Juara 1\n(1) Donasi sebesar 500.000KRW kepada Miral Welfare Foundation\n(2)Iklan kereta bawah tanah di stasiun pintu masuk Hongdae\n(3)Iklan banner satu halaman penuh\n(4)Iklan geser menu\n- Kategori Juara 2\n(1)Sumbangan sebesar 500.000KRW kepada Miral Welfare Foundation\n(2)Iklan kereta bawah tanah di stasiun masuk Hongdae\n(3)Iklan spanduk satu halaman penuh</string>
+    <string name="AAA">AAA</string>
+    <string name="award_guide">Info</string>
+    <string name="award_example">barisan</string>
+    <string name="award_realtime">Reringkat Real-time</string>
+    <string name="award_shop_closed" formatted="false">[%s] Sedang berlangsung\n%s~%s (KST)\n\nPenjualan produk akan ditangguhkan selama periode ini</string>
+    <string name="award_realtime_boy">Peringkat Real-time\nGrup Laki-Laki</string>
+    <string name="award_realtime_girl">Peringkat Real-time\nGrup Gadis</string>
+    <string name="award_accumulative_guide1">Ini adalah peringkat akumulatif (Termasuk suara individu dan grup).</string>
+    <string name="award_final_boy" formatted="false">%s\nPenghargaan Popularitas Grup Laki-Laki\nHasil Akhir</string>
+    <string name="award_final_girl" formatted="false">%s\nPenghargaan Popularitas Grup Gadis\nHasil Akhir</string>
+    <string name="award_guide_title">&lt; Asia Artist Awards 2020 &gt;</string>
+    <string name="award_guide_sub1">Jadwal penghargaan</string>
+    <string name="award_guide_sub2">Masa Voting</string>
+    <string name="award_guide_sub3">Bagaimana cara kerja suara?</string>
+    <string name="award_guide_sub4">Cara Memilih</string>
+    <string name="award_guide_sub5">Penting</string>
+    <string name="award_guide_sub6">Aturan</string>
+    <string name="award_guide_title_desc">Penghargaan AAA ke-5 ada di sini! \n
+Penghargaan Popularitas Pria/Wanita diberikan melalui suara di CHOEAEDOL.</string>
+    <string name="award_guide_desc1">- 2020.11.25 AAA</string>
+    <string name="award_guide_desc3">-Pemenang yang dipilih berdasarkan suara, 100%. \n
+-Pemenang terpilih berdasarkan point dari akumulasi voting setiap hari \n
+-Penghargaan Popularitas diberikan untuk kategori Pria/Wanita</string>
+    <string name="award_guide_desc4">Kumpulkan Heart CHOEAEDOL dan voting</string>
+    <string name="award_guide_desc5">Voting yang diberikan kepada anggota grup akan ditambahkan secara otomatis ke grup. \n
+Anda tidak dapat membeli Heart sampai masa voting selesai</string>
+    <string name="award_guide_desc6">-Aturan yang berubah selama periode voting, 
+Dapat dilihat pada pemberitahuan di aplikasi (≡).</string>
+    <string name="award_before_title">Sekarang bukan masa Voting!</string>
+    <string name="award_before_example">Ini adalah contoh pemungutan suara di mana suara individu dan kelompok dijumlahkan.</string>
+    <string name="aggregation">Peringkat akumulatif</string>
+    <string name="actor_award_guide_title">2020 Asia Artist Awards</string>
+    <string name="actor_award_guide_title_desc">Penghargaan AAA ke-5 ada di sini! \n Penghargaan Popularitas Aktor, Aktris, Penyanyi Trot \n diberikan melalui Heart di CHOEAEDOL.</string>
+    <string name="actor_award_guide_desc3">-Pemenang yang dipilih berdasarkan suara, 100%. \n -
+Pemenang terpilih berdasarkan point dari akumulasi voting setiap hari \n 
+Penghargaan Popularitas diberikan untuk peringkat pertama.</string>
+    <string name="actor_award_guide_desc4">Kumpulkan Heart CHOEAEDOL dan voting</string>
+    <string name="actor_award_guide_desc5">Anda tidak dapat membeli Heart sampai masa voting selesai</string>
+    <string name="actor_award_guide_desc6">-Aturan yang berubah selama periode voting, 
+Dapat dilihat pada pemberitahuan di aplikasi (≡).</string>
+    <string name="actor_award_realtime_trot">Peringkat Popularitas Trot Real Time</string>
+    <string name="actor_award_accumulative_title_trot">Peringkat Akumulatif Popularitas Trot</string>
+    <string name="actor_award_current_guide1">Kondisi hasil voting Popularitas Trot Real Time</string>
+    <string name="actor_award_accumulative_guide1">Kondisi Peringkat akumulatif Populer Trot Real Time</string>
+    <string name="actor_award_final_trot">Hasil akhir dari penghargaan Popularitas Trot AAA</string>
+    <string name="actor_award_before_example">Ini adalah contoh dari peringkat Real Time</string>
+    <string name="menu_video_ad">Lihat Video Iklan</string>
+    <string name="choeaedol">CHOEAEDOL</string>
+    <string name="awards_history">Sejarah Awards</string>
+    <string name="choeaedol_celeb">CHOEAEDOL_Celeb</string>
+    <string name="celeb_talk">Seleb Talk</string>
+    <string name="friend_api_block">Fungsi Teman Baru hanya tersedia pada periode tabulasi (23: 30 ~ 00: 00KST) selama periode pemungutan suara penghargaan.</string>
+    <string name="friend_api_block_all">Fungsi teman tidak tersedia selama periode penghargaan.</string>
+    <string name="friend_delete_limit">Hapus fungsi teman hanya tersedia pada waktu tabulasi suara (23:30 ~ 00:00 KST) selama periode pemungutan suara penghargaan.</string>
+    <string name="friend_api_limit">Anda dapat menggunakan fungsi teman antara 05: 00 ~ 20: 00 KST dan waktu tabulasi suara (23: 30 ~ 00: 00KST) selama periode pemungutan suara penghargaan</string>
+    <string name="support">Dukungan Ads</string>
+    <string name="support_filter_favorites">Idol saya</string>
+    <string name="support_filter_due">Tenggat waktu</string>
+    <string name="support_in_progress">Sedang berlangsung</string>
+    <string name="support_end">Akhir</string>
+    <string name="support_end_2">Mungkin lain kali :(</string>
+    <string name="support_success">Berhasil</string>
+    <string name="support_create">Buat \'Acara Dukungan\' baru</string>
+    <string name="support_use_diamond">Gunakan %1$s berlian</string>
+    <string name="support_create_title">Buat \'Acara Dukungan\'</string>
+    <string name="support_create_contents">Judul / Foto</string>
+    <string name="support_create_hint_title">Masukkan judul \'Acara Dukungan\' (wajib)</string>
+    <string name="support_create_hint_photo">Unggah foto \'Acara Dukungan\' (wajib)</string>
+    <string name="support_create_type">Jenis \'Acara Dukungan\'</string>
+    <string name="support_create_hint_type">Pilih jenis \'Acara Dukungan\'</string>
+    <string name="support_create_button">Membuat</string>
+    <string name="support_create_confirm">Anda akan menghabiskan %1$s berlian untuk membuat dukungan. \n Berlian tidak dapat dikembalikan.</string>
+    <string name="support_date_start">Tanggal \'Acara Dukungan\' dimulai</string>
+    <string name="support_period_vote">Periode penggalangan dana (KST)</string>
+    <string name="support_period_ad">Periode posting iklan (KST)</string>
+    <string name="support_agree">Saya telah membaca semua hal di atas dan setuju dengan ketentuannya.</string>
+    <string name="support_create_notice">[Perhatian]\n
+-\'Acara Dukungan\' yang telah dibuka,tidak bisa dibatalkan\n
+-Berlian akan dikembalikan secara otomatis sebagai berlian jika penggalangan dana Acara Dukungan gagal.\n
+-Berlian yang sudah digunakan untuk membuka \'Acara Dukungan\' tidak dapat dikembalikan.\n
+-Dukungan harus sudah berhasil dilakukan 30 hari sebelum hari.\n
+-\'Acara Dukungan\' bisa dibuka 100 hari sebelum hari Anniversary.\n
+-Bila design tidak dikirimkan selama pengumpulan Berlian, maka kami akan menggunakan design normal/standard.\n
+-Tergantung pada kondisi afiliasi, iklan tidak boleh digantung.\n
+-Desain iklan dapat diubah sesuka hati sesuai dengan musyawarah.\n
+-Desain pemenang akan menyertakan gambar kode QR CHOEAEDOL. Hal ini menyulitkan pembatalan iklan atau perubahan desain.\n
+-Jika iklan terjual habis atau dibatalkan, itu akan diubah menjadi iklan lain atau dikembalikan dalam berlian.</string>
+    <string name="support_create_success">Acara Dukungan\' berhasil dibuat.</string>
+    <string name="support_period">Periode \'Acara Dukungan\'</string>
+    <string name="support_vote">berpartisipasi dalam dukungan</string>
+    <string name="support_goal">Target</string>
+    <string name="support_select_date">Silakan pilih tanggal hari jadi untuk memasang iklan Anda berdasarkan KST. (dalam 100 hari)</string>
+    <string name="support_select_month">Silakan pilih satu bulan untuk menggantung iklan atau memulai \'Acara Dukungan\' Anda (dalam 100 hari)</string>
+    <string name="date_format_day">1 hari</string>
+    <string name="date_format_days" formatted="false">%d hari</string>
+    <string name="date_format_week">1 minggu</string>
+    <string name="date_format_weeks" formatted="false">%d minggu</string>
+    <string name="date_format_hour">1 jam</string>
+    <string name="date_format_hours" formatted="false">%d jam</string>
+    <string name="my_diamonds">Berlian Saya</string>
+    <string name="manage_diamonds">Kelola \'Berlian Saya\'</string>
+    <string name="my_support">Dukungan Saya</string>
+    <string name="support_top5">Dukungan TOP5</string>
+    <string name="shop_diamond">Toko Berlian</string>
+    <string name="shop_diamond_desc">Berlian untuk \'Acara Dukungan\'</string>
+    <string name="label_diamond_vote">Histori Berlian</string>
+    <string name="label_diamond_save">Histori akumulasi Berlian</string>
+    <string name="label_heart_diamond">Heart, Berlian</string>
+    <string name="label_store">Toko</string>
+    <string name="label_select_ad">Daftar \'Acara Dukungan\'</string>
+    <string name="label_button_select">Pilih di sini</string>
+    <string name="btn_support_top5">TOP5</string>
+    <string name="support_empty">Tidak ada \'Acara Dukungan\'</string>
+    <string name="support_failed">Gagal</string>
+    <string name="support_achievement" formatted="false">Pencapaian %d%%</string>
+    <string name="diamond_store_disclaimer">Berlian tidak dapat digunakan untuk pemungutan suara. Harap beli Hati dari Toko saat memilih idola Anda.\nBerlian bekas tidak dapat dikembalikan.\nBerlian akan dikembalikan secara otomatis sebagai berlian jika penggalangan dana Acara Dukungan gagal. Silakan merujuk ke [Dukungan - Penting].</string>
+    <string name="diamond_spend" formatted="false">%s berlian telah digunakan</string>
+    <string name="diamond_spend_1">1 berlian telah digunakan</string>
+    <string name="label_friend_heart_empty">Tidak ada teman yang mengirim Heart kepada Anda</string>
+    <string name="label_friend_heart_one">Menerima 1 Heart</string>
+    <string name="label_friend_heart_format" formatted="false">Menerima %d Heart</string>
+    <string name="label_tooltip_friend_heart">Terima Heart yang\ndikirim dari teman Anda!</string>
+    <string name="label_about_support">Acara Dukungan\'?</string>
+    <string name="support_about_subtitle">Dukungan di hari istimewa Idol Anda ~</string>
+    <string name="support_about_title">Dukungan CHOEAEDOL</string>
+    <string name="support_about_info1">Bias Anda atau tidak</string>
+    <string name="support_about_info2">Semua Idol bisa</string>
+    <string name="support_about_info_desc">Sulit membuat  \'Acara Dukungan\' seorang diri!\n
+Ayo gabungkan kekuatan dengan fans lainnya!\n
+Dan beri hadiah spesial untuk Idol di hari spesialnya!\n
+Penuhi target misi tepat waktu!\n
+Maka iklan di Subway Billboard, Aplikasi Banner, akan terpasang untuk Idol Anda.</string>
+    <string name="support_about_precautions">-\'Acara Dukungan\' yang telah dibuka,tidak bisa dibatalkan\n
+-Berlian akan dikembalikan secara otomatis sebagai berlian jika penggalangan dana Acara Dukungan gagal.\n
+-Berlian yang sudah digunakan untuk membuka \'Acara Dukungan\' tidak dapat dikembalikan.\n
+-Dukungan harus sudah berhasil dilakukan 30 hari sebelum hari.\n
+-\'Acara Dukungan\' bisa dibuka 100 hari sebelum hari Anniversary.\n
+-Bila design tidak dikirimkan selama pengumpulan Berlian, maka kami akan menggunakan design normal/standard.\n
+-Tergantung pada kondisi afiliasi, iklan tidak boleh digantung.\n
+-Desain iklan dapat diubah sesuka hati sesuai dengan musyawarah.\n
+-Desain pemenang akan menyertakan gambar kode QR CHOEAEDOL. Hal ini menyulitkan pembatalan iklan atau perubahan desain.\n
+-Jika iklan terjual habis atau dibatalkan, itu akan diubah menjadi iklan lain atau dikembalikan dalam berlian.</string>
+    <string name="support_example">Contoh iklan</string>
+    <string name="label_processing">Sedang memproses...</string>
+    <string name="format_include_date">%2$s termasuk %1$s</string>
+    <string name="date_format_month">satu bulan</string>
+    <string name="date_format_months" formatted="false">%d bulan</string>
+    <string name="label_support_design_competition">Kompetisi Desainer Iklan Dukungan</string>
+    <string name="label_support_design_guide">Panduan Desain Iklan</string>
+    <string name="actor_support_about_title">Dukungan untuk Seleb</string>
+    <string name="actor_support_about_subtitle">Dukungan di hari istimewa Seleb Anda ~</string>
+    <string name="actor_support_about_info_desc">Sulit membuat  \'Acara Dukungan\' seorang diri!\n
+Ayo gabungkan kekuatan dengan fans lainnya!\n
+Dan beri hadiah spesial untuk Seleb!\n
+Penuhi target misi tepat waktu!\n
+Maka iklan di Subway Billboard, Aplikasi Banner, akan terpasang untuk Seleb Anda.</string>
+    <string name="actor_support_filter_favorites">Seleb saya</string>
+    <string name="actor_diamond_store_disclaimer">Berlian tidak dapat digunakan untuk pemungutan suara. Harap beli Hati dari Toko saat memilih idola Anda.\nBerlian bekas tidak dapat dikembalikan.\nBerlian akan dikembalikan secara otomatis sebagai berlian jika penggalangan dana Acara Dukungan gagal. Silakan merujuk ke [Dukungan - Penting].</string>
+    <string name="actor_support_about_info1">Bias Anda atau tidak,</string>
+    <string name="actor_support_about_info2">Semua Seleb bisa</string>
+    <string name="subscription_account_holding">Ada masalah dengan pembayaran langgannan Anda. Buka setelan langganan Google Play untuk memperbaiki pembayaran Anda di Google Play.</string>
+    <string name="popup_no_diamond_title">Anda kehabisan berlian :(</string>
+    <string name="popup_diamond_shop_desc">Anda bisa membeli \n Berlian</string>
+    <string name="secure_user_id">Kode pengguna</string>
+    <string name="soba2020_title">2020 SORIBADA Awards</string>
+    <string name="soba_final_boy">Hasil akhir SOBA Popularitas Awards (Pria)</string>
+    <string name="soba_final_girl">Hasil akhir SOBA Popularitas Awards (Wanita)</string>
+    <string name="soba_final_trot">Hasil akhir dari Popularitas Soribada Trot</string>
+    <string name="actor_aaa_realtime_male">Peringkat Popularitas Aktor Real Time</string>
+    <string name="actor_aaa_accumulative_male">Peringkat Kumulatif Popularitas Aktor</string>
+    <string name="actor_aaa_male_current_guide">Peringkat Popularitas Aktor TODAY Real Time</string>
+    <string name="actor_aaa_male_accumulative_guide">Peringkat kumulatif Popularitas Aktor</string>
+    <string name="actor_aaa_male_fan_result">Voting AAA\n Hasil akhir Popularitas Aktor</string>
+    <string name="actor_aaa_realtime_female">Peringkat popularitas Aktris Real Time</string>
+    <string name="actor_aaa_accumulative_female">Peringkat kumulatif Popularitas Aktris</string>
+    <string name="actor_aaa_female_current_guide">Peringkat popularitas Aktris TODAY Real Time</string>
+    <string name="actor_aaa_female_accumulative_guide">Peringkat kumulatif Popularitas Aktris</string>
+    <string name="actor_aaa_female_fan_result">Voting AAA Voting\nHasil akhir Popularitas Aktris</string>
+    <string name="popup_award_diamond_alert">Untuk referensi Anda, Berlian tidak dapat digunakan untuk pemungutan suara.</string>
+    <string name="popup_update_app">Ingin merasakan fungsi baru?\nPerbarui ke versi terbaru!</string>
+    <string name="actor_aaa_trot">TROT</string>
+    <string name="tapjoy">Main &amp; Dapat♡</string>
+    <string name="offerwall_empty">Anda telah berhasil melengkapi semua misi. \nSilahkan tunggu untuk misi baru selanjutnya</string>
+    <string name="tooltip_select_my_favorite">Klik \'Heart\'♡ untuk mendaftar Idol Saya.</string>
+    <string name="tooltip_select_my_love_idol">Klik \'Bintang\' ☆ untuk Favorit.</string>
+    <string name="tooltip_select_my_favorite_actor">Klik \'Heart\'♡ untuk mendaftar Seleb Saya</string>
+    <string name="support_sympathy">Suka</string>
+    <string name="support_ready_for_photo">Hasil Iklan sedang disiapkan. Akan diupload secepatnya.</string>
+    <string name="support_success_list">Gambar bukti</string>
+    <string name="support_in_process">Dukungan sedang diproses</string>
+    <string name="support_main">Dukungan utama</string>
+    <string name="aaa2020_final_boy">Hasil akhir AAA Popularity Awards (Boys)</string>
+    <string name="aaa2020_final_girl">Hasil akhir AAA Popularity Awards (Girls)</string>
+    <string name="aaa2020_final_trot">Hasil akhir dari penghargaan Popularitas Trot AAA</string>
+    <string name="aaa2020_final_male">Voting AAA\n Hasil akhir Popularitas Aktor</string>
+    <string name="aaa2020_final_female">Voting AAA Voting\nHasil akhir Popularitas Aktris</string>
+    <string name="report_user_desc">Apa Anda yakin ingin melaporkan?</string>
+    <string name="report_feed">Laporkan Pengguna ini</string>
+    <string name="msg_report_user_confirm">Apakah Anda yakin pengguna telah melanggar aturan?\n%1$s heart akan digunakan untuk melaporkan pengguna ini. Apakah kamu yakin?</string>
+    <string name="failed_to_report_user__already_reported">Pengguna telah melaporkan. Pengguna hanya bisa melaporkan 1 kali.</string>
+    <string name="purchase_service_unavailable">Koneksi jaringan terputus</string>
+    <string name="purchase_billing_unavailable">Layanan Play tidak diinstal atau akun Google tidak diatur</string>
+    <string name="purchase_item_unavailable">Produk belum diaktifkan. Jika pembelian Anda masih tidak berhasil, harap hubungi kami di pengaturan.</string>
+    <string name="purchase_error">Kesalahan server tak terduga.</string>
+    <string name="purchase_item_already_owned">Anda telah membeli produk ini. Silakan periksa riwayat pembelian Anda di Play Store.</string>
+    <string name="purchase_item_not_owned">Gagal mengkonsumsi karena item tidak dimiliki</string>
+    <string name="quiz_review_desc">Tinjau pertanyaan untuk Kuis Idol</string>
+    <string name="inquiry_notice">[Jam Layanan Pelanggan]\nHari kerja 10:00 - 17:00(KST)\n(Harap diperhatikan bahwa pertanyaan di luar jam kerja akan dijawab secara berurutan selama jam kerja)\n\n- Jika Anda melampirkan tangkapan layar pada pertanyaan Anda, harap pastikan untuk menangkap waktu saat ini di tangkapan layar.\n- File terlampir akan otomatis dihapus setelah 30 hari sejak tanggal penyelidikan.\n- Jika konten berisi kata-kata kotor, pelecehan seksual, atau bahasa yang mengancam, Anda mungkin dilarang memposting, secara permanen ditangguhkan dari akun Anda, atau diambil tindakan berdasarkan hukum yang berlaku.</string>
+    <string name="setting_menu_push_supports">Acara Dukungan</string>
+    <string name="order_by_dday">Hari H</string>
+    <string name="error_2200">Level Anda terlalu rendah untuk menggunakan fungsi laporan.</string>
+    <string name="invalid_email_form">Harap masukkan format email yang benar.</string>
+    <string name="label_rising" formatted="false">Meningkat %d tempat</string>
+    <string name="chat_many_talk_at">keaktifan</string>
+    <string name="chat_anonymous">Anonim</string>
+    <string name="chat_list_all" formatted="false">Semua (%d)</string>
+    <string name="chat_list_join" formatted="false">Berpartisipasi (%d)</string>
+    <string name="chat_make">Buat ruang obrolan</string>
+    <string name="chat_make_help_popup1">Ruang obrolan akan dihapus jika Anda mengubah "Idola Saya" nanti.</string>
+    <string name="chat_make_help_popup2">Setiap komunitas hanya dapat memiliki maksimal 300 chat room</string>
+    <string name="chat_make_help_popup3">Maxium no. peserta untuk chat room adalah 300</string>
+    <string name="chat_make_help_popup4" formatted="false">Diperlukan %d berlian saat membuat ruang obrolan.</string>
+    <string name="chat_less_level_popup" formatted="false">Maaf. Ruang obrolan hanya dapat dibuat oleh pengguna di Level %d atau lebih tinggi</string>
+    <string name="chat_room_title">Nama ruang obrolan</string>
+    <string name="chat_room_title_placeholder">Harap masukkan nama ruang obrolan (minimal 5 Karakter)</string>
+    <string name="chat_room_desc">Deskripsi ruang obrolan</string>
+    <string name="chat_room_desc_placeholder">Silakan masukkan deskripsi ruang obrolan</string>
+    <string name="chat_room_disclose_most">Tunjukkan Idola Saya?</string>
+    <string name="chat_room_disclose_nickname">Tunjukkan nama panggilan?</string>
+    <string name="chat_room_limit_level">Pembatasan level</string>
+    <string name="chat_room_require">*Yg dibutuhkan</string>
+    <string name="chat_room_make_button" formatted="false">Create\n(%d berlian dibutuhkan)</string>
+    <string name="chat_room_make_popup1_title">Membuat</string>
+    <string name="chat_room_make_popup1_desc">Anda membutuhkan %1$s berlian untuk membuat ruang obrolan ini. Memproses?</string>
+    <string name="chat_room_make_popup2">Maaf.\nJumlah maksimum 300 ruang obrolan telah tercapai, tidak ada ruang obrolan baru yang dapat dibuat</string>
+    <string name="chat_room_join_popup1">Ruang obrolan ini tidak dapat bergabung karena berbeda di Idolaku</string>
+    <string name="chat_room_join_popup2">Ruang obrolan ini tidak dapat bergabung karena batasan level</string>
+    <string name="chat_room_join_popup3">Ruang obrolan ini tidak dapat bergabung karena penuh (maks. 300 pengguna)</string>
+    <string name="chat_room_number_of_person">Jumlah anggota</string>
+    <string name="chat_room_status">Status ruang obrolan</string>
+    <string name="chat_room_owner">Pembuat kamar</string>
+    <string name="chat_room_report">Ruang obrolan yang disalahgunakan?\nUntuk mencegah penyalahgunaan fungsi laporan, %1$s hati akan digunakan saat mengajukan laporan.\nApakah Anda ingin melaporkan ruang obrolan ini?</string>
+    <string name="chat_room_delete">Menghapus</string>
+    <string name="chat_room_delete_popup">Yakin ingin menghapus ruang obrolan ini?\nJika Anda menghapus ruang obrolan ini, semua anggota ruang obrolan juga akan dihapus dari ruang obrolan</string>
+    <string name="chat_room_leave">Meninggalkan</string>
+    <string name="chat_room_leave_desc1">Anda yakin ingin keluar?</string>
+    <string name="chat_room_leave_desc2">Pengguna lain akan menjadi pembuat ruang jika Anda meninggalkan ruang obrolan.\nApakah Anda harus ingin keluar?</string>
+    <string name="chat_room_most_only">Terbatas untuk pengguna yang sama dengan idola saya</string>
+    <string name="chat_room_most_and_group">Terbatas untuk pengguna dengan idola, grup, dan anggota grup yang sama.</string>
+    <string name="chat_room_nickname">Nama panggilan chatroom</string>
+    <string name="chat_room_anonymous">Ruang obrolan anonim</string>
+    <string name="chat_room_level_limit" formatted="false">LV.%d lebih tinggi</string>
+    <string name="chat_room_create_success">Ruang obrolan dibuat</string>
+    <string name="chat_unknown_user">(pengguna tidak dikenal)</string>
+    <string name="chat_level_select_limit">Anda tidak dapat memilih batas level di atas level Anda sendiri.</string>
+    <string name="chat_make_tooltip">Harap buat ruang obrolan.</string>
+    <string name="chat_deleted_message">Pesan dihapus</string>
+    <string name="chat_photo">Foto</string>
+    <string name="chat">Mengobrol</string>
+    <string name="setting_menu_push_chat">Mengobrol</string>
+    <string name="chat_title_short">Nama ruang obrolan harus lebih dari 5 karakter.</string>
+    <string name="chat_report_error_2401">Anda telah melaporkan ruang obrolan ini.</string>
+    <string name="google_store_error">Kesalahan Google Play Store yang tidak terduga telah terjadi.\nHarap konfirmasi apakah Google Play Store di perangkat Anda berfungsi dengan baik dan coba lagi.</string>
+    <string name="chat_first_join">Anda telah bergabung dengan ruang obrolan.</string>
+    <string name="china_payment_choice_title">Cara Pembayaran</string>
+    <string name="china_payment_choice_alipay">Alipay</string>
+    <string name="china_payment_choice_unionpay">UnionPay</string>
+    <string name="china_payment_choice_wechatpay">Pembayaran WeChat</string>
+    <string name="chat_message_already_reported">Anda telah melaporkan pesan ini.</string>
+    <string name="chat_connecting">Menghubungkan ... Harap tunggu sebentar.</string>
+    <string name="msg_favorite_guide_4" formatted="false">Anda akan keluar dari ruang obrolan %s jika Anda mengubah Idol Saya.\nAnda dapat mengubah Idol Saya lagi 48 jam setelah Anda melakukan perubahan ini.\nApakah Anda ingin mengubah Idol Saya menjadi %s?</string>
+    <string name="actor_msg_favorite_guide_4" formatted="false">Anda akan keluar dari ruang obrolan %s jika Anda mengubah Selebritis Saya.\nAnda dapat mengubah Selebritis Saya lagi 48 jam setelah Anda melakukan perubahan ini.\nApakah Anda ingin mengubah Selebritis Saya menjadi %s?</string>
+    <string name="msg_favorite_unregi_guide3" formatted="false">Anda akan keluar dari ruang obrolan%s jika Anda mengganti idola saya.\nAnda dapat menyetel idola saya yang baru 48 jam setelah Anda membuat perubahan terakhir.</string>
+    <string name="actor_msg_favorite_unregi_guide3" formatted="false">Anda akan keluar dari ruang obrolan %s jika Anda mengubah Celeb Saya\nAnda dapat mengatur Selebriti Saya yang baru 48 jam setelah Anda membuat perubahan terakhir.</string>
+    <string name="chat_title_bad_words">Nama ruang obrolan mengandung kata-kata yang tidak pantas.</string>
+    <string name="chat_description_bad_words">Deskripsi ruang obrolan berisi kata-kata yang tidak pantas.</string>
+    <string name="chatpush_image">Gambar</string>
+    <string name="chat_leave_user">(Pengguna yang telah meninggalkan ruang obrolan)</string>
+    <string name="chat_group_create_fail">Anda tidak dapat membuat ruang obrolan untuk grup jika Idol Saya adalah idola individu.</string>
+    <string name="chat_unread_message">Pesan yang belum dibaca</string>
+    <string name="detect_auto_clicker">Kami telah mendeteksi aktivitas abnormal, sehingga iklan video tidak dapat diputar. Harap akses iklan video dengan cara biasa.</string>
+    <string name="signup_age_limit">Saya berusia 14 tahun atau lebih.</string>
+    <string name="signup_age_prohibited">Anda harus berusia 14 tahun ke atas untuk bergabung.</string>
+    <string name="rank_history_30_average" formatted="false">Jumlah Suara Rata-Rata %s Hari</string>
+    <string name="chat_room_leave_desc3">Ruang obrolan akan dihapus jika Anda memutuskan untuk keluar sekarang. Apakah Anda yakin ingin meninggalkan ruang obrolan?</string>
+    <string name="actor_main_set">Kategori HIDUP/MATI</string>
+    <string name="actor_main_category_set">Silakan pilih kategori yang ingin ditampilkan</string>
+    <string name="actor_male_singer">Penyanyi Pria</string>
+    <string name="actor_female_singer">Penyanyi Wanita</string>
+    <string name="necessarily_one_category">Anda harus memilih setidaknya satu kategori</string>
+    <string name="new_shop_heart">Toko Hati</string>
+    <string name="new_shop_package">Toko Paket</string>
+    <string name="new_shop_subscription">Berlangganan</string>
+    <string name="diamond">Berlian</string>
+    <string name="diamonds">Berlian</string>
+    <string name="new_shop_diamond">Toko Berlian</string>
+    <string name="ever_heart_short">Ever hearts</string>
+    <string name="daily_heart_short">Daily hearts</string>
+    <string name="support_see_ad_types">Lihat Penempatan Iklan</string>
+    <string name="support_ad_types">Penempatan Iklan</string>
+    <string name="auto_clicker_human_check_explain">Jawablah pertanyaan berikut untuk membuktikan bahwa Anda bukan robot.</string>
+    <string name="auto_clicker_human_check_fail">Maaf, Anda telah memberikan jawaban yang salah.\nKami yakin Anda menggunakan pengeklik otomatis.\nHarap akses iklan video dengan cara biasa.</string>
+    <string name="china_agreement_deny">Maaf.\nAnda tidak menerima Syarat dan Ketentuan kami.\nAnda tidak akan dapat menggunakan aplikasi.</string>
+    <string name="my_info_title">Profil saya</string>
+    <string name="my_info_info">Profil</string>
+    <string name="my_info_list">Catatan</string>
+    <string name="my_info_own_heart">Hati yang Anda Miliki</string>
+    <string name="my_info_own_diamond">Berlian yang Anda Miliki</string>
+    <string name="my_info_heart">hati</string>
+    <string name="more_faq">Apakah Anda membutuhkan bantuan lebih lanjut?</string>
+    <string name="chat_report_short">Harap berikan detail lebih lanjut (Setidaknya 10 karakter)</string>
+    <string name="support_ad_type_detail">Detail penempatan iklan</string>
+    <string name="video_ad_time_left">Waktu tersisa sebelum koleksi hati berikutnya tersedia</string>
+    <string name="quiz_duplicated_answer">Anda telah mengirimkan jawaban yang sama berulang kali. Harap ubah dan kirimkan lagi.</string>
+    <string name="quiz_review_more">Lanjutkan meninjau lebih banyak pertanyaan?</string>
+    <string name="miracle_month">Keajaiban Bulan Ini</string>
+    <string name="record_room">Ruang Rekam</string>
+    <string name="charity_angel_count">Jumlah gelar Malaikat Amal</string>
+    <string name="charity_fairy_count">Jumlah gelar Peri Amal</string>
+    <string name="miracle_month_count">Jumlah judul Miracle of the Month</string>
+    <string name="search_hot_trend">Tren Panas</string>
+    <string name="search_history">Sejarah pencarian</string>
+    <string name="search_recommended">Direkomendasikan untukmu</string>
+    <string name="report_comment">Untuk mencegah penyalahgunaan fungsi laporan, %1$s hati akan digunakan saat mengajukan laporan.\nApakah Anda ingin melaporkan komentar ini?</string>
+    <string name="lunar_birthday">Kalender lunar</string>
+    <string name="comment_report_error_2501">Anda telah melaporkan komentar ini.</string>
+    <string name="emoji">emoji</string>
+    <string name="emoji_content">(Emoji)</string>
+    <string name="chat_push_emoticon">emotikon</string>
+    <string name="msg_daily_pack_cancel">Saat ini Anda telah berlangganan Paket Harian kami.\nJika Anda tidak berhenti berlangganan, langganan bulanan akan dikenakan biaya.\nJika Anda ingin membatalkan langganan, tekan %1$s</string>
+    <string name="withdraw">Menarik</string>
+    <string name="cancel_subscription">Batalkan langganan</string>
+    <string name="order_by_get_heart">Urutan hati</string>
+    <string name="themepick">Pilihan Bertema</string>
+    <string name="imagepick">Pilihan Gambar</string>
+    <string name="themepick_confirm_vote" formatted="false">Apakah %s opsi yang ingin Anda pilih?</string>
+    <string name="themepick_first_reward" formatted="false">Hadiah untuk No. 1\n%s</string>
+    <string name="themepick_total_votes">Jumlah suara</string>
+    <string name="photo_access_denied_icloud">Tidak dapat mengakses gambar asli. Silakan periksa apakah Anda memiliki gambar asli.</string>
+    <string name="menu_live">PLAY</string>
+    <string name="live_auto">Mobil</string>
+    <string name="live_open" formatted="false">%s BUKA!</string>
+    <string name="live_coming_soon">Segera hadir.\nMohon tunggu.</string>
+    <string name="live_coming_soon_list">Segera akan datang</string>
+    <string name="live_level_limit" formatted="false">Maaf.\nHanya pengguna di level %d atau lebih yang dapat mengakses video ini.</string>
+    <string name="live_end">Streaming langsung ini telah berakhir.</string>
+    <string name="live_disclaimer">- Ini menunjukkan ▶️ Tampilan, ❤️ Suka, 👁 Hitungan Tampilan Serentak Waktu Nyata dan 📈 Jumlah Tampilan Serentak Puncak.\n- Ketersediaan streaming langsung tergantung pada level pengguna.\n- Anda dapat diubah oleh operator Anda saat menggunakan data seluler.</string>
+    <string name="live_empty">Belum ada streaming terjadwal</string>
+    <string name="live_stalled">Streaming adalah buffering</string>
+    <string name="live_quality">Kualitas video</string>
+    <string name="live_share_title" formatted="false">#CHOEAEDOL #CHOEAEDOL_PLAY\n\n%s\n\nTonton sekarang di CHOEAEDOL PLAY\n</string>
+    <string name="themepick_already_vote">Anda telah memilih hari ini.</string>
+    <string name="current_ranking">Peringkat Langsung</string>
+    <string name="vote_themepick_finished" formatted="false">Anda telah memilih %s.\n\n%s suara dari posisi pertama.\n%s dengan teman-teman Anda dan berjuang untuk posisi pertama!</string>
+    <string name="vote_themepick_finished_first" formatted="false">Anda telah memilih %s.\n\n%s ini dengan teman-teman Anda!</string>
+    <string name="share_themepick" formatted="false">#CHOEAEDOL #ThemedPick\n\n%s\nPeringkat %s %s\n%s %s\n%s %s\n\nDetail selengkapnya tentang Aplikasi CHOEAEDOL\n%s</string>
+    <string name="share_in_progress_support" formatted="false">#CHOEAEDOL #SupportEvent #SupportAds #%s %s\n\n\"%s\" acara dukungan sedang berlangsung\n%s Datang dan bergabunglah dengan ini~\n%s</string>
+    <string name="share_success_support" formatted="false">#CHOEAEDOL #SupportEvent #SupportAds #%s %s\n\n \" %s \" acara dukungannya SUKSES!\n%s Lihat fotonya\n%s</string>
+    <string name="share_friend_invite" formatted="false">[Undangan CHOEAEDOL💌]\n#%s Peringkat Saat Ini: #%d\nIkuti saya dalam pemungutan suara untuk #%s %s!\n\nMasukkan kode undangan saat mendaftar dan dapatkan Hati!\nKode Undangan: %s\n\n#KPOP #NO1_APP #CHOEAEDOL\n%s</string>
+    <string name="share_friend_invite_nomost" formatted="false">[Undangan CHOEAEDOL💌]\nAyo vote dan fangirl/fanboy bareng!\nMasukkan kode undangan saat mendaftar dan dapatkan Hati!\nKode Undangan: %s\n\nSaat ini di posisi ke-2: #%s %s\n\nPenasaran siapa yang No. 1?\nLihat di #CHOEAEDOL\n%s</string>
+    <string name="award_realtime_rank"></string>
+    <string name="award_accumulate_rank"></string>
+    <string name="award_final_result" formatted="false">Hasil akhir\n%s\n%s %s</string>
+    <string name="share_themepick_celeb" formatted="false">#CHOEAEDOL_Celeb #ThemedPick\n\n%s\nPeringkat %s %s\n%s %s\n%s %s\n\nRincian lebih lanjut tentang Aplikasi CHOEAEDOL Celeb\n%s</string>
+    <string name="share_in_progress_support_celeb" formatted="false">#CHOEAEDOL_Celeb #SupportEvent #SupportAds #%s %s\n\n\" %s \" acara dukungan sedang berlangsung\n%s Datang dan bergabunglah dengan ini~\n%s</string>
+    <string name="share_success_support_celeb" formatted="false">#CHOEAEDOL_Celeb #SupportEvent #SupportAds #%s %s\n\n\" %s \" acara dukungannya SUKSES!\n%s Lihat fotonya\n%s</string>
+    <string name="share_friend_invite_celeb" formatted="false">[Undangan Selebriti CHOEAEDOL💌]\n#%s Peringkat Saat Ini: #%d\nIkuti saya dalam pemungutan suara untuk #%s %s!\n\nMasukkan kode undangan: saat mendaftar dan dapatkan Hati!\nKode Undangan: %s\n\nRuang fandom Anda untuk terhubung #SelebCHOEAEDOL\n%s</string>
+    <string name="share_friend_invite_nomost_celeb" formatted="false">[Undangan Selebriti CHOEAEDOL💌]\nAyo vote dan fangirl/fanboy bareng!\nMasukkan kode undangan: saat mendaftar dan dapatkan Hati!\nKode Undangan: %s\n\nSaat ini di posisi ke-2: #%s %s\n\nPenasaran siapa yang No. 1?\nLihat di #CHOEAEDOLCeleb\n%s</string>
+    <string name="live_actionbar_title">CHOEAEDOL PLAY</string>
+    <string name="live_chat">Obrolan Langsung</string>
+    <string name="live_share_title_celeb" formatted="false">#CHOEAEDOL_Celeb #CHOEAEDOLPLAY\n\n%s\n\nTonton sekarang di CHOEAEDOL PLAY\n</string>
+    <string name="themepick_today_voted">Terpilih</string>
+    <string name="block">Memblokir</string>
+    <string name="unblock">Buka blokir</string>
+    <string name="block_question">Apakah Anda yakin ingin memblokir pengguna ini?</string>
+    <string name="user_blocked">Pengguna yang diblokir</string>
+    <string name="themepick_additional_vote">Apakah Anda ingin memilih lagi menggunakan 1 berlian?</string>
+    <string name="themepick_candidate_vote">Silakan pilih kandidat dan pilih</string>
+    <string name="user_blocked2">Pengguna yang Diblokir</string>
+    <string name="share_image_pick" formatted="false">#CHOEAEDOL #ImagePick\n\n%s\nPeringkat %s %s\n%s %s\n%s %s\n\nDetail selengkapnya tentang Aplikasi CHOEAEDOL\n%s</string>
+    <string name="share_image_pick_celeb" formatted="false">#CHOEAEDOL_Celeb #ImagePick\n\n%s\nPeringkat %s %s\n%s %s\n%s %s\n\nDetail selengkapnya tentang Aplikasi CHOEAEDOL\n%s</string>
+    <string name="no_blocked_users">Tidak ada pengguna yang diblokir.</string>
+    <string name="report_description">Silakan tulis alasan Anda melaporkan pengguna tersebut.</string>
+    <string name="msg_nickname_coupon">Anda memiliki kupon perubahan nama panggilan. Apakah Anda ingin menggunakan kupon?</string>
+    <string name="msg_nickname_changed">Nama panggilan Anda telah diubah.</string>
+    <string name="no_search_result_community">Tulis posting pertama!</string>
+    <string name="surprise_dia">Berlian Kejutan</string>
+    <string name="quiz_daily_posting_limit">Anda telah menulis pertanyaan sebanyak yang Anda bisa. Silakan coba lagi besok.</string>
+    <string name="quiz_in_screening">Kuis dalam pemutaran</string>
+    <string name="quiz_denied">Kuis Ditolak</string>
+    <string name="quiz_no_approved">Tidak ada kuis yang disetujui.</string>
+    <string name="quiz_no_in_screening">Tidak ada kuis dalam pemutaran.</string>
+    <string name="quiz_no_denied">Tidak ada kuis yang ditolak.</string>
+    <string name="quiz_tutorial_get_heart">Dapatkan Hadiah Hati untuk kuis yang disetujui!</string>
+    <string name="quiz_deny_reason_title">Mengapa kuis ditolak?</string>
+    <string name="quiz_deny_reason_desc">- Ketika Anda memberi tahu jawaban yang benar dengan karakter atau emoji khusus\n- Ketika siapa pun dapat memilih jawaban yang benar tanpa membaca pertanyaan\n- Ketika jawaban yang benar dapat diubah seiring waktu\n- Ketika foto sulit dikenali\n- Kapan ada salah ketik\n- Ketika Anda mengatur jawaban yang salah ke jawaban yang benar\n- Ketika penjelasannya tidak cukup\n- Ketika Anda mengatur idola salah</string>
+    <string name="quiz_review">Ulasan kuis</string>
+    <string name="quiz_finish_today_review">Terima kasih telah meninjau.\nSilakan tinjau kuis baru besok.</string>
+    <string name="quiz_nothing_review">Tidak ada kuis untuk ditinjau.</string>
+    <string name="quiz_ask_finish_review">Apakah Anda yakin ingin berhenti? Anda akan kehilangan kesempatan untuk meninjau.</string>
+    <string name="quiz_start_short">Mulai</string>
+    <string name="quiz_already_report_review">Anda telah melaporkan kuis ini.</string>
+    <string name="another_account_daily_purchase">Anda gagal memulihkan pembelian. Silakan periksa apakah Anda berlangganan Paket Harian di akun lain.</string>
+    <string name="already_daily_purchase">Anda gagal memulihkan pembelian. Anda sudah berlangganan Paket Harian dengan akun ini.</string>
+    <string name="welcome_pack_title">Trousse de bienvenue</string>
+    <string name="welcome_pack_desc">Grande vente - une seule fois!</string>
+    <string name="attendance_check">Pemeriksaan Kehadiran</string>
+    <string name="attendance_days_start" formatted="false">Dari %s</string>
+    <string name="attendance_days_consecutive">Garis hari</string>
+    <string name="attendance_consecutive_heart_reward">%1$s hari beruntun! - Anda punya %2$s Hati.</string>
+    <string name="attendance_consecutive_dia_reward">%1$s hari beruntun! - Anda punya %2$s Berlian.</string>
+    <string name="attendance_consecutive_both_reward">%1$s hari beruntun! - Kamu punya %2$s Hati dan %3$s Berlian.</string>
+    <string name="attendance_available_account_title">Anda bisa mendapatkan prangko hanya dengan satu akun.</string>
+    <string name="attendance_available_account_subtitle" formatted="false">Apakah Anda ingin mendapatkan stempel dengan %s?</string>
+    <string name="go_to_attendance">Pergi dan dapatkan stempel</string>
+    <string name="update">Memperbarui</string>
+    <string name="attendance_with" formatted="false">Sejak kamu bertemu %s</string>
+    <string name="recent">terkini</string>
+    <string name="thirty_days">30 hari</string>
+    <string name="support_design_period">Menerima desain iklan</string>
+    <string name="solo">Solo</string>
+    <string name="solo_male">Solo Pria</string>
+    <string name="solo_female">Solo Wanita</string>
+    <string name="award_solo_realtime_example">Ini adalah contoh voting artis solo di CHOEAEDOL\ndan CHOEAEDOL Celeb yang tidak tergabung dalam grup.</string>
+    <string name="award_solo_realtime_info">Ini adalah peringkat real-time artis solo di CHOEAEDOL dan CHOEAEDOL Celeb yang tidak tergabung dalam grup.</string>
+    <string name="award_solo_aggregated_info">Ini adalah peringkat akumulatif artis solo di CHOEAEDOL dan CHOEAEDOL Celeb yang tidak tergabung dalam grup.</string>
+    <string name="award_solo_male_realtime">Peringkat Real-time\nArtis Solo Pria</string>
+    <string name="award_solo_female_realtime">Peringkat Real-time\nArtis Solo Wanita</string>
+    <string name="award_solo_male_aggregated">Peringkat Akumulatif\nArtis Solo Pria</string>
+    <string name="award_solo_female_aggregated">Peringkat Akumulatif\nArtis Solo Wanita</string>
+    <string name="award_solo_male_final" formatted="false">%s\nHasil Akhir Penghargaan Popularitas Solo Pria</string>
+    <string name="award_solo_female_final" formatted="false">%s\nHasil Akhir Penghargaan Popularitas Solo Wanita</string>
+    <string name="award_current_guide">Pemenang akhir akan ditentukan berdasarkan total akumulasi skor.</string>
+    <string name="group_male">Pria Grup</string>
+    <string name="group_female">Wanita Grup</string>
+    <string name="award_trot_male">Pria</string>
+    <string name="award_trot_female">Wanita</string>
+    <string name="award_trot_male_example">Ini adalah contoh voting artis solo pria di CHOEAEDOL dan CHOEAEDOL Celeb.</string>
+    <string name="award_trot_female_example">Ini adalah contoh pemungutan suara.</string>
+    <string name="award_trot_male_realtime_info">Ini adalah peringkat waktu nyata.</string>
+    <string name="award_trot_female_realtime_info">Ini adalah peringkat waktu nyata.</string>
+    <string name="award_trot_male_aggregated_info">Ini adalah peringkat akumulatif.</string>
+    <string name="award_trot_female_aggregated_info">Ini adalah peringkat akumulatif.</string>
+    <string name="award_trot_male_realtime">Peringkat Real-time\nPenyanyi Trot Pria</string>
+    <string name="award_trot_female_realtime">Peringkat Real-time\nPenyanyi Trot Wanita</string>
+    <string name="award_trot_male_aggregated">Peringkat Akumulatif\nPenyanyi Trot Pria</string>
+    <string name="award_trot_female_aggregated">Peringkat Akumulatif\nPenyanyi Trot Wanita</string>
+    <string name="award_trot_male_final" formatted="false">%s\nPenyanyi Trot Pria Penghargaan Popularitas\nHasil Akhir</string>
+    <string name="award_trot_female_final" formatted="false">%s\nPenyanyi Trot Wanita Penghargaan Popularitas\nHasil Akhir</string>
+    <string name="award_trot_all_example">Ini adalah contoh pemungutan suara.</string>
+    <string name="award_trot_all_realtime_info">Ini adalah peringkat waktu nyata.</string>
+    <string name="award_trot_all_realtime">Peringkat Real-time\nPenyanyi Trot</string>
+    <string name="award_trot_all_aggregated_info">Ini adalah peringkat akumulatif.</string>
+    <string name="award_trot_all_aggregated">Peringkat Akumulatif\nPenyanyi Trot</string>
+    <string name="award_trot_all_final" formatted="false">%s\nHasil Akhir\nPenghargaan Popularitas Penyanyi Trot</string>
+    <string name="today">Hari ini</string>
+    <string name="earlier">Lebih awal</string>
+    <string name="entrance_qrcode">Kode QR tiket</string>
+    <string name="auth_completed">Selesai! Terima kasih.</string>
+    <string name="win_awards_ticket">Anda telah memenangkan tiketnya!</string>
+    <string name="already_set_stamp">Anda sudah mendapatkan stempelnya. Coba lagi besok.</string>
+    <string name="ad_intend_guide" formatted="false">Jika Anda menonton iklan video, Anda bisa mendapatkan %s Hati.</string>
+    <string name="ad_start">Awal</string>
+    <string name="skip">Melewati ></string>
+    <string name="extra_heart_received" formatted="false">Anda telah menerima %s Hati Ekstra.</string>
+    <string name="hda_2022">2022 K Global Heart Dream Awards</string>
+    <string name="face_photo_not_saving">- Foto yang diunggah tidak akan langsung disimpan dan dihapus.</string>
+    <string name="are_you_sure_dia">Apakah Anda yakin?</string>
+    <string name="onepick_confirm_exit2">Jika Anda keluar sekarang, satu suara hilang. Apakah Anda yakin ingin keluar?</string>
+    <string name="miracle">Keajaiban</string>
+    <string name="cumulative_rankings">Peringkat Kumulatif</string>
+    <string name="miracle_aggregating_period">Waktu Tabulasi Suara</string>
+    <string name="unused_channels">Saluran yang Tidak Digunakan</string>
+    <string name="friends_delete_message">Apakah Anda ingin menghapus teman?</string>
+    <string name="essential">(penting)</string>
+    <string name="personal_agreement">Perjanjian Pengumpulan dan Penggunaan Informasi Pribadi</string>
+    <string name="msg_personal_information1" formatted="false">%s mengumpulkan informasi pribadi sebagai berikut untuk pendaftaran, Pertanyaan/CS, dan pemberitahuan.</string>
+    <string name="msg_personal_information2" formatted="false">Anda berhak untuk tidak setuju dengan penggunaan minimum pengumpulan informasi pribadi yang diperlukan untuk penggunaan %s, dan jika Anda menolak untuk memberikan persetujuan, layanan dapat dibatasi.</string>
+    <string name="id">PENGENAL</string>
+    <string name="recommender">Rekomendasi(kode undangan)</string>
+    <string name="pwd_combination">Kata sandi harus terdiri dari minimal 8 karakter karakter alfanumerik.</string>
+    <string name="agree_terms">Saya setuju untuk mengumpulkan dan menggunakan informasi pribadi.</string>
+    <string name="warning_report_lose_heart" formatted="false">Jika Anda melaporkan, %s hati akan dikurangi, dan Anda tidak dapat lagi melihat pos tersebut. Apakah Anda masih ingin melaporkannya?</string>
+    <string name="warning_report_hide_article">Jika Anda melaporkannya, Anda tidak akan dapat melihatnya lagi. Apakah Anda masih ingin melaporkannya?</string>
+    <string name="check_pwd_requirement">Harap penuhi persyaratan kata sandi.</string>
+    <string name="inquiry_category">Pilih Jenis Permintaan</string>
+    <string name="inquiry_how_to_use">Cara Penggunaan</string>
+    <string name="inquiry_report_bugs">Laporkan bug</string>
+    <string name="inquiry_purchase_subs">Beli/Berlangganan</string>
+    <string name="inquiry_proposal">Proposal ide</string>
+    <string name="inquiry_etc">Dll</string>
+    <string name="inquiry_send_files">Lampirkan file</string>
+    <string name="choose_inquiry_category">Silakan pilih jenis pertanyaan.</string>
+    <string name="inquiry_files">Lampirkan file</string>
+    <string name="delete_file_description">File terlampir akan dihapus setelah disimpan selama 30 hari sejak tanggal penyelidikan.</string>
+    <string name="msg_file_uploading">Mengunggah file. Coba beberapa saat lagi.</string>
+    <string name="msg_file_upload_failed">Pengunggahan file gagal. Silakan coba lagi.</string>
+    <string name="progressing_files">Memproses file</string>
+    <string name="msg_file_expired">Tidak dapat mengunduh karena telah dihapus.</string>
+    <string name="msg_invalid_file">Jenis file ini tidak didukung.</string>
+    <string name="photo">Foto</string>
+    <string name="video">Video</string>
+    <string name="desc_quiz_denied_cases_celeb">- Ketika Anda memberi tahu jawaban yang benar dengan karakter atau emoji khusus\n- Ketika siapa pun dapat memilih jawaban yang benar tanpa membaca pertanyaan\n- Ketika jawaban yang benar dapat diubah seiring waktu\n- Ketika foto sulit dikenali\n- Kapan ada salah ketik\n- Ketika Anda mengatur jawaban yang salah ke jawaban yang benar\n- Ketika penjelasannya tidak cukup</string>
+    <string name="s_league">S-Liga</string>
+    <string name="a_league">A-Liga</string>
+    <string name="will_be_updated" formatted="false">Ini akan diperbarui pada %s.</string>
+    <string name="capital_all">SEMUA</string>
+    <string name="quiz_deny_reason_desc_celeb">- Saat Anda memberi tahu jawaban yang benar dengan karakter khusus atau emoji\n- Saat siapa saja dapat memilih jawaban yang benar tanpa membaca pertanyaannya\n- Saat jawaban yang benar dapat diubah seiring berjalannya waktu\n- Saat foto sulit dikenali\n- Saat ada salah ketik- Bila Anda mengatur jawaban yang salah menjadi jawaban yang benar\n- Bila penjelasannya tidak cukup</string>
+    <string name="select_category_field">Pilih Kategori</string>
+    <string name="select_category_toast">Pilih Kategori.</string>
+    <string name="enter_title">Masukkan judul.</string>
+    <string name="enter_content">Masukkan konten.</string>
+    <string name="idol_board_article">Pos</string>
+    <string name="small_talk_empty">Belum ada postingan.\nPublikasikan postingan pertama!</string>
+    <string name="order_like">Populer</string>
+    <string name="order_hit">Melihat</string>
+    <string name="views" formatted="false">%s Tampilan</string>
+    <string name="format_recommend" formatted="false">%s Merekomendasikan</string>
+    <string name="format_comment" formatted="false">%s Komentar</string>
+    <string name="recommend">Menyarankan</string>
+    <string name="filter_all_language">Semua Bahasa</string>
+    <string name="filter_app_language">Bahasa Bawaan</string>
+    <string name="title_char_limit_placeholder" formatted="false">Judul (Maks. %shuruf)</string>
+    <string name="popup_request_auth_title">Minta persetujuan untuk tugas berikutnya di %1$s.</string>
+    <string name="agree_and_continue">Terima dan Lanjutkan</string>
+    <string name="reject">Menolak</string>
+    <string name="captured_qr_not_available">Tidak tersedia untuk menggunakan kode QR yang disimpan sebagai tangkapan layar.</string>
+    <string name="captured_qr_not_available_popup">Tangkapan layar telah terdeteksi. Tidak tersedia untuk menggunakan kode QR yang disimpan sebagai gambar.</string>
+    <string name="quiz_main_title2_celeb">Saya penggemar berat selebriti!</string>
+    <string name="show_qr_staff">Tunjukkan QR Code Anda kepada petugas tiket di loket tiket.</string>
+    <string name="seconds" formatted="false">%s</string>
+    <string name="remaining_time">Waktu tersisa</string>
+    <string name="male_4th_gen_idol">Generasi ke-4</string>
+    <string name="female_4th_gen_idol">Generasi ke-4</string>
+    <string name="hda_2023">2023 K Global Heart Dream Awards</string>
+    <string name="award_4th_gen_male_final" formatted="false">%s\nHasil Akhir Penghargaan Grup Pria Hot Icon Generasi ke-4</string>
+    <string name="award_4th_gen_female_final" formatted="false">%s\nHasil Akhir Penghargaan Grup Wanita Hot Icon Generasi ke-4</string>
+    <string name="award_4th_gen_male_aggregated">Peringkat Akumulatif Grup Pria Hot Icon Generasi ke-4</string>
+    <string name="award_4th_gen_female_aggregated">Peringkat Akumulatif Grup Wanita Hot Icon Generasi ke-4</string>
+    <string name="award_4th_gen_male_realtime">Peringkat Real-time dari Grup Pria Ikon Panas Generasi ke-4</string>
+    <string name="award_4th_gen_female_realtime">Peringkat Real-time dari Grup Wanita Hot Icon Generasi ke-4</string>
+    <string name="award_4th_gen_realtime_example">Ini adalah contoh pemungutan suara yang menggabungkan jumlah suara individu dan suara kelompok calon kelompok generasi ke-4.</string>
+    <string name="award_4th_gen_aggregated_info">Pemeringkatan akumulatif ini menggabungkan jumlah suara individu dan suara kelompok caleg generasi ke-4.</string>
+    <string name="award_4th_gen_realtime_info">Pemeringkatan real-time ini menggabungkan jumlah suara individu dan suara grup kandidat grup generasi ke-4.</string>
+    <string name="award_solo_final" formatted="false">%s\nHasil Akhir Penghargaan Popularitas Artis Solo</string>
+    <string name="quiz_celeb_unavailable_not_enough">Maaf. Jumlah kuis dalam kategori ini tidak cukup.\nSilakan pilih kategori lain.</string>
+    <string name="limited_photo_permission_desc">Tidak memiliki akses ke foto yang dipilih.\nIzinkan akses foto.</string>
+    <string name="set_photo_permission">Atur akses foto</string>
+    <string name="try_daily_stamp">Periksa Kehadiran</string>
+    <string name="daily_stamp_already_done" formatted="false">Hari %s - Kehadiran Lengkap</string>
+    <string name="stamp_and_get_hearts" formatted="false">Periksa Kehadiran dan Dapatkan %s Hati</string>
+    <string name="stamp_and_get_diamonds" formatted="false">Periksa Kehadiran dan Dapatkan %s DIA</string>
+    <string name="stamp_warning_subtitle">- Hati Tambahan adalah hati harian dan akan hilang setelah waktu penghitungan.\n- Kamu bisa mendapatkan Hot Time Heart mulai pukul 20:00 hingga 23:30 setiap hari.\n- Hati Tambahan direset pada waktu penghitungan setiap hari.\n- Kamu tidak bisa menerima Hati Tambahan selama waktu penghitungan.</string>
+    <string name="label_league_ended">Sistem liga individu telah berakhir.</string>
+    <string name="receive_more_heart_after_attendance">Dapatkan Lebih Banyak Hati</string>
+    <string name="receive_more_heart_after_video_ads" formatted="false">Tonton Iklan Video +%s Hati</string>
+    <string name="reward_daily_connection">Buka Hadiah CHOEAEDOL</string>
+    <string name="reward_daily_connection_celeb">Buka Hadiah CHOEAEDOL Celeb</string>
+    <string name="reward_sorry_heart">Bonus Hati</string>
+    <string name="reward_daily_pack">Paket Harian</string>
+    <string name="reward_level_heart">Hadiah Tingkat</string>
+    <string name="reward_buring_time">Hot time</string>
+    <string name="reward_post_article">Posting Hadiah</string>
+    <string name="reward_heartbox">Kotak Hati</string>
+    <string name="reward_attendance_heart" formatted="false">%s Hadiah Kehadiran Beruntun Harian Hati</string>
+    <string name="reward_attendance_diamond" formatted="false">%s Hadiah Kehadiran Beruntun Harian DIA</string>
+    <string name="receive">Menerima</string>
+    <string name="complete">Lengkap</string>
+    <string name="before_opening">mendatang</string>
+    <string name="attendance_heart_count_format" formatted="false">%s ♡</string>
+    <string name="dia_count_format" formatted="false">%s DIA</string>
+    <string name="more_hearts_section_title">Dapatkan Lebih Banyak Hati</string>
+    <string name="reward_quiz">Hadiah Kuis Hati</string>
+    <string name="reward_didnt_receive_quiz">Hadiah Kuis yang Belum Dibayar Hati</string>
+    <string name="reward_offerwall_heart" formatted="false">Dapatkan %s lebih banyak Hati</string>
+    <string name="reward_offerwall_diamond" formatted="false">Dapatkan %s lebih banyak DIA</string>
+    <string name="purchase_cancelled">Kami tidak dapat menyelesaikan pembelian Anda karena kesalahan sementara. Silakan coba lagi.</string>
+    <string name="purchase_refunded">Pembelian Anda dibatalkan dan dikembalikan dananya karena kesalahan sementara. Silakan coba lagi.</string>
+    <string name="purchase_pending">Pembayaran Anda tertunda. Barang Anda ditawarkan setelah pembayaran selesai.</string>
+    <string name="label_rank_daily_no_data">Peringkat Harian akan segera diperbarui.</string>
+    <string name="label_rank_daily_m_no_data">Belum ada data Peringkat Harian Bulanan.</string>
+    <string name="label_stats_highest_votes_no_data">Belum ada idola yang menerima Suara Hati. Silakan pilih idola Anda!</string>
+    <string name="label_stats_1st_place_no_data">Belum ada idola yang memenangkan posisi pertama. Silakan pilih idola Anda!</string>
+    <string name="actor_label_stats_highest_votes_no_data">Belum ada seleb yang menerima Suara Hati. Silakan pilih selebriti Anda!</string>
+    <string name="actor_label_stats_1st_place_no_data">Belum ada selebritis yang memenangkan posisi pertama. Silakan pilih selebriti Anda!</string>
+    <string name="label_award_aggregated_no_data">Peringkat Kumulatif akan dikumpulkan mulai besok.</string>
+    <string name="reward_videoad">Iklan Video Hati</string>
+    <string name="reward_adopted_quiz">Kuis Disetujui Hati</string>
+    <string name="reward_surprise_dia">Selamat! Kejutan DIA</string>
+    <string name="agree_all">Setuju dengan Semua Ketentuan</string>
+    <string name="required">Diperlukan</string>
+    <string name="reward_heartbox1000_sub">Beruntung! Anda telah memenangkan manfaat terbesar dari Heart Box!</string>
+    <string name="aw_yend2023_title">2023 BEST CHOICE By CHOEAEDOL</string>
+    <string name="aw_yend2023_result">Hasil Akhir</string>
+    <string name="award_realtime_status">Status peringkat masing-masing kandidat secara real-time.</string>
+    <string name="award_accumulate_status">Ini status peringkat kumulatif masing-masing kandidat.</string>
+    <string name="award_realtime_status_MDOL">Artis pria (Perorangan/Grup) yang merilis mini album atau album penuh antara 1 Januari hingga 19 November 2023</string>
+    <string name="award_realtime_status_FDOL">Artis wanita (Perorangan/Grup) yang merilis mini album atau album penuh antara 1 Januari hingga 19 November 2023</string>
+    <string name="award_realtime_status_NEW">Artis yang debut antara 1 Januari dan 19 November 2023</string>
+    <string name="award_realtime_status_IBD">Artis yang lahir di Tahun Naga (2000, 1988)</string>
+    <string name="award_realtime_status_MA">Semua aktor di peringkat utama</string>
+    <string name="award_realtime_status_FA">Semua aktris di peringkat utama</string>
+    <string name="award_realtime_status_MS">Semua artis pria di peringkat utama</string>
+    <string name="award_realtime_status_FS">Semua artis wanita di peringkat utama</string>
+    <string name="award_realtime_status_ENT">Semua penghibur di peringkat utama</string>
+    <string name="award_realtime_status_ABD">Artis yang lahir di Tahun Naga (2000, 1988, atau 1976).</string>
+    <string name="article_setting">Pengaturan Posting</string>
+    <string name="download_ban">Blokir Unduhan</string>
+    <string name="article_cancel_title">Batalkan Postingan</string>
+    <string name="article_cancel_msg">Postingan yang Anda tulis akan dihapus.</string>
+    <string name="over_maximum_video_duration">Hanya dapat memuat video dalam waktu 3 menit.</string>
+    <string name="uploading_thumb_error_msg">Gagal mengekstrak thumbnail.</string>
+    <string name="title_trim_video">Mengedit video</string>
+    <string name="desc_trim_video">Pindahkan kontrol ke bawah untuk mengedit video Anda.\n(60 detik atau kurang)</string>
+    <string name="all_videos">Semua Video</string>
+    <string name="all_images">Semua foto</string>
+    <string name="title_cancel_trim_video">Batalkan Pengeditan Video</string>
+    <string name="desc_cancel_trim_video">Jika Anda membatalkan pengeditan video, hasil edit Anda akan dihapus.</string>
+    <string name="article_post">Pos</string>
+    <string name="upload_in_progress">Sedang mengunggah postingan lain</string>
+    <string name="interstitial_ad_reward">Hadiah Iklan Bonus</string>
+    <string name="article_uploading">Mengunggah</string>
+    <string name="complete_article_upload">Pengunggahan Selesai!</string>
+    <string name="retry_article_upload">Coba Unggah lagi</string>
+    <string name="fail_article_upload">Gagal mengunggah</string>
+    <string name="main_image_tooltip">Hanya foto utama persegi yang akan diterapkan sebagai spanduk!</string>
+    <string name="main_image_icon_title">Utama</string>
+    <string name="label_image_option_gif">GIF</string>
+    <string name="attendance_transition">Mengunjungi</string>
+    <string name="stamp_already_done_and_retry">Anda sudah mengambil kehadiran hari ini!\nSilakan coba lagi besok.</string>
+    <string name="popup_burningtime_title">Waktu PANAS Sekarang!</string>
+    <string name="popup_burningtime_subtitle" formatted="false">Peluang mendapatkan %s Hati lebih banyak!</string>
+    <string name="popup_burningtime_button">Pergi untuk mendapatkan Hadiah Waktu PANAS</string>
+    <string name="show_background_only">Hanya Wallpaper</string>
+    <string name="background">kertas dinding</string>
+    <string name="order_by_like">Suka</string>
+    <string name="format_article_like" formatted="false">Suka %s</string>
+    <string name="retry_quiz">Coba lagi Kuis!</string>
+    <string name="video_ad_chance_solve_quiz">Anda akan memiliki satu kesempatan lagi untuk menyelesaikan kuis saat Anda menonton iklan video!</string>
+    <string name="title_result_face_detect">Hasil Pertandingan Wajah Idola</string>
+    <string name="title_retry">Mencoba kembali</string>
+    <string name="quiz_retry_ad_done">Selesai menonton iklan video!\nIkuti kuisnya sekali lagi!</string>
+    <string name="continue_quiz">Melanjutkan</string>
+    <string name="quit">Berhenti</string>
+    <string name="quiz_continue_ad_done">Selesai menonton video iklan!\nLanjutkan dengan kuis</string>
+    <string name="title_quit_quiz_popup">Berhenti</string>
+    <string name="desc_quit_quiz_popup">Tonton iklan video pendek untuk melanjutkan kuis!\nApakah Anda yakin ingin berhenti?</string>
+    <string name="desc_quit_quiz">Tonton iklan video pendek untuk melanjutkan kuis!</string>
+    <string name="msg_confirm_burning_day">Apakah Anda ingin menjadikannya sebagai All-In Day?\nDIA tidak dapat dikembalikan setelah pendaftaran.</string>
+    <string name="chatroom_enter_warning_msg">Perilaku tidak sehat seperti fitnah, kata-kata kotor, kata-kata kotor, dan iklan akan dikenakan sanksi berdasarkan kebijakan operasional,\n
+ dan kerusakan dapat terjadi, jadi mohon jangan mengungkapkan informasi pembayaran dan informasi pribadi Anda kepada orang lain.</string>
+    <string name="desc_skip_ad_to_retry_quiz">Silakan tonton iklannya untuk mencoba kembali kuisnya!</string>
+    <string name="desc_skip_ad_to_continue_quiz">Silakan tonton iklannya untuk melanjutkan kuis!</string>
+    <string name="msg_empty_background_image">Belum punya gambar wallpaper!\nCoba unggah gambar dengan rasio 3:5 atau lebih tinggi.</string>
+    <string name="heartpick">Heart Pick</string>
+    <string name="vote_finish">Pemungutan Suara Berakhir</string>
+    <string name="finish_at" formatted="false">Sampai %s</string>
+    <string name="finish">KELUAR</string>
+    <string name="finish_popup_title" formatted="false">%s Hati Harian tersisa.</string>
+    <string name="result_heartpick">Hasil Heart Pick</string>
+    <string name="cheering_comments">Komentar</string>
+    <string name="view_number_of_comments" formatted="false">Lihat %s komentar</string>
+    <string name="first_rank_reward">Hadiah untuk No. 1</string>
+    <string name="finish_popup_subtitle" formatted="false">Apakah Anda ingin keluar dari %s?</string>
+    <string name="popup_title_heartpick">Apa itu Heart Pick?</string>
+    <string name="msg_heartpick_vote_result" formatted="false">%s Hati telah dipilih.\nBagikan ini dengan temanmu!</string>
+    <string name="heartpick_share_msg" formatted="false">💖Pilihan Saya! Heart Pick💖\n%s\n[#%s #HeartPick Ranking]\n\n%s %s\n%s %s\n%s %s\n\nBerikan hadiah spesial untuk biasmu💖</string>
+    <string name="heartpick_tooltip_msg">%2$s suara lagi dari #%1$s!</string>
+    <string name="most_in_picks_banner_msg" formatted="false">Dukung bias saya di %s!</string>
+    <string name="popup_title_themepick">Apa itu Pilihan Bertema?</string>
+    <string name="popup_title_imagepick">Apa itu Pilihan Gambar?</string>
+    <string name="btn_complete_trim_video">Berikutnya</string>
+    <string name="btn_view_post">Melihat</string>
+    <string name="themepick_celeb">Themed Pick</string>
+    <string name="popup_title_themepick_celeb">Apa itu Themed Pick?</string>
+    <string name="daily_ad_exceeded_title">Itu saja untuk hari ini!</string>
+    <string name="daily_ad_exceeded_subtitle_idol">Anda telah mengumpulkan hati untuk idola Anda!</string>
+    <string name="daily_ad_exceeded_subtitle_celeb">Anda telah mengumpulkan hati untuk selebritis Anda!</string>
+    <string name="daily_ad_exceeded_desc">Tolong dukung idola Anda dengan lebih banyak cinta besok.\n\n*Anda dapat menonton iklan videonya lagi setelah suara dihitung hari ini.</string>
+    <string name="btn_more_video_ad">Lihat lebih banyak iklan</string>
+    <string name="miracle_share_msg">[Keajaiban Bulan Ini🎂]\n#%2$s saat ini berada di #%3$s dalam peringkat kumulatif!\n\nPemungutan suara ulang tahun bulan ini sedang berlangsung!\nPilih biasmu dan berikan iklan ulang tahun pada biasmu💖\n\nDukung #Idola Kpop di #CHOEAEDOL</string>
+    <string name="miracle_n_share_msg">[Keajaiban Bulan Ini🎂]\nPeringkat kumulatif saat ini\n\n%2$s #%3$s\n%4$s #%5$s\n%6$s #%7$s\n\nBerikan hadiah ulang tahun spesial kepada idolaku di CHOEAEDOL!💖\n\nDukung #Idola Kpop di #CHOEAEDOL</string>
+    <string name="face_share_msg">#Idol Face Match #CHOEAEDOL\n
+Idola mana yang mirip denganku?\n
+Lihat di CHOEAEDOL sekarang!</string>
+    <string name="community_share_msg">%2$s Lihat postingannya!\n\n
+Dukung #Idola Kpop di #CHOEAEDOL</string>
+    <string name="community_d_share_msg">%2$s Lihat postingan tentang biasmu!\n\n
+Dukung #Idola Kpop di #CHOEAEDOL</string>
+    <string name="freeboard_share_msg">Siapa idola #Kpop favoritmu?😳\n\n
+
+Mari bicarakan tentang bias Anda terhadap #CHOEAEDOL!</string>
+    <string name="qna_share_msg">Tanyakan kepada penggemar lain tentang #Kpop dan biasmu!🥹\n
+Bagikan informasi tentang idola Anda di #CHOEAEDOL</string>
+    <string name="celeb_miracle_share_msg">🎂Keajaiban Bulan Ini\n\n#CHOEAEDOL_CELEB\n#%2$s saat ini berada di #%3$s dalam peringkat kumulatif!\n\nPemungutan suara ulang tahun bulan ini sedang berlangsung! Kado ulang tahun spesial untuk biasku💜</string>
+    <string name="celeb_miracle_n_share_msg">🎂Keajaiban Bulan Ini\n\n[#CHOEAEDOL_CELEB Peringkat kumulatif saat ini]\n%2$s #%3$s\n%4$s #%5$s\n%6$s #%7$s\n\nPemungutan suara ulang tahun bulan ini sedang berlangsung ! Kado ulang tahun spesial untuk biasku💜</string>
+    <string name="celeb_community_share_msg">%2$s Kunjungi komunitas global!\n\n
+%3$s Dukung bias Anda pada #CHOEAEDOL_CELEB</string>
+    <string name="celeb_community_d_share_msg">#%2$s Bicara bebas dengan penggemar lain tentang selebriti favoritmu!\n\n
+%3$s Dukung bias Anda pada #CHOEAEDOL_CELEB</string>
+    <string name="celeb_freeboard_share_msg">#CHOEAEDOL_CELEB Papan Gratis\n\n
+
+Bicaralah secara bebas dengan penggemar lain tentang aktor dan selebriti favorit Anda!</string>
+    <string name="celeb_qna_share_msg">Pertanyaan tentang #K-Celeb? Tanyakan kepada penggemar lain segala hal tentang selebritis Anda!\n\n
+Bagikan informasi tentang selebritis Anda di #CHOEAEDOL_CELEB</string>
+    <string name="top_toggle_male">M</string>
+    <string name="top_toggle_female">F</string>
+    <string name="rookie_month_title">Pemula CHOEAEDOL</string>
+    <string name="super_rookie_history_tab">Pemula Super</string>
+    <string name="title_rookie_month">Apa itu Pemula CHOEAEDOL?</string>
+    <string name="record_super_rookie">Daftar semua idola yang telah mencapai Super Rookie</string>
+    <string name="record_super_rookie_info_title">Apa itu Pemula Super?</string>
+    <string name="record_super_rookie_info_body">Idola grup dan solo yang telah menjadi Rookie CHOEAEDOL sebanyak tiga kali. Rookie Super menerima penghargaan yang lebih baik dan lulus sebagai Rookie.</string>
+    <string name="record_rookie_month_default">Belum ada idola yang meraih Rookie of the Month.\nPilih hati untuk Idolmu dan jadikan Idolmu sebagai Rookie of the Month pertama!</string>
+    <string name="record_super_rookie_default">Belum ada idola yang mencapai Super Rookie.\nPilih hati untuk Idol Anda dan jadikan Idol Anda Super Rookie pertama</string>
+    <string name="record_super_rookie_number" formatted="false">%s</string>
+    <string name="rookie">Calon</string>
+    <string name="title_miracle_month">Apa Keajaiban Bulan Ini?</string>
+    <string name="community_main_share_msg">Kunjungi komunitas global #%1$s untuk mendukung idola Anda!\n\n
+
+Dukung #Idola Kpop di #CHOEAEDOL</string>
+    <string name="celeb_community_main_share_msg">Kunjungi komunitas global #%1$s untuk mendukung idola Anda!\n\n
+
+Dukung Aktor &amp; Selebriti Korea di #CHOEAEDOL_CELEB</string>
+    <string name="rookie_share_msg">Dukung #Kpop #Rookie_Idol di #CHOEAEDOL!\n\n
+[Pemula CHOEAEDOL👼🏻]\n
+Tempat pertama kumulatif saat ini adalah #%2$s !\n\n
+
+Berikan hadiah spesial untuk idola saya di CHOEAEDOL!💖</string>
+    <string name="banner_go_myidol_title">Buka peringkat idola saya</string>
+    <string name="banner_go_myidol_btn">PERGI!</string>
+    <string name="purchase_loading_title">Pembayaran sedang berlangsung</string>
+    <string name="purchase_loading_msg">Jika Anda meninggalkan halaman tersebut, itu mungkin merupakan pembelian duplikat.</string>
+    <string name="filter_actor">Aktor</string>
+    <string name="setting_haptic">Umpan Balik Haptik</string>
+    <string name="date_deadline">Tenggat waktu</string>
+    <string name="adtype_korean">Iklan nasional Korea Selatan</string>
+    <string name="adtype_global">🌎Iklan global</string>
+    <string name="adtype_mobile">📱Iklan seluler</string>
+    <string name="veiw_support_location">Periksa lokasi</string>
+    <string name="popup_diavote_title">Dukungan Berlian selesai</string>
+    <string name="popup_diavote_desc" formatted="false">%sDIA telah didukung.\nKumpulkan teman-teman Anda dan wujudkan!</string>
+    <string name="sort_by_achievement">Tingkat pencapaian</string>
+    <string name="tab_support_detail">detail</string>
+    <string name="adtype_icon_korean">🇰🇷</string>
+    <string name="adtype_icon_global">🌎</string>
+    <string name="adtype_icon_mobile">📱</string>
+    <string name="menu_sub_board">Komunitas bicara bebas</string>
+    <string name="menu_sub_store">Beli hati dan berlian</string>
+    <string name="menu_sub_notice">Pemberitahuan penting</string>
+    <string name="menu_sub_record">Rekor Prestasi Idola</string>
+    <string name="menu_sub_quiz">Dapatkan hingga 500 hati</string>
+    <string name="menu_sub_face_matching">Idola mana yang mirip denganku</string>
+    <string name="welcome_mission_desc">Anda akan menerima hadiah setiap kali misi selesai!\nJika Anda menyelesaikan semua misi, kami akan memberi Anda hadiah yang lebih besar.</string>
+    <string name="welcome_mission_sign_up_title">Mendaftar</string>
+    <string name="welcome_mission_sign_up_desc">Selamat datang! Anda dapat menyelesaikan misinya!</string>
+    <string name="welcome_mission_set_most_title">Pilih idola</string>
+    <string name="welcome_mission_set_most_desc">Pergi dan pilih idola saya</string>
+    <string name="welcome_mission_vote_title">Memilih</string>
+    <string name="welcome_mission_vote_desc">Kirim hati ke idola Anda</string>
+    <string name="welcome_mission_community_title">Tulis postingan di komunitas</string>
+    <string name="welcome_mission_community_desc">Berkomunikasi dengan teman yang memiliki idola yang sama</string>
+    <string name="welcome_mission_video_ad_title">Tonton Iklan Video</string>
+    <string name="welcome_mission_video_ad_desc">Lihat Iklan dan kumpulkan hati</string>
+    <string name="go">Pergi</string>
+    <string name="welcome_mission_add_friend_title">Tambahkan teman</string>
+    <string name="welcome_mission_add_friend_desc">Dapatkan lebih banyak teman untuk mengumpulkan hati bersama</string>
+    <string name="welcome_mission_complete">Misi selesai</string>
+    <string name="impossible_write_message">Pengaturan idola diperlukan</string>
+    <string name="impossible_all_clear">Anda bisa mendapatkannya setelah Anda menyelesaikan semua misi</string>
+    <string name="retry_all_clear">Hadiah Anda telah dibayarkan</string>
+    <string name="welcome_mission_all_clear_reward_title">Hadiah untuk misi</string>
+    <string name="welcome_mission_title">Misi Selamat Datang 💝</string>
+    <string name="hof_cumulative_tab">30 hari</string>
+    <string name="hof_daily_tab">Sehari-hari</string>
+    <string name="celeb_welcome_mission_set_most_title">Pilih selebriti</string>
+    <string name="celeb_welcome_mission_set_most_desc">Pergi dan pilih selebritisku</string>
+    <string name="celeb_welcome_mission_vote_desc">Kirimkan hati ke selebriti Anda</string>
+    <string name="celeb_welcome_mission_community_desc">Berkomunikasi dengan teman-teman yang memiliki seleb yang sama</string>
+    <string name="celeb_impossible_write_message">Pengaturan selebriti diperlukan</string>
+    <string name="share_awards_ready" formatted="false">[%s]\n🚀 Voting akan segera dimulai di CHOEAEDOL! 🏆\nBersiaplah untuk bersorak agar favoritmu mendapat tempat pertama!\n⏰ Pemungutan suara dimulai: %s(KST)\n\n#최애돌 #CHOEAEDOL</string>
+    <string name="share_awards_run" formatted="false">[%s]\n🔥 Voting sengit sedang berlangsung untuk CHOEAEDOL 🗳️\nDukung favoritmu dengan hati sekarang!💖\n\n#최애돌 #CHOEAEDOL</string>
+    <string name="share_awards_result" formatted="false">[%s]\n🏆 Siapa yang akan menjadi pemenang kemenangan?! 🫣\nLihat di CHOEAEDOL sekarang!\n\n#최애돌 #CHOEAEDOL</string>
+    <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 Voting akan segera dimulai di CHOEAEDOL Celeb! 🏆\nBersiaplah untuk bersorak agar favoritmu mendapat tempat pertama!\n⏰ Pemungutan suara dimulai: %s\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
+    <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 Voting sengit sedang berlangsung untuk CHOEAEDOL Celeb 🗳️\nDukung favoritmu dengan hati sekarang! 💖\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
+    <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 Siapa yang akan menjadi pemenang kemenangan?! 🫣\nLihat di CHOEAEDOL Celeb sekarang!\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
+    <string name="login_desc">Mulailah dalam 5 detik!</string>
+    <string name="login_email">mulai dengan email</string>
+    <string name="hometab_title_rank">Ranking</string>
+    <string name="hometab_title_myidol">My Idol</string>
+    <string name="hometab_title_profile">Profile</string>
+    <string name="hometab_title_freeboard">Free Talk</string>
+    <string name="hometab_title_menu">Menu</string>
+    <string name="hometab_title_myceleb">My Celeb</string>
+    <string name="hometab_title_miracle">Miracle</string>
+    <string name="hometab_title_onepick">One Pick</string>
+    <string name="hometab_title_hof">Hall of Fame</string>
+    <string name="vote_certificate_popup_button">Periksa Sertifikat</string>
+    <string name="certificate_title">Sertifikat Pemilu</string>
+    <string name="certificate_menu_desc">Lihat sertifikat hari ini</string>
+    <string name="certificate_none">Anda tidak memiliki sertifikat apa pun hari ini🥲\nPilih idola saya dan periksa sertifikatnya!</string>
+    <string name="certificate_none_button">Pergi untuk memilih</string>
+    <string name="certificate_info_title">Apa itu Sertifikat Pemilu?</string>
+    <string name="certificate_info_desc">◇ Sertifikat akan dibuat jika Anda memilih lebih dari 100❤️\n◇ Sertifikat akan disimpan hingga akhir hari pemungutan suara\n◇ Kriteria tingkat sertifikasi\n\t- Perunggu: 100❤️\n\t- Perak: 1.000❤️\n\t- Emas: 10.000❤️\n\t- Platinum: 100.000❤️</string>
+    <string name="certificate_detail_title">Detail Sertifikat Pemungutan Suara</string>
+    <string name="certificate_detail_info">*Sertifikat hari ini dapat dilihat kembali di [Menu > Sertifikat Pemungutan Suara]</string>
+    <string name="certificate_username">Nama pemilih</string>
+    <string name="certificate_heart">Hati yang Dipilih</string>
+    <string name="certificate_time">Tanggal pemungutan suara</string>
+    <string name="certificate_detail_save">Simpan gambar</string>
+    <string name="certificate_detail_share">Membagikan</string>
+    <string name="certificate_detail_share_msg">Voting selesai hari ini💝\nAyo %1$s bersama!\n\n#%1$s #%2$s #Bukti Pemungutan Suara</string>
+    <string name="certificate_detail_save_fail">Gagal menyimpan gambar</string>
+    <string name="certificate_detail_save_succ">Gambar berhasil disimpan</string>
+    <string name="themepick_vote_again">Pilih lagi</string>
+    <string name="themepick_vote_with_ad">Pilih [AD]</string>
+    <string name="imagepick_vote_with_ad">Pilih lagi [AD]</string>
+    <string name="see_translate">Lihat terjemahan</string>
+    <string name="translating">Menerjemahkan...</string>
+    <string name="see_original">Lihat yang asli</string>
+    <string name="freeboard_hotposts">Postingan panas</string>
+    <string name="freeboard_search">Masukkan istilah pencarian Anda.</string>
+    <string name="see_translate_fail">Terjemahan gagal.</string>
+    <string name="see_translate_to_english">Translate bahasa inggris</string>
+    <string name="total_amount" formatted="false">Jumlah %s</string>
+    <string name="next_level_progress" formatted="false">Next level %s</string>
+    <string name="freeboard_empty">Belum ada postingan untuk ditampilkan🥲\nCoba posting sesuatu yang baru!</string>
+    <string name="my_info_heart_dia_detail">Lihat detailnya</string>
+    <string name="my_info_coupon_quantity">kupon saya</string>
+    <string name="video_image_picker_not_found">Pemilihan video dan gambar tidak didukung</string>
+    <string name="push_setting_guide_head">Waktu Dukjil</string>
+    <string name="push_setting_guide_body">Nyalakan notifikasi dan jangan pernah ketinggalan berita favorit Anda!</string>
+    <string name="setting_menu_push_likes">Suka</string>
+    <string name="setting_menu_push_hotposts">Postingan panas</string>
+    <string name="levelheart_bonus_yes">🎬 Tonton IKLAN</string>
+    <string name="freeboard_nobias_title">Kamu harus mengatur bias untuk melihatnya!</string>
+    <string name="freeboard_nobias_subtitle">Temukan biasmu di pencarian 🔍 di kanan atas!</string>
+    <string name="freeboard_nobias_subtitle_celeb">Temukan bias Anda di "Cari🔍" di bagian atas halaman utama!</string>
+    <string name="community_feed">Feed</string>
+    <string name="community_board">Fan Talk</string>
+    <string name="community_chat">Chat</string>
+    <string name="community_schedule">Jadwal</string>
+    <string name="community_board2" formatted="false">%s Talk</string>
+    <string name="post_detail">Detail Post</string>
+    <string name="vote_dday" formatted="false">Vote dalam D-%s</string>
+    <string name="vote_preview">Pratinjau Vote</string>
+    <string name="vote_alert_before">Pengingat Vote</string>
+    <string name="vote_alert_after">Notifikasi saat vote</string>
+    <string name="upcoming">Segera</string>
+    <string name="onepick_preview_title" formatted="false">Pratinjau %s</string>
+    <string name="alert_ready_vote">Pengingat diatur!\nNotifikasi saat vote</string>
+    <string name="alert_ready_videoad">Pengingat diatur!\nNotifikasi saat siap</string>
+    <string name="push_induct_head">Aktifkan notifikasi!</string>
+    <string name="push_induct_body">Notifikasi sistem mati\nMohon aktifkan</string>
+    <string name="push_induct_button">Ke pengaturan</string>
+    <string name="ios_att_title">Tekan "Izinkan" untuk bonus</string>
+    <string name="ios_att_title_agree">"Izinkan"</string>
+    <string name="ios_att_body_1">Jika setuju</string>
+    <string name="ios_att_body_2">Nonton iklan, dapat hati gratis</string>
+    <string name="ios_att_body_3">Iklan personal untukmu</string>
+    <string name="ios_att_outro">Bisa diubah kapan saja\n[Pengaturan > Privasi > Pelacakan ON/OFF]</string>
+    <string name="video_ad_timer_title">Memuat iklan</string>
+    <string name="video_ad_timer_body">Menyiapkan iklan bonus</string>
+    <string name="video_ad_timer_time">Sisa waktu</string>
+    <string name="video_ad_timer_bonus" formatted="false">Iklan berikutnya: bonus hingga %s❤️</string>
+    <string name="video_ad_timer_alert">Beri tahu jika siap?</string>
+    <string name="video_ad_timer_alert_done">Pengingat diatur</string>
+    <string name="reward_videoad_bonus">Bonus acak</string>
+    <string name="aos_web_image_save_title">Simpan gambar</string>
+    <string name="aos_web_image_save_body">Simpan gambar ini?</string>
+    <string name="aos_web_image_save_yes">Simpan</string>
+    <string name="share_heartpick_upcoming">💖Heart Pick Mendatang: Tunjukkan cintamu dengan hati💖\n[%1$s]\n🎁[%2$s]\nSiapa yang akan menjadi pemenang utama? 👀\n\n📌 Bersiaplah untuk memilih %3$s %4$s\n🔗%5$s</string>
+    <string name="share_themepick_upcoming">💖Themed Pick Mendatang: pertarungan harian yang sengit💖\n[%1$s]\n🎁[%2$s]\nJuara pertama adalah...?👀\n\n📌 Bersiaplah untuk memilih %3$s %4$s\n🔗%5$s</string>
+    <string name="share_onepick_upcoming_nobias">your bias</string>
+    <string name="ios_store_purchase_restricted_cn">Pembelian tidak tersedia dengan akun App Store Tiongkok Daratan.\n
+Silakan beralih ke negara atau wilayah lain dan coba lagi.</string>
+    <string name="title_daily_rank">Peringkat</string>
+    <string name="menu_minigame">Arcade Jantung</string>
+    <string name="popup_game_start_title">Mulai Permainan</string>
+    <string name="popup_game_start_desc" formatted="false">Dapatkan ❤️Ever Hearts yang sesuai dengan skor permainan Anda!\n\nAnda akan menggunakan %shearts untuk memulai permainan.\nMulai sekarang?</string>
+    <string name="reward_game_result">Hadiah Game</string>
+    <string name="menu_invite_friend">Undang Teman</string>
+    <string name="friend_tooltip_invite_friend">Dapatkan hingga 110.000 Hati!</string>
+    <string name="friend_bnr_invite_friend_title">Undang Teman\nDapatkan Hati</string>
+    <string name="invite_friend_detail_title">Undang Teman</string>
+    <string name="reward_invite_mission_bonus">Hadiah Bonus Misi Undangan Teman</string>
+    <string name="reward_invite_mission_completion">Hadiah Penyelesaian Misi Undangan Teman</string>
+    <string name="signup_desc2_noreward">Masukkan kode undangan dari teman yang merekomendasikan Anda untuk bertukar Hati sebagai teman.</string>
+    <string name="signup_toast_auto_fill_recommender">Kode undangan yang disalin telah dimasukkan secara otomatis.</string>
+</resources>

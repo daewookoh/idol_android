@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cl_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:paddingTop="40dp">
+
+    <net.ib.mn.view.ExodusImageView
+        android:id="@+id/favorite_photo"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/img_favorite_secretroom_profile" />
+
+    <LinearLayout
+        android:layout_width="match_parent"          
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"          
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp">
+
+        <TextView
+            android:id="@+id/tv_favorite_tag"
+            android:layout_width="wrap_content"      
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="5dp"
+            android:text="@string/most_favorite"
+            android:textColor="@color/main"          
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/favorite"
+            android:layout_width="wrap_content"      
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textColor="@color/text_default"  
+            android:textSize="14sp"
+            android:text="@string/none"/>
+
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
+
+        <include
+            android:id="@+id/search_bar"
+            layout="@layout/search_bar" />
+    </RelativeLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:descendantFocusability="blocksDescendants"
+        android:layout_marginTop="20dp">
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:divider="@color/gray110"
+            android:dividerHeight=".3dp"
+            android:listSelector="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:listitem="@layout/idol_search_item"/>
+
+        <TextView
+            android:id="@android:id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_horizontal"
+            android:hint="@string/no_search_result"
+            android:singleLine="true"
+            android:textColor="@color/text_gray"
+            android:textSize="13.5sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/helpTakeHeart"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_max="wrap"
+            app:layout_constraintWidth_percent="0.8"
+            android:layout_marginTop="45dp"
+            android:layout_marginEnd="50dp"
+            app:layout_constraintHorizontal_bias="1"
+            android:background="@drawable/bg_guide_end_top"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp"
+            android:focusable="true"
+            android:clickable="true"
+            android:textColor="@color/fix_white"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:text="@string/tooltip_select_my_favorite"
+            android:paddingStart="10dp"
+            android:paddingEnd="25dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/helpTakeHeart1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="115dp"
+            app:layout_constraintWidth_max="wrap"
+            app:layout_constraintWidth_percent="0.8"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintHorizontal_bias="1"
+            android:background="@drawable/bg_guide_end_top"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp"
+            android:textColor="@color/fix_white"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:focusable="true"
+            android:clickable="true"
+            android:text="@string/tooltip_select_my_love_idol"
+            android:paddingStart="10dp"
+            android:paddingEnd="25dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/helpTakeHeart2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_max="wrap"
+            app:layout_constraintWidth_percent="0.8"
+            android:layout_marginTop="45dp"
+            android:layout_marginEnd="15dp"
+            app:layout_constraintHorizontal_bias="1"
+            android:focusable="true"
+            android:clickable="true"
+            android:background="@drawable/bg_guide_end_top"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp"
+            android:textColor="@color/fix_white"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:text="@string/tooltip_select_my_love_idol"
+            android:paddingStart="10dp"
+            android:paddingEnd="25dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</LinearLayout>

@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data></data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_100"
+        android:layout_marginTop="10dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_live_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="7dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textAlignment="viewStart"
+            android:textColor="@color/text_default"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/tv_live_date"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_limit_level"
+            tools:text="제목 들어감. " />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_live_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="3dp"
+            tools:text="15분전"
+            android:textAlignment="viewStart"
+            android:textColor="@color/text_gray"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/iv_live_thumbnail"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_live_title" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_limit_level"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/bg_round_live_ing"
+            android:gravity="center"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:textColor="@color/text_white_black"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/live_badge"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/live_badge"
+            app:layout_constraintTop_toTopOf="@+id/live_badge"
+            app:layout_constraintVertical_bias="0.0"
+            tools:text="Lv.14" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/live_badge"
+            android:layout_width="70dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/img_streaming_live"
+            app:layout_constraintBottom_toTopOf="@+id/iv_live_thumbnail"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_live_thumbnail"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/gray50_border_no_top"
+            android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="16:9"
+            android:src="@drawable/menu_profile_2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_live_date" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_live_icon"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.17"
+            app:layout_constraintHeight_default="percent"
+            app:layout_constraintBottom_toBottomOf="@id/iv_live_thumbnail"
+            app:layout_constraintEnd_toEndOf="@id/iv_live_thumbnail"
+            app:layout_constraintStart_toStartOf="@id/iv_live_thumbnail"
+            app:layout_constraintTop_toTopOf="@id/iv_live_thumbnail"
+            app:layout_constraintVertical_bias="0.5"
+            app:srcCompat="@drawable/img_streaming_play" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/icon_streaming_live_hits"
+            android:layout_width="21dp"
+            android:layout_height="15dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/live_bottom_bar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_live_thumbnail"
+            app:srcCompat="@drawable/icon_streaming_hits" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_streaming_live_hits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            tools:text="0"
+            android:textColor="@color/gray300"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/live_bottom_bar"
+            app:layout_constraintStart_toEndOf="@+id/icon_streaming_live_hits"
+            app:layout_constraintTop_toBottomOf="@+id/iv_live_thumbnail"
+            app:layout_constraintVertical_bias="1" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/icon_streaming_live_heart"
+            android:layout_width="wrap_content"
+            android:layout_height="15dp"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/live_bottom_bar"
+            app:layout_constraintStart_toEndOf="@+id/tv_streaming_live_hits"
+            app:layout_constraintTop_toBottomOf="@+id/iv_live_thumbnail"
+            app:srcCompat="@drawable/icon_streaming_heart" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_streaming_live_heart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            tools:text="0"
+            android:textColor="@color/gray300"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/live_bottom_bar"
+            app:layout_constraintStart_toEndOf="@+id/icon_streaming_live_heart"
+            app:layout_constraintTop_toBottomOf="@+id/iv_live_thumbnail"
+            app:layout_constraintVertical_bias="1" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/icon_streaming_live_users"
+            android:layout_width="wrap_content"
+            android:layout_height="15dp"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/live_bottom_bar"
+            app:layout_constraintStart_toEndOf="@+id/tv_streaming_live_heart"
+            app:layout_constraintTop_toBottomOf="@+id/iv_live_thumbnail"
+            app:layout_constraintVertical_bias="0.333"
+            app:srcCompat="@drawable/icon_streaming_users" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_streaming_live_users"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            tools:text="0"
+            android:textColor="@color/gray300"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/live_bottom_bar"
+            app:layout_constraintStart_toEndOf="@+id/icon_streaming_live_users"
+            app:layout_constraintTop_toBottomOf="@+id/iv_live_thumbnail"
+            app:layout_constraintVertical_bias="1" />
+
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/icon_streaming_live_users2"
+            android:layout_width="wrap_content"
+            android:layout_height="15dp"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/live_bottom_bar"
+            app:layout_constraintStart_toEndOf="@+id/tv_streaming_live_users"
+            app:layout_constraintTop_toBottomOf="@+id/iv_live_thumbnail"
+            app:srcCompat="@drawable/icon_streaming_users_2" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_streaming_live_users2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            tools:text="0"
+            android:textColor="@color/gray300"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/live_bottom_bar"
+            app:layout_constraintStart_toEndOf="@+id/icon_streaming_live_users2"
+            app:layout_constraintTop_toBottomOf="@+id/iv_live_thumbnail"
+            app:layout_constraintVertical_bias="1" />
+        <TextView
+            android:id="@+id/live_bottom_bar"
+            android:layout_width="0dp"
+            android:layout_height="10dp"
+            android:background="@color/gray80"
+            app:layout_constraintTop_toBottomOf="@+id/icon_streaming_live_hits"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

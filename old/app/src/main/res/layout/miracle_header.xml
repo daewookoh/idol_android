@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_miracle_photo"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:adjustViewBounds="true"
+            app:layout_constraintDimensionRatio="3:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_miracle_info"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_margin="9dp"
+            android:src="@drawable/btn_info_black"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_miracle_period"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/gray50"
+            android:minHeight="36dp"
+            android:padding="10dp"
+            android:textAlignment="center"
+            android:textColor="@color/text_dimmed"
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@id/iv_miracle_photo"
+            tools:text="투표기간 : 2022. 11. 01 ~ 2022. 11. 30" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

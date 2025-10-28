@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_segment_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/bg_gray120_radius18"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.addisonelliott.segmentedbutton.SegmentedButtonGroup
+                android:id="@+id/sbg_one_pick_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="@color/gray120"
+                android:layoutDirection="ltr"
+                app:draggable="true"
+                app:borderDashGap="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:radius="18dp"
+                app:selectedBackground="@color/white"
+                app:selectedButtonRadius="18dp">
+
+                <com.addisonelliott.segmentedbutton.SegmentedButton
+                    android:id="@+id/btn_theme_pick"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:padding="10dp"
+                    android:layoutDirection="ltr"
+                    app:drawableGravity="top"
+                    app:selectedTextColor="@color/text_default"
+                    app:text="@string/themepick"
+                    app:textColor="@color/text_gray"
+                    app:textSize="15sp" />
+
+                <com.addisonelliott.segmentedbutton.SegmentedButton
+                    android:id="@+id/btn_one_pick"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:padding="9dp"
+                    android:layoutDirection="ltr"
+                    app:drawableGravity="top"
+                    app:selectedTextColor="@color/text_default"
+                    app:text="@string/imagepick"
+                    app:textColor="@color/text_gray"
+                    app:textSize="15sp" />
+
+            </com.addisonelliott.segmentedbutton.SegmentedButtonGroup>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

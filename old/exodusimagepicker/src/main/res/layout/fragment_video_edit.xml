@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_parent"
+        android:layout_width="match_parent"
+        android:background="@color/background_200"
+        android:layout_height="match_parent">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/vp_video_edit"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:saveEnabled="false"
+            android:background="@color/background_200"
+            app:userInputEnabled="@{false}"
+            app:layout_constraintBottom_toTopOf="@+id/tab_video_edit"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_video_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:background="@drawable/background_bottom_border_grey40_1dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/vp_video_edit"
+            app:tabIndicatorColor="@color/gray80"
+            app:tabSelectedTextColor="@color/gray80"
+            app:tabIndicatorGravity="top"
+            app:tabTextAppearance="@style/ExodusPicker.TabLayoutTextStyle"
+            app:tabTextColor="@color/gray50"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

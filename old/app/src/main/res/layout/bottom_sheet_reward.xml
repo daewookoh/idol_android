@@ -1,0 +1,154 @@
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_reward_root"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/img_review"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/img_popup_attendance"
+            app:layout_constraintBottom_toTopOf="@+id/cl_reward"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/img_review_dia"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:src="@drawable/img_attendance_reward_dia"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/cl_reward"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_pop_up_top"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/bg_popup_top"
+            app:layout_constraintBottom_toTopOf="@+id/cl_reward"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_close"
+            android:layout_width="62dp"
+            android:layout_height="62dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:padding="25dp"
+            android:src="@drawable/btn_popup_close"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tv_pop_up_top" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/cl_reward"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_popup_start_end"
+            android:orientation="vertical"
+            android:paddingTop="4dp"
+            app:layout_constraintTop_toBottomOf="@id/img_review">
+
+            <include
+                android:id="@+id/reward1"
+                layout="@layout/item_bottom_sheet_reward"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/view_line1"
+                android:layout_width="match_parent"
+                android:layout_height="0.3dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:background="@color/gray110"
+                android:visibility="gone"/>
+
+            <include
+                android:id="@+id/reward2"
+                layout="@layout/item_bottom_sheet_reward"
+                app:layout_constraintTop_toBottomOf="@id/reward1" />
+
+            <View
+                android:id="@+id/view_line2"
+                android:layout_width="match_parent"
+                android:layout_height="0.3dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:background="@color/gray110"
+                android:visibility="gone"/>
+
+            <include
+                android:id="@+id/reward3"
+                layout="@layout/item_bottom_sheet_reward"
+                app:layout_constraintTop_toBottomOf="@id/reward2" />
+
+            <include
+                android:id="@+id/in_quiz"
+                layout="@layout/item_bottom_sheet_quiz"
+                android:visibility="gone" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_confirm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="12dp"
+                android:paddingBottom="38dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="1dp"
+                app:layout_constraintTop_toBottomOf="@id/reward3">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_confirm"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:text="@string/confirm"
+                    android:textColor="@color/text_white_black"
+                    android:textSize="16dp"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:background="@drawable/red_bg_round_radius_28"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginEnd="24dp"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_cancel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="20dp"
+                    android:text="@string/quit"
+                    android:textColor="@color/main_light"
+                    android:textSize="16dp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_confirm"
+                    tools:ignore="SpUsage" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
+
+
+
+
+

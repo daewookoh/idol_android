@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:installLocation="auto">
+
+    <!--원스토어  안드로이드 11버전  사용자가  기기에 설치한  다른 앱 쿼리 상호작용 적용하는 방법 변경 사항  -->
+    <queries>
+        <intent>
+        <action android:name="com.onestore.ipc.iap.IapService.ACTION" />
+        </intent>
+        <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="onestore" />
+        </intent>
+    </queries>
+    <!-- onestore -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <application
+        android:name=".base.BaseApplication"
+        tools:replace="android:label"
+        android:label="@string/app_name_onestore">
+        <!-- 원스토어 결제 SDK 버전 명시 -->
+        <meta-data
+            android:name="iap:api_version"
+            android:value="5" />
+        <meta-data
+            android:name="iap:view_option"
+            android:value="popup | full" />
+    </application>
+
+</manifest>

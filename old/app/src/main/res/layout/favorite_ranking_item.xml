@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/section"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/gray110"
+            android:focusable="true"
+            android:visibility="gone"
+            android:clickable="true"
+            tools:visibility="visible">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/textview_section"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:textColor="@color/text_default"
+                android:textStyle="bold"
+                android:textSize="13sp"/>
+
+        </RelativeLayout>
+
+        <FrameLayout
+            android:id="@+id/item_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include
+                android:id="@+id/inc_favorite_ranking_item"
+                layout="@layout/s_ranking_item"/>
+
+        </FrameLayout>
+
+    </LinearLayout>
+</layout>

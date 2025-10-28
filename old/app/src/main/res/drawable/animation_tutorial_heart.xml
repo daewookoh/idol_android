@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tutorial_heart"
+    android:oneshot="false">
+    <item android:drawable="@drawable/heart70_01" android:duration="54" />
+    <item android:drawable="@drawable/heart70_02" android:duration="54" />
+    <item android:drawable="@drawable/heart70_03" android:duration="54" />
+    <item android:drawable="@drawable/heart70_04" android:duration="54" />
+    <item android:drawable="@drawable/heart70_05" android:duration="54" />
+    <item android:drawable="@drawable/heart70_06" android:duration="54" />
+    <item android:drawable="@drawable/heart70_07" android:duration="54" />
+    <item android:drawable="@drawable/heart70_08" android:duration="54" />
+    <item android:drawable="@drawable/heart70_09" android:duration="54" />
+    <item android:drawable="@drawable/heart70_10" android:duration="54" />
+    <item android:drawable="@drawable/heart70_11" android:duration="54" />
+    <item android:drawable="@drawable/heart70_12" android:duration="54" />
+    <item android:drawable="@drawable/heart70_13" android:duration="54" />
+    <item android:drawable="@drawable/heart70_14" android:duration="54" />
+    <item android:drawable="@drawable/heart70_15" android:duration="54" />
+    <item android:drawable="@drawable/heart70_16" android:duration="54" />
+    <item android:drawable="@drawable/heart70_17" android:duration="54" />
+    <item android:drawable="@drawable/heart70_18" android:duration="54" />
+</animation-list>

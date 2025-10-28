@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/idol"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/schedule_write_bg">
+
+        <TextView
+            android:id="@+id/idol_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:lines="1"
+            android:paddingStart="20dp"
+            android:singleLine="true"
+            android:textColor="@drawable/schedule_write_text_color"
+            android:textSize="14sp" />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/idol_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            app:buttonCompat="@android:color/transparent"
+            android:clickable="false"
+            android:drawableStart="@drawable/schedule_checkbox"
+            android:drawablePadding="17dp"
+            android:paddingStart="0dp" />
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_chat_message"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="10dp"
+    android:background="@color/background_100">
+
+    <TextView
+        android:id="@+id/tv_day"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="10dp"
+        android:text="2014. 02. 01."
+        android:textColor="@color/gray300"
+        android:textSize="10sp"
+        android:visibility="visible"
+        tools:ignore="MissingConstraints"/>
+
+    <TextView
+        android:id="@+id/tv_nickname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginEnd="15dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="nickname"
+        android:textAlignment="viewEnd"
+        android:textColor="@color/main_light"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/message_wrapper"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_day"
+        app:layout_constraintVertical_chainStyle="packed"/>
+
+    <LinearLayout
+        android:id="@+id/message_wrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/bg_message_mine_start"
+        android:orientation="vertical"
+        android:padding="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_nickname"
+        tools:ignore="MissingConstraints">
+
+        <TextView
+            android:id="@+id/message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="7dp"
+            android:autoLink="web"
+            android:maxWidth="203dp"
+            android:text="message contents"
+            android:textColor="@color/text_default"
+            android:textColorLink="@color/text_default"
+            android:textSize="13sp"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <LinearLayout
+            android:id="@+id/ll_preview_wrapper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="7dp"
+            android:maxWidth="203dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <net.ib.mn.view.TalkLinkImageView
+                android:id="@+id/iv_preview_image"
+                android:layout_width="203dp"
+                android:layout_height="100dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/image_placeholder"/>
+
+            <LinearLayout
+                android:id="@+id/ll_preview_info"
+                android:layout_width="203dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/talk_link_border_bottom_radius"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/tv_preview_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/gray580"
+                    android:textSize="12sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tv_preview_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:textColor="@color/gray300"
+                    android:textSize="9sp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/date_wrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="3dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@id/message_wrapper"
+        app:layout_constraintEnd_toStartOf="@id/message_wrapper">
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/main"
+            android:indeterminateTintMode="src_in"
+            android:visibility="visible"/>
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="오전 12:00"
+            android:textColor="@color/gray300"
+            android:textSize="10sp"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

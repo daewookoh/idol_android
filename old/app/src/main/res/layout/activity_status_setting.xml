@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data></data>
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nsv_status_setting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <androidx.appcompat.widget.LinearLayoutCompat
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@color/background_200">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_privacy"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="21dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginTop="32dp"
+                    android:text="@string/feed_private"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/text_default"
+                    android:textSize="16sp"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toStartOf="@id/cb_privacy"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:paddingBottom="32dp"
+                    android:text="@string/feed_private_desc"
+                    android:textColor="@color/text_gray"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toEndOf="@id/tv_privacy"
+                    app:layout_constraintStart_toStartOf="@id/tv_privacy"
+                    app:layout_constraintTop_toBottomOf="@id/tv_privacy"
+                    tools:ignore="SmallSp" />
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/cb_privacy"
+                    android:layout_width="48.5dp"
+                    android:layout_height="37.5dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="10dp"
+                    app:buttonCompat="@drawable/btn_toggle"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@color/background_200">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_block_friend_add"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginStart="21dp"
+                    android:layout_marginEnd="5dp"
+                    android:text="@string/block_friend_req"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/text_default"
+                    android:textSize="16sp"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toStartOf="@id/cb_block_friend_add"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:paddingBottom="32dp"
+                    android:text="@string/block_friend_req_desc"
+                    android:textColor="@color/text_gray"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toEndOf="@id/tv_block_friend_add"
+                    app:layout_constraintStart_toStartOf="@id/tv_block_friend_add"
+                    app:layout_constraintTop_toBottomOf="@id/tv_block_friend_add"
+                    tools:ignore="SmallSp" />
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/cb_block_friend_add"
+                    android:layout_width="48.5dp"
+                    android:layout_height="37.5dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="10dp"
+                    app:buttonCompat="@drawable/btn_toggle"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@color/background_200">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_data_saving"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginStart="21dp"
+                    android:layout_marginEnd="5dp"
+                    android:text="@string/data_save"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/text_default"
+                    android:textSize="16sp"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toStartOf="@id/cb_data_saving"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:paddingBottom="32dp"
+                    android:text="@string/data_save_desc"
+                    android:textColor="@color/text_gray"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toEndOf="@id/tv_data_saving"
+                    app:layout_constraintStart_toStartOf="@id/tv_data_saving"
+                    app:layout_constraintTop_toBottomOf="@id/tv_data_saving"
+                    tools:ignore="SmallSp" />
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/cb_data_saving"
+                    android:layout_width="48.5dp"
+                    android:layout_height="37.5dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="10dp"
+                    app:buttonCompat="@drawable/btn_toggle"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@color/background_200">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_animation_on_off"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginStart="21dp"
+                    android:layout_marginEnd="5dp"
+                    android:text="@string/animation_mode"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/text_default"
+                    android:textSize="16sp"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toStartOf="@id/cb_animation_on_off"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:paddingBottom="32dp"
+                    android:text="@string/animation_mode_desc"
+                    android:textColor="@color/text_gray"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toEndOf="@id/tv_animation_on_off"
+                    app:layout_constraintStart_toStartOf="@id/tv_animation_on_off"
+                    app:layout_constraintTop_toBottomOf="@id/tv_animation_on_off"
+                    tools:ignore="SmallSp" />
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/cb_animation_on_off"
+                    android:layout_width="48.5dp"
+                    android:layout_height="37.5dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="10dp"
+                    app:buttonCompat="@drawable/btn_toggle"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_darkmode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@color/background_200">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_darkmode"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginStart="21dp"
+                    android:layout_marginEnd="5dp"
+                    android:text="@string/darkmode"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/text_default"
+                    android:textSize="16sp"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toStartOf="@id/btn_darkmode"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:paddingBottom="32dp"
+                    android:text="@string/darkmode_help"
+                    android:textColor="@color/text_gray"
+                    android:textSize="11sp"
+                    android:layout_marginEnd="70dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/tv_darkmode"
+                    app:layout_constraintTop_toBottomOf="@id/tv_darkmode"
+                    tools:ignore="SmallSp" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/btn_darkmode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:background="@android:color/transparent"
+                    app:layout_constraintBottom_toBottomOf="@+id/tv_darkmode"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/tv_darkmode">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_system_configuration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:text="@string/darkmode_system"
+                        android:textColor="@color/main"
+                        android:textSize="14sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/iv_tv_system_configuration"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_tv_system_configuration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/btn_go"
+                        app:layout_constraintBottom_toBottomOf="@+id/tv_system_configuration"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/tv_system_configuration" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.core.widget.NestedScrollView>
+</layout>

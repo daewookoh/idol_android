@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:minHeight="52dp"
+        android:layout_height="wrap_content"
+        android:background="@color/background_200"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/inquiry_qna"
+            android:layout_width="14dp"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:paddingTop="3dp"
+            android:src="@drawable/icon_inquiry_qna_q"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="8dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/btn_go"
+            android:background="@color/background_200"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:text="asdasd"
+            android:textColor="@color/text_default"
+            android:textSize="13.5sp"
+            android:textStyle="bold"
+            android:paddingBottom="20dp"
+            app:layout_constraintEnd_toStartOf="@id/icon"
+            app:layout_constraintStart_toEndOf="@id/inquiry_qna"
+            app:layout_constraintTop_toTopOf="@id/inquiry_qna" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

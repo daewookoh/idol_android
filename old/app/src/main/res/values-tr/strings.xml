@@ -1,0 +1,1812 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="heart_store">Kalp Mağazası</string>
+    <string name="normal_heart_shop">Tek seferlik SATIN ALMA</string>
+    <string name="regular_heart_shop">Düzenli satın alma</string>
+    <string name="bonus">Bonus</string>
+    <string name="no_iap_products">Satın alınabilecek ürün yok.</string>
+    <string name="votes"></string>
+    <string name="postfix_rank"></string>
+    <string name="app_name">Choeaedol</string>
+    <string name="app_name_onestore">Choeaedol</string>
+    <string name="app_name_china">Choeaedol</string>
+    <string name="actor_app_name">Choeaedol Celeb</string>
+    <string name="app_name_upper">CHOEAEDOL</string>
+    <string name="app_name_onestore_upper">CHOEAEDOL</string>
+    <string name="app_name_china_upper">CHOEAEDOL</string>
+    <string name="actor_app_name_upper">CHOEAEDOL Celeb</string>
+    <string name="ios_permission_camera">Profil fotoğrafları belirtmek, fotoğraf yüklemek veya kaydetmek için gerekli.</string>
+    <string name="ios_permission_photo">Profil fotoğrafları belirtmek, fotoğraf yüklemek veya kaydetmek için gerekli.</string>
+    <string name="ios_permission_photo_add">Profil fotoğrafları belirtmek, fotoğraf yüklemek veya kaydetmek için gerekli.</string>
+    <string name="X_DAILY_ALL">X Günlük TÜMÜ</string>
+    <string name="photo_picker">Fotoğraf yükle</string>
+    <string name="Camera">Fotoğraf çek</string>
+    <string name="photo_library">Albümden seç</string>
+    <string name="push_notification">Anlık Alarm</string>
+    <string name="push_on">Açık</string>
+    <string name="push_off">Kapalı</string>
+    <string name="image_save_error">İndirme işlemi düzgün tamamlanmadı. Cihaz Belleği veya Cihaz Ayarları &gt; CHOEAEDOL &gt; Fotoğraf kısmına gidin. Yetkilendirme ayarlarını kontrol edin ve tekrar deneyin.</string>
+    <string name="actor_image_save_error">İndirme işlemi düzgün tamamlanmadı. Cihaz Belleği veya Cihaz Ayarları > CHOEAEDOL Celeb > Fotoğraf kısmına gidin. Yetkilendirme ayarlarını kontrol edin ve tekrar deneyin.</string>
+    <string name="delete_comment">Bu yorumu silmek istiyor musunuz?</string>
+    <string name="received_heart_history">Alınan Kalpler</string>
+    <string name="login_line">LINE hesabınızla oturum açın.</string>
+    <string name="line_not_installed">Bu cihazda LINE yüklü değil.</string>
+    <string name="line_login_failed">Oturum açma başarısız.</string>
+    <string name="loading">Yükleniyor…</string>
+    <string name="opensource_license">Açık Kaynak Lisansı</string>
+    <string name="kakaotalk_not_installed">KAKAOTALK, bu cihazda yüklü değil.</string>
+    <string name="help_safari">Kılavuzu Safari\'de görüntülemek istiyor musunuz?</string>
+    <string name="actor_help_safari">Kılavuzu Safari\'de görüntülemek istiyor musunuz?</string>
+    <string name="processing_iap_receipt">Kalp dolumu siparişler işleniyor.</string>
+    <string name="processing_iap_receipt_failed">Ağ hatası nedeniyle kalp dolumu başarısız oldu. Lütfen \"YENİDEN DENE\" düğmesine basın.</string>
+    <string name="retry">Yeniden dene</string>
+    <string name="iap_cancelled">Ödeme iptal edildi.</string>
+    <string name="title_appstore_review">CHOEAEDOL için bir değerlendirme bırakın</string>
+    <string name="actor_title_appstore_review">CHOEAEDOL Celeb için bir değerlendirme bırakın</string>
+    <string name="no_my_articles">Hiçbir paylaşımda bulunmadınız.</string>
+    <string name="no_my_comments">Hiçbir yorum yazmadınız.</string>
+    <string name="hint_email">e-posta adresi</string>
+    <string name="hint_passwd">Parola</string>
+    <string name="hint_passwd_confirm">Parolayı kontrol edin</string>
+    <string name="hint_name">Takma ad</string>
+    <string name="hint_recommender">Öneren kişi (takma adı)</string>
+    <string name="hint_recommender_1">Lütfen 8 haneli davet kodunu giriniz. (Opsiyonel)</string>
+    <string name="hint_search_idol">Lütfen sanatçının adını yazınız.</string>
+    <string name="actor_hint_search_idol">Lütfen sanatçının adını yazınız.</string>
+    <string name="text_forgot_id">ID\'nizi mi unuttunuz?</string>
+    <string name="text_forgot_passwd">Şifrenizi mi unuttunuz?</string>
+    <string name="my_heart">Kalplerim</string>
+    <string name="confirm">Tamam</string>
+    <string name="failed_to_load">Bilgiler alınamadı.</string>
+    <string name="title_tab_solo">Bireysel Sıra</string>
+    <string name="title_tab_group">Grup Sırası</string>
+    <string name="actor_title_tab_actors">Aktör Sırası</string>
+    <string name="actor_title_tab_actresses">Aktris Sırası</string>
+    <string name="title_tab_favorite">Benim idolüm</string>
+    <string name="actor_title_tab_favorite">Ünlüm</string>
+    <string name="title_tab_hall">Ünlüler Salonu</string>
+    <string name="title_tab_menu">Menü</string>
+    <string name="title_agreement">Hüküm ve Koşullar</string>
+    <string name="title_forgot_passwd">Parolayı bul</string>
+    <string name="title_favorite_setting">İdol Ayarlarım</string>
+    <string name="actor_title_favorite_setting">Ünlü ayarlarım</string>
+    <string name="title_setting">Ayarlar</string>
+    <string name="title_coinplus">Cople hesabınızı kaydedin</string>
+    <string name="title_write">Yaz</string>
+    <string name="title_profile">Profil</string>
+    <string name="title_info_more">Ek bilgileri girin.</string>
+    <string name="title_share">Paylaş</string>
+    <string name="title_review">CHOEAEDOL için Google\'a bir değerlendirme yazın</string>
+    <string name="actor_title_review">CHOEAEDOL Celeb için Google\'a bir değerlendirme yazın</string>
+    <string name="title_show_option">Gizlilik Ayarları</string>
+    <string name="title_signup">Üyelik Kaydı</string>
+    <string name="title_level_heart">Birikmiş grup ortalaması, bireysel ortalama ne demek?</string>
+    <string name="actor_title_level_heart">Birikmiş grup ortalaması, bireysel ortalama ne demek?</string>
+    <string name="heart_count_format" formatted="false">%s</string>
+    <string name="vote_count_format" formatted="false">%s</string>
+    <string name="rank_count_format" formatted="false">%s</string>
+    <string name="need_agree1">Lütfen Hüküm ve Koşullar\'ı kabul edin.</string>
+    <string name="need_agree2">Lütfen Gizlilik Politikası\'nı kabul edin.</string>
+    <string name="required_field">Bu gerekli bir alandır.</string>
+    <string name="invalid_format_email">Lütfen e-posta adresinizi yazın.</string>
+    <string name="too_short_passwd">Parola çok kısa.</string>
+    <string name="passwd_confirm_not_match">Parolalar aynı değil.</string>
+    <string name="title_vote_heart">Oy Kalpleri</string>
+    <string name="favorite">En sevdiğim</string>
+    <string name="agreement1">Hüküm ve Koşullar</string>
+    <string name="agreement2">Gizlilik Politikası</string>
+    <string name="agreement1_agree">Hüküm ve Koşullar\'ı kabul ediyorum.</string>
+    <string name="agreement2_agree">Gizlilik Politikası\'nı kabul ediyorum.</string>
+    <string name="signup_desc1">E-posta adresiniz unutulan parolaları hatırlatmak kullanılacaktır. Bu nedenle doğru olduğundan emin olun.</string>
+    <string name="signup_desc2" formatted="false">Tavsiye eden kişinin davet kodunu girerek %d kadar Kalp kazanabilir ve arkadaş olarak Kalp takası yapabilirsiniz.</string>
+    <string name="heart_history_desc">*Alınan kalpler her gece yarısı sıfırlanır.</string>
+    <string name="same_nickname">Takma adınız, şu an kullanmakta olduğunuz addır.</string>
+    <string name="wait_signup">Kayıt işlemi devam ediyor...</string>
+    <string name="wait_signin">Oturum açılıyor...</string>
+    <string name="desc_failed_to_connect_internet">Ağ bağlantısı kararsız. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="wait_userinfo">Kullanıcı bilgileri alınıyor...</string>
+    <string name="btn_next">Sonraki adım</string>
+    <string name="btn_signin">Oturum aç</string>
+    <string name="btn_signup">Üyelik Kaydı</string>
+    <string name="btn_signup_finish">Kaydol</string>
+    <string name="btn_signup_finish_1">Kayıt tamamlandı</string>
+    <string name="my_action">Aktivitelerim</string>
+    <string name="my_vote">Birikmiş Oylarım</string>
+    <string name="menu_menu00">Etkinlikler</string>
+    <string name="menu_menu01">İdol Ayarlarım</string>
+    <string name="actor_menu_menu01">Ünlü ayarlarım</string>
+    <string name="menu_menu02">Kalp Dolum İstasyonu</string>
+    <string name="menu_menu03"></string>
+    <string name="menu_menu04">CHOEAEDOL nasıl kullanılır?</string>
+    <string name="menu_menu05">Ayarlar</string>
+    <string name="setting_menu01">Bildirim</string>
+    <string name="setting_menu02">Sorular</string>
+    <string name="setting_menu03"></string>
+    <string name="setting_menu04">Bildirim</string>
+    <string name="setting_menu05">Parola Değiştir</string>
+    <string name="setting_menu06">Hesabımı sil</string>
+    <string name="setting_menu07">Uygulama sürümü</string>
+    <string name="setting_menu_heart_box_event">Kalp kutu Etkinlik Ayarları</string>
+    <string name="most_favorite">İdolüm</string>
+    <string name="actor_most_favorite">Ünlüm</string>
+    <string name="empty_most">Henüz \'Benim idolüm\' yoktur.</string>
+    <string name="actor_empty_most">Henüz "Ünlüüm" yok.</string>
+    <string name="empty_vote">Birikmiş oylar (son 30): 0</string>
+    <string name="favorite_format" formatted="false">İdolüm: %s</string>
+    <string name="actor_favorite_format" formatted="false">Ünlüm: %s</string>
+    <string name="desc_empty_favorite1">İdolünüzü henüz seçmediniz!</string>
+    <string name="actor_desc_empty_favorite1">Henüz \'Ünlüüm\'ü seçmediniz!</string>
+    <string name="desc_empty_favorite2">İdolünüzü hemen seçin!</string>
+    <string name="actor_desc_empty_favorite2">Şimdi ünlünü seç!</string>
+    <string name="desc_empty_favorite3">İdol Seç</string>
+    <string name="actor_desc_empty_favorite3">Ünlülerim\'i seçin</string>
+    <string name="hint_coinplus_email"></string>
+    <string name="coinplus_download"></string>
+    <string name="order_by_time">Zaman Sırası</string>
+    <string name="order_by_heart">Kalp Sırası</string>
+    <string name="no_reporter">Kimseyi ihbar etmediniz.</string>
+    <string name="nofriend1">Henüz hiç arkadaşınız yok!</string>
+    <string name="nofriend2">Arkadaş davet edin ve birbirinizle kalp alışverişi yapın!</string>
+    <string name="invite_friend_kakao">Bir arkadaş davet et &gt;</string>
+    <string name="write_content">Lütfen içeriği girin.</string>
+    <string name="btn_write">Gönder</string>
+    <string name="upload_success">Kayıt tamamlandı</string>
+    <string name="not_enough_heart">Yeterli kalbin yok</string>
+    <string name="sent_heart_friend__format" formatted="false">Şu kişiye kalp gönderdiniz: %s</string>
+    <string name="sent_heart_all_friend__format" formatted="false">%d kişiye kalp gönderdiniz.</string>
+    <string name="already_sent_heart__format">%1$s adlı kişiye daha önce kalp gönderdiniz. (%2$s saniye sonra tekrar gönderebilirsiniz.)</string>
+    <string name="sending_heart">Kalp gönderme.</string>
+    <string name="heart_history_format">%1$s adlı kişiden kalp aldınız. (%2$s)</string>
+    <string name="sent_find_pw_mail">Parola bilgileri, e-posta adresinize gönderildi.</string>
+    <string name="title_report">Bildir</string>
+    <string name="report_desc">Bu gönderiyi bildirmek istiyor musunuz?</string>
+    <string name="btn_cancel">İptal et</string>
+    <string name="empty_comment">Yorum bulunmamaktadır.</string>
+    <string name="hint_comment">Lütfen bir yorum girin.</string>
+    <string name="title_comment">Bir yorum yazın</string>
+    <string name="title_friends">Arkadaşları yönet</string>
+    <string name="title_unfriend">Arkadaş sil</string>
+    <string name="applied">Parolanız değiştirildi.</string>
+    <string name="empty_event">Etkinlik yok.</string>
+    <string name="empty_notice">Bildirim yok.</string>
+    <string name="empty_inquiry">Soru yok.</string>
+    <string name="title_event">Etkinlikler</string>
+    <string name="title_notice">Bildirim</string>
+    <string name="title_change_passwd">Parola Değiştir</string>
+    <string name="title_faq">SSS</string>
+    <string name="title_inquiry">FAQ / Sorular</string>
+    <string name="title_myinquirylist">Soru geçmişim</string>
+    <string name="title_voting_guide">Birikmiş Oylarım</string>
+    <string name="hint_inquiry">Lütfen sorunuzu girin.</string>
+    <string name="title_rename">Takma adı değiştir</string>
+    <string name="hint_nickname">Takma ad</string>
+    <string name="rename_desc">Lütfen yeni bir takma ad girin.</string>
+    <string name="rename_confirm_desc">Takma adınızı değiştirmek için 100 kalp kullanılacak.\nTakma adınızı değiştirmek istiyor musunuz?</string>
+    <string name="registered">Kayıt tamamlandı</string>
+    <string name="inquiry_time_format">Bu soru %1$s üzerinden gönderilmiştir.</string>
+    <string name="no_search_result">Sonuç yok.</string>
+    <string name="wait_upload_article">Gönderiliyor...</string>
+    <string name="remove_desc">Bu gönderiyi silmek istiyor musunuz?</string>
+    <string name="title_remove">Sil</string>
+    <string name="button_close">Kapat</string>
+    <string name="title_heart_voting_ranking">En İyi 100 Kalp Oyu</string>
+    <string name="button_kakao">KAKAOTALK hesabınızı kullanarak oturum açın.</string>
+    <string name="hint_passwd_current">Şimdiki Parola</string>
+    <string name="hint_new_passwd">Yeni Parola</string>
+    <string name="hint_new_passwd_confirm">Yeni Parolayı Onayla</string>
+    <string name="passwd_not_match">Mevcut Parola eşleşmiyor.</string>
+    <string name="weak_heart">Günlük Kalp</string>
+    <string name="weak_heart_desc">Günlük Kalpler, her gece yarısı sıfırlanan Kalplerdir. Oturum açtığınız veya arkadaşlarınızdan aldığınız / onlara gönderdiğiniz zaman kazandığınız kalplerdir.</string>
+    <string name="btn_free_heart">Ücretsiz kalp doldur</string>
+    <string name="title_myheart">Kalplerim</string>
+    <string name="title_heartchage">Kalp Dolum İstasyonu</string>
+    <string name="wait_kakao_signin">KAKAOTALK hesap bilgileriniz alınıyor.</string>
+    <string name="your_id_is1">ID\'niz</string>
+    <string name="your_id_is2"></string>
+    <string name="failed_to_find_id">ID bulunamıyor.</string>
+    <string name="title_find_id">ID arama sonucu.</string>
+    <string name="failed_to_report">Bunu bildiremezsiniz.</string>
+    <string name="failed_to_report_2202">Günde sadece 3 bildirim yapmanıza izin verilir.</string>
+    <string name="failed_to_report_2203">3 dakika sonra tekrar bildirebilirsiniz.</string>
+    <string name="failed_to_report__not_my_most">Bildirim yapamazsınız. Bildirim hakları, sadece İdol topluluk üyelerine verilir.</string>
+    <string name="actor_failed_to_report__not_my_most">Rapor edemezsin. Raporlama hakları sadece ünlü topluluk üyelerine aittir.</string>
+    <string name="failed_to_report__already_reported">Bu paylaşım daha önce bildirilmiş. Paylaşımlar sadece bir kez raporlanabilir.</string>
+    <string name="no_writes">Hiç paylaşım ya da yorum yapmadınız.</string>
+    <string name="signup_lock">Tek bir cihazdan 10 dakika içinde tekrar kayıt olamazsınız. \nLütfen 10 dakika sonra tekrar deneyin.</string>
+    <string name="lable_invite_name">Öneren kişi:</string>
+    <string name="lable_do_not_read">Tekrar gösterme</string>
+    <string name="lable_kakao_more_1">※ Takma adınızı istediğiniz gibi değiştirebilirsiniz.</string>
+    <string name="lable_kakao_more_2">Öneren kişiyi (takma adını) yazın ve birbirinizle kalp alışverişi yapın.</string>
+    <string name="lable_change_info">Üye Bilgilerini Değiştir</string>
+    <string name="lable_change_info_complete">Üye Bilgilerini Değiştir</string>
+    <string name="lable_individual_aggregated">Bireysel 30 Gün</string>
+    <string name="actor_lable_individual_aggregated">Bireysel\n30 Gün</string>
+    <string name="lable_actors_aggregated">Aktör 30 Gün</string>
+    <string name="lable_actresses_aggregated">Aktris 30 Gün</string>
+    <string name="lable_group_aggregated">Grup 30 Gün</string>
+    <string name="actor_lable_group_aggregated">Grup\n30 Gün</string>
+    <string name="label_individual_daily">Bireysel</string>
+    <string name="label_group_daily">Grup</string>
+    <string name="lable_individual">Bireysel</string>
+    <string name="actor_lable_individual">Aktör</string>
+    <string name="lable_actors">Aktör</string>
+    <string name="lable_actresses">Aktris</string>
+    <string name="lable_group">Grup</string>
+    <string name="actor_lable_group">Grup</string>
+    <string name="lable_my_articles">Gönderilerim</string>
+    <string name="lable_my_comments">Yorumlarım</string>
+    <string name="lable_heart_vote">Kalp Kullanım Geçmişi</string>
+    <string name="lable_heart_save">Kalp birikim geçmişi</string>
+    <string name="lable_count_unit"></string>
+    <string name="lable_final_result">Son sonuç</string>
+    <string name="lable_review_ok">Lütfen 5 yıldız verin</string>
+    <string name="lable_review_no">Duygusuzca görmezden gel</string>
+    <string name="lable_review_info1">İdolünüz için cesaret verici mesajlar bırakın.</string>
+    <string name="actor_lable_review_info1">Ünlüleriniz için cesaret verici mesajlar bırakın.</string>
+    <string name="lable_review_info2">CHOEAEDOL! 5 Yıldız değerinde, değil mi?</string>
+    <string name="actor_lable_review_info2">CHOEAEDOL Celeb! 5 Yıldız değerinde, değil mi?</string>
+    <string name="lable_get_info">Veriler alınıyor...</string>
+    <string name="lable_buy">Satın al</string>
+    <string name="lable_manager_warning">Yönetici yetkisini değiştir</string>
+    <string name="lable_show_range">Gizlilik ayarları</string>
+    <string name="lable_show_public">Tümüne Aç</string>
+    <string name="lable_show_private">Sadece benim İdolüm</string>
+    <string name="actor_lable_show_private">Sadece topluluk üyelerine</string>
+    <string name="lable_manager">[Yönetici]</string>
+    <string name="lable_save">Kaydet</string>
+    <string name="lable_surprise_heart">Kazanılan sürpriz kalpler</string>
+    <string name="lable_community_heart_vote">Oyla</string>
+    <string name="lable_community_comment">Yorumlar</string>
+    <string name="lable_community_report">Bildir</string>
+    <string name="lable_coin_unit">Madeni para</string>
+    <string name="lable_coinsplayer_buy"></string>
+    <string name="lable_coinsplayer_password"></string>
+    <string name="lable_coinsplayer_account_register"></string>
+    <string name="lable_day"></string>
+    <string name="lable_heart_box">Kalp kutu</string>
+    <string name="lable_receive_no_heart">Olmadı! Bir sonraki sefere.</string>
+    <string name="lable_aggree_heart_box_1_1"></string>
+    <string name="lable_aggree_heart_box_1_2"></string>
+    <string name="lable_aggree_heart_box_1_3"></string>
+    <string name="lable_aggree_heart_box_2"></string>
+    <string name="lable_aggree_heart_box_2_1"></string>
+    <string name="lable_aggree_heart_box_2_2"></string>
+    <string name="lable_aggree_heart_box_3"></string>
+    <string name="lable_aggree_heart_box_4"></string>
+    <string name="lable_agree">Kabul et</string>
+    <string name="lable_no_agree">Reddet</string>
+    <string name="lable_more_info_heart_box_event">\"Daha fazla &gt; Ayarlar\" kısmına giderek Kalp kutu Etkinlik Ayarlarını yeniden yapabilirsiniz</string>
+    <string name="lable_heart_box_ok">Bir Kalp kutu kazandınız!</string>
+    <string name="lable_heart_box_ok_1">%1$s kalp kazanıldı..</string>
+    <string name="labe_giftcard_winner">Google hediye kartı kazananların listesine bakın.</string>
+    <string name="msg_heart_received">Kalpler doldurulmuştur.</string>
+    <string name="msg_unable_use_write">Oylar listelenmektedir; dolayısıyla yeni gönderi yapamazsınız.\n[Oy listeleme süresi\n%1$s - %2$s]</string>
+    <string name="msg_unable_use_vote">Oylar listelenmektedir; dolayısıyla oylama yapamazsınız.\n[Oy listeleme süresi\n%1$s - %2$s]</string>
+    <string name="msg_unable_use_send_heart">Oylar listelenmektedir; dolayısıyla kalp gönderemezsiniz / alamazsınız.\n[Oy listeleme süresi\n%1$s - %2$s]</string>
+    <string name="msg_unable_use_capture_1">Paylaşma işlevini kullanamazsınız. Lütfen cihazınızın durumunu kontrol edin.</string>
+    <string name="msg_unable_use_capture_2">Paylaşma işlevi normal olarak tamamlanamadı. Cihazınızın durumunu ve bellek alanını kontrol edip tekrar deneyin.</string>
+    <string name="msg_save_ok">Kaydedildi.</string>
+    <string name="msg_unable_use_download_1">İndirme işlevini kullanamazsınız. Lütfen cihazınızın durumunu kontrol edin.</string>
+    <string name="msg_unable_use_download_2">İndirme düzgün tamamlanmadı. Cihazınızın durumunu ve bellek alanını kontrol edin ve tekrar deneyin.</string>
+    <string name="msg_no_heart">Hiç kalp almadınız.</string>
+    <string name="msg_error_ok">Maalesef, bir hata meydana geldi.\nLütfen tekrar deneyin.</string>
+    <string name="msg_favorite_guide">En sevdikleriniz listesi, İdolünüzün yanında ilgilendiğiniz sanatçı topluluklarına erişmenizi sağlayan bir menüdür.\nAyrıca İdolüm ayarları sayfasından en sevdiklerinizi seçebilir ve listeye ekleyebileceğiniz sanatçı sayısında herhangi bir sınırlama yoktur.\n(İdolüm: Kalp Simgesi / Ev Sevilenler: Yıldız Simgesi)</string>
+    <string name="actor_msg_favorite_guide">Yıldızları Ünlülere İşaretleyin! İlgilendiğiniz ünlülerin topluluklarına rahatlıkla erişebilirsiniz. Celeb Ünlülere \'Ünlülerim\' menüsünde yıldız da koyabilirsiniz. Listeye ekleyebileceğiniz ünlülerin sayısında bir sınırlama yoktur.\n(Ünlülerim: Kalp Simgesi / Favoriler: Yıldız Simgesi)</string>
+    <string name="msg_go_to_add_heart">Yeterli kalp yok.\nKalp dolumu yapmak istiyor musunuz?</string>
+    <string name="msg_no_data">Hiçbir veri yazılmadı.</string>
+    <string name="msg_no_enter_self">Kendi takma adınızı giremezsiniz.</string>
+    <string name="msg_no_enter_self_1">Kullandığınız takma adı giremezsiniz.</string>
+    <string name="msg_change_nickname_guide">Takma adlarını sevmeyen üyeler şu an takma adlarını değiştirebilirler.\nRarenick olarak değiştirmek istiyor musunuz?</string>
+    <string name="msg_drop_out">Ne? Gerçekten kaydınızı silmek istiyor musunuz? T_T?\nSizi memnun edemediğimiz için üzgünüz.\nGelecekte elimizden geleni yapacağız!\nKayıt silinince bütün gönderiler, kalpler ve rarenick sıfırlanır.\nGerçekten hesabınızı silmek istiyor musunuz?</string>
+    <string name="actor_msg_drop_out">Ne? Gerçekten kaydınızı silmek istiyor musunuz? T_T?\nSizi memnun edemediğimiz için üzgünüz.\nGelecekte elimizden geleni yapacağız!\nKayıt silinince bütün gönderiler, kalpler ve rarenick sıfırlanır.\nGerçekten hesabınızı silmek istiyor musunuz?</string>
+    <string name="msg_info_change_complete">Üyelik bilgileriniz değiştirildi.</string>
+    <string name="msg_not_able_vote">Oy veremezsiniz.</string>
+    <string name="msg_favorite_guide_1">İdolünüzü seçtikten 2 gün sonra değiştirebilirsiniz.</string>
+    <string name="actor_msg_favorite_guide_1">Ünlülerimi ayarladıktan sonra 2 gün sonra değiştirebilirsiniz.</string>
+    <string name="msg_favorite_guide_2__" formatted="false">%s adlı kişiyi İdolünüz olarak kaydetmek istiyor musunuz?</string>
+    <string name="actor_msg_favorite_guide_2__" formatted="false">%s\'i ünlülerim olarak kaydetmek ister misiniz?</string>
+    <string name="msg_favorite_guide_2">Kayıt olmak ister misin?</string>
+    <string name="actor_msg_favorite_guide_2">Kayıt olmak ister misin?</string>
+    <string name="actor_msg_favorite_guide_2_1"></string>
+    <string name="msg_favorite_guide_3" formatted="false">İdolünüzü seçtikten 2 gün sonra değiştirebilirsiniz. Eğer %s adlı kişiyi en sevdiklerinizden silip İdol olarak kaydetmek istiyor musunuz?</string>
+    <string name="actor_msg_favorite_guide_3">Ünlülerini seçtikten 2 gün sonra değiştirebilirsin. Mevcut ünlünü silip% ​​s ünlün olarak ayarlamak ister misin?</string>
+    <string name="msg_favorite_unregi_guide1">İdolünüzü en sevdiklerinizden silmek istiyor musunuz?</string>
+    <string name="actor_msg_favorite_unregi_guide1">Ünlülerini sıfırlamak istiyor musun?</string>
+    <string name="msg_favorite_unregi_guide2"></string>
+    <string name="actor_msg_favorite_unregi_guide2"></string>
+    <string name="msg_iab_error">Bir hata oluştu. Uygulamayı yeniden başlattıktan sonra bile kalp dolumu yapılmamışsa ayarlar menüsü aracılığıyla bize ulaşın.</string>
+    <string name="msg_iab_purchase_error">Satın alma düzgün tamamlanmadı. Ödemenin yapılıp yapılmadığını kontrol edin. Ödeme hatası devam ederse ayarlar menüsündeki işlevi kullanarak bize ulaşın.</string>
+    <string name="msg_manager_warning">*Şu anki İdolünüzü değiştirir veya silerseniz üyelik durumunuz yöneticiden genel üyeye düşürülür.</string>
+    <string name="actor_msg_manager_warning">*Şu anki Benim Aktörümü değiştirir veya silerseniz üyelik durumunuz yöneticiden genel üyeye düşürülür.</string>
+    <string name="msg_continue">Devam etmek istiyor musunuz?</string>
+    <string name="msg_manager_notice_guide">Yönetici tarafından bir bildirim gönderildi. Alınan kalplerin sayısı ne olursa olsun bu gönderi en üstte gösterilecektir.</string>
+    <string name="msg_surprise_heart">Bir sürpriz kalp kazandınız! Tebrik ederiz!\n+%1$s sürpriz kalp aldınız.</string>
+    <string name="msg_no_history">Seçtiğiniz tarihten itibaren sonuçlar kullanılamaz.</string>
+    <string name="msg_coinsplayer_ask_password"></string>
+    <string name="msg_heart_box_event_ok">Kalp kutu Etkinliğine katılabilirsiniz.</string>
+    <string name="msg_heart_box_event_fail">Kalp kutu Etkinliğine katılamazsınız.</string>
+    <string name="msg_download_ok">\"KAYDET\" işlevini kullanabilirsiniz.</string>
+    <string name="msg_download_fail">\"KAYDET\" işlevini kullanamazsınız.</string>
+    <string name="msg_share_ok">\"PAYLAŞ\" işlevini kullanabilirsiniz.</string>
+    <string name="msg_share_fail">\"PAYLAŞ\" işlevini kullanamazsınız.</string>
+    <string name="msg_giftcard_guide">Google Hediye Kartı Etkinliğine girdiniz</string>
+    <string name="msg_link_image_guide">Aynı anda bir bağlantı ve resim yükleyemezsiniz.</string>
+    <string name="response_v1_articles_ok">Gönderi tamamlandı.</string>
+    <string name="response_v1_articles_ok_heart">Gönderi tamamlandı.\n%1$s kalp verildi.</string>
+    <string name="response_users_is_active_time_over">Günlük limiti aşan oy kullanamazsınız.</string>
+    <string name="response_v1_articles_give_heart">%1$s kalp, oy vermek için kullanıldı.\n[%2$s Mevcut Kalp Sayısı: %3$s + %4$s]</string>
+    <string name="error_nextapps_error1">Reklam alınamadı.</string>
+    <string name="error_nextapps_error2">Kampanyaya katılınamıyor.</string>
+    <string name="error_nextapps_error3">Bu kampanya sonuçlandı.</string>
+    <string name="error_nextapps_error4">Bu, sizin katıldığınız bir kampanya.</string>
+    <string name="error_nextapps_error5">Bu kampanyaya katılamazsınız.</string>
+    <string name="error_abnormal">[%1$s] Bir hata oluştu. Daha sonra tekrar deneyin.</string>
+    <string name="error_abnormal_default">Bir hata oluştu. Daha sonra tekrar deneyin.</string>
+    <string name="error_abnormal_exception">Bir durum oluştu. Daha sonra tekrar deneyin.</string>
+    <string name="error_1001">E-posta zaten kullanılıyor.</string>
+    <string name="error_1002">Lütfen e-postanızı bir kez daha kontrol edin.</string>
+    <string name="error_1010">Lütfen takma adınızı girin.</string>
+    <string name="error_1011">Takma ad zaten kullanılıyor.</string>
+    <string name="error_1012">Öneren kişi bulunamıyor.</string>
+    <string name="error_1030">Yanlış takma ad.</string>
+    <string name="error_1031">Lütfen parolanızı kontrol edin.</string>
+    <string name="error_1145">2 gün içinde İdol değiştiremezsiniz!\nBu arada, kiminle değiştirmek istediğinizi düşünün! ^^</string>
+    <string name="actor_error_1145">Celeb\'ini 2 gün içinde değiştiremezsin!\nBu arada, kiminle değiştirmek istediğini düşün! :-)</string>
+    <string name="error_1164">Ev sevilen zaten silindi.</string>
+    <string name="error_1200">Üyelik bilgilerinizle ilgili bir sorun var gibi görünüyor.</string>
+    <string name="error_1201">Üyelik bilgilerinizle ilgili bir sorun var gibi görünüyor.</string>
+    <string name="error_1912">Cople hesabı kaydedilmedi. Lütfen menüden Cople hesabınızı kaydedin. ^^</string>
+    <string name="error_1991">Yetersiz para.</string>
+    <string name="error_2090">İzin verilmeyen özel bir karakter var.</string>
+    <string name="error_2091">Açık içerik yüklediğiniz için gönderiniz engellendi.</string>
+    <string name="error_4010">Oy listeleme sırasında oy kullanamazsınız.</string>
+    <string name="error_4011">Günlük limitini aşan sayıda oy kullanamazsınız.</string>
+    <string name="error_4020">Yeterli kalp yok.</string>
+    <string name="error_8000">Arkadaş listeniz dolu.\n(En fazla 300 arkadaşa izin verilir)</string>
+    <string name="error_8001">Diğer kişinin arkadaş listesi dolu.</string>
+    <string name="error_8002">Zaten bir arkadaş isteği gönderdiniz.\nİsteğiniz şu anda beklemede.</string>
+    <string name="error_8003">Zaten arkadaşsınız.</string>
+    <string name="error_9997">10 dakika sonra gönderebilirsiniz.</string>
+    <string name="error_9998">Bir arkadaşa günde en fazla 3 kalp gönderebilirsiniz.</string>
+    <string name="voting_guide_title1">Birikmiş oylarım nedir?</string>
+    <string name="voting_guide_title2">Derece için Koşullar</string>
+    <string name="voting_guide_desc1">- Bu, idolünüz için oy verdiğiniz kalplerin sayısıdır.\n- Belirli bir süre giriş yapmazsanız notunuz ve birikmiş oylarınız sıfırlanacaktır.\n(Tekrar giriş yapıp oy verdiğinizde her şey geri gelecektir.)\n- Uygulamayı başlattığınızda günlük 100 kalp alacaksınız. , ayrıca seviye durumunuza göre bonus seviye ödül kalpleri!</string>
+    <string name="actor_voting_guide_desc1">- Bu, Celeb\'ınız için oy verdiğiniz kalplerin sayısıdır.\n- Belirli bir süre giriş yapmazsanız seviyeniz ve birikmiş oylarınız sıfırlanacaktır.\n(Tekrar giriş yapıp oy verdiğinizde her şey geri gelecektir.)\n- Uygulamayı başlattığınızda günlük 100 kalp alacaksınız. , ayrıca seviye durumunuza göre bonus seviye ödül kalpleri!</string>
+    <string name="level_heart_format" formatted="false">Birikmiş oy: %s</string>
+    <string name="level_heart_guide_title1">Toplam puan sıralamasında 1. olana İyilik Meleği deniyor👼</string>
+    <string name="actor_level_heart_guide_title1">Toplam puan sıralamasında 1. olana İyilik Meleği deniyor👼</string>
+    <string name="level_heart_guide_title2">Sıralamaya göre puanlar</string>
+    <string name="level_heart_guide_title3">Onur Listesi - Kümülatif Sıralamalar</string>
+    <string name="level_heart_guide_title4">Fark etme</string>
+    <string name="level_heart_guide_desc1">Son 30 gün içerisinde günlük oylama sıralamasından elde edilen puanların toplamıdır. İlk 100\'ü ortaya çıkarır.\nHer birey ve grup adına tıklarsanız sıralama değişim grafiğini görebilirsiniz.\n30 günlük sıralamada en üst sıralarda yer alan bir idol ve onun fandomu adına anlamlı yerlere bağış yapıyoruz!\n\n✅ Toplama yöntemi\n- Üye: Her ayın 10\'u dahil olmak üzere önceki 30 gün için #1 birikmiş puan (11\'inde duyurulur)\n- Grup: her ayın 15\'i dahil olmak üzere önceki 30 gün için #1 birikmiş puan ay (16\'sında duyurulur)\n- Diğer kategoriler: Devam ederken ayrıca bildirilir\n\n✅ Ödül\n- Sanatçı ve Fandom adına Refah Kuruluşlarına 500.000 won bağış.\n- Seul Metrosunda Elektronik Pano Reklamı Yayınlamak</string>
+    <string name="level_heart_guide_desc3">Her ligin üyeleri, 11. (Ferdi) ve 16. (Grup) lig değişiklik kriterlerine göre belirlenir.</string>
+    <string name="level_heart_guide_desc4">-Bireylerin ve grupların ligi ayrıdır. (Grup S Ligi\'nde olsa bile, bireyler A Ligi\'nde olabilir.) NIC- Beraberlik olursa, tüm beraberlikler lig tahsis kurallarına göre atanacak ve bir sonraki ay mevcut takım veya ferdi sayısına yeniden tahsis edilecektir. .\nör.) A Ligi\'nde 3 takım aynı puanı alırsa 3 takım S Ligi\'ne geçer (S Ligi kotası 13 olarak değiştirilmiştir). Düşük sıradaki üç takım, S Ligi\'nde 12 takım tutmak için bir sonraki ay A Ligi\'ne taşınacak. \'ALL\' olarak işaretlenir.</string>
+    <string name="title_heart_vote_ranking__format" formatted="false">%s En İyi 100 Kalp Oyu</string>
+    <string name="empty_heart_vote_ranking">Kalp oylamasına hiç kimse katılmadı.</string>
+    <string name="failed_to_get_vote_ranking">Kalp oyu alınamadı.</string>
+    <string name="score_format" formatted="false">%s puan</string>
+    <string name="rank_format" formatted="false">%s</string>
+    <string name="title_agg_history_format" formatted="false">%s Birikmiş sıralamada değişim</string>
+    <string name="first_rank">No. 1</string>
+    <string name="friend_request_sent">Arkadaşlık isteği başarıyla gönderildi.\nDiğer kişi isteğinizi kabul ettiğinde arkadaş olacaksınız.</string>
+    <string name="empty_friends">Arkadaşınız yok.</string>
+    <string name="btn_accept">Kabul et</string>
+    <string name="btn_decline">Reddet</string>
+    <string name="friend_request_section_title">Arkadaş isteği listesi</string>
+    <string name="friend_section_title">Arkadaş listesi</string>
+    <string name="title_friend_delete">Arkadaşı sil</string>
+    <string name="friend_delete_msg_format" formatted="false">%s adlı kişiyi arkadaş listenizden silmek istiyor musunuz?</string>
+    <string name="tiele_friend_delete_result">Silindi.</string>
+    <string name="title_accept_friend_request">Arkadaşlık isteğini kabul et</string>
+    <string name="desc_accept_friend_request">Bu arkadaşlık isteğini kabul etmek istiyor musunuz?</string>
+    <string name="desc_accepted_friend_request">Bu arkadaşlık isteğini kabul ettiniz.\nArtık hem kalp gönderebilir ve alabilirsiniz.</string>
+    <string name="title_decline_friend_request">Arkadaşlık isteğini reddet</string>
+    <string name="desc_decline_friend_request">Arkadaşlık isteğini reddetmek mi istiyorsunuz?</string>
+    <string name="desc_declined_friend_request">Arkadaşlık isteğini reddettiniz.</string>
+    <string name="lable_burning_heart">Popüler Zamanda sırasında mevcut olduğunuz için kalp.</string>
+    <string name="message_burning_heart">Popüler Zamana başarıyla katılındı!\n30 kalp verildi.</string>
+    <string name="msg_comment_heart">5 kalp verildi.\n(Günde 1 kez)</string>
+    <string name="error_1013">10 dakika içinde iki defadan fazla kayıt yapamazsınız.</string>
+    <string name="friend_request_format">Bir arkadaşlık isteği aldınız.</string>
+    <string name="loading_profile">Profil alınıyor...</string>
+    <string name="title_no_free_heart">Günlük kalp yok</string>
+    <string name="desc_no_free_heart">Günlük 0 kalbiniz var T_T\nBiraz daha almak ister misiniz?</string>
+    <string name="title_no_heart">Yeterli kalp yok.</string>
+    <string name="desc_no_heart">Yeterli kalbiniz yok T_T\nBiraz daha almak ister misiniz?</string>
+    <string name="btn_video_ad">Video reklam (5 + 5 kalp)</string>
+    <string name="btn_free_heart_charge">Ücretsiz Kalpler</string>
+    <string name="btn_invite_friends">Metin mesajı yoluyla arkadaş davet edin.</string>
+    <string name="btn_invite_friends_reward">Bir arkadaş daveti için 1000 kalp.</string>
+    <string name="btn_invite_friends_reward_burning">Bir arkadaş daveti için 1000 kalp.</string>
+    <string name="btn_invite_friends_kakao">Bir arkadaş davet et.</string>
+    <string name="btn_invite_friends_kakao_reward">Kaydolunca %1$s kalp.</string>
+    <string name="btn_invite_friends_kakao_reward_burning">Kaydolunca 1000 kalp.</string>
+    <string name="btn_confirm">Tamam</string>
+    <string name="failed_to_load_page">Sayfa alınamıyor.</string>
+    <string name="btn_retry">Tekrar dene</string>
+    <string name="error_1000_heart_give">Günde en fazla 1000 kalp gönderebilirsiniz.</string>
+    <string name="title_heart_earn">Daha fazla kalp nasıl alınır?</string>
+    <string name="desc_bookmark">En sevdiğiniz İdol yok!</string>
+    <string name="actor_desc_bookmark">Favori ünlüünüz yok!</string>
+    <string name="desc_bookmark2">Sık aradığınız sanatçıları, en sevdikleriniz listesine ekleyin!</string>
+    <string name="actor_desc_bookmark2">Sık aradığınız Ünlüleri favori listenize ekleyin!</string>
+    <string name="desc_bookmark3">En sevdiğin olarak ayarla</string>
+    <string name="title_rank_history">Sıralama Değişiklikleri</string>
+    <string name="title_reward_video">Video reklama bakın</string>
+    <string name="desc_reward_video" formatted="false">%s Kalp</string>
+    <string name="title_reward_invite">Bir arkadaş davet et</string>
+    <string name="desc_reward_invite">Ever 1000</string>
+    <string name="desc_reward_invite_burning">Ever 1000</string>
+    <string name="title_reward_charge">Ücretsiz kalp doldurma</string>
+    <string name="desc_reward_charge">Ever</string>
+    <string name="title_heart_send">Kalp gönder</string>
+    <string name="video_ad_success">Kalpler kaydedildi.</string>
+    <string name="video_ad_cancelled">Reklamın oynatılması tamamlanmadı.</string>
+    <string name="video_ad_failed">Ağ istikrarsız. Video oynatma işlemi başarısız oldu.</string>
+    <string name="video_ad_unable">Reklamverenlerden başka reklam yok.\nLütfen daha sonra tekrar deneyin.</string>
+    <string name="comment_push_format" formatted="false">\"%s\" bir yorum yapmış.</string>
+    <string name="btn_invite_friend">Bir arkadaş davet et</string>
+    <string name="desc_login">Bu işlevi kullanmak için oturum açmalısınız.\nŞimdi oturum açmak istiyor musunuz?</string>
+    <string name="ever_heart">Herhangi bir zaman kalp</string>
+    <string name="send_heart_desc">Arkadaşlarınıza sadece Ever kalpleri gönderebilirsiniz. ^^</string>
+    <string name="send_heart_confirm_desc_format">%1$s kalp, %2$s adlı kişiye gönderilecek.</string>
+    <string name="lake_strong_heart">Yeterli Ever kalbi yok.</string>
+    <string name="order_by_date">Tarihe göre</string>
+    <string name="order_by_vote">Oylara göre</string>
+    <string name="heart_receive_message" formatted="false">%s, kalp gönderdi.</string>
+    <string name="heart_receive_message_with_num">%1$s, %2$s kalp gönderdi.</string>
+    <string name="request_phone_state_permission">Ücretsiz kalp dolumu için daha da fazla reklam görmek için lütfen sonraki iki yetki ayarı için \"İzin ver\" seçeneğini kullanın.</string>
+    <string name="deny_phone_state_permission">Önceki ayarlara dönmek isterseniz, \'Sistem Ayarları &gt; Uygulamalar > CHOEAEDOL &gt; Yetkilendirme\' öğesini seçin ve Arama Ayarı ve Kişiler\'i açın</string>
+    <string name="actor_deny_phone_state_permission">Önceki ayarlara geri dönmek isterseniz \"Sistem Ayarları > Uygulamalar > CHOEAEDOL Celeb > Yetkilendirme\" kısmına gidin ve Çağrı Ayarını açın</string>
+    <string name="level">Seviye</string>
+    <string name="level_requirement">Koşul</string>
+    <string name="level_benefit">Seviye Avantajı</string>
+    <string name="level_requirement_format">%1$d oy</string>
+    <string name="level_benefit_format">&#10084; %1$s</string>
+    <string name="kakao_invite_new">Şu an %1$s adlı kişinin bulunduğu sıra %2$d!</string>
+    <string name="drawer_open">Menüyü aç</string>
+    <string name="drawer_close">Menüyü kapat</string>
+    <string name="title_item_shop">Öğe Mağazası</string>
+    <string name="title_item_buy">Satın Alma Öğeleri</string>
+    <string name="register">Kaydol</string>
+    <string name="send">Gönder</string>
+    <string name="msg_item_purchased_1">Artık toplulukta gönderi ve yorumları silebilirsiniz.</string>
+    <string name="msg_item_purchased_2">%1$d kişiye gönderildi.</string>
+    <string name="msg_item_purchased_2_unknown">Mesaj gönderildi.</string>
+    <string name="msg_item_purchased_3">Her şey dahil gün belirlendi.</string>
+    <string name="hint_community_push">İçerik girin (20 karakterden az)</string>
+    <string name="item_title_1"></string>
+    <string name="item_title_2"></string>
+    <string name="item_title_3">Her şey dahil gün rozeti</string>
+    <string name="item_desc_1"></string>
+    <string name="item_desc_1_1"></string>
+    <string name="item_desc_2"></string>
+    <string name="item_desc_2_1"></string>
+    <string name="item_desc_3">İdol Topluluğunda ayarlanan her şey dahil günü göster.</string>
+    <string name="actor_item_desc_3">Ünlüler topluluğunda geçen tüm günü gösterin.</string>
+    <string name="item_guide_1_1"></string>
+    <string name="item_guide_1_2"></string>
+    <string name="item_guide_2_1"></string>
+    <string name="item_guide_2_2"></string>
+    <string name="item_desc_3_1">(Satın aldıktan sonra 1 kez kullanım)\nHer şey dahil gün rozetini takma adın yanında göster.</string>
+    <string name="item_guide_title_1"></string>
+    <string name="item_guide_title_2"></string>
+    <string name="item_guide_title_3">Her şey dahil gün rozeti işlevi.</string>
+    <string name="item_guide_3_1">- Sonraki 10 gün içinde bir günü her şey dahil gün olarak belirleyebilirsiniz (sıralama listesi ve toplulukta uyarı gösterilir)\n- Rozet bir gün boyunca tutulur (bugünkü oy listeleme saatine kadar).\n- Sadece %1$d. seviye + üyeler bu öğeyi satın alabilir.\nTarih, sadece sizin İdolünüz için belirlenebilir.</string>
+    <string name="actor_item_guide_3_1">- Önümüzdeki 10 gün içinde bir günü tam gün olarak belirleyebilirsiniz (rütbe listesinde ve toplulukta uyarı gösterilecektir)\n- Rozet bir gün boyunca gösterilecektir (bugünün oylama zamanına kadar) .\n- Bu öğeyi yalnızca %1$d+ düzey üyeleri satın alabilir.\nTarih yalnızca kendi ünlünüz için belirlenebilir.</string>
+    <string name="item_guide_3_2">Her şey dahil günü olarak belirlemek istediğiniz tarihi seçin ve\n\"KAYDOL\" düğmesine basın.\n(%1$d elmas kullanılacak)</string>
+    <string name="error_9901">Yeterli Elmas yok.</string>
+    <string name="error_9902">Önümüzdeki on gün içinde ayarlanabilir.</string>
+    <string name="error_9903">Öğe zaten satın alındı.</string>
+    <string name="error_9904">Her şey dahil günü daha önce ayarlanmış.\nLütfen mevcut her şey dahil gününden sonra bir tarih seçip tekrar deneyin.</string>
+    <string name="error_select_day">Bir tarih seçin.</string>
+    <string name="error_9900">Bu öğe sadece %1$d. seviye + üyeler tarafından satın alınabilir.</string>
+    <string name="burning_day_format">d/M</string>
+    <string name="deleted_by">%1$s tarafından silinmiştir.</string>
+    <string name="deleted_by_unknown">Silinen gönderi.</string>
+    <string name="male">Erkekler</string>
+    <string name="female">Kızlar</string>
+    <string name="all">Tümü</string>
+    <string name="wait_line_signin">LINE hesap bilgileriniz alınıyor...</string>
+    <string name="empty_friend_request">Arkadaşlık isteğiniz yok.</string>
+    <string name="cancel_friend_request">Arkadaşlık İsteğini Reddet</string>
+    <string name="last_login">Son Oturum Açma</string>
+    <string name="settings_language">Dil Ayarları</string>
+    <string name="language_default">Sistem Varsayılanı</string>
+    <string name="view_more">Daha fazla göster</string>
+    <string name="post_limit">Maksimum %1$d karakter.</string>
+    <string name="msg_report_confirm">%1$s kalp, bildirim için kullanılacak.</string>
+    <string name="menu_change_app">Koreli Aktöre git</string>
+    <string name="actor_menu_change_app">CHOEAEDOL git</string>
+    <string name="copied_to_clipboard">Panoya kopyalandı</string>
+    <string name="title_edit">Düzenle</string>
+    <string name="error_9996">Yakma süresi içinde kullanılamaz</string>
+    <string name="title_tab_gaon">Gaon Müzik Ödülü</string>
+    <string name="gaon_guide_1">CHOEAEDOL nasıl kullanılır &gt;</string>
+    <string name="gaon_guide_2">Gaon Müzik Ödülü &gt;</string>
+    <string name="label_header_1">Gaon Müzik Ödülü Popüler Oy</string>
+    <string name="label_header_2">Dönem: 12.01 - 19.02.2017</string>
+    <string name="label_header_3">Gaon Müzik Ödülü popüler oy sayıları.\nSıralamada değişiklik ayrıntılarını görmek için şarkıcı veya gruba basın.</string>
+    <string name="label_header_result">Sonuç</string>
+    <string name="label_header_1_final">Gaon Müzik Ödülü Popüler Oy: Nihai Sonuç</string>
+    <string name="label_header_3_final">Oylama dönemi sona ermiştir.</string>
+    <string name="iab_restricted_title">Kalp Satın Al</string>
+    <string name="iab_restricted">Günde bir kez kullanılabilir</string>
+    <string name="label_not_verified_iap">Bazı satın alımlar tamamlanmadı. Kalp doldurma istasyonuna gidin.</string>
+    <string name="setting_menu_cache">Ön belleği sil</string>
+    <string name="are_you_sure">Emin misiniz?</string>
+    <string name="setting_menu_push_hearts">Kalpler</string>
+    <string name="setting_menu_push_comments">Yorum</string>
+    <string name="menu_menu_kin">İdol S ve C</string>
+    <string name="actor_menu_menu_kin">S ve C</string>
+    <string name="hint_search">Arama metnini girin</string>
+    <string name="answer">Cevap</string>
+    <string name="offer_video_ad_desc" formatted="false">%s Kalp alın (5 kez / 30 dak)</string>
+    <string name="present_heart">Kalp Hediyesi</string>
+    <string name="present_heart_confirm">%1$s kalp hediye etmek istiyor musunuz?</string>
+    <string name="present_heart_done">Kalp hediye ettiniz.</string>
+    <string name="emoticon_badge">İfade rozeti</string>
+    <string name="emoticon_badge_desc">Ruh halinizi gösterebilirsiniz</string>
+    <string name="emoticon_badge_buy">Bir ifade rozeti satın al</string>
+    <string name="emoticon_badge_buy_guide">İfade seçin ve \"Kaydet\"\' düğmesine basın.\n(%1$d kalp kullanılır)</string>
+    <string name="purchased">Satın alma işlemi tamamlanmıştır.</string>
+    <string name="newbie_info"></string>
+    <string name="report_done">Bildirildi</string>
+    <string name="message_box">Mesaj Kutusu</string>
+    <string name="message_expire_format">Bu mesajlar %1$d gün süreyle saklanacaktır.</string>
+    <string name="message_send">Bir Mesaj Gönder</string>
+    <string name="message_send_heart">Kalp ile Gönder</string>
+    <string name="message_empty">Mesaj yok.</string>
+    <!-- permissoin (korean only) -->
+    <string name="permission_required">[Gerekli İzin(ler)]</string>
+    <string name="permission_optional">[İsteğe Bağlı İzin(ler)]</string>
+    <string name="permission_contact">İletişim: Ücretsiz kalp doldurma istasyonu için gerekli. Google oturum açma işlemi için gerekli.</string>
+    <string name="permission_phone">Telefon: Ücretsiz kalp doldurma istasyonu için gerekli</string>
+    <string name="permission_storage">Depolama: Fotoğrafları yüklemek ve kaydetmek için gereklidir.</string>
+    <string name="permission_desc"></string>
+    <string name="actor_permission_desc"></string>
+    <string name="allow">İzin ver</string>
+    <string name="deny">Reddet</string>
+    <string name="label_see_video_for_heartbox">Bir video reklamı, bir şans daha</string>
+    <!-- bj app -->
+    <string name="profile_additional_info">İlave bilgi</string>
+    <string name="profile_birth">Doğum Tarihi</string>
+    <string name="profile_birthday">Doğum günü</string>
+    <string name="profile_intro">Giriş</string>
+    <string name="profile_instagram">Instagram</string>
+    <string name="profile_facebook">Facebook</string>
+    <string name="profile_personal_broadcast">Kişisel Yayın</string>
+    <string name="profile_modify_profile">Profil Değiştir</string>
+    <string name="profile_delete_birth">Doğum gününü silmek istiyor musunuz?</string>
+    <string name="profile_no_birthday">Doğum günü yok</string>
+    <string name="profile_private">Özel</string>
+    <string name="invalid_url">Web sitesi adresi geçersiz.</string>
+    <string name="format_reg_date" formatted="false">%s tarihinde katıldı</string>
+    <string name="laboratory">laboratuvar</string>
+    <string name="use_internal_photo_editor">Dahili fotoğraf düzenleyiciyi kullanın</string>
+    <string name="file_size_exceeded" formatted="false">%sMB\'a kadar yükleme yapabilirsiniz.</string>
+    <string name="gaon_welcome">7. Gaon Grafik Müzik Ödülleri!</string>
+    <string name="gaon_guide1">En Beğenilen Erkek ve Kadın Grubu, sizin oylarınızla seçiliyor.</string>
+    <string name="gaon_guide2">Sevdiğiniz sanatçınıza Sevgililer Günü Ödülü verin.</string>
+    <string name="gaon_date_title">◆ Gaon Ödülleri tarihi</string>
+    <string name="gaon_date_value">14 Şubat 2018</string>
+    <string name="gaon_period_title">◆ Oylama dönemi</string>
+    <string name="gaon_period_value">%1$s ~ %2$s</string>
+    <string name="gaon_ratio_title">◆ Oy oranı</string>
+    <string name="gaon_ratio_value">%100 oy popülerliği yansıtmaktadır</string>
+    <string name="gaon_guide3">(Biriken sıralamada ilk sırada yer alan Erkek ve Kadın grup en beğenilen grup ödülünü alacaktır.)</string>
+    <string name="gaon_howto_title">◆ Nasıl oy verilir?</string>
+    <string name="gaon_howto_value">CHOEAEDOL\'ın orijinal kurallarıyla aynı</string>
+    <string name="gaon_special_rule_title">◆ İlk kurallardan farklı kural</string>
+    <string name="gaon_special_rule_value1">* Bireysel sanatçılar değil, yalnızca en beğenilen erkek ve kadın gruplar.</string>
+    <string name="gaon_special_rule_value2">* Adaylar Gaon\'un belirttiği gruplarla sınırlıdır</string>
+    <string name="gaon_special_rule_value3">* Grubun üyelerine tek tek dokunulmasıyla oy sayısı eklenir</string>
+    <string name="gaon_special_rule_value4">* Uygulama içi satın alım, her cihaz için günde bir tane ile sınırlıdır</string>
+    <string name="gaon_special_rule_value5">* Aşağıdaki işlevler 23:15 ile 00:15 (KST) arasında kısıtlanır.</string>
+    <string name="gaon_special_rule_value6">Arkadaşlarına kalp gönder</string>
+    <string name="gaon_special_rule_value7">Oylama Bonusu</string>
+    <string name="gaon_special_rule_value8">Popüler yayınlar</string>
+    <string name="gaon_special_rule_value9">Topluluk makaleleri yaz</string>
+    <string name="gaon_goto_notice">CHOEAEDOL Bildirimi ></string>
+    <string name="gaon_goto_gaon">Gaon Ödülleri Ana Sayfa ></string>
+    <string name="gaon_award_title_male">Mevcut Erkek Sıralaması</string>
+    <string name="gaon_award_title_female">Mevcut Kadın Sıralaması</string>
+    <string name="gaon_voting_period">Oylama dönemi: %1$s ~ %2$s</string>
+    <string name="gaon_current_guide1">Bu gerçek zamanlı sıralamadır (Bireysel ve grup oylarını içerir).</string>
+    <string name="gaon_current_guide2">Biriken sıralamadaki ilk grup bir ödül kazanacak.</string>
+    <string name="gaon_current_title">Şu anki oylama durumu %1$s</string>
+    <string name="gaon_accumulative_title_male">Birikimli Sıralama\nErkek Grubu</string>
+    <string name="gaon_accumulative_title_female">Birikimli Sıralama\nKız Grubu</string>
+    <string name="gaon_accumulative_guide1">En beğenilen grup için biriken oy sıralaması</string>
+    <string name="gaon_accumulative_guide2">Biriken sıralamadaki ilk grup bir ödül kazanacak.</string>
+    <string name="gaon_accumulative_title">%1$s ~ %2$s Biriken Sonuç</string>
+    <string name="gaon_award_title_male_final">[Gaon] Erkek Final Sonuç</string>
+    <string name="gaon_award_title_female_final">[Gaon] Kadın Finali Sonucu</string>
+    <string name="gaon_final_guide">Oylama dönemi sona ermiştir.</string>
+    <string name="gaon_final_title">%1$s ~ %2$s Sonuç</string>
+    <string name="menu_freeboard">Sohbet</string>
+    <string name="myheart_today_earn">Herhangi bir zaman kalp bugün</string>
+    <string name="myheart_today_earn_help">Eğer hiç %1$s kalp atışını toplarsanız, \nilk idol profil görüntüsü idolüm profilim ile değiştirilecektir. \nDeğiştirilen profil resmi yarın sıfırlanacak.</string>
+    <string name="actor_myheart_today_earn_help">%1$s "hiç kalp" kazanırsanız, ilk yer profili resimleri Aktörüm\'ün profiline dönüştürülür. Değiştirilen profil görüntüleri yarın sıfırlanacak.</string>
+    <string name="label_image_option">Fotoğraf en boy oranı</string>
+    <string name="label_image_option_title">Fotoğrafın en boy oranını seç</string>
+    <string name="label_image_option_square">Kare (Profil&amp;Bannergram)</string>
+    <string name="label_image_option_free">Ücretsiz boyut / orijinal</string>
+    <string name="setting_lockscreen">Ekranı kilitle</string>
+    <string name="lockscreen_use">Kilit ekranı kullan</string>
+    <string name="lockscreen_background">Arka plan resmim</string>
+    <string name="lockscreen_not_available">\"İdolüm\" ayarlanmamışsa kilit ekranı kullanılamaz. \nNeden \"İdolüm\" ayarlamıyorsunuz?</string>
+    <string name="actor_lockscreen_not_available">\"İdolüm\" ayarlanmamışsa kilit ekranı kullanılamaz. \nNeden \"İdolüm\" ayarlamıyorsunuz?</string>
+    <string name="lockscreen_preview">Önizleme Kilit ekranı</string>
+    <string name="lockscreen_preview_help">Kilidi açmak için herhangi iki veya daha fazla daireyi bağlayın. Dene.</string>
+    <string name="lockscreen_permission">Kilit ekranını kullanmak için, bir sonraki sayfada \"Diğer uygulamalar üzerinden çizim yapmaya izin ver\" seçeneğini açın.</string>
+    <string name="lockscreen_style">Stil</string>
+    <string name="lockscreen_style_pattern">Desen</string>
+    <string name="lockscreen_style_slide">Kaymak</string>
+    <string name="lockscreen_show_clock">Saati göster</string>
+    <string name="lockscreen_preview_help_slide">Resmi soldaki daireden sağa kaydırmak ekranın kilidini açar.\nHaydi Yapalım şunu.</string>
+    <string name="label_set_most">İdolüm\'umu ayarlarsanız \'İdolüm\' için oylama yapabilir ve \'CHOEAEDOL\' oyununun keyfini daha eğlenceli bir hale getirebilirsiniz.\nŞimdi \'İdolüm\' kurmak mı?</string>
+    <string name="actor_label_set_most">\'Ünlülerim\' i ayarlarsanız, \'Ünlülerim\' e oy vererek seviye atlayabilir ve ekstra seviye kalpler kazanabilirsiniz!\n\'Ünlülerim\' şimdi kurulsun mu?</string>
+    <string name="setting_push">Anlık Alarm Ayarları</string>
+    <string name="menu_board">Sohbet</string>
+    <string name="menu_stats">istatistik</string>
+    <string name="account_management">Hesap Yönetimi</string>
+    <string name="stats_highest_votes">En Yüksek Oyların İlk 100\'ü</string>
+    <string name="stats_donation">Hayırsever Melek ve Peri Sayısı</string>
+    <string name="stats_1st_place">Birincilik Sayısı</string>
+    <string name="stats_votes_top300">İlk 300 Kümülatif oylama</string>
+    <string name="charity_angel">İyilik Meleği</string>
+    <string name="charity_fairy">İyilik Peri</string>
+    <string name="stats_idol">İdol</string>
+    <string name="stats_user">Kullanıcı</string>
+    <string name="none">Yok</string>
+    <string name="dropout_confirm">Hesabınızı silerseniz, hesabınızı kurtaramazsınız.\nGerçekten hesabınızı silmek istiyor musunuz?</string>
+    <string name="dropout_enter_captcha">Lütfen aşağıdaki dizgiyi giriniz</string>
+    <string name="dropout_done">Hesap Silindi</string>
+    <string name="dropout_placeholder">Lütfen yukarıdaki dizgiyi giriniz.</string>
+    <string name="hearts_from_friends">Arkadaşlarından Kalpler</string>
+    <string name="ad_show_fail">Reklam oynatma başarılı değildi.</string>
+    <string name="extension_login">Bu işlevi kullanmak için oturum açmalısınız.</string>
+    <string name="actor">Ünlü</string>
+    <string name="onestore_confirm_unconsumed"></string>
+    <string name="onestore_need_update"></string>
+    <string name="onestore_remote_exception"></string>
+    <string name="quiz_review_title">Sınav Kontrolü</string>
+    <string name="quiz_content"></string>
+    <string name="quiz_point"></string>
+    <string name="quiz_description"></string>
+    <string name="quiz_choice_one"></string>
+    <string name="quiz_choice_two"></string>
+    <string name="quiz_choice_three"></string>
+    <string name="quiz_choice_four"></string>
+    <string name="quiz_choice_one_rtl"></string>
+    <string name="quiz_choice_two_rtl"></string>
+    <string name="quiz_choice_three_rtl"></string>
+    <string name="quiz_choice_four_rtl"></string>
+    <string name="quiz_number"></string>
+    <string name="my_coupon">Kupon</string>
+    <string name="use_coupon">Kullanım</string>
+    <string name="expire_coupon">Geçerlik</string>
+    <string name="my_info">Benim profilim</string>
+    <string name="my_info_vote">Birikmiş oy</string>
+    <string name="my_info_reg_date">tarihinde katıldı</string>
+    <string name="used_coupon">Tamamlandı</string>
+    <string name="set_all_in_day">Tümü gününü ayarla</string>
+    <string name="schedule_desp_anniversary">Yıldönümü</string>
+    <string name="schedule_desp_album">Albüm sürümü</string>
+    <string name="schedule_desp_concert">Konser, fan toplantısı</string>
+    <string name="schedule_desp_sign">İmza töreni</string>
+    <string name="schedule_desp_airport">Havalimanı</string>
+    <string name="schedule_desp_tv">Televizyon</string>
+    <string name="schedule_desp_radio">Radyo</string>
+    <string name="schedule_desp_video">Canlı video</string>
+    <string name="schedule_desp_awards">Ödül töreni</string>
+    <string name="schedule_desp_etc">Vb</string>
+    <string name="schedule_btn_yes">Doğru</string>
+    <string name="schedule_btn_no">Yanlış</string>
+    <string name="schedule_btn_dup">Çoğaltın</string>
+    <string name="schedule">Takvim</string>
+    <string name="schedule_write_level" formatted="false">Sadece seviye %s veya üstü yazabilir.</string>
+    <string name="schedule_yes">Doğru takvim?</string>
+    <string name="schedule_no">Yanlış takvim?</string>
+    <string name="schedule_dupl">Çoğaltın takvim?</string>
+    <string name="schedule_write">Yazma Takvim</string>
+    <string name="schedule_category">Kategori</string>
+    <string name="schedule_location">yer</string>
+    <string name="schedule_require">Lütfen zorunlu alanları (*) doldurunuz.</string>
+    <string name="schedule_eval_most">Sadece idolüm takvimi değerlendirebilirsin.</string>
+    <string name="schedule_eval_level" formatted="false">Sadece seviye %s veya üstü değerlendirebilir.</string>
+    <string name="schedule_eval_done">Zaten değerlendirdi.</string>
+    <string name="schedule_title">Başlık</string>
+    <string name="schedule_allday">Tüm gün</string>
+    <string name="schedule_info">Bilgi</string>
+    <string name="schedule_save">kaydedilmiş</string>
+    <string name="schedule_detail">detaylı olarak görüntüle</string>
+    <string name="schedule_use_location">Bu konumu kullan</string>
+    <string name="schedule_time">zaman</string>
+    <string name="schedule_write_most">Sadece idolüm takvimi yazabilirsin.</string>
+    <string name="schedule_empty">Hiçbir programları vardır.</string>
+    <string name="schedule_desp_ticketing">Biletlendirme</string>
+    <string name="schedule_write_stop">Yazma takvimini iptal et?</string>
+    <string name="setting_menu_push_schedule">Takvim</string>
+    <string name="coming_soon">Çok yakında</string>
+    <string name="schedule_write_most_actor">Sadece ünlülerimin programını yazabilirsin.</string>
+    <string name="schedule_eval_most_actor">Sadece ünlülerimin programını değerlendirebilirsin.</string>
+    <string name="schedule_desp_movie">Film</string>
+    <string name="schedule_desp_production">Sunum</string>
+    <string name="schedule_desp_previw">Ön izleme</string>
+    <string name="schedule_desp_concert_actor">Fan toplantısı</string>
+    <string name="schedule_desp_event">Etkinlikler</string>
+    <string name="confirm_delete">Silmek istiyor musunuz?</string>
+    <string name="idoltalk_write_most">Sadece idolümün Idol Talk\'ni yazabilirsin.</string>
+    <string name="image_permission_error">Cihaz Belleği veya Cihaz Ayarları &gt; CHOEAEDOL &gt; Fotoğraf kısmına gidin. Yetkilendirme ayarlarını kontrol edin ve tekrar deneyin.</string>
+    <string name="boys_individual">Erkekler\nÜye</string>
+    <string name="girls_individual">Kızlar\nÜye</string>
+    <string name="boys_group">Erkekler\nGrup</string>
+    <string name="girls_group">Kızlar\nGrup</string>
+    <string name="my_idol">Benim\nIdolüm</string>
+    <string name="enter_community">Topluluğa gir</string>
+    <string name="enter_schedule">Plana bakınız</string>
+    <string name="post">Gönderileri</string>
+    <string name="community_post">Topluluk gönderileri</string>
+    <string name="coupon">Kupon</string>
+    <string name="friend">arkadaş</string>
+    <string name="add_favorites">Sık kullanılanlara eklendi.</string>
+    <string name="remove_favorites">Sık kullanılanlardan silindi.</string>
+    <string name="bannergram_guide_landscape">Manzara moduna geçebilirsiniz.</string>
+    <string name="my_actor">Ünlüm</string>
+    <string name="new_face">Yeni yüz</string>
+    <string name="tooltip_search">En sevdiğiniz idolü arayın.</string>
+    <string name="tooltip_set_most">Basın Kalp benim idol olarak kayıt.</string>
+    <string name="help_msg_change_gender_to_male">Erkekler idol görmek için buraya tıklayın.</string>
+    <string name="help_msg_change_gender_to_female">Kız idol görmek için buraya tıklayın.</string>
+    <string name="help_msg_profile_picture_size">Profil ve afiş olarak sadece kare fotoğraflar uygulanır</string>
+    <string name="tooltip_search_actor">En sevdiğiniz Koreli ünlüleri arayın.</string>
+    <string name="tooltip_set_most_actor">Kalp\'e basarak Ünlülerimi ayarlayın.</string>
+    <string name="no_data">Veri yok.</string>
+    <string name="title_tab_hof">Ünlüler\nSalonu</string>
+    <string name="show_most_only">Bu yazı sadece \'benim idolüm\' aynı ise görülebilir.</string>
+    <string name="actor_show_most_only">Bu gönderi yalnızca topluluk üyeleri tarafından görülebilir.</string>
+    <string name="restore_purchase">Satın Alma İşlemini Geri Yükle</string>
+    <string name="restore_purchase_completed">Satın alma restorasyon tamamlandı.</string>
+    <string name="restore_purchase_failed">Satın alma işlemi geri yüklenemedi.</string>
+    <string name="no_purchases">Satın Alma Geçmişi Yok</string>
+    <string name="regular_payment">Düzenli ödeme</string>
+    <string name="purchasing_management">Satın Almaları Yönet\n(Abonelikten Çık)</string>
+    <string name="help_msg_month_free_trial" formatted="false">%d haftalık ücretsiz deneme</string>
+    <string name="month_free_trial" formatted="false">%d haftalık ücretsiz deneme</string>
+    <string name="next_billing_date">Sonraki otomatik ödeme tarihi</string>
+    <string name="subscription_auto_renewal">*Direk iptal etmezseniz ödeme her ay otomatik olarak yapılacaktır.</string>
+    <string name="warning_delete_account">Hesabınızı silerseniz, hesabınızı kurtaramazsınız.\nAyrıca, düzenli ödeme otomatik olarak iptal edilmez.\nDaha fazla hizmet istemiyorsanız iptal etmelisiniz.</string>
+    <string name="all_users_are_given">Tüm kullanıcılar verilir</string>
+    <string name="daily_pack_modifier">Her gün idolünüze tam kalpler verin</string>
+    <string name="actor_daily_pack_modifier">Ünlülerinize her gün tam kalpler verin</string>
+    <string name="describe_monthly_payment">%1$d haftadan sonra sizden otomatik olarak ayda %2$s tutarında ücret alınacaktır.\nİstediğiniz zaman ödemeyi iptal edebilirsiniz.</string>
+    <string name="subscribed">Satın alınan</string>
+    <string name="month">ay</string>
+    <string name="important">Önemli!</string>
+    <string name="purchase_incompleted">Satın alma başarısız oldu</string>
+    <string name="send_receipt">Makbuz gönder</string>
+    <string name="warning_subscription_platform_change_ios" formatted="false">%s\' hizmetini zaten başka bir platformda (Android, vb.) Abone ediyorsun. \nBaşka bir platformdan satın alınan hizmeti kullanamazsın. Lütfen hizmeti iptal edin ve yeniden satın alın.</string>
+    <string name="warning_subscription_platform_change_android" formatted="false">%s\' hizmetini zaten başka bir platformda (ios vb.) Abone ediyorsunuz. \nBaşka bir platformdan satın alınan hizmeti kullanamazsınız. Lütfen hizmeti iptal edin ve yeniden satın alın.</string>
+    <string name="warning_subscription_only_original" formatted="false">\'%s\' Kalpler sadece CHOEAEDOL&#9825; üzerinde verilir\nLütfen CHOEAEDOL&#9825; üzerinde oturum açın</string>
+    <string name="service_information">Servis Bilgisi</string>
+    <string name="report">Rapor</string>
+    <string name="already_reported">Raporlanan mesaj</string>
+    <string name="remove">silmek</string>
+    <string name="yes">Evet</string>
+    <string name="no">Yok hayır</string>
+    <string name="reward_heart_title">Ödül Kalpleri</string>
+    <string name="vote_heart_title">Oy Verme Ödülü</string>
+    <string name="attendance">katılım</string>
+    <string name="hot_time">Yoğun saatler</string>
+    <string name="heart_reward_posting" formatted="false">Ödül Sonrası %d kalp verildi.</string>
+    <string name="heart_reward_vote" formatted="false">Oy Verme ödülü %d kalp!</string>
+    <string name="vote_posting">Yayına atılan kalpler</string>
+    <string name="commentary">açıklama</string>
+    <string name="login_required">Lütfen giriş yapın.</string>
+    <string name="onepick">One Pick</string>
+    <string name="actor_onepick">One Pick</string>
+    <string name="num_participants">Katılımcı sayısı</string>
+    <string name="num_participants_format" formatted="false">%s</string>
+    <string name="see_current_ranking">Sıralamalar</string>
+    <string name="onepick_vote">Oy</string>
+    <string name="see_result">Sonuçlar</string>
+    <string name="qualifying_round">Hazırlıklar</string>
+    <string name="final_round">Finaller</string>
+    <string name="my_onepick_is">seçimi</string>
+    <string name="zzz_onepick_is">ZZZ\'nin seçimi</string>
+    <string name="my_onepick">Benim seçimim</string>
+    <string name="onepick_hashtag">#Hashtag</string>
+    <string name="onepick_hashtag_desc">Aşağıdaki #Hashtag ile yüksek kaliteli görüntüleri idol topluluğuna gönderin! \nAnkette gösterilebilir.</string>
+    <string name="onepick_confirm_exit">Şimdi istifa edersen, bugün artık oy kullanamazsın. \nÇıkmak istiyor musun?</string>
+    <string name="final_result">Nihai sonuçlar</string>
+    <string name="my_pick">Benim seçimim</string>
+    <string name="onepick_period">Tarih</string>
+    <string name="onepick_mypick">Seçtiğiniz Diğer İdoller</string>
+    <string name="actor_onepick_mypick">Seçtiğiniz diğer ünlüler</string>
+    <string name="onepick_capture">Sonucu yakalamak için buraya dokunun!</string>
+    <string name="onepick_current_ranking">sıralamalar</string>
+    <string name="label_share">Pay</string>
+    <string name="onepick_no_votes">Henüz katılımcı yok. \nOy veren ilk kişi siz olun!</string>
+    <string name="onepick_already_voted">oylandı</string>
+    <string name="feed_status_message_hint">Durum mesajınızı girin</string>
+    <string name="feed_my_feed">Benim profilim</string>
+    <string name="feed_edit_status">Durum mesajını düzenle</string>
+    <string name="feed_no_posts">Henüz hiç yazı yok.</string>
+    <string name="feed_no_comments">Henüz hiç yorum yazılmamış.</string>
+    <string name="feed_status_message">Durum mesajı</string>
+    <string name="btn_dailypack_format" formatted="false">Her gün%s kalbini daha fazla topla</string>
+    <string name="feed_private">Profilimi özel yap</string>
+    <string name="feed_private_desc">Özel yaparsan, diğerleri profilini göremez.</string>
+    <string name="feed_is_private">Bu profil özel</string>
+    <string name="freeboard_order_newest">Son</string>
+    <string name="freeboard_order_comments">En çok yorum</string>
+    <string name="label_tag">Etiket</string>
+    <string name="no_coupons">Kupon yok</string>
+    <string name="darkmode">Karanlık modu</string>
+    <string name="automatic">Otomatik</string>
+    <string name="status_settings">Durum ayarları</string>
+    <string name="block_friend_req">Arkadaşlık isteklerini engelle</string>
+    <string name="block_friend_req_desc">Engellerseniz, artık arkadaşlık istekleri almayacaksınız.</string>
+    <string name="block_friend_msg">Bu kullanıcı herhangi bir arkadaşlık isteği istemiyor.</string>
+    <string name="search_friend">Arkadaşlarını ara</string>
+    <string name="my_friend">Arkadaşlarım</string>
+    <string name="search_result">Sonuçlar</string>
+    <string name="new_friends">Yeni arkadaşlar</string>
+    <string name="participate_new_friends">Şimdi Yeni Arkadaşlar listesinde ol</string>
+    <string name="participate_new_friends_desc">Daha fazla arkadaşlık isteği istiyorsanız, bunun için gidin!</string>
+    <string name="apply_new_friends">Katıl</string>
+    <string name="apply_new_friends_desp">Arkadaş edin ve yürek kazanın! \n\'Yeni Arkadaşlarım\'da arkadaş edinmek ister misiniz?</string>
+    <string name="cancel_new_friends">İptal etmek</string>
+    <string name="apply_new_friends_blocked">Arkadaş isteği engelleme özelliğini kullanıyorsunuz.\nEngelini kaldırın ve tekrar deneyin!</string>
+    <string name="none_participation_new_friends">Yeni Arkadaşlar\'a hiçbir kullanıcı katılmıyor.</string>
+    <string name="data_save">Veri Tasarruf Modu</string>
+    <string name="data_save_desc">Veri Tasarruf Modu açıldığında, videolar / gif\'ler önceden yüklenmez ve boyut küçülür. \n* WiFi açık olduğunda, videolar / gif\'ler otomatik olarak yüklenir.</string>
+    <string name="order_by_name">Isim</string>
+    <string name="order_by_login_time">Giriş tarihi</string>
+    <string name="wechat_not_installed">WeChat yüklü değil.</string>
+    <string name="choeaedol_sns">Resmi kanallar</string>
+    <string name="friends_request">Arkadaş istekleri</string>
+    <string name="notice_new_friend_request">Yeni arkadaşlık istekleriniz var.</string>
+    <string name="appleid_change_detected"></string>
+    <string name="quiz_get_heart_title">bilgi yarışması ödülleri</string>
+    <string name="darkmode_system">Otomatik</string>
+    <string name="darkmode_always">Her zaman</string>
+    <string name="darkmode_never">Herzaman kapalı</string>
+    <string name="darkmode_help">Karanlık modun sistem ayarlarını otomatik olarak izlemesini, her zaman açık veya kapalı olmasını sağlayabilirsiniz.</string>
+    <string name="animation_mode">Animasyon modu</string>
+    <string name="animation_mode_desc">Sıralama ekranında animasyon modunu etkinleştirin.</string>
+    <string name="see_ranking" formatted="false">%s Sıralamalarını Göster</string>
+    <string name="overall">Genel</string>
+    <string name="ranking">Sıralama</string>
+    <string name="singer">Şarkıcılar</string>
+    <string name="variety">Çeşit gösterisi</string>
+    <string name="rank_accumulative">Kümülatif Sıralamalar</string>
+    <string name="rank_daily">Günlük Sıralamalar</string>
+    <string name="deadline_format_one">1 dakika önce</string>
+    <string name="deadline_format_few" formatted="false">%d dakika önce</string>
+    <string name="celeb">Ünlü</string>
+    <string name="celeb_quiz_start">Başlat</string>
+    <string name="top_100">EN İYİ 100</string>
+    <string name="popup_no_heart_title">Kalpleriniz bitti :(</string>
+    <string name="popup_no_heart_desc">hareket etmek için dokun</string>
+    <string name="popup_video_ad">Video reklam</string>
+    <string name="popup_video_ad_desc">Video reklamları izleyin ve kalbinizi alın.</string>
+    <string name="popup_heart_shop_desc">Kalp satın alabilirsiniz.</string>
+    <string name="popup_heartbox_desc">Topluluktaki kalp simgesine dokunarak rastgele kalpler edinin> resim.</string>
+    <string name="popup_free_heart_desc">Görevleri yerine getir ve kalplerini al.</string>
+    <string name="guide_gender_title">Erkek / Kız anahtarı</string>
+    <string name="guide_gender">\nsimgesine dokunabilir ve / erkek / kız idollerine geçiş yapabilirsiniz.</string>
+    <string name="guide_community_title">Topluluk</string>
+    <string name="guide_community">\nadına dokunun ve idol topluluğuna gidin!</string>
+    <string name="guide_banner_title">Afişi aç</string>
+    <string name="guide_banner">Profil resmine dokunun \nve şeridi açın.</string>
+    <string name="guide_vote_title">Oy</string>
+    <string name="guide_vote">Simgeye dokunun ve oy verin!</string>
+    <string name="guide_wiki_title">Wiki</string>
+    <string name="guide_wiki">Profil resmine dokunun \nve idol wiki\'sini görün.</string>
+    <string name="guide_write_title">Yazmak</string>
+    <string name="guide_write">Simgeye dokunun, \nresim yükleyin veya yazın!</string>
+    <string name="guide_skip">atlamak</string>
+    <string name="menu_face">Yüz Eşleştirme</string>
+    <string name="face_limit">- Günde 3 kez eşleştirebilirsiniz!</string>
+    <string name="face_title">İdol yüz eşleşmesi</string>
+    <string name="face_similarity">Benzerlik</string>
+    <string name="face_all">Herşey</string>
+    <string name="face_submit">Eşimi bul</string>
+    <string name="time_just_now">Şu anda</string>
+    <string name="time_minute">dakika</string>
+    <string name="time_hour">saatler</string>
+    <string name="time_day">günler</string>
+    <string name="title_notifications">Bildirim</string>
+    <string name="label_no_notifications">Bildirim yok.</string>
+    <string name="label_delete_all_notifications">Hepsini temizle?</string>
+    <string name="actor_level_heart_guide_desc1">Sıralamalar, Hall of Fame\'deki her fandomdan son 30 gün içinde birleştirilen ve bir araya getirilen birikmiş puanlara dayanmaktadır. Yalnızca ilk 100 görüntülenir.\nHer fandomun üzerine tıklarsanız, ilgili sıralama değişikliği gösterilecektir.\nSon 30 gün içindeki toplam sıralamaya göre ünlülerin adına bağış yapılacaktır!\n\n✅ Başarı kriterleri\n- Koşul 1 : son 30 gün içinde ortalama 3.000.000 oy veya daha fazla\n- Koşul 2 : Hall of Fame\'de son 6 gün içinde her kategoride 1. veya 2. sırada yer almak\n- Charity Angel olarak seçilebilmek için her iki koşulun da karşılanması gerekir.\n\n✅ Ödül\n- Kategori 1.si\n(1)Miral Refah Vakfı\'na 500.000 KRW bağış\n(2)Hongdae giriş istasyonunda metro reklamı\n(3)Tam sayfa banner reklam\n(4) Kayan menü reklamı\n- Kategori 2.si\n(1)Miral\'e 500.000 KRW bağış Refah Vakfı\n(2)Hongdae giriş istasyonundaki metro reklamı\n(3)Tam sayfa banner reklam</string>
+    <string name="AAA">AAA</string>
+    <string name="award_guide">Bilgi</string>
+    <string name="award_example">Sıralanmak</string>
+    <string name="award_realtime">Gerçek Zamanlı Sıralamalar</string>
+    <string name="award_shop_closed" formatted="false">[%s] Devam ediyor\n%s~%s (KST)\n\nBu dönemde ürün satışlarına ara verilecek</string>
+    <string name="award_realtime_boy">Gerçek Zamanlı Sıralama\nErkek Grubu</string>
+    <string name="award_realtime_girl">Gerçek Zamanlı Sıralama\nKız Grubu</string>
+    <string name="award_accumulative_guide1">Bu birikimli sıralamadır (Bireysel ve grup oylarını içerir).</string>
+    <string name="award_final_boy" formatted="false">%s\nErkek Grubu Popülerlik Ödülü\nNihai Sonuç</string>
+    <string name="award_final_girl" formatted="false">%s\nKız Grubu Popülerlik Ödülü\nNihai Sonuç</string>
+    <string name="award_guide_title">&lt; 2020 Asia Artist Awardsi &gt;</string>
+    <string name="award_guide_sub1">Ödül programı</string>
+    <string name="award_guide_sub2">Oylama dönemi</string>
+    <string name="award_guide_sub3">Oylar nasıl çalışır?</string>
+    <string name="award_guide_sub4">Nasıl Oy Verilir</string>
+    <string name="award_guide_sub5">Önemli</string>
+    <string name="award_guide_sub6">kurallar</string>
+    <string name="award_guide_title_desc">5. AAA ödülleri burada! \n
+Erkek / Kız Popülerlik ödülleri CHOEAEDOL\'da verilen oylarla verilir.</string>
+    <string name="award_guide_desc1">- 2020.11.25 AAA</string>
+    <string name="award_guide_desc3">-Kazan, oylara göre 100% seçildi. \n
+- Oylama döneminde tüm puanları toplayın \n
+1 erkek / kız toplam rütbesine Popülerlik Ödülü vermek.</string>
+    <string name="award_guide_desc4">CHOEAEDOL kalplerini topla ve oy ver!</string>
+    <string name="award_guide_desc5">Grup üyelerine verilen oylar otomatik olarak grup oylarına eklenecektir. \n
+Oyumuzun sonuna kadar uygulamamızda satın alamazsınız.</string>
+    <string name="award_guide_desc6">- Ödül oylama döneminde değişen kurallar için lütfen uygulama içi menüdeki (≡) duyuru panosunu kontrol edin.</string>
+    <string name="award_before_title">Şimdi oylama süresi değil!</string>
+    <string name="award_before_example">Bu, bireysel ve grup oylarının toplandığı bir oylama örneğidir.</string>
+    <string name="aggregation">Birikimli Sıra</string>
+    <string name="actor_award_guide_title">2020 Asia Artist Awards</string>
+    <string name="actor_award_guide_title_desc">2020 Asia Artist Awards oylamaları başladı!\n
+Erkek oyuncu için oylama, Kadın akrot, Trot bölümü Popülerlik Ödülü\n
+CHOEAEDOL Celeb aracılığıyla en sevdiğiniz ünlüye oy verin</string>
+    <string name="actor_award_guide_desc3">- Kazanan oylara göre 100% seçildi. \n
+- Oylama döneminde tüm puanları toplayın \n
+Popülerlik Ödülü vermek</string>
+    <string name="actor_award_guide_desc4">CHOEAEDOL Ünlü kalpleri toplayın ve oy verin!</string>
+    <string name="actor_award_guide_desc5">AAA ödülü bitene kadar kalp alımı yapılamaz.</string>
+    <string name="actor_award_guide_desc6">- Ödül oylama döneminde değişen kurallar için lütfen uygulama içi menüdeki (≡) duyuru panosunu kontrol edin.</string>
+    <string name="actor_award_realtime_trot">Trot bölümü popülerlik ödülü gerçek zamanlı rütbeler</string>
+    <string name="actor_award_accumulative_title_trot">Trot bölümü popülerlik ödülü gerçek zamanlı kümülatif sıralama</string>
+    <string name="actor_award_current_guide1">İşte trot bölümü popülerlik ödülü BUGÜN sıralaması</string>
+    <string name="actor_award_accumulative_guide1">İşte tırıs bölümü popülerlik ödülü birikimli dereceleri</string>
+    <string name="actor_award_final_trot">AAA Trot bölümü Popülerlik ödülünün nihai sonucu</string>
+    <string name="actor_award_before_example">Bu, gerçek zamanlı sıralamaların örneğidir</string>
+    <string name="menu_video_ad">Video reklama bakın</string>
+    <string name="choeaedol">CHOEAEDOL</string>
+    <string name="awards_history">Geçmiş ödüllerin tarihi</string>
+    <string name="choeaedol_celeb">CHOEAEDOL_Celeb</string>
+    <string name="friend_api_block">Yeni Arkadaşlar işlevi yalnızca ödül oylama süresi boyunca çizelgeleme zamanında (23: 30 ~ 00: 00KST) kullanılabilir.</string>
+    <string name="friend_api_block_all">Ödül oylama döneminde arkadaşlık işlevi mevcut değildir.</string>
+    <string name="friend_delete_limit">Arkadaş silme işlevi, ödül oylama süresi boyunca yalnızca oy çizelgesi süresinde (23: 30 ~ 00: 00KST) kullanılabilir.</string>
+    <string name="friend_api_limit">Arkadaş fonksiyonunu ödül oylama süresi boyunca 05: 00 ~ 20: 00 KST ve oy çizelgesi süresi (23: 30 ~ 00: 00KST) arasında kullanabilirsiniz.</string>
+    <string name="support">Reklam Destek</string>
+    <string name="support_filter_favorites">Benim idolüm</string>
+    <string name="support_filter_due">Son tarih</string>
+    <string name="support_in_progress">Devam etmekte</string>
+    <string name="support_end">Son</string>
+    <string name="support_end_2">Belki bir dahakine :(</string>
+    <string name="support_success">başarı</string>
+    <string name="support_create">Yeni destek etkinliği oluşturun</string>
+    <string name="support_use_diamond">%1$s elmas kullan</string>
+    <string name="support_create_title">Destek etkinliği oluştur</string>
+    <string name="support_create_contents">Destek Başlığı / Fotoğraf</string>
+    <string name="support_create_hint_title">Destek etkinliğinin başlığını girin (zorunlu)</string>
+    <string name="support_create_hint_photo">Destek etkinlik fotoğrafını yükleyin (gerekli)</string>
+    <string name="support_create_type">Destek olayının türü</string>
+    <string name="support_create_hint_type">Destek etkinliği türünü seçin</string>
+    <string name="support_create_button">Oluşturmak</string>
+    <string name="support_create_confirm">Destek oluşturmak için %1$s elmas harcayacaksınız. \nReklam görevi başarılı olmasanız bile, elmaslar iade edilmez.</string>
+    <string name="support_date_start">Destek etkinliğinin başlangıç ​​tarihi</string>
+    <string name="support_period_vote">Kaynak geliştirme dönemi (KST)</string>
+    <string name="support_period_ad">İlan gönderme dönemi (KST)</string>
+    <string name="support_agree">Yukarıdakilerin hepsini okudum ve kullanılmış Elmasların iade edilemeyeceğini kabul ediyorum.</string>
+    <string name="support_create_notice">[Önlemler]\n
+-Bir kez bir destek etkinliği ayarladıktan sonra iptal edilemez.\n
+-Destek Etkinliği bağış toplama kampanyası başarısız olursa elmaslar otomatik olarak elmas olarak iade edilecektir.\n
+-Yeni bir destek toplama etkinliği eklerken kullanılan elmaslar geri ödenmez.\n
+-Fon toplama, yıl dönümü başlamadan 30 gün önce tamamlanmalıdır.\n
+-Destek etkinliğinin fon toplama yıldönümünden 100 gün önce eklenebilir.\n
+-Affiliate statüsüne göre reklam kesintiye uğrayabilir.\n
+-Kazanım süresi içinde tasarım gelmezse, reklam temel tasarımla devam eder.\n
+-Reklam tasarımı, müzakereye göre isteğe bağlı olarak değiştirilebilir.\n
+-Kazanan tasarım CHOEAEDOL\'un QR kod resmini içerecektir. Bu, reklamın iptal edilmesini veya tasarımın değiştirilmesini zorlaştırır.\n
+-İlan tükenir veya iptal edilirse başka bir ilana dönüştürülecek veya pırlanta olarak iade edilecektir.</string>
+    <string name="support_create_success">Destek olayı başarıyla oluşturuldu.</string>
+    <string name="support_period">Kaynak geliştirme dönemi</string>
+    <string name="support_vote">desteğe katılmak</string>
+    <string name="support_goal">Hedef</string>
+    <string name="support_select_date">Lütfen ilanınızın asılacağı yıl dönümü tarihini KST\'ye göre seçiniz. (100 gün içinde)</string>
+    <string name="support_select_month">Lütfen reklamı asmak veya destek etkinliğinizi başlatmak için bir ay seçin.</string>
+    <string name="date_format_day">1 gün</string>
+    <string name="date_format_days" formatted="false">%d gün</string>
+    <string name="date_format_week">1 hafta</string>
+    <string name="date_format_weeks" formatted="false">%d hafta</string>
+    <string name="date_format_hour">1 saat</string>
+    <string name="date_format_hours" formatted="false">%d saatleri</string>
+    <string name="my_diamonds">Elmaslarım</string>
+    <string name="manage_diamonds">Elmaslarımı yönet</string>
+    <string name="my_support">Bu olaya desteğim</string>
+    <string name="support_top5">EN İYİ 5</string>
+    <string name="shop_diamond">Elmas Dükkanı</string>
+    <string name="shop_diamond_desc">Destek etkinlikleri için elmaslar</string>
+    <string name="label_diamond_vote">Elmas Kullanım Geçmişi</string>
+    <string name="label_diamond_save">Elmas Birikim Tarihi</string>
+    <string name="label_heart_diamond">Kalp, Elmas</string>
+    <string name="label_store">mağaza</string>
+    <string name="label_select_ad">Destek olaylarının listesi</string>
+    <string name="label_button_select">Burayı seçin</string>
+    <string name="btn_support_top5">EN İYİ 5</string>
+    <string name="support_empty">Destek etkinliği yok</string>
+    <string name="support_failed">Başarısız</string>
+    <string name="support_achievement" formatted="false">%d%% başarı</string>
+    <string name="diamond_store_disclaimer">Elmaslar oylama için kullanılamaz. Lütfen idolünüz için oy kullanırken Mağazadan Kalp satın alın. Lütfen [Destek - Önemli] bölümüne bakın.</string>
+    <string name="diamond_spend" formatted="false">%s elmas kullanıldı</string>
+    <string name="diamond_spend_1">1 elmas kullanıldı</string>
+    <string name="label_friend_heart_empty">Hiç arkadaşım sana kalp göndermiyor</string>
+    <string name="label_friend_heart_one">1 kalp aldı</string>
+    <string name="label_friend_heart_format" formatted="false">%d kalp aldı</string>
+    <string name="label_tooltip_friend_heart">Arkadaşlarınızdan\ngönderilen kalpleri alın!</string>
+    <string name="label_about_support">Destek olayı?</string>
+    <string name="support_about_subtitle">İdolünüzün özel gününde özel etkinlikler ~</string>
+    <string name="support_about_title">CHOEAEDOL Destek etkinliği</string>
+    <string name="support_about_info1">Tüm idoller mevcuttur</string>
+    <string name="support_about_info2">Herkes yeni bir bağış toplama etkinliği ekleyebilir!</string>
+    <string name="support_about_info_desc">Kendi başınıza bir destek etkinliği düzenlemek zordur! \n
+Diğer hayranlarla güçlerinizi birleştirin! \n
+Destek etkinliğinin bağış toplama sürecini tamamlayın! \n
+İdolünüz için bir Subway reklam panosu reklamı, uygulama içi afiş asın!</string>
+    <string name="support_about_precautions">-Bir kez bir destek etkinliği ayarladıktan sonra iptal edilemez.\n
+-Destek Etkinliği bağış toplama kampanyası başarısız olursa elmaslar otomatik olarak elmas olarak iade edilecektir.\n
+-Yeni bir destek toplama etkinliği eklerken kullanılan elmaslar geri ödenmez.\n
+-Fon toplama, yıl dönümü başlamadan 30 gün önce tamamlanmalıdır.\n
+-Destek etkinliğinin fon toplama yıldönümünden 100 gün önce eklenebilir.\n
+-Affiliate statüsüne göre reklam kesintiye uğrayabilir.\n
+-Kazanım süresi içinde tasarım gelmezse, reklam temel tasarımla devam eder.\n
+-Reklam tasarımı, müzakereye göre isteğe bağlı olarak değiştirilebilir.\n
+-Kazanan tasarım CHOEAEDOL\'un QR kod resmini içerecektir. Bu, reklamın iptal edilmesini veya tasarımın değiştirilmesini zorlaştırır.\n
+-İlan tükenir veya iptal edilirse başka bir ilana dönüştürülecek veya pırlanta olarak iade edilecektir.</string>
+    <string name="support_example">Reklam örneği</string>
+    <string name="label_processing">İşleme...</string>
+    <string name="format_include_date">%1$s dahil %2$s</string>
+    <string name="date_format_month">bir ay</string>
+    <string name="date_format_months" formatted="false">%d ay</string>
+    <string name="label_support_design_competition">Reklam tasarımı aranıyor</string>
+    <string name="label_support_design_guide">Reklam oluşturma kılavuzu</string>
+    <string name="actor_support_about_title">Ünlülerin etkinliğini destekleyin</string>
+    <string name="actor_support_about_subtitle">Ünlülerin özel gününde özel etkinlikler ~</string>
+    <string name="actor_support_about_info_desc">Kendi başınıza bir destek etkinliği düzenlemek zor!\n
+Diğer hayranlarla güçlerinizi birleştirin!\n
+Destek etkinliğinin bağış toplama sürecini tamamlayın!\n
+Celeb\'iniz için bir Subway reklam panosu reklamı, uygulama içi afiş vb. Asın!</string>
+    <string name="actor_support_filter_favorites">Ünlüm</string>
+    <string name="actor_diamond_store_disclaimer">Elmaslar oylama için kullanılamaz. Lütfen idolünüz için oy kullanırken Mağazadan Kalp satın alın. Lütfen [Destek - Önemli] bölümüne bakın.</string>
+    <string name="actor_support_about_info1">Ön yargınız olsun ya da olmasın,</string>
+    <string name="actor_support_about_info2">Tüm ünlüler mevcuttur</string>
+    <string name="subscription_account_holding">Aboneliğinizle ilgili bir sorun var. Gitmek için buraya tıklayın
+Ödeme yönteminizi düzeltmek için Google Play abonelik ayarları.</string>
+    <string name="popup_no_diamond_title">Elmasların bitti :(</string>
+    <string name="popup_diamond_shop_desc">Elmas satın alabilirsin</string>
+    <string name="secure_user_id">Kullanıcı kodu</string>
+    <string name="soba2020_title">2020 SORIBADA Awards</string>
+    <string name="soba_final_boy">SOBA Popülerlik Ödülleri (Erkek) final sonucu</string>
+    <string name="soba_final_girl">SOBA Popülerlik Ödülleri (Kadın) final sonucu</string>
+    <string name="soba_final_trot">Soribada\'nın nihai sonucu Trot bölüm Popülerlik ödülünü kazandı</string>
+    <string name="actor_aaa_realtime_male">Erkek oyuncu popülerlik ödülü gerçek zamanlı sıralama</string>
+    <string name="actor_aaa_accumulative_male">Erkek oyuncu popülerlik ödülü kümülatif sıralama</string>
+    <string name="actor_aaa_male_current_guide">İşte Erkek oyuncu popülerlik ödülü BUGÜN gerçek zamanlı sıralama</string>
+    <string name="actor_aaa_male_accumulative_guide">İşte Erkek oyuncu popülerlik ödülünün kümülatif sıralaması</string>
+    <string name="actor_aaa_male_fan_result">AAA Oylama\nErkek oyuncu popülerlik ödülünün nihai sonucu</string>
+    <string name="actor_aaa_realtime_female">Kadın oyuncu popülerlik ödülü gerçek zamanlı sıralama</string>
+    <string name="actor_aaa_accumulative_female">Kadın oyuncu popülerlik ödülü kümülatif sıralama</string>
+    <string name="actor_aaa_female_current_guide">İşte Famale aktör popülerlik ödülü BUGÜN gerçek zamanlı sıralama</string>
+    <string name="actor_aaa_female_accumulative_guide">İşte Kadın oyuncu popülerlik ödülünün kümülatif sıralaması</string>
+    <string name="actor_aaa_female_fan_result">AAA Oylama\nKadın oyuncu popülerlik ödülünün nihai sonucu</string>
+    <string name="popup_award_diamond_alert">Referansınız için, Elmaslar oylama için kullanılamaz.</string>
+    <string name="popup_update_app">Yeni işlevleri denemek ister misiniz?\nEn son sürüme güncelleyin!</string>
+    <string name="actor_aaa_trot">TROT</string>
+    <string name="tapjoy">Oyna ve Al♡</string>
+    <string name="offerwall_empty">Tüm görevleri tamamladınız. \nLütfen yeni görevi bekleyin!</string>
+    <string name="tooltip_select_my_favorite">Kalbe basarak \'Benim idolüm\'ü seçin♡</string>
+    <string name="tooltip_select_my_love_idol">Yıldıza basarak yer imine ekleyin☆</string>
+    <string name="tooltip_select_my_favorite_actor">Kalbe basarak \'Benim Ünlüm\'lerinizi seçin♡</string>
+    <string name="support_sympathy">Sevmek</string>
+    <string name="support_ready_for_photo">Çok yakında! Deneme çekimi için hazırlanıyoruz.</string>
+    <string name="support_success_list">Prova resim</string>
+    <string name="support_in_process">Süreçte destek</string>
+    <string name="support_main">Ana destek</string>
+    <string name="aaa2020_final_boy">AAA Popülerlik Ödülleri (Erkek) final sonucu</string>
+    <string name="aaa2020_final_girl">AAA Popülerlik Ödülleri (Kızlar) final sonucu</string>
+    <string name="aaa2020_final_trot">AAA Trot bölümü Popülerlik ödülünün nihai sonucu</string>
+    <string name="aaa2020_final_male">AAA Oylama\nErkek oyuncu popülerlik ödülünün nihai sonucu</string>
+    <string name="aaa2020_final_female">AAA Oylama\nKadın oyuncu popülerlik ödülünün nihai sonucu</string>
+    <string name="report_user_desc">Bu kullanıcıyı bildirmek ister misiniz?</string>
+    <string name="report_feed">Kullanıcıyı bildir</string>
+    <string name="msg_report_user_confirm">Kullanıcının kurallara aykırı davrandığından emin misiniz?\nBu kullanıcıyı bildirmek için%1$s kalp kullanılacaktır. Emin misiniz?</string>
+    <string name="failed_to_report_user__already_reported">Bu kullanıcı zaten rapor etti. Raporlar, kullanıcı başına maksimum bir adetle sınırlıdır.</string>
+    <string name="purchase_service_unavailable">Ağ bağlantısı kesildi</string>
+    <string name="purchase_billing_unavailable">Play Service yüklü değil veya Google hesabı ayarlanmamış</string>
+    <string name="purchase_item_unavailable">Ürün etkinleştirilmedi. Satın alma işleminiz hala işe yaramazsa, lütfen ayardan bizimle iletişime geçin.</string>
+    <string name="purchase_error">Beklenmeyen sunucu hatası.</string>
+    <string name="purchase_item_already_owned">Bu ürünü zaten satın aldınız. Lütfen Play Store\'daki satın alma geçmişinizi kontrol edin.</string>
+    <string name="purchase_item_not_owned">Ürün sahibi olmadığı için tüketilememe</string>
+    <string name="quiz_review_desc">İdol Sınavı sorusunu inceleyin</string>
+    <string name="inquiry_notice">[Müşteri Hizmetleri Saatleri]\nHafta içi 10:00 - 17:00(KST)\n(Mesai saatleri dışındaki sorularınızın mesai saatleri içinde sırayla yanıtlanacağını lütfen unutmayın)\n\n- Sorunuz için ekran görüntüsü eklerseniz, lütfen ekran görüntüsünde geçerli saati yakalamak için.\n- Ekli dosyalar, soruşturma tarihinden itibaren 30 gün sonra otomatik olarak silinecektir.\n- İçerik küfür, cinsel taciz veya tehdit edici bir dil içeriyorsa, paylaşımda bulunmanız kalıcı olarak yasaklanabilir. hesabınız askıya alındı ​​veya geçerli yasalar uyarınca işlem yapıldı.</string>
+    <string name="setting_menu_push_supports">Destek olayı</string>
+    <string name="order_by_dday">D günü</string>
+    <string name="error_2200">Seviyeniz, rapor işlevini kullanmak için çok düşük.</string>
+    <string name="invalid_email_form">Lütfen doğru e-posta biçimini girin.</string>
+    <string name="label_rising" formatted="false">%d yer yükseliyor</string>
+    <string name="chat_many_talk_at">Aktivite</string>
+    <string name="chat_anonymous">Anonim</string>
+    <string name="chat_list_all" formatted="false">Hepsi (%d)</string>
+    <string name="chat_list_join" formatted="false">Katılıyor (%d)</string>
+    <string name="chat_make">Bir sohbet odası oluşturun</string>
+    <string name="chat_make_help_popup1">Daha sonra "İdolüm" ünüzü değiştirirseniz sohbet odası silinecektir.</string>
+    <string name="chat_make_help_popup2">Her topluluk en fazla 300 sohbet odasına sahip olabilir</string>
+    <string name="chat_make_help_popup3">Maxium hayır. bir sohbet odası için katılımcı sayısı 300</string>
+    <string name="chat_make_help_popup4" formatted="false">Bir sohbet odası oluştururken %d elmas gerekir.</string>
+    <string name="chat_less_level_popup" formatted="false">Afedersiniz. Sohbet odası yalnızca Seviye %d veya üzeri kullanıcılar tarafından oluşturulabilir</string>
+    <string name="chat_room_title">Sohbet odasının adı</string>
+    <string name="chat_room_title_placeholder">Lütfen sohbet odasının adını girin (en az 5 karakter)</string>
+    <string name="chat_room_desc">Sohbet odası açıklaması</string>
+    <string name="chat_room_desc_placeholder">Lütfen sohbet odasının açıklamasını girin</string>
+    <string name="chat_room_disclose_most">İdolümü göster?</string>
+    <string name="chat_room_disclose_nickname">Takma ad gösterilsin mi?</string>
+    <string name="chat_room_limit_level">Seviye kısıtlaması</string>
+    <string name="chat_room_require">*Gereklidir</string>
+    <string name="chat_room_make_button" formatted="false">Oluştur\n(%d elmas gerekli)</string>
+    <string name="chat_room_make_popup1_title">Oluşturmak</string>
+    <string name="chat_room_make_popup1_desc">Bu sohbet odasını oluşturmak için %1$s elmasa ihtiyacınız var. İlerlemek?</string>
+    <string name="chat_room_make_popup2">Üzgünüz.\nMaksimum 300 sohbet odası sayısına ulaşıldı, yeni sohbet odası oluşturulamaz</string>
+    <string name="chat_room_join_popup1">İdolüm\'deki farklılıklar nedeniyle bu sohbet odasına katılılamıyor</string>
+    <string name="chat_room_join_popup2">Seviye kısıtlaması nedeniyle bu sohbet odasına katılılamaz</string>
+    <string name="chat_room_join_popup3">Bu sohbet odası dolu olduğu için katılılamaz (en fazla 300 kullanıcı)</string>
+    <string name="chat_room_number_of_person">Üye sayısı</string>
+    <string name="chat_room_status">Sohbet odası durumu</string>
+    <string name="chat_room_owner">Oda yaratıcısı</string>
+    <string name="chat_room_report">Kötüye kullanım amaçlı sohbet odası?\nRapor işlevinin kötüye kullanılmasını önlemek için Bir bildirimde bulunurken %1$s kalp kullanılır.\nBu sohbet odasını bildirmek istiyor musunuz?</string>
+    <string name="chat_room_delete">Silme</string>
+    <string name="chat_room_delete_popup">Bu sohbet odasını silmek istediğinizden emin misiniz?\nBu sohbet odasını silerseniz, sohbet odasındaki tüm üyeler de sohbet odasından silinecektir.</string>
+    <string name="chat_room_leave">Ayrılmak</string>
+    <string name="chat_room_leave_desc1">Ayrılmak istediğinizden emin misiniz?</string>
+    <string name="chat_room_leave_desc2">Sohbet odasından çıkarsanız başka bir kullanıcı oda yaratıcısı olur.\nAyrılmak ister misiniz?</string>
+    <string name="chat_room_most_only">Aynı idolüm olan kullanıcılarla sınırlıdır</string>
+    <string name="chat_room_most_and_group">Aynı idolüm, grubum ve grup üyelerim olan kullanıcılarla sınırlıdır.</string>
+    <string name="chat_room_nickname">Takma ad sohbet odası</string>
+    <string name="chat_room_anonymous">Anonim sohbet odası</string>
+    <string name="chat_room_level_limit" formatted="false">LV.%d daha yüksek</string>
+    <string name="chat_room_create_success">Sohbet odası oluşturuldu</string>
+    <string name="chat_unknown_user">(bilinmeyen kullanıcı)</string>
+    <string name="chat_level_select_limit">Kendi seviyenizin üzerinde bir seviye limiti seçemezsiniz.</string>
+    <string name="chat_make_tooltip">Lütfen bir sohbet odası oluşturun.</string>
+    <string name="chat_deleted_message">silinen mesaj</string>
+    <string name="chat_photo">Fotoğraf</string>
+    <string name="chat">Sohbet</string>
+    <string name="setting_menu_push_chat">Sohbet</string>
+    <string name="chat_title_short">Sohbet odası adı 5 karakterden uzun olmalıdır.</string>
+    <string name="chat_report_error_2401">Bu sohbet odasını zaten bildirdin.</string>
+    <string name="google_store_error">Beklenmedik bir Google Play Store hatası oluştu.\nLütfen cihazınızdaki Google Play Store\'un düzgün çalışıp çalışmadığını onaylayın ve tekrar deneyin.</string>
+    <string name="chat_first_join">Sohbet odasına katıldınız.</string>
+    <string name="china_payment_choice_title">Ödeme şekli</string>
+    <string name="china_payment_choice_alipay">Alipay</string>
+    <string name="china_payment_choice_unionpay">UnionPay</string>
+    <string name="china_payment_choice_wechatpay">WeChat Pay</string>
+    <string name="chat_message_already_reported">Bu mesajı zaten bildirdin.</string>
+    <string name="chat_connecting">Bağlanıyor... Lütfen biraz bekleyin.</string>
+    <string name="msg_favorite_guide_4" formatted="false">İdolüm\'ü değiştirirseniz %s sohbet odasından çıkarsınız. Change Bu değişikliği yaptıktan 48 saat sonra İdolüm\'ü tekrar değiştirebilirsiniz.\nİdol\'ümü %s olarak değiştirmek ister misiniz?</string>
+    <string name="actor_msg_favorite_guide_4" formatted="false">Ünlüm\'ü değiştirirseniz, %s sohbet odasından ayrılacaksınız.\nBu değişikliği yaptıktan 48 saat sonra Ünlüm\'ü tekrar değiştirebilirsiniz.\nÜnlüm\'ü %s olarak değiştirmek istiyor musunuz?</string>
+    <string name="msg_favorite_unregi_guide3" formatted="false">İdolümü değiştirirseniz%s sohbet odasından çıkarsınız.\nSon değişikliği yaptıktan 48 saat sonra yeni idolünüzü ayarlayabilirsiniz.</string>
+    <string name="actor_msg_favorite_unregi_guide3" formatted="false">Benim Ünlüm\'ü değiştirirseniz, %s sohbet odasından çıkarsınız, son değişikliği yaptıktan 48 saat sonra yeni Ünlüm\'ü ayarlayabilirsiniz.</string>
+    <string name="chat_title_bad_words">Sohbet odası adı uygunsuz kelimeler içeriyor.</string>
+    <string name="chat_description_bad_words">Sohbet odası açıklaması uygunsuz kelimeler içeriyor.</string>
+    <string name="chatpush_image">resim</string>
+    <string name="chat_leave_user">(Sohbet odasından ayrılan kullanıcı)</string>
+    <string name="chat_group_create_fail">My Idol\'ünüz bireysel bir idol olduğunda bir grup için sohbet odası oluşturamazsınız.</string>
+    <string name="chat_unread_message">okunmamış mesajlar</string>
+    <string name="detect_auto_clicker">Anormal etkinlikler tespit ettik, bu nedenle video reklam oynatılamıyor. Lütfen video reklamlara normal bir şekilde erişin.</string>
+    <string name="signup_age_limit">14 yaşındayım.</string>
+    <string name="signup_age_prohibited">Katılmak için 14 yaşında veya daha büyük olmalısınız.</string>
+    <string name="rank_history_30_average" formatted="false">%s Günlük Ortalama Oy Sayısı</string>
+    <string name="chat_room_leave_desc3">Şimdi ayrılmaya karar verirseniz sohbet odası silinecek.\nSohbet odasından çıkmak istediğinizden emin misiniz?</string>
+    <string name="actor_main_set">Kategori AÇIK/KAPALI</string>
+    <string name="actor_main_category_set">Lütfen görüntülenmesini istediğiniz kategorileri seçin</string>
+    <string name="actor_male_singer">Erkek şarkıcılar</string>
+    <string name="actor_female_singer">Kadın şarkıcılar</string>
+    <string name="necessarily_one_category">En az bir kategori seçmelisiniz</string>
+    <string name="new_shop_heart">Kalp Mağazası</string>
+    <string name="new_shop_package">Paket Mağazası</string>
+    <string name="new_shop_subscription">abonelik</string>
+    <string name="diamond">Elmas</string>
+    <string name="diamonds">Elmaslar</string>
+    <string name="new_shop_diamond">Elmas Dükkanı</string>
+    <string name="ever_heart_short">Durmadan</string>
+    <string name="daily_heart_short">Günlük</string>
+    <string name="support_see_ad_types">Reklam Yerleşimlerini Görüntüle</string>
+    <string name="support_ad_types">Reklam Yerleşimleri</string>
+    <string name="auto_clicker_human_check_explain">Robot olmadığınızı kanıtlamak için lütfen aşağıdaki soruyu yanıtlayın.</string>
+    <string name="auto_clicker_human_check_fail">Üzgünüz, yanlış bir cevap verdiniz.\nOtomatik tıklama kullandığınızı düşünüyoruz.\nLütfen video reklamlara normal bir şekilde erişin.</string>
+    <string name="china_agreement_deny">Üzgünüz.\nŞartlar ve Koşullarımızı kabul etmediniz.\nUygulamayı kullanamayacaksınız.</string>
+    <string name="my_info_title">Benim profilim</string>
+    <string name="my_info_info">Profil</string>
+    <string name="my_info_list">Kayıt</string>
+    <string name="my_info_own_heart">Sahip Olduğunuz Kalpler</string>
+    <string name="my_info_own_diamond">Sahip Olduğunuz Elmas</string>
+    <string name="my_info_heart">kalpler</string>
+    <string name="more_faq">Daha fazla yardıma mı ihtiyacınız var?</string>
+    <string name="chat_report_short">Lütfen daha fazla ayrıntı sağlayın (en az 10 karakter)</string>
+    <string name="support_ad_type_detail">Reklam yerleşimi ayrıntısı</string>
+    <string name="video_ad_time_left">Bir sonraki kalp koleksiyonunun kullanıma sunulmasına kalan süre</string>
+    <string name="quiz_duplicated_answer">Aynı cevabı defalarca vermişsiniz. Lütfen değiştirin ve tekrar gönderin.</string>
+    <string name="quiz_review_more">Daha fazla soru incelemeye devam edilsin mi?</string>
+    <string name="miracle_month">Ayın Mucizesi</string>
+    <string name="record_room">Kayıt Odası</string>
+    <string name="charity_angel_count">Charity Angel unvanlarının sayısı</string>
+    <string name="charity_fairy_count">Yardım Perisi unvanlarının sayısı</string>
+    <string name="miracle_month_count">Ayın Mucizesi ünvanlarının sayısı</string>
+    <string name="search_hot_trend">Sıcak Trend</string>
+    <string name="search_history">Arama geçmişi</string>
+    <string name="search_recommended">Sizin için önerilen</string>
+    <string name="report_comment">Rapor işlevinin kötüye kullanılmasını önlemek için, bir şikayette bulunurken %1$s kalp(ler) kullanılacaktır.\nBu yorumu bildirmek istiyor musunuz?</string>
+    <string name="lunar_birthday">Ay takvimi</string>
+    <string name="comment_report_error_2501">Bu yorumu zaten bildirdiniz.</string>
+    <string name="emoji">emojiler</string>
+    <string name="emoji_content">(Emojiler)</string>
+    <string name="chat_push_emoticon">ifade</string>
+    <string name="msg_daily_pack_cancel">Şu anda Günlük Paketimize abone oldunuz.\nAboneliğinizi iptal etmezseniz, aylık abonelik ücretlendirilir.\nAboneliğinizi iptal etmek istiyorsanız lütfen %1$s\'i tuşlayın.</string>
+    <string name="withdraw">Geri çekilmek</string>
+    <string name="cancel_subscription">Aboneliği iptal et</string>
+    <string name="order_by_get_heart">kalp düzeni</string>
+    <string name="themepick">Temalı Seçim</string>
+    <string name="imagepick">Resim Seçimi</string>
+    <string name="themepick_confirm_vote" formatted="false">Oy vermek istediğiniz seçenek %s mi?</string>
+    <string name="themepick_first_reward" formatted="false">1 Numara için Ödül\n%s</string>
+    <string name="themepick_total_votes">Toplam oy</string>
+    <string name="photo_access_denied_icloud">Orijinal resme erişilemiyor. Lütfen orijinal görüntünün olup olmadığını kontrol edin.</string>
+    <string name="menu_live">PLAY</string>
+    <string name="live_auto">Oto</string>
+    <string name="live_open" formatted="false">%s AÇIK!</string>
+    <string name="live_coming_soon">Çok yakında.\nLütfen bekleyin.</string>
+    <string name="live_coming_soon_list">Yakında gelecek</string>
+    <string name="live_level_limit" formatted="false">Üzgünüz.\nBu videoya yalnızca %d ve üzeri seviyedeki kullanıcılar erişebilir.</string>
+    <string name="live_end">Bu canlı yayın sona erdi.</string>
+    <string name="live_disclaimer">- ▶️ Görüntüleme, ❤️ Beğen, 👁 Gerçek Zamanlı Eşzamanlı Görüntüleme Sayısı ve 📈 En Yüksek Eşzamanlı Görüntüleme Sayısını gösterir.\n- Canlı yayın kullanılabilirliği kullanıcı seviyelerine bağlıdır.\n- Hücresel veri kullanırken operatörünüz tarafından değiştirilebilirsiniz.</string>
+    <string name="live_empty">Henüz planlanmış yayın yok</string>
+    <string name="live_stalled">Akış arabelleğe alıyor</string>
+    <string name="live_quality">Video kalitesi</string>
+    <string name="live_share_title" formatted="false">#CHOEAEDOL #CHOEAEDOL_PLAY\n\n%s\n\nŞimdi CHOEAEDOL PLAY\'de izleyin\n</string>
+    <string name="themepick_already_vote">Bugün oy kullandınız.</string>
+    <string name="current_ranking">Canlı Sıralama</string>
+    <string name="vote_themepick_finished" formatted="false">%s oy verdiniz.\n\n%s oy(lar) 1. sıradan uzaklaştı.\n%s arkadaşlarınızla ve 1.lik için savaşın!</string>
+    <string name="vote_themepick_finished_first" formatted="false">Bunu arkadaşlarınızla %s.\n\n%s arasında oy kullandınız!</string>
+    <string name="share_themepick" formatted="false">#CHOEAEDOL #ThemedPick\n\n%s\nSıralama %s %s\n%s %s\n%s %s\n\nCHOEAEDOL Uygulaması hakkında daha fazla ayrıntı\n%s</string>
+    <string name="share_in_progress_support" formatted="false">#CHOEAEDOL #SupportEvent #SupportAds #%s %s\n\n\"%s\" destek etkinliği devam ediyor\n%s Gelin ve buna katılın~\n%s</string>
+    <string name="share_success_support" formatted="false">#CHOEAEDOL #SupportEvent #SupportAds #%s %s\n\n\" %s \"  destek etkinliği BAŞARILI!\n%s Fotoğraflara göz atın\n%s</string>
+    <string name="share_friend_invite" formatted="false">[CHOEAEDOL Davetiyesi💌]\n#%s Mevcut Sıralama: #%d\n#%s %s için oylamaya katılın!\n\nKaydolurken bir davet kodu girin ve Kalpler kazanın!\nDavet Kodu: %s\n\n#KPOP #NO1_APP #CHOEAEDOL\n%s</string>
+    <string name="share_friend_invite_nomost" formatted="false">[CHOEAEDOL Davetiyesi💌]\nHadi hep birlikte oy verelim ve fangirl/fanboy olalım!\nKaydolurken bir davet kodu girin ve Kalpler kazanın!\nDavet Kodu: %s\n\nŞu anda 2. sırada: #%s %s\n\n1 numaranın kim olduğunu merak ediyor musunuz?\n#CHOEAEDOL\'da göz atın\n%s</string>
+    <string name="award_realtime_rank"></string>
+    <string name="award_accumulate_rank"></string>
+    <string name="award_final_result" formatted="false">Nihai sonuç\n%s\n%s %s</string>
+    <string name="share_themepick_celeb" formatted="false">#CHOEAEDOL_Celeb #ThemedPick\n\n%s\nSıralama %s %s\n%s %s\n%s %s\n\nCHOEAEDOL Celeb App hakkında daha fazla ayrıntı\n%s</string>
+    <string name="share_in_progress_support_celeb" formatted="false">#CHOEAEDOL_Celeb #SupportEvent #SupportAds #%s %s\n\n\" %s \" destek etkinliği devam ediyor\n%s Gelin ve buna katılın~\n%s</string>
+    <string name="share_success_support_celeb" formatted="false">#CHOEAEDOL_Celeb #SupportEvent #SupportAds #%s %s\n\n\" %s \" destek etkinliği BAŞARILI!\n%s Fotoğraflara göz atın\n%s</string>
+    <string name="share_friend_invite_celeb" formatted="false">[CHOEAEDOL Ünlü Davetiyesi💌]\n#%s Mevcut Sıralama: #%d\n#%s %s için oylamaya katılın!\n\nKaydolurken bir davet kodu girin ve Kalpler kazanın!\nDavet Kodu: %s\n\nBağlantı kurmak için hayran alanınız #CHOEAEDOLÜnlü\n%s</string>
+    <string name="share_friend_invite_nomost_celeb" formatted="false">[CHOEAEDOL Ünlü Davetiyesi💌]\nHadi birlikte oy verelim ve fangirl/fanboy olalım!\nKaydolurken bir davet kodu girin ve Kalpler kazanın!\nDavet Kodu: %s\n\nŞu anda 2. sırada: #%s %s\n\n1 numaranın kim olduğunu merak ediyor musunuz?\n#CHOEAEDOLCeleb hesabından göz atın\n%s</string>
+    <string name="live_actionbar_title">CHOEAEDOL PLAY</string>
+    <string name="live_chat">Canlı Sohbet</string>
+    <string name="live_share_title_celeb" formatted="false">#CHOEAEDOL_Celeb #CHOEAEDOLPLAY\n\n%s\n\nŞimdi CHOEAEDOL PLAY\'de izle\n</string>
+    <string name="themepick_today_voted">oylandı</string>
+    <string name="block">Engellemek</string>
+    <string name="unblock">engeli kaldırmak</string>
+    <string name="block_question">Bu kullanıcıyı engellemek istediğinizden emin misiniz?</string>
+    <string name="user_blocked">Engellenen kullanıcı</string>
+    <string name="themepick_additional_vote">1 elmas kullanarak tekrar oy vermek ister misiniz?</string>
+    <string name="themepick_candidate_vote">Lütfen bir aday seçin ve oy verin</string>
+    <string name="user_blocked2">Engellenen Kullanıcı</string>
+    <string name="share_image_pick" formatted="false">#CHOEAEDOL #ImagePick\n\n%s\nSıralama %s %s\n%s %s\n%s %s\n\nCHOEAEDOL Uygulaması hakkında daha fazla ayrıntı\n%s</string>
+    <string name="share_image_pick_celeb" formatted="false">#CHOEAEDOL_Celeb #ImagePick\n\n%s\nSıralama %s %s\n%s %s\n%s %s\n\nCHOEAEDOL Uygulaması hakkında daha fazla ayrıntı\n%s</string>
+    <string name="no_blocked_users">Engellenen kullanıcı yok.</string>
+    <string name="report_description">Lütfen kullanıcıyı şikayet etme nedeninizi yazınız.</string>
+    <string name="msg_nickname_coupon">Takma ad değiştirme kuponunuz var.\nKuponu kullanmak istiyor musunuz?</string>
+    <string name="msg_nickname_changed">Takma adınız değiştirildi.</string>
+    <string name="no_search_result_community">İlk gönderiyi yazın!</string>
+    <string name="surprise_dia">Sürpriz Pırlanta</string>
+    <string name="quiz_daily_posting_limit">Sizleri olabildiğince çok yazdınız. Lütfen yarın tekrar deneyin.</string>
+    <string name="quiz_in_screening">Taramada sınav</string>
+    <string name="quiz_denied">Reddedilen Test</string>
+    <string name="quiz_no_approved">Onaylanmış bir sınav yok.</string>
+    <string name="quiz_no_in_screening">Taramada quiz yoktur.</string>
+    <string name="quiz_no_denied">Reddedilen bir sınav yok.</string>
+    <string name="quiz_tutorial_get_heart">Onaylanmış test için Ödül Kalpleri alın!</string>
+    <string name="quiz_deny_reason_title">Sınav neden reddedildi?</string>
+    <string name="quiz_deny_reason_desc">- Özel bir karakter veya emoji ile doğru cevabı bildirdiğinizde\n- Herkes soruyu okumadan doğru cevabı seçebildiğinde\n- Zaman geçtikçe doğru cevap değiştirilebildiğinde\n- Fotoğrafı tanımak zor olduğunda\n- Ne zaman yazım hatası var\n- yanlış cevabı doğru cevaba ayarladığınızda\n- açıklama yeterli olmadığında\n- idolü yanlış ayarladığınızda</string>
+    <string name="quiz_review">Testi İncele</string>
+    <string name="quiz_finish_today_review">İncelediğiniz için teşekkürler.\nLütfen yarınki yeni sınavı gözden geçirin.</string>
+    <string name="quiz_nothing_review">İncelenecek bir sınav yok.</string>
+    <string name="quiz_ask_finish_review">Çıkmak istediğinden emin misin? İnceleme şansınızı kaybedersiniz.</string>
+    <string name="quiz_start_short">Başlat</string>
+    <string name="quiz_already_report_review">Bu testi zaten bildirdiniz.</string>
+    <string name="another_account_daily_purchase">Satın alma işlemini geri yüklemede başarısız oldunuz. Lütfen Daily Pack\'e başka bir hesaptan abone olup olmadığınızı kontrol edin.</string>
+    <string name="already_daily_purchase">Satın alma işlemini geri yüklemede başarısız oldunuz. Bu hesapla zaten Daily Pack\'e abone oluyorsunuz.</string>
+    <string name="welcome_pack_title">Hoş Geldiniz Paketi</string>
+    <string name="welcome_pack_desc">Büyük satış - sadece bir kez!</string>
+    <string name="attendance_check">Devam Kontrolü</string>
+    <string name="attendance_days_start" formatted="false">%s\'den</string>
+    <string name="attendance_days_consecutive">günlük galibiyet serisi</string>
+    <string name="attendance_consecutive_heart_reward">%1$s günlük galibiyet serisi! - %2$s Kalbin var.</string>
+    <string name="attendance_consecutive_dia_reward">%1$s günlük galibiyet serisi! - %2$s Pırlantanız var.</string>
+    <string name="attendance_consecutive_both_reward">%1$s günlük galibiyet serisi! - %2$s Kalbin ve %3$s Pırlantanın var.</string>
+    <string name="attendance_available_account_title">Pulları yalnızca bir hesapla alabilirsiniz.</string>
+    <string name="attendance_available_account_subtitle" formatted="false">%s ile damga almak istiyor musunuz?</string>
+    <string name="go_to_attendance">Git ve bir damga al</string>
+    <string name="update">Güncelleme</string>
+    <string name="attendance_with" formatted="false">%s ile tanıştığınızdan beri</string>
+    <string name="recent">son</string>
+    <string name="thirty_days">30 gün</string>
+    <string name="support_design_period">Reklam tasarımları alma</string>
+    <string name="solo">Solo</string>
+    <string name="solo_male">Erkek Solo</string>
+    <string name="solo_female">Kadın Solo</string>
+    <string name="award_solo_realtime_example">Bu, bir grupta olmayan CHOEAEDOL ve CHOEAEDOL Celeb\'deki solo sanatçıların oylama örneğidir.</string>
+    <string name="award_solo_realtime_info">Bu, bir grupta olmayan CHOEAEDOL ve CHOEAEDOL Celeb\'deki solo sanatçıların gerçek zamanlı bir sıralamasıdır.</string>
+    <string name="award_solo_aggregated_info">Bu, bir grupta olmayan CHOEAEDOL ve CHOEAEDOL Celeb\'deki solo sanatçıların kümülatif sıralamasıdır.</string>
+    <string name="award_solo_male_realtime">Gerçek Zamanlı Sıralama\nErkek Solo Sanatçılar</string>
+    <string name="award_solo_female_realtime">Gerçek Zamanlı Sıralama\nKadın Solo Sanatçılar</string>
+    <string name="award_solo_male_aggregated">Birikimli Sıralama\nErkek Solo Sanatçı</string>
+    <string name="award_solo_female_aggregated">Birikimli Sıralama\nKadın Solo Sanatçı</string>
+    <string name="award_solo_male_final" formatted="false">%s\nErkek Solo Popülerlik Ödülünün Nihai Sonucu</string>
+    <string name="award_solo_female_final" formatted="false">%s\nKadın Solo Popülerlik Ödülü\'nün Nihai Sonucu</string>
+    <string name="award_current_guide">Nihai kazanan, toplam puanlara göre belirlenecektir.</string>
+    <string name="group_male">Erkekler Grup</string>
+    <string name="group_female">Kızlar Grup</string>
+    <string name="award_trot_male">Erkek</string>
+    <string name="award_trot_female">Kadın</string>
+    <string name="award_trot_male_example">Bu, CHOEAEDOL ve CHOEAEDOL Celeb\'deki erkek solo sanatçıların oylama örneğidir.</string>
+    <string name="award_trot_female_example">Bu bir oylama örneğidir.</string>
+    <string name="award_trot_male_realtime_info">Bu gerçek zamanlı sıralamadır.</string>
+    <string name="award_trot_female_realtime_info">Bu gerçek zamanlı sıralamadır.</string>
+    <string name="award_trot_male_aggregated_info">Bu birikimli sıralamadır.</string>
+    <string name="award_trot_female_aggregated_info">Bu birikimli sıralamadır.</string>
+    <string name="award_trot_male_realtime">Gerçek Zamanlı Sıralama\nErkek Tırıs Şarkıcılar</string>
+    <string name="award_trot_female_realtime">Gerçek Zamanlı Sıralama\nKadın Tırıs Şarkıcılar</string>
+    <string name="award_trot_male_aggregated">Birikimli Sıralama\nErkek Tırıs Şarkıcılar</string>
+    <string name="award_trot_female_aggregated">Birikimli Sıralama\nKadın Tırıs Şarkıcılar</string>
+    <string name="award_trot_male_final" formatted="false">%s\nErkek Tırıs Şarkıcılar Popülerlik Ödülü\nNihai Sonuç</string>
+    <string name="award_trot_female_final" formatted="false">%s\nKadın Tırıs Şarkıcılar Popülerlik Ödülü\nNihai Sonuç</string>
+    <string name="award_trot_all_example">Bu bir oylama örneğidir.</string>
+    <string name="award_trot_all_realtime_info">Bu gerçek zamanlı sıralamadır.</string>
+    <string name="award_trot_all_realtime">Gerçek Zamanlı Sıralama\nTırıs şarkıcılar</string>
+    <string name="award_trot_all_aggregated_info">Bu birikimli sıralamadır.</string>
+    <string name="award_trot_all_aggregated">Birikimli Sıralama\nTırıs şarkıcılar</string>
+    <string name="award_trot_all_final" formatted="false">%s\nNihai Sonuç\nTırıs şarkıcılar Popülerlik Ödülü</string>
+    <string name="today">Bugün</string>
+    <string name="earlier">Daha erken</string>
+    <string name="entrance_qrcode">Bilet QR kodu</string>
+    <string name="auth_completed">Tamamlandı!\nTeşekkürler.</string>
+    <string name="win_awards_ticket">Bileti kazandınız!</string>
+    <string name="already_set_stamp">Zaten damgayı aldın. Yarın tekrar dene.</string>
+    <string name="ad_intend_guide" formatted="false">Video reklamı izlerseniz, %s Kalp alabilirsiniz.</string>
+    <string name="ad_start">Başlama</string>
+    <string name="skip">Atlamak ></string>
+    <string name="extra_heart_received" formatted="false">%s Ekstra Kalp aldınız.</string>
+    <string name="hda_2022">2022 K Global Heart Dream Awards</string>
+    <string name="face_photo_not_saving">- Yüklenen fotoğraflar kaydedilmeyecek ve hemen silinmeyecektir.</string>
+    <string name="are_you_sure_dia">Emin misiniz?</string>
+    <string name="onepick_confirm_exit2">Şimdi çıkarsanız, bir oy kaybedilir.\nÇıkmak istediğinizden emin misiniz?</string>
+    <string name="miracle">Mucize</string>
+    <string name="cumulative_rankings">Kümülatif Sıralamalar</string>
+    <string name="miracle_aggregating_period">Oy Tablolama Süresi</string>
+    <string name="unused_channels">Kullanılmayan Kanallar</string>
+    <string name="friends_delete_message">Arkadaşlarını kaldırmak istiyor musun?</string>
+    <string name="essential">(gerekli)</string>
+    <string name="personal_agreement">Kişisel Bilgi Toplama ve Kullanım Sözleşmesi</string>
+    <string name="msg_personal_information1" formatted="false">%s, kayıt, Sorgu/CS ve bildirim için kişisel bilgileri aşağıdaki şekilde toplar.</string>
+    <string name="msg_personal_information2" formatted="false">%s\'ün kullanımı için gerekli olan minimum kişisel bilgi toplama kullanımına katılmama hakkına sahipsiniz ve rıza göstermeyi reddederseniz hizmet kısıtlanabilir.</string>
+    <string name="id">İD</string>
+    <string name="recommender">Önerici(davet kodu)</string>
+    <string name="pwd_combination">Parola en az 8 karakter uzunluğunda alfasayısal karakterlerden oluşmalıdır.</string>
+    <string name="agree_terms">Kişisel bilgileri toplamayı ve kullanmayı kabul ediyorum.</string>
+    <string name="warning_report_lose_heart" formatted="false">Şikayet ederseniz, %s kalp düşülecek ve artık gönderiyi göremeyeceksiniz. Yine de bildirmek istiyor musunuz?</string>
+    <string name="warning_report_hide_article">Bildirirseniz, artık görüntüleyemezsiniz. Yine de bildirmek istiyor musunuz?</string>
+    <string name="check_pwd_requirement">Lütfen şifre gereksinimini karşılayın.</string>
+    <string name="inquiry_category">Sorgu Türünü Seçin</string>
+    <string name="inquiry_how_to_use">Nasıl kullanılır</string>
+    <string name="inquiry_report_bugs">Hataları bildir</string>
+    <string name="inquiry_purchase_subs">Satın al/Abone ol</string>
+    <string name="inquiry_proposal">fikir önerisi</string>
+    <string name="inquiry_etc">Vb</string>
+    <string name="inquiry_send_files">Dosyaları ekle</string>
+    <string name="choose_inquiry_category">Lütfen talep tipini seçiniz.</string>
+    <string name="inquiry_files">Dosyaları ekle</string>
+    <string name="delete_file_description">Ekli dosya, inceleme tarihinden itibaren 30 gün saklandıktan sonra silinecektir.</string>
+    <string name="msg_file_uploading">Dosya yükleniyor. Lütfen biraz sonra tekrar deneyin.</string>
+    <string name="msg_file_upload_failed">Dosya yükleme başarısız oldu. Lütfen tekrar deneyin.</string>
+    <string name="progressing_files">Dosyalar işleniyor</string>
+    <string name="msg_file_expired">Silindiği için indirilemiyor.</string>
+    <string name="msg_invalid_file">Bu dosya türü desteklenmiyor.</string>
+    <string name="photo">Fotoğraf</string>
+    <string name="video">Video</string>
+    <string name="desc_quiz_denied_cases_celeb">- Özel bir karakter veya emoji ile doğru cevabı bildirdiğinizde\n- Herkes soruyu okumadan doğru cevabı seçebildiğinde\n- Zaman geçtikçe doğru cevap değiştirilebildiğinde\n- Fotoğrafı tanımak zor olduğunda\n- Ne zaman yazım hatası var\n- yanlış cevabı doğru cevaba ayarladığınızda\n- açıklama yeterli olmadığında</string>
+    <string name="s_league">S-Lig</string>
+    <string name="a_league">A-Lig</string>
+    <string name="will_be_updated" formatted="false">%s tarihinde güncellenecektir.</string>
+    <string name="capital_all">TÜM</string>
+    <string name="quiz_deny_reason_desc_celeb">- Doğru cevabı özel bir karakter veya emoji ile bildirdiğinizde - Herkes soruyu okumadan doğru cevabı seçebildiğinde - Doğru cevap zaman geçtikçe değişebildiğinde - Fotoğrafı tanımak zor olduğunda - - Ne zaman yazım hatası var- Yanlış cevabı doğru cevaba çevirdiğinizde- Açıklama yeterli olmadığında</string>
+    <string name="select_category_field">Kategori seç</string>
+    <string name="select_category_toast">Bir kategori seç.</string>
+    <string name="enter_title">Bir başlık girin.</string>
+    <string name="enter_content">İçeriği girin.</string>
+    <string name="idol_board_article">Postalamak</string>
+    <string name="small_talk_empty">Henüz gönderi yok.îllk gönderiyi yayınla!</string>
+    <string name="order_like">Popüler</string>
+    <string name="order_hit">Görüş</string>
+    <string name="views" formatted="false">%s Görüntüleme</string>
+    <string name="format_recommend" formatted="false">%s Öner</string>
+    <string name="format_comment" formatted="false">%s Yorumlar</string>
+    <string name="recommend">Tavsiye etmek</string>
+    <string name="filter_all_language">Tüm Diller</string>
+    <string name="filter_app_language">Varsayılan dil</string>
+    <string name="title_char_limit_placeholder" formatted="false">Başlık(Maks. %sharf)</string>
+    <string name="popup_request_auth_title">%1$s\'deki bir sonraki görev için onay isteğinde bulunun.</string>
+    <string name="agree_and_continue">Kabul Et ve Devam Et</string>
+    <string name="reject">Reddetmek</string>
+    <string name="captured_qr_not_available">Ekran görüntüsü olarak kaydedilen QR kodu kullanılamaz.</string>
+    <string name="captured_qr_not_available_popup">Bir ekran görüntüsü algılandı. Resim olarak kaydedilen QR kodu kullanılamaz.</string>
+    <string name="quiz_main_title2_celeb">Ünlülerin tutkulu bir hayranıyım!</string>
+    <string name="show_qr_staff">Bilet gişesinde bilet alan kişiye QR Kodunuzu gösterin.</string>
+    <string name="seconds" formatted="false">%s</string>
+    <string name="remaining_time">Kalan zaman</string>
+    <string name="male_4th_gen_idol">4. Nesil</string>
+    <string name="female_4th_gen_idol">4. Nesil</string>
+    <string name="hda_2023">2023 K Global Heart Dream Awards</string>
+    <string name="award_4th_gen_male_final" formatted="false">%s\n4. Nesil Sıcak İkon Erkek Grubu Ödülü Nihai Sonuç</string>
+    <string name="award_4th_gen_female_final" formatted="false">%s\n4. Nesil Sıcak İkon Kadın Grubu Ödülünün Nihai Sonucu</string>
+    <string name="award_4th_gen_male_aggregated">4. Nesil Sıcak İkon Erkek Grubunun Kümülatif Sıralaması</string>
+    <string name="award_4th_gen_female_aggregated">4. Nesil Sıcak İkon Kadın Grubunun Kümülatif Sıralaması</string>
+    <string name="award_4th_gen_male_realtime">4. Nesil Hot Icon Erkek Grubunun Gerçek Zamanlı Sıralaması</string>
+    <string name="award_4th_gen_female_realtime">4. Nesil Sıcak İkon Kadın Grubunun Gerçek Zamanlı Sıralaması</string>
+    <string name="award_4th_gen_realtime_example">Bu, 4. nesil grup adaylarının bireysel oyları ile grup oylarını birleştiren bir oylama örneğidir.</string>
+    <string name="award_4th_gen_aggregated_info">Bu birikimli sıralama, 4. nesil grup adaylarının bireysel oylarını ve grup oylarını birleştirir.</string>
+    <string name="award_4th_gen_realtime_info">Bu gerçek zamanlı sıralama, 4. nesil grup adaylarının bireysel oylarını ve grup oylarını birleştirir.</string>
+    <string name="award_solo_final" formatted="false">%s\nSolo Sanatçı Popülerlik Ödülü\'nün Nihai Sonucu</string>
+    <string name="quiz_celeb_unavailable_not_enough">Üzgünüm. Bu kategoride yeterli sınav yok. ָLütfen başka bir kategori seçin.</string>
+    <string name="limited_photo_permission_desc">Seçili fotoğraflara erişiminiz yok.\nLütfen fotoğraf erişimine izin verin.</string>
+    <string name="set_photo_permission">Fotoğraf erişimini ayarla</string>
+    <string name="try_daily_stamp">Katılımı Kontrol Et</string>
+    <string name="daily_stamp_already_done" formatted="false">Gün %s - Tam Katılım</string>
+    <string name="stamp_and_get_hearts" formatted="false">Katılımı Kontrol Edin ve %s Kalp Alın</string>
+    <string name="stamp_and_get_diamonds" formatted="false">Katılımı Kontrol Edin ve %s DIA\'yı Alın</string>
+    <string name="stamp_warning_subtitle">- Ek Kalpler günlük kalplerdir ve hesaplama süresi dolduktan sonra kaybolur.\n- Sıcak Zamanlı Kalpleri her gün 20:00 ile 23:30 arasında alabilirsiniz.\n- Ek Kalpler her gün hesaplama saatinde sıfırlanır.\n- Şunları yapamazsınız: sayma süresi boyunca Ek Kalpler alırsınız.</string>
+    <string name="label_league_ended">Bireysel lig sistemi sona erdi.</string>
+    <string name="receive_more_heart_after_attendance">Daha Fazla Kalp Alın</string>
+    <string name="receive_more_heart_after_video_ads" formatted="false">Video Reklam +%s Kalplerini İzle</string>
+    <string name="reward_daily_connection">CHOEAEDOL Ödülünü Aç</string>
+    <string name="reward_daily_connection_celeb">Açık CHOEAEDOL Celeb Ödülü</string>
+    <string name="reward_sorry_heart">Bonus Kalpler</string>
+    <string name="reward_daily_pack">Günlük Paket</string>
+    <string name="reward_level_heart">Seviye Ödülü</string>
+    <string name="reward_buring_time">Yoğun saatler</string>
+    <string name="reward_post_article">Ödül Gönderin</string>
+    <string name="reward_heartbox">Kalp Kutusu</string>
+    <string name="reward_attendance_heart" formatted="false">%s Gün Serisi Seyirci Ödülü Kalpleri</string>
+    <string name="reward_attendance_diamond" formatted="false">%s Gün Serisi Seyirci Ödülü DIA</string>
+    <string name="receive">Almak</string>
+    <string name="complete">Tamamlanmış</string>
+    <string name="before_opening">yaklaşan</string>
+    <string name="attendance_heart_count_format" formatted="false">%s ♡</string>
+    <string name="dia_count_format" formatted="false">%s DIA</string>
+    <string name="more_hearts_section_title">Daha Fazla Kalp Alın</string>
+    <string name="reward_quiz">Sınav Ödül Kalpleri</string>
+    <string name="reward_didnt_receive_quiz">Ücretsiz Sınav Ödül Kalpleri</string>
+    <string name="reward_offerwall_heart" formatted="false">%s daha fazla Kalp alın</string>
+    <string name="reward_offerwall_diamond" formatted="false">%s daha fazla DIA alın</string>
+    <string name="purchase_cancelled">Geçici bir hata nedeniyle satın alma işleminizi tamamlayamadık. Lütfen tekrar deneyin.</string>
+    <string name="purchase_refunded">Geçici bir hata nedeniyle satın alma işleminiz iptal edildi ve geri ödeme yapıldı. Lütfen tekrar deneyin.</string>
+    <string name="purchase_pending">Ödemeniz beklemede. Ödeme tamamlandıktan sonra ürünleriniz satışa sunulur.</string>
+    <string name="label_rank_daily_no_data">Günlük Sıralamalar yakında güncellenecektir.</string>
+    <string name="label_rank_daily_m_no_data">Henüz Aylık Günlük Sıralama verisi yok.</string>
+    <string name="label_stats_highest_votes_no_data">Henüz hiçbir idol Kalp Oyu almadı. Lütfen idolünüze oy verin!</string>
+    <string name="label_stats_1st_place_no_data">Henüz hiçbir idol 1. sırayı alamadı. Lütfen idolünüze oy verin!</string>
+    <string name="actor_label_stats_highest_votes_no_data">Henüz hiçbir ünlü Kalp Oyu almadı. Lütfen ünlünüze oy verin!</string>
+    <string name="actor_label_stats_1st_place_no_data">Henüz hiçbir ünlü 1. sırayı alamadı. Lütfen ünlünüze oy verin!</string>
+    <string name="label_award_aggregated_no_data">Kümülatif Sıralamalar yarından itibaren toplanacak.</string>
+    <string name="reward_videoad">Video Reklam Kalpleri</string>
+    <string name="reward_adopted_quiz">Sınav Onaylı Kalpler</string>
+    <string name="reward_surprise_dia">Tebrikler! Sürpriz DIA</string>
+    <string name="agree_all">Tüm Şartları Kabul Edin</string>
+    <string name="required">Gerekli</string>
+    <string name="reward_heartbox1000_sub">Şanslı! Heart Box\'ın en büyük avantajını kazandınız!</string>
+    <string name="aw_yend2023_title">2023 BEST CHOICE By CHOEAEDOL</string>
+    <string name="aw_yend2023_result">Nihai sonuçlar</string>
+    <string name="award_realtime_status">Bu, her adayın gerçek zamanlı sıralama durumudur.</string>
+    <string name="award_accumulate_status">Bu, her adayın kümülatif sıralama durumudur.</string>
+    <string name="award_realtime_status_MDOL">1 Ocak - 19 Kasım 2023 tarihleri ​​arasında mini albüm veya tam uzunlukta albüm yayınlayan erkek sanatçı (Bireysel/Grup)</string>
+    <string name="award_realtime_status_FDOL">1 Ocak - 19 Kasım 2023 tarihleri ​​arasında mini albüm veya tam uzunlukta albüm yayınlayan kadın sanatçı (Bireysel/Grup)</string>
+    <string name="award_realtime_status_NEW">1 Ocak ile 19 Kasım 2023 arasında çıkış yapan sanatçılar</string>
+    <string name="award_realtime_status_IBD">Ejderha Yılı\'nda doğan sanatçılar (2000, 1988)</string>
+    <string name="award_realtime_status_MA">Ana sıralamadaki tüm aktörler</string>
+    <string name="award_realtime_status_FA">Ana sıralamadaki tüm aktrisler</string>
+    <string name="award_realtime_status_MS">Ana sıralamadaki tüm erkek sanatçılar</string>
+    <string name="award_realtime_status_FS">Ana sıralamadaki tüm kadın sanatçılar</string>
+    <string name="award_realtime_status_ENT">Ana sıralamadaki tüm eğlence sanatçıları</string>
+    <string name="award_realtime_status_ABD">Ejderha Yılı\'nda (2000, 1988 veya 1976) doğan sanatçılar.</string>
+    <string name="article_setting">Gönderi Ayarları</string>
+    <string name="download_ban">İndirmeleri Engelle</string>
+    <string name="article_cancel_title">Gönderimi İptal Et</string>
+    <string name="article_cancel_msg">Yazdığınız yazı silinecektir.</string>
+    <string name="over_maximum_video_duration">Videoları yalnızca 3 dakika içinde yükleyebilir.</string>
+    <string name="uploading_thumb_error_msg">Küçük resim çıkarılamadı.</string>
+    <string name="title_trim_video">Videoyu düzenleme</string>
+    <string name="desc_trim_video">Videonuzu düzenlemek için aşağıdaki kontrolleri hareket ettirin.\n(60 saniye veya daha az)</string>
+    <string name="all_videos">Tüm videolar</string>
+    <string name="all_images">Tüm fotoğraflar</string>
+    <string name="title_cancel_trim_video">Video Düzenlemelerini İptal Et</string>
+    <string name="desc_cancel_trim_video">Bir videoyu düzenlemeyi iptal ederseniz düzenlemeleriniz silinir.</string>
+    <string name="article_post">Postalamak</string>
+    <string name="upload_in_progress">Şu anda başka bir gönderi yüklüyorum</string>
+    <string name="interstitial_ad_reward">Bonus Reklam Ödülü</string>
+    <string name="article_uploading">Yükleniyor</string>
+    <string name="complete_article_upload">Yükleme Tamamlandı!</string>
+    <string name="retry_article_upload">Yüklemeyi Yeniden Dene</string>
+    <string name="fail_article_upload">Yükleme başarısız</string>
+    <string name="main_image_tooltip">Banner olarak yalnızca kare ana fotoğraf uygulanacaktır!</string>
+    <string name="main_image_icon_title">Ana</string>
+    <string name="label_image_option_gif">GIF</string>
+    <string name="attendance_transition">Ziyaret etmek</string>
+    <string name="stamp_already_done_and_retry">Bugün yoklama aldınız!\nLütfen yarın tekrar deneyin.</string>
+    <string name="popup_burningtime_title">Şimdi SICAK Zamanı!</string>
+    <string name="popup_burningtime_subtitle" formatted="false">%s daha fazla Kalp kazanma şansı!</string>
+    <string name="popup_burningtime_button">HOT Time Ödülünü almaya gidin</string>
+    <string name="show_background_only">Sadece Duvar Kağıdı</string>
+    <string name="background">Duvar kağıdı</string>
+    <string name="order_by_like">Seviyor</string>
+    <string name="format_article_like" formatted="false">%s\'yi beğeniyor</string>
+    <string name="retry_quiz">Testi Tekrar Deneyin!</string>
+    <string name="video_ad_chance_solve_quiz">Video reklamları izlediğinizde testi çözmek için bir şansınız daha olacak!</string>
+    <string name="title_result_face_detect">İdol Yüz Maç Sonucu</string>
+    <string name="title_retry">Yeniden dene</string>
+    <string name="quiz_retry_ad_done">Video reklamı izlemeyi bitirdiniz!\nTest\'e bir kez daha katılın!</string>
+    <string name="continue_quiz">Devam etmek</string>
+    <string name="quit">Çıkış yapmak</string>
+    <string name="quiz_continue_ad_done">Video reklamı izlemeyi bitirdim!\nTestle devam et</string>
+    <string name="title_quit_quiz_popup">Çıkış yapmak</string>
+    <string name="desc_quit_quiz_popup">Teste devam etmek için kısa reklam videosunu izleyin!\nÇıkmak istediğinizden emin misiniz?</string>
+    <string name="desc_quit_quiz">Teste devam etmek için kısa bir video reklamı izleyin!</string>
+    <string name="msg_confirm_burning_day">Bunu Hepsi Bir Arada olarak ayarlamak ister misiniz?\nDIA\'lar kayıttan sonra iade edilmez.</string>
+    <string name="chatroom_enter_warning_msg">İftira, küfür, müstehcenlik, reklam gibi sağlıksız davranışlar işletme politikası kapsamında yaptırımlara tabi olacaktır,\n
+ ve hasar meydana gelebilir, bu nedenle lütfen ödeme bilgilerinizi ve kişisel bilgilerinizi başkalarına açıklamayın.</string>
+    <string name="desc_skip_ad_to_retry_quiz">Testi tekrar denemek için lütfen reklamı izleyin!</string>
+    <string name="desc_skip_ad_to_continue_quiz">Teste devam etmek için lütfen reklamı izleyin!</string>
+    <string name="msg_empty_background_image">Henüz bir duvar kağıdı resminiz yok!\n3:5 veya daha yüksek oranlı bir resim yüklemeyi deneyin.</string>
+    <string name="heartpick">Heart Pick</string>
+    <string name="vote_finish">Oylama Sona Erdi</string>
+    <string name="finish_at" formatted="false">%s tarihine kadar</string>
+    <string name="finish">çıkış</string>
+    <string name="finish_popup_title" formatted="false">%s Günlük Kalp kaldı.</string>
+    <string name="result_heartpick">Heart Pick Sonucu</string>
+    <string name="cheering_comments">Yorumlar</string>
+    <string name="view_number_of_comments" formatted="false">%s yorumu görüntüle</string>
+    <string name="first_rank_reward">1 Numara için Ödül</string>
+    <string name="finish_popup_subtitle" formatted="false">%s\'den çıkmak istiyor musunuz?</string>
+    <string name="popup_title_heartpick">Heart Pick nedir?</string>
+    <string name="msg_heartpick_vote_result" formatted="false">%s Kalp oylandı.\nBunu arkadaşlarınızla paylaşın!</string>
+    <string name="heartpick_share_msg" formatted="false">💖Benim Seçimim! Heart Pick💖\n%s\n[#%s #HeartPick Ranking]\n\n%s %s\n%s %s\n%s %s\n\nbias\'ınıza özel bir hediye verin💖</string>
+    <string name="heartpick_tooltip_msg">#%1$s\'e %2$s oy kaldı!</string>
+    <string name="most_in_picks_banner_msg" formatted="false">%s\'deki önyargımı destekleyin!</string>
+    <string name="popup_title_themepick">Temalı Seçim Nedir?</string>
+    <string name="popup_title_imagepick">Resim Seçimi Nedir?</string>
+    <string name="btn_complete_trim_video">Sonraki</string>
+    <string name="btn_view_post">Görüş</string>
+    <string name="themepick_celeb">Themed Pick</string>
+    <string name="popup_title_themepick_celeb">Themed Pick nedir?</string>
+    <string name="daily_ad_exceeded_title">Bugünlük bu kadar!</string>
+    <string name="daily_ad_exceeded_subtitle_idol">İdolünüz için kalp topluyorsunuz!</string>
+    <string name="daily_ad_exceeded_subtitle_celeb">Ünlün için kalp topluyorsun!</string>
+    <string name="daily_ad_exceeded_desc">Lütfen idolünüzü yarın daha da çok sevgiyle destekleyin.\n\n*Bugün oylar sayıldıktan sonra reklam videosunu tekrar izleyebilirsiniz.</string>
+    <string name="btn_more_video_ad">Daha fazla reklam görün</string>
+    <string name="miracle_share_msg">[Ayın Mucizesi🎂]\n#%2$s şu anda kümülatif sıralamada #%3$s!\n\nAyın doğum günü oylaması devam ediyor!\nBias\'ınıza oy verin ve Bias\'ınıza bir doğum günü reklamı verin💖\n\n#CHOEAEDOL\'da #Kpop idolünü destekleyin</string>
+    <string name="miracle_n_share_msg">[Ayın Mucizesi🎂]\nMevcut kümülatif sıralama\n\n%2$s #%3$s\n%4$s #%5$s\n%6$s #%7$s\n\nİdolime özel bir doğum günü hediyesi ver CHOEAEDOL!💖\n\n#CHOEAEDOL\'da #Kpop idolünü destekleyin</string>
+    <string name="face_share_msg">#Idol Yüz Maçı #CHOEAEDOL\n
+Hangi idol bana benziyor?\n
+Şimdi CHOEAEDOL\'a göz atın!</string>
+    <string name="community_share_msg">%2$s Gönderiyi gör!\n\n
+#CHOEAEDOL\'da #Kpop idolünü destekleyin</string>
+    <string name="community_d_share_msg">%2$s Ön yargınızla ilgili gönderiye bakın!\n\n
+#CHOEAEDOL\'da #Kpop idolünü destekleyin</string>
+    <string name="freeboard_share_msg">En sevdiğiniz #Kpop idolünüz kim? 😳\n\n
+
+#CHOEAEDOL\'a olan önyargınız hakkında konuşalım!</string>
+    <string name="qna_share_msg">Diğer hayranlara #Kpop ve önyargılarınız hakkında her şeyi sorun!🥹\n
+İdolünüz hakkındaki bilgileri #CHOEAEDOL\'da paylaşın</string>
+    <string name="celeb_miracle_share_msg">🎂Ayın Mucizesi\n\n#CHOEAEDOL_CELEB\n#%2$s şu anda kümülatif sıralamada #%3$s!\n\nAyın doğum günü oylaması devam ediyor! Bias\'ıma özel bir doğum günü hediyesi💜</string>
+    <string name="celeb_miracle_n_share_msg">🎂Ayın Mucizesi\n\n[#CHOEAEDOL_CELEB Mevcut kümülatif sıralama]\n%2$s #%3$s\n%4$s #%5$s\n%6$s #%7$s\n\nAyın doğum günü oylaması devam ediyor ! Bias\'ıma özel bir doğum günü hediyesi💜</string>
+    <string name="celeb_community_share_msg">%2$s Küresel topluluğa gidin!\n\n
+%3$s #CHOEAEDOL_CELEB\'de önyargınızı destekleyin</string>
+    <string name="celeb_community_d_share_msg">#%2$s En sevdiğiniz ünlüler hakkında diğer hayranlarla özgürce konuşun!\n\n
+%3$s #CHOEAEDOL_CELEB\'de önyargınızı destekleyin</string>
+    <string name="celeb_freeboard_share_msg">#CHOEAEDOL_CELEB Ücretsiz Board\n\n
+
+En sevdiğiniz aktörler ve ünlüler hakkında diğer hayranlarla özgürce konuşun!</string>
+    <string name="celeb_qna_share_msg">#K-Celeb hakkında sorularınız mı var? Diğer hayranlara ünlünüz hakkında her şeyi sorun!\n\n
+#CHOEAEDOL_CELEB\'de ünlünüzle ilgili bilgileri paylaşın</string>
+    <string name="top_toggle_male">M</string>
+    <string name="top_toggle_female">F</string>
+    <string name="rookie_month_title">CHOEAEDOL Çaylak</string>
+    <string name="super_rookie_history_tab">Süper Çaylak</string>
+    <string name="title_rookie_month">CHOEAEDOL Çaylağı nedir?</string>
+    <string name="record_super_rookie">Süper Çaylak\'a ulaşan tüm idollerin listesi</string>
+    <string name="record_super_rookie_info_title">Süper Çaylak nedir?</string>
+    <string name="record_super_rookie_info_body">Üç kez CHOEAEDOL Çaylağı olan grup ve solo idoller.\nSüper Çaylaklar daha iyi ödüller alır ve Çaylak olarak mezun olurlar.</string>
+    <string name="record_rookie_month_default">Henüz hiçbir idol Ayın Çaylağı\'na ulaşmadı.\nİdolünüz için kalplere oy verin ve Idol\'ünüzü Ayın ilk Çaylağı yapın!</string>
+    <string name="record_super_rookie_default">Henüz hiçbir idol Süper Çaylak\'a ulaşmadı.\nİdolünüz için kalplere oy verin ve Idol\'ünüzü ilk Süper Çaylak yapın</string>
+    <string name="record_super_rookie_number" formatted="false">%s</string>
+    <string name="rookie">Çaylak</string>
+    <string name="title_miracle_month">Ayın Mucizesi Nedir?</string>
+    <string name="community_main_share_msg">İdollerinizi desteklemek için küresel #%1$s topluluğuna gidin!\n\n
+
+#CHOEAEDOL\'da #Kpop idolünü destekleyin</string>
+    <string name="celeb_community_main_share_msg">İdollerinizi desteklemek için küresel #%1$s topluluğuna gidin!\n\n
+
+#CHOEAEDOL_CELEB\n\'de Koreli Aktörleri ve Ünlüleri Destekleyin</string>
+    <string name="rookie_share_msg">#CHOEAEDOL\'da #Kpop #Rookie_Idol\'u destekleyin!\n\n
+[CHOEAEDOL Çaylak👼🏻]\n
+Şu anki kümülatif 1. sıra #%2$s!\n\n
+
+CHOEAEDOL\'daki idolüme özel bir hediye ver!💖</string>
+    <string name="banner_go_myidol_title">İdol sıralamama git</string>
+    <string name="banner_go_myidol_btn">GİTMEK!</string>
+    <string name="purchase_loading_title">Ödeme devam ediyor</string>
+    <string name="purchase_loading_msg">Sayfadan ayrılırsanız bu, yinelenen bir satın alma olabilir.</string>
+    <string name="filter_actor">Aktör</string>
+    <string name="setting_haptic">Dokunsal Geribildirim</string>
+    <string name="date_deadline">Son teslim tarihi</string>
+    <string name="adtype_korean">🇰🇷Kore ulusal reklamı</string>
+    <string name="adtype_global">🌎Global reklam</string>
+    <string name="adtype_mobile">📱Mobil reklam</string>
+    <string name="veiw_support_location">Konumu kontrol et</string>
+    <string name="popup_diavote_title">Elmas Desteği tamamlandı</string>
+    <string name="popup_diavote_desc" formatted="false">%sDIA\'lar destekleniyor.\nArkadaşlarınızı toplayın ve bunu gerçekleştirin!</string>
+    <string name="sort_by_achievement">Başarı oranı</string>
+    <string name="tab_support_detail">detaylar</string>
+    <string name="adtype_icon_korean">🇰🇷</string>
+    <string name="adtype_icon_global">🌎</string>
+    <string name="adtype_icon_mobile">📱</string>
+    <string name="menu_sub_board">Ücretsiz konuşma topluluğu</string>
+    <string name="menu_sub_store">Kalpler ve elmaslar satın alın</string>
+    <string name="menu_sub_notice">Önemli bildirimler</string>
+    <string name="menu_sub_record">İdol Başarı kayıtları</string>
+    <string name="menu_sub_quiz">500 kalbe kadar kazanın</string>
+    <string name="menu_sub_face_matching">Hangi idol bana benziyor</string>
+    <string name="welcome_mission_desc">Her görev tamamlandığında bir ödül alacaksınız!\nTüm görevleri tamamlarsanız size daha büyük bir ödül vereceğiz.</string>
+    <string name="welcome_mission_sign_up_title">Üye olmak</string>
+    <string name="welcome_mission_sign_up_desc">Hoş geldin! Görevi bitirebilirsin!</string>
+    <string name="welcome_mission_set_most_title">İdol seç</string>
+    <string name="welcome_mission_set_most_desc">Git ve idolümü seç</string>
+    <string name="welcome_mission_vote_title">Oy</string>
+    <string name="welcome_mission_vote_desc">İdolünüze kalp gönderin</string>
+    <string name="welcome_mission_community_title">Toplulukta bir gönderi yazın</string>
+    <string name="welcome_mission_community_desc">Aynı idole sahip arkadaşlarınızla iletişim kurun</string>
+    <string name="welcome_mission_video_ad_title">Video Reklamı İzle</string>
+    <string name="welcome_mission_video_ad_desc">Reklamları görün ve kalpleri toplayın</string>
+    <string name="go">Gitmek</string>
+    <string name="welcome_mission_add_friend_title">Arkadaş ekle</string>
+    <string name="welcome_mission_add_friend_desc">Kalpleri bir araya toplamak için daha fazla arkadaş edinin</string>
+    <string name="welcome_mission_complete">Görev tamamlandı</string>
+    <string name="impossible_write_message">Idol ayarı gerekli</string>
+    <string name="impossible_all_clear">Tüm görevleri tamamladığınızda bunu alabilirsiniz</string>
+    <string name="retry_all_clear">Ödülünüz zaten ödendi</string>
+    <string name="welcome_mission_all_clear_reward_title">Görev ödülü</string>
+    <string name="welcome_mission_title">Hoş geldin misyonu 💝</string>
+    <string name="hof_cumulative_tab">30 gün</string>
+    <string name="hof_daily_tab">Günlük</string>
+    <string name="celeb_welcome_mission_set_most_title">Ünlü seç</string>
+    <string name="celeb_welcome_mission_set_most_desc">Git ve ünlümü seç</string>
+    <string name="celeb_welcome_mission_vote_desc">Ünlülerinize kalp gönderin</string>
+    <string name="celeb_welcome_mission_community_desc">Aynı ünlüye sahip arkadaşlarınızla iletişim kurun</string>
+    <string name="celeb_impossible_write_message">Ünlü ayarı gerekli</string>
+    <string name="share_awards_ready" formatted="false">[%s]\n🚀 CHOEAEDOL\'da oylama yakında başlayacak! 🏆\nEn sevdiğiniz kişinin birinci olması için tezahürat yapmaya hazır olun!\n⏰ Oylama başlangıcı: %s(KST)\n\n#최애돌 #CHOEAEDOL</string>
+    <string name="share_awards_run" formatted="false">[%s]\n🔥 CHOEAEDOL için şiddetli oylama sürüyor 🗳️\nEn sevdiğiniz kişiyi şimdi kalplerle destekleyin! 💖\n\n#최애돌 #CHOEAEDOL</string>
+    <string name="share_awards_result" formatted="false">[%s]\n🏆 Zaferin kazananı kim olacak?! 🫣\nHemen CHOEAEDOL\'a göz atın!\n\n#최애돌 #CHOEAEDOL</string>
+    <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 CHOEAEDOL Celeb\'da oylama yakında başlayacak! 🏆\nEn sevdiğiniz kişinin birinci olması için tezahürat yapmaya hazır olun!\n⏰ Oylama başlangıcı: %s\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
+    <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 CHOEAEDOL Celeb için şiddetli oylama sürüyor 🗳️\nEn sevdiğiniz kişiyi şimdi kalplerle destekleyin! 💖\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
+    <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 Zaferin kazananı kim olacak?! 🫣\nHemen CHOEAEDOL Celeb\'a göz atın!\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
+    <string name="login_desc">5 saniyede başlayın!</string>
+    <string name="login_email">e-postayla başla</string>
+    <string name="hometab_title_rank">Ranking</string>
+    <string name="hometab_title_myidol">My Idol</string>
+    <string name="hometab_title_profile">Profile</string>
+    <string name="hometab_title_freeboard">Free Talk</string>
+    <string name="hometab_title_menu">Menu</string>
+    <string name="hometab_title_myceleb">My Celeb</string>
+    <string name="hometab_title_miracle">Miracle</string>
+    <string name="hometab_title_onepick">One Pick</string>
+    <string name="hometab_title_hof">Hall of Fame</string>
+    <string name="vote_certificate_popup_button">Sertifikayı Kontrol Et</string>
+    <string name="certificate_title">Oy Verme Belgesi</string>
+    <string name="certificate_menu_desc">Bugünün sertifikalarına göz atın</string>
+    <string name="certificate_none">Bugün hiç sertifikanız yok🥲\nİdolüm için oy verin ve sertifikaları kontrol edin!</string>
+    <string name="certificate_none_button">Oy vermeye git</string>
+    <string name="certificate_info_title">Oy Verme Belgesi Nedir?</string>
+    <string name="certificate_info_desc">◇ Sertifika, 100\'den fazla oy verdiğinizde oluşturulacaktır❤️\n◇ Sertifika, oylama gününün sonuna kadar saklanacaktır\n◇ Sertifika düzeyi kriterleri\n\t- Bronz: 100❤️\n\t- Gümüş: 1.000❤️\n\t- Altın: 10.000❤️\n\t- Platin: 100.000❤️</string>
+    <string name="certificate_detail_title">Oy Sertifikası Detayları</string>
+    <string name="certificate_detail_info">* Bugünün sertifikası [Menü > Oylama Sertifikası]\'nda tekrar görüntülenebilir</string>
+    <string name="certificate_username">Seçmenin adı</string>
+    <string name="certificate_heart">Oylanan Kalpler</string>
+    <string name="certificate_time">Oylama tarihi</string>
+    <string name="certificate_detail_save">Resmi kaydet</string>
+    <string name="certificate_detail_share">Paylaşmak</string>
+    <string name="certificate_detail_share_msg">Oylama bugün tamamlandı💝\nHadi %1$s\'i hep birlikte yapalım!\n\n#%1$s #%2$s #VotingProof</string>
+    <string name="certificate_detail_save_fail">Resim kaydedilemedi</string>
+    <string name="certificate_detail_save_succ">Resim başarıyla kaydedildi</string>
+    <string name="themepick_vote_again">Tekrar oy verin</string>
+    <string name="themepick_vote_with_ad">Oy ver [AD]</string>
+    <string name="imagepick_vote_with_ad">Tekrar oy verin [AD]</string>
+    <string name="see_translate">Çeviriye bakın</string>
+    <string name="translating">Çeviri...</string>
+    <string name="see_original">Orijinali görün</string>
+    <string name="freeboard_hotposts">Sıcak gönderiler</string>
+    <string name="freeboard_search">Arama teriminizi girin.</string>
+    <string name="see_translate_fail">Çeviri başarısız oldu.</string>
+    <string name="see_translate_to_english">İngilizceye çevir</string>
+    <string name="total_amount" formatted="false">Toplam %s</string>
+    <string name="next_level_progress" formatted="false">Next level %s</string>
+    <string name="freeboard_empty">Henüz gösterilecek gönderi yok🥲\nYeni bir şeyler paylaşmayı deneyin!</string>
+    <string name="my_info_heart_dia_detail">Ayrıntıları görüntüle</string>
+    <string name="my_info_coupon_quantity">Kuponlarım</string>
+    <string name="video_image_picker_not_found">Video ve resim seçimi desteklenmiyor</string>
+    <string name="push_setting_guide_head">Dukjil\'in Zamanlaması</string>
+    <string name="push_setting_guide_body">Bildirimleri açın ve en sevdiğiniz haberleri asla kaçırmayın!</string>
+    <string name="setting_menu_push_likes">Beğeniler</string>
+    <string name="setting_menu_push_hotposts">Sıcak gönderiler</string>
+    <string name="levelheart_bonus_yes">🎬 REKLAM\'ı izle</string>
+    <string name="freeboard_nobias_title">Görmek için biasını ayarlaman gerekiyor!</string>
+    <string name="freeboard_nobias_subtitle">Sağ üstteki arama 🔍 bölümünde biasını bul!</string>
+    <string name="freeboard_nobias_subtitle_celeb">Ana sayfanın üst kısmındaki "Arama🔍" bölümünde biasını bul!</string>
+    <string name="community_feed">Akış</string>
+    <string name="community_board">Fan Talk</string>
+    <string name="community_chat">Sohbet</string>
+    <string name="community_schedule">Takvim</string>
+    <string name="community_board2" formatted="false">%s Talk</string>
+    <string name="post_detail">Gönderi Detay</string>
+    <string name="vote_dday" formatted="false">Oylamaya D-%s</string>
+    <string name="vote_preview">Önizleme</string>
+    <string name="vote_alert_before">Oy hatırlat</string>
+    <string name="vote_alert_after">Oylama başlayınca bildir</string>
+    <string name="upcoming">Yakında</string>
+    <string name="onepick_preview_title" formatted="false">%s Önizleme</string>
+    <string name="alert_ready_vote">Hatırlatıcı ayarlandı!\nBaşlayınca bildirilir</string>
+    <string name="alert_ready_videoad">Hatırlatıcı ayarlandı!\nHazır olunca bildirilir</string>
+    <string name="push_induct_head">Önce bildirimleri aç!</string>
+    <string name="push_induct_body">Sistem bildirimleri kapalı\nLütfen etkinleştirin</string>
+    <string name="push_induct_button">Ayarlar\'a Git</string>
+    <string name="ios_att_title">Daha fazla bonus için "İzin Ver"</string>
+    <string name="ios_att_title_agree">"İzin Ver"</string>
+    <string name="ios_att_body_1">Kabul ederseniz</string>
+    <string name="ios_att_body_2">Daha çok reklam, daha çok kalp</string>
+    <string name="ios_att_body_3">Size özel reklamlar</string>
+    <string name="ios_att_outro">İstediğiniz zaman değiştirilebilir\n[Ayarlar > Gizlilik > Takip AÇIK/KAPALI]</string>
+    <string name="video_ad_timer_title">Yükleniyor...</string>
+    <string name="video_ad_timer_body">Bonus reklamı hazırlanıyor</string>
+    <string name="video_ad_timer_time">Kalan süre</string>
+    <string name="video_ad_timer_bonus" formatted="false">Sonraki reklam: %s❤️ kadar bonus</string>
+    <string name="video_ad_timer_alert">Hazır olunca bildirelim mi?</string>
+    <string name="video_ad_timer_alert_done">Hatırlatıcı ayarlandı</string>
+    <string name="reward_videoad_bonus">Rastgele bonus</string>
+    <string name="aos_web_image_save_title">Resmi kaydet</string>
+    <string name="aos_web_image_save_body">Bu resmi kaydet?</string>
+    <string name="aos_web_image_save_yes">Kaydet</string>
+    <string name="share_heartpick_upcoming">💖Yaklaşan Heart Pick: Sevginizi kalplerle gösterin💖\n[%1$s]\n🎁[%2$s]\nNihai kazanan kim olacak? 👀\n\n📌 %3$s %4$s için oy vermeye hazır olun\n🔗%5$s</string>
+    <string name="share_themepick_upcoming">💖Yaklaşan Themed Pick: şiddetli bir günlük savaş💖\n[%1$s]\n🎁[%2$s]\n1\'incilik...?👀\n\n📌 %3$s %4$s için oy vermeye hazır olun\n🔗%5$s</string>
+    <string name="share_onepick_upcoming_nobias">your bias</string>
+    <string name="ios_store_purchase_restricted_cn">Çin Anakarası App Store hesabıyla satın alma işlemi yapılamaz.\nLütfen başka bir ülkeye veya bölgeye geçin ve tekrar deneyin.</string>
+    <string name="title_daily_rank">Sıralama</string>
+    <string name="menu_minigame">Kalp Oyun Salonu</string>
+    <string name="popup_game_start_title">Oyunu Başlat</string>
+    <string name="popup_game_start_desc" formatted="false">Oyun puanınıza uygun\n❤️Ever Hearts kazan!\n\nOyuna başlamak için %shearts kullanacaksınız.\nHemen başla?</string>
+    <string name="reward_game_result">Oyun Ödülleri</string>
+    <string name="menu_invite_friend">Arkadaşlarını Davet Et</string>
+    <string name="friend_tooltip_invite_friend">110.000 Kalbe kadar kazanın!</string>
+    <string name="friend_bnr_invite_friend_title">Arkadaşlarınızı davet edin\nKalpler kazanın</string>
+    <string name="invite_friend_detail_title">Arkadaşlarını Davet Et</string>
+    <string name="reward_invite_mission_bonus">Arkadaş Daveti Görev Bonusu Ödülü</string>
+    <string name="reward_invite_mission_completion">Arkadaş Daveti Görev Tamamlama Ödülü</string>
+    <string name="signup_desc2_noreward">Arkadaş olarak Kalpleri paylaşmak için kod davetini girin.</string>
+    <string name="signup_toast_auto_fill_recommender">Kopyalanan davet kodu otomatik olarak girilmiştir.</string>
+</resources>

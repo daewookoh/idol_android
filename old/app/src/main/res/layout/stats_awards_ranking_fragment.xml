@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
+
+	<data>
+
+	</data>
+
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:id="@+id/cl_ranking_view"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="vertical"
+		android:background="@color/background_100">
+
+		<include
+			android:id="@+id/awards_guide"
+			layout="@layout/awards_guide"
+			android:visibility="gone" />
+
+		<androidx.appcompat.widget.AppCompatTextView
+			android:id="@+id/tv_load_data"
+			android:layout_width="match_parent"
+			android:layout_height="0dp"
+			android:layout_centerInParent="true"
+			android:gravity="center"
+			android:padding="10dp"
+			android:text="@string/lable_get_info"
+			android:textColor="@color/gray200"
+			android:textSize="16sp"
+			android:visibility="visible"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/in_top_awards" />
+
+        <include
+            android:id="@+id/in_top_awards"
+            layout="@layout/item_stats_awards_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintVertical_bias="0"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/rv_ranking"/>
+
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/rv_ranking"
+			android:layout_width="match_parent"
+			android:layout_height="0dp"
+			android:scrollbars="vertical"
+            android:visibility="gone"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/in_top_awards" />
+
+	</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

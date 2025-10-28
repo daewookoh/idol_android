@@ -1,0 +1,659 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@color/gray80"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingBottom="10dp">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/ll_category_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/gray_border_bottom"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="10dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/gray580"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:text="@string/community_post"
+                android:textColor="@color/gray300"
+                android:textSize="12sp" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <RelativeLayout
+            android:id="@+id/rl_article"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border_gray110">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/ll_article"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="20dp"
+                    android:paddingTop="13dp"
+                    android:paddingEnd="11dp"
+                    android:paddingBottom="11dp">
+
+                    <net.ib.mn.view.ExodusImageView
+                        android:id="@+id/photo"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/menu_profile_default2"
+                        app:layout_constraintEnd_toStartOf="@+id/ll_author_info"
+                        app:layout_constraintHorizontal_chainStyle="spread_inside"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottie_tutorial_profile"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="@+id/photo"
+                        app:layout_constraintEnd_toEndOf="@+id/photo"
+                        app:layout_constraintStart_toStartOf="@+id/photo"
+                        app:layout_constraintTop_toTopOf="@+id/photo"
+                        tools:visibility="visible" />
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/ll_author_info"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:gravity="top|start"
+                        android:orientation="horizontal"
+                        app:layout_constraintEnd_toStartOf="@+id/ll_btn_container"
+                        app:layout_constraintHorizontal_bias="0"
+                        app:layout_constraintHorizontal_chainStyle="spread_inside"
+                        app:layout_constraintHorizontal_weight="1"
+                        app:layout_constraintStart_toEndOf="@id/photo"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/emoticon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="1dp"
+                            android:scaleType="fitCenter"
+                            android:visibility="gone" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/level"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginEnd="2dp"
+                            android:background="@android:color/transparent"
+                            android:padding="0dp"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/icon_level_0" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_level"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="2dp"
+                            android:text="@string/lable_manager"
+                            android:textColor="@color/gray580"
+                            android:textSize="15sp"
+                            android:textStyle="normal"
+                            android:visibility="gone" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/main"
+                            android:textSize="14sp"
+                            tools:text="닉네임" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/ll_btn_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toBottomOf="@id/ll_author_info"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_chainStyle="spread_inside"
+                        app:layout_constraintStart_toEndOf="@id/ll_author_info"
+                        app:layout_constraintTop_toTopOf="@id/ll_author_info">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/iv_view_more"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/icon_view_more"
+                            android:visibility="gone" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/ll_article_info"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0"
+                        app:layout_constraintHorizontal_chainStyle="spread_inside"
+                        app:layout_constraintHorizontal_weight="1"
+                        app:layout_constraintStart_toEndOf="@id/photo"
+                        app:layout_constraintTop_toBottomOf="@id/ll_author_info">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/created_at"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:textColor="@color/text_dimmed"
+                            android:textSize="12sp"
+                            tools:ignore="SmallSp"
+                            tools:text="2014.11.4 오후 5:05" />
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:id="@+id/icon_secret"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:layout_marginStart="7dp"
+                            android:orientation="horizontal"
+                            android:visibility="visible">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="13dp"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginEnd="3dp"
+                                android:layout_marginBottom="1dp"
+                                android:src="@drawable/icon_onlymyidol" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="9dp"
+                    android:background="@drawable/main200_radius6"
+                    android:gravity="center"
+                    android:layout_marginBottom="6dp"
+                    android:paddingHorizontal="7dp"
+                    android:paddingVertical="3dp"
+                    android:textAlignment="center"
+                    android:textColor="@color/main_light"
+                    android:textSize="13sp"
+                    app:layout_constraintStart_toStartOf="@+id/eiv_small_talk_header_photo"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_small_talk_header_date"
+                    tools:text="총공" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/ll_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginBottom="21dp"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_popular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="5dp"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="@id/tv_small_talk_header_title"
+                        app:layout_constraintEnd_toStartOf="@id/iv_small_talk_most_only"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/tv_small_talk_header_title"
+                        app:srcCompat="@drawable/icon_popularpost_title"
+                        tools:visibility="visible" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="@color/text_default"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constrainedWidth="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/iv_small_talk_most_only"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_small_talk_header_tag"
+                        tools:text="같이 콘서트 갈사람 있나요!!" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <net.ib.mn.view.NoScrollingTextView
+                    android:id="@+id/content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autoLink="web"
+                    android:linksClickable="false"
+                    android:maxLines="4000"
+                    android:paddingHorizontal="20dp"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/text_default"
+                    android:textColorLink="@color/text_light_blue"
+                    android:textIsSelectable="true"
+                    android:textSize="14sp"
+                    tools:text="내용 자리 입니다" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/view_more"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingStart="20dp"
+                    android:paddingTop="13dp"
+                    android:paddingEnd="20dp"
+                    android:text="@string/view_more"
+                    android:textColor="@color/text_dimmed"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/view_translate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingVertical="6dp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:text="@string/see_translate"
+                    android:textColor="@color/text_gray"
+                    android:textSize="12sp"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <RelativeLayout
+                    android:id="@+id/cl_multi_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:layout_height="100dp">
+
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/vp_community"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cl_photo_idx"
+                        android:layout_width="wrap_content"
+                        android:layout_height="24dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="29dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/text_default_radius13"
+                        android:minWidth="31dp"
+                        android:text="1/1"
+                        android:visibility="visible">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_photo_idx"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/fix_white"
+                            android:textSize="10sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/article_result"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="13dp"
+                    android:layout_marginBottom="13dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="16dp">
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/ll_heart_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginEnd="18dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginEnd="3dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/icon_community_heart" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/heart_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_default"
+                            android:textSize="13sp"
+                            tools:text="0" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/ll_like_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginEnd="18dp"
+                        android:layout_toEndOf="@id/ll_heart_count"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="10dp"
+                        android:paddingTop="5dp"
+                        android:paddingEnd="10dp">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/like_count_icon"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginTop="1dp"
+                            android:layout_marginEnd="3dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/icon_board_like" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/like_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:hint="0"
+                            android:textColor="@color/text_default"
+                            android:textSize="13sp" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/ll_comment_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="18dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_toEndOf="@id/ll_like_count"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/comment_count_icon"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginTop="1dp"
+                            android:layout_marginEnd="3dp"
+                            android:scaleType="centerInside"
+                            android:tint="@color/text_default"
+                            android:src="@drawable/icon_community_comment" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/comment_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:hint="0"
+                            android:textColor="@color/text_default"
+                            android:textSize="13sp" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/ll_view_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="18dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_toEndOf="@id/ll_comment_count"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/view_count_icon"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginTop="1dp"
+                            android:layout_marginEnd="3dp"
+                            android:scaleType="centerInside"
+                            android:tint="@color/text_default"
+                            android:src="@drawable/icon_board_hits" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/view_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:hint="0"
+                            android:textColor="@color/text_default"
+                            android:textSize="13sp" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+                </RelativeLayout>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/article_action"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_below="@id/ll_article"
+                android:orientation="horizontal">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_footer_heart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/footer_heart"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginEnd="7dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/icon_community_heart" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/lable_community_heart_vote"
+                            android:textColor="@color/text_gray"
+                            android:textSize="14sp" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottie_tutorial_vote"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="@+id/footer_heart"
+                        app:layout_constraintEnd_toEndOf="@+id/footer_heart"
+                        app:layout_constraintStart_toStartOf="@+id/footer_heart"
+                        app:layout_constraintTop_toTopOf="@+id/footer_heart" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:layout_width="0.3dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/gray110" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/footer_like"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/iv_like"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginTop="1dp"
+                            android:layout_marginEnd="7dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/icon_board_like" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_like"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/support_sympathy"
+                            android:textColor="@color/text_gray"
+                            android:textSize="14sp" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottie_tutorial_like"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="@+id/footer_like"
+                        app:layout_constraintEnd_toEndOf="@+id/footer_like"
+                        app:layout_constraintStart_toStartOf="@+id/footer_like"
+                        app:layout_constraintTop_toTopOf="@+id/footer_like" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:layout_width="0.3dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/gray110" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_footer_comment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/footer_comment"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginTop="1dp"
+                            android:layout_marginEnd="7dp"
+                            android:scaleType="centerInside"
+                            android:tint="@color/text_default"
+                            android:src="@drawable/icon_community_comment" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_comment"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/lable_community_comment"
+                            android:textColor="@color/text_gray"
+                            android:textSize="14sp" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottie_tutorial_comment"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="@+id/footer_comment"
+                        app:layout_constraintEnd_toEndOf="@+id/footer_comment"
+                        app:layout_constraintStart_toStartOf="@+id/footer_comment"
+                        app:layout_constraintTop_toTopOf="@+id/footer_comment"
+                        tools:visibility="visible" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.3dp"
+                android:layout_below="@id/ll_article"
+                android:background="@color/gray110" />
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"
+            android:layout_below="@id/ll_article"
+            android:background="@color/gray110" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>

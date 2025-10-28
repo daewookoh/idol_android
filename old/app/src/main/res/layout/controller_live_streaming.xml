@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data></data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/live_controller_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_more_menu"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:background="@drawable/btn_live_more"
+            android:scaleX="@integer/locale_mirror_flip"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.97"
+            app:layout_constraintStart_toEndOf="@+id/btn_back"
+            app:layout_constraintTop_toTopOf="@+id/btn_back"
+            app:layout_constraintVertical_bias="0" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_chat_show"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="@drawable/icon_streaming_chatting_full"
+            android:scaleX="@integer/locale_mirror_flip"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_more_menu"
+            app:layout_constraintEnd_toStartOf="@+id/btn_more_menu"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintStart_toEndOf="@+id/btn_back"
+            app:layout_constraintTop_toTopOf="@+id/btn_more_menu"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_chat_hide"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="@drawable/icon_streaming_chatting_hide_full"
+            android:scaleX="@integer/locale_mirror_flip"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_more_menu"
+            app:layout_constraintEnd_toStartOf="@+id/btn_more_menu"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintStart_toEndOf="@+id/btn_back"
+            app:layout_constraintTop_toTopOf="@+id/btn_more_menu"
+            app:layout_constraintVertical_bias="0.5"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/btn_live_back"
+            android:scaleX="@integer/locale_mirror_flip"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_controller_limit_level"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/bg_round_live_ing"
+            android:gravity="center"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="Lv.14"
+            android:textColor="@color/text_white_black"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/controller_live_badge"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/controller_live_badge"
+            app:layout_constraintTop_toTopOf="@+id/controller_live_badge"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/controller_live_badge"
+            android:layout_width="70dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/img_streaming_live"
+            app:layout_constraintStart_toEndOf="@+id/btn_back"
+            app:layout_constraintTop_toTopOf="@+id/btn_back"
+            app:layout_constraintVertical_bias="0.0" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_controller_live_title"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="10dp"
+            android:gravity="center"
+            android:maxLines="1"
+            tools:text="신혜성 생일"
+            android:textColor="@color/fix_white"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_controller_limit_level"
+            app:layout_constraintStart_toEndOf="@+id/tv_controller_limit_level"
+            app:layout_constraintTop_toTopOf="@+id/tv_controller_limit_level" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_live_time_full"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="10dp"
+            android:textColor="@color/fix_white"
+            android:textSize="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintTop_toTopOf="@+id/tv_controller_limit_level"
+            app:layout_constraintStart_toEndOf="@+id/tv_controller_live_title"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_controller_limit_level"
+            app:layout_constraintVertical_bias="1"
+            tools:text="15분전" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_play"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@drawable/img_streaming_video_play"
+            android:visibility="gone"
+            app:layout_constraintHeight_percent="0.19"
+            app:layout_constraintWidth_percent="0.15"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_pause"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@drawable/img_streaming_video_stop"
+            android:visibility="visible"
+            app:layout_constraintHeight_percent="0.19"
+            app:layout_constraintWidth_percent="0.15"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_full_screen"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:src="@drawable/icon_streaming_screen"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/btn_more_menu"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.92" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/icon_controller_streaming_hits"
+            android:layout_width="21dp"
+            android:layout_height="15dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btn_back"
+            app:layout_constraintTop_toBottomOf="@+id/controller_live_badge"
+            app:layout_constraintVertical_bias="0"
+            app:srcCompat="@drawable/icon_streaming_hits" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_controller_streaming_hits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="@color/text_dimmed"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/icon_controller_streaming_hits"
+            app:layout_constraintStart_toEndOf="@+id/icon_controller_streaming_hits"
+            app:layout_constraintTop_toTopOf="@+id/icon_controller_streaming_hits"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/icon_controller_streaming_heart"
+            android:layout_width="wrap_content"
+            android:layout_height="15dp"
+            android:layout_marginStart="18dp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_controller_streaming_hits"
+            app:layout_constraintStart_toEndOf="@+id/tv_controller_streaming_hits"
+            app:layout_constraintTop_toTopOf="@+id/tv_controller_streaming_hits"
+            app:srcCompat="@drawable/icon_streaming_heart" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_controller_streaming_heart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="@color/text_dimmed"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/icon_controller_streaming_heart"
+            app:layout_constraintStart_toEndOf="@+id/icon_controller_streaming_heart"
+            app:layout_constraintTop_toTopOf="@+id/icon_controller_streaming_heart"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/icon_controller_streaming_users"
+            android:layout_width="wrap_content"
+            android:layout_height="15dp"
+            android:layout_marginStart="18dp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_controller_streaming_heart"
+            app:layout_constraintStart_toEndOf="@+id/tv_controller_streaming_heart"
+            app:layout_constraintTop_toTopOf="@+id/tv_controller_streaming_heart"
+            app:srcCompat="@drawable/icon_streaming_users" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_controller_streaming_users"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="@color/text_dimmed"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/icon_controller_streaming_users"
+            app:layout_constraintStart_toEndOf="@+id/icon_controller_streaming_users"
+            app:layout_constraintTop_toTopOf="@+id/icon_controller_streaming_users"
+            app:layout_constraintVertical_bias="0.5" />
+
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/icon_controller_streaming_users2"
+            android:layout_width="20dp"
+            android:layout_height="11dp"
+            android:layout_marginStart="18dp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_controller_streaming_users"
+            app:layout_constraintStart_toEndOf="@+id/tv_controller_streaming_users"
+            app:layout_constraintTop_toTopOf="@+id/tv_controller_streaming_users"
+            app:srcCompat="@drawable/icon_streaming_users_2" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_controller_streaming_users2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="@color/text_dimmed"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/icon_controller_streaming_users2"
+            app:layout_constraintStart_toEndOf="@+id/icon_controller_streaming_users2"
+            app:layout_constraintTop_toTopOf="@+id/icon_controller_streaming_users2"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/live_landscape_controller_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="
+        controller_live_badge,
+        tv_controller_limit_level,
+        tv_controller_live_title,
+        tv_live_time_full,
+        icon_controller_streaming_hits,
+        tv_controller_streaming_hits,
+        icon_controller_streaming_heart,
+        tv_controller_streaming_heart,
+        icon_controller_streaming_users,
+        tv_controller_streaming_users,
+        icon_controller_streaming_users2,
+        tv_controller_streaming_users2" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

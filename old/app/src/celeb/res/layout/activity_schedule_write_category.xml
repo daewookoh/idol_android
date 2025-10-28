@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sv_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/category_anniversary"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/schedule_write_bg"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/schedule_category_01"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:text="@string/schedule_desp_anniversary"
+                android:textColor="@drawable/schedule_write_text_color"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/category_album"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/schedule_write_bg"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/schedule_category_02"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:text="@string/schedule_desp_album"
+                android:textColor="@drawable/schedule_write_text_color"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/category_tv_icon"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/schedule_write_bg"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/schedule_category_06"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:text="@string/schedule_desp_tv"
+                android:textColor="@drawable/schedule_write_text_color"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/category_movie"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/schedule_write_bg"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/schedule_category_20"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:text="@string/schedule_desp_movie"
+                android:textColor="@drawable/schedule_write_text_color"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/category_production"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/schedule_write_bg"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/schedule_category_21"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:text="@string/schedule_desp_production"
+                android:textColor="@drawable/schedule_write_text_color"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/category_preview"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/schedule_write_bg"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/schedule_category_22"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:text="@string/schedule_desp_previw"
+                android:textColor="@drawable/schedule_write_text_color"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/category_awards"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/schedule_write_bg"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/schedule_category_09"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:text="@string/schedule_desp_awards"
+                android:textColor="@drawable/schedule_write_text_color"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/category_concert"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/schedule_write_bg"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/schedule_category_03"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:text="@string/schedule_desp_concert"
+                android:textColor="@drawable/schedule_write_text_color"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/category_event"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/schedule_write_bg"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/schedule_category_04"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:text="@string/schedule_desp_event"
+                android:textColor="@drawable/schedule_write_text_color"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/category_sign"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/schedule_write_bg"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/schedule_category_05"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:text="@string/schedule_desp_sign"
+                android:textColor="@drawable/schedule_write_text_color"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/category_radio"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/schedule_write_bg"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/schedule_category_07"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:text="@string/schedule_desp_radio"
+                android:textColor="@drawable/schedule_write_text_color"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/category_video"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/schedule_write_bg"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/schedule_category_08"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:text="@string/schedule_desp_video"
+                android:textColor="@drawable/schedule_write_text_color"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/category_etc"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/schedule_write_bg"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/schedule_category_10"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:text="@string/schedule_desp_etc"
+                android:textColor="@drawable/schedule_write_text_color"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

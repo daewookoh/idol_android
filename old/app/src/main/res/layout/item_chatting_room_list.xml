@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data></data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container_chatting_room_list_item"
+        android:layout_width="match_parent"
+        android:minHeight="73dp"
+        android:layout_height="wrap_content"
+        android:background="@color/background_200">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/next"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            >
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_height="wrap_content">
+
+
+                <TextView
+                    android:id="@+id/tv_chatting_level"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/tv_chatting_level_circle"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    tools:text="Lv.10"
+                    android:textColor="@color/gray50"
+                    android:textSize="10dp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="4dp"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toTopOf="@+id/tv_chatting_room_name"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed"
+                    tools:ignore="RtlHardcoded" />
+                <TextView
+                    android:id="@+id/tv_anonymous"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="@string/chat_anonymous"
+                    android:textSize="10dp"
+                    android:textColor="@color/main"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_chatting_room_name"
+                    />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/tv_chatting_room_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="2dp"
+                android:gravity="center_vertical"
+                tools:text="투표 공지방"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="@color/gray1000"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toTopOf="@id/tv_chat_room_desc"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_chatting_level"
+                tools:layout_editor_absoluteX="128dp"
+                tools:layout_editor_absoluteY="140dp" />
+
+            <TextView
+                android:id="@+id/tv_chat_room_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="3dp"
+                android:gravity="center_vertical"
+                tools:text="BTS 투표 총공팀 입니다!"
+                android:textSize="11sp"
+                android:visibility="visible"
+                android:ellipsize="end"
+                android:maxLines="1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_chatting_room_name"
+                />
+
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/next"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/yearWrapper"
+            android:padding="20dp"
+            android:src="@drawable/schedule_more"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="RtlHardcoded" />
+        <ImageView
+            android:id="@+id/img_default_chatting_character"
+            android:layout_width="90dp"
+            android:layout_height="0dp"
+            android:scaleType="fitXY"
+            android:visibility="gone"
+            android:src="@drawable/img_chatting_list_general"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/next"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="RtlHardcoded" />
+
+
+        <View
+            android:id="@+id/footer_right_border"
+            android:layout_width="0dp"
+            android:layout_height="0.5dp"
+            android:background="@color/gray100"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias="1" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

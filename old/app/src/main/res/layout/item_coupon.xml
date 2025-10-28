@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:id="@+id/coupon"
+        android:layout_width="match_parent"
+        android:layout_height="124dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/coupon_bg_on"
+        android:visibility="gone">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="20dp"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            tools:ignore="RelativeOverlap,RtlHardcoded">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/coupon_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:textColor="@color/main_light"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="위메프 10,000P 적립 쿠폰" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/coupon_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginTop="8dp"
+                android:maxLines="2"
+                android:textColor="@color/gray580"
+                android:textSize="10sp"
+                tools:ignore="SmallSp"
+                tools:text="최애돌 유저에게만 드리는 특별 혜택!" />
+
+            <TextView
+                android:id="@+id/coupon_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textColor="@color/gray580"
+                android:textSize="10sp"
+                tools:ignore="SmallSp"
+                tools:text="2018년 10월 7일까지" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/ll_coupon_use"
+            android:layout_width="66dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            tools:ignore="RtlHardcoded">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/icon_download" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/coupon_use"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/use_coupon"
+                android:textAlignment="center"
+                android:textColor="@color/text_white_black"
+                android:textSize="10sp"
+                tools:ignore="RtlHardcoded,SmallSp" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/coupon2"
+        android:layout_width="match_parent"
+        android:layout_height="125dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/image_coupon2_left"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/coupon_bg_left_1"
+                android:scaleType="fitXY"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/image_coupon2_right"
+                tools:ignore="RtlHardcoded,SmallSp"/>
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/image_coupon2_right"
+                android:layout_alignParentEnd="true"
+                android:layout_width="66dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/coupon_bg_on_right"
+                android:scaleType="fitXY"
+                app:layout_constraintRight_toRightOf="parent"
+                tools:ignore="RtlHardcoded,SmallSp"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="20dp"
+            android:gravity="center_vertical"
+            android:layout_marginEnd="78dp"
+            android:orientation="vertical"
+            tools:ignore="RelativeOverlap,RtlHardcoded">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/coupon_title2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:textColor="@color/main_light"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="위메프 10,000P 적립 쿠폰" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/coupon_description2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginTop="8dp"
+                android:maxLines="2"
+                android:textColor="@color/gray580"
+                android:textSize="10sp"
+                tools:ignore="SmallSp"
+                tools:text="최애돌 유저에게만 드리는 특별 혜택!" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/coupon_date2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textColor="@color/gray580"
+                android:textSize="10sp"
+                tools:ignore="SmallSp"
+                tools:text="2018년 10월 7일까지" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/coupon_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:textColor="@color/gray580"
+                android:textSize="10sp"
+                tools:ignore="SmallSp"
+                tools:text="ABCD-EFGH-ABCD-1234" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/coupon_number_cp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="80dp"
+            android:layout_marginBottom="14dp"
+            android:src="@drawable/icon_clipboard"
+            tools:ignore="RtlHardcoded" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/ll_coupon_use2"
+            android:layout_width="66dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            tools:ignore="RtlHardcoded">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/icon_download" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/coupon_use2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/use_coupon"
+                android:textAlignment="center"
+                android:textColor="@color/text_white_black"
+                android:textSize="10sp"
+                tools:ignore="RtlHardcoded,SmallSp" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </RelativeLayout>
+
+</FrameLayout>

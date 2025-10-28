@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:id="@+id/main_menu_group"
+        android:visible="true">
+        <item
+            android:id="@+id/action_search"
+            android:icon="@drawable/btn_navigation_search"
+            android:title="@string/hint_search"
+            app:showAsAction="always"/>
+        <item
+            android:id="@+id/action_friends"
+            android:icon="@drawable/btn_navigation_friend"
+            android:title="@string/title_friends"
+            app:showAsAction="always"/>
+    </group>
+</menu>

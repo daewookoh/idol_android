@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/video_pick_nav_graph"
+    app:startDestination="@id/videoFilePickerFragment"
+    >
+
+    <fragment
+        android:id="@+id/videoFilePickerFragment"
+        android:name="feature.common.exodusimagepicker.fragment.VideoFilePickerFragment"
+        android:label="VideoFilePickerFragment"
+        tools:layout="@layout/fragment_video_file_picker">
+        <action
+            android:id="@+id/action_filePickerFragment_to_folderListFragment"
+            app:enterAnim="@anim/top_to_bottom"
+            app:exitAnim="@anim/fadeout"
+            app:popExitAnim="@anim/bottom_to_top"
+            app:destination="@id/folderListFragment" />
+        <action
+            android:id="@+id/action_videoFilePickerFragment_to_videoFileEditFragment"
+            app:destination="@id/videoFileEditFragment"
+            app:enterAnim="@anim/slide_from_right"
+            app:exitAnim="@anim/stationary"
+            app:popExitAnim="@anim/slide_to_right"
+            app:popEnterAnim="@anim/stationary"
+            />
+    </fragment>
+
+
+
+    <fragment
+        android:id="@+id/videoFileEditFragment"
+        android:name="feature.common.exodusimagepicker.fragment.VideoFileEditFragment"
+        android:label="VideoFileEditFragment"
+        tools:layout="@layout/fragment_video_edit">
+
+    </fragment>
+
+
+
+    <fragment
+        android:id="@+id/folderListFragment"
+        android:name="feature.common.exodusimagepicker.fragment.FolderListFragment"
+        android:label="FolderListFragment"
+        tools:layout="@layout/fragment_folder_list">
+        <action
+            android:id="@+id/action_folderListFragment_to_filePickerFragment2"
+            app:destination="@id/filePickerFragment" />
+    </fragment>
+
+</navigation>

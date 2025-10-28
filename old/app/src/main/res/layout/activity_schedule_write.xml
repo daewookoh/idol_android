@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/sv_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_100">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/gray_border_bottom"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="8.5dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="17dp"
+                android:layout_marginTop="1dp"
+                android:text="*"
+                android:textColor="@color/main" />
+
+            <EditText
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/gray_border_bottom"
+                android:hint="@string/schedule_title"
+                android:lines="1"
+                android:maxLength="30"
+                android:paddingEnd="20dp"
+                android:singleLine="true"
+                android:textAlignment="viewStart"
+                android:textColor="@color/gray580"
+                android:textColorHint="@color/gray200"
+                android:textSize="14sp"
+                tools:ignore="RtlSymmetry" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/category"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/gray_border_bottom">
+
+            <TextView
+                android:id="@+id/schedule_require1"
+                android:layout_width="8.5dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="17dp"
+                android:paddingTop="4dp"
+                android:text="*"
+                android:textColor="@color/main" />
+
+            <TextView
+                android:id="@+id/category_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/schedule_require1"
+                android:hint="@string/schedule_category"
+                android:lines="1"
+                android:maxLength="20"
+                android:singleLine="true"
+                android:textColor="@color/gray580"
+                android:textColorHint="@color/gray200"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/category_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="10dp"
+                android:layout_toStartOf="@id/category_arrow" />
+
+            <ImageView
+                android:id="@+id/category_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:paddingRight="20dp"
+                android:scaleX="@integer/locale_mirror_flip"
+                android:src="@drawable/schedule_more"
+                tools:ignore="RtlHardcoded,RtlSymmetry" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/idol"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/gray_border_bottom">
+
+            <TextView
+                android:id="@+id/schedule_require3"
+                android:layout_width="8.5dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="17dp"
+                android:paddingTop="4dp"
+                android:text="*"
+                android:textColor="@color/main" />
+
+            <TextView
+                android:id="@+id/idol_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/schedule_require3"
+                android:hint="@string/stats_idol"
+                android:lines="1"
+                android:maxLength="20"
+                android:singleLine="true"
+                android:textColor="@color/gray580"
+                android:textColorHint="@color/gray200"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/idol_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="26dp"
+                android:layout_toStartOf="@id/idol_arrow"
+                android:layout_toEndOf="@id/idol_label"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:lines="1"
+                android:paddingEnd="14dp"
+                android:singleLine="true"
+                android:textAlignment="gravity"
+                android:textColor="@color/gray580"
+                android:textSize="12sp"
+                tools:ignore="RtlSymmetry" />
+
+            <ImageView
+                android:id="@+id/idol_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:paddingRight="20dp"
+                android:scaleX="@integer/locale_mirror_flip"
+                android:src="@drawable/schedule_more"
+                tools:ignore="RtlHardcoded,RtlSymmetry" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/allday"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/gray_border_bottom">
+
+            <TextView
+                android:id="@+id/allday_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:hint="@string/schedule_allday"
+                android:lines="1"
+                android:maxLength="20"
+                android:paddingStart="26dp"
+                android:singleLine="true"
+                android:textColor="@color/gray580"
+                android:textColorHint="@color/gray200"
+                android:textSize="14sp"
+                tools:ignore="RtlSymmetry" />
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/allday_check"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="17dp"
+                android:clickable="false"
+                app:buttonCompat="@drawable/schedule_checkbox"
+                android:drawablePadding="17dp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/startday"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/gray_border_bottom">
+
+            <TextView
+                android:id="@+id/schedule_require2"
+                android:layout_width="8.5dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="17dp"
+                android:paddingTop="4dp"
+                android:text="*"
+                android:textColor="@color/main" />
+
+            <TextView
+                android:id="@+id/startday_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/schedule_require2"
+                android:hint="@string/schedule_time"
+                android:lines="1"
+                android:singleLine="true"
+                android:textColor="@color/gray580"
+                android:textColorHint="@color/gray200"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/startday_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/startday_arrow"
+                android:lines="1"
+                android:paddingEnd="14dp"
+                android:singleLine="true"
+                android:textColor="@color/gray580"
+                android:textColorHint="@color/gray200"
+                android:textSize="12sp"
+                tools:ignore="RtlSymmetry" />
+
+            <ImageView
+                android:id="@+id/startday_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:paddingRight="20dp"
+                android:scaleX="@integer/locale_mirror_flip"
+                android:src="@drawable/schedule_more"
+                tools:ignore="RtlHardcoded,RtlSymmetry" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/location_wrapper"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/gray_border_bottom">
+
+            <TextView
+                android:id="@+id/location_label"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginEnd="14dp"
+                android:gravity="center_vertical"
+                android:hint="@string/schedule_location"
+                android:lines="1"
+                android:paddingStart="26dp"
+                android:singleLine="true"
+                android:textColor="@color/gray580"
+                android:textColorHint="@color/gray200"
+                android:textSize="14sp"
+                tools:ignore="RtlSymmetry" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/location_arrow"
+                android:layout_toEndOf="@id/location_label"
+                android:gravity="end|center_vertical">
+
+                <ImageView
+                    android:id="@+id/btn_cancel_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:src="@drawable/btn_cancel_schedule_place"
+                    android:visibility="invisible" />
+
+                <TextView
+                    android:id="@+id/location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="end"
+                    android:lines="1"
+                    android:paddingEnd="14dp"
+                    android:singleLine="true"
+                    android:textAlignment="gravity"
+                    android:textColor="@color/gray580"
+                    android:textColorHint="@color/gray200"
+                    android:textSize="12sp"
+                    tools:ignore="RtlSymmetry" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/location_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:paddingRight="20dp"
+                android:scaleX="@integer/locale_mirror_flip"
+                android:src="@drawable/schedule_more"
+                tools:ignore="RtlHardcoded,RtlSymmetry" />
+
+        </RelativeLayout>
+
+        <EditText
+            android:id="@+id/url"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/gray_border_bottom"
+            android:hint="URL"
+            android:inputType="textUri"
+            android:lines="1"
+            android:paddingStart="26dp"
+            android:singleLine="true"
+            android:textAlignment="viewStart"
+            android:textColor="@color/gray580"
+            android:textColorHint="@color/gray200"
+            android:textSize="14sp"
+			android:maxLength="100"
+            tools:ignore="RtlSymmetry" />
+
+        <EditText
+            android:id="@+id/info"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@drawable/gray_border_bottom"
+            android:gravity="top"
+            android:hint="@string/schedule_info"
+            android:maxLength="100"
+            android:paddingStart="26dp"
+            android:paddingTop="15dp"
+            android:textAlignment="viewStart"
+            android:textColor="@color/gray580"
+            android:textColorHint="@color/gray200"
+            android:textSize="14sp"
+            tools:ignore="RtlCompat,RtlSymmetry" />
+
+        <Button
+            android:id="@+id/btn_write"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="10dp"
+            android:text="@string/lable_save" />
+
+    </LinearLayout>
+
+</ScrollView>
+

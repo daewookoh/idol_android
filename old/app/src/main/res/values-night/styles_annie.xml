@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     File created by the Android Action Bar Style Generator
+
+     Copyright (C) 2011 The Android Open Source Project
+     Copyright (C) 2012 readyState Software Ltd
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <style name="CustomActionBarTheme" parent="@style/Tiber">
+        <item name="colorAccent">@color/toolbar_default</item>
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="android:actionBarTabTextStyle">@style/MyActionBarTabText</item>
+        <item name="android:actionMenuTextColor">@color/toolbar_default</item>
+
+        <!-- Support library compatibility
+            : 이부분이 없어지면 ActionBar 검은색바탕에 흰글씨가 된다.-->
+        <item name="actionBarStyle">@style/MyActionBar</item>
+        <item name="actionBarTabTextStyle">@style/MyActionBarTabText</item>
+        <item name="actionMenuTextColor">@color/toolbar_default</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="colorControlNormal">@color/toolbar_default</item>
+        <item name="actionButtonStyle">@style/ActionButtonStyle</item>
+        <item name="actionBarItemBackground">@drawable/selectable_background_annie</item>
+        <item name="homeAsUpIndicator">@drawable/btn_navigation_back</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="elevation">0dp</item>
+        <item name="android:elevation">0dp</item>
+
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <!-- ActionBar styles -->
+    <style name="MyActionBar" parent="@style/Widget.AppCompat.ActionBar">
+        <item name="android:titleTextStyle">@style/MyActionBarTitleText</item>
+        <!-- Support library compatibility -->
+        <item name="titleTextStyle">@style/MyActionBarTitleText</item>
+
+        <item name="colorControlNormal">@color/toolbar_default</item>
+    </style>
+
+    <!-- ActionBar title text -->
+    <style name="MyActionBarTitleText" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/toolbar_default</item>
+        <!-- The textColor property is backward compatible with the Support Library -->
+    </style>
+
+    <!-- ActionBar tabs text -->
+    <style name="MyActionBarTabText" parent="@style/Widget.AppCompat.ActionBar.TabText">
+        <item name="android:textColor">@color/toolbar_default</item>
+        <!-- The textColor property is backward compatible with the Support Library -->
+    </style>
+
+    <style name="Theme.Annie.NoActionBar" parent="@style/CustomActionBarTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <!-- 스케쥴 몰빵일 등록  spinner text color 적용 용  theme    -->
+    <style name="Theme.Annie.NumberPicker" parent="@android:style/Theme.Holo.Light">
+        <item name="android:textColorPrimary">@color/text_gray</item>
+    </style>
+
+    <!-- 인트로 화면에서  coldStart 시 로고 먼저 띄우기 위한 theme -->
+    <style name="Theme.Annie.SplashTheme"  parent="@style/Theme.Annie.NoActionBar">
+    </style>
+
+    <style name="Theme.Annie.Translucent.NoTitleBar" parent="@style/Theme.Annie.NoActionBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+
+    <style name="Theme.Annie.NoActionBar.Fullscreen" parent="@style/Theme.Annie.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <style name="ActionBar.Solid.Annie" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="background">@color/navigation_bar</item>
+        <item name="backgroundStacked">@drawable/ab_stacked_solid_annie</item>
+        <item name="backgroundSplit">@color/navigation_bar</item>
+        <item name="progressBarStyle">@style/ProgressBar.Annie</item>
+    </style>
+
+    <!-- ToolBar -->
+    <style name="ToolBarStyle" parent="CustomActionBarTheme">
+        <item name="android:textColorPrimary">@color/toolbar_default</item>
+        <item name="android:textColorSecondary">@color/toolbar_default</item>
+        <item name="actionMenuTextColor">@color/toolbar_default</item>
+    </style>
+
+    <style name="ActionBarTabStyle.Annie" parent="@style/Widget.AppCompat.ActionBar.TabView">
+        <!--<item name="android:background">@drawable/tab_indicator_ab_annie</item>-->
+        <item name="background">@drawable/ab_stacked_solid_annie</item>
+        <item name="android:background">@drawable/ab_stacked_solid_annie</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingLeft">0dp</item>
+        <item name="android:paddingRight">0dp</item>
+    </style>
+
+    <style name="ActionBarTabTextStyle.Annie" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle">
+        <item name="android:textColor">@color/toolbar_default</item>
+    </style>
+
+    <style name="ProgressBar.Annie" parent="@style/Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal_annie</item>
+    </style>
+
+    <style name="ActionButtonStyle" parent="@style/Widget.AppCompat.ActionButton">
+        <item name="android:minWidth">0dip</item>
+        <item name="android:paddingLeft">0dip</item>
+        <item name="android:paddingRight">0dip</item>
+        <item name="android:height">40dp</item>
+        <item name="android:width">40dp</item>
+    </style>
+
+    <style name="CustomTabText" parent="TextAppearance.Design.Tab">
+        <item name="textAllCaps">false</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+</resources>

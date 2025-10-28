@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <EditText
+        android:id="@+id/input"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:background="@drawable/bg_round1_border_gray100"
+        android:ems="10"
+        android:gravity="top"
+        android:hint="@string/inquiry_notice"
+        android:textColor="@color/text_gray"
+        android:textColorHint="@color/gray200"
+        android:textSize="13.5sp">
+
+        <requestFocus/>
+
+    </EditText>
+
+    <Button
+        android:id="@+id/btn_submit"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="25dp"
+        android:text="@string/confirm"/>
+
+</LinearLayout>

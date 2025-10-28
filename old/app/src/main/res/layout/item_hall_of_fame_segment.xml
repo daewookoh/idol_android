@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <com.addisonelliott.segmentedbutton.SegmentedButton
+        android:id="@+id/btn_one_pick"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:layout_weight="1"
+        android:layoutDirection="ltr"
+        android:padding="9dp"
+        app:drawableGravity="top"
+        app:selectedTextColor="@color/text_default"
+        app:text="@string/imagepick"
+        app:textColor="@color/text_gray"
+        app:textSize="15sp" />
+</layout>

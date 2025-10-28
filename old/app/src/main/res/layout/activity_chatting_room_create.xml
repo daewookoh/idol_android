@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+    <data></data>
+    <ScrollView
+        android:id="@+id/sv_chatting_room_create"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:background="@color/background_100">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/chatting_require"
+                android:layout_width="8.5dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="10dp"
+                android:text="*"
+                android:textColor="@color/main"
+                android:layout_marginTop="23dp"
+                android:textSize="14dp"
+                android:gravity="top|center_horizontal"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_title_chat_room_name"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_title_chat_room_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:layout_marginEnd="10dp"
+                android:text="@string/chat_room_title"
+                android:textColor="@color/gray1000"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/chatting_require"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_chatting_room_name_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="25dp"
+                android:layout_marginEnd="17dp"
+                android:text="0/50"
+                android:textColor="@color/gray200"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@+id/edit_chat_room_name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constraintStart_toEndOf="@+id/tv_title_chat_room_name"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <EditText
+                android:id="@+id/edit_chat_room_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/gray_border_radius"
+                android:hint="@string/chat_room_title_placeholder"
+                android:maxLength="50"
+                android:minHeight="38dp"
+                android:paddingStart="15dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="10dp"
+                android:textColor="@color/gray1000"
+                android:textColorHint="@color/gray200"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_chat_room_name" />
+
+            <TextView
+                android:id="@+id/tv_title_chat_room_instruction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginEnd="10dp"
+                android:text="@string/chat_room_desc"
+                android:textColor="@color/gray1000"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_chat_room_name" />
+
+            <TextView
+                android:id="@+id/tv_chatting_room_instruction_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="25dp"
+                android:layout_marginEnd="17dp"
+                android:text="0/100"
+                android:textColor="@color/gray200"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_title_chat_room_instruction"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constraintStart_toEndOf="@+id/tv_title_chat_room_instruction"
+                app:layout_constraintTop_toBottomOf="@+id/edit_chat_room_name" />
+
+            <EditText
+                android:id="@+id/edit_chat_room_instruction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/gray_border_radius"
+                android:gravity="top"
+                android:hint="@string/chat_room_desc_placeholder"
+                android:maxLength="100"
+                android:minHeight="60dp"
+                android:paddingStart="15dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="10dp"
+                android:textColor="@color/gray1000"
+                android:textColorHint="@color/gray200"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_chat_room_instruction" />
+
+
+            <TextView
+                android:id="@+id/tv_chatting_room_open_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/gray_border_radius"
+                android:gravity="top"
+                android:minHeight="38dp"
+                android:paddingStart="15dp"
+                android:clickable="false"
+                android:focusable="false"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:textColor="@color/gray1000"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_chatting_room_anonymous_status" />
+
+
+
+
+            <TextView
+                android:id="@+id/tv_title_anonymous_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="10dp"
+                android:text="@string/chat_room_disclose_nickname"
+                android:textColor="@color/gray1000"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/chatting_require2"
+                app:layout_constraintTop_toBottomOf="@+id/tv_chatting_room_level_limit" />
+
+            <TextView
+                android:id="@+id/chatting_require2"
+                android:layout_width="8.5dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="10dp"
+                android:text="*"
+                android:textColor="@color/main"
+                android:layout_marginTop="18dp"
+                android:textSize="14dp"
+                android:gravity="top|center_horizontal"
+                app:layout_constraintTop_toBottomOf="@+id/tv_chatting_room_level_limit"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_title_anonymous_status"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_chatting_room_anonymous_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/gray_border_radius"
+                android:gravity="top"
+                android:minHeight="38dp"
+                android:paddingStart="15dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:textColor="@color/gray1000"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_anonymous_status" />
+
+            <ImageView
+                android:id="@+id/ivArrowClose1"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/btn_arrow_down_nor"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_chatting_room_anonymous_status"
+                app:layout_constraintEnd_toEndOf="@+id/tv_chatting_room_anonymous_status"
+                app:layout_constraintTop_toTopOf="@+id/tv_chatting_room_anonymous_status" />
+
+
+            <TextView
+                android:id="@+id/tv_level_limit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="10dp"
+                android:text="@string/chat_room_limit_level"
+                android:textColor="@color/gray1000"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/chatting_require3"
+                app:layout_constraintTop_toBottomOf="@+id/edit_chat_room_instruction" />
+
+            <TextView
+                android:id="@+id/chatting_require3"
+                android:layout_width="8.5dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="10dp"
+                android:text="*"
+                android:textColor="@color/main"
+                android:layout_marginTop="18dp"
+                android:textSize="14dp"
+                android:gravity="top|center_horizontal"
+                app:layout_constraintTop_toBottomOf="@+id/edit_chat_room_instruction"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_level_limit"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_chatting_room_level_limit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/gray_border_radius"
+                android:gravity="top"
+                android:minHeight="38dp"
+                android:paddingStart="15dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:textColor="@color/gray1000"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/chatting_require3" />
+
+            <ImageView
+                android:id="@+id/ivArrowClose2"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/btn_arrow_down_nor"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_chatting_room_level_limit"
+                app:layout_constraintEnd_toEndOf="@+id/tv_chatting_room_level_limit"
+                app:layout_constraintTop_toTopOf="@+id/tv_chatting_room_level_limit" />
+
+
+
+            <TextView
+                android:id="@+id/tv_require_list_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="33dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginStart="10dp"
+                android:text="@string/chat_room_require"
+                android:textColor="@color/main"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/btn_chatting_create"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_chatting_room_open_status"
+                app:layout_constraintVertical_bias="0.4"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_chatting_create"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="30dp"
+                android:background="@drawable/bg_radius_gray300"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="@string/chat_room_make_button"
+                android:textColor="@color/text_white_black"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_require_list_icon"
+                app:layout_constraintVertical_bias="0" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </ScrollView>
+</layout>

@@ -1,0 +1,72 @@
+{
+  "project_info": {
+    "project_number": "445540446080",
+    "firebase_url": "https://myloveactor.firebaseio.com",
+    "project_id": "myloveactor",
+    "storage_bucket": "myloveactor.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:445540446080:android:f1790ef919f8e7bc",
+        "android_client_info": {
+          "package_name": "com.exodus.myloveactor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "445540446080-8vnrbg4s5kddqj5r8dneh15f463323af.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.exodus.myloveactor",
+            "certificate_hash": "20c827b513fd8b8159efacfcd25d7fe384ab883d"
+          }
+        },
+        {
+          "client_id": "445540446080-o3aqpk2ve2tnhuv8358ipp5nhb7edv9u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.exodus.myloveactor",
+            "certificate_hash": "e3d3f25030993b1671cf18026c01323098ad61b6"
+          }
+        },
+        {
+          "client_id": "445540446080-88i18uvrj6vciklhddn57i1lnpvjteq7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBj43qCyt-D_V1xfU3PSuJQHOFVT6xCijM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "445540446080-k8t4epiusdhednk8sjluavodctnuffeo.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "445540446080-pb00ia77fv021hervjlgdd5rjndnui9j.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.exodus.myloveactor",
+                "app_store_id": "1202089963"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      },
+      "admob_app_id": "ca-app-pub-4951070488234097~8280455763"
+    }
+  ],
+  "configuration_version": "1"
+}

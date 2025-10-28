@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@color/background_100">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:text="@string/lable_kakao_more_1"
+        android:textColor="@color/main"
+        android:textSize="13sp"/>
+
+    <EditText
+        android:id="@+id/input_nickname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:singleLine="true"
+        android:textColor="@color/text_gray"
+        android:textColorHint="@color/text_dimmed"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:text="@string/lable_kakao_more_2"
+        android:textColor="@color/main"
+        android:textSize="13sp"/>
+
+    <EditText
+        android:id="@+id/input_recommender"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/hint_recommender_1"
+        android:singleLine="true"
+        android:textColor="@color/text_gray"
+        android:textColorHint="@color/text_dimmed"
+        android:textSize="14sp"/>
+
+    <Button
+        android:id="@+id/btn_change_info"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="40dp"
+        android:text="@string/lable_change_info_complete"/>
+
+</LinearLayout>

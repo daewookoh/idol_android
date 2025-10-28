@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_coupon"
+        android:icon="@drawable/btn_navigation_coupon"
+        android:title="@string/coupon"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_myheart"
+        android:icon="@drawable/btn_navigation_my_heart"
+        android:title="@string/title_myheart"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_report"
+        android:icon="@drawable/btn_navigation_report"
+        android:title="@string/report_feed"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_friend"
+        android:icon="@drawable/btn_navigation_friend_already"
+        android:title="@string/friend"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_friend_add"
+        android:icon="@drawable/btn_navigation_friend_add"
+        android:title="@string/new_face"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_friend_wait"
+        android:icon="@drawable/btn_navigation_friend_waiting"
+        android:title="@string/cancel_friend_request"
+        app:showAsAction="always" />
+
+
+</menu>

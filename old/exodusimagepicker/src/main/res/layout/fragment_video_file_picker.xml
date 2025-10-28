@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_100"
+        tools:ignore="MissingDefaultResource">
+
+        <androidx.media3.ui.PlayerView
+            android:id="@+id/exo_player_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:shutter_background_color="@color/background_100"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:surface_type="texture_view"
+            app:use_controller="false" />
+
+        <TextView
+            android:id="@+id/tv_video_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintVertical_bias="0"
+            app:layout_constraintHorizontal_bias="1"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
+            android:textSize="17dp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            android:textColor="@color/background_100"
+            android:layout_marginBottom="5dp"
+            app:layout_constraintTop_toTopOf="@+id/exo_player_view"
+            app:layout_constraintEnd_toEndOf="@+id/exo_player_view"
+            app:layout_constraintStart_toStartOf="@+id/exo_player_view"
+            app:layout_constraintBottom_toBottomOf="@+id/exo_player_view"
+            tools:text="01:00" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_video_thumbnails"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="2dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/exo_player_view"
+            app:spanCount="4" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

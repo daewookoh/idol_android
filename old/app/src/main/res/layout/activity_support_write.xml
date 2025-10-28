@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <ScrollView
+        android:id="@+id/support_write_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:background="@color/background_100"
+        tools:context=".support.SupportWriteActivity">
+
+
+        <LinearLayout
+            android:id="@+id/support_write_parent_li"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/tv_idol"
+                android:text="@string/stats_idol"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/gray1000"
+                android:layout_width="match_parent"
+                android:layout_marginTop="5dp"
+                android:layout_height="wrap_content" />
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/support_write_search_con"
+                android:background="@drawable/gray_border_radius"
+                android:layout_marginTop="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="38dp">
+
+
+                <ImageButton
+                    android:id="@+id/search_btn"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="12.3dp"
+                    android:background="@android:color/transparent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/variant_btn_search_red"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/search_btn"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginStart="10dp">
+
+                    <EditText
+                        android:id="@+id/search_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:ellipsize="end"
+                        android:imeOptions="actionSearch"
+                        android:inputType="textNoSuggestions"
+                        android:lines="1"
+                        android:maxLines="1"
+                        android:paddingStart="5dp"
+                        android:singleLine="true"
+                        android:visibility="gone"
+                        android:textAlignment="viewStart"
+                        android:textColor="@color/gray900"
+                        android:textSize="12sp" />
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/search_li"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10.7dp"
+                            android:textColor="@color/gray1000"
+                            android:textSize="14sp"
+                            tools:text="김성규" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/group"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:layout_marginTop="1dp"
+                            android:textColor="@color/gray300"
+                            android:textSize="10sp"
+                            tools:text="인피니트" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                </FrameLayout>
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <FrameLayout
+                android:id="@+id/search_list_frame"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/support_write_search_con">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/support_write_con"
+                    android:layout_width="match_parent"
+                    android:layout_height="158dp"
+                    android:visibility="gone">
+
+                    <ListView
+                        android:id="@android:id/list"
+                        android:background="@drawable/gray_border_radius"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <LinearLayout
+                    android:id="@+id/support_write_li"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="15dp"
+                    android:orientation="vertical"
+                    android:focusableInTouchMode="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/support_create_contents"
+                        android:textStyle="bold"
+                        android:textColor="@color/gray1000"
+                        android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:background="@drawable/gray_border_radius"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="match_parent"
+                            android:layout_height="77dp"
+                            android:gravity="start"
+                            android:orientation="horizontal"
+                            android:paddingTop="12dp">
+
+                            <androidx.appcompat.widget.AppCompatEditText
+                                android:id="@+id/support_write_title_tv"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="12.7dp"
+                                android:layout_marginEnd="12.7dp"
+                                android:background="#00000000"
+                                android:gravity="start"
+                                android:hint="@string/support_create_hint_title"
+                                android:textColorHint="@color/gray200"
+                                android:textSize="14sp" />
+
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                        <View
+                            android:background="?android:attr/listDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="0.5dp" />
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:id="@+id/support_write_photo_upload_li"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:minHeight="38dp"
+                            android:gravity="start"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.LinearLayoutCompat
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginStart="12.7dp"
+                                android:orientation="horizontal">
+
+                                <net.ib.mn.view.ExodusImageView
+                                    android:id="@+id/support_photo"
+                                    android:layout_width="23.3dp"
+                                    android:layout_height="23.3dp"
+                                    android:layout_marginEnd="10dp"
+                                    android:visibility="gone" />
+
+                                <androidx.appcompat.widget.AppCompatImageButton
+                                    android:id="@+id/support_photo_upload_btn"
+                                    android:layout_width="23.3dp"
+                                    android:layout_height="23.3dp"
+                                    android:background="@drawable/btn_contents_add_picture" />
+                            </androidx.appcompat.widget.LinearLayoutCompat>
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/support_write_photo_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginStart="12.7dp"
+                                android:text="@string/support_create_hint_photo"
+                                android:textColor="@color/gray1000"
+                                android:textSize="14sp" />
+
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="@string/support_create_type"
+                        android:textStyle="bold"
+                        android:textColor="@color/gray1000" />
+
+                    <RelativeLayout
+                        android:id="@+id/support_write_ad_choice_li"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="38dp"
+                        android:layout_marginTop="2dp"
+                        android:background="@drawable/gray_border_radius">
+
+                        <TextView
+                            android:id="@+id/support_write_ad_choice_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_toStartOf="@+id/iv_support_write_ad_choice"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="12.7dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:text="@string/support_create_hint_type"
+                            android:textColor="@color/gray1000"
+                            android:textSize="14sp" />
+
+                        <ImageView
+                            android:id="@+id/iv_support_write_ad_choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:paddingEnd="14dp"
+                            android:scaleX="@integer/locale_mirror_flip"
+                            android:src="@drawable/schedule_more"
+                            tools:ignore="RtlHardcoded,RtlSymmetry" />
+
+                    </RelativeLayout>
+
+
+                    <LinearLayout
+                        android:id="@+id/support_write_date_start_li"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/support_date_start"
+                            android:textColor="@color/gray1000"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+
+                        <RelativeLayout
+                            android:id="@+id/support_write_startday"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:minHeight="50dp"
+                            android:background="@drawable/gray_border_radius">
+
+                            <TextView
+                                android:id="@+id/support_write_startday_label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentStart="true"
+                                android:layout_centerVertical="true"
+                                android:layout_marginStart="12.7dp"
+                                android:layout_marginVertical="5dp"
+                                android:layout_toStartOf="@+id/support_write_startday_arrow"
+                                android:text="@string/support_select_date"
+                                android:textColor="@color/gray1000"
+                                android:textColorHint="@color/gray1000"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/support_write_startday_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_alignParentStart="true"
+                                android:layout_marginStart="17dp"
+                                android:lines="1"
+                                android:paddingEnd="14dp"
+                                android:singleLine="true"
+                                android:textColor="@color/gray580"
+                                android:textColorHint="@color/gray200"
+                                android:textSize="12sp"
+                                tools:ignore="RtlSymmetry" />
+
+                            <ImageView
+                                android:id="@+id/support_write_startday_arrow"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:paddingHorizontal="14dp"
+                                android:scaleX="@integer/locale_mirror_flip"
+                                android:src="@drawable/schedule_more"
+                                tools:ignore="RtlHardcoded,RtlSymmetry" />
+
+                        </RelativeLayout>
+
+
+                    </LinearLayout>
+
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/support_write_support_period_li"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/support_period_vote"
+                            android:textColor="@color/gray1000"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="match_parent"
+                            android:layout_height="38dp"
+                            android:background="@drawable/gray_border_radius"
+                            android:gravity="start"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/support_write_support_period_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginStart="12.7dp"
+                                android:layout_marginTop="1dp"
+                                android:textColor="@color/main"
+                                android:textSize="14sp"
+                                tools:text="2020년 4월 20일 ~ 2020년 5월 20일" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/support_write_ad_period_li"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/support_write_ad_period_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/support_period_ad"
+                            android:textColor="@color/gray1000"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="match_parent"
+                            android:layout_height="38dp"
+                            android:background="@drawable/gray_border_radius"
+                            android:gravity="start"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/support_write_ad_period_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginStart="12.7dp"
+                                android:textColor="@color/main"
+                                android:textSize="14sp"
+                                tools:text="2020년 4월 20일 ~ 2020년 5월 20일" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/support_write_create_caution"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="58.7dp"
+                        android:textAlignment="viewStart"
+                        android:text="@string/support_create_notice"
+                        android:textColor="@color/gray1000"
+                        android:textSize="12sp" />
+
+                    <androidx.appcompat.widget.AppCompatCheckBox
+                        android:id="@+id/support_write_check_box"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="29dp"
+                        android:button="@drawable/checkbox_off"
+                        android:text="@string/support_agree"
+                        android:textColor="@color/gray200"
+                        android:textSize="12sp" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/support_write_create_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="21dp"
+                        android:background="@drawable/bg_radius_gray300"
+                        android:enabled="false"
+                        android:text="@string/support_create" />
+                </LinearLayout>
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+</layout>

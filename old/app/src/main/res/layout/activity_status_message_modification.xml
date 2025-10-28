@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data></data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_status_message_modification"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/background_100">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="84dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="292dp"
+            android:background="@android:color/transparent"
+            android:text="@string/confirm"
+            android:textAlignment="center"
+            android:textColor="@color/gray580"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_status_message" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="84dp"
+            android:layout_marginBottom="292dp"
+            android:background="@android:color/transparent"
+            android:text="@string/btn_cancel"
+            android:textAlignment="center"
+            android:textColor="@color/gray580"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_status_message" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/et_status_message"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:layout_marginStart="38dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="38dp"
+            android:background="@drawable/gray_border3"
+            android:enabled="true"
+            android:gravity="top|start"
+            android:hint="@string/feed_status_message_hint"
+            android:inputType="textMultiLine"
+            android:isScrollContainer="true"
+            android:maxLength="1000"
+            android:padding="5dp"
+            android:scrollbars="vertical"
+            android:textAlignment="viewStart"
+            android:textColor="@color/gray900"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_status_message_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/gray300"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toEndOf="@id/et_status_message"
+            app:layout_constraintTop_toBottomOf="@id/et_status_message"
+            tools:ignore="SmallSp"
+            tools:text="0/1000" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

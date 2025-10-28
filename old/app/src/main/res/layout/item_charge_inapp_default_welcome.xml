@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/background_100">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/section"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="4.5:1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_welcome_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/main"
+        android:textAlignment="center"
+        android:layout_marginTop="8dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/section"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tv_welcome_desc"
+        tools:text="웰컴 패키지"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_welcome_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@color/main"
+        android:textAlignment="center"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/tv_welcome_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/cd_welcome"
+        tools:text="첫 구매 특급 할인" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_welcome_side_sale"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/img_store_package_sale_2500"
+        android:layout_marginEnd="7dp"
+        app:layout_constraintTop_toTopOf="@+id/cd_welcome"
+        app:layout_constraintBottom_toBottomOf="@+id/cd_welcome"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:scaleX="@integer/locale_mirror_flip"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cd_welcome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp"
+        app:layout_constraintTop_toBottomOf="@+id/tv_welcome_desc">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_welcome_side_sale"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+                android:layout_marginEnd="-7dp"
+            android:layout_gravity="center|end">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_welcome_side_sale2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/img_store_package_sale_2500"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:scaleX="@integer/locale_mirror_flip"/>
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_welcome_side_sale"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:textColor="@color/text_white_black"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:autoSizeMaxTextSize="14sp"
+                android:autoSizeMinTextSize="10sp"
+                android:autoSizeStepGranularity="1sp"
+                android:autoSizeTextType="uniform"
+                android:maxLines="2"
+                android:layout_marginTop="10dp"
+                tools:text="67%\nOFF"
+                app:layout_constraintTop_toTopOf="@id/iv_welcome_side_sale2"
+                app:layout_constraintBottom_toBottomOf="@id/iv_welcome_side_sale2"
+                app:layout_constraintEnd_toEndOf="@id/iv_welcome_side_sale2"
+                app:layout_constraintStart_toStartOf="@id/iv_welcome_side_sale2"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/itemContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingBottom="8dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_welcome_top_img"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/img_store_package_2500"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/cl_constraintLayout2_root"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_constraintLayout2_root"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="19dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iv_welcome_top_img">
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/itemImg"
+                    android:layout_width="56dp"
+                    android:layout_height="54dp"
+                    android:layout_marginStart="10dp"
+                    app:layout_constraintVertical_bias="0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintLayout2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="10dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintVertical_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@id/itemImg"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/heartCount"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:textAlignment="viewStart"
+                        android:textColor="@color/gray580"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:autoSizeMaxTextSize="24sp"
+                        app:autoSizeTextType="uniform"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0"
+                        tools:text="1800[+360]" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/heartCount2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:textAlignment="viewStart"
+                        android:textColor="@color/gray580"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:autoSizeMaxTextSize="24sp"
+                        app:autoSizeTextType="uniform"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/heartCount"
+                        tools:text="24000 데일리 하트" />
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/heartCountInfo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="@+id/heartCount2"
+                        app:layout_constraintTop_toBottomOf="@+id/heartCount2">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/bonus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:src="@drawable/img_shop_bonus" />
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/heartCountDesc"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/gray580"
+                                android:textSize="12sp"
+                                app:autoSizeMaxTextSize="20sp"
+                                app:autoSizeTextType="uniform"
+                                tools:text="에버하트[+데일리하트]" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/heartCountDesc2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/gray580"
+                                android:textSize="12sp"
+                                app:autoSizeMaxTextSize="20sp"
+                                app:autoSizeTextType="uniform"
+                                tools:text="다이아 1" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/bonusPercent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/gray580"
+                            android:textSize="12sp"
+                            android:visibility="gone"
+                            tools:text="+11% Bonus" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="14dp"
+                    android:layout_marginTop="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/prior_price_li"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:layout_constraintTop_toTopOf="@+id/price"
+                        app:layout_constraintBottom_toBottomOf="@id/price"
+                        app:layout_constraintEnd_toStartOf="@+id/price">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/prior_price"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/gray300"
+                            android:textSize="12sp"
+                            android:layout_marginEnd="5dp"
+                            app:autoSizeMaxTextSize="17sp"
+                            app:autoSizeTextType="uniform"
+                            tools:text="￦1200" />
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="5dp"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/arrow"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/icon_store_welcome_arrow" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_price_active"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:textAlignment="center"
+                        android:textColor="@color/text_white_black"
+                        android:textSize="12sp"
+                        app:autoSizeMaxTextSize="17sp"
+                        app:autoSizeTextType="uniform"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        tools:text="￦1200" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    </androidx.cardview.widget.CardView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

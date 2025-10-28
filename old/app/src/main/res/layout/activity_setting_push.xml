@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sv_setting_push"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_100">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/rl_setting_push_notice"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:paddingStart="20dp"
+            android:background="@color/background_200">
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/cb_push_notice"
+                android:layout_width="48.5dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="20dp"
+                app:buttonCompat="@drawable/btn_toggle" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/cb_push_notice"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/setting_menu04"
+                    android:textColor="@color/text_default"
+                    android:textSize="15sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_setting_push_comment"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:paddingStart="20dp"
+            android:background="@color/background_200">
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/cb_push_comment"
+                android:layout_width="48.5dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="20dp"
+                app:buttonCompat="@drawable/btn_toggle" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/cb_push_comment"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/setting_menu_push_comments"
+                    android:textColor="@color/text_default"
+                    android:textSize="15sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_setting_push_heart"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:paddingStart="20dp"
+            android:background="@color/background_200">
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/cb_push_heart"
+                android:layout_width="48.5dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="20dp"
+                app:buttonCompat="@drawable/btn_toggle" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/cb_push_heart"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/setting_menu_push_hearts"
+                    android:textColor="@color/text_default"
+                    android:textSize="15sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_setting_push_schedule"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:paddingStart="20dp"
+            android:background="@color/background_200">
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/cb_push_schedule"
+                android:layout_width="48.5dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="20dp"
+                app:buttonCompat="@drawable/btn_toggle" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/cb_push_schedule"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/setting_menu_push_schedule"
+                    android:textColor="@color/text_default"
+                    android:textSize="15sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/rl_setting_push_supports"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:paddingStart="20dp"
+            android:background="@color/background_200">
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/cb_push_supports"
+                android:layout_width="48.5dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="20dp"
+                app:buttonCompat="@drawable/btn_toggle" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/cb_push_supports"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/setting_menu_push_supports"
+                    android:textColor="@color/text_default"
+                    android:textSize="15sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/rl_setting_push_chat"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:paddingStart="20dp"
+            android:background="@color/background_200">
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/cb_push_chat"
+                android:layout_width="48.5dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="20dp"
+                app:buttonCompat="@drawable/btn_toggle" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/cb_push_chat"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/setting_menu_push_chat"
+                    android:textColor="@color/text_default"
+                    android:textSize="15sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </RelativeLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</ScrollView>
+
