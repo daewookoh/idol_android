@@ -1,5 +1,6 @@
 package com.example.idol_android.presentation.login
 
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,10 +27,12 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idol_android.R
+import com.example.idol_android.ui.theme.Idol_androidTheme
 
 /**
  * Login 화면 (old 프로젝트의 SigninFragment).
@@ -76,6 +79,22 @@ fun LoginScreen(
             }
         }
     }
+
+    LoginContent(
+        state = state,
+        onIntent = viewModel::sendIntent
+    )
+}
+
+/**
+ * Login 화면의 UI 컨텐츠 (Stateless).
+ * 프리뷰 및 테스트를 위한 stateless composable.
+ */
+@Composable
+private fun LoginContent(
+    state: LoginContract.State,
+    onIntent: (LoginContract.Intent) -> Unit
+) {
 
     Box(
         modifier = Modifier
@@ -138,7 +157,7 @@ fun LoginScreen(
                     offImageRes = R.drawable.btn_login_sns_kakao_off,
                     onImageRes = R.drawable.btn_login_sns_kakao_on,
                     contentDescription = "Kakao Login",
-                    onClick = { viewModel.sendIntent(LoginContract.Intent.LoginWithKakao) }
+                    onClick = { onIntent(LoginContract.Intent.LoginWithKakao) }
                 )
 
                 Spacer(modifier = Modifier.width(6.dp))
@@ -148,7 +167,7 @@ fun LoginScreen(
                     offImageRes = R.drawable.btn_login_sns_line_off,
                     onImageRes = R.drawable.btn_login_sns_line_on,
                     contentDescription = "Line Login",
-                    onClick = { viewModel.sendIntent(LoginContract.Intent.LoginWithLine) }
+                    onClick = { onIntent(LoginContract.Intent.LoginWithLine) }
                 )
 
                 Spacer(modifier = Modifier.width(6.dp))
@@ -158,7 +177,7 @@ fun LoginScreen(
                     offImageRes = R.drawable.btn_login_sns_google_off,
                     onImageRes = R.drawable.btn_login_sns_google_on,
                     contentDescription = "Google Login",
-                    onClick = { viewModel.sendIntent(LoginContract.Intent.LoginWithGoogle) }
+                    onClick = { onIntent(LoginContract.Intent.LoginWithGoogle) }
                 )
 
                 Spacer(modifier = Modifier.width(6.dp))
@@ -168,7 +187,7 @@ fun LoginScreen(
                     offImageRes = R.drawable.btn_login_sns_facebook_off,
                     onImageRes = R.drawable.btn_login_sns_facebook_on,
                     contentDescription = "Facebook Login",
-                    onClick = { viewModel.sendIntent(LoginContract.Intent.LoginWithFacebook) }
+                    onClick = { onIntent(LoginContract.Intent.LoginWithFacebook) }
                 )
             }
 
@@ -181,7 +200,7 @@ fun LoginScreen(
                 color = colorResource(id = R.color.text_gray),
                 modifier = Modifier
                     .clickable {
-                        viewModel.sendIntent(LoginContract.Intent.NavigateToEmailLogin)
+                        onIntent(LoginContract.Intent.NavigateToEmailLogin)
                     }
                     .padding(10.dp)
             )
@@ -236,6 +255,37 @@ private fun SocialLoginButton(
             painter = painterResource(id = if (isPressed) onImageRes else offImageRes),
             contentDescription = contentDescription,
             modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+@Preview(
+    name = "Light Mode",
+    showSystemUi = true,
+    showBackground = true
+)
+@Composable
+fun LoginScreenPreviewLight() {
+    Idol_androidTheme(darkTheme = false) {
+        LoginContent(
+            state = LoginContract.State(),
+            onIntent = {}
+        )
+    }
+}
+
+@Preview(
+    name = "Dark Mode",
+    showSystemUi = true,
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun LoginScreenPreviewDark() {
+    Idol_androidTheme(darkTheme = true) {
+        LoginContent(
+            state = LoginContract.State(),
+            onIntent = {}
         )
     }
 }

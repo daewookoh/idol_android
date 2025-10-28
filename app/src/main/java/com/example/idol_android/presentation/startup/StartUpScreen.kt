@@ -1,5 +1,6 @@
 package com.example.idol_android.presentation.startup
 
+import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,10 +25,12 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.idol_android.R
+import com.example.idol_android.ui.theme.Idol_androidTheme
 import kotlinx.coroutines.flow.collectLatest
 
 /**
@@ -66,6 +69,18 @@ fun StartUpScreen(
         }
     }
 
+    StartUpContent(state = state)
+}
+
+/**
+ * 스타트업 화면의 UI 컨텐츠 (Stateless).
+ * 프리뷰 및 테스트를 위한 stateless composable.
+ */
+@Composable
+private fun StartUpContent(
+    state: StartUpContract.State
+) {
+
     Scaffold(
         containerColor = colorResource(id = R.color.text_white_black),
         modifier = Modifier.fillMaxSize()
@@ -101,5 +116,34 @@ fun StartUpScreen(
                 )
             }
         }
+    }
+}
+
+@Preview(
+    name = "Light Mode",
+    showSystemUi = true,
+    showBackground = true
+)
+@Composable
+fun StartUpScreenPreviewLight() {
+    Idol_androidTheme(darkTheme = false) {
+        StartUpContent(
+            state = StartUpContract.State()
+        )
+    }
+}
+
+@Preview(
+    name = "Dark Mode",
+    showSystemUi = true,
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun StartUpScreenPreviewDark() {
+    Idol_androidTheme(darkTheme = true) {
+        StartUpContent(
+            state = StartUpContract.State()
+        )
     }
 }

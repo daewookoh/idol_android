@@ -1,5 +1,7 @@
 package com.example.idol_android.presentation.main
 
+import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,16 +19,23 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.idol_android.R
+import com.example.idol_android.ui.theme.Idol_androidTheme
 
 /**
  * 메인 화면.
@@ -86,3 +95,28 @@ private val bottomNavItems = listOf(
     BottomNavItem("Favorites", Icons.Default.Favorite),
     BottomNavItem("Profile", Icons.Default.Person)
 )
+
+@Preview(
+    name = "Light Mode",
+    showSystemUi = true,
+    showBackground = true
+)
+@Composable
+fun MainScreenPreviewLight() {
+    Idol_androidTheme(darkTheme = false) {
+        MainScreen()
+    }
+}
+
+@Preview(
+    name = "Dark Mode",
+    showSystemUi = true,
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun MainScreenPreviewDark() {
+    Idol_androidTheme(darkTheme = true) {
+        MainScreen()
+    }
+}

@@ -1,5 +1,6 @@
 package com.example.idol_android.presentation.login
 
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,10 +30,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.idol_android.R
+import com.example.idol_android.ui.theme.Idol_androidTheme
 
 /**
  * Email 로그인 화면 (old 프로젝트의 EmailSigninFragment).
@@ -49,7 +52,6 @@ fun EmailLoginScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    val focusManager = LocalFocusManager.current
 
     // Effect 처리
     LaunchedEffect(Unit) {
@@ -70,6 +72,23 @@ fun EmailLoginScreen(
         }
     }
 
+    EmailLoginContent(
+        state = state,
+        onIntent = viewModel::sendIntent
+    )
+}
+
+/**
+ * Email 로그인 화면의 UI 컨텐츠 (Stateless).
+ * 프리뷰 및 테스트를 위한 stateless composable.
+ */
+@Composable
+private fun EmailLoginContent(
+    state: EmailLoginContract.State,
+    onIntent: (EmailLoginContract.Intent) -> Unit
+) {
+    val focusManager = LocalFocusManager.current
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -88,7 +107,7 @@ fun EmailLoginScreen(
                     .padding(horizontal = 4.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
-                IconButton(onClick = { viewModel.sendIntent(EmailLoginContract.Intent.NavigateBack) }) {
+                IconButton(onClick = { onIntent(EmailLoginContract.Intent.NavigateBack) }) {
                     Icon(
                         painter = painterResource(id = android.R.drawable.ic_menu_close_clear_cancel),
                         contentDescription = "Back",
@@ -116,11 +135,11 @@ fun EmailLoginScreen(
                 // Email Input (background="@drawable/edit_underline")
                 InputFieldWithIcon(
                     value = state.email,
-                    onValueChange = { viewModel.sendIntent(EmailLoginContract.Intent.EmailChanged(it)) },
+                    onValueChange = { onIntent(EmailLoginContract.Intent.EmailChanged(it)) },
                     hint = stringResource(id = R.string.hint_email),
                     iconRes = R.drawable.img_login_id,
                     isFocused = state.isEmailFocused,
-                    onFocusChanged = { viewModel.sendIntent(EmailLoginContract.Intent.EmailFocusChanged(it)) },
+                    onFocusChanged = { onIntent(EmailLoginContract.Intent.EmailFocusChanged(it)) },
                     keyboardType = KeyboardType.Email,
                     isPassword = false,
                     onPasswordToggle = null,
@@ -133,14 +152,14 @@ fun EmailLoginScreen(
                 // Password Input (EditText has layout_marginTop="15dp")
                 InputFieldWithIcon(
                     value = state.password,
-                    onValueChange = { viewModel.sendIntent(EmailLoginContract.Intent.PasswordChanged(it)) },
+                    onValueChange = { onIntent(EmailLoginContract.Intent.PasswordChanged(it)) },
                     hint = stringResource(id = R.string.hint_passwd),
                     iconRes = R.drawable.img_login_password,
                     isFocused = state.isPasswordFocused,
-                    onFocusChanged = { viewModel.sendIntent(EmailLoginContract.Intent.PasswordFocusChanged(it)) },
+                    onFocusChanged = { onIntent(EmailLoginContract.Intent.PasswordFocusChanged(it)) },
                     keyboardType = KeyboardType.Password,
                     isPassword = true,
-                    onPasswordToggle = { viewModel.sendIntent(EmailLoginContract.Intent.TogglePasswordVisibility) },
+                    onPasswordToggle = { onIntent(EmailLoginContract.Intent.TogglePasswordVisibility) },
                     isPasswordVisible = state.isPasswordVisible,
                     topMargin = 15.dp
                 )
@@ -151,7 +170,7 @@ fun EmailLoginScreen(
                 PressableButton(
                     onClick = {
                         focusManager.clearFocus()
-                        viewModel.sendIntent(EmailLoginContract.Intent.SignIn)
+                        onIntent(EmailLoginContract.Intent.SignIn)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -169,7 +188,7 @@ fun EmailLoginScreen(
 
                 // Sign Up Button
                 OutlinedPressableButton(
-                    onClick = { viewModel.sendIntent(EmailLoginContract.Intent.SignUp) },
+                    onClick = { onIntent(EmailLoginContract.Intent.SignUp) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(36.dp),
@@ -193,7 +212,7 @@ fun EmailLoginScreen(
                         color = colorResource(id = R.color.text_default),
                         modifier = Modifier
                             .weight(1f)
-                            .clickable { viewModel.sendIntent(EmailLoginContract.Intent.ForgotId) }
+                            .clickable { onIntent(EmailLoginContract.Intent.ForgotId) }
                             .padding(vertical = 8.dp),
                         textAlign = TextAlign.Center
                     )
@@ -211,7 +230,7 @@ fun EmailLoginScreen(
                         color = colorResource(id = R.color.text_default),
                         modifier = Modifier
                             .weight(1f)
-                            .clickable { viewModel.sendIntent(EmailLoginContract.Intent.ForgotPassword) }
+                            .clickable { onIntent(EmailLoginContract.Intent.ForgotPassword) }
                             .padding(vertical = 8.dp),
                         textAlign = TextAlign.Center
                     )
@@ -409,5 +428,36 @@ private fun OutlinedPressableButton(
         contentPadding = PaddingValues(0.dp)
     ) {
         content()
+    }
+}
+
+@Preview(
+    name = "Light Mode",
+    showSystemUi = true,
+    showBackground = true
+)
+@Composable
+fun EmailLoginScreenPreviewLight() {
+    Idol_androidTheme(darkTheme = false) {
+        EmailLoginContent(
+            state = EmailLoginContract.State(),
+            onIntent = {}
+        )
+    }
+}
+
+@Preview(
+    name = "Dark Mode",
+    showSystemUi = true,
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun EmailLoginScreenPreviewDark() {
+    Idol_androidTheme(darkTheme = true) {
+        EmailLoginContent(
+            state = EmailLoginContract.State(),
+            onIntent = {}
+        )
     }
 }
