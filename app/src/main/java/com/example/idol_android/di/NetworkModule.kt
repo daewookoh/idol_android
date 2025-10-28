@@ -1,66 +1,91 @@
 package com.example.idol_android.di
 
-import com.example.idol_android.data.remote.ApiService
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.example.idol_android.data.remote.api.*
+import com.example.idol_android.data.remote.interceptor.AuthInterceptor
+import com.example.idol_android.util.Constants
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-/**
- * Hilt module for providing network-related dependencies.
- */
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideJson(): Json = Json {
-        ignoreUnknownKeys = true
-        coerceInputValues = true
-        isLenient = true
-    }
+    fun provideGson(): Gson = GsonBuilder().setLenient().create()
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
-            .addInterceptor(
-                HttpLoggingInterceptor().apply {
-                    level = HttpLoggingInterceptor.Level.BODY
-                }
-            )
-            .build()
-    }
+    fun provideAuthInterceptor(): AuthInterceptor = AuthInterceptor()
+
+    @Provides
+    @Singleton
+    fun provideLoggingInterceptor(): HttpLoggingInterceptor =
+        HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(
+        authInterceptor: AuthInterceptor,
+        loggingInterceptor: HttpLoggingInterceptor
+    ): OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(Constants.API_TIMEOUT, TimeUnit.MILLISECONDS)
+        .readTimeout(Constants.API_TIMEOUT, TimeUnit.MILLISECONDS)
+        .writeTimeout(Constants.API_TIMEOUT, TimeUnit.MILLISECONDS)
+        .addInterceptor(authInterceptor)
+        .addInterceptor(loggingInterceptor)
+        .build()
 
     @Provides
     @Singleton
     fun provideRetrofit(
         okHttpClient: OkHttpClient,
-        json: Json
-    ): Retrofit {
-        val contentType = "application/json".toMediaType()
-        return Retrofit.Builder()
-            .baseUrl(ApiService.BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(json.asConverterFactory(contentType))
-            .build()
-    }
+        gson: Gson
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl(Constants.BASE_URL)
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create(gson))
+        .build()
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): ApiService {
-        return retrofit.create(ApiService::class.java)
-    }
+    fun provideConfigApi(retrofit: Retrofit): ConfigApi =
+        retrofit.create(ConfigApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideUserApi(retrofit: Retrofit): UserApi =
+        retrofit.create(UserApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideIdolApi(retrofit: Retrofit): IdolApi =
+        retrofit.create(IdolApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideAdApi(retrofit: Retrofit): AdApi =
+        retrofit.create(AdApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideMessageApi(retrofit: Retrofit): MessageApi =
+        retrofit.create(MessageApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideUtilityApi(retrofit: Retrofit): UtilityApi =
+        retrofit.create(UtilityApi::class.java)
 }

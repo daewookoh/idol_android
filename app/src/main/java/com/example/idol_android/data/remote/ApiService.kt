@@ -17,6 +17,6 @@ interface ApiService {
     suspend fun getUserById(@Path("id") userId: Int): UserDto
 
     companion object {
-        const val BASE_URL = "https://jsonplaceholder.typicode.com/"
+        const val BASE_URL = "https://www.myloveidol.com/api/v1"
     }
 }

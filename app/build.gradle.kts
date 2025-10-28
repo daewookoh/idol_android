@@ -92,6 +92,17 @@ dependencies {
     // Splash Screen
     implementation(libs.androidx.core.splashscreen)
 
+    // DataStore
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.core)
+
+    // Billing
+    implementation(libs.billing)
+
+    // Gson
+    implementation(libs.gson)
+    implementation(libs.retrofit.converter.gson)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
