@@ -21,19 +21,18 @@ class AuthInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
 
-        // 이미 Authorization 헤더가 있으면 그대로 진행
-        if (originalRequest.header("Authorization") != null) {
-            return chain.proceed(originalRequest)
+        // TODO: DAEWOO
+        val requestBuilder = originalRequest.newBuilder()
+            .header("HTTP-X-APPID", "test_android")
+            .header("HTTP-X-VERSION", "10.10.99")
+
+        // Authorization 헤더가 없고 토큰이 있으면 추가
+        if (originalRequest.header("Authorization") == null) {
+            token?.let {
+                requestBuilder.header("Authorization", "Bearer $it")
+            }
         }
 
-        // 토큰이 없으면 그대로 진행
-        val currentToken = token ?: return chain.proceed(originalRequest)
-
-        // Authorization 헤더 추가
-        val authenticatedRequest = originalRequest.newBuilder()
-            .header("Authorization", "Bearer $currentToken")
-            .build()
-
-        return chain.proceed(authenticatedRequest)
+        return chain.proceed(requestBuilder.build())
     }
 }

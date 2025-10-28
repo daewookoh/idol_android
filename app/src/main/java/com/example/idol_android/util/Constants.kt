@@ -10,7 +10,22 @@ object Constants {
     // ============================================================
     // API Configuration
     // ============================================================
-    const val BASE_URL = "https://api.example.com/" // TODO: Replace with actual API URL
+
+    // Server URLs (from old project's ServerUrl.kt)
+    private const val HOST_REAL = "https://www.myloveidol.com"        // 실서버 (Production)
+    private const val HOST_TEST = "https://test.myloveidol.com"       // 테스트 서버 (Test)
+    private const val HOST_BBB_TEST = "https://bbb.test.myloveidol.com" // BBB 테스트 서버
+
+    // Select server environment
+    // Change USE_PRODUCTION to switch between servers:
+    // - true: Production server (https://www.myloveidol.com)
+    // - false: Test server (https://test.myloveidol.com)
+    // TODO: Use BuildConfig.DEBUG to automatically switch between test/production
+    private const val USE_PRODUCTION = false
+
+    private val HOST = if (USE_PRODUCTION) HOST_REAL else HOST_TEST
+    val BASE_URL = "$HOST/api/v1/"
+
     const val API_TIMEOUT = 30_000L // 30 seconds
 
     // ============================================================
