@@ -3,35 +3,4 @@
 <!-- Generated with http://android-holo-colors.com -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="Tiber" parent="@style/_Tiber">
-        <item name="android:windowBackground">@color/background_100</item>
-        <item name="android:windowContentOverlay">@null</item>
-    </style>
-
-    <style name="_Tiber" parent="Theme.AppCompat.DayNight.DarkActionBar">
-        <item name="homeAsUpIndicator">@drawable/btn_back</item>
-        <item name="android:editTextStyle">@style/EditTexttiber</item>
-        <item name="editTextStyle">@style/EditTexttiber</item>
-        <item name="android:textColorHighlight">#99ff4444</item>
-        <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewtiber</item>
-        <item name="android:checkboxStyle">@style/CheckBoxtiber</item>
-        <item name="android:buttonStyle">@style/Buttontiber</item>
-        <item name="buttonStyle">@style/Buttontiber</item>
-        <item name="android:imageButtonStyle">@style/ImageButtontiber</item>
-        <item name="android:spinnerStyle">@style/Spinnertiber</item>
-        <item name="android:progressBarStyleHorizontal">@style/ProgressBartiber</item>
-        <item name="android:seekBarStyle">@style/SeekBartiber</item>
-        <item name="android:buttonStyleToggle">@style/Toggletiber</item>
-        <item name="android:listViewStyle">@style/ListViewtiber</item>
-        <item name="android:listViewWhiteStyle">@style/ListViewtiber.White</item>
-        <item name="android:spinnerItemStyle">@style/SpinnerItemtiber</item>
-        <item name="android:actionButtonStyle">@style/ActionButtonStyle</item>
-        <item name="android:actionBarTabTextStyle">@style/ActionBarTabTextStyle.Annie</item>
-    </style>
-    <style name="OverlayActionBarTheme" parent="CustomActionBarTheme">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowActionBarOverlay">true</item>
-        <!-- Support library compatibility -->
-        <item name="windowActionBarOverlay">true</item>
-    </style>
 </resources>
