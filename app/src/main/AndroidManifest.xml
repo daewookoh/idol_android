@@ -5,6 +5,13 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- SNS 로그인을 위한 패키지 쿼리 (Android 11 이상) -->
+    <queries>
+        <package android:name="com.facebook.katana" />
+        <package android:name="com.kakao.talk" />
+        <package android:name="jp.naver.line.android" />
+    </queries>
+
     <application
         android:name=".IdolApplication"
         android:allowBackup="true"
@@ -110,6 +117,73 @@
                 <data android:scheme="${scheme}" />
             </intent-filter>
         </activity>
+
+        <!-- ============================================================ -->
+        <!-- SNS 로그인 SDK 설정 (old 프로젝트와 동일) -->
+        <!-- ============================================================ -->
+
+        <!-- Kakao SDK App Key -->
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="${KAKAO_APP_KEY_FOR_MANIFEST}" />
+
+        <!-- Facebook SDK Application ID -->
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
+        <!-- Facebook SDK Client Token -->
+        <meta-data
+            android:name="com.facebook.sdk.ClientToken"
+            android:value="${FACEBOOK_CLIENT_ID}" />
+
+        <!-- Facebook SDK Auto Init (자동 초기화 비활성화) -->
+        <meta-data
+            android:name="com.facebook.sdk.AutoInitEnabled"
+            android:value="false" />
+
+        <!-- Facebook SDK Auto App Event Logging (자동 이벤트 로깅 비활성화) -->
+        <meta-data
+            android:name="com.facebook.sdk.AutoLogAppEventsEnabled"
+            android:value="false" />
+
+        <!-- Facebook Login Activity -->
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name" />
+
+        <!-- Facebook Custom Tab Activity for OAuth -->
+        <activity
+            android:name="com.facebook.CustomTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+            </intent-filter>
+        </activity>
+
+        <!-- Kakao OAuth Handler Activity -->
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- Redirect URI: "kakao${NATIVE_APP_KEY}://oauth" -->
+                <data
+                    android:host="oauth"
+                    android:scheme="kakao${KAKAO_APP_KEY_FOR_MANIFEST}" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

@@ -19,3 +19,24 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# ============================================================
+# SNS Login SDK ProGuard Rules
+# ============================================================
+
+# Line SDK - Keep all Line SDK classes and data binding
+-keep class com.linecorp.linesdk.** { *; }
+-dontwarn com.linecorp.linesdk.**
+
+# Kakao SDK - Keep all Kakao SDK classes
+-keep class com.kakao.sdk.** { *; }
+-dontwarn com.kakao.sdk.**
+
+# Facebook SDK - Keep all Facebook SDK classes
+-keep class com.facebook.** { *; }
+-dontwarn com.facebook.**
+
+# Google Sign-In - Keep all Google auth classes
+-keep class com.google.android.gms.auth.** { *; }
+-keep class com.google.android.gms.common.** { *; }
+-dontwarn com.google.android.gms.**

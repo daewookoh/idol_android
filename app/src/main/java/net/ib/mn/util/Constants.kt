@@ -161,9 +161,9 @@ object Constants {
     const val IDOL_TYPE_ACTOR = 3 // CELEB flavor only
 
     // ============================================================
-    // Authentication / Login
+    // Authentication / Login (old 프로젝트와 동일한 값)
     // ============================================================
-    const val CHANNEL_ID = "1474745561" // Line channel ID
+    const val CHANNEL_ID = "1654016030" // Line channel ID (old: Const.CHANNEL_ID)
 
     // Login domains (old Const.kt)
     const val DOMAIN_EMAIL = "email"
@@ -172,7 +172,7 @@ object Constants {
     const val DOMAIN_LINE = "line"
     const val DOMAIN_FACEBOOK = "facebook"
 
-    // Email postfix for social login
+    // Email postfix for social login (old Const.kt)
     const val POSTFIX_KAKAO = "@kakao.com"
     const val POSTFIX_LINE = "@line.com"
     const val POSTFIX_GOOGLE = "@google.com"

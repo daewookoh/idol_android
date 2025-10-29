@@ -160,6 +160,9 @@ class LoginViewModel @Inject constructor(
 
     /**
      * 실제 로그인 API 호출.
+     *
+     * NOTE: old 프로젝트 참고 - 서버는 로그인 성공 여부만 반환하고 토큰을 반환하지 않습니다.
+     * 클라이언트가 소셜 플랫폼의 access token을 직접 저장하여 사용합니다.
      */
     private suspend fun performSignIn() {
         val email = tempEmail ?: return
@@ -186,20 +189,24 @@ class LoginViewModel @Inject constructor(
                 }
                 is ApiResult.Success -> {
                     val response = result.data
-                    val token = response.data?.token
 
-                    if (token != null) {
-                        // 토큰 저장
-                        preferencesManager.setAccessToken(token)
-                        authInterceptor.setToken(token)
+                    if (response.success) {
+                        // old 프로젝트 방식: 소셜 플랫폼의 access token을 저장
+                        // 서버는 토큰을 반환하지 않고, 클라이언트가 tempPassword (access token)을 저장
+                        preferencesManager.setAccessToken(password) // Kakao/Google/etc access token
+                        authInterceptor.setToken(password)
 
-                        android.util.Log.d(TAG, "Login success - token saved")
+                        android.util.Log.d(TAG, "Login success - access token saved")
 
                         setState { copy(isLoading = false, loginType = null) }
                         setEffect { LoginContract.Effect.NavigateToMain }
                     } else {
                         setState { copy(isLoading = false) }
-                        setEffect { LoginContract.Effect.ShowError("토큰을 받지 못했습니다") }
+                        setEffect {
+                            LoginContract.Effect.ShowError(
+                                response.message ?: "Login failed"
+                            )
+                        }
                     }
                 }
                 is ApiResult.Error -> {
@@ -228,6 +235,35 @@ class LoginViewModel @Inject constructor(
     }
 
     /**
+     * Google 로그인 결과 처리.
+     *
+     * @param email Google 계정 이메일
+     * @param displayName 사용자 이름
+     * @param idToken Google ID 토큰
+     */
+    fun handleGoogleLoginResult(
+        email: String,
+        displayName: String?,
+        idToken: String?
+    ) {
+        viewModelScope.launch {
+            try {
+                android.util.Log.d(TAG, "Google login success - email: $email")
+
+                tempEmail = email
+                tempPassword = idToken ?: "qazqazqaz" // old 코드: mPasswd = mAuthToken or "qazqazqaz"
+                tempDomain = Constants.DOMAIN_GOOGLE
+
+                // validate API 호출하여 회원 여부 확인
+                validateAndSignIn(email, Constants.DOMAIN_GOOGLE)
+
+            } catch (e: Exception) {
+                handleError(e)
+            }
+        }
+    }
+
+    /**
      * Line 로그인.
      */
     private fun loginWithLine() {
@@ -243,6 +279,37 @@ class LoginViewModel @Inject constructor(
     }
 
     /**
+     * Line 로그인 결과 처리.
+     *
+     * @param userId Line user ID
+     * @param displayName 사용자 닉네임
+     * @param accessToken Line access token
+     */
+    fun handleLineLoginResult(
+        userId: String,
+        displayName: String?,
+        accessToken: String
+    ) {
+        viewModelScope.launch {
+            try {
+                // old 코드: mEmail = "$mid${Const.POSTFIX_LINE}"
+                val email = "$userId${Constants.POSTFIX_LINE}"
+                tempEmail = email
+                tempPassword = accessToken // old 코드: mPasswd = mAuthToken
+                tempDomain = Constants.DOMAIN_LINE
+
+                android.util.Log.d(TAG, "Line login success - userId: $userId, email: $email")
+
+                // validate API 호출하여 회원 여부 확인
+                validateAndSignIn(email, Constants.DOMAIN_LINE)
+
+            } catch (e: Exception) {
+                handleError(e)
+            }
+        }
+    }
+
+    /**
      * Facebook 로그인.
      */
     private fun loginWithFacebook() {
@@ -251,6 +318,35 @@ class LoginViewModel @Inject constructor(
                 setState { copy(isLoading = true, loginType = LoginContract.LoginType.FACEBOOK) }
                 android.util.Log.d(TAG, "Facebook login started")
                 setEffect { LoginContract.Effect.StartSocialLogin(LoginContract.LoginType.FACEBOOK) }
+            } catch (e: Exception) {
+                handleError(e)
+            }
+        }
+    }
+
+    /**
+     * Facebook 로그인 결과 처리.
+     *
+     * @param email Facebook 계정 이메일
+     * @param name 사용자 이름
+     * @param accessToken Facebook access token
+     */
+    fun handleFacebookLoginResult(
+        email: String,
+        name: String?,
+        accessToken: String
+    ) {
+        viewModelScope.launch {
+            try {
+                android.util.Log.d(TAG, "Facebook login success - email: $email")
+
+                tempEmail = email
+                tempPassword = accessToken // old 코드: mPasswd = mAuthToken
+                tempDomain = Constants.DOMAIN_FACEBOOK
+
+                // validate API 호출하여 회원 여부 확인
+                validateAndSignIn(email, Constants.DOMAIN_FACEBOOK)
+
             } catch (e: Exception) {
                 handleError(e)
             }
@@ -280,6 +376,21 @@ class LoginViewModel @Inject constructor(
 
         setEffect { LoginContract.Effect.ShowError(errorMessage) }
         android.util.Log.e(TAG, "Login error: $errorMessage", exception)
+    }
+
+    /**
+     * SNS SDK 에러 처리 (LoginScreen에서 SDK 에러 발생 시 호출).
+     * 로딩 상태를 해제하고 에러 메시지를 표시합니다.
+     */
+    fun handleSnsLoginError(errorMessage: String? = null) {
+        setState {
+            copy(
+                isLoading = false,
+                error = errorMessage,
+                loginType = null
+            )
+        }
+        android.util.Log.e(TAG, "SNS login error: $errorMessage")
     }
 
     /**

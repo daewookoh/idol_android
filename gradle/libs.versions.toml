@@ -26,6 +26,21 @@ billing = "7.1.1"
 gson = "2.11.0"
 material = "1.12.0"
 
+# Firebase (old 프로젝트와 동일한 버전)
+googleServices = "4.4.3"
+firebaseAppDistribution = "5.1.1"
+
+# SNS Login SDKs (old 프로젝트와 동일한 버전)
+kakaoSdk = "2.13.0"
+lineSdk = "5.8.1"
+facebookLogin = "17.0.2"
+playServicesAuth = "20.7.0"
+
+# RxJava (Kakao SDK v2-user-rx 의존성)
+rxandroid = "2.1.1"
+rxjava = "2.2.17"
+rxkotlin = "2.4.0"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -93,6 +108,17 @@ retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-
 # Material
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
+# SNS Login SDKs (old 프로젝트와 동일한 버전)
+kakao-sdk-user-rx = { group = "com.kakao.sdk", name = "v2-user-rx", version.ref = "kakaoSdk" }
+line-sdk = { group = "com.linecorp.linesdk", name = "linesdk", version.ref = "lineSdk" }
+facebook-login = { group = "com.facebook.android", name = "facebook-login", version.ref = "facebookLogin" }
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+
+# RxJava (Kakao SDK v2-user-rx 의존성)
+rxandroid = { group = "io.reactivex.rxjava2", name = "rxandroid", version.ref = "rxandroid" }
+rxjava = { group = "io.reactivex.rxjava2", name = "rxjava", version.ref = "rxjava" }
+rxkotlin = { group = "io.reactivex.rxjava2", name = "rxkotlin", version.ref = "rxkotlin" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -101,4 +127,8 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+# Firebase (old 프로젝트와 동일)
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebase-app-distribution = { id = "com.google.firebase.appdistribution", version.ref = "firebaseAppDistribution" }
 
