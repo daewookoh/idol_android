@@ -1,2 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <integer name="mezzo_publisher">1075</integer>
+    <integer name="mezzo_media">30394</integer>
+    <integer name="mezzo_section">300884</integer>
+</resources>

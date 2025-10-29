@@ -1,2 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <integer name="locale_mirror_flip">1</integer>
+    <integer name="anim_duration_medium">400</integer>
+</resources>

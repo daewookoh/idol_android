@@ -2,51 +2,135 @@
 <resources>
     <!-- MAIN COLORS -->
     <color name="main">#ff4444</color>
+    <color name="main_light">#ff6666</color>
+    <color name="navigation_bar">#ffffff</color>
+    <color name="bottom_sheet_title">#8f8f8f</color>
 
     <!-- BACKGROUND COLORS -->
     <color name="background_100">#ffffff</color>
+    <color name="background_100_transparent">#00ffffff</color>
+    <color name="background_200">#ffffff</color>
+    <color name="background_400">#f1f1f1</color>
+    <color name="background_300">#f6f6f6</color>
 
     <!-- TEXT COLORS -->
     <color name="text_default">#333333</color>
     <color name="text_gray">#666666</color>
     <color name="text_dimmed">#aaaaaa</color>
+    <color name="text_light">#ffffff</color>
     <color name="text_white_black">#ffffff</color>
+    <color name="text_light_blue">#68a9e0</color>
+    <color name="toolbar_default">#333333</color>
 
     <!-- GRAY COLORS -->
+    <color name="gray50">#f6f6f6</color>
+    <color name="gray80">#f1f1f1</color>
+    <color name="gray100">#eeeeee</color>
+    <color name="gray110">#e1e1e1</color>
+    <color name="gray120">#e0e1e2</color>
     <color name="gray150">#dddddd</color>
     <color name="gray200">#cccccc</color>
+    <color name="gray250">#bbbbbb</color>
+    <color name="gray300">#aaaaaa</color>
+    <color name="gray580">#757575</color>
+    <color name="gray900">#222222</color>
+    <color name="gray1000">#000000</color>
+    <color name="gray1000_opa15">#26000000</color>
+    <color name="gray_toast">#222222D6</color>
 
     <!-- CHAT COLORS -->
+    <color name="text_chat">#333333</color>
+    <color name="my_chat_deleted">#a33e3e</color>
 
     <!-- CELEB CARD COLORS(setting) -->
+    <color name="card_fix_text_black">#121212</color>
+    <color name="card_fix_text_vote">#666666</color>
+    <color name="card_line">#eeeeee</color>
+    <color name="card_setting">#ffffff</color>
 
     <!-- 기부 뱃지 COLOR -->
+    <color name="text_angel">#10cddd</color>
+    <color name="text_fairy">#9e5ff6</color>
+    <color name="text_miracle">#ff7d7d</color>
+    <color name="text_rookie">#15ce23</color>
+    <color name="text_super_rookie">#ffb60e</color>
 
     <!-- 소리바다 -->
+    <color name="soribada_text">#1b0090</color>
+    <color name="soribada_underbar">#52f8fc</color>
 
     <!-- 퀴즈 -->
+    <color name="quiz_content_color">#ffffff</color>
+    <color name="quiz_solve_label_color">#eeeeee</color>
+    <color name="quiz_shadow_1">#00CCCCCC</color>
+    <color name="quiz_shadow_2">#06CCCCCC</color>
+    <color name="quiz_shadow_3">#09CCCCCC</color>
+    <color name="quiz_shadow_4">#0BCCCCCC</color>
+    <color name="quiz_shadow_5">#0DCCCCCC</color>
+    <color name="quiz_shadow_6">#10CCCCCC</color>
 
     <!-- 퀴즈 메인 텍스트는 항상 흰색 -->
+    <color name="idol_quiz_category">#ff4444</color>
+    <color name="celeb_quiz_category">#a96bd4</color>
 
     <!-- 쿠폰 -->
+    <color name="main_yellow">#ffc355</color>
 
     <color name="red_click_border">#E53D3D</color>
+    <color name="button_on">#96312c</color>
 
 
     <!-- mention -->
-    <!-- 작성중일 때 멘션 배경 -->
+    <color name="mention_fg">#555555</color>
+    <color name="mention_bg">#eeeeee</color>
+    <color name="mention_bg_editing">#ffa7a7</color> <!-- 작성중일 때 멘션 배경 -->
 
     <!-- brand -->
+    <color name="brand800">#A54949</color>
 
     <!-- fix_gray -->
+    <color name="fix_gray1000">#000000</color>
+    <color name="fix_gray900">#222222</color>
+    <color name="fix_white">#ffffff</color>
+    <color name="fix_main">#ff4444</color>
+
+    <color name="webview_background">#ffffff</color>
 
     <!-- S리그 프로그레스 바 color -->
+    <color name="s_league_progress">#fcbb92</color>
+    <color name="a_league_progress">#ff6666</color>
+
+    <color name="text_light_only">#ffffff</color>
+
+    <color name="main100">#fff4f4</color>
+    <color name="main200">#FFEFEF</color>
+    <color name="main300">#ffbaba</color>
 
     <!-- awards -->
+    <color name="awards_yellow">#ffcc66</color>
+
+    <color name="actionbar">@color/text_white_black</color>
 
     <!-- 애돌/셀럽 투표수 색상 -->
+    <color name="text_heart_votes">#ffffff</color>
 
+    <color name="text_default_opacity_60">#99333333</color>
+
+    <color name="gray1000_opacity_60">#99000000</color>
+    <color name="gray1000_shadow_12">#0A000000</color>
+    <color name="pink_200">#fff4f4</color>
     <color name="white">#ffffff</color>
+    
+    <color name="notice_background">#fff4f4</color>
 
+    <color name="subscribe_label">#ff414c</color>
+
+    <color name="certificate_bg">#842121</color>
+
+    <color name="pink_400">#FF9BC1</color>
+    <color name="pink_500">#FF7AAD</color>
+
+    <color name="purple_400">#AA8EFF</color>
+    <color name="purple_500">#9B6DFF</color>
     <color name="purple_700">#7B52D9</color>
 </resources>
