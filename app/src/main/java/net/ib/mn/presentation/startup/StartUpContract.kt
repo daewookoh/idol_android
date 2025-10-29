@@ -17,16 +17,12 @@ class StartUpContract {
      * @property isLoading 로딩 중 여부
      * @property error 에러 메시지
      * @property currentStep 현재 진행 중인 단계
-     * @property apiCallsCompleted 완료된 API 호출 수
-     * @property totalApiCalls 전체 API 호출 수
      */
     data class State(
         val progress: Float = 0f,
         val isLoading: Boolean = true,
         val error: String? = null,
-        val currentStep: String = "Initializing...",
-        val apiCallsCompleted: Int = 0,
-        val totalApiCalls: Int = 0
+        val currentStep: String = "Initializing..."
     ) : UiState
 
     /**

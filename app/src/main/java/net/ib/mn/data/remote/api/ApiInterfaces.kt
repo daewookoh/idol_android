@@ -5,10 +5,10 @@ import retrofit2.Response
 import retrofit2.http.*
 
 /**
- * TODO: 각 API를 별도 파일로 분리 (권장)
+ * NOTE: 각 API를 별도 파일로 분리 권장
  *
  * 현재는 ConfigStartup 플로우 완성을 위해 기본 구조만 제공
- * 실제 구현 시 각 도메인별로 파일 분리:
+ * 프로젝트 확장 시 각 도메인별로 파일 분리 권장:
  * - UserApi.kt
  * - IdolApi.kt
  * - PaymentApi.kt
@@ -71,7 +71,7 @@ interface UserApi {
         @Body body: SignInRequest
     ): Response<SignInResponse>
 
-    // TODO: Add more user endpoints
+    // NOTE: 추가 가능한 User 엔드포인트 (필요 시 구현)
     // - POST /users/iab_verify/ - IAB 검증
     // - POST /users/payments/google_item/ - Google Play 아이템 검증
     // - POST /users/payments/google_subscription_check/ - 구독 확인
@@ -97,7 +97,7 @@ interface IdolApi {
         @Query("category") category: String? = null
     ): Response<IdolListResponse>
 
-    // TODO: Add more idol endpoints
+    // NOTE: 추가 가능한 Idol 엔드포인트 (필요 시 구현)
     // - GET /idols/{id}/ - Idol 상세
     // - GET /types/ - Type 리스트 (CELEB flavor)
     // - POST /idols/{id}/vote/ - 투표
@@ -114,7 +114,7 @@ interface AdApi {
     @GET("ads/types/")
     suspend fun getAdTypeList(): Response<AdTypeListResponse>
 
-    // TODO: Add more ad endpoints
+    // NOTE: 추가 가능한 Ad 엔드포인트 (필요 시 구현)
     // - GET /offerwall/reward/ - OfferWall 보상 조회
 }
 

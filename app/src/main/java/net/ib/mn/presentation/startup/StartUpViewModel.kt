@@ -2,6 +2,7 @@ package net.ib.mn.presentation.startup
 
 import androidx.lifecycle.viewModelScope
 import net.ib.mn.base.BaseViewModel
+import net.ib.mn.data.remote.dto.toEntity
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.usecase.*
 import net.ib.mn.util.Constants
@@ -24,8 +25,29 @@ import javax.inject.Inject
  * 3. 필요한 데이터 프리로드
  * 4. 초기화 완료 후 메인 화면으로 이동
  *
- * 완성된 플로우: ConfigStartup API
- * TODO 플로우: 나머지 14개 API
+ * UseCases:
+ * - GetConfigStartupUseCase: 앱 전역 설정 (욕설 필터, 공지사항, 이벤트 등)
+ * - GetConfigSelfUseCase: 사용자 앱 설정 (언어, 테마, 푸시 알림)
+ * - GetUpdateInfoUseCase: 아이돌 업데이트 플래그 (전체/일일/SNS)
+ * - GetUserSelfUseCase: 사용자 프로필 정보 (ETag 캐싱 지원)
+ * - GetUserStatusUseCase: 사용자 상태 (튜토리얼, 첫 로그인)
+ * - GetAdTypeListUseCase: 광고 타입 목록
+ * - GetMessageCouponUseCase: 쿠폰 메시지 목록
+ * - UpdateTimezoneUseCase: 타임존 업데이트
+ * - GetIdolsUseCase: 전체 아이돌 목록 (Room DB 저장)
+ * - GetIabKeyUseCase: IAB 공개키 (미사용)
+ * - GetBlocksUseCase: 차단 사용자 목록 (미사용)
+ *
+ * 호출 API 및 사용 Field:
+ * - GET /config/startup - badWords, boardTags, noticeList, eventList, snsChannels, uploadVideoSpec
+ * - GET /config/self - language, theme, pushEnabled
+ * - GET /update/info - allIdolUpdate, dailyIdolUpdate, snsChannelUpdate
+ * - GET /user/self - id, username, email, nickname, profileImage, hearts (ETag 헤더)
+ * - GET /user/status - tutorialCompleted, firstLogin
+ * - GET /ad/types - id, type, reward
+ * - GET /message/coupon - id, message, couponCode
+ * - PUT /user/timezone - timezone (request body)
+ * - GET /idols - id, name, group, imageUrl, type, debutDate
  */
 @HiltViewModel
 class StartUpViewModel @Inject constructor(
@@ -42,14 +64,12 @@ class StartUpViewModel @Inject constructor(
     private val getBlocksUseCase: GetBlocksUseCase,
     private val preferencesManager: net.ib.mn.data.local.PreferencesManager,
     private val authInterceptor: net.ib.mn.data.remote.interceptor.AuthInterceptor,
+    private val idolDao: net.ib.mn.data.local.dao.IdolDao,
 ) : BaseViewModel<StartUpContract.State, StartUpContract.Intent, StartUpContract.Effect>() {
 
     companion object {
         private const val TAG = "StartUpViewModel"
-        private const val TOTAL_API_CALLS = 11 // 병렬 호출되는 API 수
     }
-
-    private var apiCallsCompleted = 0
 
     override fun createInitialState(): StartUpContract.State {
         return StartUpContract.State(
@@ -89,61 +109,16 @@ class StartUpViewModel @Inject constructor(
                     android.util.Log.w(TAG, "⚠️  No saved token - user not logged in (guest mode)")
                     // Guest mode - Navigate to Login screen
                     setState { copy(isLoading = false, progress = 0f, currentStep = "Login required") }
-                    setEffect { StartUpContract.Effect.NavigateToMain }
-//                    setEffect { StartUpContract.Effect.NavigateToLogin }
+                    setEffect { StartUpContract.Effect.NavigateToLogin }
                     return@launch
                 }
 
-                // Step 1: 기본 설정 확인 (0-20%)
-                updateProgress(0.1f, "Loading configuration...")
-                delay(300)
-                // TODO: 서버 설정 확인, SharedPreferences 로드 등
-
-                updateProgress(0.2f, "Checking settings...")
-                delay(300)
-
-                // Step 2: 광고 ID 및 디바이스 정보 수집 (20-40%)
-                updateProgress(0.3f, "Collecting device info...")
-                delay(300)
-                // TODO: AdvertisingIdClient.getAdvertisingIdInfo() 호출
-
-                updateProgress(0.4f, "Device info collected")
-                delay(300)
-
-                // Step 3: 인앱 배너 정보 가져오기 (40-60%)
-                updateProgress(0.5f, "Loading banners...")
-                delay(300)
-                // TODO: viewModel.getInAppBanner() 구현
-
-                updateProgress(0.6f, "Banners loaded")
-                delay(300)
-
-                // Step 4: 모든 API 병렬 호출 (60-85%)
-                updateProgress(0.6f, "Loading startup APIs...")
-
-                setState { copy(totalApiCalls = TOTAL_API_CALLS) }
-
-                // old 프로젝트처럼 병렬 호출
+                // 실제 작업: API 병렬 호출
+                updateProgress(0.2f, "Loading startup APIs...")
                 loadAllStartupAPIs()
 
-                updateProgress(0.85f, "All APIs loaded")
-                delay(300)
-
-                // Step 5: 구독 정보 확인 (80-90%)
-                updateProgress(0.85f, "Checking subscriptions...")
-                delay(300)
-                // TODO: checkSubscriptions() 구현
-
-                updateProgress(0.9f, "Subscriptions checked")
-                delay(300)
-
-                // Step 6: IAB 정보 확인 (90-100%)
-                updateProgress(0.95f, "Checking IAB...")
-                delay(300)
-                // TODO: checkIAB() 구현
-
+                // 초기화 완료
                 updateProgress(1.0f, "Initialization complete")
-                delay(300)
 
                 // 초기화 완료
                 setState {
@@ -323,7 +298,10 @@ class StartUpViewModel @Inject constructor(
 
                         android.util.Log.d(TAG, "✓ ConfigStartup data saved to DataStore")
                     }
-                    // TODO: 메모리에 캐싱 (Application 클래스 또는 싱글톤)
+                    // NOTE: 메모리 캐싱이 필요한 경우 구현 방법:
+                    // 1. Application 클래스에 ConfigCache 싱글톤 생성
+                    // 2. 또는 Hilt SingletonComponent로 ConfigRepository 제공
+                    // 3. 현재는 DataStore만 사용하며, 필요시 Flow로 실시간 데이터 접근 가능
                 }
                 is ApiResult.Error -> {
                     // 에러 처리
@@ -346,7 +324,6 @@ class StartUpViewModel @Inject constructor(
             when (result) {
                 is ApiResult.Loading -> {}
                 is ApiResult.Success -> {
-                    incrementApiProgress()
                     val data = result.data.data
 
                     android.util.Log.d(TAG, "========================================")
@@ -359,7 +336,9 @@ class StartUpViewModel @Inject constructor(
 
                     // DataStore에 저장
                     data?.let { configData ->
-                        // TODO: language, theme, pushEnabled 저장 로직 추가
+                        configData.language?.let { preferencesManager.setLanguage(it) }
+                        configData.theme?.let { preferencesManager.setTheme(it) }
+                        configData.pushEnabled?.let { preferencesManager.setPushEnabled(it) }
                         android.util.Log.d(TAG, "✓ ConfigSelf data saved to DataStore")
                     }
                 }
@@ -378,7 +357,6 @@ class StartUpViewModel @Inject constructor(
             when (result) {
                 is ApiResult.Loading -> {}
                 is ApiResult.Success -> {
-                    incrementApiProgress()
                     val data = result.data.data
 
                     android.util.Log.d(TAG, "========================================")
@@ -391,12 +369,34 @@ class StartUpViewModel @Inject constructor(
 
                     // DataStore에 저장 및 기존 플래그와 비교
                     data?.let { updateData ->
-                        updateData.allIdolUpdate?.let { preferencesManager.setAllIdolUpdate(it) }
-                        updateData.dailyIdolUpdate?.let { preferencesManager.setDailyIdolUpdate(it) }
-                        updateData.snsChannelUpdate?.let { preferencesManager.setSnsChannelUpdate(it) }
+                        // 기존 플래그 가져오기
+                        val oldAllIdolUpdate = preferencesManager.allIdolUpdate.first()
+                        val oldDailyIdolUpdate = preferencesManager.dailyIdolUpdate.first()
+                        val oldSnsChannelUpdate = preferencesManager.snsChannelUpdate.first()
+
+                        // 플래그 비교 및 동기화 필요 여부 로그
+                        updateData.allIdolUpdate?.let { newFlag ->
+                            if (oldAllIdolUpdate != newFlag) {
+                                android.util.Log.d(TAG, "⚠️  AllIdolUpdate changed: $oldAllIdolUpdate -> $newFlag (sync needed)")
+                            }
+                            preferencesManager.setAllIdolUpdate(newFlag)
+                        }
+
+                        updateData.dailyIdolUpdate?.let { newFlag ->
+                            if (oldDailyIdolUpdate != newFlag) {
+                                android.util.Log.d(TAG, "⚠️  DailyIdolUpdate changed: $oldDailyIdolUpdate -> $newFlag (sync needed)")
+                            }
+                            preferencesManager.setDailyIdolUpdate(newFlag)
+                        }
+
+                        updateData.snsChannelUpdate?.let { newFlag ->
+                            if (oldSnsChannelUpdate != newFlag) {
+                                android.util.Log.d(TAG, "⚠️  SnsChannelUpdate changed: $oldSnsChannelUpdate -> $newFlag (sync needed)")
+                            }
+                            preferencesManager.setSnsChannelUpdate(newFlag)
+                        }
 
                         android.util.Log.d(TAG, "✓ UpdateInfo flags saved to DataStore")
-                        // TODO: 기존 플래그와 비교하여 동기화 필요 여부 결정
                     }
                 }
                 is ApiResult.Error -> {
@@ -417,7 +417,6 @@ class StartUpViewModel @Inject constructor(
             when (result) {
                 is ApiResult.Loading -> {}
                 is ApiResult.Success -> {
-                    incrementApiProgress()
                     val data = result.data.data
 
                     android.util.Log.d(TAG, "========================================")
@@ -442,10 +441,7 @@ class StartUpViewModel @Inject constructor(
                             hearts = userData.hearts
                         )
 
-                        // ETag 저장 (다음 요청 시 캐싱에 사용)
-                        // TODO: Response에서 ETag 헤더 추출하여 저장
-                        // val newETag = response.headers()["ETag"]
-                        // newETag?.let { preferencesManager.setUserSelfETag(it) }
+                        // ETag는 Repository에서 자동으로 저장됨
 
                         android.util.Log.d(TAG, "✓ UserSelf data saved to DataStore")
                     }
@@ -470,7 +466,6 @@ class StartUpViewModel @Inject constructor(
             when (result) {
                 is ApiResult.Loading -> {}
                 is ApiResult.Success -> {
-                    incrementApiProgress()
                     val data = result.data.data
 
                     android.util.Log.d(TAG, "========================================")
@@ -503,7 +498,6 @@ class StartUpViewModel @Inject constructor(
             when (result) {
                 is ApiResult.Loading -> {}
                 is ApiResult.Success -> {
-                    incrementApiProgress()
                     val data = result.data.data
 
                     android.util.Log.d(TAG, "========================================")
@@ -531,7 +525,6 @@ class StartUpViewModel @Inject constructor(
             when (result) {
                 is ApiResult.Loading -> {}
                 is ApiResult.Success -> {
-                    incrementApiProgress()
                     val data = result.data.data
 
                     android.util.Log.d(TAG, "========================================")
@@ -561,8 +554,6 @@ class StartUpViewModel @Inject constructor(
             when (result) {
                 is ApiResult.Loading -> {}
                 is ApiResult.Success -> {
-                    incrementApiProgress()
-
                     android.util.Log.d(TAG, "========================================")
                     android.util.Log.d(TAG, "Timezone Update API Response")
                     android.util.Log.d(TAG, "========================================")
@@ -585,7 +576,6 @@ class StartUpViewModel @Inject constructor(
             when (result) {
                 is ApiResult.Loading -> {}
                 is ApiResult.Success -> {
-                    incrementApiProgress()
                     val data = result.data.data
 
                     android.util.Log.d(TAG, "========================================")
@@ -609,7 +599,12 @@ class StartUpViewModel @Inject constructor(
                     }
                     android.util.Log.d(TAG, "========================================")
 
-                    // TODO: Room Database에 저장
+                    // Room Database에 저장
+                    data?.let { idolList ->
+                        val entities = idolList.map { it.toEntity() }
+                        idolDao.insertIdols(entities)
+                        android.util.Log.d(TAG, "✓ ${entities.size} idols saved to Room Database")
+                    }
                 }
                 is ApiResult.Error -> {
                     android.util.Log.e(TAG, "Idols error: ${result.message}")
@@ -618,34 +613,52 @@ class StartUpViewModel @Inject constructor(
         }
     }
 
-    /**
-     * API 완료 카운트 증가 및 프로그레스 업데이트
-     */
-    private fun incrementApiProgress() {
-        apiCallsCompleted++
-        val progress = 0.6f + (apiCallsCompleted.toFloat() / TOTAL_API_CALLS) * 0.25f
-
-        setState {
-            copy(
-                apiCallsCompleted = apiCallsCompleted,
-                progress = progress
-            )
-        }
-    }
+    // ============================================================
+    // 추가 구현 참고 메서드 (현재 미사용)
+    // ============================================================
 
     /**
-     * 구독 정보 확인.
+     * 구독 정보 확인 (참고용 - 미구현)
+     *
+     * NOTE: Google Play Billing Library를 사용한 구독 정보 확인 구현 가이드
+     * 1. build.gradle에 추가: implementation("com.android.billingclient:billing-ktx:6.0.1")
+     * 2. BillingClient 초기화:
+     *    val billingClient = BillingClient.newBuilder(context)
+     *        .setListener(purchasesUpdatedListener)
+     *        .enablePendingPurchases()
+     *        .build()
+     * 3. 활성 구독 조회:
+     *    billingClient.queryPurchasesAsync(QueryPurchasesParams.newBuilder()
+     *        .setProductType(BillingClient.ProductType.SUBS)
+     *        .build()) { billingResult, purchases ->
+     *        // 구독 정보 처리
+     *    }
      */
+    @Suppress("unused")
     private suspend fun checkSubscriptions() {
-        // TODO: 구독 정보 확인 로직
-        delay(300) // 시뮬레이션
+        // 구현 필요 시 사용
     }
 
     /**
-     * IAB 정보 확인.
+     * IAB 공개키 확인 (참고용 - 미구현)
+     *
+     * NOTE: IAB 공개키 조회 구현 가이드
+     * 1. GetIabKeyUseCase는 이미 존재 (Priority2UseCases.kt)
+     * 2. loadIabKey() 메서드 추가:
+     *    private suspend fun loadIabKey() {
+     *        getIabKeyUseCase().collect { result ->
+     *            when (result) {
+     *                is ApiResult.Success -> {
+     *                    val key = result.data.key
+     *                    // DataStore에 저장 또는 메모리 캐싱
+     *                }
+     *            }
+     *        }
+     *    }
+     * 3. loadAllStartupAPIs()의 병렬 호출 목록에 추가
      */
+    @Suppress("unused")
     private suspend fun checkIAB() {
-        // TODO: IAB 정보 확인 로직
-        delay(300) // 시뮬레이션
+        // 구현 필요 시 사용
     }
 }

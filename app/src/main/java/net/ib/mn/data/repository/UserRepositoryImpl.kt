@@ -1,10 +1,12 @@
 package net.ib.mn.data.repository
 
+import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.remote.api.UserApi
 import net.ib.mn.data.remote.dto.*
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
@@ -14,22 +16,24 @@ import javax.inject.Inject
  * User Repository 구현체
  */
 class UserRepositoryImpl @Inject constructor(
-    private val userApi: UserApi
+    private val userApi: UserApi,
+    private val preferencesManager: PreferencesManager
 ) : UserRepository {
 
     override fun getUserSelf(etag: String?): Flow<ApiResult<UserSelfResponse>> = flow {
         emit(ApiResult.Loading)
 
         try {
-            // TODO: Get token from DataStore
-            val token = "Bearer YOUR_TOKEN_HERE"
+            // Get token from DataStore
+            val accessToken = preferencesManager.accessToken.first()
+            val token = "Bearer ${accessToken ?: ""}"
 
             val response = userApi.getUserSelf(token, etag)
 
             // HTTP 304 Not Modified (캐시 유효)
             if (response.code() == 304) {
-                // 캐시된 데이터 사용 (별도 처리 필요)
-                // TODO: 로컬 캐시에서 불러오기
+                // 캐시된 데이터 사용 - DataStore의 userInfo를 그대로 사용
+                // 304는 데이터가 변경되지 않았음을 의미하므로 로컬 데이터가 최신 상태
                 emit(ApiResult.Error(
                     exception = Exception("Cache valid - use local data"),
                     code = 304
@@ -43,7 +47,10 @@ class UserRepositoryImpl @Inject constructor(
                 if (body.success) {
                     // 새로운 ETag 저장
                     val newETag = response.headers()["ETag"]
-                    // TODO: DataStore에 ETag 저장
+                    newETag?.let {
+                        preferencesManager.setUserSelfETag(it)
+                        android.util.Log.d("UserRepositoryImpl", "✓ ETag saved: $it")
+                    }
 
                     emit(ApiResult.Success(body))
                 } else {
@@ -81,7 +88,8 @@ class UserRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading)
 
         try {
-            val token = "Bearer YOUR_TOKEN_HERE"
+            val accessToken = preferencesManager.accessToken.first()
+            val token = "Bearer ${accessToken ?: ""}"
             val response = userApi.getUserStatus(token)
 
             if (response.isSuccessful && response.body() != null) {
@@ -124,7 +132,8 @@ class UserRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading)
 
         try {
-            val token = "Bearer YOUR_TOKEN_HERE"
+            val accessToken = preferencesManager.accessToken.first()
+            val token = "Bearer ${accessToken ?: ""}"
             val response = userApi.getIabKey(token)
 
             if (response.isSuccessful && response.body() != null) {
@@ -167,7 +176,8 @@ class UserRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading)
 
         try {
-            val token = "Bearer YOUR_TOKEN_HERE"
+            val accessToken = preferencesManager.accessToken.first()
+            val token = "Bearer ${accessToken ?: ""}"
             val response = userApi.getBlocks(token)
 
             if (response.isSuccessful && response.body() != null) {

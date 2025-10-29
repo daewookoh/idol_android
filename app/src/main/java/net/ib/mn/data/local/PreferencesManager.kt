@@ -79,6 +79,15 @@ class PreferencesManager @Inject constructor(
         val KEY_BOARD_TAGS = stringPreferencesKey("board_tags_json")
         val KEY_NOTICES = stringPreferencesKey("notices_json")
         val KEY_EVENTS = stringPreferencesKey("events_json")
+
+        // ConfigSelf Data
+        val KEY_LANGUAGE = stringPreferencesKey("config_self_language")
+        val KEY_THEME = stringPreferencesKey("config_self_theme")
+        val KEY_PUSH_ENABLED = booleanPreferencesKey("config_self_push_enabled")
+
+        // Device Info
+        val KEY_DEVICE_ID = stringPreferencesKey("device_id")
+        val KEY_FCM_TOKEN = stringPreferencesKey("fcm_token")
     }
 
     // ============================================================
@@ -133,6 +142,31 @@ class PreferencesManager @Inject constructor(
                     hearts = preferences[KEY_USER_HEARTS]
                 )
             } else null
+        }
+
+    val language: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_LANGUAGE]
+        }
+
+    val theme: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_THEME]
+        }
+
+    val pushEnabled: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_PUSH_ENABLED] ?: true
+        }
+
+    val deviceId: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_DEVICE_ID]
+        }
+
+    val fcmToken: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_FCM_TOKEN]
         }
 
     // ============================================================
@@ -238,6 +272,36 @@ class PreferencesManager @Inject constructor(
     suspend fun setLoginDomain(domain: String) {
         context.dataStore.edit { preferences ->
             preferences[KEY_LOGIN_DOMAIN] = domain
+        }
+    }
+
+    suspend fun setLanguage(language: String) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_LANGUAGE] = language
+        }
+    }
+
+    suspend fun setTheme(theme: String) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_THEME] = theme
+        }
+    }
+
+    suspend fun setPushEnabled(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_PUSH_ENABLED] = enabled
+        }
+    }
+
+    suspend fun setDeviceId(deviceId: String) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_DEVICE_ID] = deviceId
+        }
+    }
+
+    suspend fun setFcmToken(token: String) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_FCM_TOKEN] = token
         }
     }
 

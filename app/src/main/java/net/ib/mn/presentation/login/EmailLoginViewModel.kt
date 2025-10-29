@@ -240,7 +240,10 @@ class EmailLoginViewModel @Inject constructor(
         android.util.Log.d(TAG, "Navigating to StartUp screen...")
         android.util.Log.d(TAG, "========================================")
 
-        // TODO: AppsFlyer 이벤트 로깅 (필요 시 추가)
+        // NOTE: AppsFlyer 이벤트 로깅 구현 가이드 (필요 시 추가):
+        // 1. build.gradle에 추가: implementation("com.appsflyer:af-android-sdk:6.x.x")
+        // 2. Application 클래스에서 AppsFlyer 초기화
+        // 3. 로그인 완료 후 이벤트 전송:
         // val appsFlyerInstance = AppsFlyerLib.getInstance()
         // val eventValues = mapOf(
         //     "user_id" to appsFlyerInstance.getAppsFlyerUID(context),

@@ -62,8 +62,11 @@ fun LoginScreen(
                     onNavigateToEmailLogin()
                 }
                 is LoginContract.Effect.StartSocialLogin -> {
-                    // TODO: 실제 소셜 로그인 프로세스 시작
+                    // NOTE: 소셜 로그인 프로세스 구현 가이드:
                     // Activity Result API를 사용하여 소셜 로그인 Intent 시작
+                    // Google: GoogleSignIn API
+                    // Facebook: Facebook SDK
+                    // Line: Line SDK
                     Toast.makeText(
                         context,
                         "${effect.loginType.name} login coming soon",

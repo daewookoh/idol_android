@@ -14,10 +14,10 @@ import javax.inject.Inject
  * 2. 성공 시 데이터 반환
  * 3. 실패 시 에러 처리
  *
- * TODO: 추가 비즈니스 로직
- * - DataStore에 캐싱
- * - 욕설 필터 리스트 파싱 및 저장
- * - 공지사항 로컬 저장
+ * NOTE: 비즈니스 로직은 ViewModel에서 처리됨
+ * - DataStore 캐싱: StartUpViewModel.loadConfigStartup()에서 처리
+ * - 욕설 필터 리스트: PreferencesManager.setBadWords()로 저장
+ * - 공지사항: PreferencesManager.setNotices()로 저장
  */
 class GetConfigStartupUseCase @Inject constructor(
     private val configRepository: ConfigRepository

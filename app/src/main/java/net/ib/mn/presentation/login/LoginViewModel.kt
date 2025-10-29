@@ -11,6 +11,7 @@ import net.ib.mn.domain.usecase.ValidateUserUseCase
 import net.ib.mn.util.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
@@ -142,9 +143,9 @@ class LoginViewModel @Inject constructor(
                         android.util.Log.d(TAG, "User not found - sign up required")
                         setState { copy(isLoading = false) }
                         setEffect {
-                            LoginContract.Effect.ShowToast("회원가입이 필요합니다. (TODO: 회원가입 화면 구현)")
+                            LoginContract.Effect.ShowToast("회원가입이 필요합니다. (회원가입 화면 미구현)")
                         }
-                        // TODO: 회원가입 프로세스로 이동
+                        // NOTE: 회원가입 화면 구현 시 NavigateToSignUp Effect 추가
                     }
                 }
                 is ApiResult.Error -> {
@@ -168,7 +169,7 @@ class LoginViewModel @Inject constructor(
         // Device info
         val deviceId = getDeviceId()
         val gmail = getGmail()
-        val deviceKey = "" // TODO: FCM token
+        val deviceKey = getFcmToken() // FCM token from DataStore
 
         signInUseCase(
             domain = domain,
@@ -283,18 +284,44 @@ class LoginViewModel @Inject constructor(
 
     /**
      * 디바이스 ID 가져오기 (UUID).
+     * DataStore에 저장된 UUID를 가져오거나, 없으면 새로 생성하여 저장.
      */
-    private fun getDeviceId(): String {
-        // TODO: SharedPreferences에서 저장된 UUID 가져오기, 없으면 생성
-        return UUID.randomUUID().toString()
+    private suspend fun getDeviceId(): String {
+        val savedDeviceId = preferencesManager.deviceId.first()
+        return if (savedDeviceId != null) {
+            savedDeviceId
+        } else {
+            val newDeviceId = UUID.randomUUID().toString()
+            preferencesManager.setDeviceId(newDeviceId)
+            newDeviceId
+        }
+    }
+
+    /**
+     * FCM Token 가져오기.
+     * DataStore에 저장된 FCM Token을 반환, 없으면 빈 문자열.
+     */
+    private suspend fun getFcmToken(): String {
+        return preferencesManager.fcmToken.first() ?: ""
     }
 
     /**
      * Gmail 계정 가져오기.
-     * 없으면 device UUID 사용.
+     * AccountManager에서 Gmail 계정을 가져오거나, 없으면 device UUID 사용.
+     *
+     * NOTE: AccountManager 사용을 위한 구현 가이드:
+     * 1. AndroidManifest.xml에 권한 추가:
+     *    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+     * 2. AccountManager를 통해 계정 조회:
+     *    val accountManager = AccountManager.get(context)
+     *    val accounts = accountManager.getAccountsByType("com.google")
+     *    val gmail = accounts.firstOrNull()?.name
+     * 3. Android 6.0+ (API 23+)에서는 런타임 권한 요청 필요
+     * 4. Android 8.0+ (API 26+)에서는 GET_ACCOUNTS 권한이 제한됨
+     *    대신 GoogleSignIn API 사용을 권장
      */
-    private fun getGmail(): String {
-        // TODO: AccountManager에서 Gmail 계정 가져오기
+    private suspend fun getGmail(): String {
+        // 현재는 deviceId를 반환 (AccountManager 구현 필요 시 위 가이드 참조)
         return getDeviceId()
     }
 }

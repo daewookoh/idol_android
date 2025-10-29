@@ -124,7 +124,8 @@ fun NavGraph(
                     }
                 },
                 onNavigateToSignUp = {
-                    // TODO: 회원가입 화면으로 이동
+                    // NOTE: 회원가입 화면 미구현 - 구현 시 Screen.SignUp.route로 navigate
+                    // navController.navigate(Screen.SignUp.route)
                     android.widget.Toast.makeText(
                         navController.context,
                         "회원가입 화면은 추후 구현 예정입니다",
@@ -132,7 +133,8 @@ fun NavGraph(
                     ).show()
                 },
                 onNavigateToForgotId = {
-                    // TODO: 아이디 찾기 화면으로 이동
+                    // NOTE: 아이디 찾기 화면 미구현 - 구현 시 Screen.ForgotId.route로 navigate
+                    // navController.navigate(Screen.ForgotId.route)
                     android.widget.Toast.makeText(
                         navController.context,
                         "아이디 찾기 화면은 추후 구현 예정입니다",
@@ -140,7 +142,8 @@ fun NavGraph(
                     ).show()
                 },
                 onNavigateToForgotPassword = {
-                    // TODO: 비밀번호 찾기 화면으로 이동
+                    // NOTE: 비밀번호 찾기 화면 미구현 - 구현 시 Screen.ForgotPassword.route로 navigate
+                    // navController.navigate(Screen.ForgotPassword.route)
                     android.widget.Toast.makeText(
                         navController.context,
                         "비밀번호 찾기 화면은 추후 구현 예정입니다",

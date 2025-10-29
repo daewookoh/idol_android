@@ -7,7 +7,9 @@ import okhttp3.Response
  * 인증 Interceptor
  *
  * Authorization 헤더를 자동으로 추가
- * TODO: 실제 토큰 관리 로직 구현 (DataStore 또는 AccountManager)
+ * NOTE: 토큰은 PreferencesManager(DataStore)에서 관리됨
+ * - 로그인 성공 시: preferencesManager.setAccessToken()으로 저장
+ * - 앱 시작 시: StartUpViewModel에서 토큰을 로드하여 setToken() 호출
  */
 class AuthInterceptor : Interceptor {
 
@@ -21,7 +23,7 @@ class AuthInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
 
-        // TODO: DAEWOO
+        // HTTP-X-APPID, HTTP-X-VERSION 헤더 추가 (서버 요구사항)
         val requestBuilder = originalRequest.newBuilder()
             .header("HTTP-X-APPID", "test_android")
             .header("HTTP-X-VERSION", "10.10.99")

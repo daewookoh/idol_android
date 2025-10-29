@@ -1,6 +1,7 @@
 package net.ib.mn.presentation.startup
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,14 +34,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ExodusTheme
 import kotlinx.coroutines.flow.collectLatest
+import net.ib.mn.ui.components.AppScaffold
 
 /**
  * 스타트업 화면.
- * safe area 내에서 전체 화면을 사용합니다.
+ * 전체 화면을 사용합니다.
  *
  * UI 구성:
  * - 배경: @color/text_white_black (라이트: #ffffff, 다크: #121212)
- * - 로고 이미지: startup_logo.xml (variant별 다른 XML drawable), width=150dp, 비율 유지
+ * - 로고 이미지: startup_logo.xml (variant별 다른 XML drawable), 비율 유지
  * - 프로그레스바: 하단 중앙, width=160dp, marginBottom=60dp
  *   - color: @color/main (라이트: #ff4444, 다크: #E24848)
  *   - trackColor: @color/gray150 (라이트: #dddddd, 다크: #404040)
@@ -51,6 +54,7 @@ fun StartUpScreen(
     viewModel: StartUpViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     // Side effects 처리
     LaunchedEffect(Unit) {
@@ -63,7 +67,12 @@ fun StartUpScreen(
                     onNavigateToLogin()
                 }
                 is StartUpContract.Effect.ShowError -> {
-                    // TODO: 에러 처리 (필요시 Toast 또는 Dialog)
+                    // 에러 메시지를 Toast로 표시
+                    Toast.makeText(
+                        context,
+                        effect.message,
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }
@@ -81,7 +90,7 @@ private fun StartUpContent(
     state: StartUpContract.State
 ) {
 
-    Scaffold(
+    AppScaffold (
         containerColor = colorResource(id = R.color.text_white_black),
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
@@ -112,7 +121,7 @@ private fun StartUpContent(
                         .height(1.dp),
                     color = colorResource(id = R.color.main),
                     trackColor = colorResource(id = R.color.gray150),
-                    strokeCap = StrokeCap.Butt,
+                    strokeCap = StrokeCap.Round,
                 )
             }
         }
@@ -128,7 +137,7 @@ private fun StartUpContent(
 fun StartUpScreenPreviewLight() {
     ExodusTheme(darkTheme = false) {
         StartUpContent(
-            state = StartUpContract.State()
+            state = StartUpContract.State(0.5F)
         )
     }
 }
@@ -143,7 +152,7 @@ fun StartUpScreenPreviewLight() {
 fun StartUpScreenPreviewDark() {
     ExodusTheme(darkTheme = true) {
         StartUpContent(
-            state = StartUpContract.State()
+            state = StartUpContract.State(0.5F)
         )
     }
 }

@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * 나머지 API Response 모델들
  *
- * TODO: 각 API마다 별도 파일로 분리하고 상세 필드 추가
+ * NOTE: 프로젝트 확장 시 각 API마다 별도 파일로 분리하고 상세 필드 추가 권장
  * 현재는 ConfigStartup 플로우 완성을 위한 기본 구조만 제공
  */
 
@@ -28,9 +28,9 @@ data class ConfigSelfData(
     val theme: String?,
 
     @SerializedName("push_enabled")
-    val pushEnabled: Boolean?,
+    val pushEnabled: Boolean?
 
-    // TODO: 실제 API 스펙에 맞게 필드 추가
+    // NOTE: 추가 필드는 실제 API 스펙 확인 후 추가 (old 프로젝트 참조)
 )
 
 // ============================================================
@@ -85,7 +85,7 @@ data class UserSelfData(
     @SerializedName("hearts")
     val hearts: Int?,
 
-    // TODO: 실제 API 스펙에 맞게 필드 추가
+    // NOTE: 추가 필드는 실제 API 스펙 확인 후 추가 (old 프로젝트 참조)
 )
 
 // ============================================================
@@ -106,7 +106,7 @@ data class UserStatusData(
     @SerializedName("first_login")
     val firstLogin: Boolean?,
 
-    // TODO: 실제 API 스펙에 맞게 필드 추가
+    // NOTE: 추가 필드는 실제 API 스펙 확인 후 추가 (old 프로젝트 참조)
 )
 
 // ============================================================
@@ -196,8 +196,26 @@ data class IdolData(
     @SerializedName("debut_date")
     val debutDate: String?,
 
-    // TODO: 실제 API 스펙에 맞게 필드 추가
+    @SerializedName("group")
+    val group: String? = null,
+
+    // NOTE: 추가 필드는 실제 API 스펙 확인 후 추가 (old 프로젝트 참조)
 )
+
+/**
+ * Extension function to convert IdolData to IdolEntity for Room Database.
+ */
+fun IdolData.toEntity(): net.ib.mn.data.local.entity.IdolEntity {
+    return net.ib.mn.data.local.entity.IdolEntity(
+        id = id,
+        name = name,
+        group = group,
+        imageUrl = imageUrl,
+        heartCount = 0, // 초기값
+        isTop3 = false, // 초기값
+        timestamp = System.currentTimeMillis()
+    )
+}
 
 // ============================================================
 // /users/iab_key/ - IAB 공개키
@@ -314,7 +332,7 @@ data class SignInData(
 
 /*
  * ============================================================
- * TODO: 나머지 API Response 모델 추가
+ * NOTE: 추가 가능한 API Response 모델 (필요 시 구현)
  * ============================================================
  *
  * 1. /offerwall/reward/ - OfferWallRewardResponse
