@@ -104,7 +104,7 @@ private fun StartUpContent(
             Image(
                 painter = painterResource(id = R.drawable.startup_logo),
                 contentDescription = "Startup Logo",
-                modifier = Modifier.width(150.dp),
+                modifier = Modifier.width(130.dp).height(110.dp),
                 contentScale = ContentScale.FillWidth
             )
 

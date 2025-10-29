@@ -116,7 +116,7 @@ private fun LoginContent(
 
             // Main Image
             Image(
-                painter = painterResource(id = R.drawable.img_login_main),
+                painter = painterResource(id = R.drawable.startup_logo),
                 contentDescription = "Login Main Image",
                 modifier = Modifier
                     .width(178.dp)
@@ -131,9 +131,8 @@ private fun LoginContent(
                 painter = painterResource(id = R.drawable.img_login_logo),
                 contentDescription = "App Logo",
                 modifier = Modifier
-                    .fillMaxWidth(0.6f)
                     .height(30.dp),
-                contentScale = ContentScale.FillBounds
+                contentScale = ContentScale.FillHeight
             )
 
             Spacer(modifier = Modifier.height(75.dp))
