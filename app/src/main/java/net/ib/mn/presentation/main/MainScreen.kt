@@ -1,5 +1,6 @@
 package net.ib.mn.presentation.main
 
+import android.app.Activity
 import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -14,10 +15,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import net.ib.mn.ui.components.AppScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -33,27 +34,25 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import net.ib.mn.R
-import net.ib.mn.ui.theme.Idol_androidTheme
+import net.ib.mn.ui.theme.ExodusTheme
 
 /**
  * 메인 화면.
  * 하단 네비게이션 바를 포함한 메인 컨테이너.
- * Scaffold를 사용하여 Material Design 가이드라인을 따릅니다.
+ * AppScaffold를 사용하여 Safe Area 안에서 작동합니다.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
     var selectedTab by remember { mutableIntStateOf(0) }
 
-    Scaffold(
-        containerColor = colorResource(id = R.color.text_white_black),
-        modifier = Modifier.fillMaxSize(),
+    AppScaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Idol App") },
-                colors = TopAppBarDefaults.topAppBarColors()
             )
         },
         bottomBar = {
@@ -103,7 +102,7 @@ private val bottomNavItems = listOf(
 )
 @Composable
 fun MainScreenPreviewLight() {
-    Idol_androidTheme(darkTheme = false) {
+    ExodusTheme(darkTheme = false) {
         MainScreen()
     }
 }
@@ -116,7 +115,7 @@ fun MainScreenPreviewLight() {
 )
 @Composable
 fun MainScreenPreviewDark() {
-    Idol_androidTheme(darkTheme = true) {
+    ExodusTheme(darkTheme = true) {
         MainScreen()
     }
 }

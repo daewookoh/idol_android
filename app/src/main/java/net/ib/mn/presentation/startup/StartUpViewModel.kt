@@ -89,6 +89,7 @@ class StartUpViewModel @Inject constructor(
                     android.util.Log.w(TAG, "⚠️  No saved token - user not logged in (guest mode)")
                     // Guest mode - Navigate to Login screen
                     setState { copy(isLoading = false, progress = 0f, currentStep = "Login required") }
+                    setEffect { StartUpContract.Effect.NavigateToMain }
 //                    setEffect { StartUpContract.Effect.NavigateToLogin }
                     return@launch
                 }

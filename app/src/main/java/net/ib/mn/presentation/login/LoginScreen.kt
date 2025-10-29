@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
-import net.ib.mn.ui.theme.Idol_androidTheme
+import net.ib.mn.ui.theme.ExodusTheme
 
 /**
  * Login 화면 (old 프로젝트의 SigninFragment).
@@ -266,7 +266,7 @@ private fun SocialLoginButton(
 )
 @Composable
 fun LoginScreenPreviewLight() {
-    Idol_androidTheme(darkTheme = false) {
+    ExodusTheme(darkTheme = false) {
         LoginContent(
             state = LoginContract.State(),
             onIntent = {}
@@ -282,7 +282,7 @@ fun LoginScreenPreviewLight() {
 )
 @Composable
 fun LoginScreenPreviewDark() {
-    Idol_androidTheme(darkTheme = true) {
+    ExodusTheme(darkTheme = true) {
         LoginContent(
             state = LoginContract.State(),
             onIntent = {}

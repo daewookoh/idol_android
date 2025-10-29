@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import net.ib.mn.navigation.NavGraph
-import net.ib.mn.ui.theme.Idol_androidTheme
+import net.ib.mn.ui.theme.ExodusTheme
 import net.ib.mn.util.SetupSystemBars
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,19 +21,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Splash Screen API 사용
         val splashScreen = installSplashScreen()
 
         super.onCreate(savedInstanceState)
 
-        // ActionBar를 코드 레벨에서 명시적으로 숨김
-        supportActionBar?.hide()
-
-        enableEdgeToEdge()
-
         setContent {
-            Idol_androidTheme {
-                // 전체 앱에서 theme에 따라 status bar 아이콘 색상 자동 변경
+            ExodusTheme {
                 SetupSystemBars(
                     statusBarColor = androidx.compose.ui.graphics.Color.Transparent,
                     navigationBarColor = androidx.compose.ui.graphics.Color.Transparent
@@ -43,29 +36,5 @@ class MainActivity : AppCompatActivity() {
                 NavGraph(navController = navController)
             }
         }
-    }
-
-    /**
-     * ActionBar를 표시해야 하는 경우 사용.
-     * 예: showActionBar()
-     */
-    fun showActionBar() {
-        supportActionBar?.show()
-    }
-
-    /**
-     * ActionBar를 숨기는 경우 사용.
-     * 예: hideActionBar()
-     */
-    fun hideActionBar() {
-        supportActionBar?.hide()
-    }
-
-    /**
-     * ActionBar 타이틀 설정.
-     * 예: setActionBarTitle("제목")
-     */
-    fun setActionBarTitle(title: String) {
-        supportActionBar?.title = title
     }
 }

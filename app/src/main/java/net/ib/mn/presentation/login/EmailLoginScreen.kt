@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
-import net.ib.mn.ui.theme.Idol_androidTheme
+import net.ib.mn.ui.theme.ExodusTheme
 
 /**
  * Email 로그인 화면 (old 프로젝트의 EmailSigninFragment).
@@ -438,7 +438,7 @@ private fun OutlinedPressableButton(
 )
 @Composable
 fun EmailLoginScreenPreviewLight() {
-    Idol_androidTheme(darkTheme = false) {
+    ExodusTheme(darkTheme = false) {
         EmailLoginContent(
             state = EmailLoginContract.State(),
             onIntent = {}
@@ -454,7 +454,7 @@ fun EmailLoginScreenPreviewLight() {
 )
 @Composable
 fun EmailLoginScreenPreviewDark() {
-    Idol_androidTheme(darkTheme = true) {
+    ExodusTheme(darkTheme = true) {
         EmailLoginContent(
             state = EmailLoginContract.State(),
             onIntent = {}

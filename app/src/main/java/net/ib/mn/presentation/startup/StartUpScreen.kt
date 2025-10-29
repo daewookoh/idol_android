@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.ib.mn.R
-import net.ib.mn.ui.theme.Idol_androidTheme
+import net.ib.mn.ui.theme.ExodusTheme
 import kotlinx.coroutines.flow.collectLatest
 
 /**
@@ -126,7 +126,7 @@ private fun StartUpContent(
 )
 @Composable
 fun StartUpScreenPreviewLight() {
-    Idol_androidTheme(darkTheme = false) {
+    ExodusTheme(darkTheme = false) {
         StartUpContent(
             state = StartUpContract.State()
         )
@@ -141,7 +141,7 @@ fun StartUpScreenPreviewLight() {
 )
 @Composable
 fun StartUpScreenPreviewDark() {
-    Idol_androidTheme(darkTheme = true) {
+    ExodusTheme(darkTheme = true) {
         StartUpContent(
             state = StartUpContract.State()
         )
