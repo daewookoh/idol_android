@@ -5,7 +5,6 @@
     <!-- 마시멜로 버전(23) 이상 부터  로고 png background 적용 가능   -->
     <style name="Theme.Annie.SplashTheme"  parent="@style/Theme.Annie.NoActionBar">
         <item name="android:statusBarColor">@color/text_white_black</item>
-        <item name="android:windowBackground" >@drawable/renew_intro_logo</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
