@@ -39,7 +39,7 @@ import kotlinx.coroutines.flow.collectLatest
  *
  * UI 구성:
  * - 배경: @color/text_white_black (라이트: #ffffff, 다크: #121212)
- * - 로고 이미지: startup_logo.png, width=400dp, 비율 유지
+ * - 로고 이미지: startup_logo.xml (variant별 다른 XML drawable), width=150dp, 비율 유지
  * - 프로그레스바: 하단 중앙, width=160dp, marginBottom=60dp
  *   - color: @color/main (라이트: #ff4444, 다크: #E24848)
  *   - trackColor: @color/gray150 (라이트: #dddddd, 다크: #404040)
@@ -91,7 +91,7 @@ private fun StartUpContent(
                 .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
-            // 스타트업 로고
+            // 스타트업 로고 (variant별로 다른 XML drawable 사용)
             Image(
                 painter = painterResource(id = R.drawable.startup_logo),
                 contentDescription = "Startup Logo",
