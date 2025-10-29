@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="ExodusImageView">
+        <attr name="fixedAlong" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="com.mapps.android.view.AdView">
+        <attr name="locationType" format="integer" />
+        <attr name="backgroundStretch" format="integer" />
+        <attr name="publisherCode" format ="string" />
+        <attr name="mediaCode" format ="string" />
+        <attr name="sectionCode" format ="string" />
+    </declare-styleable>
+    <declare-styleable name="com.mapps.android.view.EndingAdView">
+        <attr name="pCode" format ="string" />
+        <attr name="mCode" format ="string" />
+        <attr name="sCode" format ="string" />
+    </declare-styleable>
+    <declare-styleable name="InvertedTextProgressbar">
+        <attr name="text" format="string"/>
+        <attr name="text_color" format="color"/>
+        <attr name="text_inverted_color" format="color"/>
+        <attr name="text_size" format="dimension"/>
+        <attr name="text_typeface" format="integer"/>
+        <attr name="max_progress" format="integer"/>
+        <attr name="min_progress" format="integer"/>
+    </declare-styleable>
+
+    <declare-styleable name="RecomposeNameAndGroup">
+        <attr name="recompose" format="boolean"/>
+    </declare-styleable>
+</resources>

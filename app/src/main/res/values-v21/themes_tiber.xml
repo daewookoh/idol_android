@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="_Tiber" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="android:editTextBackground">@drawable/tiber_edit_text_holo_light</item>
+        <item name="android:buttonStyle">@style/Buttontiber</item>
+        <item name="android:statusBarColor">#000000</item>
+        <item name="android:textViewStyle">@style/TextView</item>
+        <item name="android:editTextStyle">@style/EditText</item>
+    </style>
+</resources>

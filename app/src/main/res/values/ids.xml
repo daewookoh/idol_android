@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="tag_holder" type="id"/>
+    <item name="tag_default_res" type="id"/>
+    <item name="TAG_LOAD_LARGE_IMAGE" type="id"/>
+    <item name="TAG_THUMBNAIL_URL" type="id"/>
+    <item name="TAG_IS_UMJJAL" type="id"/>
+    <item name="tv_answer" type="id"/>
+</resources>

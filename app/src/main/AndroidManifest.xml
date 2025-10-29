@@ -25,6 +25,90 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Custom scheme for deep linking -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="${devscheme}" />
+            </intent-filter>
+
+            <!-- Share text intent -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
+            <!-- Share image intent -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="image/*" />
+            </intent-filter>
+
+            <!-- HTTP/HTTPS deep links with auto verify -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:scheme="http" />
+                <data android:host="${host_wildcard}" />
+
+                <!-- Various app deep link paths -->
+                <data android:pathPrefix="/webview/invite_share" />
+                <data android:pathPrefix="/community" />
+                <data android:pathPrefix="/idol" />
+                <data android:pathPrefix="/coupon" />
+                <data android:pathPrefix="/articles" />
+                <data android:pathPrefix="/supports" />
+                <data android:pathPrefix="/themepick" />
+                <data android:pathPrefix="/live" />
+                <data android:pathPrefix="/onepick" />
+                <data android:pathPrefix="/heartpick" />
+                <data android:pathPrefix="/quizzes" />
+                <data android:pathPrefix="/store" />
+                <data android:pathPrefix="/offerwall" />
+                <data android:pathPrefix="/qna" />
+                <data android:pathPrefix="/board" />
+                <data android:pathPrefix="/records" />
+                <data android:pathPrefix="/facedetect" />
+                <data android:pathPrefix="/notices" />
+                <data android:pathPrefix="/events" />
+                <data android:pathPrefix="/menu" />
+                <data android:pathPrefix="/awards" />
+                <data android:pathPrefix="/hottrends" />
+                <data android:pathPrefix="/bannergram" />
+                <data android:pathPrefix="/attendance" />
+                <data android:pathPrefix="/friends" />
+                <data android:pathPrefix="/schedules" />
+                <data android:pathPrefix="/miracle" />
+                <data android:pathPrefix="/feed" />
+                <data android:pathPrefix="/myinfo" />
+                <data android:pathPrefix="/rookie" />
+                <data android:pathPrefix="/invite" />
+                <data android:pathPrefix="/auth" />
+            </intent-filter>
+
+            <!-- App custom scheme -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="${scheme}" />
+            </intent-filter>
         </activity>
     </application>
 

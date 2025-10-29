@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>]
+
+    <!-- 다크 모드 버전    -->
+    <!-- 17~ 19 버전 인트로 로고 먼저 띄우기 적용 안됨
+       manifest에서 heme.Annie.SplashTheme 적용되어 있으므  17~19는 해 style 오버라이드해서 다르게 적용 -->
+    <style name="Theme.Annie.SplashTheme" parent="@style/Theme.Annie.NoActionBar">
+        <item name="android:windowBackground" >@drawable/renew_intro_logo_full</item>
+    </style>
+</resources>

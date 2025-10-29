@@ -1,0 +1,1859 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="heart_store">ハートショップ</string>
+    <string name="normal_heart_shop">ハートコーナー</string>
+    <string name="regular_heart_shop">定期購入コーナー</string>
+    <string name="bonus">ボーナス</string>
+    <string name="no_iap_products">現在購入できる商品がありません</string>
+    <string name="votes">票</string>
+    <string name="postfix_rank">位</string>
+    <string name="app_name">最愛ドル</string>
+    <string name="app_name_onestore">最愛ドル</string>
+    <string name="app_name_china">CHOEAEDOL</string>
+    <string name="actor_app_name">最愛ドルスター</string>
+    <string name="app_name_upper">最愛ドル</string>
+    <string name="app_name_onestore_upper">最愛ドル</string>
+    <string name="app_name_china_upper">CHOEAEDOL</string>
+    <string name="actor_app_name_upper">最愛ドルスター</string>
+    <string name="ios_permission_camera">【フォルダのアクセス権限】\nプロフィールの画像を設定したり、画像をアップロードまたは保存したりするために必要です。</string>
+    <string name="ios_permission_photo">【フォルダのアクセス権限】\nプロフィールの画像を設定したり、画像をアップロードまたは保存したりするために必要です。</string>
+    <string name="ios_permission_photo_add">【フォルダのアクセス権限】\nプロフィールの画像を設定したり、画像をアップロードまたは保存したりするために必要です。</string>
+    <string name="X_DAILY_ALL">X デイリー ALL</string>
+    <string name="photo_picker">写真をアップロード</string>
+    <string name="Camera">写真を撮影する</string>
+    <string name="photo_library">アルバムから選択</string>
+    <string name="push_notification">プッシュ通知</string>
+    <string name="push_on">オン</string>
+    <string name="push_off">オフ</string>
+    <string name="image_save_error">ダウンロードが正常に行われませんでした。デバイスまたはデバイスの容量の設定&gt;最愛ドル&gt;写真の権限を確認してからもう一度試してください。</string>
+    <string name="actor_image_save_error">ダウンロードが正常に行われませんでした。デバイスの容量またはデバイスの設定>最愛ドルスター>写真の権限を確認してからもう一度試してください。</string>
+    <string name="delete_comment">このコメントを削除しますか？</string>
+    <string name="received_heart_history">もらったハート</string>
+    <string name="login_line">LINEアカウントでログイン</string>
+    <string name="line_not_installed">LINEがインストールされていません。</string>
+    <string name="line_login_failed">ログイン失敗</string>
+    <string name="loading">ロード中…</string>
+    <string name="opensource_license">オープンソースライセンス</string>
+    <string name="kakaotalk_not_installed">カカオトークがインストールされていません。</string>
+    <string name="help_safari">Safariで最愛ドルの利用方法を見ますか？</string>
+    <string name="actor_help_safari">Safariで最愛ドルスターの利用方法を視聴されますか？</string>
+    <string name="processing_iap_receipt">ハート支給処理中…</string>
+    <string name="processing_iap_receipt_failed">ネットワークエラーによりハートが支給されませんでした。「再試行」ボタンを押してください。</string>
+    <string name="retry">再試行</string>
+    <string name="iap_cancelled">支払いがキャンセルされました。</string>
+    <string name="title_appstore_review">最愛ドルのレビューを書く</string>
+    <string name="actor_title_appstore_review">最愛ドルスターのレビューを書く</string>
+    <string name="no_my_articles">作成した投稿はありません。</string>
+    <string name="no_my_comments">投稿したコメントはありません。</string>
+    <string name="hint_email">メールアドレス</string>
+    <string name="hint_passwd">パスワード</string>
+    <string name="hint_passwd_confirm">パスワード確認</string>
+    <string name="hint_name">ニックネーム</string>
+    <string name="hint_recommender">推薦人（ニックネーム）</string>
+    <string name="hint_recommender_1">招待コード8桁を入力してください。（任意）</string>
+    <string name="hint_search_idol">アイドル名を入力してください。</string>
+    <string name="actor_hint_search_idol">スターの名前を入力してください。</string>
+    <string name="text_forgot_id"><i>IDをお忘れですか？</i></string>
+    <string name="text_forgot_passwd"><i>パスワードをお忘れですか？</i></string>
+    <string name="my_heart">私のハート</string>
+    <string name="confirm">OK</string>
+    <string name="failed_to_load">情報の取得に失敗しました。</string>
+    <string name="title_tab_solo">個人ランキング</string>
+    <string name="title_tab_group">グループランキング</string>
+    <string name="actor_title_tab_actors">男性俳優ランキング</string>
+    <string name="actor_title_tab_actresses">女性俳優ランキング</string>
+    <string name="title_tab_favorite">推し</string>
+    <string name="actor_title_tab_favorite">私のスター</string>
+    <string name="title_tab_hall">殿堂入り</string>
+    <string name="title_tab_menu">メニュー</string>
+    <string name="title_agreement">利用規約</string>
+    <string name="title_forgot_passwd">パスワードを忘れた場合</string>
+    <string name="title_favorite_setting">推し設定</string>
+    <string name="actor_title_favorite_setting">私のスター設定</string>
+    <string name="title_setting">設定</string>
+    <string name="title_coinplus">coinsplayerアカウントでログイン</string>
+    <string name="title_write">作成する</string>
+    <string name="title_profile">プロフィール</string>
+    <string name="title_info_more">追加情報記入</string>
+    <string name="title_share">シェア</string>
+    <string name="title_review">Googleに最愛ドルのレビューを書く</string>
+    <string name="actor_title_review">Googleに最愛ドルスターのレビューを書く</string>
+    <string name="title_show_option">公開範囲設定</string>
+    <string name="title_signup">会員登録</string>
+    <string name="title_level_heart">累計ランキングとは？</string>
+    <string name="actor_title_level_heart">累計ランキングとは？</string>
+    <string name="heart_count_format" formatted="false">%s個</string>
+    <string name="vote_count_format" formatted="false">%s票</string>
+    <string name="rank_count_format" formatted="false">%s位</string>
+    <string name="need_agree1">利用規約に同意してください。</string>
+    <string name="need_agree2">プライバシーポリシーに同意してください。</string>
+    <string name="required_field">必須項目です。</string>
+    <string name="invalid_format_email">メールアドレスを入力してください。</string>
+    <string name="too_short_passwd">パスワードが短すぎます。</string>
+    <string name="passwd_confirm_not_match">パスワードと確認用パスワードが一致しません。</string>
+    <string name="title_vote_heart">ハートで投票する</string>
+    <string name="favorite">お気に入り</string>
+    <string name="agreement1">サービス利用規約</string>
+    <string name="agreement2">個人情報処理方針</string>
+    <string name="agreement1_agree">サービス利用規約に同意します。</string>
+    <string name="agreement2_agree">プライバシーポリシーに同意します。</string>
+    <string name="signup_desc1">メールアドレスはパスワードを忘れた場合に利用されるので正確に入力してください。</string>
+    <string name="signup_desc2" formatted="false">推薦人の招待コードを入力すると最大%d ハートがもらえて、友達とハートを送り合えます。</string>
+    <string name="heart_history_desc">もらったハートは毎日夜12時のハート初期化の際に一緒に初期化されます。</string>
+    <string name="same_nickname">使用中のニックネームと同じです。</string>
+    <string name="wait_signup">会員登録中…</string>
+    <string name="wait_signin">ログイン中…</string>
+    <string name="desc_failed_to_connect_internet">ネットワーク接続が不安定です。後で再試行してください。</string>
+    <string name="wait_userinfo">ユーザー情報ロード中…</string>
+    <string name="btn_next">次へ</string>
+    <string name="btn_signin">ログイン</string>
+    <string name="btn_signup">会員登録</string>
+    <string name="btn_signup_finish">登録する</string>
+    <string name="btn_signup_finish_1">登録完了</string>
+    <string name="my_action">あなたの活動</string>
+    <string name="my_vote">あなたの投票数</string>
+    <string name="menu_menu00">イベント</string>
+    <string name="menu_menu01">推し設定</string>
+    <string name="actor_menu_menu01">私のスター設定</string>
+    <string name="menu_menu02">ハートをチャージ</string>
+    <string name="menu_menu03"></string>
+    <string name="menu_menu04">最愛ドルの利用方法</string>
+    <string name="menu_menu05">設定</string>
+    <string name="setting_menu01">お知らせ</string>
+    <string name="setting_menu02">質問する</string>
+    <string name="setting_menu03"></string>
+    <string name="setting_menu04">お知らせ</string>
+    <string name="setting_menu05">パスワード変更</string>
+    <string name="setting_menu06">退会する</string>
+    <string name="setting_menu07">アプリバージョン</string>
+    <string name="setting_menu_heart_box_event">ハートボックスイベント設定</string>
+    <string name="most_favorite">推し</string>
+    <string name="actor_most_favorite">私のスター</string>
+    <string name="empty_most">推しがいません。</string>
+    <string name="actor_empty_most">私のスターがいません。</string>
+    <string name="empty_vote">投票数（最近30）：0個</string>
+    <string name="favorite_format" formatted="false">推し : %s</string>
+    <string name="actor_favorite_format" formatted="false">私のスター : %s</string>
+    <string name="desc_empty_favorite1">まだ推しがいません！</string>
+    <string name="actor_desc_empty_favorite1">まだ私のスターがいません！</string>
+    <string name="desc_empty_favorite2">今すぐ自分の推しを設定してください！</string>
+    <string name="actor_desc_empty_favorite2">今すぐ私のスターを設定してください！</string>
+    <string name="desc_empty_favorite3">推しを設定する</string>
+    <string name="actor_desc_empty_favorite3">私のスターを設定する</string>
+    <string name="hint_coinplus_email"></string>
+    <string name="coinplus_download"></string>
+    <string name="order_by_time">最新順</string>
+    <string name="order_by_heart">ハート順</string>
+    <string name="no_reporter">問題を通告した人がいません。</string>
+    <string name="nofriend1">まだ友達がいません。</string>
+    <string name="nofriend2">友達を招待してハート送り、もらいましょう！</string>
+    <string name="invite_friend_kakao">友達を招待する&gt;</string>
+    <string name="write_content">内容を入力してください。</string>
+    <string name="btn_write">投稿する</string>
+    <string name="upload_success">登録されました。</string>
+    <string name="not_enough_heart">ハートが足りません。</string>
+    <string name="sent_heart_friend__format" formatted="false">%sさんにハートを送りました。</string>
+    <string name="sent_heart_all_friend__format" formatted="false">%d人にハートを送りました。</string>
+    <string name="already_sent_heart__format">すでに%1$sさんにハートを送りました。（%2$s秒後に再送信可能）</string>
+    <string name="sending_heart">ハートを送っています。</string>
+    <string name="heart_history_format">%1$sさんからハートをもらいました。（%2$s）</string>
+    <string name="sent_find_pw_mail">パスワード案内メールが送信されました。</string>
+    <string name="title_report">通告する</string>
+    <string name="report_desc">この投稿を通告しますか？</string>
+    <string name="btn_cancel">キャンセル</string>
+    <string name="empty_comment">コメントがありません。</string>
+    <string name="hint_comment">コメントを入力してください。</string>
+    <string name="title_comment">コメントする</string>
+    <string name="title_friends">友達管理</string>
+    <string name="title_unfriend">友達削除</string>
+    <string name="applied">パスワードが変更されました。</string>
+    <string name="empty_event">イベントがありません</string>
+    <string name="empty_notice">お知らせがありません。</string>
+    <string name="empty_inquiry">質問がありません。</string>
+    <string name="title_event">イベント</string>
+    <string name="title_notice">お知らせ</string>
+    <string name="title_change_passwd">パスワード変更</string>
+    <string name="title_faq">よくあるご質問（FAQ）</string>
+    <string name="title_inquiry">FAQ/質問する</string>
+    <string name="title_myinquirylist">自分の質問内容</string>
+    <string name="title_voting_guide">あなたの投票数</string>
+    <string name="hint_inquiry">ご質問内容を入力してください。</string>
+    <string name="title_rename">ニックネーム変更</string>
+    <string name="hint_nickname">ニックネーム</string>
+    <string name="rename_desc">変更するニックネームを\n入力してください。</string>
+    <string name="rename_confirm_desc">ニックネームを変更するとハート100個消耗します。\nニックネームを変更しますか？</string>
+    <string name="registered">登録されました。</string>
+    <string name="inquiry_time_format">%1$sのご質問内容です。</string>
+    <string name="no_search_result">検索結果がありません。</string>
+    <string name="wait_upload_article">投稿中…</string>
+    <string name="remove_desc">この投稿を削除しますか？</string>
+    <string name="title_remove">削除する</string>
+    <string name="button_close">閉じる</string>
+    <string name="title_heart_voting_ranking">投票 Top100</string>
+    <string name="button_kakao">カカオトークのアカウントでログインする</string>
+    <string name="hint_passwd_current">現在のパスワード</string>
+    <string name="hint_new_passwd">新しいパスワード</string>
+    <string name="hint_new_passwd_confirm">新しいパスワードを確認</string>
+    <string name="passwd_not_match">現在のパスワードが一致しません。</string>
+    <string name="weak_heart">デイリーハート</string>
+    <string name="weak_heart_desc">デイリーハートとは毎日夜12時に初期化されるハートで、毎日もらえる出席ハートと友達とやり取りするハートがあります。</string>
+    <string name="btn_free_heart">ハート無料\nチャージ</string>
+    <string name="title_myheart">私のハート</string>
+    <string name="title_heartchage">ハートをチャージする</string>
+    <string name="wait_kakao_signin">カカオトークの情報を取得中…</string>
+    <string name="your_id_is1">あなたのIDは</string>
+    <string name="your_id_is2">です。</string>
+    <string name="failed_to_find_id">IDが見つかりません。</string>
+    <string name="title_find_id">ID検索結果</string>
+    <string name="failed_to_report">問題通告できません。</string>
+    <string name="failed_to_report_2202">問題通告は一日3回までです。</string>
+    <string name="failed_to_report_2203">3分後に再び問題通告できます。</string>
+    <string name="failed_to_report__not_my_most">コミュニティのメンバーでなければ問題通告できません。</string>
+    <string name="actor_failed_to_report__not_my_most">コミュニティのメンバーでなければ問題通告できません。</string>
+    <string name="failed_to_report__already_reported">すでに通告した投稿です。通告はコンテンツごと1回に制限されています。</string>
+    <string name="no_writes">投稿・コメントはまだありません。</string>
+    <string name="signup_lock">同じ端末から10分は再登録できません。\n10分後に再登録してください。</string>
+    <string name="lable_invite_name">推薦人：</string>
+    <string name="lable_do_not_read">再度表示しない</string>
+    <string name="lable_kakao_more_1">※あなたが希望するニックネームに変更できます。</string>
+    <string name="lable_kakao_more_2">推薦人を入力するとお互いにハートのやり取りができます。</string>
+    <string name="lable_change_info">会員情報変更</string>
+    <string name="lable_change_info_complete">会員情報変更</string>
+    <string name="lable_individual_aggregated">個人の累計</string>
+    <string name="actor_lable_individual_aggregated">役者の累計</string>
+    <string name="lable_actors_aggregated">俳優の累計</string>
+    <string name="lable_actresses_aggregated">女優の累計</string>
+    <string name="lable_group_aggregated">グループの累計</string>
+    <string name="actor_lable_group_aggregated">演技ドルの累計</string>
+    <string name="label_individual_daily">個人</string>
+    <string name="label_group_daily">グループ</string>
+    <string name="lable_individual">個人</string>
+    <string name="actor_lable_individual">役者</string>
+    <string name="lable_actors">男性俳優</string>
+    <string name="lable_actresses">女性俳優</string>
+    <string name="lable_group">グループ</string>
+    <string name="actor_lable_group">演技ドル</string>
+    <string name="lable_my_articles">マイ投稿</string>
+    <string name="lable_my_comments">マイコメント</string>
+    <string name="lable_heart_vote">ハートの使用内容</string>
+    <string name="lable_heart_save">ハート加算の内容</string>
+    <string name="lable_count_unit">個</string>
+    <string name="lable_final_result">最終結果</string>
+    <string name="lable_review_ok">親切に星5つ</string>
+    <string name="lable_review_no">冷たく無視する</string>
+    <string name="lable_review_info1">あなたの推しに応援メッセージを送ってください。</string>
+    <string name="actor_lable_review_info1">あなたのスターに応援メッセージを送ってください。</string>
+    <string name="lable_review_info2">最愛ドル！星5つもらう価値があるでしょう^^?</string>
+    <string name="actor_lable_review_info2">最愛ドルスター！星5つあげてもいい人！(^^)/</string>
+    <string name="lable_get_info">データを取得中…</string>
+    <string name="lable_buy">購入する</string>
+    <string name="lable_manager_warning">運営陣の権限変更</string>
+    <string name="lable_show_range">公開範囲</string>
+    <string name="lable_show_public">全体を公開</string>
+    <string name="lable_show_private">推しにのみ公開</string>
+    <string name="actor_lable_show_private">私のスターにのみ公開</string>
+    <string name="lable_manager">[運営陣]</string>
+    <string name="lable_save">保存する</string>
+    <string name="lable_surprise_heart">サプライズハート当選</string>
+    <string name="lable_community_heart_vote">投票</string>
+    <string name="lable_community_comment">コメント</string>
+    <string name="lable_community_report">通告する</string>
+    <string name="lable_coin_unit">コイン</string>
+    <string name="lable_coinsplayer_buy"></string>
+    <string name="lable_coinsplayer_password"></string>
+    <string name="lable_coinsplayer_account_register"></string>
+    <string name="lable_day">日</string>
+    <string name="lable_heart_box">ハートボックス</string>
+    <string name="lable_receive_no_heart">はずれ…次の機会に</string>
+    <string name="lable_aggree_heart_box_1_1"></string>
+    <string name="lable_aggree_heart_box_1_2"></string>
+    <string name="lable_aggree_heart_box_1_3"></string>
+    <string name="lable_aggree_heart_box_2"></string>
+    <string name="lable_aggree_heart_box_2_1"></string>
+    <string name="lable_aggree_heart_box_2_2"></string>
+    <string name="lable_aggree_heart_box_3"></string>
+    <string name="lable_aggree_heart_box_4"></string>
+    <string name="lable_agree">同意</string>
+    <string name="lable_no_agree">同意しない</string>
+    <string name="lable_more_info_heart_box_event">ハートボックスイベントの設定は「その他メニュー&gt;設定」でもう一度できます^^</string>
+    <string name="lable_heart_box_ok">ハートボックス当選！</string>
+    <string name="lable_heart_box_ok_1">ハート%1$s個が支給されました。</string>
+    <string name="labe_giftcard_winner">Googleのギフトカード当選者を見る。</string>
+    <string name="msg_heart_received">ハートが支給されました。</string>
+    <string name="msg_unable_use_write">現在投票集計中のため投稿できません。\n[投票集計中\n%1$s <![CDATA[-]]> %2$s]</string>
+    <string name="msg_unable_use_vote">現在投票集計中のため投票できません。\n[投票集計中\n%1$s <![CDATA[-]]> %2$s]</string>
+    <string name="msg_unable_use_send_heart">現在投票集計中のためハートのやり取りはできません。\n[投票集計中\n%1$s <![CDATA[-]]> %2$s]</string>
+    <string name="msg_unable_use_capture_1">共有機能が使用できません。デバイスの状態を確認してください。</string>
+    <string name="msg_unable_use_capture_2">共有機能が正常に処理されませんでした。デバイスの容量を確認してからもう一度試してください。</string>
+    <string name="msg_save_ok">保存されました。</string>
+    <string name="msg_unable_use_download_1">ダウンロード機能が使用できません。デバイスの状態を確認してください。</string>
+    <string name="msg_unable_use_download_2">ダウンロードが正常に行われませんでした。バイス空間と状態を確認してからもう一度試してください。デ</string>
+    <string name="msg_no_heart">もらったハートがありません。</string>
+    <string name="msg_error_ok">申し訳ありません。エラーが発生しました。 \nもう一度試してください。</string>
+    <string name="msg_favorite_guide">お気に入りは推し以外に興味のあるアイドルのコミュニティに直接アクセスできるように提供されているメニューです。\nまた、お気に入りは推し設定で設定が可能で、人数の制限はありません。\n（マイアイドル：ハートアイコン/お気に入り：星形アイコン）</string>
+    <string name="actor_msg_favorite_guide">お気に入りは私のスター以外に興味のあるスターのコミュニティに直接アクセスできるように提供されているメニューです。\nまた、お気に入りは私のスター設定で設定が可能で、人数の制限はありません。\n（私のスター：ハートアイコン/お気に入り：星形アイコン）</string>
+    <string name="msg_go_to_add_heart">ハートが足りません。\nハートを補充しますか？</string>
+    <string name="msg_no_data">作成されたデータがありません。</string>
+    <string name="msg_no_enter_self">本人のニックネームは入力できません。</string>
+    <string name="msg_no_enter_self_1">使用中のニックネームは入力できません。</string>
+    <string name="msg_change_nickname_guide">現在のニックネームが気に入らない会員の方はニックネームの変更ができます。\nレアニックに変更しますか？</string>
+    <string name="msg_drop_out">退会! 本当にするんですかT_T？\n満足を与えることができず本当に申し訳ありません。\n最愛ドルはさらに努力してまいります！\n.退会するとすべての投稿、保有していたハート、あなたのレアニックなどが初期化されます。\n本当にアカウントを削除しますか？</string>
+    <string name="actor_msg_drop_out">本当に退会してしまうんですか？\nお客様の満足にお答えすることができず本当に申し訳ありません。\n最愛ドルスターはさらに努力してまいります！\n.退会するとすべての投稿、保有していたハート、あなたのレアニックなどが初期化されます。\n本当にアカウントを削除しますか？</string>
+    <string name="msg_info_change_complete">会員情報が変更されました。</string>
+    <string name="msg_not_able_vote">投票できません。</string>
+    <string name="msg_favorite_guide_1">推しは一度設定すると2日後以降に変更が可能になります。</string>
+    <string name="actor_msg_favorite_guide_1">私のスターは一度設定すると2日後以降に変更が可能になります。</string>
+    <string name="msg_favorite_guide_2__" formatted="false">%sを推しに登録しますか？</string>
+    <string name="actor_msg_favorite_guide_2__" formatted="false">%sを私のスターに登録しますか？</string>
+    <string name="msg_favorite_guide_2">を推しに登録しますか？</string>
+    <string name="actor_msg_favorite_guide_2">を私のスターに登録しますか？</string>
+    <string name="actor_msg_favorite_guide_2_1"></string>
+    <string name="msg_favorite_guide_3" formatted="false">推しは一度設定すると2日後<BR> 以降に変更が可能になります</BR>お気に入りをキャンセルして%sを推しに登録しますか？</string>
+    <string name="actor_msg_favorite_guide_3" formatted="false">私のスターは一度設定すると2日後 以降に変更が可能になりますお気に入りを解除して%sを私のスターに登録しますか？</string>
+    <string name="msg_favorite_unregi_guide1">登録した推しをキャンセルしますか？</string>
+    <string name="actor_msg_favorite_unregi_guide1">登録した私のスターをキャンセルしますか？</string>
+    <string name="msg_favorite_unregi_guide2">推しの再設定は最後に設定した日から48時間後可能になります。</string>
+    <string name="actor_msg_favorite_unregi_guide2">私のスターの再設定は最後に設定した日から48時間後可能になります。</string>
+    <string name="msg_iab_error">エラーが発生しました。アプリを再起動してもハートが補充されていない場合は設定のお問い合わせからご連絡お願いします。</string>
+    <string name="msg_iab_purchase_error">購入が正しく行われませんでした。支払い状況を確認し、購入手続きが正式に行われていない場合には設定のお問い合わせからご連絡お願いします。</string>
+    <string name="msg_manager_warning">*今、推しの変更およびキャンセルをするとあなたのレベルが運営陣から一般会員にレベルダウンします。</string>
+    <string name="actor_msg_manager_warning">*今、私のスターの変更および解除するとあなたのレベルが運営陣から一般会員にレベルダウンされます。</string>
+    <string name="msg_continue">このまま続けますか？</string>
+    <string name="msg_manager_notice_guide">運営陣のおしらせが設定されました。本投稿はハートの数に関係なく上位に公開されます。</string>
+    <string name="msg_surprise_heart">サプライズハート当選！おめでとうございます。\nサプライズハート +%1$s個が支給されました！</string>
+    <string name="msg_no_history">選択した日の結果データは提供されません。</string>
+    <string name="msg_coinsplayer_ask_password"></string>
+    <string name="msg_heart_box_event_ok">ハートボックスイベントに参加できます。</string>
+    <string name="msg_heart_box_event_fail">ハートボックスイベントに参加できません。</string>
+    <string name="msg_download_ok">「保存する」機能を使用することができます。</string>
+    <string name="msg_download_fail">「保存する」機能は使用できません。</string>
+    <string name="msg_share_ok">「シェア」機能を使用することができます。</string>
+    <string name="msg_share_fail">「シェア」機能は使用できません。</string>
+    <string name="msg_giftcard_guide">Googleギフトカードイベントに\n応募されました。</string>
+    <string name="msg_link_image_guide">リンクと画像は一緒にアップロードできません。</string>
+    <string name="response_v1_articles_ok">投稿が完了しました。</string>
+    <string name="response_v1_articles_ok_heart">投稿が完了しました。\nハート%1$s個が支給されました。</string>
+    <string name="response_users_is_active_time_over">一日の投票制限数を超えると投票できません。</string>
+    <string name="response_v1_articles_give_heart">ハート%1$s個が投票されました。\n[%2$s 現在のハート数 : %3$s + %4$s]</string>
+    <string name="error_nextapps_error1">広告の表示に失敗しました。</string>
+    <string name="error_nextapps_error2">キャンペーンに参加できません。</string>
+    <string name="error_nextapps_error3">終了したキャンペーンです。</string>
+    <string name="error_nextapps_error4">すでに参加したキャンペーンです。</string>
+    <string name="error_nextapps_error5">キャンペーンに参加できません。</string>
+    <string name="error_abnormal">[%1$s]エラーが発生しました。しばらくしてからもう一度試してください。</string>
+    <string name="error_abnormal_default">エラーが発生しました。しばらくしてからもう一度試してください。</string>
+    <string name="error_abnormal_exception">例外が発生しました。しばらくしてから\nもう一度試してください。</string>
+    <string name="error_1001">すでに使われているメールアドレスです。</string>
+    <string name="error_1002">メールアドレスを確認してください</string>
+    <string name="error_1010">ニックネームを入力してください。</string>
+    <string name="error_1011">すでに使われているニックネームです。</string>
+    <string name="error_1012">推薦人を見つけられませんでした。</string>
+    <string name="error_1030">ニックネームが間違っています。</string>
+    <string name="error_1031">パスワードを確認してください。</string>
+    <string name="error_1145">2日間は推しの変更ができません！\nそれまでもう少し考えてくださいね^^!</string>
+    <string name="actor_error_1145">2日間は私のスターの変更ができません！\nそれまでもう少し考えてくださいね^^!</string>
+    <string name="error_1164">すでに削除されたお気に入りです。</string>
+    <string name="error_1200">会員情報に問題があるようです。</string>
+    <string name="error_1201">会員情報に問題があるようです。</string>
+    <string name="error_1912">登録されたcoinsplayerアカウントがありません。メニューからcoinsplayerアカウントの登録をしてください。</string>
+    <string name="error_1991">積立金が足りません。</string>
+    <string name="error_2090">使用できない特殊文字が含まれています</string>
+    <string name="error_2091">不適切な投稿をアップロードしたため、投稿がブロックされました。</string>
+    <string name="error_4010">投票集計中には投票できません。</string>
+    <string name="error_4011">1日投票数の制限を超過したため投票できません。</string>
+    <string name="error_4020">ハートが足りません。</string>
+    <string name="error_8000">あなたの友達リストがいっぱいになりました。\n（友達の数は300人まで）</string>
+    <string name="error_8001">相手の友達リストがいっぱいです。</string>
+    <string name="error_8002">すでに友達申請して\n承認待ち状態です。</string>
+    <string name="error_8003">すでに友達になっています。</string>
+    <string name="error_9997">10分後に送信可能です。</string>
+    <string name="error_9998">友達1人につき送ることができるハートは1日3個までです。</string>
+    <string name="voting_guide_title1">あなたの投票数とは？</string>
+    <string name="voting_guide_title2">レベルの条件</string>
+    <string name="voting_guide_desc1">- 自分の推しに投票した総ハート数です。\n(同じグループ、同じグループのメンバーに投票したハート数も反映)\n- 最後にログインした日から日程期間が過ぎてもログインしない場合、累積投票数とレベルがリセットされます。\n(ログインし、また投票すると累積投票数とレベルは元に戻ります。)\n- アプリにアクセスすると毎日100個のハートが支給され、レベルによるボーナスハートももらえます！</string>
+    <string name="actor_voting_guide_desc1">- 自分の推しにだけ投票した総ハート数です。\n- 最後にログインした日から日程期間が過ぎてもログインしない場合、累積投票数とレベルがリセットされます。\n(ログインし、また投票すると累積投票数とレベルは元に戻ります。)\n- アプリにアクセスすると毎日100個のハートが支給され、レベルによるボーナスハートももらえます！</string>
+    <string name="level_heart_format" formatted="false">投票数：%s</string>
+    <string name="level_heart_guide_title1">累計ランキング1位が寄付天使になります👼</string>
+    <string name="actor_level_heart_guide_title1">累計ランキング1位が寄付天使になります👼</string>
+    <string name="level_heart_guide_title2">ランキング別の点数</string>
+    <string name="level_heart_guide_title3">殿堂入り－累計ランキング</string>
+    <string name="level_heart_guide_title4">留意事項</string>
+    <string name="level_heart_guide_desc1">30日間のデイリー投票ランキングで得られた点数の合算です。上位100位までご覧いただけます。\n各個人・グループの名をタップすると、累積ランキングの変化グラフが表示されます。\n30日間の累計1位となったアイドルとそのファンダムの名義で、有意義な場所に寄付を行います！\n\n✅ 集計方法\n- 個人: 毎月10日を含む過去30日間の累計ランキング1位（毎月11日に発表）\n- グループ: 毎月15日を含む過去30日間の累計ランキング1位（毎月16日に発表）\n- その他のカテゴリー：実施時に別途お知らせします。\n\n✅ 報酬\n- アイドルとファンダムの名義で福祉団体に50万ウォンを寄付。\n- ソウル地下鉄に広告掲出</string>
+    <string name="level_heart_guide_desc3">毎月個人11日、グループ、16日にリーグ変更の基準によってリーグ別にメンバーが決められます。\nリーグが変更された場合、殿堂入りの累計ランキングの点数は0点から始まります。</string>
+    <string name="level_heart_guide_desc4">- 個人・グループのリーグは別々に行われます。(グループがSリーグでも個人はAリーグにいる場合があります。)\n- 同点者が発生した場合、同点者全員リーグの変更ルールに従って変更され、その翌月既存の人数に合わせて再変更されます。\n ex) Aリーグで同点者が3人発生し、3人がSリーグへ移動(Sリーグの定員13人に変更)、その翌月12人になるよう計3人がAリーグへ移動\n- 新しく追加されたアイドルはAリーグでスタートです。\n- 殿堂入り内のリーグ制導入以前のランキング記録は全て「ALL」だと表記します。</string>
+    <string name="title_heart_vote_ranking__format" formatted="false">%s 投票 Top100</string>
+    <string name="empty_heart_vote_ranking">ハート投票に参加した会員がいません。</string>
+    <string name="failed_to_get_vote_ranking">ハート投票の表示に失敗しました。</string>
+    <string name="score_format" formatted="false">%s点</string>
+    <string name="rank_format" formatted="false">%s位</string>
+    <string name="title_agg_history_format" formatted="false">%s 累積ランキングの変化</string>
+    <string name="first_rank">1位</string>
+    <string name="friend_request_sent">友達リクエストが完了しました。\n相手が承認すれば友達になります。</string>
+    <string name="empty_friends">友達がいません。</string>
+    <string name="btn_accept">全体承認</string>
+    <string name="btn_decline">拒否</string>
+    <string name="friend_request_section_title">友達リクエストリスト</string>
+    <string name="friend_section_title">友達リスト</string>
+    <string name="title_friend_delete">友達を削除</string>
+    <string name="friend_delete_msg_format" formatted="false">%sさんを友達リストから削除しますか？</string>
+    <string name="tiele_friend_delete_result">削除されました。</string>
+    <string name="title_accept_friend_request">友達リクエスト承認</string>
+    <string name="desc_accept_friend_request">友達リクエストを\n承認しますか？</string>
+    <string name="desc_accepted_friend_request">友達リクエストを承認しました。\n今からハートのやり取りができます。</string>
+    <string name="title_decline_friend_request">友達リクエストを拒否</string>
+    <string name="desc_decline_friend_request">友達リクエストを\n拒否しますか？</string>
+    <string name="desc_declined_friend_request">友達リクエストを拒否しました。</string>
+    <string name="lable_burning_heart">オタクタイム出席ハート</string>
+    <string name="message_burning_heart">オタクタイム出席完了！\nハート30個が支給されました！</string>
+    <string name="msg_comment_heart">ハート5個が支給されました。\n(1日1回支給)</string>
+    <string name="error_1013">10分以内に2回以上登録することはできません。</string>
+    <string name="friend_request_format">友達からリクエストが届きました。</string>
+    <string name="loading_profile">プロフィールをロード中…</string>
+    <string name="title_no_free_heart">デイリーハート消耗</string>
+    <string name="desc_no_free_heart">デイリーハートが0個ですㅜㅜ\nハートをゲットしに行きますか？</string>
+    <string name="title_no_heart">ハート不足</string>
+    <string name="desc_no_heart">ハートが足りませんㅜㅜ\nハートをゲットしに行きますか？</string>
+    <string name="btn_video_ad">ビデオ広告（ハート5＋5個）</string>
+    <string name="btn_free_heart_charge">無料チャージ</string>
+    <string name="btn_invite_friends">携帯メールで友達を招待する</string>
+    <string name="btn_invite_friends_reward">招待すると1,000ハート</string>
+    <string name="btn_invite_friends_reward_burning">招待すると1,000ハート</string>
+    <string name="btn_invite_friends_kakao">友達を招待する</string>
+    <string name="btn_invite_friends_kakao_reward">登録すると%1$sハート</string>
+    <string name="btn_invite_friends_kakao_reward_burning">登録すると1,000ハート</string>
+    <string name="btn_confirm">OK</string>
+    <string name="failed_to_load_page">ページを読み込むことができません。</string>
+    <string name="btn_retry">再試行</string>
+    <string name="error_1000_heart_give">ハートは1日に1,000個まで送ることができます。</string>
+    <string name="title_heart_earn">ハートを集める方法</string>
+    <string name="desc_bookmark">まだお気に入りのアイドルがいません！</string>
+    <string name="actor_desc_bookmark">まだお気に入りに私のスターがいません！</string>
+    <string name="desc_bookmark2">よく検索するアイドルをお気に入りに追加してください！</string>
+    <string name="actor_desc_bookmark2">よく検索するスターをお気に入りに追加してください！</string>
+    <string name="desc_bookmark3">お気に入りに追加</string>
+    <string name="title_rank_history">ランキングの推移</string>
+    <string name="title_reward_video">ビデオ広告</string>
+    <string name="desc_reward_video" formatted="false">%s ハート</string>
+    <string name="title_reward_invite">友達を招待する</string>
+    <string name="desc_reward_invite">非消滅1,000</string>
+    <string name="desc_reward_invite_burning">非消滅1,000</string>
+    <string name="title_reward_charge">ハート無料チャージ</string>
+    <string name="desc_reward_charge">エバー</string>
+    <string name="title_heart_send">ハートを送る</string>
+    <string name="video_ad_success">ハートの加算が完了しました。</string>
+    <string name="video_ad_cancelled">広告の再生が終了していません。</string>
+    <string name="video_ad_failed">ネットワークが不安定で再生に失敗しました。</string>
+    <string name="video_ad_unable">広告会社からこれ以上配信可能な広告がありません。\nしばらく時間をおいてから、もう一度お試しください。</string>
+    <string name="comment_push_format" formatted="false">「%s」さんからコメントが投稿されました。</string>
+    <string name="btn_invite_friend">友達を招待</string>
+    <string name="desc_login">ログインが必要な機能です。<br/>ログインしますか？</string>
+    <string name="ever_heart">エバーハート</string>
+    <string name="send_heart_desc">友達にはエバーハートのみ送ることができます ^^</string>
+    <string name="send_heart_confirm_desc_format">ハート%1$s個が %2$sさんに送られます。</string>
+    <string name="lake_strong_heart">エバーハートが足りません。</string>
+    <string name="order_by_date">日付順</string>
+    <string name="order_by_vote">得票順</string>
+    <string name="heart_receive_message" formatted="false">%sさんがハートを送りました。</string>
+    <string name="heart_receive_message_with_num">%1$sさんがハート%2$s個を送りました。</string>
+    <string name="request_phone_state_permission">より多く無料チャージするところの広告リストを見るためには次の権限の設定(2つ)を必ず許可してください。</string>
+    <string name="deny_phone_state_permission">再設定を希望する場合は「システム設定&gt;アプリケーション&gt;最愛ドル&gt;権限」で電話の項目及び連絡先の項目をonに設定してください。</string>
+    <string name="actor_deny_phone_state_permission">再設定を希望する場合は「システム設定>アプリケーション>最愛ドルスター>権限」で電話の項目をonに設定してください。</string>
+    <string name="level">レベル</string>
+    <string name="level_requirement">投票数</string>
+    <string name="level_benefit">アクセス＋レベル</string>
+    <string name="level_requirement_format">%1$d投票</string>
+    <string name="level_benefit_format">&#10084; %1$s</string>
+    <string name="kakao_invite_new">現在%1$sランキング%2$d位！</string>
+    <string name="drawer_open">メニューを開く</string>
+    <string name="drawer_close">メニューを閉じる</string>
+    <string name="title_item_shop">アイテムショップ</string>
+    <string name="title_item_buy">アイテム購入</string>
+    <string name="register">登録</string>
+    <string name="send">送る</string>
+    <string name="msg_item_purchased_1">コミュニティの投稿とコメントを削除することができます。</string>
+    <string name="msg_item_purchased_2">%1$d人に送りました。</string>
+    <string name="msg_item_purchased_2_unknown">メッセージを送信しました。</string>
+    <string name="msg_item_purchased_3">オールインデーが指定されました。</string>
+    <string name="hint_community_push">内容を入力（20字以内）</string>
+    <string name="item_title_1"></string>
+    <string name="item_title_2"></string>
+    <string name="item_title_3">オールインデーバッジ</string>
+    <string name="item_desc_1"></string>
+    <string name="item_desc_1_1"></string>
+    <string name="item_desc_2"></string>
+    <string name="item_desc_2_1"></string>
+    <string name="item_desc_3">推しコミュニティに設定するオールインデーを表示</string>
+    <string name="actor_item_desc_3">私のスターコミュニティに設定するオールインデーを表示</string>
+    <string name="item_guide_1_1"></string>
+    <string name="item_guide_1_2"></string>
+    <string name="item_guide_2_1"></string>
+    <string name="item_guide_2_2"></string>
+    <string name="item_desc_3_1">（購入後1回使用）\nニックネームの横にオールインデーバッジを表示</string>
+    <string name="item_guide_title_1"></string>
+    <string name="item_guide_title_2"></string>
+    <string name="item_guide_title_3">オールインデーバッジの機能</string>
+    <string name="item_guide_3_1">- 10日以内で希望の日をオールインデーに登録可能(ランキングリストとコミュニティ通知を表示)\n-1日中バッジを維持（集計時間まで）\n-レベル%1$d+の会員のみ購入可能\n-自分の推しオールインデーのみ登録可能</string>
+    <string name="actor_item_guide_3_1">- 10日以内で希望の日をオールインデーに登録可能(ランキングリストとコミュニティ通知を表示)\n-1日中バッジを維持（集計時間まで）\n-レベル%1$d+の会員のみ購入可能\n-私のスターオールインデーのみ登録可能</string>
+    <string name="item_guide_3_2">オールインデーに登録する日付を選択し、\n「登録」ボタンを押してください。\n（ダイヤ%1$d個使用）</string>
+    <string name="error_9901">購入ダイヤが足りません。</string>
+    <string name="error_9902">設定可能なのは10日以内です</string>
+    <string name="error_9903">すでに購入したアイテムです</string>
+    <string name="error_9904">登録されているオールインデーがあります。\n現在設定されているオールインデー以降に再試行してください。</string>
+    <string name="error_select_day">日付を選択してください</string>
+    <string name="error_9900">レベル%1$d+の会員のみ購入可能なアイテムです</string>
+    <string name="burning_day_format">M月d日</string>
+    <string name="deleted_by">%1$sさんによって削除されました。</string>
+    <string name="deleted_by_unknown">削除された投稿です</string>
+    <string name="male">男性</string>
+    <string name="female">女性</string>
+    <string name="all">全体</string>
+    <string name="wait_line_signin">LINE情報をロード中…</string>
+    <string name="empty_friend_request">友達申請内容がありません。</string>
+    <string name="cancel_friend_request">友達申請キャンセル</string>
+    <string name="last_login">最近のログイン</string>
+    <string name="settings_language">言語設定</string>
+    <string name="language_default">システムデフォルト</string>
+    <string name="view_more">もっと見る</string>
+    <string name="post_limit">最大%1$d文字。</string>
+    <string name="msg_report_confirm">通告すれば、%1$sハートを消耗します。</string>
+    <string name="menu_change_app">最愛ドルスターに行く</string>
+    <string name="actor_menu_change_app">最愛ドルに行く</string>
+    <string name="copied_to_clipboard">クリップボードにコピーされました</string>
+    <string name="title_edit">編集</string>
+    <string name="label_header_result">投票集計結果</string>
+    <string name="iab_restricted">1日1回購入可能</string>
+    <string name="label_not_verified_iap">購入が完了していない項目があります。ハートショップで確認してください。</string>
+    <string name="setting_menu_cache">キャッシュを削除する</string>
+    <string name="are_you_sure">本気ですか？</string>
+    <string name="setting_menu_push_hearts">ハート</string>
+    <string name="setting_menu_push_comments">コメント</string>
+    <string name="menu_menu_kin">Idol Q &amp; A</string>
+    <string name="actor_menu_menu_kin">Q &amp; A</string>
+    <string name="hint_search"></string>
+    <string name="answer">回答</string>
+    <string name="offer_video_ad_desc" formatted="false">ハート%s個 (30分に5回)</string>
+    <string name="present_heart">ハートをプレゼントする</string>
+    <string name="present_heart_confirm">%1$sハートをプレゼントしますか？</string>
+    <string name="present_heart_done">ハートをプレゼントしました。</string>
+    <string name="emoticon_badge">絵文字バッジ</string>
+    <string name="emoticon_badge_desc">私の気分を表す絵文字バッジを付けます。</string>
+    <string name="emoticon_badge_buy">絵文字バッジを購入する</string>
+    <string name="emoticon_badge_buy_guide">絵文字を選択し、「登録」を押します。\n(%1$dハートが使用されます）</string>
+    <string name="purchased">購入が完了しました。</string>
+    <string name="newbie_info"></string>
+    <string name="report_done">問題が通告されました。</string>
+    <!-- permissoin (korean only) -->
+    <string name="permission_storage">ストレージ：写真を投稿したり保存するために必要です。</string>
+    <string name="permission_desc"></string>
+    <string name="actor_permission_desc">アクセス権限に同意をしていなくても、最愛ドルスターの基本的な機能の使用には問題ありません。\n\n最愛ドルスターはどんな個人情報も収集いたしません。</string>
+    <string name="allow">承認</string>
+    <string name="deny">承認しない</string>
+    <string name="label_see_video_for_heartbox">ビデオ広告を視聴すると\nハートボックスがまたできるよ！</string>
+    <!-- bj app -->
+    <string name="format_reg_date" formatted="false">%sに登録</string>
+    <string name="laboratory">研究室</string>
+    <string name="use_internal_photo_editor">内部の画像編集機能を使う</string>
+    <string name="file_size_exceeded" formatted="false">%sMB 以下まで投稿可能です。</string>
+    <string name="unsupported_format">このファイルの形式を認識できません。</string>
+    <string name="cropper_not_found">読み込み可能な画像編集機能がありません。</string>
+    <string name="comment_minimum_characters">%1$d文字以上を入力してください。</string>
+    <string name="gaon_welcome">第7回Gaonチャート音楽賞！</string>
+    <string name="gaon_guide1">男性と女性の人気賞はあなたの投票で決定されます。</string>
+    <string name="gaon_guide2">バレンタインデーのトロフィーをあなたの最愛のアーティストにプレゼントしてください。</string>
+    <string name="gaon_date_title">◆ Gaon賞の日付</string>
+    <string name="gaon_date_value">2018年2月14日</string>
+    <string name="gaon_period_title">◆ 投票期間</string>
+    <string name="gaon_period_value">%1$s ~ %2$s</string>
+    <string name="gaon_ratio_title">◆ 投票の反映比率</string>
+    <string name="gaon_ratio_value">人気賞100％投票反映</string>
+    <string name="gaon_guide3">(累積ランキングは、毎日のスコアを蓄積することによって決定されます。 累積ランクで一位にランクされた男性と女性は、人気賞を受賞します。)</string>
+    <string name="gaon_howto_title">◆ 投票方法</string>
+    <string name="gaon_howto_value">最愛ドルの元のルールと同じ</string>
+    <string name="gaon_special_rule_title">◆ 元のルールと異なるルール</string>
+    <string name="gaon_special_rule_value1">* *男と女の人気賞はあなたの投票で決定されます</string>
+    <string name="gaon_special_rule_value2">* 候補者はGaon指定の歌手に限られます</string>
+    <string name="gaon_special_rule_value3">* グループのメンバー（個人）に投票しても反映されます</string>
+    <string name="gaon_special_rule_value4">* アプリ内での支払いは、ディバイスごとに1日1回に 制限されています</string>
+    <string name="gaon_special_rule_value5">* 以下の機能を制限します（23：15〜00：15）</string>
+    <string name="gaon_special_rule_value6">友達にハートを送信</string>
+    <string name="gaon_special_rule_value7">投票ボーナス</string>
+    <string name="gaon_special_rule_value8">人気のポスターボーナス</string>
+    <string name="gaon_special_rule_value9">ポストボーナス</string>
+    <string name="gaon_goto_notice">最愛ドル お知らせ ></string>
+    <string name="gaon_goto_gaon">Gaon賞ホームページ ></string>
+    <string name="gaon_award_title_male">今日の男人気賞ランキング</string>
+    <string name="gaon_award_title_female">今日の女人気賞ランキング</string>
+    <string name="gaon_voting_period">投票期間 : %1$s ~ %2$s</string>
+    <string name="gaon_current_guide1">個人(メンバー)の投票数とグループの投票数を\n合算したリアルタイムのランキングです。</string>
+    <string name="gaon_current_guide2">累計ランキング1位の結果によって人気賞が決定されます。</string>
+    <string name="gaon_current_title">TODAY %1$s リアルタイムの投票現状</string>
+    <string name="gaon_accumulative_title_male">男性グループ累計ランキング</string>
+    <string name="gaon_accumulative_title_female">女性グループ累計ランキング</string>
+    <string name="gaon_accumulative_guide1">Gaon賞人気投票の累計集計ステータス。</string>
+    <string name="gaon_accumulative_guide2">累計ランキング1位の結果によって人気賞が決定されます。</string>
+    <string name="gaon_accumulative_title">%1$s ~ %2$s 累積結果</string>
+    <string name="gaon_award_title_male_final">[ガオンアワード]ファン投票男性人気賞最終結果</string>
+    <string name="gaon_award_title_female_final">[ガオンアワード] ]ファン投票女性人気賞最終結果</string>
+    <string name="gaon_final_guide">投票期間が終了しました。</string>
+    <string name="gaon_final_title">%1$s ~ %2$s 最終結果</string>
+    <string name="nas_heart_format">%1$d+ ハート</string>
+    <string name="confirm_change_account">すでに同じメールアドレスで登録されています。該当のアカウントを選択したログイン方法に変更いたしますか？</string>
+    <string name="facebook_no_email">Facebookからメール情報を確認するこができませんでした。</string>
+    <string name="menu_freeboard">掲示板</string>
+    <string name="myheart_today_earn">今日貯めたエバーハート</string>
+    <string name="myheart_today_earn_help">%1$s個のエバーハートを集めると、現在1位の\n個人またはグループのプロフィール画像が自分の推しの画像に変更されます。\n変更された画像は集計時間にリセットされます。</string>
+    <string name="actor_myheart_today_earn_help">%1$sの "エバーハート"を獲得した場合、最初の場所のプロフィール画像は私のスターのプロフィールに変更されます。 \n変更されたプロフィール画像は明日にリセットされます。</string>
+    <string name="label_image_option">写真の縦横比</string>
+    <string name="label_image_option_title">写真の縦横比を設定</string>
+    <string name="label_image_option_square">正方形(プロフィール&amp;バナー)</string>
+    <string name="label_image_option_free">フリーサイズ/オリジナル</string>
+    <string name="setting_lockscreen">ロック画面を設定</string>
+    <string name="lockscreen_use">ロック画面を設定</string>
+    <string name="lockscreen_background">私のホーム画面</string>
+    <string name="lockscreen_not_available">\"推し \"が設定されていない場合、ロック画面は使用できません。\n\"推し\"を設定してみませんか？</string>
+    <string name="actor_lockscreen_not_available">\"私のスター \"が設定されていない場合、ロック画面は使用できません。\n\"私のスター\"を設定してみませんか？</string>
+    <string name="lockscreen_preview">ロック画面をプレビューする</string>
+    <string name="lockscreen_preview_help">2つ以上の円をつなぎ合わせるとロックが解除されます。試してみましょう。</string>
+    <string name="lockscreen_permission">ロック画面を使用するには、次のページの\"他のアプリの上に表示される\"をオンにしてください。</string>
+    <string name="lockscreen_style">スタイル</string>
+    <string name="lockscreen_style_pattern">パターン</string>
+    <string name="lockscreen_style_slide">スライド</string>
+    <string name="lockscreen_show_clock">時計を表示する</string>
+    <string name="lockscreen_preview_help_slide">左下の写真を右の円の中に移動させると、画面のロックが解除されます。\n試してみましょう。</string>
+    <string name="label_set_most">「推し」を設定した場合、あなたは「推し」に投票してレベルアップすることができ、「推し」をもっと楽しむことができます。\n今すぐ「推し」を設定しますか？</string>
+    <string name="actor_label_set_most">「私のスター」を設定した場合、あなたは「私のスター」に投票した分レベルアップすることができ、レベルハートをもらうことができます。\n今すぐ「私のスター」を設定しますか？</string>
+    <string name="setting_push">プッシュ通知の設定</string>
+    <string name="menu_board">掲示板</string>
+    <string name="menu_stats">統計</string>
+    <string name="account_management">アカウント管理</string>
+    <string name="stats_highest_votes">最多票ランキングTOP100</string>
+    <string name="stats_donation">寄付天使、寄付妖精の回数</string>
+    <string name="stats_1st_place">1位になった回数</string>
+    <string name="stats_votes_top300">累積投票TOP300</string>
+    <string name="charity_angel">寄付天使</string>
+    <string name="charity_fairy">寄付妖精</string>
+    <string name="stats_idol">アイドル</string>
+    <string name="stats_user">ユーザー</string>
+    <string name="none">なし</string>
+    <string name="dropout_confirm">アカウントを削除すると、アカウントを復元できなくなります。\n本当にアカウントを削除しますか？</string>
+    <string name="dropout_enter_captcha">次の文字列を入力してください</string>
+    <string name="dropout_done">正常に退会されました。</string>
+    <string name="dropout_placeholder">上記の文字列を入力してください。</string>
+    <string name="hearts_from_friends">友達からもらったハート</string>
+    <string name="ad_show_fail">広告の再生に失敗しました。</string>
+    <string name="msg_use_internal_editor">画像編集機能を読み込めませんでした。内臓されている編集機能を使ってください。</string>
+    <string name="extension_login">ログインが必要な機能です。</string>
+    <string name="actor">スター</string>
+    <string name="onestore_confirm_unconsumed"></string>
+    <string name="onestore_need_update"></string>
+    <string name="onestore_remote_exception"></string>
+    <string name="menu_quiz">アイドルクイズ</string>
+    <string name="stats_quiz">クイズランキングTOP100</string>
+    <string name="stats_quiz_today">今日のTOP100</string>
+    <string name="stats_quiz_yesterday">昨日のTOP100</string>
+    <string name="stats_quiz_alltime">全体のTOP100</string>
+    <string name="quiz_idol_all">ALL</string>
+    <string name="quiz_start">Start</string>
+    <string name="quiz_main_top">アイドルクイズは一日に1回のみ可能です。</string>
+    <string name="quiz_main_title">あなたのオタクレベルをテストしてみましょう！</string>
+    <string name="quiz_button_ranking">ランキングを見る</string>
+    <string name="quiz_button_write">クイズを作る</string>
+    <string name="quiz_button_my_quiz">クイズ管理室</string>
+    <string name="quiz_unavailable_time">集計時間 (%1$s-%2$s)にはクイズを解くことができません。</string>
+    <string name="quiz_unavailable_done">残念！今日のクイズはここまで！\n明日また挑戦してみてね！</string>
+    <string name="quiz_unavailable_not_enough">ごめんなさい！該当するアイドルのクイズが不十分です。</string>
+    <string name="quiz_write_help_title">必ずお読みください！\n次の場合には、審査できません。</string>
+    <string name="quiz_write_help_1">時間によって解答が変わる要素</string>
+    <string name="quiz_write_help_1_1">（住所、年齢、体重など）</string>
+    <string name="quiz_write_help_2">正確に把握できない解答。</string>
+    <string name="quiz_write_help_2_1">（身長などのボディサイズ）</string>
+    <string name="quiz_write_help_3">管理者が解答を確認できない場合。</string>
+    <string name="quiz_write_content">問題を入力してください。（100文字以内）</string>
+    <string name="quiz_write_image">画像が必要な場合、アプロードしてください。</string>
+    <string name="quiz_write_choice">内容を入力してください。</string>
+    <string name="quiz_write_answer">正解</string>
+    <string name="quiz_write_difficulty">難易度</string>
+    <string name="quiz_write_difficulty_high">上</string>
+    <string name="quiz_write_difficulty_mid">中</string>
+    <string name="quiz_write_difficulty_low">下</string>
+    <string name="quiz_write_description">答えの解説を入力してください。（100文字以内）</string>
+    <string name="quiz_write_submit">提出する</string>
+    <string name="quiz_write_delete_image">アップロードした画像を削除する</string>
+    <string name="quiz_write_empty">空白をすべて埋めてください。</string>
+    <string name="quiz_write_done">正常に提出されました。\nユーザーから承認された場合、ハートを受け取ることができます。</string>
+    <string name="quiz_test_idol">アイドルクイズ</string>
+    <string name="quiz_test_all">オタク能力テスト</string>
+    <string name="quiz_writer">出題者</string>
+    <string name="quiz_correct">正解！</string>
+    <string name="quiz_incorrect">はずれ！</string>
+    <string name="quiz_confirm_exit">クイズを終了しますか？</string>
+    <string name="quiz_fail">クイズ %1$d個成功!</string>
+    <string name="quiz_complete">すごい！%1$d個の問題をすべて正解しました！あなたは真のアイドルオタク！</string>
+    <string name="quiz_my_quiz">私のクイズ</string>
+    <string name="quiz_accepted">審査されたクイズ</string>
+    <string name="quiz_delete_all">すべて削除</string>
+    <string name="quiz_get_heart">ハートをもらう</string>
+    <string name="quiz_get_heart_done">クイズ出題ボーナスで%1$dハートが加算されました。</string>
+    <string name="quiz_accepted_none">審査されたクイズがありません。\nもしくは、すでにボーナスハートを受け取られました。</string>
+    <string name="quiz_time_over">時間が過ぎてしまいました！</string>
+    <string name="service_wait_please">準備中のサービスです。</string>
+    <string name="quiz_main_title2">私が真のアイドルオタク！</string>
+    <string name="quiz_select_idol">選んでください。</string>
+    <string name="quiz_report">問題が間違っていますか？</string>
+    <string name="quiz_report_description">問題を通報した理由を記入してください。</string>
+    <string name="quiz_report_hint">内容を入力してください。\n（10文字以上）</string>
+    <string name="quiz_confirm_exit2">今終了するとチャンスが一回使用されます。</string>
+    <string name="quiz_confirm_exit_highlight1">チャンス一回使用</string>
+    <string name="quiz_confirm_exit_highlight2">ボーナスハート</string>
+    <string name="quiz_review_enter">クイズを評価する</string>
+    <string name="quiz_review_in_review">審査中のクイズ</string>
+    <string name="quiz_review_title">クイズの審査</string>
+    <string name="quiz_review_thankyou">アイドルクイズの審査にご協力いただき\nありがとうございました。</string>
+    <string name="actor_quiz_review_thankyou">クイズの審査にご協力いただき\nありがとうございました。</string>
+    <string name="quiz_go_to_main">クイズメイン画面に移動</string>
+    <string name="quiz_content"></string>
+    <string name="quiz_point"></string>
+    <string name="quiz_description"></string>
+    <string name="quiz_choice_one"></string>
+    <string name="quiz_choice_two"></string>
+    <string name="quiz_choice_three"></string>
+    <string name="quiz_choice_four"></string>
+    <string name="quiz_choice_one_rtl"></string>
+    <string name="quiz_choice_two_rtl"></string>
+    <string name="quiz_choice_three_rtl"></string>
+    <string name="quiz_choice_four_rtl"></string>
+    <string name="quiz_number"></string>
+    <string name="gallery_title">バナーグラム</string>
+    <string name="actor_menu_quiz">芸能クイズ</string>
+    <string name="actor_quiz_main_top">芸能クイズは一日に一回のみ可能です。</string>
+    <string name="quiz_power">オタク度</string>
+    <string name="power_guide_title">オタク度とは？</string>
+    <string name="power_guide_desc"></string>
+    <string name="power_guide_score">点数</string>
+    <string name="power_guide_level"></string>
+    <string name="my_coupon">私のクーポン</string>
+    <string name="use_coupon">使う</string>
+    <string name="expire_coupon">有効期間</string>
+    <string name="my_info">私の情報</string>
+    <string name="my_info_vote">投票数</string>
+    <string name="my_info_reg_date">登録日</string>
+    <string name="used_coupon">使用済み</string>
+    <string name="set_all_in_day">オールインの日を設定する</string>
+    <string name="actor_power_guide_desc">芸能クイズで私のオタク</string>
+    <string name="schedule_desp_anniversary">記念日</string>
+    <string name="schedule_desp_album">音源・アルバムのリリース</string>
+    <string name="schedule_desp_concert">コンサート、ファンミーティング</string>
+    <string name="schedule_desp_sign">サイン会</string>
+    <string name="schedule_desp_airport">空港</string>
+    <string name="schedule_desp_tv">テレビ</string>
+    <string name="schedule_desp_radio">ラジオ</string>
+    <string name="schedule_desp_video">ライブ映像</string>
+    <string name="schedule_desp_awards">授賞式</string>
+    <string name="schedule_desp_etc">その他</string>
+    <string name="schedule_btn_yes">正しいです</string>
+    <string name="schedule_btn_no">違います</string>
+    <string name="schedule_btn_dup">重複しています</string>
+    <string name="schedule">スケジュール</string>
+    <string name="schedule_write_level" formatted="false">レベル%s以上の方のみ書き込み可能です。</string>
+    <string name="schedule_yes">正しいスケジュールですか？</string>
+    <string name="schedule_no">間違ったスケジュールですか？</string>
+    <string name="schedule_dupl">スケジュールが重複していますか？</string>
+    <string name="schedule_write">スケジュールを書く</string>
+    <string name="schedule_category">カテゴリー</string>
+    <string name="schedule_location">場所</string>
+    <string name="schedule_require">必須フィールド(*)を記入してください。</string>
+    <string name="schedule_eval_most">推しのスケジュールのみ評価することができます。</string>
+    <string name="schedule_eval_level" formatted="false">レベル%s以上のみ評価することができます。</string>
+    <string name="schedule_eval_done">すでに評価しました。</string>
+    <string name="schedule_title">タイトル</string>
+    <string name="schedule_allday">一日中</string>
+    <string name="schedule_info">追加の情報</string>
+    <string name="schedule_save">スケジュールが保存されました。</string>
+    <string name="schedule_detail">詳しく見る</string>
+    <string name="schedule_use_location">この場所に設定します。</string>
+    <string name="schedule_time">時間</string>
+    <string name="schedule_write_most">推しのスケジュールのみ作成することができます。</string>
+    <string name="schedule_empty">登録されたスケジュールはありません。</string>
+    <string name="schedule_desp_ticketing">チケット予約</string>
+    <string name="schedule_write_stop">スケジュールの作成をやめますか？</string>
+    <string name="setting_menu_push_schedule">スケジュール</string>
+    <string name="coming_soon">近日公開</string>
+    <string name="schedule_write_most_actor">私のスターのスケジュールのみ評価することができます。</string>
+    <string name="schedule_eval_most_actor">私のスターのスケジュールのみ作成することができます。</string>
+    <string name="schedule_desp_movie">映画</string>
+    <string name="schedule_desp_production">制作発表会</string>
+    <string name="schedule_desp_previw">試写会</string>
+    <string name="bad_words">不適切な表現が含まれています。</string>
+    <string name="schedule_desp_concert_actor">ファンミーティング</string>
+    <string name="tvtalk">TVトーク</string>
+    <string name="idoltalk">アイドルトーク</string>
+    <string name="schedule_desp_event">イベント</string>
+    <string name="confirm_delete">削除しますか？</string>
+    <string name="idoltalk_write_most">推しのトークしか書くことができません。</string>
+    <string name="image_permission_error">デバイスの容量またはデバイスの設定&gt;最愛ドル&gt;写真の権限を確認してからもう一度試してください。</string>
+    <string name="boys_individual">男性\n個人</string>
+    <string name="girls_individual">女性\n個人</string>
+    <string name="boys_group">男性\nグループ</string>
+    <string name="girls_group">女性\nグループ</string>
+    <string name="my_idol">私の\nアイドル</string>
+    <string name="enter_community">コミュニティに入る</string>
+    <string name="enter_schedule">スケジュールを見る</string>
+    <string name="post">投稿</string>
+    <string name="community_post">コミュニティ投稿</string>
+    <string name="coupon">クーポン</string>
+    <string name="friend">友達</string>
+    <string name="add_favorites">お気に入りに追加しました。</string>
+    <string name="remove_favorites">お気に入りから削除されました。</string>
+    <string name="bannergram_guide_landscape">横画面に切り替えることができます。</string>
+    <string name="my_actor">私のスター</string>
+    <string name="new_face">ニューフェイス</string>
+    <string name="tooltip_search">お気に入りのアイドルを検索してみてください。</string>
+    <string name="tooltip_set_most">ハートを押して推しに設定します。</string>
+    <string name="help_msg_change_gender_to_male">男性アイドルを見るにはここをクリックしてください。</string>
+    <string name="help_msg_change_gender_to_female">女性アイドルを見るにはここをクリックしてください。</string>
+    <string name="help_msg_profile_picture_size">正方形の写真のみプロフィール\nまたはバナーで使用できます。</string>
+    <string name="tooltip_search_actor">好きなスターを検索してみてください。</string>
+    <string name="tooltip_set_most_actor">ハートを押して私のスターに設定します。</string>
+    <string name="no_data">データがありません。</string>
+    <string name="title_tab_hof">殿堂入り</string>
+    <string name="show_most_only">推し\'が同じであれば見ることができます。</string>
+    <string name="actor_show_most_only">私のスター\'が同じであれば見ることができます。</string>
+    <string name="restore_purchase">購入を復元する</string>
+    <string name="restore_purchase_completed">購入が復元されました。</string>
+    <string name="restore_purchase_failed">購入の復元ができませんでした。</string>
+    <string name="no_purchases">ご購入内容がありません。</string>
+    <string name="regular_payment">定期決済</string>
+    <string name="purchasing_management">お支払い管理\n(サブスクリプション解約)</string>
+    <string name="help_msg_month_free_trial" formatted="false">初回の%d週間無料</string>
+    <string name="month_free_trial" formatted="false">%d週間無料</string>
+    <string name="next_billing_date">次回の自動決済日</string>
+    <string name="subscription_auto_renewal">*直接キャンセル(解約)しないと毎月、自動で決済されます。</string>
+    <string name="warning_delete_account">退会された場合、アカウント復元ができなくなります。\nまた、定期購入は自動で解約されないため、お客様ご自身で解約を行ってください。</string>
+    <string name="all_users_are_given">初めて利用される方は誰でも</string>
+    <string name="daily_pack_modifier">毎日あなたのアイドルにハートをたくさん！</string>
+    <string name="actor_daily_pack_modifier">毎日あなたのスターにハートがたくさん！</string>
+    <string name="describe_monthly_payment">%1$d 週間が経過すると、%2$s/月が自動的に請求されます。\nいつでもお支払いをキャンセルできます。</string>
+    <string name="subscribed">購入済み</string>
+    <string name="month">月</string>
+    <string name="important">必ずお読みください！</string>
+    <string name="purchase_incompleted">購入を完了できませんでした。</string>
+    <string name="send_receipt">領収書を送信する。</string>
+    <string name="warning_subscription_platform_change_ios" formatted="false">他のプラットフォーム(アンドロイドまたはその他)にて「%s」の定期決済中です。\n他のプラットフォーム(アンドロイドまたはその他)でご購入された定期決済は適用されなかったため、解除後ご利用お願いいたします。</string>
+    <string name="warning_subscription_platform_change_android" formatted="false">他のプラットフォーム(iosまたはその他)にて「%s」の定期決済中です。\n他のプラットフォーム(iosまたはその他)でご購入された定期決済は適用されなかったため、解除後ご利用お願いいたします。</string>
+    <string name="warning_subscription_only_original" formatted="false">\'%s\'ハートは最愛ドル&#9825;でのみ支給されます。\n最愛ドル&#9825;からログインしてください。</string>
+    <string name="service_information">サービス情報</string>
+    <string name="report">通告</string>
+    <string name="already_reported">通告されたメッセージです</string>
+    <string name="remove">削除</string>
+    <string name="yes">はい</string>
+    <string name="no">いいえ</string>
+    <string name="reward_heart_title">ボーナス</string>
+    <string name="vote_heart_title">投票ボーナス</string>
+    <string name="attendance">出席</string>
+    <string name="hot_time">オタクタイム</string>
+    <string name="heart_reward_posting" formatted="false">投稿ハート%d個支給！</string>
+    <string name="heart_reward_vote" formatted="false">投票ボーナスハート%d個支給！</string>
+    <string name="vote_posting">投稿投票</string>
+    <string name="commentary">解説</string>
+    <string name="login_required">ログインしてください</string>
+    <string name="onepick">One Pick</string>
+    <string name="actor_onepick">One Pick</string>
+    <string name="num_participants">参加人数</string>
+    <string name="num_participants_format" formatted="false">%s人</string>
+    <string name="see_current_ranking">現在の順位を見る</string>
+    <string name="onepick_vote">投票する</string>
+    <string name="see_result">結果を見る</string>
+    <string name="qualifying_round">予選</string>
+    <string name="final_round">決勝</string>
+    <string name="my_onepick_is">さんのPICKは？</string>
+    <string name="zzz_onepick_is">ZZZさんのPICKは？</string>
+    <string name="my_onepick">One Pick</string>
+    <string name="onepick_hashtag">#ハッシュタグ</string>
+    <string name="onepick_hashtag_desc">高画質の画像と一緒にお題に合う\n#ハッシュタグをつけて投稿しよう！\n投稿した画像が候補になるかも！？</string>
+    <string name="onepick_confirm_exit">今終了すると、今日はこれ以上参加することができません。\nそれでも終了しますか？</string>
+    <string name="final_result">最終結果</string>
+    <string name="my_pick">私のPICK</string>
+    <string name="onepick_period">投票期間</string>
+    <string name="onepick_mypick">あなたが選んだアイドル</string>
+    <string name="actor_onepick_mypick">あなたが選んだスター</string>
+    <string name="onepick_capture">タップするとスクショできるよ！</string>
+    <string name="onepick_current_ranking">現在の順位</string>
+    <string name="label_share">シェアする</string>
+    <string name="onepick_no_votes">まだ参加者がいません。\n最初の参加者になりましょう！</string>
+    <string name="onepick_already_voted">今日の投票終了！</string>
+    <string name="feed_status_message_hint">ステータスメッセージを入力してください。</string>
+    <string name="feed_my_feed">私のホーム画面</string>
+    <string name="feed_edit_status">ステータスメッセージを修正する。</string>
+    <string name="feed_no_posts">作成した投稿がありません。</string>
+    <string name="feed_no_comments">作成したコメントがありません。</string>
+    <string name="feed_status_message">ステータスメッセージ</string>
+    <string name="btn_dailypack_format" formatted="false">毎日、ハート %s個\nもっともらう</string>
+    <string name="feed_private">ホーム画面を非公開にする</string>
+    <string name="feed_private_desc">非公開に設定すると、相手に自分のホーム画面が見えなくなります。</string>
+    <string name="feed_is_private">非公開のプロフィールです。</string>
+    <string name="freeboard_order_newest">最新順</string>
+    <string name="freeboard_order_comments">コメント多い順</string>
+    <string name="label_tag">タグ</string>
+    <string name="no_coupons">クーポンがありません</string>
+    <string name="darkmode">ダークモード</string>
+    <string name="automatic">自動</string>
+    <string name="status_settings">状態設定</string>
+    <string name="block_friend_req">友達申請ブロック</string>
+    <string name="block_friend_req_desc">ブロックをすると、友達申請が来ません。</string>
+    <string name="block_friend_msg">相手が友達申請を受け付けておりません。</string>
+    <string name="search_friend">友達検索</string>
+    <string name="my_friend">私の友達</string>
+    <string name="search_result">検索結果</string>
+    <string name="new_friends">NEWとも</string>
+    <string name="participate_new_friends">NEWともに参加する</string>
+    <string name="participate_new_friends_desc">友達を増やしたいなら申請してみてね！</string>
+    <string name="apply_new_friends">申請する</string>
+    <string name="apply_new_friends_desp">友達を作るとハートがもらえるよ！\n「NEWとも」で友達申請をしますか？</string>
+    <string name="cancel_new_friends">申請をやめる</string>
+    <string name="apply_new_friends_blocked">友達申請ブロック状態です。\nブロックを解除してもう一度申請してください！</string>
+    <string name="none_participation_new_friends">まだNEWともの参加者がいません。</string>
+    <string name="data_save">データ省エネモード</string>
+    <string name="data_save_desc">データ使用の際、動画/GIFを自動で再生せず、画像の容量が減ります。\n*WIFIに繋がると、動画/GIFは自動に再生されます。</string>
+    <string name="order_by_name">名前順</string>
+    <string name="order_by_login_time">アクセス日順</string>
+    <string name="wechat_not_installed">WeChatはインストールされていません。</string>
+    <string name="choeaedol_sns">最愛ドルSNS</string>
+    <string name="friends_request">友達申請</string>
+    <string name="notice_new_friend_request">新しい友達申請がきました。</string>
+    <string name="appleid_change_detected">Apple IDが変更され、デイリーパックの特典を受けとることができません。デイリーパックを購入されたApple IDでAppStoreにログインしてください。</string>
+    <string name="quiz_get_heart_title">クイズの報酬</string>
+    <string name="darkmode_system">システム設定値</string>
+    <string name="darkmode_always">常にON</string>
+    <string name="darkmode_never">使用しない</string>
+    <string name="darkmode_help">システム設定に従って、常にON、常にOFF設定からライト/ダークモードに切り替わります。</string>
+    <string name="animation_mode">アニメーションモード</string>
+    <string name="animation_mode_desc">ランキング画面でアニメーションモードをアクティブにします。</string>
+    <string name="aggregating_time">投票結果集計中</string>
+    <string name="see_ranking" formatted="false">%s順位をもっと見る</string>
+    <string name="overall">総合</string>
+    <string name="ranking">ランキング</string>
+    <string name="singer">歌手</string>
+    <string name="variety">バラエティ</string>
+    <string name="rank_accumulative">累積ランキング</string>
+    <string name="rank_daily">毎日ランキング</string>
+    <string name="deadline_format_one" formatted="false">締め切り%d分前</string>
+    <string name="deadline_format_few" formatted="false">締め切り%d分前</string>
+    <string name="celeb">スター</string>
+    <string name="celeb_quiz_start">スタート</string>
+    <string name="top_100">TOP100</string>
+    <string name="popup_no_heart_title">ハートが足りません(´;ω;｀)</string>
+    <string name="popup_no_heart_desc">タップすると移動します。</string>
+    <string name="popup_video_ad">ビデオ広告</string>
+    <string name="popup_video_ad_desc">ビデオ広告を視聴して\nハートをGET!</string>
+    <string name="popup_heart_shop_desc">ハートを購入できます。</string>
+    <string name="popup_heartbox_desc">コミュニティ→画像→ハートをタップすると\nランダムでハートをGET!</string>
+    <string name="popup_free_heart_desc">ミッションをクリアしてハートをGET!</string>
+    <string name="guide_gender_title">男/女に変換</string>
+    <string name="guide_gender">アイコンをタップすると\n男性アイドル/ 女性アイドル\nに変えられるよ！</string>
+    <string name="guide_community_title">コミュニティ</string>
+    <string name="guide_community">名前をタップすると該当のアイドルの\nコミュニティに移動するよ！</string>
+    <string name="guide_banner_title">バナーを開く</string>
+    <string name="guide_banner">プロフィール画像をタップすると\nバナーが見れるよ！</string>
+    <string name="guide_vote_title">投票する</string>
+    <string name="guide_vote">ハートをタップして\n投票しよう！</string>
+    <string name="guide_wiki_title">ウィキ（Wikipedia）</string>
+    <string name="guide_wiki">プロフィール画像をタップすると\nウィキが見れるよ！</string>
+    <string name="guide_write_title">投稿する</string>
+    <string name="guide_write">アイコンをタップすると\n投稿・画像をアップできるよ！</string>
+    <string name="guide_skip">スキップする</string>
+    <string name="menu_face">そっくり アイドル診断</string>
+    <string name="face_limit">- 一日3回のみできます。</string>
+    <string name="face_title">そっくりさんを探す</string>
+    <string name="face_similarity">そっくり度</string>
+    <string name="face_all">全体</string>
+    <string name="face_submit">そっくりさんを探す</string>
+    <string name="time_just_now">今</string>
+    <string name="time_minute">分前</string>
+    <string name="time_hour">時間前</string>
+    <string name="time_day">日</string>
+    <string name="title_notifications">アラーム通知</string>
+    <string name="label_no_notifications">受け取った通知がありません。</string>
+    <string name="label_delete_all_notifications">全ての通知を削除しますか？</string>
+    <string name="actor_level_heart_guide_desc1">最近30日間、各ファンダムごとの殿堂入り順位で得た点数を合算して集計されたランキングであり、上位100位まで表示されます。\n各ファンダムをクリックすると、そのファンダムの順位変化の推移を確認することができます。\n30日間の累積順位で選ばれたスターの名前で、意義深いところに寄付をします！\n\n✅達成条件\n- 条件1 : 30日間の平均投票数が300万票以上\n- 条件2 : 殿堂入りで6日基準、各カテゴリーで1~2位\n- 二つの条件をすべて満たした場合、寄付天使に選定されます。\n\n✅褒賞\n- カテゴリー1位\n(1)小麦福祉財団に50万ウォンを寄付\n(2)弘大入口駅の地下鉄広告\n(3)ポップアップバナー広告\n(4)メニュー スライドバナー広告 \n- カテゴリー2位\n(1)小麦福祉財団に50万ウォンを寄付\n(2)弘大入口駅の地下鉄広告\n(3)ポップアップバナー広告</string>
+    <string name="AAA">AAA</string>
+    <string name="award_guide">案内</string>
+    <string name="award_example">ラインナップ</string>
+    <string name="award_realtime">リアルタイム\nランキング</string>
+    <string name="award_shop_closed" formatted="false">[%s] 進行中\n%s~%s (KST)\n\n期間中は商品の販売を休止させていただきます</string>
+    <string name="award_realtime_boy">男性グループリアルタイムランキング</string>
+    <string name="award_realtime_girl">女性グループリアルタイムランキング</string>
+    <string name="award_accumulative_guide1">個人(メンバー)の投票数とグループの投票数を合算した\n累積ランキングです。</string>
+    <string name="award_final_boy" formatted="false">%s\n男性グループ人気賞最終結果</string>
+    <string name="award_final_girl" formatted="false">%s\n女性グループ人気賞最終結果</string>
+    <string name="award_guide_title">&lt; 2020アジアアーティストアワード&gt;</string>
+    <string name="award_guide_sub1">授賞式日程</string>
+    <string name="award_guide_sub2">投票期間</string>
+    <string name="award_guide_sub3">投票の反映</string>
+    <string name="award_guide_sub4">投票方法</string>
+    <string name="award_guide_sub5">留意事項</string>
+    <string name="award_guide_sub6">投票期間中の詳細ルール</string>
+    <string name="award_guide_title_desc">第５回アジアアーティストアワード（AAA）が\n始まります！
+最愛ドルでの投票で、\n男性人気賞・女性人気賞が決まります。
+大好きなアーティストに\nトロフィーをプレゼントしましょう！</string>
+    <string name="award_guide_desc1">2020/11/25 授賞式</string>
+    <string name="award_guide_desc3">100%投票が反映されます。\n
+投票期間の間、集計された点数を合算し\n
+男女の累積ランキング１位に人気賞を授与します。</string>
+    <string name="award_guide_desc4">最愛ドルでハートを集めて投票してください。</string>
+    <string name="award_guide_desc5">グループのメンバーに投票したハートは、\nグループの投票数に加算され集計します。\n
+投票期間中はアプリ内課金ができません。</string>
+    <string name="award_guide_desc6">アワーズ投票期間の間、変更されたルールについてはメニュー(≡)からお知らせを確認してください。</string>
+    <string name="award_before_title">今は投票期間ではありません！</string>
+    <string name="award_before_example">個人(メンバー)投票数とグループ投票数を合算した\nリアルタイムランキングの例です。</string>
+    <string name="aggregation">累計ランキング</string>
+    <string name="actor_award_guide_title">2020アジアアーティストアワード</string>
+    <string name="actor_award_guide_title_desc">第５回アジアアーティストアワード（AAA）が始まります！
+男性俳優、女性俳優、トロット歌手人気賞の投票を行います！\n
+大好きなアーティストにトロフィーをプレゼントしましょう！</string>
+    <string name="actor_award_guide_desc3">100%投票が反映されます。\n
+投票期間の間、集計された点数が合算され\n人気賞を授与します。</string>
+    <string name="actor_award_guide_desc4">最愛ドルスターでハートを集めて投票してください。</string>
+    <string name="actor_award_guide_desc5">投票期間中はアプリ内課金ができません。</string>
+    <string name="actor_award_guide_desc6">アワーズ投票期間の間、変更されたルールについてはメニュー(≡)からお知らせを確認してください。</string>
+    <string name="actor_award_realtime_trot">トロット人気賞リアルタイムランキング</string>
+    <string name="actor_award_accumulative_title_trot">トロット人気賞累積ランキング</string>
+    <string name="actor_award_current_guide1">トロット人気賞</string>
+    <string name="actor_award_accumulative_guide1">トロット人気賞累積投票の現状です。</string>
+    <string name="actor_award_final_trot">AAAファン投票\nトロット人気賞最終結果</string>
+    <string name="actor_award_before_example">投票の例です。</string>
+    <string name="menu_video_ad">ビデオ広告</string>
+    <string name="choeaedol">最愛ドル</string>
+    <string name="awards_history">歴代授賞式記録</string>
+    <string name="choeaedol_celeb">最愛ドルスター</string>
+    <string name="celeb_talk">スタートーク</string>
+    <string name="friend_api_block">アワーズの投票期間の間、NEWとも機能は、集計時間に限りご利用できます。</string>
+    <string name="friend_api_block_all">アワーズの投票期間の間、友達機能はご利用できません。</string>
+    <string name="friend_delete_limit">アワーズの投票期間の間、友達削除は集計時間のみ可能です。</string>
+    <string name="friend_api_limit">アワーズの投票期間の間、集計時間を除いた20:00 ~ 05:00には友達関連機能をご利用できません。</string>
+    <string name="support">サポート</string>
+    <string name="support_filter_favorites">私の推し</string>
+    <string name="support_filter_due">期限切迫順</string>
+    <string name="support_in_progress">サポート中</string>
+    <string name="support_end">締め切り</string>
+    <string name="support_end_2">次の機会に(´;ω;｀)</string>
+    <string name="support_success">サポート\n成功</string>
+    <string name="support_create">サポートを開設する</string>
+    <string name="support_use_diamond">ダイヤ%1$s個消耗</string>
+    <string name="support_create_title">サポートを開設</string>
+    <string name="support_create_contents">サポート名／画像</string>
+    <string name="support_create_hint_title">サポート名を入力してください。（必須／100文字以内）</string>
+    <string name="support_create_hint_photo">サポートの画像を添付してください。（必須）</string>
+    <string name="support_create_type">広告を選ぶ</string>
+    <string name="support_create_hint_type">広告を選んでください。（必須）</string>
+    <string name="support_create_button">開設する</string>
+    <string name="support_create_confirm">開設するには\nダイヤ%1$s個が必要です。\n広告のミッションに成功しなかった場合、開設時のダイヤの払い戻しは\nされませんのでご注意ください。</string>
+    <string name="support_date_start">広告開始日</string>
+    <string name="support_period_vote">募金期間／広告デザイン募集</string>
+    <string name="support_period_ad">広告掲示期間</string>
+    <string name="support_agree">上記の内容を全てお読みになりましたらダイヤの払い戻し不可に同意したものとみなします。</string>
+    <string name="support_create_notice">[注意事項]\n
+-開設したサポートはキャンセルできません。\n
+-サポートに使ったダイヤは、サポート募金が失敗した場合、自動的に払い戻しされます。\n
+-開設に使用したダイヤは払い戻しができず、募金に失敗した場合にも払い戻しはされません。\n
+-記念日の30日前には募金を完了しなくてはなりません。\n
+-今日を基準に100日以内の記念日のみサポートを開設することができます。
+-募金期間内にデザインが届かない場合、基本デザインで広告を掲載します。
+-選定されたデザインでも広告審査又は審議により任意にデザインが修正されることがあります。\n
+‐選定されたデザインには最愛ドルのQRコードイメージが含まれて配信されます。これによる広告キャンセル及びデザイン変更は不可能です。\n
+‐広告会社の事情により広告掲載ができなくなる可能性があります。\n
+-広告完売又は機械故障及び修理などで広告がキャンセルされる場合、他の広告に変更又はダイヤで払い戻しさせていただきます。.</string>
+    <string name="support_create_success">サポート開設が完了しました。</string>
+    <string name="support_period">募金期間／広告デザイン募集</string>
+    <string name="support_vote">応援に参加する</string>
+    <string name="support_goal">目標</string>
+    <string name="support_select_date">広告を掲示する記念日を選択してください。（100日以内）</string>
+    <string name="support_select_month">広告を掲示する月を選択してください。（100日以内）</string>
+    <string name="date_format_day">1日</string>
+    <string name="date_format_days" formatted="false">%d日</string>
+    <string name="date_format_week">1週間</string>
+    <string name="date_format_weeks" formatted="false">%d週間</string>
+    <string name="date_format_hour">1時間</string>
+    <string name="date_format_hours" formatted="false">%d時間</string>
+    <string name="my_diamonds">私のダイヤ</string>
+    <string name="manage_diamonds">ダイヤ管理</string>
+    <string name="my_support">私のサポート</string>
+    <string name="support_top5">サポーターTOP5</string>
+    <string name="shop_diamond">ダイヤショップ</string>
+    <string name="shop_diamond_desc">サポート用ダイヤ</string>
+    <string name="label_diamond_vote">ダイヤ使用内容</string>
+    <string name="label_diamond_save">ダイヤ加算内容</string>
+    <string name="label_heart_diamond">ハート、ダイヤ</string>
+    <string name="label_store">ショップ</string>
+    <string name="label_select_ad">広告一覧</string>
+    <string name="label_button_select">選択する</string>
+    <string name="btn_support_top5">TOP5</string>
+    <string name="support_empty">開設されたサポートがありません。</string>
+    <string name="support_failed">サポート\n失敗</string>
+    <string name="support_achievement" formatted="false">%d%% 達成</string>
+    <string name="diamond_store_disclaimer">ダイヤはランキング投票には使えないアイテムです。ランキングのために投票する時は\"ハートショップ\"を利用してください。\n使ったダイヤは払い戻しが不可能です。\nサポートに使ったダイヤは、サポート募金が失敗した場合、自動的に払い戻しされます。サポートの留意事項を参考してください。</string>
+    <string name="diamond_spend" formatted="false">ダイヤ%s個を使用しました。</string>
+    <string name="diamond_spend_1">ダイヤ1個を使用しました。</string>
+    <string name="label_friend_heart_empty">友達からもらったハートが\nありません。</string>
+    <string name="label_friend_heart_one">ハート1個を受け取りました。</string>
+    <string name="label_friend_heart_format" formatted="false">ハート%d個を受け取りました。</string>
+    <string name="label_tooltip_friend_heart">友達からもらったハートを\n受け取ってください！</string>
+    <string name="label_about_support">サポートとは？</string>
+    <string name="support_about_subtitle">推しの記念日を特別に</string>
+    <string name="support_about_title">最愛ドル\nアイドル応援広告</string>
+    <string name="support_about_info1">推しだけじゃなくても</string>
+    <string name="support_about_info2">アイドルなら誰でもOK！</string>
+    <string name="support_about_info_desc">1人ではなかなか難しいサポート\n（アイドル応援広告）を\nファンのみなさんと力を合わせて特別な日に\n広告をプレゼントしてみるのはいかがですか？\n期間内にミッションをクリアすると\n地下鉄広告やアプリ内バナー広告などが\nできちゃいます！</string>
+    <string name="support_about_precautions">-開設したサポートはキャンセルできません。\n
+-サポートに使ったダイヤは、サポート募金が失敗した場合、自動的に払い戻しされます。\n
+-開設に使用したダイヤは払い戻しができず、募金に失敗した場合にも払い戻しはされません。\n
+-記念日の30日前には募金を完了しなくてはなりません。\n
+-今日を基準に100日以内の記念日のみサポートを開設することができます。
+-募金期間内にデザインが届かない場合、基本デザインで広告を掲載します。
+-選定されたデザインでも広告審査又は審議により任意にデザインが修正されることがあります。\n
+‐選定されたデザインには最愛ドルのQRコードイメージが含まれて配信されます。これによる広告キャンセル及びデザイン変更は不可能です。\n
+‐広告会社の事情により広告掲載ができなくなる可能性があります。\n
+-広告完売又は機械故障及び修理などで広告がキャンセルされる場合、他の広告に変更又はダイヤで払い戻しさせていただきます。.</string>
+    <string name="support_example">広告の例</string>
+    <string name="label_processing">処理中…</string>
+    <string name="format_include_date">%1$s 含め %2$s</string>
+    <string name="date_format_month">1ヶ月</string>
+    <string name="date_format_months" formatted="false">%dヶ月</string>
+    <string name="label_support_design_competition">広告デザインコンクール</string>
+    <string name="label_support_design_guide">広告制作ガイド</string>
+    <string name="actor_support_about_title">最愛ドルスター応援広告</string>
+    <string name="actor_support_about_subtitle">私のスターの記念日を特別に</string>
+    <string name="actor_support_about_info_desc">1人ではなかなか難しいサポート\n（スター応援広告）を\nファンのみなさんと力を合わせて特別な日に\n広告をプレゼントしてみるのはいかがですか？\n期間内にミッションをクリアすると\n地下鉄広告やアプリ内バナー広告などが\nできちゃいます！</string>
+    <string name="actor_support_filter_favorites">私のスター</string>
+    <string name="actor_diamond_store_disclaimer">ダイヤはランキング投票には使えないアイテムです。ランキングのために投票する時は\"ハートショップ\"を利用してください。\n使ったダイヤは払い戻しが不可能です。\nサポートに使ったダイヤは、サポート募金が失敗した場合、自動的に払い戻しされます。サポートの留意事項を参考してください。</string>
+    <string name="actor_support_about_info1">好きな最愛ドルスター</string>
+    <string name="actor_support_about_info2">どんなスターでもOK</string>
+    <string name="subscription_account_holding">定期購入に問題があります。Google Play の定期購入の設定に移動して、Google Play のお支払い方法を修正してください。</string>
+    <string name="popup_no_diamond_title">ダイヤが足りません(´;ω;｀)</string>
+    <string name="popup_diamond_shop_desc">ダイヤを購入できます。</string>
+    <string name="secure_user_id">固有番号</string>
+    <string name="soba2020_title">2020ソリバダアワード</string>
+    <string name="soba_final_boy">ソリバダアワーズファン投票\n男性人気賞最終結果</string>
+    <string name="soba_final_girl">ソリバダアワーズファン投票\n女性人気賞最終結果</string>
+    <string name="soba_final_trot">ソリバダアワーズファン投票\nトロット人気賞最終結果</string>
+    <string name="actor_aaa_realtime_male">男性俳優人気賞リアルタイムランキング</string>
+    <string name="actor_aaa_accumulative_male">男性俳優人気賞累積ランキング</string>
+    <string name="actor_aaa_male_current_guide">男性俳優人気賞リアルタイム投票状況です。</string>
+    <string name="actor_aaa_male_accumulative_guide">男性俳優人気賞累積投票状況です。</string>
+    <string name="actor_aaa_male_fan_result">AAAファン投票\n男性俳優人気賞最終結果</string>
+    <string name="actor_aaa_realtime_female">女性俳優人気賞リアルタイムランキング</string>
+    <string name="actor_aaa_accumulative_female">女性俳優人気賞累積ランキング</string>
+    <string name="actor_aaa_female_current_guide">女性俳優人気賞リアルタイム投票状況です。</string>
+    <string name="actor_aaa_female_accumulative_guide">女性俳優人気賞累積投票状況です。</string>
+    <string name="actor_aaa_female_fan_result">AAAファン投票\n女性俳優人気賞最終結果</string>
+    <string name="popup_award_diamond_alert">ダイヤはランキング投票には使えないアイテムです。\nご参考になさってください。</string>
+    <string name="popup_update_app">新しい最愛ドルに会えるチャンス！\n今すぐ最新バージョンにアップデートする。</string>
+    <string name="actor_aaa_trot">トロット</string>
+    <string name="tapjoy">ゲームで♡ゲット</string>
+    <string name="offerwall_empty">全てのキャンペーンに参加されました。\n次のキャンペーンまでしばらくお待ちください。</string>
+    <string name="tooltip_select_my_favorite">♡ハートをタップして推しを設定してください。</string>
+    <string name="tooltip_select_my_love_idol">☆星をタップしてお気に入りに追加してください。</string>
+    <string name="tooltip_select_my_favorite_actor">♡ハートをタップして私のスターを設定してください。</string>
+    <string name="support_sympathy">いいね</string>
+    <string name="support_ready_for_photo">まだ広告の写真がありません( ﾉД`)少々お待ちください！</string>
+    <string name="support_success_list">広告掲載画像を見る</string>
+    <string name="support_in_process">実施中のサポート</string>
+    <string name="support_main">サポートメイン画面</string>
+    <string name="aaa2020_final_boy">AAA投票\n男性人気賞最終結果</string>
+    <string name="aaa2020_final_girl">AAA投票\n女性人気賞最終結果</string>
+    <string name="aaa2020_final_trot">AAAファン投票\nトロット人気賞最終結果</string>
+    <string name="aaa2020_final_male">AAAファン投票\n男性俳優人気賞最終結果</string>
+    <string name="aaa2020_final_female">AAAファン投票\n女性俳優人気賞最終結果</string>
+    <string name="report_user_desc">該当のユーザーを通報しますか？</string>
+    <string name="report_feed">ユーザーを通報</string>
+    <string name="msg_report_user_confirm">不適切なユーザーですか？間違い通報を防ぐためにハート%1$s個が消耗されます。\nそれでも通告しますか？</string>
+    <string name="failed_to_report_user__already_reported">既に通報されたユーザーです。\n通報は各ユーザーにつき1回までと制限されています。</string>
+    <string name="purchase_service_unavailable">ネットワーク接続がダウンしました。</string>
+    <string name="purchase_billing_unavailable">Play Serviceが設定されていない。または、Googleアカウントが設定されていません。</string>
+    <string name="purchase_item_unavailable">該当の商品は供給されていません。\n立て続けに購入ができない場合には、設定内の「質問する」でお問い合わせお願いします。</string>
+    <string name="purchase_error">致命的なエラーが発生しました。</string>
+    <string name="purchase_item_already_owned">該当の商品は既に購入されています。プレイストアで購入内訳を確認してください。</string>
+    <string name="purchase_item_not_owned">アイテムを所有していないので、消費できない</string>
+    <string name="quiz_review_desc">アイドルクイズに出題される問題を\n直接審査してください！</string>
+    <string name="inquiry_notice">[お問い合わせ可能時間]\n平日10:00 - 17:00\n(時間外にお問い合わせいただいた場合、回答までお時間をいただく場合がございますので、ご了承お願いいたします。)\n\n- アプリの利用に関するお問い合わせの場合、必ず時間が映るようにスクショしてください。\n- アップロードしたファイルはお問い合わせした日から30日後、自動的に削除されます。\n- スタッフへの悪口、セクハラ、威嚇的な表現で精神的な被害を与える方は、作文禁止または強制退場、もしくは関連法令に基づいて措置されることがあります。</string>
+    <string name="setting_menu_push_supports">サポート</string>
+    <string name="order_by_dday">記念日順</string>
+    <string name="error_2200">レベルが低いため通報することができません。</string>
+    <string name="invalid_email_form">メールアドレスを正しく入力してください。</string>
+    <string name="label_rising" formatted="false">%d位 up!</string>
+    <string name="chat_many_talk_at">会話多い順</string>
+    <string name="chat_anonymous">匿名</string>
+    <string name="chat_list_all" formatted="false">全体(%d)</string>
+    <string name="chat_list_join" formatted="false">参加中(%d)</string>
+    <string name="chat_make">チャットルーム開設</string>
+    <string name="chat_make_help_popup1">チャットルームの開設後、推しを変更する場合、チャットルームの利用ができなくなり、リーダーの権限が消えます。</string>
+    <string name="chat_make_help_popup2">チャットルームはコミュニティ当たり300個まで作ることができます。</string>
+    <string name="chat_make_help_popup3">チャットルームは最大300人まで参加可能です。</string>
+    <string name="chat_make_help_popup4" formatted="false">チャットルームの開設際、ダイヤ%d個が消耗されます。</string>
+    <string name="chat_less_level_popup" formatted="false">すみません。\nチャットルームはレベル%d以上から作ることができます。</string>
+    <string name="chat_room_title">チャットルームの名前</string>
+    <string name="chat_room_title_placeholder">チャットルームの名前を入力してください。(5字以上)</string>
+    <string name="chat_room_desc">チャットルームの紹介</string>
+    <string name="chat_room_desc_placeholder">チャットルームの紹介を入力してください。</string>
+    <string name="chat_room_disclose_most">公開可否(推し)</string>
+    <string name="chat_room_disclose_nickname">公開可否(ニックネーム)</string>
+    <string name="chat_room_limit_level">レベル制限</string>
+    <string name="chat_room_require">＊必須項目</string>
+    <string name="chat_room_make_button" formatted="false">開設する\n(ダイヤ%d個消耗)</string>
+    <string name="chat_room_make_popup1_title">開設する</string>
+    <string name="chat_room_make_popup1_desc">開設するにはダイヤ%1$s個が必要です。\n開設しますか？</string>
+    <string name="chat_room_make_popup2">すみません。\nチャットルームの数は最大300個ですので、これ以上開設することはできません。</string>
+    <string name="chat_room_join_popup1">推しが異なるため、入場することができません。</string>
+    <string name="chat_room_join_popup2">レベル制限で入場することができません。</string>
+    <string name="chat_room_join_popup3">最大人数の300人で全部埋まり、入場できません。</string>
+    <string name="chat_room_number_of_person">参加人数</string>
+    <string name="chat_room_status">チャットルームの状態</string>
+    <string name="chat_room_owner">チャットルームリーダー</string>
+    <string name="chat_room_report">不良のチャットルームですか？\n虚偽の申告を防止するためにハート%1$s個が使われます。\n申告しますか？</string>
+    <string name="chat_room_delete">削除</string>
+    <string name="chat_room_delete_popup">チャットルームを削除しますか？\nチャットルームを削除すると、会話に参加した全ての人々にも削除されます。</string>
+    <string name="chat_room_leave">出る</string>
+    <string name="chat_room_leave_desc1">本当に出ますか？</string>
+    <string name="chat_room_leave_desc2">チャットルームから出ると違う人がチャットルームのリーダーになります。\n本当に出ますか？</string>
+    <string name="chat_room_most_only">推しだけ公開チャットルーム</string>
+    <string name="chat_room_most_and_group">グループ・メンバー公開チャットルーム</string>
+    <string name="chat_room_nickname">ニックネーム公開チャットルーム</string>
+    <string name="chat_room_anonymous">匿名チャットルーム</string>
+    <string name="chat_room_level_limit" formatted="false">Lv.%d以上</string>
+    <string name="chat_room_create_success">チャットルームの開設が完了しました。</string>
+    <string name="chat_unknown_user">不明なユーザー</string>
+    <string name="chat_level_select_limit">自分のレベルより高いレベルは選ぶことができません。</string>
+    <string name="chat_make_tooltip">チャットルームを作ってみてください。</string>
+    <string name="chat_deleted_message">削除されたメッセージです。</string>
+    <string name="chat_photo">画像</string>
+    <string name="chat">チャット</string>
+    <string name="setting_menu_push_chat">チャット</string>
+    <string name="chat_title_short">チャットルームの名前を5文字以上に書いてください。</string>
+    <string name="chat_report_error_2401">既に通告したチャットルームです。</string>
+    <string name="google_store_error">Google Playストアサービスが円滑ではありません。
+Google Playストアの環境を確認した後、もう一度お試しください。</string>
+    <string name="chat_first_join">チャットに参加しました。</string>
+    <string name="china_payment_choice_title">決済手段</string>
+    <string name="china_payment_choice_alipay">Alipay</string>
+    <string name="china_payment_choice_unionpay">UnionPay</string>
+    <string name="china_payment_choice_wechatpay">WeChat Pay</string>
+    <string name="chat_message_already_reported">すでに通告したメッセージです。</string>
+    <string name="chat_connecting">接続中です。しばらくお待ちください。</string>
+    <string name="msg_favorite_guide_4" formatted="false">推しを変更すると%sチャットルームから出ることになり、48時間後に変更できます。\n推しを解除し%sを推しに登録しますか？</string>
+    <string name="actor_msg_favorite_guide_4" formatted="false">私のスターを変更すると%sチャットルームから出ることになり、変更してから48時間以後に変更可能です。\n私のスターを解除して%sを私のスターに登録しますか？</string>
+    <string name="msg_favorite_unregi_guide3" formatted="false">推しを解除すると%sチャットルームから出ることになり\n推しの再設定は最後に設定した日から48時間後可能になります。</string>
+    <string name="actor_msg_favorite_unregi_guide3" formatted="false">私のスターを解除すると%sチャットルームから出ることになり\n私のスターの再設定は最後に設定した日から48時間後可能になります。</string>
+    <string name="chat_title_bad_words">チャットルームのタイトルに悪口が含まれています。</string>
+    <string name="chat_description_bad_words">チャットルームの紹介に悪口が含まれています。</string>
+    <string name="chatpush_image">画像</string>
+    <string name="chat_leave_user">(退場したユーザー)</string>
+    <string name="chat_group_create_fail">推しが個人の場合にはグループのチャットルームを作ることができません。</string>
+    <string name="chat_unread_message">未読メッセージ</string>
+    <string name="detect_auto_clicker">異常な活動が検出されたため、ビデオ広告を視聴することができません。正常的な方法でご利用ください。</string>
+    <string name="signup_age_limit">満14歳以上です。</string>
+    <string name="signup_age_prohibited">満14歳未満は加入することができません。</string>
+    <string name="rank_history_30_average" formatted="false">%s日間の平均投票数</string>
+    <string name="chat_room_leave_desc3">今、出るとチャットルームが削除されます。\n本当に出ますか？</string>
+    <string name="actor_main_set">カテゴリー ON/OFF</string>
+    <string name="actor_main_category_set">見たいカテゴリーを設定してください。</string>
+    <string name="actor_male_singer">男性歌手</string>
+    <string name="actor_female_singer">女性歌手</string>
+    <string name="necessarily_one_category">一つ以上のカテゴリーを必ず設定してください。</string>
+    <string name="new_shop_heart">ハート</string>
+    <string name="new_shop_package">パッケージ</string>
+    <string name="new_shop_subscription">定期購入ショップ</string>
+    <string name="diamond">ダイヤ</string>
+    <string name="diamonds">ダイヤ</string>
+    <string name="new_shop_diamond">ダイヤショップ</string>
+    <string name="ever_heart_short">エバーハート</string>
+    <string name="daily_heart_short">デイリーハート</string>
+    <string name="support_see_ad_types">広告の種類を見る</string>
+    <string name="support_ad_types">広告の種類</string>
+    <string name="auto_clicker_human_check_explain">ロボットではなければ\n次の問題を解いてください!</string>
+    <string name="auto_clicker_human_check_fail">誤答です!自動クリック(Auto Clicker)など\nロボットだと判断し\nビデオ広告を見ることができません。\n正常的な方法で使ってください。</string>
+    <string name="china_agreement_deny">すみません。\n利用規約に同意しない場合\nこのアプリを使うことができません。</string>
+    <string name="my_info_title">私の情報</string>
+    <string name="my_info_info">情報</string>
+    <string name="my_info_list">内容</string>
+    <string name="my_info_own_heart">私のハート</string>
+    <string name="my_info_own_diamond">私のダイヤ</string>
+    <string name="my_info_heart">ハート</string>
+    <string name="more_faq">何かお困りですか？</string>
+    <string name="chat_report_short">通告の内容が短すぎます。(10字以上)</string>
+    <string name="support_ad_type_detail">広告の詳細情報</string>
+    <string name="video_ad_time_left">次の広告ハート加算まで残り時間</string>
+    <string name="quiz_duplicated_answer">重複した答えがあります。 もう一度作成してください。</string>
+    <string name="quiz_review_more">クイズ審査をもっとする</string>
+    <string name="miracle_month">今月の奇跡</string>
+    <string name="record_room">歴史館</string>
+    <string name="charity_angel_count">寄付天使の回数</string>
+    <string name="charity_fairy_count">寄付妖精の回数</string>
+    <string name="miracle_month_count">今月の奇跡回数</string>
+    <string name="search_hot_trend">ホットトレンド</string>
+    <string name="search_history">最近の検索ワード</string>
+    <string name="search_recommended">おすすめの自動補完</string>
+    <string name="report_comment">虚偽の通告を防止するためにハート%1$s個が使われます。\nこのコメントを通告しますか？</string>
+    <string name="lunar_birthday">旧暦</string>
+    <string name="comment_report_error_2501">既に通告したコメントです。</string>
+    <string name="emoji">絵文字</string>
+    <string name="emoji_content">(絵文字)</string>
+    <string name="chat_push_emoticon">絵文字を送りました。</string>
+    <string name="msg_daily_pack_cancel">現在、デイリーパックを購読中です。\nデイリーパックの購読を解約しない場合は料金が請求される可能性がございます。\nデイリーパックの購読解約をご希望の場合は、%1$sをタップしてください。</string>
+    <string name="withdraw">退会</string>
+    <string name="cancel_subscription">購読解約</string>
+    <string name="order_by_get_heart">ハート順</string>
+    <string name="themepick">テーマPICK</string>
+    <string name="imagepick">イメージPICK</string>
+    <string name="themepick_confirm_vote" formatted="false">%sに投票しますか？</string>
+    <string name="themepick_first_reward" formatted="false">1位ボーナス\n%s</string>
+    <string name="themepick_total_votes">総投票数</string>
+    <string name="photo_access_denied_icloud">原本の写真を読み込むことができません。原本のファイルを持っているか確認してください。</string>
+    <string name="menu_live">PLAY</string>
+    <string name="live_auto">自動</string>
+    <string name="live_open" formatted="false">%s OPEN!</string>
+    <string name="live_coming_soon">準備中です。\nしばらくお待ちください。</string>
+    <string name="live_coming_soon_list">準備中です。</string>
+    <string name="live_level_limit" formatted="false">すみません。\nレベル %d 以上だけ視聴することができます。</string>
+    <string name="live_end">ライブ配信が終了しました。</string>
+    <string name="live_disclaimer">- ▶️ 視聴回数、❤️ いいねの数、👁 リアルタイム同時接続者の数、📈 最大接続者の数を提供します。\n- レベル制限により視聴ができない場合があります。\n- 3G/LTE/5G などの環境ではデータ料金が発生することがあります。</string>
+    <string name="live_empty">予定された配信がありません。</string>
+    <string name="live_stalled">送出が遅延しています。</string>
+    <string name="live_quality">解像度</string>
+    <string name="live_share_title" formatted="false">#最愛ドル #最愛ドルPLAY\n\n%s\n\n最愛ドルPLAYで今すぐ視聴してみてください!\n</string>
+    <string name="themepick_already_vote">既に投票しました。</string>
+    <string name="current_ranking">現在の順位</string>
+    <string name="vote_themepick_finished" formatted="false">%sに投票しました。\n\n1位まで %s票！\n友達と%sして1位に挑戦してみてください！</string>
+    <string name="vote_themepick_finished_first" formatted="false">%sに投票しました。\n\n友達と%sしてみてください！</string>
+    <string name="share_themepick" formatted="false">#最愛ドル #テーマPICK\n\n%s\n %s %s\n%s %s\n%s %s\n\n今すぐ最愛ドルで確認してください!\n%s</string>
+    <string name="share_in_progress_support" formatted="false">#最愛ドル #サポート #広告 #%s %s\n\n今、最愛ドルで \" %s \" サポート実施中!\n%s 一緒にプレゼントしましょう~\n%s</string>
+    <string name="share_success_support" formatted="false">#最愛ドル #サポート #広告 #%s %s\n\n最愛ドルで \" %s \" サポートが成功しました!\n%s 掲載された画像一緒に見ましょう:)\n%s</string>
+    <string name="share_friend_invite" formatted="false">[最愛ドル招待状💌]\n#%s現在ランキング%d位\n一緒に#%s %s投票して推し活しましょう！\n\n招待コードを入力して会員登録するとハートがもらえます！!\n招待コード: %s\n\n#KPOP #NO1_APP #最愛ドル\n%s</string>
+    <string name="share_friend_invite_nomost" formatted="false">[最愛ドル招待状💌]\n一緒に投票して推し活しましょう！\n招待コードを入力して会員登録すると、ハートがもらえます！\n招待コード: %s\n\n現在2位: #%s %s\n\n1位が気になるなら？\n#最愛ドル でチェックしてください。\n%s</string>
+    <string name="award_realtime_rank" formatted="false">%s %s リアルタイムランキング</string>
+    <string name="award_accumulate_rank" formatted="false">%s %s 累積ランキング</string>
+    <string name="award_final_result" formatted="false">%s\n%s %s 最終結果</string>
+    <string name="share_themepick_celeb" formatted="false">#最愛ドルスター #Themed Pick\n\n%s\n%s %s\n%s %s\n%s %s\n\n今すぐ最愛ドルスターで確認してください!\n%s</string>
+    <string name="share_in_progress_support_celeb" formatted="false">#最愛ドルスター #サポート #広告 #%s %s\n\n今、最愛ドルスターで  \" %s \"  サポート実施中!\n%s 一緒にプレゼントしましょう~\n%s</string>
+    <string name="share_success_support_celeb" formatted="false">#最愛ドルスター #サポート #広告 #%s %s\n\n最愛ドルスターで \" %s \" サポートが成功しました!\n%s 掲載された画像一緒に見ましょう:)\n%s</string>
+    <string name="share_friend_invite_celeb" formatted="false">[最愛ドルスター招待状💌]\n#%s現在ランキング%d位\n一緒に#%s %s投票して推し活しましょう！\n\n招待コードを入力して会員登録するとハートがもらえます！\n招待コード: %s\n\nファンダムと交流する推し活コニュニティ #最愛ドルスター\n%s</string>
+    <string name="share_friend_invite_nomost_celeb" formatted="false">[最愛ドルスター招待状💌]\n一緒に投票して推し活しましょう！\n招待コードを入力して会員東特すると、ハートをプレゼントします！\n招待コード: %s\n\n現在2位: #%s %s\n\n1位が気になるなら？\n#最愛ドルスター でチェックしてください。\n%s</string>
+    <string name="live_actionbar_title">最愛ドルPLAY</string>
+    <string name="live_chat">チャット</string>
+    <string name="live_share_title_celeb" formatted="false">#最愛ドルスター #最愛ドルPLAY\n\n%s\n\n最愛ドルPLAYで今すぐ視聴してみてください!\n</string>
+    <string name="themepick_today_voted">今日の投票終了</string>
+    <string name="block">ブロック</string>
+    <string name="unblock">ブロック解除</string>
+    <string name="block_question">このユーザーをブロックしますか？</string>
+    <string name="user_blocked">ブロックしたユーザーです。</string>
+    <string name="themepick_additional_vote">ダイヤ1個を使ってもう一度投票しますか？</string>
+    <string name="themepick_candidate_vote">候補の中から一位を選んで投票してください。</string>
+    <string name="user_blocked2">ブロックされたユーザー</string>
+    <string name="share_image_pick" formatted="false">#最愛ドル #イメージPICK\n\n%s\n%s %s\n%s %s\n%s %s\n\n今すぐ最愛ドルで確認してください!\n%s</string>
+    <string name="share_image_pick_celeb" formatted="false">#最愛ドルスター #イメージPICK\n\n%s\n%s %s\n%s %s\n%s %s\n\n今すぐ最愛ドルスターで確認してください!\n%s</string>
+    <string name="no_blocked_users">ブロックしたユーザーがいません。</string>
+    <string name="report_description">通報した理由を記入してください。</string>
+    <string name="msg_nickname_coupon">長期未使用者のニックネーム変更クーポンをお持ちです。\nクーポンを使いますか？</string>
+    <string name="msg_nickname_changed">ニックネームが変更されました。</string>
+    <string name="no_search_result_community">初の投稿を作成してみてください！</string>
+    <string name="surprise_dia">サプライズダイヤ</string>
+    <string name="quiz_daily_posting_limit">一日に作成できるクイズの数を超過しました。明日もう一度お試しください。</string>
+    <string name="quiz_in_screening">審査待ちのクイズ</string>
+    <string name="quiz_denied">断られたクイズ</string>
+    <string name="quiz_no_approved">承認されたクイズがありません。</string>
+    <string name="quiz_no_in_screening">審査待ちのクイズがありません。</string>
+    <string name="quiz_no_denied">断られたクイズがありません。</string>
+    <string name="quiz_tutorial_get_heart">承認されたクイズのハートを受け取ってください！</string>
+    <string name="quiz_deny_reason_title">断られた理由</string>
+    <string name="quiz_deny_reason_desc">- 選択肢に絵文字などで正解を表示した場合\n- 質問を見なくても正解が簡単にわかる場合\n- クイズの内容が重複した場合\n- 時間がたつと正解が変わる場合\n- 写真がよく見えない場合\n- 誤字がある場合\n- 質問の答えが間違っている場合\n- 解説の内容が足りない場合\n- クイズとアイドルがミスマッチされている場合</string>
+    <string name="quiz_review">クイズを審査する</string>
+    <string name="quiz_finish_today_review">今日の審査は終了!\n明日また審査してください。</string>
+    <string name="quiz_nothing_review">もうこれ以上審査できるクイズがありません。</string>
+    <string name="quiz_ask_finish_review">クイズの審査を終了しますか?\n今終了するとクイズ審査の機会が差し引かれます。</string>
+    <string name="quiz_start_short">START</string>
+    <string name="quiz_already_report_review">既に通報したクイズです。</string>
+    <string name="another_account_daily_purchase">購入復元に失敗しました。他のアカウントで購入中ではないのか確認してください。</string>
+    <string name="already_daily_purchase">購入復元に失敗しました。すでに購入中のアカウントです。</string>
+    <string name="welcome_pack_title">Welcome Package</string>
+    <string name="welcome_pack_desc">1回限定ビックセール</string>
+    <string name="attendance_check">出席チェック</string>
+    <string name="attendance_days_start" formatted="false">%s から</string>
+    <string name="attendance_days_consecutive">連続出席</string>
+    <string name="attendance_consecutive_heart_reward">%1$s日連続出席ハートリワード %2$s個が支給されました。</string>
+    <string name="attendance_consecutive_dia_reward">%1$s日連続出席ダイヤリワード %2$s個が支給されました。</string>
+    <string name="attendance_consecutive_both_reward">%1$s日連続出席ハートリワード %2$s個, ダイヤ %3$s個が支給されました。</string>
+    <string name="attendance_available_account_title">一つのアカウントでのみ連続チェックができます。</string>
+    <string name="attendance_available_account_subtitle" formatted="false">%sで出席チェックしますか？</string>
+    <string name="go_to_attendance">出席チェックしに行く</string>
+    <string name="update">アップデート</string>
+    <string name="attendance_with" formatted="false">%sを始めて</string>
+    <string name="recent">最近</string>
+    <string name="thirty_days">30日</string>
+    <string name="support_design_period">デザイン募集</string>
+    <string name="solo">個人</string>
+    <string name="solo_male">男性個人</string>
+    <string name="solo_female">女性個人</string>
+    <string name="award_solo_realtime_example">グループに属していない最愛ドル・最愛ドルスターのソロアーティストのリアルタイムランキングの例です。</string>
+    <string name="award_solo_realtime_info">最愛ドル・最愛ドルスターのソロアーティストの\nリアルタイムランキングです。</string>
+    <string name="award_solo_aggregated_info">最愛ドル・最愛ドルスターのソロアーティストの累計ランキングです。</string>
+    <string name="award_solo_male_realtime">ソロアーティストのリアルタイムランキング</string>
+    <string name="award_solo_female_realtime">ソロアーティストのリアルタイムランキング</string>
+    <string name="award_solo_male_aggregated">ソロアーティストの累計ランキング</string>
+    <string name="award_solo_female_aggregated">ソロアーティストの累計ランキング</string>
+    <string name="award_solo_male_final" formatted="false">%s\n男性ソロ人気賞の最終結果</string>
+    <string name="award_solo_female_final" formatted="false">%s\n女性ソロ人気賞の最終結果</string>
+    <string name="award_current_guide">最終的な勝者は、累計スコアに基づいて決定されます。</string>
+    <string name="group_male">男性グループ</string>
+    <string name="group_female">女性グループ</string>
+    <string name="award_trot_male">男性歌手</string>
+    <string name="award_trot_female">女性歌手</string>
+    <string name="award_trot_male_example">最愛ドル・最愛ドルスターの男性ソロアーティストのリアルタイム投票の例画面です。</string>
+    <string name="award_trot_female_example">最愛ドル・最愛ドルスターの女性ソロアーティストのリアルタイム投票の例画面です。</string>
+    <string name="award_trot_male_realtime_info">最愛ドル・最愛ドルスターの男性ソロアーティストのリアルタイムランキングです。</string>
+    <string name="award_trot_female_realtime_info">最愛ドル・最愛ドルスターの女性ソロアーティストのリアルタイムランキングです。</string>
+    <string name="award_trot_male_aggregated_info">最愛ドル・最愛ドルスターの男性ソロアーティストの累計ランキングです。</string>
+    <string name="award_trot_female_aggregated_info">最愛ドル・最愛ドルスターの女性ソロアーティストの累計ランキングです。</string>
+    <string name="award_trot_male_realtime">男性歌手リアルタイムランキング</string>
+    <string name="award_trot_female_realtime">女性歌手リアルタイムランキング</string>
+    <string name="award_trot_male_aggregated">男性歌手累計ランキング</string>
+    <string name="award_trot_female_aggregated">女性歌手累計ランキング</string>
+    <string name="award_trot_male_final" formatted="false">%s\n男性ソロアーティスト人気賞最終結果</string>
+    <string name="award_trot_female_final" formatted="false">%s\n女性ソロアーティスト人気賞最終結果</string>
+    <string name="award_trot_all_example">トロット部門のリアルタイムランキングの例です。</string>
+    <string name="award_trot_all_realtime_info">トロット歌手のリアルタイムランキングです。</string>
+    <string name="award_trot_all_realtime">トロット部門のリアルタイムランキング</string>
+    <string name="award_trot_all_aggregated_info">トロット歌手の累積ランキングです。</string>
+    <string name="award_trot_all_aggregated">トロット部門の累積ランキング</string>
+    <string name="award_trot_all_final" formatted="false">%s\nトロット人気賞の最終結果</string>
+    <string name="today">今日</string>
+    <string name="earlier">以前</string>
+    <string name="entrance_qrcode">チケット交換QRコード</string>
+    <string name="auth_completed">認証が完了しました。\nありがとうございます。</string>
+    <string name="win_awards_ticket">アワーズチケット当選</string>
+    <string name="already_set_stamp">既にスタンプを押しました。明日もう一度お試しください。</string>
+    <string name="ad_intend_guide" formatted="false">ビデオ広告を見るとボーナスハート%s個を受け取ることができます。</string>
+    <string name="ad_start">広告スタート</string>
+    <string name="skip">広告スキップ ></string>
+    <string name="extra_heart_received" formatted="false">ボーナスハート%s個が支給されました。</string>
+    <string name="hda_2022">2022 K Global Heart Dream Awards</string>
+    <string name="face_photo_not_saving">- 投稿された画像は保存されず、即時削除されます。</string>
+    <string name="are_you_sure_dia">本気ですか？</string>
+    <string name="onepick_confirm_exit2">今、終了すると1回の投票機会がなくなります。\n終了しますか？</string>
+    <string name="miracle">奇跡</string>
+    <string name="cumulative_rankings">累計ランキング</string>
+    <string name="miracle_aggregating_period">集計期間</string>
+    <string name="unused_channels">使わないチャンネル</string>
+    <string name="friends_delete_message">友達を削除しますか？</string>
+    <string name="essential">(必須)</string>
+    <string name="personal_agreement">個人情報の収集及び利用同意</string>
+    <string name="msg_personal_information1" formatted="false">%sはサービスの会員登録、お問い合わせ及びCS、通知のお知らせなどのために以下のように個人情報を収集します。</string>
+    <string name="msg_personal_information2" formatted="false">*お客様は%sサービス利用に必要な最小限の個人情報収集利用に同意しない権利があり、同意を拒否する際には拒否した内容につきましてサービスが制限されることがあります。</string>
+    <string name="id">ID</string>
+    <string name="recommender">推薦人（招待コード）</string>
+    <string name="pwd_combination">8字以上英文+数字の組み合わせで入力してください。</string>
+    <string name="agree_terms">個人情報の収集及び利用に同意します。</string>
+    <string name="warning_report_lose_heart" formatted="false">通報するとハート%s個が使われ、この投稿をこれ以上見ることができません。それでも通報しますか？</string>
+    <string name="warning_report_hide_article">通報するとこの投稿を見ることができなくなります。それでも通報しますか？</string>
+    <string name="check_pwd_requirement">パスワードの条件を確認してください。</string>
+    <string name="offerwall_appdriver">ミッションで♡</string>
+    <string name="inquiry_category">質問のカテゴリー選択</string>
+    <string name="inquiry_how_to_use">利用方法</string>
+    <string name="inquiry_report_bugs">エラー・バグ</string>
+    <string name="inquiry_purchase_subs">決済・サブスクリプション</string>
+    <string name="inquiry_proposal">アイデア提案</string>
+    <string name="inquiry_etc">その他</string>
+    <string name="inquiry_send_files">ファイル添付</string>
+    <string name="choose_inquiry_category">お問い合わせの内容を選んでください。</string>
+    <string name="inquiry_files">ファイル添付</string>
+    <string name="delete_file_description">添付したファイルはお問い合わせの日から30日間保存し、そのあと削除されます。</string>
+    <string name="msg_file_uploading">ファイルアップロード中です。しばらくしてからもう一度お試しください。</string>
+    <string name="msg_file_upload_failed">ファイルアップロードに失敗しました。もう一度お試しください。</string>
+    <string name="progressing_files">ファイル処理中</string>
+    <string name="msg_file_expired">削除されダウンロードできません。</string>
+    <string name="msg_invalid_file">このファイル形式には対応していません。</string>
+    <string name="photo">イメージ</string>
+    <string name="video">動画</string>
+    <string name="desc_quiz_denied_cases_celeb">- 選択肢に絵文字などで正解を表示した場合\n- 質問を見なくても正解が簡単にわかる場合\n- クイズの内容が重複した場合\n- 時間がたつと正解が変わる場合\n- 写真がよく見えない場合\n- 誤字がある場合\n- 質問の答えが間違っている場合\n- 解説の内容が足りない場合</string>
+    <string name="s_league">Sリーグ</string>
+    <string name="a_league">Aリーグ</string>
+    <string name="will_be_updated" formatted="false">%s日にアップデートされます。</string>
+    <string name="capital_all">ALL</string>
+    <string name="quiz_deny_reason_desc_celeb">- 選択肢に絵文字などで正解を表示した場合\n- 質問を見なくても正解が簡単にわかる場合\n- クイズの内容が重複した場合\n- 時間がたつと正解が変わる場合\n- 写真がよく見えない場合\n- 誤字がある場合\n- 質問の答えが間違っている場合\n- 解説の内容が足りない場合</string>
+    <string name="select_category_field">カテゴリー選択</string>
+    <string name="select_category_toast">カテゴリーを選択してください。</string>
+    <string name="enter_title">タイトルを入力してください。</string>
+    <string name="enter_content">内容を入力してください。</string>
+    <string name="idol_board_article">掲示板投稿</string>
+    <string name="small_talk_empty">まだ、投稿がありません。\n1番目に投稿してみてください！</string>
+    <string name="order_like">人気順</string>
+    <string name="order_hit">閲覧数順</string>
+    <string name="views" formatted="false">閲覧 %s</string>
+    <string name="format_recommend" formatted="false">おすすめ %s</string>
+    <string name="format_comment" formatted="false">コメント %s</string>
+    <string name="recommend">おすすめ</string>
+    <string name="filter_all_language">全ての言語</string>
+    <string name="filter_app_language">設定言語</string>
+    <string name="title_char_limit_placeholder" formatted="false">タイトル(最大 %s字)</string>
+    <string name="popup_request_auth_title">%1$sで次の作業のために\n承認を要請しました。</string>
+    <string name="agree_and_continue">同意して続く</string>
+    <string name="reject">拒否</string>
+    <string name="captured_qr_not_available">スクショで保存したQRコードは使えません。</string>
+    <string name="captured_qr_not_available_popup">この画面はスクショ禁止です。写真で保存したQRコードは使えません。</string>
+    <string name="quiz_main_title2_celeb">私が本当の芸能人・TVオタク!!</string>
+    <string name="show_qr_staff">チケット交換先で担当者にQRコードをお見せください。</string>
+    <string name="seconds" formatted="false">%s秒</string>
+    <string name="remaining_time">残り時間</string>
+    <string name="male_4th_gen_idol">4世代(男)</string>
+    <string name="female_4th_gen_idol">4世代(女)</string>
+    <string name="hda_2023">2023 K Global Heart Dream Awards</string>
+    <string name="award_4th_gen_male_final" formatted="false">%s\n4世代ホットアイコン男性グループ賞最終結果</string>
+    <string name="award_4th_gen_female_final" formatted="false">%s\n4世代ホットアイコン女性グループ賞最終結果</string>
+    <string name="award_4th_gen_male_aggregated">4世代ホットアイコン男性グループ累計ランキング</string>
+    <string name="award_4th_gen_female_aggregated">4世代ホットアイコン女性グループ累計ランキング</string>
+    <string name="award_4th_gen_male_realtime">4世代ホットアイコン男性グループ\nリアルタイムランキング</string>
+    <string name="award_4th_gen_female_realtime">4世代ホットアイコン女性グループ\nリアルタイムランキング</string>
+    <string name="award_4th_gen_realtime_example">4世代ホットアイコン女性グループ\nリアルタイムランキング</string>
+    <string name="award_4th_gen_aggregated_info">4世代グループ候補の個人(メンバー)投票数とグループ投票数を合算した\n累計ランキングです。</string>
+    <string name="award_4th_gen_realtime_info">4世代グループ候補の個人(メンバー)投票数とグループ投票数を合算した\nリアルタイムランキングです。</string>
+    <string name="award_solo_final" formatted="false">%s\nソロアーティスト人気賞の最終結果</string>
+    <string name="quiz_celeb_unavailable_not_enough">すみません。こちらのカテゴリーのクイズが足りない状態です。\n他のカテゴリーを選択し、解いてください。</string>
+    <string name="limited_photo_permission_desc">選択した写真へのアクセス権限がありません。\nアクセスを許可してください。</string>
+    <string name="set_photo_permission">アクセスを許可する</string>
+    <string name="try_daily_stamp">出席チェックする</string>
+    <string name="daily_stamp_already_done" formatted="false">%s日目 - 出席チェック完了</string>
+    <string name="stamp_and_get_hearts" formatted="false">出席チェックしてハート %s個もらう</string>
+    <string name="stamp_and_get_diamonds" formatted="false">出席チェックしてダイヤ %s個もらう</string>
+    <string name="stamp_warning_subtitle">- 追加ハートはデイリーハートで、集計時間以後無くなります。\n- オタクタイムハートは毎日20:00∼23:30にもらえます。\n- 追加ハートは毎日、集計時間にリセットされます。\n- 集計時間には追加ハートがもらえません。</string>
+    <string name="label_league_ended">個人リーグ制が終了されました。</string>
+    <string name="receive_more_heart_after_attendance">出席チェックしてハートをもらう</string>
+    <string name="receive_more_heart_after_video_ads" formatted="false">ビデオ広告を見る＋%sハート</string>
+    <string name="reward_daily_connection">最愛ドルアクセスリワード</string>
+    <string name="reward_daily_connection_celeb">最愛ドルスターアクセスリワード</string>
+    <string name="reward_sorry_heart">ボーナスハート</string>
+    <string name="reward_daily_pack">デイリーパック</string>
+    <string name="reward_level_heart">レベルハート</string>
+    <string name="reward_buring_time">オタクタイム</string>
+    <string name="reward_post_article">投稿ボーナスハート</string>
+    <string name="reward_heartbox">ハートボックス</string>
+    <string name="reward_attendance_heart" formatted="false">%s日連続出席ハート</string>
+    <string name="reward_attendance_diamond" formatted="false">%s日連続出席ダイヤ</string>
+    <string name="receive">もらう</string>
+    <string name="complete">完了</string>
+    <string name="before_opening">まもなく</string>
+    <string name="attendance_heart_count_format" formatted="false">ハート%s個</string>
+    <string name="dia_count_format" formatted="false">ダイヤ%s個</string>
+    <string name="more_hearts_section_title">追加ハートをもらう</string>
+    <string name="reward_quiz">クイズハート</string>
+    <string name="reward_didnt_receive_quiz">未支給クイズハート</string>
+    <string name="reward_offerwall_heart" formatted="false">ハート%s個をもらう</string>
+    <string name="reward_offerwall_diamond" formatted="false">ダイヤ%s個をもらう</string>
+    <string name="purchase_cancelled">一時的なエラーにより購入がキャンセルされました。再度お試しください。</string>
+    <string name="purchase_refunded">一時的なエラーにより購入が自動的にキャンセルされ、払い戻しされました。再度お試しください。</string>
+    <string name="purchase_pending">購入の件、決済保留状態です。決済完了後、支給されます。</string>
+    <string name="label_rank_daily_no_data">まもなくデイリーランキングがアップデートされます。</string>
+    <string name="label_rank_daily_m_no_data">月別デイリーランキングデータがありません。</string>
+    <string name="label_stats_highest_votes_no_data">まだ、ハート投票をもらったアイドルがいません。推しに投票してみてください！</string>
+    <string name="label_stats_1st_place_no_data">まだ、1位したアイドルがいません。推しに投票してみてください！</string>
+    <string name="actor_label_stats_highest_votes_no_data">まだ、ハート投票をもらったスターがいません。スターに投票してみてください！</string>
+    <string name="actor_label_stats_1st_place_no_data">まだ、1位したスターがいません。スターに投票してみてください！</string>
+    <string name="label_award_aggregated_no_data">累計ランキングは明日から集計されます。</string>
+    <string name="reward_videoad">ビデオ広告ハート</string>
+    <string name="reward_adopted_quiz">クイズ承認ハート</string>
+    <string name="reward_surprise_dia">おめでとうございます！サプライズダイヤ！</string>
+    <string name="agree_all">全体同意</string>
+    <string name="required">必須</string>
+    <string name="reward_heartbox1000_sub">ハートボックス最大ハートに当たりです！</string>
+    <string name="aw_yend2023_title">2023 BEST CHOICE By CHOEAEDOL</string>
+    <string name="aw_yend2023_result">アワーズ最終結果</string>
+    <string name="award_realtime_status">各候補のリアルタイムランキングです。</string>
+    <string name="award_accumulate_status">各候補の累計ランキングです。</string>
+    <string name="award_realtime_status_MDOL">23.01.01~11.19 内にミニ・フルアルバムで活動した男性アーティスト個人・グループ</string>
+    <string name="award_realtime_status_FDOL">23.01.01~11.19 内にミニ・フルアルバムで活動した女性アーティスト個人・グループ</string>
+    <string name="award_realtime_status_NEW">2023.01.01 ~ 11.19 内にデビューしたアーティスト</string>
+    <string name="award_realtime_status_IBD">辰の年生まれ(00・88年) のアーティスト</string>
+    <string name="award_realtime_status_MA">メインランキングに入っているすべての男性俳優</string>
+    <string name="award_realtime_status_FA">メインランキングに入っているすべての女性俳優</string>
+    <string name="award_realtime_status_MS">メインランキングに入っているすべての男性アーティスト</string>
+    <string name="award_realtime_status_FS">メインランキングに入っているすべての女性アーティスト</string>
+    <string name="award_realtime_status_ENT">メインランキングに入っているすべてのエンターテイナー</string>
+    <string name="award_realtime_status_ABD">辰の年生まれ(76・88・00年) のアーティスト</string>
+    <string name="article_setting">投稿設定</string>
+    <string name="download_ban">ダウンロード禁止</string>
+    <string name="article_cancel_title">投稿キャンセル</string>
+    <string name="article_cancel_msg">作成中の投稿は削除されます。</string>
+    <string name="over_maximum_video_duration">3分以内の映像のみ読み込めます。</string>
+    <string name="uploading_thumb_error_msg">サムネイルの抽出に失敗しました。</string>
+    <string name="title_trim_video">ビデオを編集する</string>
+    <string name="desc_trim_video">下のコントローラーを動いてビデオを編集してください。.\n(60秒以内に編集可能)</string>
+    <string name="all_videos">全てのビデオ</string>
+    <string name="all_images">全ての写真</string>
+    <string name="title_cancel_trim_video">ビデオ編集をやめる</string>
+    <string name="desc_cancel_trim_video">ビデオ編集をやめると編集内容が削除されます。</string>
+    <string name="article_post">投稿</string>
+    <string name="upload_in_progress">今は他の投稿をアップロード中です。</string>
+    <string name="interstitial_ad_reward">ボーナスビデオ広告ハート</string>
+    <string name="article_uploading">投稿中です。</string>
+    <string name="complete_article_upload">投稿完了！見に行く！</string>
+    <string name="retry_article_upload">投稿されませんでした。再試行します。</string>
+    <string name="fail_article_upload">投稿に失敗しました。</string>
+    <string name="main_image_tooltip">正方形の代表イメージだけバナーに使われます！</string>
+    <string name="main_image_icon_title">代表</string>
+    <string name="label_image_option_gif">GIF</string>
+    <string name="attendance_transition">移動</string>
+    <string name="stamp_already_done_and_retry">今日はすでに出席チェックを完了しました!\n明日、もう一度お試しください。</string>
+    <string name="popup_burningtime_title">今はオタクタイム！</string>
+    <string name="popup_burningtime_subtitle" formatted="false">ハート %s個もらってください!</string>
+    <string name="popup_burningtime_button">オタクタイムハートをもらう</string>
+    <string name="show_background_only">待ち受け画像のみ見る</string>
+    <string name="background">待ち受け画像</string>
+    <string name="order_by_like">いいね順</string>
+    <string name="format_article_like" formatted="false">いいね %s</string>
+    <string name="retry_quiz">クイズ再挑戦!</string>
+    <string name="video_ad_chance_solve_quiz">ビデオ広告を見ると\nクイズをもう1回解くことができます！</string>
+    <string name="title_result_face_detect">そっくりアイドル診断結果</string>
+    <string name="title_retry">やり直し</string>
+    <string name="quiz_retry_ad_done">ビデオ広告視聴完了!\nもう一度クイズに挑戦してみてください！</string>
+    <string name="continue_quiz">続く</string>
+    <string name="quit">やめる</string>
+    <string name="quiz_continue_ad_done">ビデオ広告視聴完了!\nクイズを続きます。</string>
+    <string name="title_quit_quiz_popup">やめる</string>
+    <string name="desc_quit_quiz_popup">短い広告を見るとクイズを続くことができます!\n本当にやめますか？</string>
+    <string name="desc_quit_quiz">短い広告を見るとクイズを続くことができます!</string>
+    <string name="msg_confirm_burning_day">オールインデー登録をしますか?\n登録された後、ダイヤは払い戻しできません。</string>
+    <string name="chatroom_enter_warning_msg">誹謗/悪口/淫乱/広告などの不健全行為は運営政策に基づき制裁対象となり、\n被害が発生する可能性がありますので、決済情報や個人情報は絶対に他人に公開しないでください。</string>
+    <string name="desc_skip_ad_to_retry_quiz">クイズをやり直すためには広告を最後まで見てください！</string>
+    <string name="desc_skip_ad_to_continue_quiz">クイズを続くためには広告を最後まで見てください！</string>
+    <string name="msg_empty_background_image">まだ、待ち受け画面サイズのイメージがないです！\n3:5 以上のイメージを投稿してみてください。</string>
+    <string name="heartpick">Heart Pick</string>
+    <string name="vote_finish">投票終了</string>
+    <string name="finish_at" formatted="false">%sまで</string>
+    <string name="finish">終了する</string>
+    <string name="finish_popup_title" formatted="false">デイリーハートが %s個残っています。</string>
+    <string name="result_heartpick">Heart Pick最終結果</string>
+    <string name="cheering_comments">応援コメント</string>
+    <string name="view_number_of_comments" formatted="false">%s個見る</string>
+    <string name="first_rank_reward">1位プレゼント</string>
+    <string name="finish_popup_subtitle" formatted="false">%sを終了しますか？</string>
+    <string name="popup_title_heartpick">Heart Pickとは？</string>
+    <string name="msg_heartpick_vote_result" formatted="false">ハート%s個が投票されました。\n友達にシェアしてみてください!</string>
+    <string name="heartpick_share_msg" formatted="false">💖私の推しPICK! Heart Pick💖\n%s\n[#%s #ハートPICK ランキング]\n\n%s %s\n%s %s\n%s %s\n\n推しに特別なプレゼントをしに行く💖</string>
+    <string name="heartpick_tooltip_msg">%1$s位と%2$s票差</string>
+    <string name="most_in_picks_banner_msg" formatted="false">%sで推しを応援してください！</string>
+    <string name="popup_title_themepick">テーマPICKとは？</string>
+    <string name="popup_title_imagepick">イメージPICKとは？</string>
+    <string name="btn_complete_trim_video">次</string>
+    <string name="btn_view_post">見に行く</string>
+    <string name="themepick_celeb">テーマPICK</string>
+    <string name="popup_title_themepick_celeb">テーマPICKとは？</string>
+    <string name="daily_ad_exceeded_title">今日はここまで！</string>
+    <string name="daily_ad_exceeded_subtitle_idol">今日も推しのために頑張ってハートを集めましたね！</string>
+    <string name="daily_ad_exceeded_subtitle_celeb">今日もスターのために頑張ってハートを集めましたね！</string>
+    <string name="daily_ad_exceeded_desc">明日、もっと大きい愛で応援してください。\n\n
+*本日の投票集計後、再度動画広告をご覧いただけます。</string>
+    <string name="btn_more_video_ad">広告をもっと見る</string>
+    <string name="miracle_share_msg">[#%1$s月誕生日イベント🎂]\n今、#%2$s 累計ランキングは #%3$s位\n\nさらに、最愛ドルでは #%1$s月誕生日イベント中!\n推しに投票して誕生日記念広告をプレゼントしてください💖\n\n#アイドル 推し活は #最愛ドル</string>
+    <string name="miracle_n_share_msg">[%1$s月の奇跡🎂]\n現在の累計ランキング\n\n%2$s #%3$s\n%4$s #%5$s\n%6$s #%7$s\n\n今、最愛ドルで推しに特別な誕生日プレゼントをしてください!💖\n\n#アイドル 推し活は #最愛ドル</string>
+    <string name="face_share_msg">そっくり #アイドル 診断 #最愛ドル\n
+自分とそっくりなアイドルは誰?\n
+今すぐ最愛ドルで確認してみてください！</string>
+    <string name="community_share_msg">%2$s 投稿を見に行く!\n\n
+#アイドル 推し活は #最愛ドル</string>
+    <string name="community_d_share_msg">%2$s #ファントーク でみんなの声を見に行く！\n\n
+#アイドルの推し活 は #最愛ドル</string>
+    <string name="freeboard_share_msg">ねぇねぇ、好きなアイドル誰?教えて😳\n\n
+
+#最愛ドル #フリートーク でK-POPアイドルについて語ろう!</string>
+    <string name="qna_share_msg">ここが有名なK-POP専門家の研究所ですか?🥹\n
+#最愛ドル K-POPアイドル.ver知恵袋</string>
+    <string name="celeb_miracle_share_msg">🎂 #%1$s月誕生日スター\n\n#最愛ドルスター\n今、 #%2$s 累計ランキング %3$s位!\n\n%1$s月の1か月間、誕生日イベント投票中！スターへの特別な誕生日プレゼント💜</string>
+    <string name="celeb_miracle_n_share_msg">🎂 #%1$s月誕生日スター\n\n[#最愛ドルスター 現在の累計ランキング]\n%2$s #%3$s\n%4$s #%5$s\n%6$s #%7$s\n\n%1$s月の1か月間、誕生日イベント投票中！スターへの特別な誕生日プレゼント💜</string>
+    <string name="celeb_community_share_msg">%2$s ファンが集まってるコミュニティ見に行く!\n\n
+%3$s 韓流好きは #最愛ドルスター</string>
+    <string name="celeb_community_d_share_msg">#%2$s #ファントーク でみんなの声を見に行く!\n\n
+%3$s 韓流好きは #最愛ドルスター</string>
+    <string name="celeb_freeboard_share_msg">#最愛ドルスターの #フリートーク\n\n
+#最愛ドルスター フリートークで韓流スターについて語ってみよう！</string>
+    <string name="celeb_qna_share_msg">#韓流スター について何でも聞いてください!\n\n
+#最愛ドルスター.ver知恵袋</string>
+    <string name="top_toggle_male">男性</string>
+    <string name="top_toggle_female">女性</string>
+    <string name="rookie_month_title">最愛ドルのルーキー</string>
+    <string name="super_rookie_history_tab">歴代スーパールーキー</string>
+    <string name="title_rookie_month">最愛ドルのルーキーとは？</string>
+    <string name="record_super_rookie">スーパールーキーを達成した歴代アイドルのリストです。</string>
+    <string name="record_super_rookie_info_title">スーパールーキーとは？</string>
+    <string name="record_super_rookie_info_body">最愛ドルのルーキーを3回達成したグループ及び\n個人アイドルのことです。\nスーパールーキーはもっと大きいリワードをもらい、\nルーキーを卒業します。</string>
+    <string name="record_rookie_month_default">まだ最愛ドルのルーキーに選ばれたアイドルがいません。\nハート投票で推しを初の1位ルーキーにしてみてください！</string>
+    <string name="record_super_rookie_default">まだスーパールーキーに選ばれたアイドルがいません。\nハート投票で推しを初の1位ルーキーにしてみてください！</string>
+    <string name="record_super_rookie_number" formatted="false">第%s代</string>
+    <string name="rookie">ルーキー</string>
+    <string name="title_miracle_month">今月の奇跡とは？</string>
+    <string name="community_main_share_msg">#%1$s コミュニティで一緒に推し活しよう!\n\n
+
+#アイドル 推し活は #最愛ドル\n</string>
+    <string name="celeb_community_main_share_msg">#%1$s コミュニティで一緒に推し活しよう!\n\n
+
+#Kスター 推し活は #最愛ドルスター\n</string>
+    <string name="rookie_share_msg">#最愛ドル で #新人アイドル を応援しよう!\n\n
+[最愛ドルのルーキー👼🏻アイドル]\n
+現在の累計ランキング1位は #%2$s !\n\n
+
+推しに特別なプレゼントをしましょう💖</string>
+    <string name="banner_go_myidol_title">今すぐ、推しのランキングを見る</string>
+    <string name="banner_go_myidol_btn">GO!</string>
+    <string name="purchase_loading_title">ただいま決済中です！</string>
+    <string name="purchase_loading_msg">このページから出ると重複購入になる可能性があります。</string>
+    <string name="filter_actor">俳優</string>
+    <string name="setting_haptic">触覚フィードバック</string>
+    <string name="date_deadline">締め切り</string>
+    <string name="adtype_korean">🇰🇷韓国の全国広告</string>
+    <string name="adtype_global">🌎グローバル広告</string>
+    <string name="adtype_mobile">📱モバイル広告</string>
+    <string name="veiw_support_location">場所を確認する</string>
+    <string name="popup_diavote_title">ダイヤモンドサポート完了</string>
+    <string name="popup_diavote_desc" formatted="false">%sDIAs はサポートされています。\n友達を集めて実現しましょう!</string>
+    <string name="sort_by_achievement">達成率順</string>
+    <string name="tab_support_detail">詳細</string>
+    <string name="adtype_icon_korean">🇰🇷</string>
+    <string name="adtype_icon_global">🌎</string>
+    <string name="adtype_icon_mobile">📱</string>
+    <string name="menu_sub_board">自由な推し活空間</string>
+    <string name="menu_sub_store">ハート&amp;ダイヤが必要な時</string>
+    <string name="menu_sub_notice">重要なお知らせはここから！</string>
+    <string name="menu_sub_record">最愛ドルオタク活動の歴史を一目で</string>
+    <string name="menu_sub_quiz">最大500ハートがもらえる！</string>
+    <string name="menu_sub_face_matching">私に似たアイドルは誰？</string>
+    <string name="welcome_mission_desc">ミッションをクリアするたびに報酬を受け取れます！\nすべてのミッションをクリアすると、より大きな報酬がらえます。</string>
+    <string name="welcome_mission_sign_up_title">会員登録</string>
+    <string name="welcome_mission_sign_up_desc">いらっしゃいませ！ミッションの最後まで頑張ってください！</string>
+    <string name="welcome_mission_set_most_title">推し設定</string>
+    <string name="welcome_mission_set_most_desc">自分の推しを設定してください</string>
+    <string name="welcome_mission_vote_title">投票する</string>
+    <string name="welcome_mission_vote_desc">私の推しにハートを送りましょう</string>
+    <string name="welcome_mission_community_title">コミュニティに投稿する</string>
+    <string name="welcome_mission_community_desc">同じ推しのファンと一緒に話してみましょう</string>
+    <string name="welcome_mission_video_ad_title">ビデオ広告を見る</string>
+    <string name="welcome_mission_video_ad_desc">広告を見てハートを集めましょう</string>
+    <string name="go">行く</string>
+    <string name="welcome_mission_add_friend_title">友達追加</string>
+    <string name="welcome_mission_add_friend_desc">一緒にハートを集める友達を追加してみましょう</string>
+    <string name="welcome_mission_complete">ミッション完クリア</string>
+    <string name="impossible_write_message">推し設定が必要です</string>
+    <string name="impossible_all_clear">全てのミッションをクリアすると受け取れます</string>
+    <string name="retry_all_clear">すでに報酬は支給されています</string>
+    <string name="welcome_mission_all_clear_reward_title">ミッション完了報酬</string>
+    <string name="welcome_mission_title">ウェルカムミッション💝</string>
+    <string name="hof_cumulative_tab">30日累積順位</string>
+    <string name="hof_daily_tab">毎日順位</string>
+    <string name="celeb_welcome_mission_set_most_title">私のスターを選ぶ</string>
+    <string name="celeb_welcome_mission_set_most_desc">自分のスターを設定してください</string>
+    <string name="celeb_welcome_mission_vote_desc">私のスターにハートを送りましょう</string>
+    <string name="celeb_welcome_mission_community_desc">同じスターのファンと一緒に話してみましょう</string>
+    <string name="celeb_impossible_write_message">私のスター設定が必要です</string>
+    <string name="share_awards_ready" formatted="false">[%s]\n🚀 最愛ドルへの投票が間もなく開始されます! 🏆\n推しが 1 位になるよう応援する準備をしましょう!\n⏰ 投票開始: %s(KST)\n\n#最愛ドル#최애돌 #CHOEAEDOL</string>
+    <string name="share_awards_run" formatted="false">[%s]\n🔥 最愛ドルへの熱い投票が進行中です 🗳️\n今すぐハートで推しを応援してください! 💖\n\n#最愛ドル #최애돌 #CHOEAEDOL</string>
+    <string name="share_awards_result" formatted="false">[%s]\n🏆 栄光を勝ち取るのは誰だ?! 🫣\n今すぐ最愛ドルでチェックしてみてください！\n\n#最愛ドル #최애돌 #CHOEAEDOL</string>
+    <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 最愛ドルスターへの投票が間もなく開始されます! 🏆\nあなたのスターが1位になれるように応援しましょう!\n⏰ 投票開始: %s\n\n#最愛ドルスター#최애돌셀럽 #CHOEAEDOL_Celeb</string>
+    <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 最愛ドルスターへの熱い投票が進行中です 🗳️\n今すぐハートであなたのスターを応援してください! 💖\n\n#最愛ドルスター #최애돌셀럽 #CHOEAEDOL_Celeb</string>
+    <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 栄光を勝ち取るのは誰だ?! 🫣\n今すぐ最愛ドルスターでチェックしてみてください！\n\n#最愛ドルスター #최애돌셀럽 #CHOEAEDOL_Celeb</string>
+    <string name="login_desc">5秒で始めましょう！</string>
+    <string name="login_email">メールアドレスでログイン</string>
+    <string name="hometab_title_rank">ランキング</string>
+    <string name="hometab_title_myidol">私の推し</string>
+    <string name="hometab_title_profile">私の情報</string>
+    <string name="hometab_title_freeboard">フリートーク</string>
+    <string name="hometab_title_menu">メニュー</string>
+    <string name="hometab_title_myceleb">私のスター</string>
+    <string name="hometab_title_miracle">奇跡</string>
+    <string name="hometab_title_onepick">One Pick</string>
+    <string name="hometab_title_hof">殿堂入り</string>
+    <string name="vote_certificate_popup_button">証明書を見る</string>
+    <string name="certificate_title">投票証明書</string>
+    <string name="certificate_menu_desc">今日の証明書を確認しましょう</string>
+    <string name="certificate_none">今日の証明書がありません 🥲\n私の推しに投票して、証明書を確認しましょう！</string>
+    <string name="certificate_none_button">投票に行く</string>
+    <string name="certificate_info_title">投票証明書とは?</string>
+    <string name="certificate_info_desc">◇ 100❤️以上投票すると、証明書を作れます。❤️\n◇ 証明書は投票日の投票が終わるまで保管されます。\n◇ 認証レベル基準\n\t- ブロンズ: 100❤️\n\t- シルバー: 1,000❤️\n\t- ゴールド: 10,000❤️\n\t- プラチナ: 100,000❤️</string>
+    <string name="certificate_detail_title">投票証明書の詳細</string>
+    <string name="certificate_detail_info">※本日の証明書は[メニュー＞投票証明書]から再度ご覧いただけます。</string>
+    <string name="certificate_username">投票者の氏名</string>
+    <string name="certificate_heart">投票済みのハート</string>
+    <string name="certificate_time">投票日</string>
+    <string name="certificate_detail_save">イメージ保存</string>
+    <string name="certificate_detail_share">共有する</string>
+    <string name="certificate_detail_share_msg">本日投票完了しました💝\n一緒に%1$sしましょう！\n\n#%1$s #%2$s #投票証明</string>
+    <string name="certificate_detail_save_fail">画像の保存に失敗しました</string>
+    <string name="certificate_detail_save_succ">画像は正常に保存されました</string>
+    <string name="themepick_vote_again">もう一度投票</string>
+    <string name="themepick_vote_with_ad">投票[AD]</string>
+    <string name="imagepick_vote_with_ad">もう一度投票 [AD]</string>
+    <string name="see_translate">翻訳する</string>
+    <string name="translating">翻訳中...</string>
+    <string name="see_original">原文を見る</string>
+    <string name="freeboard_hotposts">注目の投稿</string>
+    <string name="freeboard_search">キーワードを入力してください。</string>
+    <string name="see_translate_fail">翻訳に失敗しました。</string>
+    <string name="see_translate_to_english">英語に翻訳する</string>
+    <string name="total_amount" formatted="false">総 %s</string>
+    <string name="next_level_progress" formatted="false">次のレベルまで %s</string>
+    <string name="freeboard_empty">表示できる投稿がまだありません🥲\n新しく投稿をポストしてみてください!</string>
+    <string name="my_info_heart_dia_detail">詳細を見る</string>
+    <string name="my_info_coupon_quantity">私のクーポン</string>
+    <string name="video_image_picker_not_found">ビデオもしくはイメージ選択を支援するアプリがありません。</string>
+    <string name="push_setting_guide_head">推し活もタイミング</string>
+    <string name="push_setting_guide_body">通知をオンにして、推しの最新情報を見逃さないでくださいね！</string>
+    <string name="setting_menu_push_likes">いいね</string>
+    <string name="setting_menu_push_hotposts">注目の投稿</string>
+    <string name="levelheart_bonus_yes">🎬 広告を見る</string>
+    <string name="freeboard_nobias_title">推しを設定したら確認できます！</string>
+    <string name="freeboard_nobias_subtitle">右上の検索ボタン🔍で推しを探してみましょう!</string>
+    <string name="freeboard_nobias_subtitle_celeb">メインページ上部の「検索🔍」で推しを見つけてください！</string>
+    <string name="community_feed">フィード</string>
+    <string name="community_board">ファントーク</string>
+    <string name="community_chat">チャット</string>
+    <string name="community_schedule">日程</string>
+    <string name="community_board2" formatted="false">%s トーク</string>
+    <string name="post_detail">投稿詳細</string>
+    <string name="vote_dday" formatted="false">投票開始 D-%s</string>
+    <string name="vote_preview">投票プレビュー</string>
+    <string name="vote_alert_before">投票通知設定</string>
+    <string name="vote_alert_after">投票が始まり次第、お知らせします。</string>
+    <string name="upcoming">まもなくオープン</string>
+    <string name="onepick_preview_title" formatted="false">%s プレビュー</string>
+    <string name="alert_ready_vote">通知設定完了！\n投票が始まり次第、お知らせします。</string>
+    <string name="alert_ready_videoad">通知設定完了！\n準備が終わり次第、お知らせします。</string>
+    <string name="push_induct_head">まずは通知をオン！</string>
+    <string name="push_induct_body">システム通知がオフになっています。\nまずは通知をオンに設定してください。</string>
+    <string name="push_induct_button">設定を開く</string>
+    <string name="ios_att_title">{app_name}からより多くの特典を提供でできますように、「許可」をタップしてください。</string>
+    <string name="ios_att_title_agree">「許可」</string>
+    <string name="ios_att_body_1">こちらに同意していただくと</string>
+    <string name="ios_att_body_2">無料特典を提供する広告の視聴機会が増えます。</string>
+    <string name="ios_att_body_3">不要な広告の代わりに、より有益な広告をご覧いただけます。</string>
+    <string name="ios_att_outro">この設定は以下の手順でいつでも変更できますのでご安心ください。\n[設定 > プライバシーとセキュリティ > トラッキング オン/オフ]</string>
+    <string name="video_ad_timer_title">広告準備中</string>
+    <string name="video_ad_timer_body">無料特典のための広告を準備中です！</string>
+    <string name="video_ad_timer_time">残り時間</string>
+    <string name="video_ad_timer_bonus" formatted="false">次の広告は最大%s❤️のボーナス</string>
+    <string name="video_ad_timer_alert">準備が完了次第お知らせしますか？</string>
+    <string name="video_ad_timer_alert_done">アラーム設定完了</string>
+    <string name="reward_videoad_bonus">ランダムボーナスハート</string>
+    <string name="aos_web_image_save_title">画像を保存</string>
+    <string name="aos_web_image_save_body">この画像を保存しますか？</string>
+    <string name="aos_web_image_save_yes">保存</string>
+    <string name="share_heartpick_upcoming">💖ハートで愛を届けるハートPICK予告💖\n[%1$s]\n🎁[%2$s]\n果たして1位を手にするのは誰？👀\n\n📌 今すぐ%3$s %4$sの応援準備を始めよう！\n🔗%5$s</string>
+    <string name="share_themepick_upcoming">💖毎日白熱の投票勝負！テーマPICK予告💖\n[%1$s]\n🎁[%2$s]\n毎日無料投票で決まる1位は…？👀\n\n📌 今すぐ%3$s %4$sの応援準備を始めよう！\n🔗%5$s</string>
+    <string name="share_onepick_upcoming_nobias">推し</string>
+    <string name="ios_store_purchase_restricted_cn">中国本土のApp Storeアカウントでは購入できません。\n別の国または地域に切り替えて、もう一度お試しください。</string>
+    <string name="title_daily_rank">ランキング</string>
+    <string name="menu_minigame">ハートゲームセンター</string>
+    <string name="popup_game_start_title">ゲームスタート</string>
+    <string name="popup_game_start_desc" formatted="false">ゲームで得たスコアに応じて\n❤️エバーハートをプレゼントします！\n\nゲーム開始時にハートを%s個消費します。\nゲームを開始しますか？</string>
+    <string name="reward_game_result">ゲーム結果の報酬</string>
+    <string name="menu_invite_friend">友達招待</string>
+    <string name="friend_tooltip_invite_friend">最大110,000ハートをゲットしましょう！</string>
+    <string name="friend_bnr_invite_friend_title">友達を招待して\nハートをもらう</string>
+    <string name="invite_friend_detail_title">友達招待</string>
+    <string name="reward_invite_mission_bonus">友達招待ミッション追加ボーナス</string>
+    <string name="reward_invite_mission_completion">友達招待ミッションクリアボーナス</string>
+    <string name="signup_desc2_noreward">推薦者の招待コードを入力すると、友達としてハートを交換できます。</string>
+    <string name="signup_toast_auto_fill_recommender">コピーした招待コードを自動入力しました。</string>
+</resources>

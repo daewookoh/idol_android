@@ -7,38 +7,182 @@ plugins {
     alias(libs.plugins.kotlin.kapt)
 }
 
+// ============================================================
+// Multi-Flavor Configuration (old 프로젝트와 동일)
+// ============================================================
+
+// 앱 ID 상수
+val APP_ID_ORIGINAL = "net.ib.mn"
+val APP_ID_ONESTORE = "com.exodus.myloveidol.twostore"
+val APP_ID_CHINA = "com.exodus.myloveidol.china"
+val APP_ID_CELEB = "com.exodus.myloveactor"
+
 android {
-    namespace = "com.example.idol_android"
+    namespace = "net.ib.mn"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.idol_android"
+        applicationId = APP_ID_ORIGINAL
         minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
+        buildConfigField("int", "VERSION_CODE", "${versionCode}")
+    }
+
+    // ============================================================
+    // Product Flavors (4개 앱: app, onestore, china, celeb)
+    // ============================================================
+
+    flavorDimensions += "default"
+
+    productFlavors {
+        create("app") {
+            dimension = "default"
+            applicationId = APP_ID_ORIGINAL
+
+            // BuildConfig Fields
+            buildConfigField("boolean", "CELEB", "false")
+            buildConfigField("boolean", "ONESTORE", "false")
+            buildConfigField("boolean", "CHINA", "false")
+            buildConfigField("String", "APP_ID_VALUE", "\"\"")
+            buildConfigField("String", "BASE_URL", "\"https://www.myloveidol.com/api/v1/\"")
+            buildConfigField("String", "HOST", "\"https://www.myloveidol.com\"")
+            buildConfigField("String", "KAKAO_APP_KEY", "\"0dd43f929e357f51e61c2d82a683b29a\"")
+
+            // Manifest Placeholders
+            manifestPlaceholders["KAKAO_APP_KEY_FOR_MANIFEST"] = "0dd43f929e357f51e61c2d82a683b29a"
+            manifestPlaceholders["FACEBOOK_CLIENT_ID"] = "d8c7bdf0d17c7e774d4f637d29d6db9a"
+            manifestPlaceholders["host"] = "www.myloveidol.com"
+            manifestPlaceholders["host_wildcard"] = "*.myloveidol.com"
+            manifestPlaceholders["scheme"] = "choeaedol"
+            manifestPlaceholders["devscheme"] = "devloveidol"
+        }
+
+        create("onestore") {
+            dimension = "default"
+            applicationId = APP_ID_ONESTORE
+
+            // BuildConfig Fields
+            buildConfigField("boolean", "CELEB", "false")
+            buildConfigField("boolean", "ONESTORE", "true")
+            buildConfigField("boolean", "CHINA", "false")
+            buildConfigField("String", "APP_ID_VALUE", "\"twostore\"")
+            buildConfigField("String", "BASE_URL", "\"https://www.myloveidol.com/api/v1/\"")
+            buildConfigField("String", "HOST", "\"https://www.myloveidol.com\"")
+            buildConfigField("String", "KAKAO_APP_KEY", "\"8af2706fda8ad5ecc7b1b5c03bb0c457\"")
+
+            // Manifest Placeholders
+            manifestPlaceholders["KAKAO_APP_KEY_FOR_MANIFEST"] = "8af2706fda8ad5ecc7b1b5c03bb0c457"
+            manifestPlaceholders["FACEBOOK_CLIENT_ID"] = "bb9ff280eeb8a9e3a1d839d276a643fe"
+            manifestPlaceholders["host"] = "www.myloveidol.com"
+            manifestPlaceholders["host_wildcard"] = "*.myloveidol.com"
+            manifestPlaceholders["scheme"] = "choeaedol"
+            manifestPlaceholders["devscheme"] = "devloveidol"
+        }
+
+        create("china") {
+            dimension = "default"
+            applicationId = APP_ID_CHINA
+
+            // BuildConfig Fields
+            buildConfigField("boolean", "CELEB", "false")
+            buildConfigField("boolean", "ONESTORE", "false")
+            buildConfigField("boolean", "CHINA", "true")
+            buildConfigField("String", "APP_ID_VALUE", "\"china\"")
+            buildConfigField("String", "BASE_URL", "\"https://www.myloveidol.com/api/v1/\"")
+            buildConfigField("String", "HOST", "\"https://www.myloveidol.com\"")
+            buildConfigField("String", "KAKAO_APP_KEY", "\"0dd43f929e357f51e61c2d82a683b29a\"")
+
+            // Manifest Placeholders
+            manifestPlaceholders["KAKAO_APP_KEY_FOR_MANIFEST"] = "0dd43f929e357f51e61c2d82a683b29a"
+            manifestPlaceholders["FACEBOOK_CLIENT_ID"] = "d8c7bdf0d17c7e774d4f637d29d6db9a"
+            manifestPlaceholders["host"] = "www.myloveidol.com"
+            manifestPlaceholders["host_wildcard"] = "*.myloveidol.com"
+            manifestPlaceholders["scheme"] = "choeaedol"
+            manifestPlaceholders["devscheme"] = "devloveidol"
+        }
+
+        create("celeb") {
+            dimension = "default"
+            applicationId = APP_ID_CELEB
+
+            // BuildConfig Fields
+            buildConfigField("boolean", "CELEB", "true")
+            buildConfigField("boolean", "ONESTORE", "false")
+            buildConfigField("boolean", "CHINA", "false")
+            buildConfigField("String", "APP_ID_VALUE", "\"4B418BC059C536ECE2DE206C3DC7C4D7\"")
+            buildConfigField("String", "BASE_URL", "\"https://www.myloveactor.com/api/v1/\"")
+            buildConfigField("String", "HOST", "\"https://www.myloveactor.com\"")
+            buildConfigField("String", "KAKAO_APP_KEY", "\"6715432cd074c4d0dd029b3e8995add2\"")
+
+            // Manifest Placeholders
+            manifestPlaceholders["KAKAO_APP_KEY_FOR_MANIFEST"] = "6715432cd074c4d0dd029b3e8995add2"
+            manifestPlaceholders["FACEBOOK_CLIENT_ID"] = "a59d87d83c736f501cb6d7223010344d"
+            manifestPlaceholders["host"] = "www.myloveactor.com"
+            manifestPlaceholders["host_wildcard"] = "*.myloveactor.com"
+            manifestPlaceholders["scheme"] = "choeaedolceleb"
+            manifestPlaceholders["devscheme"] = "myloveactor"
+        }
     }
 
     buildTypes {
-        release {
+        debug {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
+        release {
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
+        buildConfig = true  // BuildConfig 활성화
+    }
+
+    packagingOptions {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
+    // 리소스 충돌 방지
+    androidResources {
+        noCompress += "txt"
+    }
+
+    // AAPT 옵션 - 리소스 오류를 경고로 변경
+    @Suppress("UnstableApiUsage")
+    androidComponents {
+        onVariants { variant ->
+            variant.androidResources.ignoreAssetsPatterns.add("**/.*")
+        }
+    }
+
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
     }
 }
 
@@ -102,6 +246,9 @@ dependencies {
     // Gson
     implementation(libs.gson)
     implementation(libs.retrofit.converter.gson)
+
+    // Material
+    implementation(libs.material)
 
     // Testing
     testImplementation(libs.junit)

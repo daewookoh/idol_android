@@ -16,4 +16,17 @@
         <item name="android:windowBackground">@color/white</item>
         <item name="android:statusBarColor">@color/purple_700</item>
     </style>
+
+    <!-- Material Components BottomSheet styles (공통 리소스) -->
+    <style name="Theme.MaterialComponents.Light.BottomSheetDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="Widget.Design.BottomSheet.Modal" parent="">
+        <item name="android:background">@drawable/bg_bottom_sheet_dialog_fragment</item>
+        <item name="android:elevation">16dp</item>
+    </style>
 </resources>

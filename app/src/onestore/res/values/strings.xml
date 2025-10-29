@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="facebook_app_id" translatable="false">655014057635732</string>
-    <string name="fb_login_protocol_scheme" translatable="false">fb655014057635732</string>
+    <string name="app_name">Choeaedol 1store</string>
 </resources>
