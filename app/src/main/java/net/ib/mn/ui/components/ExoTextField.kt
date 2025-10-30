@@ -1,126 +1,169 @@
 package net.ib.mn.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import net.ib.mn.ui.theme.ColorPalette
+import kotlinx.coroutines.delay
+import net.ib.mn.R
 
 /**
- * 프로젝트 전역에서 사용하는 공통 TextField 컴포넌트
+ * old 프로젝트 SignupFragment 스타일의 TextField
  *
- * 기본 스타일:
- * - OutlinedTextField 기반
- * - 포커스 시: 메인 컬러 테두리
- * - 에러 시: 빨간색 테두리 및 에러 메시지 표시
- * - 비활성화 시: 회색 테두리
+ * 주요 기능:
+ * - 우측 아이콘 표시 (성공: join_approval, 실패: join_disapproval)
+ * - 에러 메시지 표시 (supportingText로 표시)
+ * - 실시간 검증을 위한 디바운싱 지원
+ * - 포커스 변경 감지
  *
  * @param value 입력 값
  * @param onValueChange 값 변경 콜백
- * @param modifier Modifier (기본: fillMaxWidth)
- * @param label 라벨 텍스트
- * @param placeholder 플레이스홀더 텍스트
- * @param enabled 활성화 여부 (기본: true)
- * @param readOnly 읽기 전용 여부 (기본: false)
- * @param isError 에러 상태 (기본: false)
- * @param errorMessage 에러 메시지 (isError가 true일 때 표시)
- * @param helperText 도움말 텍스트 (에러가 아닐 때 표시)
- * @param leadingIcon 앞쪽 아이콘
- * @param trailingIcon 뒤쪽 아이콘
- * @param visualTransformation 비주얼 변환 (비밀번호 마스킹 등)
- * @param keyboardType 키보드 타입 (기본: Text)
- * @param imeAction IME 액션 (기본: Next)
- * @param keyboardActions 키보드 액션
- * @param singleLine 한 줄 입력 여부 (기본: true)
- * @param maxLines 최대 줄 수 (기본: 1)
+ * @param modifier Modifier
+ * @param placeholder 플레이스홀더
+ * @param enabled 활성화 여부
+ * @param isValid 검증 성공 여부 (true면 체크 아이콘, null이면 아이콘 없음)
+ * @param errorMessage 에러 메시지
+ * @param visualTransformation 비주얼 변환
+ * @param keyboardType 키보드 타입
+ * @param imeAction IME 액션
+ * @param onFocusChanged 포커스 변경 콜백
+ * @param onValueChangeDebounced 디바운싱된 값 변경 콜백 (지연 시간 후 호출)
+ * @param debounceMillis 디바운싱 지연 시간 (밀리초)
  */
 @Composable
 fun ExoTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier.fillMaxWidth(),
-    label: String? = null,
     placeholder: String? = null,
     enabled: Boolean = true,
-    readOnly: Boolean = false,
-    isError: Boolean = false,
+    isValid: Boolean? = null,
     errorMessage: String? = null,
-    helperText: String? = null,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Next,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
-    singleLine: Boolean = true,
-    maxLines: Int = 1
+    onFocusChanged: ((FocusState) -> Unit)? = null,
+    onValueChangeDebounced: ((String) -> Unit)? = null,
+    debounceMillis: Long = 0
 ) {
-    Column {
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = modifier,
-            label = if (label != null) {
-                { Text(label) }
-            } else null,
-            placeholder = if (placeholder != null) {
-                { Text(placeholder) }
-            } else null,
-            enabled = enabled,
-            readOnly = readOnly,
-            isError = isError,
-            leadingIcon = leadingIcon,
-            trailingIcon = trailingIcon,
-            visualTransformation = visualTransformation,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = keyboardType,
-                imeAction = imeAction
-            ),
-            keyboardActions = keyboardActions,
-            singleLine = singleLine,
-            maxLines = maxLines,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = ColorPalette.main,
-                unfocusedBorderColor = ColorPalette.gray300,
-                errorBorderColor = Color.Red,
-                disabledBorderColor = ColorPalette.gray200,
-                focusedLabelColor = ColorPalette.main,
-                unfocusedLabelColor = ColorPalette.textGray,
-                errorLabelColor = Color.Red,
-                cursorColor = ColorPalette.main,
-                errorCursorColor = Color.Red
-            )
-        )
+    // 디바운싱 처리
+    LaunchedEffect(value) {
+        if (debounceMillis > 0 && onValueChangeDebounced != null) {
+            delay(debounceMillis)
+            onValueChangeDebounced(value)
+        }
+    }
 
-        // 에러 메시지 표시
-        if (isError && errorMessage != null) {
+    Column {
+        // TextField 박스
+        Row(
+            modifier = modifier
+                .background(
+                    color = colorResource(id = R.color.background_300),
+                    shape = RoundedCornerShape(6.dp)
+                )
+                .padding(horizontal = 12.dp)
+                .then(
+                    if (onFocusChanged != null) {
+                        Modifier.onFocusChanged(onFocusChanged)
+                    } else {
+                        Modifier
+                    }
+                ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // BasicTextField
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                BasicTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = enabled,
+                    textStyle = TextStyle(
+                        fontSize = 12.sp,
+                        color = colorResource(id = R.color.text_default)
+                    ),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = keyboardType,
+                        imeAction = imeAction
+                    ),
+                    keyboardActions = keyboardActions,
+                    singleLine = true,
+                    visualTransformation = visualTransformation,
+                    cursorBrush = SolidColor(colorResource(id = R.color.main))
+                )
+
+                // 플레이스홀더
+                if (value.isEmpty() && placeholder != null) {
+                    Text(
+                        text = placeholder,
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            color = colorResource(id = R.color.text_dimmed)
+                        )
+                    )
+                }
+            }
+
+            // 우측 아이콘
+            when {
+                isValid == true -> {
+                    Icon(
+                        painter = painterResource(id = R.drawable.join_approval),
+                        contentDescription = "Valid",
+                        modifier = Modifier.size(16.dp),
+                        tint = Color.Unspecified
+                    )
+                }
+                isValid == false && errorMessage != null -> {
+                    Icon(
+                        painter = painterResource(id = R.drawable.join_disapproval),
+                        contentDescription = "Invalid",
+                        modifier = Modifier.size(16.dp),
+                        tint = Color.Unspecified
+                    )
+                }
+            }
+        }
+
+        // 에러 메시지
+        if (errorMessage != null) {
             Text(
                 text = errorMessage,
                 color = Color.Red,
                 fontSize = 12.sp,
-                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-            )
-        }
-
-        // 도움말 텍스트 표시 (에러가 아닐 때만)
-        if (!isError && helperText != null) {
-            Text(
-                text = helperText,
-                color = ColorPalette.gray500,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                modifier = Modifier.padding(start = 4.dp, top = 4.dp)
             )
         }
     }

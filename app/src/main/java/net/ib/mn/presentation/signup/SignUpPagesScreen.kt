@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -34,6 +35,7 @@ import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoTextField
 import net.ib.mn.ui.components.ExoCheckBox
 import net.ib.mn.ui.components.ExoCheckBoxWithDetail
+import net.ib.mn.ui.components.ExoSimpleDialog
 import net.ib.mn.ui.theme.ExodusTheme
 import net.ib.mn.util.AgreementUtil
 
@@ -120,6 +122,14 @@ fun SignUpPagesScreen(
             onNavigateBack = {
                 viewModel.handleIntent(SignUpContract.Intent.GoBack)
             }
+        )
+    }
+
+    // 다이얼로그 표시
+    state.dialogMessage?.let { message ->
+        ExoSimpleDialog(
+            message = message,
+            onDismiss = { viewModel.handleIntent(SignUpContract.Intent.DismissDialog) }
         )
     }
 }
@@ -209,15 +219,12 @@ internal fun AgreementPage(
             // 다음 버튼
             Button(
                 onClick = { onIntent(SignUpContract.Intent.ProceedToSignUpForm) },
-                enabled = state.canProceedStep1,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (state.canProceedStep1) colorResource(id = R.color.main) else colorResource(id = R.color.gray200),
-                    contentColor = Color.White,
-                    disabledContainerColor = colorResource(id = R.color.gray200),
-                    disabledContentColor = Color.White
+                    contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(10.dp)
             ) {
@@ -249,12 +256,14 @@ private fun SignUpFormPage(
             )
         }
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(horizontal = 20.dp, vertical = 18.dp)
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 20.dp)
+                    .padding(top = 18.dp, bottom = 86.dp) // 버튼 높이 40dp + 패딩 46dp
+            ) {
             // 이메일 입력 (SNS 로그인의 경우 비활성화)
             Text(
                 text = stringResource(R.string.id),
@@ -271,10 +280,16 @@ private fun SignUpFormPage(
                 onValueChange = { onIntent(SignUpContract.Intent.UpdateEmail(it)) },
                 placeholder = stringResource(R.string.hint_email),
                 enabled = state.preFilledEmail == null,
-                isError = state.emailError != null,
+                isValid = if (state.emailError != null) false else if (state.isEmailValid) true else null,
                 errorMessage = state.emailError,
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next,
+                onValueChangeDebounced = {
+                    if (it.isNotEmpty()) {
+                        onIntent(SignUpContract.Intent.ValidateEmail)
+                    }
+                },
+                debounceMillis = 1000,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(36.dp)
@@ -305,7 +320,7 @@ private fun SignUpFormPage(
                 ExoTextField(
                     value = state.password,
                     onValueChange = { onIntent(SignUpContract.Intent.UpdatePassword(it)) },
-                    isError = state.passwordError != null,
+                    isValid = if (state.passwordError != null) false else if (state.isPasswordValid) true else null,
                     errorMessage = state.passwordError,
                     keyboardType = KeyboardType.Password,
                     visualTransformation = PasswordVisualTransformation(),
@@ -339,7 +354,7 @@ private fun SignUpFormPage(
                 ExoTextField(
                     value = state.passwordConfirm,
                     onValueChange = { onIntent(SignUpContract.Intent.UpdatePasswordConfirm(it)) },
-                    isError = state.passwordConfirmError != null,
+                    isValid = if (state.passwordConfirmError != null) false else if (state.isPasswordConfirmValid) true else null,
                     errorMessage = state.passwordConfirmError,
                     keyboardType = KeyboardType.Password,
                     visualTransformation = PasswordVisualTransformation(),
@@ -366,9 +381,15 @@ private fun SignUpFormPage(
             ExoTextField(
                 value = state.nickname,
                 onValueChange = { onIntent(SignUpContract.Intent.UpdateNickname(it)) },
-                isError = state.nicknameError != null,
+                isValid = if (state.nicknameError != null) false else if (state.isNicknameValid) true else null,
                 errorMessage = state.nicknameError,
                 imeAction = ImeAction.Next,
+                onValueChangeDebounced = {
+                    if (it.isNotEmpty() && it.length >= 2) {
+                        onIntent(SignUpContract.Intent.ValidateNickname)
+                    }
+                },
+                debounceMillis = 1500,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(36.dp)
@@ -391,7 +412,15 @@ private fun SignUpFormPage(
                 value = state.recommenderCode,
                 onValueChange = { onIntent(SignUpContract.Intent.UpdateRecommenderCode(it)) },
                 placeholder = stringResource(R.string.hint_recommender_1),
+                isValid = if (state.recommenderError != null) false else if (state.isRecommenderValid) true else null,
+                errorMessage = state.recommenderError,
                 imeAction = ImeAction.Done,
+                onValueChangeDebounced = {
+                    if (it.isNotEmpty()) {
+                        onIntent(SignUpContract.Intent.ValidateRecommenderCode)
+                    }
+                },
+                debounceMillis = 1500,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(36.dp)
@@ -404,15 +433,17 @@ private fun SignUpFormPage(
                 fontSize = 12.sp,
                 color = colorResource(id = R.color.main)
             )
+            } // 스크롤 가능한 폼 영역 끝
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // 가입하기 버튼
+            // 하단 고정 버튼
             Button(
                 onClick = { onIntent(SignUpContract.Intent.SignUp) },
                 enabled = state.canProceedStep2 && !state.isLoading,
                 modifier = Modifier
+                    .align(Alignment.BottomCenter)
                     .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 28.dp)
                     .height(40.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (state.canProceedStep2) colorResource(id = R.color.main) else colorResource(id = R.color.gray200),
@@ -435,9 +466,7 @@ private fun SignUpFormPage(
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(28.dp))
-        }
+        } // Box 끝
     }
 }
 
@@ -470,6 +499,60 @@ fun AgreementPagePreviewDark() {
     ExodusTheme(darkTheme = true) {
         AgreementPage(
             state = SignUpContract.State(),
+            onIntent = {},
+            onNavigateBack = {}
+        )
+    }
+}
+
+@Preview(
+    name = "SignUp Form Page - Light Mode",
+    showSystemUi = true,
+    showBackground = true,
+    locale = "ko"
+)
+@Composable
+fun SignUpFormPagePreviewLight() {
+    ExodusTheme(darkTheme = false) {
+        SignUpFormPage(
+            state = SignUpContract.State(
+                currentStep = 1,
+                email = "",
+                password = "",
+                passwordConfirm = "",
+                nickname = "",
+                recommenderCode = ""
+            ),
+            onIntent = {},
+            onNavigateBack = {}
+        )
+    }
+}
+
+@Preview(
+    name = "SignUp Form Page - Dark Mode",
+    showSystemUi = true,
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    locale = "ko"
+)
+@Composable
+fun SignUpFormPagePreviewDark() {
+    ExodusTheme(darkTheme = true) {
+        SignUpFormPage(
+            state = SignUpContract.State(
+                currentStep = 1,
+                email = "test@example.com",
+                password = "password123",
+                passwordConfirm = "password123",
+                nickname = "테스트",
+                recommenderCode = "ABC123",
+                isEmailValid = true,
+                isPasswordValid = true,
+                isPasswordConfirmValid = true,
+                isNicknameValid = true,
+                canProceedStep2 = true
+            ),
             onIntent = {},
             onNavigateBack = {}
         )

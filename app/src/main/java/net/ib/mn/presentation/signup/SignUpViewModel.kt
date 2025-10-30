@@ -72,6 +72,7 @@ class SignUpViewModel @Inject constructor(
             is SignUpContract.Intent.ShowTermsOfService -> setEffect { SignUpContract.Effect.NavigateToTermsOfService }
             is SignUpContract.Intent.ShowPrivacyPolicy -> setEffect { SignUpContract.Effect.NavigateToPrivacyPolicy }
             is SignUpContract.Intent.ProceedToSignUpForm -> proceedToSignUpForm()
+            is SignUpContract.Intent.DismissDialog -> dismissDialog()
 
             // Step 2: 회원가입 폼
             is SignUpContract.Intent.UpdateEmail -> updateEmail(intent.email)
@@ -81,6 +82,7 @@ class SignUpViewModel @Inject constructor(
             is SignUpContract.Intent.UpdateRecommenderCode -> updateRecommenderCode(intent.code)
             is SignUpContract.Intent.ValidateEmail -> validateEmail()
             is SignUpContract.Intent.ValidateNickname -> validateNickname()
+            is SignUpContract.Intent.ValidateRecommenderCode -> validateRecommenderCode()
             is SignUpContract.Intent.SignUp -> signUp()
 
             // Navigation
@@ -142,7 +144,7 @@ class SignUpViewModel @Inject constructor(
                 !currentState.agreeAge -> context.getString(net.ib.mn.R.string.error_need_agree_age)
                 else -> context.getString(net.ib.mn.R.string.error_need_agree_all)
             }
-            setEffect { SignUpContract.Effect.ShowError(errorMessage) }
+            setState { copy(dialogMessage = errorMessage) }
             return
         }
 
@@ -154,6 +156,10 @@ class SignUpViewModel @Inject constructor(
             setState { copy(currentStep = 1) }
             setEffect { SignUpContract.Effect.NavigateToNextStep }
         }
+    }
+
+    private fun dismissDialog() {
+        setState { copy(dialogMessage = null) }
     }
 
     // ============================================================
@@ -227,7 +233,13 @@ class SignUpViewModel @Inject constructor(
     }
 
     private fun updateRecommenderCode(code: String) {
-        setState { copy(recommenderCode = code) }
+        setState {
+            copy(
+                recommenderCode = code,
+                recommenderError = null,
+                isRecommenderValid = false
+            )
+        }
     }
 
     private fun validateEmail() {
@@ -309,6 +321,62 @@ class SignUpViewModel @Inject constructor(
                     }
                     is ApiResult.Error -> {
                         setEffect { SignUpContract.Effect.ShowError(result.message ?: context.getString(net.ib.mn.R.string.error_nickname_check_failed)) }
+                    }
+                    is ApiResult.Loading -> {
+                        // 로딩 중
+                    }
+                }
+            }
+        }
+    }
+
+    private fun validateRecommenderCode() {
+        val recommenderCode = currentState.recommenderCode
+        if (recommenderCode.isEmpty()) {
+            // 추천인 코드가 비어있으면 검증하지 않음 (선택사항)
+            setState {
+                copy(
+                    recommenderError = null,
+                    isRecommenderValid = false
+                )
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            validateUserUseCase(
+                type = "referral_code",
+                value = recommenderCode,
+                appId = Constants.APP_ID
+            ).collect { result ->
+                when (result) {
+                    is ApiResult.Success -> {
+                        val response = result.data
+                        if (response.success) {
+                            // 유효한 추천인 코드
+                            setState {
+                                copy(
+                                    recommenderError = null,
+                                    isRecommenderValid = true
+                                )
+                            }
+                        } else {
+                            // 존재하지 않는 추천인 코드 (error_1012: "추천인을 찾지 못했습니다.")
+                            setState {
+                                copy(
+                                    recommenderError = context.getString(net.ib.mn.R.string.error_1012),
+                                    isRecommenderValid = false
+                                )
+                            }
+                        }
+                    }
+                    is ApiResult.Error -> {
+                        setState {
+                            copy(
+                                recommenderError = result.message ?: context.getString(net.ib.mn.R.string.error_check_input_fields),
+                                isRecommenderValid = false
+                            )
+                        }
                     }
                     is ApiResult.Loading -> {
                         // 로딩 중

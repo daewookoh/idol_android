@@ -32,7 +32,7 @@ import java.nio.charset.StandardCharsets
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    startDestination: String = Screen.SignUpPages.route
+    startDestination: String = Screen.StartUp.route
 ) {
     NavHost(
         navController = navController,

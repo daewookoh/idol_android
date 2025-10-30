@@ -22,6 +22,7 @@ class SignUpContract {
         val currentStep: Int = 0, // 0: 약관동의, 1: 회원가입 폼
         val isLoading: Boolean = false,
         val error: String? = null,
+        val dialogMessage: String? = null, // 다이얼로그 메시지
 
         // SNS 로그인에서 전달받은 데이터 (옵셔널)
         val preFilledEmail: String? = null,
@@ -53,6 +54,8 @@ class SignUpContract {
         val isNicknameValid: Boolean = false,
 
         val recommenderCode: String = "",
+        val recommenderError: String? = null,
+        val isRecommenderValid: Boolean = false,
 
         // 가입 가능 여부
         val canProceedStep1: Boolean = false,
@@ -71,6 +74,7 @@ class SignUpContract {
         object ShowTermsOfService : Intent()
         object ShowPrivacyPolicy : Intent()
         object ProceedToSignUpForm : Intent()
+        object DismissDialog : Intent()
 
         // Step 2: 회원가입 폼
         data class UpdateEmail(val email: String) : Intent()
@@ -80,6 +84,7 @@ class SignUpContract {
         data class UpdateRecommenderCode(val code: String) : Intent()
         object ValidateEmail : Intent()
         object ValidateNickname : Intent()
+        object ValidateRecommenderCode : Intent()
         object SignUp : Intent()
 
         // Navigation

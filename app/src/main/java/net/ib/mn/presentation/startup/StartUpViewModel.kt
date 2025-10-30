@@ -110,7 +110,7 @@ class StartUpViewModel @Inject constructor(
                     // Guest mode - Navigate to Login screen
                     setState { copy(isLoading = false, progress = 0f, currentStep = "Login required") }
 
-//                    setEffect { StartUpContract.Effect.NavigateToLogin }
+                    setEffect { StartUpContract.Effect.NavigateToLogin }
                     return@launch
                 }
 
