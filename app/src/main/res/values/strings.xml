@@ -1962,6 +1962,22 @@ Give a special gift to my idol on CHOEAEDOL!💖</string>
     <string name="invite_friend_detail_title">Invite Friends</string>
     <string name="reward_invite_mission_bonus">Friend Invitation Mission Bonus Reward</string>
     <string name="reward_invite_mission_completion">Friend Invitation Mission Completion Reward</string>
-    <string name="signup_desc2_noreward">Enter your recommender’s invitation code to exchange Hearts as friends.</string>
+    <string name="signup_desc2_noreward">Enter your recommender\'s invitation code to exchange Hearts as friends.</string>
     <string name="signup_toast_auto_fill_recommender">The copied invitation code has been entered automatically.</string>
+
+    <!-- Sign Up Error Messages -->
+    <string name="error_need_agree_age">You must be 14 years old or older to sign up.</string>
+    <string name="error_need_agree_all">Please accept all required terms and conditions.</string>
+    <string name="error_invalid_password_format">Password must be 8–20 characters long and contain both letters and numbers.</string>
+    <string name="error_password_not_match">Passwords do not match.</string>
+    <string name="error_invalid_nickname_length">Nickname must be 2–10 characters long.</string>
+    <string name="error_email_already_used">This email is already in use.</string>
+    <string name="error_nickname_already_used">This nickname is already in use.</string>
+    <string name="error_signup_failed">Sign up failed.</string>
+    <string name="error_check_input_fields">Please check the input fields.</string>
+    <string name="error_please_agree_terms">Please accept the terms and conditions.</string>
+    <string name="success_email_available">This email is available.</string>
+    <string name="success_nickname_available">This nickname is available.</string>
+    <string name="error_email_check_failed">Email verification failed.</string>
+    <string name="error_nickname_check_failed">Nickname verification failed.</string>
 </resources>

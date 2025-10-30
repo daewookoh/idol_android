@@ -315,4 +315,32 @@ class UserRepositoryImpl @Inject constructor(
             ))
         }
     }
+
+    override fun signUp(
+        email: String,
+        password: String,
+        nickname: String,
+        domain: String,
+        recommenderCode: String,
+        appId: String
+    ): Flow<ApiResult<CommonResponse>> = flow {
+        emit(ApiResult.Loading)
+
+        try {
+            // TODO: 실제 API 구현 필요
+            // old 프로젝트의 UsersApi.signUp() 호출
+            // SIGNATURE 헤더 생성 필요
+
+            // 임시 구현: 항상 성공 반환
+            emit(ApiResult.Success(CommonResponse(
+                success = true,
+                message = "Sign up successful (stub implementation)"
+            )))
+        } catch (e: Exception) {
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Sign up error: ${e.message}"
+            ))
+        }
+    }
 }

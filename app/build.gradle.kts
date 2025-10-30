@@ -99,6 +99,9 @@ android {
             buildConfigField("boolean", "CELEB", "false")
             buildConfigField("boolean", "ONESTORE", "true")
             buildConfigField("boolean", "CHINA", "false")
+            buildConfigField("String", "APP_ID_VALUE", "\"twostore\"")
+            buildConfigField("String", "BASE_URL", "\"https://www.myloveidol.com/api/v1/\"")
+            buildConfigField("String", "HOST", "\"https://www.myloveidol.com\"")
             buildConfigField("String", "KAKAO_APP_KEY", "\"8af2706fda8ad5ecc7b1b5c03bb0c457\"")
             manifestPlaceholders["KAKAO_APP_KEY_FOR_MANIFEST"] = "8af2706fda8ad5ecc7b1b5c03bb0c457"
             manifestPlaceholders["FACEBOOK_CLIENT_ID"] = "bb9ff280eeb8a9e3a1d839d276a643fe"
@@ -128,6 +131,9 @@ android {
             buildConfigField("boolean", "CELEB", "false")
             buildConfigField("boolean", "ONESTORE", "false")
             buildConfigField("boolean", "CHINA", "true")
+            buildConfigField("String", "APP_ID_VALUE", "\"china\"")
+            buildConfigField("String", "BASE_URL", "\"https://www.myloveidol.com/api/v1/\"")
+            buildConfigField("String", "HOST", "\"https://www.myloveidol.com\"")
             buildConfigField("String", "KAKAO_APP_KEY", "\"0dd43f929e357f51e61c2d82a683b29a\"")
             manifestPlaceholders["KAKAO_APP_KEY_FOR_MANIFEST"] = "0dd43f929e357f51e61c2d82a683b29a"
             manifestPlaceholders["FACEBOOK_CLIENT_ID"] = "d8c7bdf0d17c7e774d4f637d29d6db9a"
@@ -155,6 +161,9 @@ android {
             buildConfigField("boolean", "CELEB", "true")
             buildConfigField("boolean", "ONESTORE", "false")
             buildConfigField("boolean", "CHINA", "false")
+            buildConfigField("String", "APP_ID_VALUE", "\"4B418BC059C536ECE2DE206C3DC7C4D7\"")
+            buildConfigField("String", "BASE_URL", "\"https://www.myloveactor.com/api/v1/\"")
+            buildConfigField("String", "HOST", "\"https://www.myloveactor.com\"")
             buildConfigField("String", "KAKAO_APP_KEY", "\"6715432cd074c4d0dd029b3e8995add2\"")
             manifestPlaceholders["KAKAO_APP_KEY_FOR_MANIFEST"] = "6715432cd074c4d0dd029b3e8995add2"
             manifestPlaceholders["FACEBOOK_CLIENT_ID"] = "a59d87d83c736f501cb6d7223010344d"
@@ -214,6 +223,9 @@ android {
 
     kotlinOptions {
         jvmTarget = "11"
+        freeCompilerArgs += listOf(
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api"
+        )
     }
 
     buildFeatures {

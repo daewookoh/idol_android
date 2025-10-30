@@ -347,3 +347,23 @@ data class SignInData(
  * - @SerializedName으로 JSON 매핑
  * - nullable 타입 사용 (안전성)
  */
+
+// ============================================================
+// Common Response (범용)
+// ============================================================
+data class CommonResponse(
+    @SerializedName("success")
+    val success: Boolean,
+
+    @SerializedName("message")
+    val message: String? = null,
+
+    @SerializedName("code")
+    val code: Int? = null,
+
+    @SerializedName("gcode")
+    val gcode: Int? = null,
+
+    @SerializedName("mcode")
+    val mcode: Int? = null
+)

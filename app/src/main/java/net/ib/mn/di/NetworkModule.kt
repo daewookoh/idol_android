@@ -53,11 +53,15 @@ object NetworkModule {
     fun provideRetrofit(
         okHttpClient: OkHttpClient,
         gson: Gson
-    ): Retrofit = Retrofit.Builder()
-        .baseUrl(Constants.BASE_URL)
-        .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .build()
+    ): Retrofit {
+        // ServerUrl.BASE_URL을 사용하여 동적으로 변경 가능하도록 수정
+        // old 프로젝트처럼 런타임에 서버 URL 변경 지원
+        return Retrofit.Builder()
+            .baseUrl(net.ib.mn.util.ServerUrl.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+    }
 
     @Provides
     @Singleton

@@ -1,5 +1,6 @@
 package net.ib.mn.data.remote.interceptor
 
+import net.ib.mn.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.Response
 
@@ -23,10 +24,12 @@ class AuthInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
 
-        // HTTP-X-APPID, HTTP-X-VERSION 헤더 추가 (서버 요구사항)
+        // X-HTTP-APPID, X-HTTP-VERSION 헤더 추가 (서버 요구사항)
+        // X-HTTP-APPID: 패키지명 (net.ib.mn, com.exodus.myloveidol.twostore, etc.)
+        // X-HTTP-VERSION: old 프로젝트의 version.xml app_version (10.10.0)
         val requestBuilder = originalRequest.newBuilder()
-            .header("HTTP-X-APPID", "test_android")
-            .header("HTTP-X-VERSION", "10.10.99")
+            .header("X-HTTP-APPID", BuildConfig.APPLICATION_ID)
+            .header("X-HTTP-VERSION", "10.10.0")
 
         // Authorization 헤더가 없고 토큰이 있으면 추가
         if (originalRequest.header("Authorization") == null) {

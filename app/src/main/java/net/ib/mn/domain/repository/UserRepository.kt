@@ -1,8 +1,8 @@
 package net.ib.mn.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import net.ib.mn.data.remote.dto.*
 import net.ib.mn.domain.model.ApiResult
-import kotlinx.coroutines.flow.Flow
 
 /**
  * User Repository 인터페이스
@@ -75,4 +75,24 @@ interface UserRepository {
         deviceId: String,
         appId: String
     ): Flow<ApiResult<SignInResponse>>
+
+    /**
+     * 회원가입
+     *
+     * @param email 이메일
+     * @param password 비밀번호
+     * @param nickname 닉네임
+     * @param domain 가입 도메인 (email, kakao, google, line, facebook)
+     * @param recommenderCode 추천인 코드 (옵션)
+     * @param appId 앱 ID
+     * @return Flow<ApiResult<CommonResponse>>
+     */
+    fun signUp(
+        email: String,
+        password: String,
+        nickname: String,
+        domain: String,
+        recommenderCode: String,
+        appId: String
+    ): Flow<ApiResult<CommonResponse>>
 }

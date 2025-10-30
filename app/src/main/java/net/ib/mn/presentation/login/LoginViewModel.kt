@@ -135,17 +135,31 @@ class LoginViewModel @Inject constructor(
                     val response = result.data
 
                     if (response.success) {
-                        // 회원이 존재함 -> 로그인 진행
+                        // 회원이 존재함 -> 바로 로그인 진행 (old 프로젝트와 동일)
                         android.util.Log.d(TAG, "User exists - proceeding to sign in")
                         performSignIn()
                     } else {
-                        // 회원이 존재하지 않음 -> 회원가입 필요
-                        android.util.Log.d(TAG, "User not found - sign up required")
-                        setState { copy(isLoading = false) }
-                        setEffect {
-                            LoginContract.Effect.ShowToast("회원가입이 필요합니다. (회원가입 화면 미구현)")
+                        // 회원이 존재하지 않음 -> domain 확인 (old 프로젝트 로직)
+                        val registeredDomain = response.domain
+                        android.util.Log.d(TAG, "User not found - checking if registered with different method")
+                        android.util.Log.d(TAG, "Registered domain: $registeredDomain, trying domain: $domain")
+
+                        if (registeredDomain != null && !registeredDomain.equals(domain, ignoreCase = true)) {
+                            // 다른 소셜 로그인으로 가입됨
+                            android.util.Log.w(TAG, "User registered with different method: $registeredDomain")
+                            setState { copy(isLoading = false) }
+                            setEffect {
+                                LoginContract.Effect.ShowError("이미 다른 방법(${registeredDomain})으로 가입된 계정입니다.")
+                            }
+                        } else {
+                            // 신규 회원가입 필요
+                            android.util.Log.d(TAG, "New user - sign up required")
+                            setState { copy(isLoading = false) }
+                            setEffect {
+                                LoginContract.Effect.ShowToast("회원가입이 필요합니다. (회원가입 화면 미구현)")
+                            }
+                            // NOTE: 회원가입 화면 구현 시 NavigateToSignUp Effect 추가
                         }
-                        // NOTE: 회원가입 화면 구현 시 NavigateToSignUp Effect 추가
                     }
                 }
                 is ApiResult.Error -> {
@@ -173,6 +187,18 @@ class LoginViewModel @Inject constructor(
         val deviceId = getDeviceId()
         val gmail = getGmail()
         val deviceKey = getFcmToken() // FCM token from DataStore
+
+        // GOOGLE LOGIN: 파라미터 로그 출력
+        android.util.Log.d("GOOGLE_LOGIN", "========================================")
+        android.util.Log.d("GOOGLE_LOGIN", "SignIn API Parameters:")
+        android.util.Log.d("GOOGLE_LOGIN", "  domain: $domain")
+        android.util.Log.d("GOOGLE_LOGIN", "  email: $email")
+        android.util.Log.d("GOOGLE_LOGIN", "  passwd: $password")
+        android.util.Log.d("GOOGLE_LOGIN", "  push_key: $deviceKey")
+        android.util.Log.d("GOOGLE_LOGIN", "  gmail: $gmail")
+        android.util.Log.d("GOOGLE_LOGIN", "  device_id: $deviceId")
+        android.util.Log.d("GOOGLE_LOGIN", "  app_id: ${Constants.APP_ID}")
+        android.util.Log.d("GOOGLE_LOGIN", "========================================")
 
         signInUseCase(
             domain = domain,

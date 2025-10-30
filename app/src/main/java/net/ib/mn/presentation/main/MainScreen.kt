@@ -11,14 +11,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import net.ib.mn.ui.components.AppScaffold
+import net.ib.mn.ui.components.ExoScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import net.ib.mn.R
+import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.theme.ExodusTheme
 
 /**
@@ -44,15 +44,14 @@ import net.ib.mn.ui.theme.ExodusTheme
  * 하단 네비게이션 바를 포함한 메인 컨테이너.
  * AppScaffold를 사용하여 Safe Area 안에서 작동합니다.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
     var selectedTab by remember { mutableIntStateOf(0) }
 
-    AppScaffold(
+    ExoScaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Idol App") },
+            ExoAppBar(
+                title = "app" ,
             )
         },
         bottomBar = {
@@ -98,7 +97,8 @@ private val bottomNavItems = listOf(
 @Preview(
     name = "Light Mode",
     showSystemUi = true,
-    showBackground = true
+    showBackground = true,
+    locale = "ko"
 )
 @Composable
 fun MainScreenPreviewLight() {
@@ -111,7 +111,8 @@ fun MainScreenPreviewLight() {
     name = "Dark Mode",
     showSystemUi = true,
     showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    locale = "ko"
 )
 @Composable
 fun MainScreenPreviewDark() {

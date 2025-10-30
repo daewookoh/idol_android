@@ -60,3 +60,36 @@ val Gray200Dark = Color(0xFF606060)
 val Gray300Dark = Color(0xFF808080)
 val Gray580Dark = Color(0xFF8a8a8a)
 val Gray900Dark = Color(0xFFdddddd)
+
+/**
+ * Color Palette for easy access in Composables
+ * 현재는 Light 모드만 지원, 추후 다크모드 추가 가능
+ */
+object ColorPalette {
+    val main = MainLight
+    val mainVariant = MainLightVariant
+    val redClickBorder = RedClickBorderLight
+
+    val background100 = Background100Light
+    val background200 = Background200Light
+    val background300 = Background300Light
+    val background400 = Background400Light
+
+    val textDefault = TextDefaultLight
+    val textGray = TextGrayLight
+    val textDimmed = TextDimmedLight
+    val textLight = TextLightLight
+    val textWhiteBlack = TextWhiteBlackLight
+
+    val gray50 = Gray50Light
+    val gray80 = Gray80Light
+    val gray100 = Gray100Light
+    val gray110 = Color(0xFFE8E8E8)
+    val gray150 = Gray150Light
+    val gray200 = Gray200Light
+    val gray300 = Gray300Light
+    val gray400 = Color(0xFF999999)
+    val gray500 = Color(0xFF888888)
+    val gray580 = Gray580Light
+    val gray900 = Gray900Light
+}

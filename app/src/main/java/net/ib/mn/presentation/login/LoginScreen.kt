@@ -52,6 +52,7 @@ import com.linecorp.linesdk.auth.LineLoginApi
 import kotlinx.coroutines.launch
 import net.ib.mn.MainActivity
 import net.ib.mn.R
+import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.theme.ExodusTheme
 import net.ib.mn.util.Constants
 
@@ -112,7 +113,7 @@ fun LoginScreen(
     // Google Sign-In Options
     val googleSignInClient = remember {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("444896554540-g8k5jvtnbme5fr00e2dp16a0evelif30.apps.googleusercontent.com") // OAuth Client ID (Web client type 3)
+            .requestIdToken("444896554540-g8k5jvtnbme5fr00e2dp16a0evelif30.apps.googleusercontent.com")
             .requestEmail()
             .build()
         GoogleSignIn.getClient(context, gso)
@@ -122,14 +123,19 @@ fun LoginScreen(
     // Activity Result Launchers
     // ============================================================
 
-    // Google Sign-In Launcher
+    // Google Sign-In Launcher (old 프로젝트와 동일: resultCode 체크하지 않음)
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
+        android.util.Log.d("LoginScreen", "Google result - resultCode: ${result.resultCode}, data: ${result.data}")
+
+        // old 프로젝트와 동일: resultCode 체크하지 않고 data != null만 체크
+        if (result.data != null) {
             try {
                 val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
                 val account = task.getResult(ApiException::class.java)
+
+                android.util.Log.d("LoginScreen", "Google account - email: ${account.email}, displayName: ${account.displayName}")
 
                 // Google 로그인 성공
                 viewModel.handleGoogleLoginResult(
@@ -138,13 +144,14 @@ fun LoginScreen(
                     idToken = account.idToken
                 )
             } catch (e: ApiException) {
-                android.util.Log.e("LoginScreen", "Google sign-in failed", e)
-                viewModel.handleSnsLoginError("Google login failed")
+                android.util.Log.e("LoginScreen", "Google sign-in ApiException - statusCode: ${e.statusCode}, message: ${e.message}", e)
+                viewModel.handleSnsLoginError("Google login failed: ${e.statusCode}")
                 Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
             }
         } else {
-            // 사용자가 취소했거나 결과가 실패한 경우
-            viewModel.handleSnsLoginError("Google login cancelled or failed")
+            // data가 null인 경우 (사용자가 취소)
+            android.util.Log.w("LoginScreen", "Google login cancelled - data is null")
+            viewModel.handleSnsLoginError("Google login cancelled")
         }
     }
 
@@ -275,8 +282,10 @@ fun LoginScreen(
                         }
                         LoginContract.LoginType.GOOGLE -> {
                             // Google 로그인 시작 (Activity Result API 사용)
+                            android.util.Log.d("LoginScreen", "Starting Google login...")
                             googleSignInClient.signOut() // 이전 세션 제거
                             val signInIntent = googleSignInClient.signInIntent
+                            android.util.Log.d("LoginScreen", "Launching Google sign-in intent")
                             googleSignInLauncher.launch(signInIntent)
                         }
                         LoginContract.LoginType.LINE -> {
@@ -400,19 +409,19 @@ private fun LoginContent(
     state: LoginContract.State,
     onIntent: (LoginContract.Intent) -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(colorResource(id = R.color.background_100))
-            .statusBarsPadding()
-    ) {
-        Column(
+    ExoScaffold { paddingValues ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(paddingValues)
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
             Spacer(modifier = Modifier.height(100.dp))
 
             // Main Image
@@ -524,7 +533,8 @@ private fun LoginContent(
                 )
             }
         }
-    }
+        } // Box
+    } // ExoScaffold
 }
 
 /**
@@ -569,7 +579,8 @@ private fun SocialLoginButton(
 @Preview(
     name = "Light Mode",
     showSystemUi = true,
-    showBackground = true
+    showBackground = true,
+    locale = "ko"
 )
 @Composable
 fun LoginScreenPreviewLight() {
@@ -585,7 +596,8 @@ fun LoginScreenPreviewLight() {
     name = "Dark Mode",
     showSystemUi = true,
     showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    locale = "ko"
 )
 @Composable
 fun LoginScreenPreviewDark() {

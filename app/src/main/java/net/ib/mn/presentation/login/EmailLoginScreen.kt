@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
+import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.theme.ExodusTheme
 
 /**
@@ -89,16 +90,16 @@ private fun EmailLoginContent(
 ) {
     val focusManager = LocalFocusManager.current
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(colorResource(id = R.color.background_100))
-            .statusBarsPadding()
-    ) {
-        Column(
+    ExoScaffold { paddingValues ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
             // Close Button (대신 TopAppBar 역할)
             Box(
                 modifier = Modifier
@@ -251,7 +252,8 @@ private fun EmailLoginContent(
                 )
             }
         }
-    }
+        } // Box
+    } // ExoScaffold
 }
 
 /**
@@ -434,7 +436,8 @@ private fun OutlinedPressableButton(
 @Preview(
     name = "Light Mode",
     showSystemUi = true,
-    showBackground = true
+    showBackground = true,
+    locale = "ko"
 )
 @Composable
 fun EmailLoginScreenPreviewLight() {
@@ -450,7 +453,8 @@ fun EmailLoginScreenPreviewLight() {
     name = "Dark Mode",
     showSystemUi = true,
     showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    locale = "ko"
 )
 @Composable
 fun EmailLoginScreenPreviewDark() {

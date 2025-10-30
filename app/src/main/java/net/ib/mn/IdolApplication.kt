@@ -7,8 +7,13 @@ import android.util.Log
 import com.facebook.FacebookSdk
 import com.kakao.sdk.common.KakaoSdk
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.util.Constants
+import net.ib.mn.util.ServerUrl
 import java.security.MessageDigest
+import javax.inject.Inject
 
 /**
  * Application class for Hilt initialization and SNS SDK setup.
@@ -22,8 +27,14 @@ import java.security.MessageDigest
 @HiltAndroidApp
 class IdolApplication : Application() {
 
+    @Inject
+    lateinit var preferencesManager: PreferencesManager
+
     override fun onCreate() {
         super.onCreate()
+
+        // 저장된 서버 URL 로드 (old 프로젝트 방식)
+        initializeServerUrl()
 
         // Kakao SDK 초기화 (old 프로젝트와 동일)
         // China flavor에서는 Kakao를 사용하지 않으므로 제외
@@ -41,6 +52,22 @@ class IdolApplication : Application() {
 
         // Line SDK: 별도 초기화 불필요 (사용 시 자동 초기화)
         // Google Sign-In: 별도 초기화 불필요
+    }
+
+    /**
+     * 저장된 서버 URL을 로드하여 ServerUrl.HOST를 설정합니다.
+     * old 프로젝트의 BaseApplication.onCreate()와 동일한 로직
+     */
+    private fun initializeServerUrl() {
+        runBlocking {
+            val savedUrl = preferencesManager.serverUrl.first()
+            if (!savedUrl.isNullOrEmpty()) {
+                ServerUrl.setHost(savedUrl)
+                Log.d("ServerUrl", "Loaded saved server URL: $savedUrl")
+            } else {
+                Log.d("ServerUrl", "Using default server URL: ${ServerUrl.HOST}")
+            }
+        }
     }
 
     /**

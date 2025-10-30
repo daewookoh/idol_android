@@ -4,12 +4,19 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import net.ib.mn.presentation.login.EmailLoginScreen
 import net.ib.mn.presentation.login.LoginScreen
 import net.ib.mn.presentation.main.MainScreen
+import net.ib.mn.presentation.signup.SignUpPagesScreen
 import net.ib.mn.presentation.startup.StartUpScreen
+import net.ib.mn.presentation.webview.WebViewScreen
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 /**
  * 앱의 네비게이션 그래프.
@@ -25,7 +32,7 @@ import net.ib.mn.presentation.startup.StartUpScreen
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    startDestination: String = Screen.StartUp.route
+    startDestination: String = Screen.SignUpPages.route
 ) {
     NavHost(
         navController = navController,
@@ -124,13 +131,7 @@ fun NavGraph(
                     }
                 },
                 onNavigateToSignUp = {
-                    // NOTE: 회원가입 화면 미구현 - 구현 시 Screen.SignUp.route로 navigate
-                    // navController.navigate(Screen.SignUp.route)
-                    android.widget.Toast.makeText(
-                        navController.context,
-                        "회원가입 화면은 추후 구현 예정입니다",
-                        android.widget.Toast.LENGTH_SHORT
-                    ).show()
+                    navController.navigate(Screen.SignUpPages.route)
                 },
                 onNavigateToForgotId = {
                     // NOTE: 아이디 찾기 화면 미구현 - 구현 시 Screen.ForgotId.route로 navigate
@@ -149,6 +150,24 @@ fun NavGraph(
                         "비밀번호 찾기 화면은 추후 구현 예정입니다",
                         android.widget.Toast.LENGTH_SHORT
                     ).show()
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // SignUp Pages 화면
+        composable(
+            route = Screen.SignUpPages.route
+        ) {
+            SignUpPagesScreen(
+                navController = navController,
+                onSignUpComplete = {
+                    // 회원가입 완료 시 StartUp으로 이동 (API 호출 후 Main으로 이동)
+                    navController.navigate(Screen.StartUp.route) {
+                        popUpTo(Screen.SignUpPages.route) { inclusive = true }
+                    }
                 },
                 onNavigateBack = {
                     navController.popBackStack()
@@ -190,6 +209,57 @@ fun NavGraph(
         ) {
             MainScreen()
         }
+
+        // WebView 화면
+        composable(
+            route = Screen.WebView.route,
+            arguments = listOf(
+                navArgument("url") { type = NavType.StringType },
+                navArgument("title") {
+                    type = NavType.StringType
+                    nullable = true
+                }
+            ),
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(600)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(600)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(600)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(600)
+                )
+            }
+        ) { backStackEntry ->
+            val encodedUrl = backStackEntry.arguments?.getString("url") ?: ""
+            val url = URLDecoder.decode(encodedUrl, StandardCharsets.UTF_8.toString())
+            val encodedTitle = backStackEntry.arguments?.getString("title")
+            val title = encodedTitle?.let {
+                URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
+            }
+
+            WebViewScreen(
+                url = url,
+                title = title,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }
 
@@ -200,5 +270,24 @@ sealed class Screen(val route: String) {
     data object StartUp : Screen("startup")
     data object Login : Screen("login")
     data object EmailLogin : Screen("email_login")
+    data object SignUpPages : Screen("signup_pages")
     data object Main : Screen("main")
+    data object WebView : Screen("webview/{url}?title={title}") {
+        /**
+         * WebView 화면으로 이동하는 라우트 생성
+         * @param url 로드할 URL
+         * @param title AppBar 타이틀 (옵션)
+         */
+        fun createRoute(url: String, title: String? = null): String {
+            val encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
+            val encodedTitle = title?.let {
+                URLEncoder.encode(it, StandardCharsets.UTF_8.toString())
+            }
+            return if (encodedTitle != null) {
+                "webview/$encodedUrl?title=$encodedTitle"
+            } else {
+                "webview/$encodedUrl"
+            }
+        }
+    }
 }

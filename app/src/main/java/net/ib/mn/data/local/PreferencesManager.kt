@@ -88,6 +88,9 @@ class PreferencesManager @Inject constructor(
         // Device Info
         val KEY_DEVICE_ID = stringPreferencesKey("device_id")
         val KEY_FCM_TOKEN = stringPreferencesKey("fcm_token")
+
+        // Server Config
+        val KEY_SERVER_URL = stringPreferencesKey("server_url")
     }
 
     // ============================================================
@@ -167,6 +170,11 @@ class PreferencesManager @Inject constructor(
     val fcmToken: Flow<String?> = context.dataStore.data
         .map { preferences ->
             preferences[KEY_FCM_TOKEN]
+        }
+
+    val serverUrl: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_SERVER_URL]
         }
 
     // ============================================================
@@ -302,6 +310,12 @@ class PreferencesManager @Inject constructor(
     suspend fun setFcmToken(token: String) {
         context.dataStore.edit { preferences ->
             preferences[KEY_FCM_TOKEN] = token
+        }
+    }
+
+    suspend fun setServerUrl(url: String) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_SERVER_URL] = url
         }
     }
 

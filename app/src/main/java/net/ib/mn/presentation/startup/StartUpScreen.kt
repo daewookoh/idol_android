@@ -34,7 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ExodusTheme
 import kotlinx.coroutines.flow.collectLatest
-import net.ib.mn.ui.components.AppScaffold
+import net.ib.mn.ui.components.ExoScaffold
 
 /**
  * 스타트업 화면.
@@ -90,10 +90,7 @@ private fun StartUpContent(
     state: StartUpContract.State
 ) {
 
-    AppScaffold (
-        containerColor = colorResource(id = R.color.text_white_black),
-        modifier = Modifier.fillMaxSize()
-    ) { paddingValues ->
+    ExoScaffold { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -131,7 +128,8 @@ private fun StartUpContent(
 @Preview(
     name = "Light Mode",
     showSystemUi = true,
-    showBackground = true
+    showBackground = true,
+    locale = "ko"
 )
 @Composable
 fun StartUpScreenPreviewLight() {
@@ -146,7 +144,8 @@ fun StartUpScreenPreviewLight() {
     name = "Dark Mode",
     showSystemUi = true,
     showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    locale = "ko"
 )
 @Composable
 fun StartUpScreenPreviewDark() {
