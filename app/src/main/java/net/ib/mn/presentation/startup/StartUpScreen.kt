@@ -90,11 +90,9 @@ private fun StartUpContent(
     state: StartUpContract.State
 ) {
 
-    ExoScaffold { paddingValues ->
+    ExoScaffold {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             // 스타트업 로고 (variant별로 다른 XML drawable 사용)

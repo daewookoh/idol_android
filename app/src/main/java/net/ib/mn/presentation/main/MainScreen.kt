@@ -51,7 +51,7 @@ fun MainScreen() {
     ExoScaffold(
         topBar = {
             ExoAppBar(
-                title = "app" ,
+                title = "app"
             )
         },
         bottomBar = {
@@ -66,11 +66,10 @@ fun MainScreen() {
                 }
             }
         }
-    ) { paddingValues ->
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {

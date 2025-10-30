@@ -1,9 +1,11 @@
 package net.ib.mn.ui.components
 
 import android.app.Activity
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.FabPosition
@@ -18,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import net.ib.mn.R
 
@@ -37,14 +40,12 @@ import net.ib.mn.R
  * @param floatingActionButtonPosition FAB 위치
  * @param containerColor 배경색
  * @param contentColor 컨텐츠 색상
- * @param contentWindowInsets 컨텐츠 window insets
- * @param applySystemBarColor 시스템바 색상을 containerColor와 동일하게 설정할지 여부 (기본: true)
  * @param content Scaffold 내부 컨텐츠
  */
 @Composable
 fun ExoScaffold(
     modifier: Modifier = Modifier,
-    applySystemBarsPadding: Boolean = true,
+    useFullScreen: Boolean = false,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     snackbarHost: @Composable () -> Unit = {},
@@ -52,18 +53,17 @@ fun ExoScaffold(
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     containerColor: Color = colorResource(id = R.color.background_100),
     contentColor: Color = colorResource(id = R.color.text_default),
-    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
-    applySystemBarColor: Boolean = true,
-    content: @Composable (PaddingValues) -> Unit
+    content: @Composable () -> Unit
 ) {
+    // applyContentWindowInsets 값에 따라 Scaffold에 전달할 인셋 결정
+    val windowInsets = if (useFullScreen) {
+        WindowInsets(0.dp)
+    } else {
+        ScaffoldDefaults.contentWindowInsets
+    }
+
     Scaffold(
-        modifier = if (applySystemBarsPadding) {
-            modifier
-                .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.systemBars)
-        } else {
-        modifier.fillMaxSize()
-        },
+        modifier = modifier.fillMaxSize(), // Scaffold는 항상 전체 화면 차지
         topBar = topBar,
         bottomBar = bottomBar,
         snackbarHost = snackbarHost,
@@ -71,7 +71,15 @@ fun ExoScaffold(
         floatingActionButtonPosition = floatingActionButtonPosition,
         containerColor = containerColor,
         contentColor = contentColor,
-        contentWindowInsets = contentWindowInsets,
-        content = content
+        contentWindowInsets = windowInsets,
+        content = { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                content()
+            }
+        }
     )
 }

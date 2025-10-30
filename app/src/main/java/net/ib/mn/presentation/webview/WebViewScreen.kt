@@ -2,10 +2,7 @@ package net.ib.mn.presentation.webview
 
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,13 +30,7 @@ fun WebViewScreen(
     }
 
     ExoScaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0)
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
+        topBar = {
             // 타이틀이 있으면 AppBar 표시
             if (title != null) {
                 ExoAppBar(
@@ -47,13 +38,13 @@ fun WebViewScreen(
                     onNavigationClick = onNavigateBack
                 )
             }
-
-            // 나머지 영역은 WebView
-            ExoWebView(
-                url = url,
-                modifier = Modifier.fillMaxSize()
-            )
         }
+    ) {
+        // WebView
+        ExoWebView(
+            url = url,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
 

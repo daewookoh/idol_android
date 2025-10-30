@@ -36,15 +36,10 @@ class MainActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
+        enableEdgeToEdge()
+
         setContent {
             ExodusTheme {
-                val backgroundColor = androidx.compose.ui.res.colorResource(id = R.color.background_100)
-
-                SetupSystemBars(
-                    statusBarColor = backgroundColor,
-                    navigationBarColor = backgroundColor
-                )
-
                 val navController = rememberNavController()
                 NavGraph(navController = navController)
             }

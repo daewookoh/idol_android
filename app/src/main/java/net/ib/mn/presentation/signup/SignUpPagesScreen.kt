@@ -140,11 +140,10 @@ internal fun AgreementPage(
                 onNavigationClick = onNavigateBack
             )
         }
-    ) { paddingValues ->
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .padding(horizontal = 20.dp, vertical = 18.dp)
         ) {
             // 전체 동의
@@ -191,8 +190,6 @@ internal fun AgreementPage(
                 onCheckedChange = { onIntent(SignUpContract.Intent.UpdateAgreePrivacy(it)) },
                 onDetailClick = { onIntent(SignUpContract.Intent.ShowPrivacyPolicy) }
             )
-
-            Spacer(modifier = Modifier.height(10.dp))
 
             // 만 14세 이상 (필수)
             val ageText = buildAnnotatedString {
@@ -251,11 +248,10 @@ private fun SignUpFormPage(
                 onNavigationClick = onNavigateBack
             )
         }
-    ) { paddingValues ->
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .verticalScroll(scrollState)
                 .padding(horizontal = 20.dp, vertical = 18.dp)
         ) {

@@ -409,11 +409,9 @@ private fun LoginContent(
     state: LoginContract.State,
     onIntent: (LoginContract.Intent) -> Unit
 ) {
-    ExoScaffold { paddingValues ->
+    ExoScaffold {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier = Modifier.fillMaxSize()
         ) {
             Column(
                 modifier = Modifier

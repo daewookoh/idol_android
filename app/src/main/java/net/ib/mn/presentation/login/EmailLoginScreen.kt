@@ -90,11 +90,9 @@ private fun EmailLoginContent(
 ) {
     val focusManager = LocalFocusManager.current
 
-    ExoScaffold { paddingValues ->
+    ExoScaffold {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier = Modifier.fillMaxSize()
         ) {
             Column(
                 modifier = Modifier
