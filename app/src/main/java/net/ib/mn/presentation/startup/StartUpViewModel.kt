@@ -99,14 +99,40 @@ class StartUpViewModel @Inject constructor(
             try {
                 setState { copy(isLoading = true, progress = 0f, error = null) }
 
-                // Step 0: 저장된 토큰 로드 (old 프로젝트의 IdolAccount.getAccount() 역할)
-                // 인증이 필요한 API 호출 전에 반드시 토큰을 먼저 로드해야 함
+                // Step 0: 저장된 인증 정보 로드 (old 프로젝트의 IdolAccount.getAccount() 역할)
+                // old 프로젝트와 동일: email, domain, token을 모두 로드
+                android.util.Log.d("USER_INFO", "========================================")
+                android.util.Log.d("USER_INFO", "[StartUpViewModel] Loading auth credentials from DataStore...")
+
+                val savedEmail = preferencesManager.loginEmail.first()
+                val savedDomain = preferencesManager.loginDomain.first()
                 val savedToken = preferencesManager.accessToken.first()
-                if (savedToken != null) {
-                    authInterceptor.setToken(savedToken)
-                    android.util.Log.d(TAG, "✓ Access token loaded from DataStore")
+
+                if (savedEmail != null && savedDomain != null && savedToken != null) {
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Auth credentials found in DataStore")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel]   - Email: $savedEmail")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel]   - Domain: $savedDomain")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel]   - Token: ${savedToken.take(20)}...")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Setting credentials in AuthInterceptor...")
+
+                    // old 프로젝트와 동일: email, domain, token을 AuthInterceptor에 설정
+                    authInterceptor.setAuthCredentials(savedEmail, savedDomain, savedToken)
+
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ AuthInterceptor credentials set successfully")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Ready to make authenticated API calls")
+                    android.util.Log.d("USER_INFO", "========================================")
+
+                    android.util.Log.d(TAG, "✓ Auth credentials loaded from DataStore")
                 } else {
-                    android.util.Log.w(TAG, "⚠️  No saved token - user not logged in (guest mode)")
+                    android.util.Log.w("USER_INFO", "========================================")
+                    android.util.Log.w("USER_INFO", "[StartUpViewModel] ⚠️ Auth credentials incomplete")
+                    android.util.Log.w("USER_INFO", "[StartUpViewModel]   - Email: $savedEmail")
+                    android.util.Log.w("USER_INFO", "[StartUpViewModel]   - Domain: $savedDomain")
+                    android.util.Log.w("USER_INFO", "[StartUpViewModel]   - Token: ${if (savedToken != null) "present" else "null"}")
+                    android.util.Log.w("USER_INFO", "[StartUpViewModel] User not logged in - navigating to Login screen")
+                    android.util.Log.w("USER_INFO", "========================================")
+
+                    android.util.Log.w(TAG, "⚠️  Auth credentials incomplete - user not logged in (guest mode)")
                     // Guest mode - Navigate to Login screen
                     setState { copy(isLoading = false, progress = 0f, currentStep = "Login required") }
 
@@ -255,25 +281,23 @@ class StartUpViewModel @Inject constructor(
                     android.util.Log.d(TAG, "ConfigStartup API Response")
                     android.util.Log.d(TAG, "========================================")
                     android.util.Log.d(TAG, "BadWords count: ${data?.badWords?.size ?: 0}")
-                    android.util.Log.d(TAG, "BadWords: ${data?.badWords?.joinToString(", ")}")
+                    data?.badWords?.take(3)?.forEach { badWord ->
+                        android.util.Log.d(TAG, "  - ${badWord.word} (type: ${badWord.type}, exc: ${badWord.exc.size})")
+                    }
                     android.util.Log.d(TAG, "----------------------------------------")
                     android.util.Log.d(TAG, "Board Tags count: ${data?.boardTags?.size ?: 0}")
-                    android.util.Log.d(TAG, "Board Tags: ${data?.boardTags?.joinToString(", ")}")
+                    data?.boardTags?.take(3)?.forEach { tag ->
+                        android.util.Log.d(TAG, "  - [${tag.id}] ${tag.name}")
+                    }
                     android.util.Log.d(TAG, "----------------------------------------")
                     android.util.Log.d(TAG, "SNS Channels count: ${data?.snsChannels?.size ?: 0}")
                     data?.snsChannels?.forEach { channel ->
                         android.util.Log.d(TAG, "  - ${channel.name}: ${channel.url}")
                     }
                     android.util.Log.d(TAG, "----------------------------------------")
-                    android.util.Log.d(TAG, "Notices count: ${data?.noticeList?.size ?: 0}")
-                    data?.noticeList?.take(3)?.forEach { notice ->
-                        android.util.Log.d(TAG, "  - [${notice.id}] ${notice.title}")
-                    }
+                    android.util.Log.d(TAG, "Notice List: ${if (data?.noticeList.isNullOrEmpty()) "Empty" else "JSON String (${data?.noticeList?.length} chars)"}")
                     android.util.Log.d(TAG, "----------------------------------------")
-                    android.util.Log.d(TAG, "Events count: ${data?.eventList?.size ?: 0}")
-                    data?.eventList?.take(3)?.forEach { event ->
-                        android.util.Log.d(TAG, "  - [${event.id}] ${event.title}")
-                    }
+                    android.util.Log.d(TAG, "Event List: ${if (data?.eventList.isNullOrEmpty()) "Empty" else "JSON String (${data?.eventList?.length} chars)"}")
                     android.util.Log.d(TAG, "----------------------------------------")
                     android.util.Log.d(TAG, "Family Apps count: ${data?.familyAppList?.size ?: 0}")
                     data?.familyAppList?.forEach { app ->
@@ -286,13 +310,17 @@ class StartUpViewModel @Inject constructor(
                     android.util.Log.d(TAG, "  - Allowed Formats: ${data?.uploadVideoSpec?.allowedFormats?.joinToString(", ")}")
                     android.util.Log.d(TAG, "----------------------------------------")
                     android.util.Log.d(TAG, "End Popup: ${data?.endPopup?.title ?: "None"}")
-                    android.util.Log.d(TAG, "New Picks count: ${data?.newPicks?.size ?: 0}")
-                    android.util.Log.d(TAG, "Help Infos count: ${data?.helpInfos?.size ?: 0}")
+                    android.util.Log.d(TAG, "New Picks: ${data?.newPicks}")
+                    android.util.Log.d(TAG, "Help Infos: ${data?.helpInfos}")
                     android.util.Log.d(TAG, "========================================")
 
                     // DataStore에 저장
                     data?.let { configData ->
-                        configData.badWords?.let { preferencesManager.setBadWords(it) }
+                        // BadWords는 List<BadWord>를 word 필드만 추출하여 List<String>으로 변환
+                        configData.badWords?.let { badWords ->
+                            val badWordStrings = badWords.map { it.word }
+                            preferencesManager.setBadWords(badWordStrings)
+                        }
                         configData.boardTags?.let { preferencesManager.setBoardTags(it) }
                         configData.noticeList?.let { preferencesManager.setNotices(it) }
                         configData.eventList?.let { preferencesManager.setEvents(it) }
@@ -414,25 +442,34 @@ class StartUpViewModel @Inject constructor(
         // DataStore에서 저장된 ETag 가져오기
         val etag = preferencesManager.userSelfETag.first()
 
+        android.util.Log.d("USER_INFO", "========================================")
+        android.util.Log.d("USER_INFO", "[StartUpViewModel] Loading user info from server")
+        android.util.Log.d("USER_INFO", "[StartUpViewModel] ETag: $etag")
+        android.util.Log.d("USER_INFO", "========================================")
+
         getUserSelfUseCase(etag).collect { result ->
             when (result) {
-                is ApiResult.Loading -> {}
+                is ApiResult.Loading -> {
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Loading user info...")
+                }
                 is ApiResult.Success -> {
                     val data = result.data.data
 
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "UserSelf API Response")
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "User ID: ${data?.id}")
-                    android.util.Log.d(TAG, "Username: ${data?.username}")
-                    android.util.Log.d(TAG, "Email: ${data?.email}")
-                    android.util.Log.d(TAG, "Nickname: ${data?.nickname}")
-                    android.util.Log.d(TAG, "Profile Image: ${data?.profileImage}")
-                    android.util.Log.d(TAG, "Hearts: ${data?.hearts}")
-                    android.util.Log.d(TAG, "========================================")
+                    android.util.Log.d("USER_INFO", "========================================")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ UserSelf API Response received")
+                    android.util.Log.d("USER_INFO", "========================================")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] User ID: ${data?.id}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Username: ${data?.username}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Email: ${data?.email}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Nickname: ${data?.nickname}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Profile Image: ${data?.profileImage}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Hearts: ${data?.hearts}")
+                    android.util.Log.d("USER_INFO", "========================================")
 
                     // 사용자 정보 DataStore 저장
                     data?.let { userData ->
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel] Saving user info to DataStore...")
+
                         preferencesManager.setUserInfo(
                             id = userData.id,
                             email = userData.email,
@@ -444,14 +481,29 @@ class StartUpViewModel @Inject constructor(
 
                         // ETag는 Repository에서 자동으로 저장됨
 
-                        android.util.Log.d(TAG, "✓ UserSelf data saved to DataStore")
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ User info saved to DataStore successfully")
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - This will trigger MainViewModel's DataStore subscription")
                     }
+
+                    android.util.Log.d(TAG, "========================================")
+                    android.util.Log.d(TAG, "UserSelf API Response")
+                    android.util.Log.d(TAG, "========================================")
+                    android.util.Log.d(TAG, "User ID: ${data?.id}")
+                    android.util.Log.d(TAG, "Username: ${data?.username}")
+                    android.util.Log.d(TAG, "Email: ${data?.email}")
+                    android.util.Log.d(TAG, "Nickname: ${data?.nickname}")
+                    android.util.Log.d(TAG, "Profile Image: ${data?.profileImage}")
+                    android.util.Log.d(TAG, "Hearts: ${data?.hearts}")
+                    android.util.Log.d(TAG, "========================================")
                 }
                 is ApiResult.Error -> {
                     if (result.code == 304) {
                         // 캐시 유효 - 로컬 데이터 사용
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel] UserSelf cache valid (304 Not Modified)")
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel] Using cached user info from DataStore")
                         android.util.Log.d(TAG, "UserSelf cache valid (304 Not Modified)")
                     } else {
+                        android.util.Log.e("USER_INFO", "[StartUpViewModel] ❌ UserSelf API error: ${result.message}")
                         android.util.Log.e(TAG, "UserSelf error: ${result.message}")
                     }
                 }

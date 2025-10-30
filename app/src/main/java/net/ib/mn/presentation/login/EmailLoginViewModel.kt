@@ -169,6 +169,17 @@ class EmailLoginViewModel @Inject constructor(
         password: String,
         response: net.ib.mn.data.remote.dto.SignInResponse
     ) {
+        android.util.Log.d("USER_INFO", "========================================")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel] Login Success - Analyzing server response")
+        android.util.Log.d("USER_INFO", "========================================")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel] response.success: ${response.success}")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel] response.data: ${response.data}")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel] response.data?.token: ${response.data?.token}")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel] response.data?.userId: ${response.data?.userId}")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel] response.data?.email: ${response.data?.email}")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel] response.data?.username: ${response.data?.username}")
+        android.util.Log.d("USER_INFO", "========================================")
+
         android.util.Log.d(TAG, "========================================")
         android.util.Log.d(TAG, "Login Success - Saving user data...")
         android.util.Log.d(TAG, "========================================")
@@ -194,18 +205,24 @@ class EmailLoginViewModel @Inject constructor(
 
         // Access token 저장 (StartUpViewModel에서 체크하는 값)
         val tokenToSave = response.data?.token ?: hashedToken
+
+        android.util.Log.d("USER_INFO", "========================================")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel] Saving auth credentials to DataStore")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel]   - Email: $email")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel]   - Domain: ${Constants.DOMAIN_EMAIL}")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel]   - Token source: ${if (response.data?.token != null) "server response" else "hashed password"}")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel]   - Token preview: ${tokenToSave.take(20)}...")
+
+        // old 프로젝트와 동일: email, domain, token을 모두 저장
+        // old에서는 IdolAccount.createAccount(context, email, token, domain) 호출
         preferencesManager.setAccessToken(tokenToSave)
-        android.util.Log.d(TAG, "✓ Access token saved: ${tokenToSave.take(20)}...")
-        android.util.Log.d(TAG, "  (Source: ${if (response.data?.token != null) "server response" else "hashed password"})")
-
-        // 도메인 저장
         preferencesManager.setLoginDomain(Constants.DOMAIN_EMAIL)
-        android.util.Log.d(TAG, "✓ Login domain saved: ${Constants.DOMAIN_EMAIL}")
 
-        // 3. 사용자 정보 저장 (email 포함)
-        // old 프로젝트는 IdolAccount.createAccount 직후에는 사용자 정보가 없음
-        // StartupActivity에서 /users/self/ API를 호출하여 사용자 정보를 가져옴
+        // IMPORTANT: Email도 명시적으로 저장 (StartUpViewModel에서 필요)
+        // setUserInfo에서도 email을 저장하지만, response.data가 null일 수 있으므로
+        // 여기서 미리 저장하여 StartUpViewModel이 즉시 사용할 수 있도록 함
         if (response.data != null) {
+            // 서버에서 받은 전체 정보 저장
             preferencesManager.setUserInfo(
                 id = response.data.userId,
                 email = response.data.email,
@@ -214,15 +231,29 @@ class EmailLoginViewModel @Inject constructor(
                 profileImage = response.data.profileImage,
                 hearts = null
             )
-            android.util.Log.d(TAG, "✓ User info saved:")
-            android.util.Log.d(TAG, "  - User ID: ${response.data.userId}")
-            android.util.Log.d(TAG, "  - Email: ${response.data.email}")
-            android.util.Log.d(TAG, "  - Username: ${response.data.username}")
+            android.util.Log.d("USER_INFO", "[EmailLoginViewModel] ✓ User info saved (from server response)")
         } else {
-            // 서버가 사용자 정보를 보내지 않는 경우 (old 프로젝트와 동일)
-            // email만 저장하고 나머지는 StartUpScreen에서 /users/self/ API로 가져옴
-            android.util.Log.w(TAG, "⚠️  Server did not return user data - will fetch from /users/self/")
+            // 서버가 user data를 보내지 않은 경우, email만 최소한 저장
+            // (id=0은 임시값, StartUpViewModel에서 /users/self/로 정확한 정보 가져옴)
+            preferencesManager.setUserInfo(
+                id = 0,  // 임시값
+                email = email,
+                username = email.substringBefore("@"),  // 임시값
+                nickname = null,
+                profileImage = null,
+                hearts = null
+            )
+            android.util.Log.d("USER_INFO", "[EmailLoginViewModel] ✓ Minimal user info saved (email only)")
+            android.util.Log.d("USER_INFO", "[EmailLoginViewModel]   - Full user info will be loaded from /users/self/")
         }
+
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel] ✓ Auth credentials saved to DataStore")
+        android.util.Log.d("USER_INFO", "========================================")
+
+        android.util.Log.d(TAG, "✓ Access token saved: ${tokenToSave.take(20)}...")
+        android.util.Log.d(TAG, "  (Source: ${if (response.data?.token != null) "server response" else "hashed password"})")
+        android.util.Log.d(TAG, "✓ Login domain saved: ${Constants.DOMAIN_EMAIL}")
+        android.util.Log.d(TAG, "✓ User email saved: $email")
 
         // 4. 로그인 타임스탬프 저장
         // old: Util.setPreference(this, "user_login_ts", System.currentTimeMillis())
@@ -230,10 +261,12 @@ class EmailLoginViewModel @Inject constructor(
         preferencesManager.setLoginTimestamp(loginTimestamp)
         android.util.Log.d(TAG, "✓ Login timestamp saved: $loginTimestamp")
 
-        // 5. AuthInterceptor에 토큰 설정 (API 호출용)
+        // 5. AuthInterceptor에 인증 정보 설정 (API 호출용)
         // old: IdolAccount.createAccount()는 sAccount 메모리 객체도 생성
-        authInterceptor.setToken(tokenToSave)
-        android.util.Log.d(TAG, "✓ AuthInterceptor token set")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel] Setting auth credentials in AuthInterceptor...")
+        authInterceptor.setAuthCredentials(email, Constants.DOMAIN_EMAIL, tokenToSave)
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel] ✓ AuthInterceptor credentials set for immediate API calls")
+        android.util.Log.d(TAG, "✓ AuthInterceptor credentials set")
 
         android.util.Log.d(TAG, "========================================")
         android.util.Log.d(TAG, "All login data saved successfully!")

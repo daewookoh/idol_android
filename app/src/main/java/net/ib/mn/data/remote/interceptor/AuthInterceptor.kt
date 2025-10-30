@@ -1,43 +1,102 @@
 package net.ib.mn.data.remote.interceptor
 
+import android.util.Base64
 import net.ib.mn.BuildConfig
+import net.ib.mn.util.Constants
 import okhttp3.Interceptor
 import okhttp3.Response
 
 /**
  * 인증 Interceptor
  *
- * Authorization 헤더를 자동으로 추가
- * NOTE: 토큰은 PreferencesManager(DataStore)에서 관리됨
- * - 로그인 성공 시: preferencesManager.setAccessToken()으로 저장
- * - 앱 시작 시: StartUpViewModel에서 토큰을 로드하여 setToken() 호출
+ * Authorization 헤더를 자동으로 추가 (Basic 인증)
+ * NOTE: old 프로젝트와 동일하게 "email:domain:token" 형식의 Basic 인증 사용
+ * - 로그인 성공 시: setAuthCredentials()로 email, domain, token 설정
+ * - 앱 시작 시: StartUpViewModel에서 로드하여 setAuthCredentials() 호출
  */
 class AuthInterceptor : Interceptor {
 
     @Volatile
+    private var email: String? = null
+
+    @Volatile
+    private var domain: String? = null
+
+    @Volatile
     private var token: String? = null
 
+    /**
+     * old 프로젝트와 동일: email, domain, token을 설정
+     */
+    fun setAuthCredentials(email: String?, domain: String?, token: String?) {
+        android.util.Log.d("USER_INFO", "[AuthInterceptor] setAuthCredentials() called")
+        android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Email: $email")
+        android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Domain: $domain")
+        android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Token: ${if (token != null) "${token.take(20)}..." else "null"}")
+
+        this.email = email
+        this.domain = domain
+        this.token = token
+
+        android.util.Log.d("USER_INFO", "[AuthInterceptor] ✓ Auth credentials updated")
+    }
+
+    /**
+     * 하위 호환성을 위한 메서드 (deprecated)
+     */
+    @Deprecated("Use setAuthCredentials instead")
     fun setToken(newToken: String?) {
-        token = newToken
+        this.token = newToken
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
+        val url = originalRequest.url.toString()
 
         // X-HTTP-APPID, X-HTTP-VERSION 헤더 추가 (서버 요구사항)
-        // X-HTTP-APPID: 패키지명 (net.ib.mn, com.exodus.myloveidol.twostore, etc.)
+        // IMPORTANT: X-HTTP-APPID는 Constants.APP_ID 사용 (old 프로젝트와 동일)
+        // - app flavor: "" (빈 문자열)
+        // - onestore flavor: "twostore"
+        // - china flavor: "china"
+        // - celeb flavor: "4B418BC059C536ECE2DE206C3DC7C4D7"
         // X-HTTP-VERSION: old 프로젝트의 version.xml app_version (10.10.0)
         val requestBuilder = originalRequest.newBuilder()
-            .header("X-HTTP-APPID", BuildConfig.APPLICATION_ID)
+            .header("X-HTTP-APPID", Constants.APP_ID)  // ✅ APPLICATION_ID → APP_ID
             .header("X-HTTP-VERSION", "10.10.0")
 
-        // Authorization 헤더가 없고 토큰이 있으면 추가
+        // Authorization 헤더가 없으면 추가 (old 프로젝트와 동일한 Basic 인증)
         if (originalRequest.header("Authorization") == null) {
-            token?.let {
-                requestBuilder.header("Authorization", "Bearer $it")
+            if (email != null && domain != null && token != null) {
+                // old 프로젝트와 동일: "email:domain:token" 형식의 Basic 인증
+                val credential = "$email:$domain:$token"
+                val authHeader = "Basic ${Base64.encodeToString(credential.toByteArray(), Base64.NO_WRAP)}"
+
+                android.util.Log.d("USER_INFO", "[AuthInterceptor] Adding Authorization header to request")
+                android.util.Log.d("USER_INFO", "[AuthInterceptor]   - URL: $url")
+                android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Auth type: Basic")
+                android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Credential: $email:$domain:${token?.take(10)}...")
+
+                requestBuilder.header("Authorization", authHeader)
+            } else {
+                android.util.Log.w("USER_INFO", "[AuthInterceptor] ⚠️ No auth credentials available")
+                android.util.Log.w("USER_INFO", "[AuthInterceptor]   - URL: $url")
+                android.util.Log.w("USER_INFO", "[AuthInterceptor]   - Email: $email, Domain: $domain, Token: ${if (token != null) "present" else "null"}")
+                android.util.Log.w("USER_INFO", "[AuthInterceptor]   - This will likely result in 401 Unauthorized")
             }
         }
 
-        return chain.proceed(requestBuilder.build())
+        val request = requestBuilder.build()
+        val response = chain.proceed(request)
+
+        // 401 에러 발생 시 로그
+        if (response.code == 401) {
+            android.util.Log.e("USER_INFO", "[AuthInterceptor] ❌ 401 Unauthorized response received")
+            android.util.Log.e("USER_INFO", "[AuthInterceptor]   - URL: $url")
+            android.util.Log.e("USER_INFO", "[AuthInterceptor]   - Email was: $email")
+            android.util.Log.e("USER_INFO", "[AuthInterceptor]   - Domain was: $domain")
+            android.util.Log.e("USER_INFO", "[AuthInterceptor]   - Token was: ${if (token != null) "${token?.take(20)}..." else "null"}")
+        }
+
+        return response
     }
 }

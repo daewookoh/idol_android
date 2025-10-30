@@ -207,7 +207,14 @@ fun NavGraph(
                 )
             }
         ) {
-            MainScreen()
+            MainScreen(
+                onLogout = {
+                    // 로그아웃 시 StartUp으로 이동 (모든 네비게이션 스택 제거)
+                    navController.navigate(Screen.StartUp.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
 
         // WebView 화면

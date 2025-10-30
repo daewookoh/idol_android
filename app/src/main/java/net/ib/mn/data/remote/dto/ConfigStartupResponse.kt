@@ -16,43 +16,57 @@ data class ConfigStartupResponse(
     @SerializedName("success")
     val success: Boolean,
 
-    @SerializedName("data")
+    @SerializedName("objects")
     val data: ConfigStartupData?
 )
 
 data class ConfigStartupData(
     @SerializedName("badword")
-    val badWords: List<String>?,
+    val badWords: List<BadWord>?,  // ✅ List<BadWordModel> 구조 (old 프로젝트와 동일)
 
-    @SerializedName("boardTag")
+    @SerializedName("board_tag")  // ✅ snake_case로 수정 (old 프로젝트와 동일)
     val boardTags: List<BoardTag>?,
 
     @SerializedName("lgcode")
-    val lgCodes: List<LgCode>?,
+    val lgCodes: List<String>?,  // ✅ List<String>으로 수정 (old 프로젝트와 동일)
 
     @SerializedName("sns")
     val snsChannels: List<SnsChannel>?,
 
-    @SerializedName("noticeList")
-    val noticeList: List<Notice>?,
+    @SerializedName("notice_list")  // ✅ snake_case로 수정 + String으로 변경 (JSON 문자열)
+    val noticeList: String?,
 
-    @SerializedName("eventList")
-    val eventList: List<Event>?,
+    @SerializedName("event_list")  // ✅ snake_case로 수정 + String으로 변경 (JSON 문자열)
+    val eventList: String?,
 
-    @SerializedName("familyAppList")
+    @SerializedName("family_app_list")  // ✅ snake_case로 수정
     val familyAppList: List<FamilyApp>?,
 
-    @SerializedName("uploadVideoSpec")
+    @SerializedName("upload_video_spec")  // ✅ snake_case로 수정
     val uploadVideoSpec: UploadVideoSpec?,
 
-    @SerializedName("endPopup")
+    @SerializedName("end_popup")  // ✅ snake_case로 수정
     val endPopup: EndPopup?,
 
-    @SerializedName("newPicks")
-    val newPicks: List<NewPick>?,
+    @SerializedName("new_picks")  // ✅ snake_case로 수정
+    val newPicks: NewPicks?,  // ✅ NewPicks 객체로 변경 (old 프로젝트와 동일)
 
-    @SerializedName("helpInfos")
-    val helpInfos: List<HelpInfo>?
+    @SerializedName("help_infos")  // ✅ snake_case로 수정
+    val helpInfos: HelpInfos?  // ✅ HelpInfos 객체로 변경 (old 프로젝트와 동일)
+)
+
+// ============================================================
+// BadWord - 욕설 필터 (old 프로젝트 BadWordModel과 동일)
+// ============================================================
+data class BadWord(
+    @SerializedName("exc")
+    val exc: List<String> = emptyList(),  // 예외 단어
+
+    @SerializedName("type")
+    val type: String,  // 타입
+
+    @SerializedName("word")
+    val word: String  // 욕설 단어
 )
 
 data class BoardTag(
@@ -164,6 +178,41 @@ data class EndPopup(
     val imageUrl: String?
 )
 
+// ============================================================
+// NewPicks - 하트픽 New 표시 (old 프로젝트 NewPicksModel과 동일)
+// ============================================================
+data class NewPicks(
+    @SerializedName("heartpick")
+    val heartpick: Boolean,
+
+    @SerializedName("onepick")
+    val onepick: Boolean,
+
+    @SerializedName("themepick")
+    val themepick: Boolean
+)
+
+// ============================================================
+// HelpInfos - 도움말 정보 (old 프로젝트 HelpInfosModel과 동일)
+// ============================================================
+data class HelpInfos(
+    @SerializedName("heartpick")
+    val heartPick: String? = null,
+
+    @SerializedName("onepick")
+    val onePick: String? = null,
+
+    @SerializedName("themepick")
+    val themePick: String? = null,
+
+    @SerializedName("free_board_placeholder")
+    val freeBoardPlaceHolder: String? = null
+)
+
+// ============================================================
+// 아래 클래스들은 noticeList, eventList를 JSON 파싱할 때 사용
+// (서버는 JSON 문자열로 반환)
+// ============================================================
 data class NewPick(
     @SerializedName("id")
     val id: Int,

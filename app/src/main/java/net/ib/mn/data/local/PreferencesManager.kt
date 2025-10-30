@@ -102,6 +102,16 @@ class PreferencesManager @Inject constructor(
             preferences[KEY_ACCESS_TOKEN]
         }
 
+    val loginEmail: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_USER_EMAIL]
+        }
+
+    val loginDomain: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_LOGIN_DOMAIN]
+        }
+
     val allIdolUpdate: Flow<String?> = context.dataStore.data
         .map { preferences ->
             preferences[KEY_ALL_IDOL_UPDATE]
@@ -136,7 +146,7 @@ class PreferencesManager @Inject constructor(
         .map { preferences ->
             val userId = preferences[KEY_USER_ID]
             if (userId != null) {
-                UserInfo(
+                val info = UserInfo(
                     id = userId,
                     email = preferences[KEY_USER_EMAIL] ?: "",
                     username = preferences[KEY_USER_USERNAME] ?: "",
@@ -144,7 +154,13 @@ class PreferencesManager @Inject constructor(
                     profileImage = preferences[KEY_USER_PROFILE_IMAGE],
                     hearts = preferences[KEY_USER_HEARTS]
                 )
-            } else null
+                android.util.Log.d("USER_INFO", "[PreferencesManager] DataStore emitting user info to collectors")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - ID: ${info.id}, Email: ${info.email}, Username: ${info.username}")
+                info
+            } else {
+                android.util.Log.d("USER_INFO", "[PreferencesManager] DataStore emitting null (no user info)")
+                null
+            }
         }
 
     val language: Flow<String?> = context.dataStore.data
@@ -182,9 +198,14 @@ class PreferencesManager @Inject constructor(
     // ============================================================
 
     suspend fun setAccessToken(token: String) {
+        android.util.Log.d("USER_INFO", "[PreferencesManager] Writing access token to DataStore...")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - Token preview: ${token.take(20)}...")
+
         context.dataStore.edit { preferences ->
             preferences[KEY_ACCESS_TOKEN] = token
         }
+
+        android.util.Log.d("USER_INFO", "[PreferencesManager] ✓ Access token written to DataStore")
     }
 
     suspend fun setAllIdolUpdate(timestamp: String) {
@@ -225,6 +246,13 @@ class PreferencesManager @Inject constructor(
         profileImage: String?,
         hearts: Int?
     ) {
+        android.util.Log.d("USER_INFO", "[PreferencesManager] Writing user info to DataStore...")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - ID: $id")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - Email: $email")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - Username: $username")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - Nickname: $nickname")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - Hearts: $hearts")
+
         context.dataStore.edit { preferences ->
             preferences[KEY_USER_ID] = id
             preferences[KEY_USER_EMAIL] = email
@@ -233,6 +261,9 @@ class PreferencesManager @Inject constructor(
             profileImage?.let { preferences[KEY_USER_PROFILE_IMAGE] = it }
             hearts?.let { preferences[KEY_USER_HEARTS] = it }
         }
+
+        android.util.Log.d("USER_INFO", "[PreferencesManager] ✓ User info written to DataStore")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - DataStore will now emit new value to all collectors")
     }
 
     suspend fun setTutorialCompleted(completed: Boolean) {
