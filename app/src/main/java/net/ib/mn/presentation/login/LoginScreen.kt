@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -347,11 +348,37 @@ fun LoginScreen(
                 val signInIntent = googleSignInClient.signInIntent
                 googleSignInLauncher.launch(signInIntent)
             } else {
-                // 권한이 없으면 설명 다이얼로그 먼저 표시 (old 프로젝트와 동일)
-                android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
-                android.util.Log.d(GOOGLE_LOGIN_TAG, "Showing Google permission explanation dialog")
-                android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
-                showGooglePermissionDialog = true
+                // 권한이 없으면, 사용자가 이미 권한 선택 결과를 결정했는지 확인
+                // shouldShowRequestPermissionRationale()가 false면:
+                // 1. 권한이 허용된 경우 (이미 체크했으므로 여기서는 해당 없음)
+                // 2. 사용자가 "다시 묻지 않음"을 선택한 경우
+                // 이 경우 다이얼로그를 띄우지 않고 바로 권한 요청 진행
+                val shouldShowRationale = if (activity != null) {
+                    androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale(
+                        activity!!,
+                        Manifest.permission.GET_ACCOUNTS
+                    )
+                } else {
+                    false
+                }
+                
+                if (shouldShowRationale) {
+                    // 사용자가 아직 권한을 거부하지 않았거나, 첫 요청인 경우 설명 다이얼로그 표시
+                    android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+                    android.util.Log.d(GOOGLE_LOGIN_TAG, "Showing Google permission explanation dialog")
+                    android.util.Log.d(GOOGLE_LOGIN_TAG, "  shouldShowRationale: true")
+                    android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+                    showGooglePermissionDialog = true
+                } else {
+                    // 사용자가 이미 권한 선택 결과를 결정한 경우 (다시 묻지 않음 선택)
+                    // 다이얼로그 없이 바로 권한 요청 진행
+                    android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+                    android.util.Log.d(GOOGLE_LOGIN_TAG, "User already made permission choice, skipping dialog")
+                    android.util.Log.d(GOOGLE_LOGIN_TAG, "  shouldShowRationale: false")
+                    android.util.Log.d(GOOGLE_LOGIN_TAG, "  Requesting permission directly")
+                    android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+                    googleAccountsPermissionLauncher.launch(Manifest.permission.GET_ACCOUNTS)
+                }
             }
         } else {
             // Android 6.0 미만에서는 권한 요청 불필요 (매니페스트에 선언만 하면 됨)

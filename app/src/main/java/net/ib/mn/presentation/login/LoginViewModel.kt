@@ -202,54 +202,68 @@ class LoginViewModel @Inject constructor(
                     android.util.Log.d(loginTag, "========================================")
 
                     if (response.success) {
-                        // Old 프로젝트: success == true일 때도 약관 동의 화면으로 이동
-                        // 이유: 약관 동의를 다시 받기 위함 (161011 약관동의 처리)
-                        // → AgreementFragment → KakaoMoreFragment → 회원가입 API → trySignin()
-                        // 
-                        // 하지만 사용자 요구사항: 이미 있는 회원은 바로 로그인해야 함
-                        // 따라서 기존 회원은 바로 로그인 API 호출
-                        android.util.Log.d(TAG, "User exists - calling signIn API directly")
-                        android.util.Log.d(loginTag, "========================================")
-                        android.util.Log.d(loginTag, "User EXISTS - Calling performSignIn()")
-                        android.util.Log.d(loginTag, "========================================")
-                        
-                        // 기존 회원: 바로 로그인 API 호출 (isExistingUser = true 플래그 전달)
-                        performSignIn(isExistingUser = true)
-                        
-                    } else {
-                        // 회원이 존재하지 않음 -> domain 확인 (old 프로젝트 로직)
+                        // success == true이지만 domain이 null이면 미가입자로 처리
                         val registeredDomain = response.domain
-                        android.util.Log.d(TAG, "User not found - checking if registered with different method")
-                        android.util.Log.d(TAG, "Registered domain: $registeredDomain, trying domain: $domain")
-                        android.util.Log.d(loginTag, "========================================")
-                        android.util.Log.d(loginTag, "User NOT FOUND")
-                        android.util.Log.d(loginTag, "  registeredDomain: $registeredDomain")
-                        android.util.Log.d(loginTag, "  trying domain: $domain")
-                        android.util.Log.d(loginTag, "========================================")
-
-                        // Old 프로젝트: registeredDomain이 null이 아니고 domain과 다르면 다이얼로그 표시
-                        // 하지만 사용자 요구사항: 계정이 없으면 회원가입으로 이동해야 함
-                        // 따라서 신규 회원으로 간주하고 회원가입 플로우로 이동
-                        android.util.Log.d(TAG, "New user - sign up required")
-                        android.util.Log.d(loginTag, "========================================")
-                        android.util.Log.d(loginTag, "NEW USER - Checking temp data")
-                        android.util.Log.d(loginTag, "  tempEmail: $tempEmail")
-                        android.util.Log.d(loginTag, "  tempPassword: ${tempPassword?.take(20)}...")
-                        android.util.Log.d(loginTag, "  tempDomain: $tempDomain")
-                        android.util.Log.d(loginTag, "  tempDisplayName: $tempDisplayName")
-                        android.util.Log.d(loginTag, "  tempProfileImageUrl: $tempProfileImageUrl")
-                        android.util.Log.d(loginTag, "========================================")
-                        
-                        val email = tempEmail ?: run {
-                            android.util.Log.e(loginTag, "========================================")
-                            android.util.Log.e(loginTag, "ERROR: tempEmail is null")
-                            android.util.Log.e(loginTag, "========================================")
+                        if (registeredDomain == null) {
+                            android.util.Log.d(loginTag, "========================================")
+                            android.util.Log.d(loginTag, "NEW USER - success=true but domain is null")
+                            android.util.Log.d(loginTag, "  email: $email")
+                            android.util.Log.d(loginTag, "  domain: $domain")
+                            android.util.Log.d(loginTag, "  registeredDomain: null")
+                            android.util.Log.d(loginTag, "========================================")
+                            
+                            // 신규 회원: 회원가입 화면으로 이동
+                            val password = tempPassword ?: run {
+                                android.util.Log.e(loginTag, "ERROR: tempPassword is null")
+                                setState { copy(isLoading = false) }
+                                setEffect {
+                                    LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
+                                }
+                                return@collect
+                            }
+                            val currentDomain = tempDomain ?: run {
+                                android.util.Log.e(loginTag, "ERROR: tempDomain is null")
+                                setState { copy(isLoading = false) }
+                                setEffect {
+                                    LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
+                                }
+                                return@collect
+                            }
+                            
+                            // SNS 로그인(카카오, 구글 등) 시 nickname(displayName)을 전달하지 않음
+                            val displayName = if (currentDomain == Constants.DOMAIN_EMAIL) tempDisplayName else null
+                            val profileImageUrl = tempProfileImageUrl
+                            
+                            android.util.Log.d(loginTag, "Navigating to SignUp screen")
+                            android.util.Log.d(loginTag, "  email: $email")
+                            android.util.Log.d(loginTag, "  password: ${password.take(20)}...")
+                            android.util.Log.d(loginTag, "  domain: $currentDomain")
+                            android.util.Log.d(loginTag, "  displayName: $displayName")
+                            android.util.Log.d(loginTag, "  profileImageUrl: $profileImageUrl")
+                            
                             setState { copy(isLoading = false) }
                             setEffect {
-                                LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
+                                LoginContract.Effect.NavigateToSignUp(
+                                    email = email,
+                                    password = password,
+                                    displayName = displayName,
+                                    domain = currentDomain,
+                                    profileImageUrl = profileImageUrl
+                                )
                             }
                             return@collect
                         }
+                        
+                        // 새로운 로직: validate API에서 success == true이고 domain이 있으면 기존 회원
+                        // 회원정보를 기준으로 local에 필요한 데이터 저장하고 StartupScreen에서 로그인 처리
+                        android.util.Log.d(loginTag, "========================================")
+                        android.util.Log.d(loginTag, "EXISTING USER - Saving login info and navigating to StartupScreen")
+                        android.util.Log.d(loginTag, "  email: $email")
+                        android.util.Log.d(loginTag, "  domain: $domain")
+                        android.util.Log.d(loginTag, "  registeredDomain: $registeredDomain")
+                        android.util.Log.d(loginTag, "========================================")
+                        
+                        // 기존 회원: local에 필요한 데이터 저장 후 StartupScreen으로 이동
                         val password = tempPassword ?: run {
                             android.util.Log.e(loginTag, "========================================")
                             android.util.Log.e(loginTag, "ERROR: tempPassword is null")
@@ -260,21 +274,139 @@ class LoginViewModel @Inject constructor(
                             }
                             return@collect
                         }
-                        val currentDomain = tempDomain ?: run {
-                            android.util.Log.e(loginTag, "========================================")
-                            android.util.Log.e(loginTag, "ERROR: tempDomain is null")
-                            android.util.Log.e(loginTag, "========================================")
-                            setState { copy(isLoading = false) }
-                            setEffect {
-                                LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
+                        
+                        // Old 프로젝트의 afterSignin 로직과 동일
+                        val hashToken = if (domain == Constants.DOMAIN_EMAIL) {
+                            password // Email 로그인의 경우 md5salt (현재는 구현하지 않음)
+                        } else {
+                            password // SNS 로그인의 경우 access token 그대로 사용
+                        }
+                        
+                        // 1. AuthInterceptor에 기본 정보 저장
+                        authInterceptor.setAuthCredentials(
+                            email = email,
+                            domain = domain,
+                            token = hashToken
+                        )
+                        
+                        // 2. DataStore에 로그인 정보 저장
+                        preferencesManager.setAccessToken(hashToken)
+                        preferencesManager.setLoginDomain(domain)
+                        
+                        // 3. 최소한의 사용자 정보 저장 (StartUpScreen에서 업데이트됨)
+                        preferencesManager.setUserInfo(
+                            id = 0,
+                            email = email,
+                            username = "",
+                            nickname = null,
+                            profileImage = null,
+                            hearts = null,
+                            domain = domain
+                        )
+                        
+                        android.util.Log.d(loginTag, "✓ Login credentials saved (existing user)")
+                        android.util.Log.d(loginTag, "  - Email: $email")
+                        android.util.Log.d(loginTag, "  - Domain: $domain")
+                        android.util.Log.d(loginTag, "  - Token: ${hashToken.take(20)}...")
+                        android.util.Log.d(loginTag, "  - Note: User info will be fetched in StartupScreen")
+                        
+                        // Old 프로젝트: 카카오 로그인 성공 후 unlink 호출
+                        if (domain == Constants.DOMAIN_KAKAO) {
+                            android.util.Log.d(loginTag, "Calling requestKakaoUnlink()")
+                            requestKakaoUnlink()
+                        }
+                        
+                        setState { copy(isLoading = false, loginType = null) }
+                        setEffect { LoginContract.Effect.NavigateToMain }
+                        
+                    } else {
+                        // 새로운 로직: validate API에서 success == false면 신규 회원 또는 email이 없음
+                        // email이 없거나 이메일이 잘못되었다고 나올 경우 회원가입화면으로 이동
+                        val registeredDomain = response.domain
+                        val errorMessage = response.message ?: ""
+                        val isEmailError = errorMessage.contains("이메일이 잘못되었습니다", ignoreCase = true) ||
+                                errorMessage.contains("email", ignoreCase = true) ||
+                                errorMessage.contains("잘못", ignoreCase = true)
+                        val isDuplicateEmail = errorMessage.contains("중복되는 이메일", ignoreCase = true) ||
+                                errorMessage.contains("중복", ignoreCase = true)
+                        
+                        android.util.Log.d(loginTag, "========================================")
+                        android.util.Log.d(loginTag, "NEW USER or EMAIL ERROR - Checking conditions")
+                        android.util.Log.d(loginTag, "  email: $email")
+                        android.util.Log.d(loginTag, "  domain: $domain")
+                        android.util.Log.d(loginTag, "  registeredDomain: $registeredDomain")
+                        android.util.Log.d(loginTag, "  errorMessage: $errorMessage")
+                        android.util.Log.d(loginTag, "  isEmailError: $isEmailError")
+                        android.util.Log.d(loginTag, "  isDuplicateEmail: $isDuplicateEmail")
+                        android.util.Log.d(loginTag, "========================================")
+                        
+                        // "중복되는 이메일입니다." 메시지가 있고 registeredDomain이 현재 domain과 일치하면 기존 회원으로 처리
+                        if (isDuplicateEmail && registeredDomain != null && registeredDomain.equals(domain, ignoreCase = true)) {
+                            android.util.Log.d(loginTag, "========================================")
+                            android.util.Log.d(loginTag, "EXISTING USER - Duplicate email with same domain")
+                            android.util.Log.d(loginTag, "  email: $email")
+                            android.util.Log.d(loginTag, "  domain: $domain")
+                            android.util.Log.d(loginTag, "========================================")
+                            
+                            // 기존 회원: local에 필요한 데이터 저장 후 StartupScreen으로 이동
+                            val password = tempPassword ?: run {
+                                android.util.Log.e(loginTag, "ERROR: tempPassword is null")
+                                setState { copy(isLoading = false) }
+                                setEffect {
+                                    LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
+                                }
+                                return@collect
                             }
+                            
+                            // Old 프로젝트의 afterSignin 로직과 동일
+                            val hashToken = if (domain == Constants.DOMAIN_EMAIL) {
+                                password // Email 로그인의 경우 md5salt (현재는 구현하지 않음)
+                            } else {
+                                password // SNS 로그인의 경우 access token 그대로 사용
+                            }
+                            
+                            // 1. AuthInterceptor에 기본 정보 저장
+                            authInterceptor.setAuthCredentials(
+                                email = email,
+                                domain = domain,
+                                token = hashToken
+                            )
+                            
+                            // 2. DataStore에 로그인 정보 저장
+                            preferencesManager.setAccessToken(hashToken)
+                            preferencesManager.setLoginDomain(domain)
+                            
+                            // 3. 최소한의 사용자 정보 저장 (StartUpScreen에서 업데이트됨)
+                            preferencesManager.setUserInfo(
+                                id = 0,
+                                email = email,
+                                username = "",
+                                nickname = null,
+                                profileImage = null,
+                                hearts = null,
+                                domain = domain
+                            )
+                            
+                            android.util.Log.d(loginTag, "✓ Login credentials saved (existing user - duplicate email)")
+                            android.util.Log.d(loginTag, "  - Email: $email")
+                            android.util.Log.d(loginTag, "  - Domain: $domain")
+                            android.util.Log.d(loginTag, "  - Token: ${hashToken.take(20)}...")
+                            android.util.Log.d(loginTag, "  - Note: User info will be fetched in StartupScreen")
+                            
+                            // Old 프로젝트: 카카오 로그인 성공 후 unlink 호출
+                            if (domain == Constants.DOMAIN_KAKAO) {
+                                android.util.Log.d(loginTag, "Calling requestKakaoUnlink()")
+                                requestKakaoUnlink()
+                            }
+                            
+                            setState { copy(isLoading = false, loginType = null) }
+                            setEffect { LoginContract.Effect.NavigateToMain }
                             return@collect
                         }
                         
-                        // 다른 소셜 로그인으로 가입된 경우 에러 표시 (Old 프로젝트 로직)
-                        if (registeredDomain != null && !registeredDomain.equals(currentDomain, ignoreCase = true)) {
-                            android.util.Log.w(TAG, "User registered with different method: $registeredDomain")
-                            android.util.Log.w(loginTag, "User registered with DIFFERENT method: $registeredDomain")
+                        // 다른 소셜 로그인으로 가입된 경우 에러 표시
+                        if (registeredDomain != null && !registeredDomain.equals(domain, ignoreCase = true)) {
+                            android.util.Log.w(loginTag, "User registered with different method: $registeredDomain")
                             setState { copy(isLoading = false) }
                             setEffect {
                                 LoginContract.Effect.ShowError(
@@ -284,17 +416,40 @@ class LoginViewModel @Inject constructor(
                             return@collect
                         }
                         
+                        android.util.Log.d(loginTag, "========================================")
+                        android.util.Log.d(loginTag, "NEW USER - NavigateToSignUp")
+                        android.util.Log.d(loginTag, "  email: $email")
+                        android.util.Log.d(loginTag, "  domain: $domain")
+                        android.util.Log.d(loginTag, "========================================")
+                        
+                        // 신규 회원: 회원가입 화면으로 이동
+                        val password = tempPassword ?: run {
+                            android.util.Log.e(loginTag, "ERROR: tempPassword is null")
+                            setState { copy(isLoading = false) }
+                            setEffect {
+                                LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
+                            }
+                            return@collect
+                        }
+                        val currentDomain = tempDomain ?: run {
+                            android.util.Log.e(loginTag, "ERROR: tempDomain is null")
+                            setState { copy(isLoading = false) }
+                            setEffect {
+                                LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
+                            }
+                            return@collect
+                        }
+                        
                         // SNS 로그인(카카오, 구글 등) 시 nickname(displayName)을 전달하지 않음
-                        // 사용자가 직접 닉네임을 입력해야 함
                         val displayName = if (currentDomain == Constants.DOMAIN_EMAIL) tempDisplayName else null
                         val profileImageUrl = tempProfileImageUrl
                         
                         android.util.Log.d(loginTag, "========================================")
-                        android.util.Log.d(loginTag, "NEW USER - NavigateToSignUp")
+                        android.util.Log.d(loginTag, "Navigating to SignUp screen")
                         android.util.Log.d(loginTag, "  email: $email")
                         android.util.Log.d(loginTag, "  password: ${password.take(20)}...")
                         android.util.Log.d(loginTag, "  domain: $currentDomain")
-                        android.util.Log.d(loginTag, "  displayName: $displayName (SNS 로그인은 null로 전달)")
+                        android.util.Log.d(loginTag, "  displayName: $displayName")
                         android.util.Log.d(loginTag, "  profileImageUrl: $profileImageUrl")
                         android.util.Log.d(loginTag, "========================================")
                         
@@ -507,6 +662,8 @@ class LoginViewModel @Inject constructor(
                         // Old 프로젝트: response.optBoolean("success")가 false인 경우
                         // "이메일이 잘못되었습니다" 메시지가 포함된 경우 신규 회원으로 간주하고 회원가입 플로우로 이동
                         // 구글 로그인의 경우: "이메일이 잘못되었습니다" 에러가 나오면 무조건 회원가입으로 이동
+                        // 단, validate API에서 이미 회원으로 확인된 경우(isExistingUser == true)에는
+                        // "이메일이 잘못되었습니다"가 아니면 회원가입으로 이동하지 않고 로그인 처리
                         val errorMessage = response.message ?: ""
                         val isEmailError = errorMessage.contains("이메일이 잘못되었습니다", ignoreCase = true) ||
                                 errorMessage.contains("email", ignoreCase = true) ||
@@ -521,9 +678,63 @@ class LoginViewModel @Inject constructor(
                         android.util.Log.e(loginTag, "  domain: $domain")
                         android.util.Log.e(loginTag, "========================================")
                         
-                        // 구글 로그인인 경우: "이메일이 잘못되었습니다" 에러가 나오면 무조건 회원가입으로 이동
-                        // validate API에서 success == true를 반환했지만, signIn API에서 "이메일이 잘못되었습니다" 에러가 나오면 신규 회원으로 간주
-                        if (isEmailError && (domain == Constants.DOMAIN_GOOGLE || !isExistingUser)) {
+                        // Old 프로젝트: validate API에서 이미 회원으로 확인된 경우(isExistingUser == true)
+                        // signIn API가 실패해도 회원가입으로 이동하지 않고 로그인 처리
+                        // "이메일이 잘못되었습니다" 에러가 나와도 validate API에서 이미 회원으로 확인되었으므로 로그인 처리
+                        if (isExistingUser) {
+                            // validate API에서 이미 회원으로 확인되었으므로, signIn API 실패해도 로그인 처리
+                            android.util.Log.w(loginTag, "========================================")
+                            android.util.Log.w(loginTag, "User exists in DB but signIn API failed - proceeding with login")
+                            android.util.Log.w(loginTag, "  errorMessage: $errorMessage")
+                            android.util.Log.w(loginTag, "  isEmailError: $isEmailError")
+                            android.util.Log.w(loginTag, "  Old project: validate success=true means user exists, proceed with login")
+                            android.util.Log.w(loginTag, "========================================")
+                            
+                            // 로그인 처리 (afterSignin과 동일)
+                            val email = tempEmail ?: return@collect
+                            val password = tempPassword ?: return@collect
+                            
+                            // Old 프로젝트의 afterSignin 로직과 동일
+                            val hashToken = if (domain == Constants.DOMAIN_EMAIL) {
+                                password // Email 로그인의 경우 md5salt (현재는 구현하지 않음)
+                            } else {
+                                password // SNS 로그인의 경우 access token 그대로 사용
+                            }
+                            
+                            // 1. AuthInterceptor에 기본 정보 저장
+                            authInterceptor.setAuthCredentials(
+                                email = email,
+                                domain = domain,
+                                token = hashToken
+                            )
+                            
+                            // 2. DataStore에 로그인 정보 저장
+                            preferencesManager.setAccessToken(hashToken)
+                            preferencesManager.setLoginDomain(domain)
+                            
+                            // 3. 최소한의 사용자 정보 저장 (StartUpScreen에서 업데이트됨)
+                            preferencesManager.setUserInfo(
+                                id = 0,
+                                email = email,
+                                username = "",
+                                nickname = null,
+                                profileImage = null,
+                                hearts = null,
+                                domain = domain
+                            )
+                            
+                            android.util.Log.d(loginTag, "✓ Login credentials saved (user exists in DB)")
+                            android.util.Log.d(loginTag, "  - Email: $email")
+                            android.util.Log.d(loginTag, "  - Domain: $domain")
+                            
+                            setState { copy(isLoading = false, loginType = null) }
+                            setEffect { LoginContract.Effect.NavigateToMain }
+                            return@collect
+                        }
+                        
+                        // validate API에서 회원으로 확인되지 않은 경우(!isExistingUser)
+                        // "이메일이 잘못되었습니다" 에러가 나오면 신규 회원으로 간주하고 회원가입 플로우로 이동
+                        if (isEmailError && !isExistingUser) {
                             // 이메일 오류인 경우 신규 회원으로 간주하고 회원가입 플로우로 이동
                             android.util.Log.d(loginTag, "========================================")
                             android.util.Log.d(loginTag, "Email error detected - NavigateToSignUp")
