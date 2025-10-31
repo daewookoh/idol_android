@@ -84,6 +84,23 @@ class LoginContract {
         data class StartSocialLogin(val loginType: LoginType) : Effect()
 
         /**
+         * 회원가입 화면으로 이동 (SNS 로그인 후 신규 회원인 경우).
+         * 
+         * @param email SNS 로그인에서 받은 이메일
+         * @param password SNS 로그인에서 받은 access token (비밀번호로 사용)
+         * @param displayName SNS 로그인에서 받은 표시 이름 (옵션)
+         * @param domain 로그인 도메인 (kakao, google, line, facebook)
+         * @param profileImageUrl 프로필 이미지 URL (옵션)
+         */
+        data class NavigateToSignUp(
+            val email: String,
+            val password: String,
+            val displayName: String? = null,
+            val domain: String,
+            val profileImageUrl: String? = null
+        ) : Effect()
+
+        /**
          * 에러 표시.
          */
         data class ShowError(val message: String) : Effect()

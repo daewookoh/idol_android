@@ -3,16 +3,20 @@ package net.ib.mn.presentation.signup
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -36,6 +40,7 @@ import net.ib.mn.ui.components.ExoTextField
 import net.ib.mn.ui.components.ExoCheckBox
 import net.ib.mn.ui.components.ExoCheckBoxWithDetail
 import net.ib.mn.ui.components.ExoSimpleDialog
+import net.ib.mn.ui.components.ExoStatusButton
 import net.ib.mn.ui.theme.ExodusTheme
 import net.ib.mn.util.AgreementUtil
 
@@ -64,6 +69,21 @@ fun SignUpPagesScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+
+    // SNS 로그인에서 전달받은 파라미터를 SavedStateHandle에 저장
+    // Navigation Compose의 navArgument는 자동으로 SavedStateHandle에 저장되지 않으므로 수동으로 저장
+    LaunchedEffect(email, password, displayName, domain) {
+        if (email != null || password != null || displayName != null || domain != null) {
+            viewModel.handleIntent(
+                SignUpContract.Intent.InitializeFromNavigation(
+                    email = email,
+                    password = password,
+                    displayName = displayName,
+                    domain = domain
+                )
+            )
+        }
+    }
 
     // Side Effects 처리
     LaunchedEffect(Unit) {
@@ -143,17 +163,50 @@ internal fun AgreementPage(
     onIntent: (SignUpContract.Intent) -> Unit,
     onNavigateBack: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+
+    // 키보드를 내리는 공통 함수
+    val hideKeyboard = {
+        focusManager.clearFocus()
+
+        // Activity의 현재 포커스된 뷰에서 키보드 숨기기
+        val activity = context as? android.app.Activity
+        activity?.let {
+            val imm = it.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+
+            // 현재 포커스된 뷰가 있으면 그것을 사용
+            val currentFocus = it.currentFocus
+            if (currentFocus != null) {
+                imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
+            } else {
+                // 포커스된 뷰가 없으면 DecorView를 사용
+                val decorView = it.window.decorView
+                imm.hideSoftInputFromWindow(decorView.windowToken, 0)
+            }
+        }
+    }
+
     ExoScaffold(
         topBar = {
             ExoAppBar(
                 title = stringResource(R.string.title_agreement),
-                onNavigationClick = onNavigateBack
+                onNavigationClick = {
+                    hideKeyboard()
+                    onNavigateBack()
+                }
             )
         }
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .clickable(
+                    indication = null, // 클릭 시 ripple 효과 제거
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    hideKeyboard()
+                }
                 .padding(horizontal = 20.dp, vertical = 18.dp)
         ) {
             // 전체 동의
@@ -217,22 +270,14 @@ internal fun AgreementPage(
             Spacer(modifier = Modifier.weight(1f))
 
             // 다음 버튼
-            Button(
-                onClick = { onIntent(SignUpContract.Intent.ProceedToSignUpForm) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (state.canProceedStep1) colorResource(id = R.color.main) else colorResource(id = R.color.gray200),
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.btn_next),
-                    fontSize = 14.sp
-                )
-            }
+            ExoStatusButton(
+                text = stringResource(R.string.btn_next),
+                onClick = {
+                    hideKeyboard()
+                    onIntent(SignUpContract.Intent.ProceedToSignUpForm)
+                },
+                enabled = state.canProceedStep1
+            )
         }
     }
 }
@@ -247,66 +292,105 @@ private fun SignUpFormPage(
     onNavigateBack: () -> Unit
 ) {
     val scrollState = rememberScrollState()
+    val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+
+    // 키보드를 내리는 공통 함수
+    val hideKeyboard = {
+        focusManager.clearFocus()
+
+        // Activity의 현재 포커스된 뷰에서 키보드 숨기기
+        val activity = context as? android.app.Activity
+        activity?.let {
+            val imm = it.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+
+            // 현재 포커스된 뷰가 있으면 그것을 사용
+            val currentFocus = it.currentFocus
+            if (currentFocus != null) {
+                imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
+            } else {
+                // 포커스된 뷰가 없으면 DecorView를 사용
+                val decorView = it.window.decorView
+                imm.hideSoftInputFromWindow(decorView.windowToken, 0)
+            }
+        }
+    }
 
     ExoScaffold(
         topBar = {
             ExoAppBar(
                 title = stringResource(R.string.title_signup),
-                onNavigationClick = onNavigateBack
+                onNavigationClick = {
+                    hideKeyboard()
+                    onNavigateBack()
+                }
             )
         }
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        // old 프로젝트: ViewCompat.setOnApplyWindowInsetsListener로 키보드 높이 감지
+        // Compose: WindowInsets.ime를 사용하여 키보드가 올라오면 버튼이 함께 올라오도록 함
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    indication = null, // 클릭 시 ripple 효과 제거
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    hideKeyboard()
+                }
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
                     .padding(horizontal = 20.dp)
-                    .padding(top = 18.dp, bottom = 86.dp) // 버튼 높이 40dp + 패딩 46dp
+                    .padding(top = 18.dp)
+                    .padding(bottom = 86.dp) // 버튼 높이 40dp + 패딩 46dp
             ) {
-            // 이메일 입력 (SNS 로그인의 경우 비활성화)
-            Text(
-                text = stringResource(R.string.id),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorResource(id = R.color.text_default),
-                modifier = Modifier.padding(start = 4.dp)
-            )
+            // 이메일 입력 (SNS 로그인의 경우 숨김 - domain이 "email"이 아니면 SNS 로그인)
+            if (state.domain == "email") {
+                Text(
+                    text = stringResource(R.string.id),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(id = R.color.text_default),
+                    modifier = Modifier.padding(start = 4.dp)
+                )
 
-            Spacer(modifier = Modifier.height(5.dp))
+                Spacer(modifier = Modifier.height(5.dp))
 
-            ExoTextField(
-                value = state.email,
-                onValueChange = { onIntent(SignUpContract.Intent.UpdateEmail(it)) },
-                placeholder = stringResource(R.string.hint_email),
-                enabled = state.preFilledEmail == null,
-                isValid = if (state.emailError != null) false else if (state.isEmailValid) true else null,
-                errorMessage = state.emailError,
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next,
-                onValueChangeDebounced = {
-                    if (it.isNotEmpty()) {
-                        onIntent(SignUpContract.Intent.ValidateEmail)
-                    }
-                },
-                debounceMillis = 1000,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(36.dp)
-            )
+                ExoTextField(
+                    value = state.email,
+                    onValueChange = { onIntent(SignUpContract.Intent.UpdateEmail(it)) },
+                    placeholder = stringResource(R.string.hint_email),
+                    isValid = if (state.emailError != null) false else if (state.isEmailValid) true else null,
+                    errorMessage = state.emailError,
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next,
+                    onValueChangeDebounced = {
+                        if (it.isNotEmpty()) {
+                            onIntent(SignUpContract.Intent.ValidateEmail)
+                        }
+                    },
+                    debounceMillis = 1000,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(36.dp)
+                )
 
-            Spacer(modifier = Modifier.height(3.dp))
+                Spacer(modifier = Modifier.height(3.dp))
 
-            Text(
-                text = stringResource(R.string.signup_desc1),
-                fontSize = 12.sp,
-                color = colorResource(id = R.color.main)
-            )
+                Text(
+                    text = stringResource(R.string.signup_desc1),
+                    fontSize = 12.sp,
+                    color = colorResource(id = R.color.main)
+                )
 
-            Spacer(modifier = Modifier.height(11.dp))
+                Spacer(modifier = Modifier.height(11.dp))
+            }
 
-            // 비밀번호 입력 (SNS 로그인의 경우 비활성화)
-            if (state.preFilledPassword == null) {
+            // 비밀번호 입력 (SNS 로그인의 경우 숨김 - domain이 "email"이 아니면 SNS 로그인)
+            if (state.domain == "email") {
                 Text(
                     text = stringResource(R.string.hint_passwd),
                     fontSize = 14.sp,
@@ -436,36 +520,16 @@ private fun SignUpFormPage(
             } // 스크롤 가능한 폼 영역 끝
 
             // 하단 고정 버튼
-            Button(
-                onClick = { onIntent(SignUpContract.Intent.SignUp) },
-                enabled = state.canProceedStep2 && !state.isLoading,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .padding(bottom = 28.dp)
-                    .height(40.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (state.canProceedStep2) colorResource(id = R.color.main) else colorResource(id = R.color.gray200),
-                    contentColor = Color.White,
-                    disabledContainerColor = colorResource(id = R.color.gray200),
-                    disabledContentColor = Color.White
-                ),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                if (state.isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        color = Color.White,
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(
-                        text = stringResource(R.string.btn_signup_finish),
-                        fontSize = 14.sp
-                    )
-                }
-            }
+            ExoStatusButton(
+                text = stringResource(R.string.btn_signup_finish),
+                onClick = {
+                    hideKeyboard()
+                    onIntent(SignUpContract.Intent.SignUp)
+                },
+                enabled = state.canProceedStep2,
+                isLoading = state.isLoading,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
         } // Box 끝
     }
 }

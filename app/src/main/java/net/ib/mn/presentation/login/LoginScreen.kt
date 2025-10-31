@@ -1,9 +1,12 @@
 package net.ib.mn.presentation.login
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -92,6 +96,13 @@ private fun Context.findActivity(): Activity? {
 fun LoginScreen(
     onNavigateToMain: () -> Unit,
     onNavigateToEmailLogin: () -> Unit,
+    onNavigateToSignUp: (
+        email: String,
+        password: String,
+        displayName: String?,
+        domain: String,
+        profileImageUrl: String?
+    ) -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -117,6 +128,38 @@ fun LoginScreen(
             .requestEmail()
             .build()
         GoogleSignIn.getClient(context, gso)
+    }
+
+    // ============================================================
+    // 푸시 알림 권한 요청 (Old 프로젝트의 checkNotificationPermission과 동일)
+    // ============================================================
+    
+    // 푸시 알림 권한 요청 Launcher
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        android.util.Log.d("LoginScreen", "Notification permission result: $isGranted")
+    }
+
+    // Old 프로젝트: AuthActivity.onCreate()에서 checkNotificationPermission() 호출
+    // Android 13 (TIRAMISU) 이상에서만 동작
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val permission = Manifest.permission.POST_NOTIFICATIONS
+            val hasPermission = ContextCompat.checkSelfPermission(
+                context,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (!hasPermission) {
+                android.util.Log.d("LoginScreen", "Requesting notification permission")
+                notificationPermissionLauncher.launch(permission)
+            } else {
+                android.util.Log.d("LoginScreen", "Notification permission already granted")
+            }
+        } else {
+            android.util.Log.d("LoginScreen", "Android version < TIRAMISU, notification permission not required")
+        }
     }
 
     // ============================================================
@@ -274,6 +317,15 @@ fun LoginScreen(
                 is LoginContract.Effect.NavigateToEmailLogin -> {
                     onNavigateToEmailLogin()
                 }
+                is LoginContract.Effect.NavigateToSignUp -> {
+                    onNavigateToSignUp(
+                        effect.email,
+                        effect.password,
+                        effect.displayName,
+                        effect.domain,
+                        effect.profileImageUrl
+                    )
+                }
                 is LoginContract.Effect.StartSocialLogin -> {
                     when (effect.loginType) {
                         LoginContract.LoginType.KAKAO -> {
@@ -340,63 +392,194 @@ fun LoginScreen(
 /**
  * Kakao 로그인 처리.
  * Old 프로젝트의 requestKakaoLogin() 로직을 Compose로 변환.
- *
+ * 
+ * Old 프로젝트 로직:
+ * 1. 카카오톡 설치 여부 확인
+ * 2. 카카오톡이 있으면 카카오톡으로 로그인 시도
+ *    - 취소된 경우: 에러 처리 (로딩 상태 해제)
+ *    - 그 외 에러: 자동으로 카카오 계정으로 재시도
+ * 3. 카카오톡이 없으면 바로 카카오 계정으로 로그인
+ * 4. 로그인 성공 시 requestKakaoMe 호출하여 사용자 정보 가져오기
+ * 
  * Kakao SDK는 Context만 있으면 동작하므로 Activity가 필수는 아님.
- * Context에서 Activity를 자동으로 찾아 사용.
  */
 private fun handleKakaoLogin(
     viewModel: LoginViewModel,
     context: Context
 ) {
-    val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
-        if (error != null) {
-            android.util.Log.e("LoginScreen", "Kakao login error", error)
-            viewModel.handleSnsLoginError("Kakao login error: ${error.message}")
-            Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
-        } else if (token != null) {
-            android.util.Log.d("LoginScreen", "Kakao login success - token: ${token.accessToken}")
-
-            // 사용자 정보 가져오기
-            UserApiClient.instance.me { user, meError ->
-                if (meError != null) {
-                    android.util.Log.e("LoginScreen", "Kakao user info error", meError)
-                    viewModel.handleSnsLoginError("Kakao user info error: ${meError.message}")
+    val TAG = "KAKAO_LOGIN"
+    
+    android.util.Log.d(TAG, "========================================")
+    android.util.Log.d(TAG, "handleKakaoLogin() called")
+    android.util.Log.d(TAG, "========================================")
+    
+    // requestKakaoMe: 사용자 정보 가져오기 (Old 프로젝트의 requestKakaoMe와 동일)
+    fun requestKakaoMe(accessToken: String) {
+        android.util.Log.d(TAG, "========================================")
+        android.util.Log.d(TAG, "requestKakaoMe() called")
+        android.util.Log.d(TAG, "  accessToken: ${accessToken.take(20)}...")
+        android.util.Log.d(TAG, "========================================")
+        
+        UserApiClient.instance.me { user, meError ->
+            if (meError != null) {
+                android.util.Log.e(TAG, "========================================")
+                android.util.Log.e(TAG, "Kakao me() ERROR")
+                android.util.Log.e(TAG, "  error: ${meError.message}")
+                android.util.Log.e(TAG, "  error class: ${meError.javaClass.simpleName}")
+                android.util.Log.e(TAG, "  stackTrace:", meError)
+                android.util.Log.e(TAG, "========================================")
+                viewModel.handleSnsLoginError("Kakao user info error: ${meError.message}")
+                Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
+            } else if (user != null) {
+                android.util.Log.d(TAG, "========================================")
+                android.util.Log.d(TAG, "Kakao me() SUCCESS")
+                android.util.Log.d(TAG, "  userId: ${user.id}")
+                android.util.Log.d(TAG, "  nickname: ${user.kakaoAccount?.profile?.nickname}")
+                android.util.Log.d(TAG, "  profileImageUrl: ${user.kakaoAccount?.profile?.thumbnailImageUrl}")
+                android.util.Log.d(TAG, "  kakaoAccount: ${user.kakaoAccount != null}")
+                android.util.Log.d(TAG, "========================================")
+                
+                // Old 프로젝트: user.id가 null이면 에러 처리
+                // val id = user.id
+                // mEmail = "$id${Const.POSTFIX_KAKAO}"
+                val userId = user.id
+                if (userId == null) {
+                    android.util.Log.e(TAG, "========================================")
+                    android.util.Log.e(TAG, "Kakao user.id is null")
+                    android.util.Log.e(TAG, "========================================")
+                    viewModel.handleSnsLoginError("Kakao user ID is null")
                     Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
-                } else if (user != null) {
-                    // Kakao 로그인 성공
-                    viewModel.handleKakaoLoginResult(
-                        userId = user.id ?: 0L,
-                        nickname = user.kakaoAccount?.profile?.nickname,
-                        profileImageUrl = user.kakaoAccount?.profile?.thumbnailImageUrl,
-                        accessToken = token.accessToken
-                    )
+                    return@me
                 }
+                
+                // Kakao 로그인 성공 (Old 프로젝트의 requestKakaoMe 로직과 동일)
+                android.util.Log.d(TAG, "Calling viewModel.handleKakaoLoginResult()")
+                viewModel.handleKakaoLoginResult(
+                    userId = userId,
+                    nickname = user.kakaoAccount?.profile?.nickname,
+                    profileImageUrl = user.kakaoAccount?.profile?.thumbnailImageUrl,
+                    accessToken = accessToken
+                )
+                android.util.Log.d(TAG, "viewModel.handleKakaoLoginResult() called")
+            } else {
+                android.util.Log.e(TAG, "========================================")
+                android.util.Log.e(TAG, "Kakao me() ERROR: user is null")
+                android.util.Log.e(TAG, "  meError: null")
+                android.util.Log.e(TAG, "  user: null")
+                android.util.Log.e(TAG, "========================================")
+                viewModel.handleSnsLoginError("Kakao user info is null")
+                Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    // 카카오톡 설치 여부 확인 후 로그인
-    if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
-        // 카카오톡으로 로그인
-        UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
-            if (error != null) {
-                android.util.Log.e("LoginScreen", "Kakao Talk login error", error)
+    // 카카오 계정 로그인 콜백 (Old 프로젝트의 onErrorResumeNext 로직과 동일)
+    val kakaoAccountCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
+        android.util.Log.d(TAG, "========================================")
+        android.util.Log.d(TAG, "kakaoAccountCallback() called")
+        android.util.Log.d(TAG, "  token: ${if (token != null) "present" else "null"}")
+        android.util.Log.d(TAG, "  error: ${if (error != null) error.message else "null"}")
+        android.util.Log.d(TAG, "========================================")
+        
+        if (error != null) {
+            android.util.Log.e(TAG, "========================================")
+            android.util.Log.e(TAG, "Kakao Account Login ERROR")
+            android.util.Log.e(TAG, "  error message: ${error.message}")
+            android.util.Log.e(TAG, "  error class: ${error.javaClass.simpleName}")
+            android.util.Log.e(TAG, "  stackTrace:", error)
+            android.util.Log.e(TAG, "========================================")
+            viewModel.handleSnsLoginError("Kakao login error: ${error.message}")
+            Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
+        } else if (token != null) {
+            android.util.Log.d(TAG, "========================================")
+            android.util.Log.d(TAG, "Kakao Account Login SUCCESS")
+            android.util.Log.d(TAG, "  accessToken: ${token.accessToken.take(20)}...")
+            android.util.Log.d(TAG, "  refreshToken: ${token.refreshToken?.take(20)}...")
+            android.util.Log.d(TAG, "  idToken: ${token.idToken?.take(20)}...")
+            android.util.Log.d(TAG, "========================================")
+            android.util.Log.d(TAG, "Calling requestKakaoMe()")
+            requestKakaoMe(token.accessToken)
+        } else {
+            android.util.Log.e(TAG, "========================================")
+            android.util.Log.e(TAG, "Kakao Account Login ERROR: Both token and error are null")
+            android.util.Log.e(TAG, "========================================")
+            viewModel.handleSnsLoginError("Kakao login failed: Unknown error")
+            Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
+        }
+    }
 
-                // 사용자가 취소한 경우 - 로딩 상태 해제
+    // 카카오톡 설치 여부 확인 (Old 프로젝트와 동일)
+    val isKakaoTalkAvailable = UserApiClient.instance.isKakaoTalkLoginAvailable(context)
+    android.util.Log.d(TAG, "========================================")
+    android.util.Log.d(TAG, "Checking Kakao Talk availability")
+    android.util.Log.d(TAG, "  isKakaoTalkLoginAvailable: $isKakaoTalkAvailable")
+    android.util.Log.d(TAG, "========================================")
+    
+    if (isKakaoTalkAvailable) {
+        // 카카오톡으로 로그인 시도 (Old 프로젝트의 loginWithKakaoTalk 로직과 동일)
+        android.util.Log.d(TAG, "========================================")
+        android.util.Log.d(TAG, "Starting Kakao Talk login")
+        android.util.Log.d(TAG, "========================================")
+        
+        UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
+            android.util.Log.d(TAG, "========================================")
+            android.util.Log.d(TAG, "Kakao Talk login callback received")
+            android.util.Log.d(TAG, "  token: ${if (token != null) "present" else "null"}")
+            android.util.Log.d(TAG, "  error: ${if (error != null) error.message else "null"}")
+            android.util.Log.d(TAG, "========================================")
+            
+            if (error != null) {
+                android.util.Log.e(TAG, "========================================")
+                android.util.Log.e(TAG, "Kakao Talk Login ERROR")
+                android.util.Log.e(TAG, "  error message: ${error.message}")
+                android.util.Log.e(TAG, "  error class: ${error.javaClass.simpleName}")
+                android.util.Log.e(TAG, "  is ClientError: ${error is ClientError}")
+                if (error is ClientError) {
+                    android.util.Log.e(TAG, "  error reason: ${error.reason}")
+                    android.util.Log.e(TAG, "  error cause: ${error.reason.name}")
+                }
+                android.util.Log.e(TAG, "  stackTrace:", error)
+                android.util.Log.e(TAG, "========================================")
+
+                // Old 프로젝트: 취소된 경우 Single.error(error) 반환 (에러 처리)
                 if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                    android.util.Log.d(TAG, "========================================")
+                    android.util.Log.d(TAG, "Kakao login CANCELLED by user")
+                    android.util.Log.d(TAG, "  Stopping login flow")
+                    android.util.Log.d(TAG, "========================================")
                     viewModel.handleSnsLoginError("Kakao login cancelled")
                     return@loginWithKakaoTalk
                 }
 
-                // 카카오톡 로그인 실패 시 카카오 계정으로 로그인 시도
-                UserApiClient.instance.loginWithKakaoAccount(context, callback = callback)
+                // Old 프로젝트: 그 외 에러는 카카오 계정으로 자동 재시도
+                // "카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인 시도"
+                android.util.Log.d(TAG, "========================================")
+                android.util.Log.d(TAG, "Kakao Talk login failed, trying Kakao Account login")
+                android.util.Log.d(TAG, "  This is expected behavior when Kakao Talk account is not linked")
+                android.util.Log.d(TAG, "========================================")
+                UserApiClient.instance.loginWithKakaoAccount(context, callback = kakaoAccountCallback)
+            } else if (token != null) {
+                // Old 프로젝트: "로그인 성공." -> requestKakaoMe 호출
+                android.util.Log.d(TAG, "========================================")
+                android.util.Log.d(TAG, "Kakao Talk Login SUCCESS")
+                android.util.Log.d(TAG, "  accessToken: ${token.accessToken.take(20)}...")
+                android.util.Log.d(TAG, "========================================")
+                android.util.Log.d(TAG, "Calling requestKakaoMe()")
+                requestKakaoMe(token.accessToken)
             } else {
-                callback(token, null)
+                android.util.Log.e(TAG, "========================================")
+                android.util.Log.e(TAG, "Kakao Talk Login ERROR: Both token and error are null")
+                android.util.Log.e(TAG, "========================================")
+                viewModel.handleSnsLoginError("Kakao Talk login failed: Unknown error")
+                Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
             }
         }
     } else {
-        // 카카오 계정으로 로그인
-        UserApiClient.instance.loginWithKakaoAccount(context, callback = callback)
+        // Old 프로젝트: 카카오톡이 없으면 바로 카카오 계정으로 로그인
+        android.util.Log.d(TAG, "========================================")
+        android.util.Log.d(TAG, "Kakao Talk not available, using Kakao Account login")
+        android.util.Log.d(TAG, "========================================")
+        UserApiClient.instance.loginWithKakaoAccount(context, callback = kakaoAccountCallback)
     }
 }
 

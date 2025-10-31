@@ -86,6 +86,17 @@ fun NavGraph(
                 },
                 onNavigateToEmailLogin = {
                     navController.navigate(Screen.EmailLogin.route)
+                },
+                onNavigateToSignUp = { email, password, displayName, domain, profileImageUrl ->
+                    navController.navigate(
+                        Screen.SignUpPages.createRoute(
+                            email = email,
+                            password = password,
+                            displayName = displayName,
+                            domain = domain,
+                            profileImageUrl = profileImageUrl
+                        )
+                    )
                 }
             )
         }
@@ -159,10 +170,43 @@ fun NavGraph(
 
         // SignUp Pages 화면
         composable(
-            route = Screen.SignUpPages.route
-        ) {
+            route = Screen.SignUpPages.routeWithArgs,
+            arguments = listOf(
+                navArgument("email") { type = NavType.StringType },
+                navArgument("password") { type = NavType.StringType },
+                navArgument("displayName") {
+                    type = NavType.StringType
+                    nullable = true
+                },
+                navArgument("domain") { type = NavType.StringType },
+                navArgument("profileImageUrl") {
+                    type = NavType.StringType
+                    nullable = true
+                }
+            )
+        ) { backStackEntry ->
+            val encodedEmail = backStackEntry.arguments?.getString("email") ?: ""
+            val encodedPassword = backStackEntry.arguments?.getString("password") ?: ""
+            val encodedDisplayName = backStackEntry.arguments?.getString("displayName")
+            val encodedDomain = backStackEntry.arguments?.getString("domain") ?: ""
+            val encodedProfileImageUrl = backStackEntry.arguments?.getString("profileImageUrl")
+            
+            val email = URLDecoder.decode(encodedEmail, StandardCharsets.UTF_8.toString())
+            val password = URLDecoder.decode(encodedPassword, StandardCharsets.UTF_8.toString())
+            val displayName = encodedDisplayName?.let {
+                URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
+            }
+            val domain = URLDecoder.decode(encodedDomain, StandardCharsets.UTF_8.toString())
+            val profileImageUrl = encodedProfileImageUrl?.let {
+                URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
+            }
+            
             SignUpPagesScreen(
                 navController = navController,
+                email = email.takeIf { it.isNotEmpty() },
+                password = password.takeIf { it.isNotEmpty() },
+                displayName = displayName,
+                domain = domain.takeIf { it.isNotEmpty() },
                 onSignUpComplete = {
                     // 회원가입 완료 시 StartUp으로 이동 (API 호출 후 Main으로 이동)
                     navController.navigate(Screen.StartUp.route) {
@@ -277,7 +321,51 @@ sealed class Screen(val route: String) {
     data object StartUp : Screen("startup")
     data object Login : Screen("login")
     data object EmailLogin : Screen("email_login")
-    data object SignUpPages : Screen("signup_pages")
+    data object SignUpPages : Screen("signup_pages") {
+        // 파라미터 없이 회원가입 화면 이동 (일반 회원가입)
+        val routeWithArgs = "signup_pages/{email}/{password}?displayName={displayName}&domain={domain}&profileImageUrl={profileImageUrl}"
+        
+        /**
+         * 회원가입 화면으로 이동하는 라우트 생성 (SNS 로그인 후 신규 회원인 경우)
+         * @param email SNS 로그인에서 받은 이메일
+         * @param password SNS 로그인에서 받은 access token
+         * @param displayName SNS 로그인에서 받은 표시 이름 (옵션)
+         * @param domain 로그인 도메인 (kakao, google, line, facebook)
+         * @param profileImageUrl 프로필 이미지 URL (옵션)
+         */
+        fun createRoute(
+            email: String,
+            password: String,
+            displayName: String? = null,
+            domain: String,
+            profileImageUrl: String? = null
+        ): String {
+            val encodedEmail = URLEncoder.encode(email, StandardCharsets.UTF_8.toString())
+            val encodedPassword = URLEncoder.encode(password, StandardCharsets.UTF_8.toString())
+            val encodedDisplayName = displayName?.let {
+                URLEncoder.encode(it, StandardCharsets.UTF_8.toString())
+            }
+            val encodedDomain = URLEncoder.encode(domain, StandardCharsets.UTF_8.toString())
+            val encodedProfileImageUrl = profileImageUrl?.let {
+                URLEncoder.encode(it, StandardCharsets.UTF_8.toString())
+            }
+            
+            return buildString {
+                append("signup_pages/$encodedEmail/$encodedPassword")
+                if (encodedDisplayName != null) {
+                    append("?displayName=$encodedDisplayName")
+                }
+                if (encodedDomain.isNotEmpty()) {
+                    append(if (encodedDisplayName != null) "&" else "?")
+                    append("domain=$encodedDomain")
+                }
+                if (encodedProfileImageUrl != null) {
+                    append(if (encodedDisplayName != null || encodedDomain.isNotEmpty()) "&" else "?")
+                    append("profileImageUrl=$encodedProfileImageUrl")
+                }
+            }
+        }
+    }
     data object Main : Screen("main")
     data object WebView : Screen("webview/{url}?title={title}") {
         /**

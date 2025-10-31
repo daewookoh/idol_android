@@ -233,18 +233,47 @@ class UserRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading)
 
         try {
-            val params = mapOf(
-                "type" to type,
-                "value" to value,
-                "app_id" to appId
-            )
+            // Old 프로젝트: mutableMapOf(type to value) 형태로 전송
+            // 예: type="nickname", value="test" -> {"nickname": "test", "app_id": "appId"}
+            // NOT: {"type": "nickname", "value": "test", "app_id": "appId"}
+            val params = mutableMapOf<String, String?>(type to value)
+            params["app_id"] = appId
+
+            android.util.Log.d("ValidateUserAPI", "========================================")
+            android.util.Log.d("ValidateUserAPI", "API Request Parameters:")
+            android.util.Log.d("ValidateUserAPI", "  - type: $type")
+            android.util.Log.d("ValidateUserAPI", "  - value: $value")
+            android.util.Log.d("ValidateUserAPI", "  - appId: $appId")
+            android.util.Log.d("ValidateUserAPI", "  - params: $params")
+            android.util.Log.d("ValidateUserAPI", "========================================")
 
             val response = userApi.validate(params)
 
+            android.util.Log.d("ValidateUserAPI", "========================================")
+            android.util.Log.d("ValidateUserAPI", "API Response:")
+            android.util.Log.d("ValidateUserAPI", "  - isSuccessful: ${response.isSuccessful}")
+            android.util.Log.d("ValidateUserAPI", "  - code: ${response.code()}")
+            android.util.Log.d("ValidateUserAPI", "  - errorBody: ${response.errorBody()?.string()}")
+            android.util.Log.d("ValidateUserAPI", "  - body: ${response.body()}")
+            android.util.Log.d("ValidateUserAPI", "========================================")
+
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
+                
+                android.util.Log.d("ValidateUserAPI", "========================================")
+                android.util.Log.d("ValidateUserAPI", "Parsed Response Body:")
+                android.util.Log.d("ValidateUserAPI", "  - success: ${body.success}")
+                android.util.Log.d("ValidateUserAPI", "  - message: ${body.message}")
+                android.util.Log.d("ValidateUserAPI", "  - domain: ${body.domain}")
+                android.util.Log.d("ValidateUserAPI", "  - gcode: ${body.gcode}")
+                android.util.Log.d("ValidateUserAPI", "  - mcode: ${body.mcode}")
+                android.util.Log.d("ValidateUserAPI", "========================================")
+                
                 emit(ApiResult.Success(body))
             } else {
+                val errorBody = response.errorBody()?.string()
+                android.util.Log.e("ValidateUserAPI", "API Error: HTTP ${response.code()}")
+                android.util.Log.e("ValidateUserAPI", "Error Body: $errorBody")
                 emit(ApiResult.Error(
                     exception = HttpException(response),
                     code = response.code()

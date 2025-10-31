@@ -24,11 +24,8 @@ class SignUpContract {
         val error: String? = null,
         val dialogMessage: String? = null, // 다이얼로그 메시지
 
-        // SNS 로그인에서 전달받은 데이터 (옵셔널)
-        val preFilledEmail: String? = null,
-        val preFilledPassword: String? = null,
-        val preFilledDisplayName: String? = null,
-        val domain: String? = null, // google, kakao, line, facebook
+        // 로그인 도메인 (email: 이메일 로그인, kakao/google/line/facebook: SNS 로그인)
+        val domain: String = "email", // email, google, kakao, line, facebook
 
         // Step 1: 약관동의
         val agreeAll: Boolean = false,
@@ -77,6 +74,12 @@ class SignUpContract {
         object DismissDialog : Intent()
 
         // Step 2: 회원가입 폼
+        data class InitializeFromNavigation(
+            val email: String?,
+            val password: String?,
+            val displayName: String?,
+            val domain: String?
+        ) : Intent()
         data class UpdateEmail(val email: String) : Intent()
         data class UpdatePassword(val password: String) : Intent()
         data class UpdatePasswordConfirm(val passwordConfirm: String) : Intent()
