@@ -38,6 +38,8 @@ import net.ib.mn.R
  * @param confirmButtonText 확인 버튼 텍스트 (기본값: "확인")
  * @param onDismiss 다이얼로그 닫기 콜백
  * @param onConfirm 확인 버튼 클릭 콜백 (기본값: onDismiss와 동일)
+ * @param dismissOnBackPress 백버튼으로 다이얼로그 닫기 가능 여부 (기본값: true, old 프로젝트는 false)
+ * @param dismissOnClickOutside 외부 클릭으로 다이얼로그 닫기 가능 여부 (기본값: true, old 프로젝트는 false)
  */
 @Composable
 fun ExoDialog(
@@ -46,13 +48,19 @@ fun ExoDialog(
     modifier: Modifier = Modifier,
     title: String? = null,
     confirmButtonText: String = stringResource(R.string.confirm),
-    onConfirm: () -> Unit = onDismiss
+    onConfirm: () -> Unit = onDismiss,
+    dismissOnBackPress: Boolean = true,
+    dismissOnClickOutside: Boolean = true
 ) {
     Dialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            if (dismissOnBackPress || dismissOnClickOutside) {
+                onDismiss()
+            }
+        },
         properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true,
+            dismissOnBackPress = dismissOnBackPress,
+            dismissOnClickOutside = dismissOnClickOutside,
             usePlatformDefaultWidth = false
         )
     ) {
@@ -91,10 +99,14 @@ fun ExoDialog(
                 }
 
                 // 메시지 (스크롤 가능)
+                // old 프로젝트: TextView의 기본 줄간격 사용 (lineSpacingExtra 없음)
+                // Compose Text의 기본 lineHeight는 fontSize * 1.2 정도이므로,
+                // old 프로젝트와 동일하게 맞추기 위해 lineHeight를 명시적으로 설정
                 val scrollState = rememberScrollState()
                 Text(
                     text = message,
                     fontSize = 14.sp,
+                    lineHeight = 20.sp, // old 프로젝트 TextView 기본 줄간격과 유사하게 설정 (14sp * 1.43 ≈ 20sp)
                     fontWeight = FontWeight.Normal,
                     color = colorResource(id = R.color.gray580),
                     textAlign = TextAlign.Center,

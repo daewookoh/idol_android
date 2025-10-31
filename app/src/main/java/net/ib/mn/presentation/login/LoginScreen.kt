@@ -45,7 +45,15 @@ import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.auth.GoogleAuthUtil
+import com.google.android.gms.auth.GoogleAuthException
+import com.google.android.gms.auth.UserRecoverableAuthException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.IOException
+import com.google.firebase.messaging.FirebaseMessaging
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
@@ -56,6 +64,7 @@ import com.linecorp.linesdk.auth.LineLoginApi
 import kotlinx.coroutines.launch
 import net.ib.mn.MainActivity
 import net.ib.mn.R
+import net.ib.mn.ui.components.ExoDialog
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.theme.ExodusTheme
 import net.ib.mn.util.Constants
@@ -134,15 +143,230 @@ fun LoginScreen(
     // 푸시 알림 권한 요청 (Old 프로젝트의 checkNotificationPermission과 동일)
     // ============================================================
     
-    // 푸시 알림 권한 요청 Launcher
+    // 푸시 알림 권한 요청 Launcher (Old 프로젝트의 checkNotificationPermission과 동일)
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         android.util.Log.d("LoginScreen", "Notification permission result: $isGranted")
+        // Old 프로젝트: 권한이 허용되면 FCM 토큰을 가져와서 저장
+        // GcmUtils.registerDevice()와 동일한 로직
+        if (isGranted) {
+            android.util.Log.d("LoginScreen", "Notification permission granted, registering FCM token")
+            try {
+                FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                    android.util.Log.d("LoginScreen", "FCM token received: ${token?.take(20)}...")
+                    if (token != null) {
+                        coroutineScope.launch {
+                            viewModel.registerFcmToken(token)
+                        }
+                    }
+                }.addOnFailureListener { e ->
+                    android.util.Log.e("LoginScreen", "Failed to get FCM token", e)
+                }
+            } catch (e: IllegalStateException) {
+                android.util.Log.e("LoginScreen", "IllegalStateException while getting FCM token", e)
+            }
+        } else {
+            android.util.Log.d("LoginScreen", "Notification permission denied")
+        }
+    }
+
+    // ============================================================
+    // Google 로그인 권한 요청 (Old 프로젝트의 GET_ACCOUNTS 권한 체크)
+    // ============================================================
+
+    // Google 권한 설명 다이얼로그 표시 여부
+    var showGooglePermissionDialog by remember { mutableStateOf(false) }
+    
+    // 에러 다이얼로그 표시 여부 및 메시지
+    var showErrorDialog by remember { mutableStateOf<String?>(null) }
+
+    // Google Sign-In Launcher (old 프로젝트와 동일: resultCode 체크하지 않음)
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val GOOGLE_LOGIN_TAG = "GOOGLE_LOGIN"
+        android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+        android.util.Log.d(GOOGLE_LOGIN_TAG, "Google sign-in result received")
+        android.util.Log.d(GOOGLE_LOGIN_TAG, "  resultCode: ${result.resultCode}")
+        android.util.Log.d(GOOGLE_LOGIN_TAG, "  data: ${result.data}")
+        android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+
+        // old 프로젝트와 동일: resultCode 체크하지 않고 data != null만 체크
+        if (result.data != null) {
+            try {
+                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                val account = task.getResult(ApiException::class.java)
+
+                android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+                android.util.Log.d(GOOGLE_LOGIN_TAG, "Google account received")
+                android.util.Log.d(GOOGLE_LOGIN_TAG, "  email: ${account.email}")
+                android.util.Log.d(GOOGLE_LOGIN_TAG, "  displayName: ${account.displayName}")
+                android.util.Log.d(GOOGLE_LOGIN_TAG, "  idToken: ${account.idToken?.take(20)}...")
+                android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+
+                // Google 로그인 성공
+                // Old 프로젝트와 동일: email이 필수, 없으면 에러 처리
+                val email = account.email
+                if (email.isNullOrEmpty()) {
+                    android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
+                    android.util.Log.e(GOOGLE_LOGIN_TAG, "Google account email is null or empty")
+                    android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
+                    viewModel.handleSnsLoginError(context.getString(R.string.facebook_no_email))
+                } else {
+                    // Old 프로젝트: GoogleAuthUtil.getToken()으로 access token 가져오기
+                    // 백그라운드 스레드에서 실행
+                    coroutineScope.launch(Dispatchers.IO) {
+                        try {
+                            android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+                            android.util.Log.d(GOOGLE_LOGIN_TAG, "Getting Google access token via GoogleAuthUtil.getToken()")
+                            android.util.Log.d(GOOGLE_LOGIN_TAG, "  email: $email")
+                            android.util.Log.d(GOOGLE_LOGIN_TAG, "  account: ${account.account}")
+                            android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+                            
+                            val accessToken = try {
+                                GoogleAuthUtil.getToken(
+                                    context,
+                                    account.account!!,
+                                    "oauth2:https://www.googleapis.com/auth/plus.me"
+                                )
+                            } catch (e: UserRecoverableAuthException) {
+                                android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
+                                android.util.Log.e(GOOGLE_LOGIN_TAG, "UserRecoverableAuthException")
+                                android.util.Log.e(GOOGLE_LOGIN_TAG, "  message: ${e.message}")
+                                android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
+                                // Old 프로젝트: 에러 발생 시 토스트만 표시하고 계속 진행
+                                null
+                            } catch (e: GoogleAuthException) {
+                                android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
+                                android.util.Log.e(GOOGLE_LOGIN_TAG, "GoogleAuthException")
+                                android.util.Log.e(GOOGLE_LOGIN_TAG, "  message: ${e.message}")
+                                android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
+                                null
+                            } catch (e: IOException) {
+                                android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
+                                android.util.Log.e(GOOGLE_LOGIN_TAG, "IOException")
+                                android.util.Log.e(GOOGLE_LOGIN_TAG, "  message: ${e.message}")
+                                android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
+                                null
+                            }
+                            
+                            android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+                            android.util.Log.d(GOOGLE_LOGIN_TAG, "Google access token retrieved")
+                            android.util.Log.d(GOOGLE_LOGIN_TAG, "  accessToken: ${accessToken?.take(20)}...")
+                            android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+                            
+                            // Old 프로젝트: access token이 없으면 idToken 사용 (fallback)
+                            val tokenToUse = accessToken ?: account.idToken
+                            
+                            if (tokenToUse == null) {
+                                android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
+                                android.util.Log.e(GOOGLE_LOGIN_TAG, "Both access token and idToken are null")
+                                android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
+                                withContext(Dispatchers.Main) {
+                                    viewModel.handleSnsLoginError(context.getString(R.string.error_abnormal_exception))
+                                }
+                            } else {
+                                withContext(Dispatchers.Main) {
+                                    viewModel.handleGoogleLoginResult(
+                                        email = email,
+                                        displayName = account.displayName,
+                                        accessToken = tokenToUse
+                                    )
+                                }
+                            }
+                        } catch (e: Exception) {
+                            android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
+                            android.util.Log.e(GOOGLE_LOGIN_TAG, "Exception while getting Google access token")
+                            android.util.Log.e(GOOGLE_LOGIN_TAG, "  error: ${e.message}")
+                            android.util.Log.e(GOOGLE_LOGIN_TAG, "  stackTrace:", e)
+                            android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
+                            withContext(Dispatchers.Main) {
+                                viewModel.handleSnsLoginError(context.getString(R.string.error_abnormal_exception))
+                            }
+                        }
+                    }
+                }
+            } catch (e: ApiException) {
+                android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
+                android.util.Log.e(GOOGLE_LOGIN_TAG, "Google sign-in ApiException")
+                android.util.Log.e(GOOGLE_LOGIN_TAG, "  statusCode: ${e.statusCode}")
+                android.util.Log.e(GOOGLE_LOGIN_TAG, "  message: ${e.message}")
+                android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
+                
+                // Google 로그인 취소 시에도 에러 다이얼로그 표시
+                if (e.statusCode == GoogleSignInStatusCodes.SIGN_IN_CANCELLED) {
+                    android.util.Log.d(GOOGLE_LOGIN_TAG, "Google login cancelled by user")
+                    viewModel.handleSnsLoginError(context.getString(R.string.line_login_failed))
+                } else {
+                    viewModel.handleSnsLoginError(context.getString(R.string.line_login_failed))
+                }
+            }
+        } else {
+            // data가 null인 경우 (사용자가 취소) - 로그인 실패 다이얼로그 표시
+            android.util.Log.w(GOOGLE_LOGIN_TAG, "========================================")
+            android.util.Log.w(GOOGLE_LOGIN_TAG, "Google login cancelled - data is null")
+            android.util.Log.w(GOOGLE_LOGIN_TAG, "========================================")
+            viewModel.handleSnsLoginError(context.getString(R.string.line_login_failed))
+        }
+    }
+
+    // GET_ACCOUNTS 권한 요청 Launcher (Android 6.0 이상에서만 필요)
+    val googleAccountsPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        val GOOGLE_LOGIN_TAG = "GOOGLE_LOGIN"
+        android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+        android.util.Log.d(GOOGLE_LOGIN_TAG, "GET_ACCOUNTS permission result: $isGranted")
+        android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+        // old 프로젝트: onPermissionDenied()가 빈 함수로, 권한이 없어도 구글 로그인 진행
+        // 권한이 허용되든 거부되든 구글 로그인 진행
+        android.util.Log.d(GOOGLE_LOGIN_TAG, "Starting Google sign-in (permission granted: $isGranted)")
+        googleSignInClient.signOut() // 이전 세션 제거
+        val signInIntent = googleSignInClient.signInIntent
+        googleSignInLauncher.launch(signInIntent)
+    }
+
+    // Google 로그인 시작 함수 (권한 체크 포함)
+    fun startGoogleSignIn() {
+        val GOOGLE_LOGIN_TAG = "GOOGLE_LOGIN"
+        
+        // Android 6.0 (API 23) 이상에서만 런타임 권한 필요
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val hasPermission = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.GET_ACCOUNTS
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (hasPermission) {
+                // 권한이 이미 있으면 바로 Google 로그인 진행
+                android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+                android.util.Log.d(GOOGLE_LOGIN_TAG, "GET_ACCOUNTS permission already granted, starting Google sign-in")
+                android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+                googleSignInClient.signOut() // 이전 세션 제거
+                val signInIntent = googleSignInClient.signInIntent
+                googleSignInLauncher.launch(signInIntent)
+            } else {
+                // 권한이 없으면 설명 다이얼로그 먼저 표시 (old 프로젝트와 동일)
+                android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+                android.util.Log.d(GOOGLE_LOGIN_TAG, "Showing Google permission explanation dialog")
+                android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+                showGooglePermissionDialog = true
+            }
+        } else {
+            // Android 6.0 미만에서는 권한 요청 불필요 (매니페스트에 선언만 하면 됨)
+            android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+            android.util.Log.d(GOOGLE_LOGIN_TAG, "Android version < M, permission not required, starting Google sign-in")
+            android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+            googleSignInClient.signOut() // 이전 세션 제거
+            val signInIntent = googleSignInClient.signInIntent
+            googleSignInLauncher.launch(signInIntent)
+        }
     }
 
     // Old 프로젝트: AuthActivity.onCreate()에서 checkNotificationPermission() 호출
     // Android 13 (TIRAMISU) 이상에서만 동작
+    // 권한이 이미 허용된 경우 FCM 토큰을 즉시 가져와서 저장
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val permission = Manifest.permission.POST_NOTIFICATIONS
@@ -155,48 +379,46 @@ fun LoginScreen(
                 android.util.Log.d("LoginScreen", "Requesting notification permission")
                 notificationPermissionLauncher.launch(permission)
             } else {
-                android.util.Log.d("LoginScreen", "Notification permission already granted")
+                android.util.Log.d("LoginScreen", "Notification permission already granted, registering FCM token")
+                // Old 프로젝트: 권한이 이미 허용되어 있으면 FCM 토큰을 즉시 가져와서 저장
+                try {
+                    FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                        android.util.Log.d("LoginScreen", "FCM token received: ${token?.take(20)}...")
+                        if (token != null) {
+                            coroutineScope.launch {
+                                viewModel.registerFcmToken(token)
+                            }
+                        }
+                    }.addOnFailureListener { e ->
+                        android.util.Log.e("LoginScreen", "Failed to get FCM token", e)
+                    }
+                } catch (e: IllegalStateException) {
+                    android.util.Log.e("LoginScreen", "IllegalStateException while getting FCM token", e)
+                }
             }
         } else {
             android.util.Log.d("LoginScreen", "Android version < TIRAMISU, notification permission not required")
+            // Android 13 미만에서는 권한이 필요 없으므로 FCM 토큰을 즉시 가져와서 저장
+            try {
+                FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                    android.util.Log.d("LoginScreen", "FCM token received: ${token?.take(20)}...")
+                    if (token != null) {
+                        coroutineScope.launch {
+                            viewModel.registerFcmToken(token)
+                        }
+                    }
+                }.addOnFailureListener { e ->
+                    android.util.Log.e("LoginScreen", "Failed to get FCM token", e)
+                }
+            } catch (e: IllegalStateException) {
+                android.util.Log.e("LoginScreen", "IllegalStateException while getting FCM token", e)
+            }
         }
     }
 
     // ============================================================
     // Activity Result Launchers
     // ============================================================
-
-    // Google Sign-In Launcher (old 프로젝트와 동일: resultCode 체크하지 않음)
-    val googleSignInLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        android.util.Log.d("LoginScreen", "Google result - resultCode: ${result.resultCode}, data: ${result.data}")
-
-        // old 프로젝트와 동일: resultCode 체크하지 않고 data != null만 체크
-        if (result.data != null) {
-            try {
-                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-                val account = task.getResult(ApiException::class.java)
-
-                android.util.Log.d("LoginScreen", "Google account - email: ${account.email}, displayName: ${account.displayName}")
-
-                // Google 로그인 성공
-                viewModel.handleGoogleLoginResult(
-                    email = account.email ?: "",
-                    displayName = account.displayName,
-                    idToken = account.idToken
-                )
-            } catch (e: ApiException) {
-                android.util.Log.e("LoginScreen", "Google sign-in ApiException - statusCode: ${e.statusCode}, message: ${e.message}", e)
-                viewModel.handleSnsLoginError("Google login failed: ${e.statusCode}")
-                Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
-            }
-        } else {
-            // data가 null인 경우 (사용자가 취소)
-            android.util.Log.w("LoginScreen", "Google login cancelled - data is null")
-            viewModel.handleSnsLoginError("Google login cancelled")
-        }
-    }
 
     // Line Sign-In Launcher
     val lineSignInLauncher = rememberLauncherForActivityResult(
@@ -220,21 +442,18 @@ fun LoginScreen(
                     }
                     com.linecorp.linesdk.LineApiResponseCode.CANCEL -> {
                         android.util.Log.d("LoginScreen", "Line login cancelled")
-                        viewModel.handleSnsLoginError("Line login cancelled")
+                        // Line 로그인 취소는 에러로 표시하지 않음
                     }
                     else -> {
-                        viewModel.handleSnsLoginError("Line login failed")
-                        Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
+                        viewModel.handleSnsLoginError(context.getString(R.string.line_login_failed))
                     }
                 }
             } catch (e: Exception) {
                 android.util.Log.e("LoginScreen", "Line sign-in failed", e)
-                viewModel.handleSnsLoginError("Line login failed: ${e.message}")
-                Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
+                viewModel.handleSnsLoginError(context.getString(R.string.line_login_failed))
             }
         } else {
-            // 사용자가 취소했거나 결과가 실패한 경우
-            viewModel.handleSnsLoginError("Line login cancelled or failed")
+            // 사용자가 취소했거나 결과가 실패한 경우 - 취소는 에러로 표시하지 않음
         }
     }
 
@@ -260,8 +479,7 @@ fun LoginScreen(
                     // Facebook Graph API로 사용자 정보 가져오기
                     val request = GraphRequest.newMeRequest(loginResult.accessToken) { jsonObject, _ ->
                         if (jsonObject == null) {
-                            viewModel.handleSnsLoginError("Facebook: Cannot get user info")
-                            Toast.makeText(context, R.string.facebook_no_email, Toast.LENGTH_SHORT).show()
+                            viewModel.handleSnsLoginError(context.getString(R.string.facebook_no_email))
                             LoginManager.getInstance().logOut()
                             return@newMeRequest
                         }
@@ -271,8 +489,7 @@ fun LoginScreen(
                         val accessToken = loginResult.accessToken.token
 
                         if (email.isNullOrEmpty()) {
-                            viewModel.handleSnsLoginError("Facebook: No email provided")
-                            Toast.makeText(context, R.string.facebook_no_email, Toast.LENGTH_SHORT).show()
+                            viewModel.handleSnsLoginError(context.getString(R.string.facebook_no_email))
                             LoginManager.getInstance().logOut()
                             return@newMeRequest
                         }
@@ -293,13 +510,12 @@ fun LoginScreen(
 
                 override fun onCancel() {
                     android.util.Log.d("LoginScreen", "Facebook login cancelled")
-                    viewModel.handleSnsLoginError("Facebook login cancelled")
+                    // Facebook 로그인 취소는 에러로 표시하지 않음
                 }
 
                 override fun onError(error: FacebookException) {
                     android.util.Log.e("LoginScreen", "Facebook login error", error)
-                    viewModel.handleSnsLoginError("Facebook login error: ${error.message}")
-                    Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
+                    viewModel.handleSnsLoginError(context.getString(R.string.line_login_failed))
                 }
             })
     }
@@ -318,6 +534,15 @@ fun LoginScreen(
                     onNavigateToEmailLogin()
                 }
                 is LoginContract.Effect.NavigateToSignUp -> {
+                    android.util.Log.d("LoginScreen", "========================================")
+                    android.util.Log.d("LoginScreen", "NavigateToSignUp effect received")
+                    android.util.Log.d("LoginScreen", "  email: ${effect.email}")
+                    android.util.Log.d("LoginScreen", "  password: ${effect.password.take(20)}...")
+                    android.util.Log.d("LoginScreen", "  displayName: ${effect.displayName}")
+                    android.util.Log.d("LoginScreen", "  domain: ${effect.domain}")
+                    android.util.Log.d("LoginScreen", "  profileImageUrl: ${effect.profileImageUrl}")
+                    android.util.Log.d("LoginScreen", "========================================")
+                    android.util.Log.d("LoginScreen", "Calling onNavigateToSignUp...")
                     onNavigateToSignUp(
                         effect.email,
                         effect.password,
@@ -325,6 +550,7 @@ fun LoginScreen(
                         effect.domain,
                         effect.profileImageUrl
                     )
+                    android.util.Log.d("LoginScreen", "onNavigateToSignUp called")
                 }
                 is LoginContract.Effect.StartSocialLogin -> {
                     when (effect.loginType) {
@@ -333,12 +559,12 @@ fun LoginScreen(
                             handleKakaoLogin(viewModel, context)
                         }
                         LoginContract.LoginType.GOOGLE -> {
-                            // Google 로그인 시작 (Activity Result API 사용)
-                            android.util.Log.d("LoginScreen", "Starting Google login...")
-                            googleSignInClient.signOut() // 이전 세션 제거
-                            val signInIntent = googleSignInClient.signInIntent
-                            android.util.Log.d("LoginScreen", "Launching Google sign-in intent")
-                            googleSignInLauncher.launch(signInIntent)
+                            // Google 로그인 시작 (권한 체크 후 진행)
+                            val GOOGLE_LOGIN_TAG = "GOOGLE_LOGIN"
+                            android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+                            android.util.Log.d(GOOGLE_LOGIN_TAG, "Starting Google login...")
+                            android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
+                            startGoogleSignIn()
                         }
                         LoginContract.LoginType.LINE -> {
                             // Line 로그인 시작 (Activity Result API 사용)
@@ -370,7 +596,8 @@ fun LoginScreen(
                     }
                 }
                 is LoginContract.Effect.ShowError -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                    // old 프로젝트와 동일: 에러를 다이얼로그로 표시
+                    showErrorDialog = effect.message
                 }
                 is LoginContract.Effect.ShowToast -> {
                     Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
@@ -387,6 +614,40 @@ fun LoginScreen(
         state = state,
         onIntent = viewModel::sendIntent
     )
+    
+    // Google 권한 설명 다이얼로그 (old 프로젝트와 동일)
+    if (showGooglePermissionDialog) {
+        val permissionMessage = buildString {
+            append(context.getString(R.string.permission_optional))
+            append("\n\n")
+            append(context.getString(R.string.permission_contact))
+            append("\n\n")
+            append(context.getString(R.string.permission_desc))
+        }
+        
+        ExoDialog(
+            message = permissionMessage,
+            onDismiss = { showGooglePermissionDialog = false },
+            onConfirm = {
+                showGooglePermissionDialog = false
+                // 확인 버튼 클릭 시 실제 권한 요청 (old 프로젝트와 동일)
+                android.util.Log.d("LoginScreen", "User confirmed permission dialog, requesting GET_ACCOUNTS permission")
+                googleAccountsPermissionLauncher.launch(Manifest.permission.GET_ACCOUNTS)
+            },
+            // old 프로젝트: setCancelable(false), setCanceledOnTouchOutside(false)
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false
+        )
+    }
+    
+    // 에러 다이얼로그 (old 프로젝트의 showDefaultIdolDialogWithBtn1와 동일)
+    showErrorDialog?.let { errorMessage ->
+        ExoDialog(
+            message = errorMessage,
+            onDismiss = { showErrorDialog = null },
+            onConfirm = { showErrorDialog = null }
+        )
+    }
 }
 
 /**
@@ -428,8 +689,7 @@ private fun handleKakaoLogin(
                 android.util.Log.e(TAG, "  error class: ${meError.javaClass.simpleName}")
                 android.util.Log.e(TAG, "  stackTrace:", meError)
                 android.util.Log.e(TAG, "========================================")
-                viewModel.handleSnsLoginError("Kakao user info error: ${meError.message}")
-                Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
+                viewModel.handleSnsLoginError(context.getString(R.string.error_abnormal_exception))
             } else if (user != null) {
                 android.util.Log.d(TAG, "========================================")
                 android.util.Log.d(TAG, "Kakao me() SUCCESS")
@@ -447,8 +707,7 @@ private fun handleKakaoLogin(
                     android.util.Log.e(TAG, "========================================")
                     android.util.Log.e(TAG, "Kakao user.id is null")
                     android.util.Log.e(TAG, "========================================")
-                    viewModel.handleSnsLoginError("Kakao user ID is null")
-                    Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
+                    viewModel.handleSnsLoginError(context.getString(R.string.error_abnormal_exception))
                     return@me
                 }
                 
@@ -467,8 +726,7 @@ private fun handleKakaoLogin(
                 android.util.Log.e(TAG, "  meError: null")
                 android.util.Log.e(TAG, "  user: null")
                 android.util.Log.e(TAG, "========================================")
-                viewModel.handleSnsLoginError("Kakao user info is null")
-                Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
+                viewModel.handleSnsLoginError(context.getString(R.string.error_abnormal_exception))
             }
         }
     }
@@ -488,8 +746,7 @@ private fun handleKakaoLogin(
             android.util.Log.e(TAG, "  error class: ${error.javaClass.simpleName}")
             android.util.Log.e(TAG, "  stackTrace:", error)
             android.util.Log.e(TAG, "========================================")
-            viewModel.handleSnsLoginError("Kakao login error: ${error.message}")
-            Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
+            viewModel.handleSnsLoginError(context.getString(R.string.error_abnormal_exception))
         } else if (token != null) {
             android.util.Log.d(TAG, "========================================")
             android.util.Log.d(TAG, "Kakao Account Login SUCCESS")
@@ -503,8 +760,7 @@ private fun handleKakaoLogin(
             android.util.Log.e(TAG, "========================================")
             android.util.Log.e(TAG, "Kakao Account Login ERROR: Both token and error are null")
             android.util.Log.e(TAG, "========================================")
-            viewModel.handleSnsLoginError("Kakao login failed: Unknown error")
-            Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
+            viewModel.handleSnsLoginError(context.getString(R.string.error_abnormal_exception))
         }
     }
 
@@ -547,7 +803,7 @@ private fun handleKakaoLogin(
                     android.util.Log.d(TAG, "Kakao login CANCELLED by user")
                     android.util.Log.d(TAG, "  Stopping login flow")
                     android.util.Log.d(TAG, "========================================")
-                    viewModel.handleSnsLoginError("Kakao login cancelled")
+                    // 카카오 로그인 취소는 에러로 표시하지 않음
                     return@loginWithKakaoTalk
                 }
 
@@ -570,8 +826,7 @@ private fun handleKakaoLogin(
                 android.util.Log.e(TAG, "========================================")
                 android.util.Log.e(TAG, "Kakao Talk Login ERROR: Both token and error are null")
                 android.util.Log.e(TAG, "========================================")
-                viewModel.handleSnsLoginError("Kakao Talk login failed: Unknown error")
-                Toast.makeText(context, R.string.line_login_failed, Toast.LENGTH_SHORT).show()
+                viewModel.handleSnsLoginError(context.getString(R.string.line_login_failed))
             }
         }
     } else {

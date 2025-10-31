@@ -29,6 +29,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.focus.FocusRequester
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -294,6 +295,12 @@ private fun SignUpFormPage(
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
+    val nicknameFocusRequester = remember { FocusRequester() }
+    
+    // 회원가입 페이지가 열릴 때 닉네임 필드에 자동 포커스
+    LaunchedEffect(Unit) {
+        nicknameFocusRequester.requestFocus()
+    }
 
     // 키보드를 내리는 공통 함수
     val hideKeyboard = {
@@ -474,6 +481,7 @@ private fun SignUpFormPage(
                     }
                 },
                 debounceMillis = 1500,
+                focusRequester = nicknameFocusRequester,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(36.dp)

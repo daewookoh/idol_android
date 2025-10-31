@@ -80,7 +80,9 @@ fun NavGraph(
         ) {
             LoginScreen(
                 onNavigateToMain = {
-                    navController.navigate(Screen.Main.route) {
+                    // Old 프로젝트: afterSignin()에서 StartupActivity로 이동하고 finish() 호출
+                    // 로그인 성공 시 StartUp으로 이동하여 사용자 정보를 가져온 후 Main으로 이동
+                    navController.navigate(Screen.StartUp.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 },
@@ -209,8 +211,10 @@ fun NavGraph(
                 domain = domain.takeIf { it.isNotEmpty() },
                 onSignUpComplete = {
                     // 회원가입 완료 시 StartUp으로 이동 (API 호출 후 Main으로 이동)
+                    // old 프로젝트: afterSignin()에서 StartupActivity로 이동하고 finish() 호출
+                    // 모든 이전 화면을 제거하고 StartUp으로 이동
                     navController.navigate(Screen.StartUp.route) {
-                        popUpTo(Screen.SignUpPages.route) { inclusive = true }
+                        popUpTo(0) { inclusive = true }
                     }
                 },
                 onNavigateBack = {

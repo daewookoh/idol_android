@@ -68,6 +68,16 @@ interface UserApi {
         @Body body: SignInRequest
     ): Response<SignInResponse>
 
+    /**
+     * 회원가입
+     * @param signature SIGNATURE 헤더 (AES 암호화된 타임스탬프)
+     */
+    @POST("users/")
+    suspend fun signUp(
+        @Header("SIGNATURE") signature: String,
+        @Body body: SignUpRequest
+    ): Response<CommonResponse>
+
     // NOTE: 추가 가능한 User 엔드포인트 (필요 시 구현)
     // - POST /users/iab_verify/ - IAB 검증
     // - POST /users/payments/google_item/ - Google Play 아이템 검증

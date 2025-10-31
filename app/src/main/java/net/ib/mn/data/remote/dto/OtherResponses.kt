@@ -393,6 +393,50 @@ data class SignInData(
     val profileImage: String?
 )
 
+// ============================================================
+// /users/ - 회원가입
+// ============================================================
+data class SignUpRequest(
+    @SerializedName("domain")
+    val domain: String?, // email, kakao, google, line, facebook
+
+    @SerializedName("email")
+    val email: String,
+
+    @SerializedName("passwd")
+    val passwd: String,
+
+    @SerializedName("nickname")
+    val nickname: String,
+
+    @SerializedName("referral_code")
+    val referralCode: String,
+
+    @SerializedName("push_key")
+    val pushKey: String, // deviceKey (FCM token)
+
+    @SerializedName("gmail")
+    val gmail: String,
+
+    @SerializedName("version")
+    val version: String,
+
+    @SerializedName("app_id")
+    val appId: String,
+
+    @SerializedName("device_id")
+    val deviceId: String,
+
+    @SerializedName("google_account")
+    val googleAccount: String, // "N" for all cases
+
+    @SerializedName("time")
+    val time: Long,
+
+    @SerializedName("facebook_id")
+    val facebookId: Long? = null
+)
+
 /*
  * ============================================================
  * NOTE: 추가 가능한 API Response 모델 (필요 시 구현)

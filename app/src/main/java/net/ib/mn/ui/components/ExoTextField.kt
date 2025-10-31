@@ -13,8 +13,13 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.input.ImeAction
@@ -50,6 +55,7 @@ import net.ib.mn.R
  * @param onFocusChanged 포커스 변경 콜백
  * @param onValueChangeDebounced 디바운싱된 값 변경 콜백 (지연 시간 후 호출)
  * @param debounceMillis 디바운싱 지연 시간 (밀리초)
+ * @param focusRequester 포커스 요청자 (자동 포커스용)
  */
 @Composable
 fun ExoTextField(
@@ -66,9 +72,13 @@ fun ExoTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     onFocusChanged: ((FocusState) -> Unit)? = null,
     onValueChangeDebounced: ((String) -> Unit)? = null,
-    debounceMillis: Long = 0
+    debounceMillis: Long = 0,
+    focusRequester: FocusRequester? = null
 ) {
     val context = LocalContext.current
+
+    // 포커스 요청을 위한 변수 (AndroidView의 EditText에 직접 포커스 설정)
+    var editTextRef: EditText? by remember { mutableStateOf(null) }
 
     // 디바운싱 처리
     LaunchedEffect(value) {
@@ -161,21 +171,55 @@ fun ExoTextField(
                         addTextChangedListener(object : android.text.TextWatcher {
                             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                                if (s?.toString() != value) {
-                                    onValueChange(s?.toString() ?: "")
+                                // 값이 실제로 변경되었을 때만 onValueChange 호출
+                                val newText = s?.toString() ?: ""
+                                if (newText != value) {
+                                    android.util.Log.d("ExoTextField", "TextWatcher.onTextChanged: '$newText' (value: '$value')")
+                                    onValueChange(newText)
                                 }
                             }
                             override fun afterTextChanged(s: android.text.Editable?) {}
                         })
 
                         // Editor action listener는 EditText가 자체적으로 처리하므로 별도 설정 불필요
+                        
+                        // EditText 참조 저장 (포커스 설정용)
+                        editTextRef = this
                     }
                 },
                 update = { editText ->
-                    // Update text
-                    if (editText.text.toString() != value) {
-                        editText.setText(value)
-                        editText.setSelection(value.length)
+                    // Update text - 사용자가 입력 중일 때는 값을 덮어쓰지 않도록 주의
+                    // editText.text.toString()이 현재 표시된 값, value가 Compose state 값
+                    // 사용자가 입력 중일 때는 editText의 값이 더 최신일 수 있으므로 주의
+                    val currentText = editText.text.toString()
+                    if (currentText != value) {
+                        // 포커스 상태 확인 - 포커스가 있으면 사용자가 입력 중일 수 있음
+                        val hasFocus = editText.isFocused
+                        
+                        if (hasFocus) {
+                            // 포커스가 있을 때는 값이 실제로 다를 때만 업데이트
+                            // (사용자가 입력 중일 때는 TextWatcher를 통해 이미 업데이트됨)
+                            android.util.Log.d("ExoTextField", "Update: hasFocus=true, currentText='$currentText', value='$value' - skipping update")
+                        } else {
+                            // 포커스가 없을 때만 강제로 업데이트 (외부에서 값 변경 시)
+                            android.util.Log.d("ExoTextField", "Update: hasFocus=false, currentText='$currentText', value='$value' - updating")
+                            
+                            // 커서 위치 저장
+                            val selectionStart = editText.selectionStart
+                            val selectionEnd = editText.selectionEnd
+                            val wasAtEnd = selectionStart == currentText.length && selectionEnd == currentText.length
+                            
+                            editText.setText(value)
+                            
+                            // 커서 위치 복원 (끝에 있었으면 끝으로, 아니면 원래 위치로)
+                            if (wasAtEnd || selectionStart > value.length) {
+                                editText.setSelection(value.length)
+                            } else {
+                                val newStart = selectionStart.coerceIn(0, value.length)
+                                val newEnd = selectionEnd.coerceIn(0, value.length)
+                                editText.setSelection(newStart, newEnd)
+                            }
+                        }
                     }
 
                     // Update password transformation
@@ -206,8 +250,27 @@ fun ExoTextField(
                     // Update placeholder
                     editText.hint = placeholder
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
             )
+            
+            // 포커스 요청 처리 (AndroidView의 EditText에 직접 포커스 설정)
+            focusRequester?.let { requester ->
+                LaunchedEffect(editTextRef) {
+                    // EditText가 생성된 후 포커스 요청
+                    if (editTextRef != null) {
+                        // 약간의 지연 후 EditText에 직접 포커스를 요청
+                        delay(100)
+                        editTextRef?.requestFocus()
+                        // 키보드 표시
+                        editTextRef?.context?.let { ctx ->
+                            val imm = ctx.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
+                            imm?.showSoftInput(editTextRef, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+                        }
+                    }
+                }
+            }
         }
     }
 }

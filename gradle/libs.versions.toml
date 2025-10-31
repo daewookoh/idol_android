@@ -29,6 +29,7 @@ material = "1.12.0"
 # Firebase (old 프로젝트와 동일한 버전)
 googleServices = "4.4.3"
 firebaseAppDistribution = "5.1.1"
+firebaseBom = "33.11.0"
 
 # SNS Login SDKs (old 프로젝트와 동일한 버전)
 kakaoSdk = "2.13.0"
@@ -107,6 +108,10 @@ retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-
 
 # Material
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+
+# Firebase (old 프로젝트와 동일한 버전)
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 
 # SNS Login SDKs (old 프로젝트와 동일한 버전)
 kakao-sdk-user-rx = { group = "com.kakao.sdk", name = "v2-user-rx", version.ref = "kakaoSdk" }

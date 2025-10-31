@@ -49,6 +49,7 @@ class SignUpContract {
         val nickname: String = "",
         val nicknameError: String? = null,
         val isNicknameValid: Boolean = false,
+        val isBadWordsNickName: Boolean = false, // Old 프로젝트: gcode: 88888일 때 true
 
         val recommenderCode: String = "",
         val recommenderError: String? = null,

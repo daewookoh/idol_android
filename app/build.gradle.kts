@@ -322,6 +322,10 @@ dependencies {
     // Material
     implementation(libs.material)
 
+    // Firebase (old 프로젝트와 동일한 버전)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+
     // SNS Login SDKs (old 프로젝트와 동일한 버전)
     implementation(libs.kakao.sdk.user.rx)  // Kakao SDK 2.13.0
     implementation(libs.line.sdk)           // Line SDK 5.8.1

@@ -1,15 +1,29 @@
 package net.ib.mn.data.repository
 
+import android.content.Context
+import android.util.Base64
+import dagger.hilt.android.qualifiers.ApplicationContext
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.remote.api.UserApi
 import net.ib.mn.data.remote.dto.*
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.UserRepository
+import net.ib.mn.util.Constants
+import net.ib.mn.util.DeviceUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
+import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.math.BigInteger
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+import java.security.SecureRandom
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 import javax.inject.Inject
 
 /**
@@ -17,7 +31,9 @@ import javax.inject.Inject
  */
 class UserRepositoryImpl @Inject constructor(
     private val userApi: UserApi,
-    private val preferencesManager: PreferencesManager
+    private val preferencesManager: PreferencesManager,
+    @ApplicationContext private val context: Context,
+    private val deviceUtil: DeviceUtil
 ) : UserRepository {
 
     override fun getUserSelf(etag: String?): Flow<ApiResult<UserSelfResponse>> = flow {
@@ -364,21 +380,179 @@ class UserRepositoryImpl @Inject constructor(
     ): Flow<ApiResult<CommonResponse>> = flow {
         emit(ApiResult.Loading)
 
-        try {
-            // TODO: 실제 API 구현 필요
-            // old 프로젝트의 UsersApi.signUp() 호출
-            // SIGNATURE 헤더 생성 필요
+        // Domain에 따른 로그 태그 설정
+        val signUpTag = when (domain) {
+            Constants.DOMAIN_KAKAO -> "KAKAO_SIGNUP"
+            Constants.DOMAIN_GOOGLE -> "GOOGLE_SIGNUP"
+            else -> "SignUpAPI"
+        }
 
-            // 임시 구현: 항상 성공 반환
-            emit(ApiResult.Success(CommonResponse(
-                success = true,
-                message = "Sign up successful (stub implementation)"
-            )))
+        try {
+            // Old 프로젝트: domain이 null이거나 email이면 비밀번호를 MD5 해싱
+            var processedPassword = password
+            var processedDomain = domain
+            if (domain == Constants.DOMAIN_EMAIL || domain.isEmpty()) {
+                processedPassword = md5salt(password) ?: password
+                processedDomain = Constants.DOMAIN_EMAIL
+            }
+
+            // Device info
+            val deviceId = deviceUtil.getDeviceUUID()
+            val gmail = deviceUtil.getGmail()
+            val deviceKey = preferencesManager.fcmToken.first() ?: ""
+            val version = context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.0"
+            val time = System.currentTimeMillis()
+
+            // Signature 생성
+            val signature = getSignature(time)
+
+            // SignUpRequest 생성 (Old 프로젝트와 동일한 필드 순서)
+            val request = SignUpRequest(
+                domain = processedDomain,
+                email = email,
+                passwd = processedPassword,
+                nickname = nickname,
+                referralCode = recommenderCode.trim(),
+                pushKey = deviceKey,
+                gmail = gmail,
+                version = version,
+                appId = appId,
+                deviceId = deviceId,
+                googleAccount = "N", // Old 프로젝트: 모든 경우에 "N"
+                time = time,
+                facebookId = null
+            )
+
+            android.util.Log.d(signUpTag, "========================================")
+            android.util.Log.d(signUpTag, "SignUp API Request:")
+            android.util.Log.d(signUpTag, "  domain: ${request.domain}")
+            android.util.Log.d(signUpTag, "  email: ${request.email}")
+            android.util.Log.d(signUpTag, "  passwd: ${request.passwd.take(20)}...")
+            android.util.Log.d(signUpTag, "  nickname: ${request.nickname}")
+            android.util.Log.d(signUpTag, "  referralCode: ${request.referralCode}")
+            android.util.Log.d(signUpTag, "  pushKey: ${request.pushKey}")
+            android.util.Log.d(signUpTag, "  gmail: ${request.gmail}")
+            android.util.Log.d(signUpTag, "  version: ${request.version}")
+            android.util.Log.d(signUpTag, "  googleAccount: ${request.googleAccount}")
+            android.util.Log.d(signUpTag, "  time: ${request.time}")
+            android.util.Log.d(signUpTag, "  appId: ${request.appId}")
+            android.util.Log.d(signUpTag, "  deviceId: ${request.deviceId}")
+            android.util.Log.d(signUpTag, "========================================")
+
+            val response = userApi.signUp(signature, request)
+
+            if (response.isSuccessful && response.body() != null) {
+                val body = response.body()!!
+                android.util.Log.d(signUpTag, "========================================")
+                android.util.Log.d(signUpTag, "SignUp API Response:")
+                android.util.Log.d(signUpTag, "  success: ${body.success}")
+                android.util.Log.d(signUpTag, "  message: ${body.message}")
+                android.util.Log.d(signUpTag, "  gcode: ${body.gcode}")
+                android.util.Log.d(signUpTag, "  mcode: ${body.mcode}")
+                android.util.Log.d(signUpTag, "========================================")
+                emit(ApiResult.Success(body))
+            } else {
+                val errorBody = response.errorBody()?.string()
+                android.util.Log.e(signUpTag, "========================================")
+                android.util.Log.e(signUpTag, "SignUp API Error: HTTP ${response.code()}")
+                android.util.Log.e(signUpTag, "Error Body: $errorBody")
+                android.util.Log.e(signUpTag, "========================================")
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            android.util.Log.e(signUpTag, "========================================")
+            android.util.Log.e(signUpTag, "SignUp API HttpException", e)
+            android.util.Log.e(signUpTag, "  code: ${e.code()}")
+            android.util.Log.e(signUpTag, "  message: ${e.message}")
+            android.util.Log.e(signUpTag, "========================================")
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code(),
+                message = "HTTP ${e.code()}: ${e.message}"
+            ))
+        } catch (e: IOException) {
+            android.util.Log.e(signUpTag, "========================================")
+            android.util.Log.e(signUpTag, "SignUp API IOException", e)
+            android.util.Log.e(signUpTag, "  message: ${e.message}")
+            android.util.Log.e(signUpTag, "========================================")
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Network error: ${e.message}"
+            ))
         } catch (e: Exception) {
+            android.util.Log.e(signUpTag, "========================================")
+            android.util.Log.e(signUpTag, "SignUp API Exception", e)
+            android.util.Log.e(signUpTag, "  message: ${e.message}")
+            android.util.Log.e(signUpTag, "========================================")
             emit(ApiResult.Error(
                 exception = e,
                 message = "Sign up error: ${e.message}"
             ))
         }
+    }
+
+    // ============================================================
+    // Signature & Password Hashing (Old 프로젝트와 동일)
+    // ============================================================
+
+    private val EXOKEY = "dus-"
+
+    /**
+     * MD5 해싱 (Old 프로젝트의 md5salt 함수)
+     */
+    private fun md5salt(s: String): String? {
+        return try {
+            val md = MessageDigest.getInstance("MD5")
+            val key = EXOKEY + s
+            md.update(key.toByteArray(StandardCharsets.UTF_8), 0, key.length)
+            val messageDigest = md.digest()
+            val number = BigInteger(1, messageDigest)
+            var md5 = number.toString(16)
+            while (md5.length < 32) md5 = "0$md5"
+            md5
+        } catch (e: NoSuchAlgorithmException) {
+            android.util.Log.e("SignUpAPI", "MD5 error", e)
+            null
+        }
+    }
+
+    /**
+     * AES 암호화 (Old 프로젝트의 AES_Encode 함수)
+     */
+    private fun aesEncode(str: String, iv: ByteArray?): ByteArray {
+        return try {
+            val key = "FF7BF8C3B7C844C956B0344B71D166A49E5A19D7DBA9408E2D1E77A8340010CC"
+            val tsBytes = str.toByteArray(StandardCharsets.UTF_8)
+            val md = MessageDigest.getInstance("SHA-256")
+            val digest = md.digest(key.toByteArray())
+            val newKey = SecretKeySpec(digest, "AES")
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7PADDING")
+            cipher.init(Cipher.ENCRYPT_MODE, newKey, IvParameterSpec(iv))
+            cipher.doFinal(tsBytes)
+        } catch (e: Exception) {
+            android.util.Log.e("SignUpAPI", "AES encode error", e)
+            ByteArray(0)
+        }
+    }
+
+    /**
+     * Signature 생성 (Old 프로젝트의 getSignature 함수)
+     */
+    private fun getSignature(time: Long): String {
+        val iv = ByteArray(16)
+        SecureRandom().nextBytes(iv)
+        val output = ByteArrayOutputStream()
+        val trTime = time / 1000
+        val sig = aesEncode(trTime.toString(), iv)
+        try {
+            output.write(iv)
+            output.write(sig)
+        } catch (e: IOException) {
+            android.util.Log.e("SignUpAPI", "Signature write error", e)
+        }
+        return Base64.encodeToString(output.toByteArray(), Base64.NO_WRAP)
     }
 }
