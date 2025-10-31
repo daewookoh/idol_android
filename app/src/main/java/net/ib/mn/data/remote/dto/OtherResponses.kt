@@ -58,12 +58,30 @@ data class UpdateInfoData(
 // ============================================================
 // /users/self/ - 사용자 프로필
 // ============================================================
+/**
+ * getUserSelf API Response
+ *
+ * NOTE: old 프로젝트와 동일한 구조 사용
+ * 서버는 {objects: [UserModel], ...} 형식으로 응답합니다
+ */
 data class UserSelfResponse(
-    @SerializedName("success")
-    val success: Boolean,
+    @SerializedName("objects")
+    val objects: List<UserSelfData>,
 
-    @SerializedName("data")
-    val data: UserSelfData?
+    @SerializedName("event_list")
+    val eventList: String?,
+
+    @SerializedName("article_count")
+    val articleCount: Int?,
+
+    @SerializedName("comment_count")
+    val commentCount: Int?,
+
+    @SerializedName("need_change_info")
+    val needChangeInfo: String?,
+
+    @SerializedName("google_review")
+    val googleReview: String?
 )
 
 data class UserSelfData(
@@ -85,7 +103,52 @@ data class UserSelfData(
     @SerializedName("hearts")
     val hearts: Int?,
 
-    // NOTE: 추가 필드는 실제 API 스펙 확인 후 추가 (old 프로젝트 참조)
+    @SerializedName("diamond")
+    val diamond: Int?,
+
+    @SerializedName("strong_heart")
+    val strongHeart: Long?,
+
+    @SerializedName("weak_heart")
+    val weakHeart: Long?,
+
+    @SerializedName("level")
+    val level: Int?,
+
+    @SerializedName("level_heart")
+    val levelHeart: Long?,
+
+    @SerializedName("power")
+    val power: Int?,
+
+    @SerializedName("resource_uri")
+    val resourceUri: String?,
+
+    @SerializedName("push_key")
+    val pushKey: String?,
+
+    @SerializedName("created_at")
+    val createdAt: String?,
+
+    @SerializedName("push_filter")
+    val pushFilter: Int?,
+
+    @SerializedName("status_message")
+    val statusMessage: String?,
+
+    @SerializedName("ts")
+    val ts: Int?,
+
+    @SerializedName("item_no")
+    val itemNo: Int?,
+
+    @SerializedName("domain")
+    val domain: String?,
+
+    @SerializedName("give_heart")
+    val giveHeart: Int?
+
+    // NOTE: most, subscriptions, emoticon 등 복잡한 객체는 필요시 추가
 )
 
 // ============================================================

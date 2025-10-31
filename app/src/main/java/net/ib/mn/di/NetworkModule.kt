@@ -1,5 +1,6 @@
 package net.ib.mn.di
 
+import android.content.Context
 import net.ib.mn.data.remote.api.*
 import net.ib.mn.data.remote.interceptor.AuthInterceptor
 import net.ib.mn.util.Constants
@@ -8,6 +9,7 @@ import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -26,7 +28,9 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthInterceptor(): AuthInterceptor = AuthInterceptor()
+    fun provideAuthInterceptor(
+        @ApplicationContext context: Context
+    ): AuthInterceptor = AuthInterceptor(context)
 
     @Provides
     @Singleton

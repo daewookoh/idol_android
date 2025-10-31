@@ -453,17 +453,35 @@ class StartUpViewModel @Inject constructor(
                     android.util.Log.d("USER_INFO", "[StartUpViewModel] Loading user info...")
                 }
                 is ApiResult.Success -> {
-                    val data = result.data.data
+                    // NOTE: UserSelfResponse 구조: {objects: [UserSelfData], ...}
+                    // 사용자 데이터는 objects 배열의 첫 번째 요소
+                    val data = result.data.objects.firstOrNull()
 
                     android.util.Log.d("USER_INFO", "========================================")
                     android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ UserSelf API Response received")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Objects count: ${result.data.objects.size}")
                     android.util.Log.d("USER_INFO", "========================================")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] User ID: ${data?.id}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Username: ${data?.username}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Email: ${data?.email}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Nickname: ${data?.nickname}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Profile Image: ${data?.profileImage}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Hearts: ${data?.hearts}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] id: ${data?.id}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] email: ${data?.email}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] username: ${data?.username}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] nickname: ${data?.nickname}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] profileImage: ${data?.profileImage}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] hearts: ${data?.hearts}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] diamond: ${data?.diamond}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] strongHeart: ${data?.strongHeart}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] weakHeart: ${data?.weakHeart}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] level: ${data?.level}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] levelHeart: ${data?.levelHeart}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] power: ${data?.power}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] resourceUri: ${data?.resourceUri}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] pushKey: ${data?.pushKey}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] createdAt: ${data?.createdAt}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] pushFilter: ${data?.pushFilter}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] statusMessage: ${data?.statusMessage}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] ts: ${data?.ts}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] itemNo: ${data?.itemNo}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] domain: ${data?.domain}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] giveHeart: ${data?.giveHeart}")
                     android.util.Log.d("USER_INFO", "========================================")
 
                     // 사용자 정보 DataStore 저장
@@ -476,25 +494,26 @@ class StartUpViewModel @Inject constructor(
                             username = userData.username,
                             nickname = userData.nickname,
                             profileImage = userData.profileImage,
-                            hearts = userData.hearts
+                            hearts = userData.hearts,
+                            diamond = userData.diamond,
+                            strongHeart = userData.strongHeart,
+                            weakHeart = userData.weakHeart,
+                            level = userData.level,
+                            levelHeart = userData.levelHeart,
+                            power = userData.power,
+                            resourceUri = userData.resourceUri,
+                            pushKey = userData.pushKey,
+                            createdAt = userData.createdAt,
+                            pushFilter = userData.pushFilter,
+                            statusMessage = userData.statusMessage,
+                            ts = userData.ts,
+                            itemNo = userData.itemNo,
+                            domain = userData.domain,
+                            giveHeart = userData.giveHeart
                         )
 
-                        // ETag는 Repository에서 자동으로 저장됨
-
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ User info saved to DataStore successfully")
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - This will trigger MainViewModel's DataStore subscription")
                     }
 
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "UserSelf API Response")
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "User ID: ${data?.id}")
-                    android.util.Log.d(TAG, "Username: ${data?.username}")
-                    android.util.Log.d(TAG, "Email: ${data?.email}")
-                    android.util.Log.d(TAG, "Nickname: ${data?.nickname}")
-                    android.util.Log.d(TAG, "Profile Image: ${data?.profileImage}")
-                    android.util.Log.d(TAG, "Hearts: ${data?.hearts}")
-                    android.util.Log.d(TAG, "========================================")
                 }
                 is ApiResult.Error -> {
                     if (result.code == 304) {

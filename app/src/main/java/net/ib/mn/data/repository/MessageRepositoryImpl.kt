@@ -18,8 +18,8 @@ class MessageRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading)
 
         try {
-            val token = "Bearer YOUR_TOKEN_HERE"
-            val response = messageApi.getMessageCoupon(token)
+            // AuthInterceptor가 자동으로 Authorization 헤더를 추가
+            val response = messageApi.getMessageCoupon()
 
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!

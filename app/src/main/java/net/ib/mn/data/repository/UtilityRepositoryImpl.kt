@@ -18,9 +18,9 @@ class UtilityRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading)
 
         try {
-            val token = "Bearer YOUR_TOKEN_HERE"
+            // AuthInterceptor가 자동으로 Authorization 헤더를 추가
             val body = mapOf("timezone" to timezone)
-            val response = utilityApi.updateTimezone(token, body)
+            val response = utilityApi.updateTimezone(body)
 
             if (response.isSuccessful && response.body() != null) {
                 val responseBody = response.body()!!

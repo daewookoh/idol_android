@@ -23,10 +23,13 @@ interface UserApi {
 
     /**
      * 사용자 프로필 조회 (ETag 캐싱 지원)
+     *
+     * @param ts Timestamp (사용자 정보의 마지막 업데이트 시간)
+     * @param etag ETag 값 (캐시 검증용)
      */
     @GET("users/self/")
     suspend fun getUserSelf(
-        @Header("Authorization") authorization: String,
+        @Query("ts") ts: Int = 0,
         @Header("If-None-Match") etag: String? = null
     ): Response<UserSelfResponse>
 
@@ -34,25 +37,19 @@ interface UserApi {
      * 사용자 상태 조회 (튜토리얼, 첫 로그인 등)
      */
     @GET("users/status/")
-    suspend fun getUserStatus(
-        @Header("Authorization") authorization: String
-    ): Response<UserStatusResponse>
+    suspend fun getUserStatus(): Response<UserStatusResponse>
 
     /**
      * IAB 공개키 조회
      */
     @GET("users/iab_key/")
-    suspend fun getIabKey(
-        @Header("Authorization") authorization: String
-    ): Response<IabKeyResponse>
+    suspend fun getIabKey(): Response<IabKeyResponse>
 
     /**
      * 차단 사용자 목록 조회
      */
     @GET("users/blocks/")
-    suspend fun getBlocks(
-        @Header("Authorization") authorization: String
-    ): Response<BlockListResponse>
+    suspend fun getBlocks(): Response<BlockListResponse>
 
     /**
      * 사용자 검증 (회원 여부 확인)
@@ -127,9 +124,7 @@ interface MessageApi {
      * 쿠폰 메시지 조회
      */
     @GET("messages/coupons/")
-    suspend fun getMessageCoupon(
-        @Header("Authorization") authorization: String
-    ): Response<MessageCouponResponse>
+    suspend fun getMessageCoupon(): Response<MessageCouponResponse>
 }
 
 // ============================================================
@@ -142,7 +137,6 @@ interface UtilityApi {
      */
     @POST("timezone/update/")
     suspend fun updateTimezone(
-        @Header("Authorization") authorization: String,
         @Body timezone: Map<String, String>
     ): Response<TimezoneUpdateResponse>
 }

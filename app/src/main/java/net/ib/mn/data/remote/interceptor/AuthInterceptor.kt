@@ -1,10 +1,14 @@
 package net.ib.mn.data.remote.interceptor
 
+import android.content.Context
 import android.util.Base64
+import dagger.hilt.android.qualifiers.ApplicationContext
 import net.ib.mn.BuildConfig
 import net.ib.mn.util.Constants
 import okhttp3.Interceptor
 import okhttp3.Response
+import java.util.Locale
+import javax.inject.Inject
 
 /**
  * 인증 Interceptor
@@ -14,7 +18,9 @@ import okhttp3.Response
  * - 로그인 성공 시: setAuthCredentials()로 email, domain, token 설정
  * - 앱 시작 시: StartUpViewModel에서 로드하여 setAuthCredentials() 호출
  */
-class AuthInterceptor : Interceptor {
+class AuthInterceptor @Inject constructor(
+    @ApplicationContext private val context: Context
+) : Interceptor {
 
     @Volatile
     private var email: String? = null
@@ -53,18 +59,20 @@ class AuthInterceptor : Interceptor {
         val originalRequest = chain.request()
         val url = originalRequest.url.toString()
 
-        // X-HTTP-APPID, X-HTTP-VERSION 헤더 추가 (서버 요구사항)
-        // IMPORTANT: X-HTTP-APPID는 Constants.APP_ID 사용 (old 프로젝트와 동일)
-        // - app flavor: "" (빈 문자열)
-        // - onestore flavor: "twostore"
-        // - china flavor: "china"
-        // - celeb flavor: "4B418BC059C536ECE2DE206C3DC7C4D7"
-        // X-HTTP-VERSION: old 프로젝트의 version.xml app_version (10.10.0)
-        val requestBuilder = originalRequest.newBuilder()
-            .header("X-HTTP-APPID", Constants.APP_ID)  // ✅ APPLICATION_ID → APP_ID
-            .header("X-HTTP-VERSION", "10.10.0")
+        // User-Agent 헤더 구성
+        val systemUserAgent = System.getProperty("http.agent") ?: ""
+        val packageName = context.packageName
+        val appVersion = "10.10.0"
+        val versionCode = BuildConfig.VERSION_CODE
+        val userAgent = "$systemUserAgent ($packageName/$appVersion/$versionCode)"
+        val systemLanguage = Locale.getDefault().language
 
-        // Authorization 헤더가 없으면 추가 (old 프로젝트와 동일한 Basic 인증)
+        val requestBuilder = originalRequest.newBuilder()
+            .header("User-Agent", userAgent)
+            .header("X-HTTP-APPID", Constants.APP_ID)
+            .header("X-HTTP-VERSION", appVersion)
+            .header("X-HTTP-NATION", systemLanguage)
+
         if (originalRequest.header("Authorization") == null) {
             if (email != null && domain != null && token != null) {
                 // old 프로젝트와 동일: "email:domain:token" 형식의 Basic 인증

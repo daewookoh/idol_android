@@ -216,13 +216,37 @@ class LoginViewModel @Inject constructor(
                 is ApiResult.Success -> {
                     val response = result.data
 
-                    if (response.success) {
-                        // old 프로젝트 방식: 소셜 플랫폼의 access token을 저장
-                        // 서버는 토큰을 반환하지 않고, 클라이언트가 tempPassword (access token)을 저장
-                        preferencesManager.setAccessToken(password) // Kakao/Google/etc access token
-                        authInterceptor.setToken(password)
+                    if (response.success && response.data != null) {
+                        val userData = response.data
 
-                        android.util.Log.d(TAG, "Login success - access token saved")
+                        // 서버에서 받은 토큰과 사용자 정보 저장
+                        android.util.Log.d(TAG, "========================================")
+                        android.util.Log.d(TAG, "Login success - saving user info")
+                        android.util.Log.d(TAG, "  userId: ${userData.userId}")
+                        android.util.Log.d(TAG, "  email: ${userData.email}")
+                        android.util.Log.d(TAG, "  username: ${userData.username}")
+                        android.util.Log.d(TAG, "  domain: $domain")
+                        android.util.Log.d(TAG, "========================================")
+
+                        // 1. 인증 정보 저장 (AuthInterceptor에 설정)
+                        authInterceptor.setAuthCredentials(
+                            email = userData.email,
+                            domain = domain,
+                            token = userData.token
+                        )
+
+                        // 2. 기본 사용자 정보 저장 (나머지는 getUserSelf에서 받아서 저장)
+                        preferencesManager.setUserInfo(
+                            id = userData.userId,
+                            email = userData.email,
+                            username = userData.username,
+                            nickname = null, // getUserSelf에서 받음
+                            profileImage = null,
+                            hearts = null,
+                            domain = domain  // 로그인 타입 저장
+                        )
+
+                        android.util.Log.d(TAG, "✓ User info and credentials saved")
 
                         setState { copy(isLoading = false, loginType = null) }
                         setEffect { LoginContract.Effect.NavigateToMain }

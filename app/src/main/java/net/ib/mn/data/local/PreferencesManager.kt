@@ -21,7 +21,22 @@ data class UserInfo(
     val username: String,
     val nickname: String?,
     val profileImage: String?,
-    val hearts: Int?
+    val hearts: Int?,
+    val diamond: Int?,
+    val strongHeart: Long?,
+    val weakHeart: Long?,
+    val level: Int?,
+    val levelHeart: Long?,
+    val power: Int?,
+    val resourceUri: String?,
+    val pushKey: String?,
+    val createdAt: String?,
+    val pushFilter: Int?,
+    val statusMessage: String?,
+    val ts: Int?,
+    val itemNo: Int?,
+    val domain: String?,
+    val giveHeart: Int?
 )
 
 /**
@@ -45,7 +60,7 @@ class PreferencesManager @Inject constructor(
     // Keys
     // ============================================================
     companion object {
-        // User
+        // User Basic
         val KEY_USER_ID = intPreferencesKey(Constants.KEY_USER_ID)
         val KEY_USER_EMAIL = stringPreferencesKey(Constants.KEY_USER_EMAIL)
         val KEY_USER_USERNAME = stringPreferencesKey("user_username")
@@ -53,6 +68,23 @@ class PreferencesManager @Inject constructor(
         val KEY_USER_PROFILE_IMAGE = stringPreferencesKey("user_profile_image")
         val KEY_USER_HEARTS = intPreferencesKey("user_hearts")
         val KEY_ACCESS_TOKEN = stringPreferencesKey(Constants.KEY_ACCESS_TOKEN)
+
+        // User Extended
+        val KEY_USER_DIAMOND = intPreferencesKey("user_diamond")
+        val KEY_USER_STRONG_HEART = longPreferencesKey("user_strong_heart")
+        val KEY_USER_WEAK_HEART = longPreferencesKey("user_weak_heart")
+        val KEY_USER_LEVEL = intPreferencesKey("user_level")
+        val KEY_USER_LEVEL_HEART = longPreferencesKey("user_level_heart")
+        val KEY_USER_POWER = intPreferencesKey("user_power")
+        val KEY_USER_RESOURCE_URI = stringPreferencesKey("user_resource_uri")
+        val KEY_USER_PUSH_KEY = stringPreferencesKey("user_push_key")
+        val KEY_USER_CREATED_AT = stringPreferencesKey("user_created_at")
+        val KEY_USER_PUSH_FILTER = intPreferencesKey("user_push_filter")
+        val KEY_USER_STATUS_MESSAGE = stringPreferencesKey("user_status_message")
+        val KEY_USER_TS = intPreferencesKey("user_ts")
+        val KEY_USER_ITEM_NO = intPreferencesKey("user_item_no")
+        val KEY_USER_DOMAIN = stringPreferencesKey("user_domain")
+        val KEY_USER_GIVE_HEART = intPreferencesKey("user_give_heart")
 
         // Update Flags
         val KEY_ALL_IDOL_UPDATE = stringPreferencesKey(Constants.PREF_ALL_IDOL_UPDATE)
@@ -152,10 +184,38 @@ class PreferencesManager @Inject constructor(
                     username = preferences[KEY_USER_USERNAME] ?: "",
                     nickname = preferences[KEY_USER_NICKNAME],
                     profileImage = preferences[KEY_USER_PROFILE_IMAGE],
-                    hearts = preferences[KEY_USER_HEARTS]
+                    hearts = preferences[KEY_USER_HEARTS],
+                    diamond = preferences[KEY_USER_DIAMOND],
+                    strongHeart = preferences[KEY_USER_STRONG_HEART],
+                    weakHeart = preferences[KEY_USER_WEAK_HEART],
+                    level = preferences[KEY_USER_LEVEL],
+                    levelHeart = preferences[KEY_USER_LEVEL_HEART],
+                    power = preferences[KEY_USER_POWER],
+                    resourceUri = preferences[KEY_USER_RESOURCE_URI],
+                    pushKey = preferences[KEY_USER_PUSH_KEY],
+                    createdAt = preferences[KEY_USER_CREATED_AT],
+                    pushFilter = preferences[KEY_USER_PUSH_FILTER],
+                    statusMessage = preferences[KEY_USER_STATUS_MESSAGE],
+                    ts = preferences[KEY_USER_TS],
+                    itemNo = preferences[KEY_USER_ITEM_NO],
+                    domain = preferences[KEY_USER_DOMAIN],
+                    giveHeart = preferences[KEY_USER_GIVE_HEART]
                 )
                 android.util.Log.d("USER_INFO", "[PreferencesManager] DataStore emitting user info to collectors")
-                android.util.Log.d("USER_INFO", "[PreferencesManager]   - ID: ${info.id}, Email: ${info.email}, Username: ${info.username}")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - ID: ${info.id}")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - Email: ${info.email}")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - Username: ${info.username}")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - Nickname: ${info.nickname}")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - ProfileImage: ${info.profileImage}")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - Hearts: ${info.hearts}")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - Diamond: ${info.diamond}")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - StrongHeart: ${info.strongHeart}")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - WeakHeart: ${info.weakHeart}")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - Level: ${info.level}")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - LevelHeart: ${info.levelHeart}")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - Power: ${info.power}")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - Domain: ${info.domain}")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - TS: ${info.ts}")
                 info
             } else {
                 android.util.Log.d("USER_INFO", "[PreferencesManager] DataStore emitting null (no user info)")
@@ -244,22 +304,72 @@ class PreferencesManager @Inject constructor(
         username: String,
         nickname: String?,
         profileImage: String?,
-        hearts: Int?
+        hearts: Int?,
+        diamond: Int? = null,
+        strongHeart: Long? = null,
+        weakHeart: Long? = null,
+        level: Int? = null,
+        levelHeart: Long? = null,
+        power: Int? = null,
+        resourceUri: String? = null,
+        pushKey: String? = null,
+        createdAt: String? = null,
+        pushFilter: Int? = null,
+        statusMessage: String? = null,
+        ts: Int? = null,
+        itemNo: Int? = null,
+        domain: String? = null,
+        giveHeart: Int? = null
     ) {
+        android.util.Log.d("USER_INFO", "[PreferencesManager] ========================================")
         android.util.Log.d("USER_INFO", "[PreferencesManager] Writing user info to DataStore...")
         android.util.Log.d("USER_INFO", "[PreferencesManager]   - ID: $id")
         android.util.Log.d("USER_INFO", "[PreferencesManager]   - Email: $email")
         android.util.Log.d("USER_INFO", "[PreferencesManager]   - Username: $username")
         android.util.Log.d("USER_INFO", "[PreferencesManager]   - Nickname: $nickname")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - ProfileImage: $profileImage")
         android.util.Log.d("USER_INFO", "[PreferencesManager]   - Hearts: $hearts")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - Diamond: $diamond")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - StrongHeart: $strongHeart")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - WeakHeart: $weakHeart")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - Level: $level")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - LevelHeart: $levelHeart")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - Power: $power")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - ResourceUri: $resourceUri")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - PushKey: $pushKey")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - CreatedAt: $createdAt")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - PushFilter: $pushFilter")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - StatusMessage: $statusMessage")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - TS: $ts")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - ItemNo: $itemNo")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - Domain: $domain")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - GiveHeart: $giveHeart")
+        android.util.Log.d("USER_INFO", "[PreferencesManager] ========================================")
 
         context.dataStore.edit { preferences ->
             preferences[KEY_USER_ID] = id
             preferences[KEY_USER_EMAIL] = email
             preferences[KEY_USER_USERNAME] = username
-            nickname?.let { preferences[KEY_USER_NICKNAME] = it }
-            profileImage?.let { preferences[KEY_USER_PROFILE_IMAGE] = it }
-            hearts?.let { preferences[KEY_USER_HEARTS] = it }
+
+            // Nullable 필드는 null이면 키 삭제, 아니면 저장
+            if (nickname != null) preferences[KEY_USER_NICKNAME] = nickname else preferences.remove(KEY_USER_NICKNAME)
+            if (profileImage != null) preferences[KEY_USER_PROFILE_IMAGE] = profileImage else preferences.remove(KEY_USER_PROFILE_IMAGE)
+            if (hearts != null) preferences[KEY_USER_HEARTS] = hearts else preferences.remove(KEY_USER_HEARTS)
+            if (diamond != null) preferences[KEY_USER_DIAMOND] = diamond else preferences.remove(KEY_USER_DIAMOND)
+            if (strongHeart != null) preferences[KEY_USER_STRONG_HEART] = strongHeart else preferences.remove(KEY_USER_STRONG_HEART)
+            if (weakHeart != null) preferences[KEY_USER_WEAK_HEART] = weakHeart else preferences.remove(KEY_USER_WEAK_HEART)
+            if (level != null) preferences[KEY_USER_LEVEL] = level else preferences.remove(KEY_USER_LEVEL)
+            if (levelHeart != null) preferences[KEY_USER_LEVEL_HEART] = levelHeart else preferences.remove(KEY_USER_LEVEL_HEART)
+            if (power != null) preferences[KEY_USER_POWER] = power else preferences.remove(KEY_USER_POWER)
+            if (resourceUri != null) preferences[KEY_USER_RESOURCE_URI] = resourceUri else preferences.remove(KEY_USER_RESOURCE_URI)
+            if (pushKey != null) preferences[KEY_USER_PUSH_KEY] = pushKey else preferences.remove(KEY_USER_PUSH_KEY)
+            if (createdAt != null) preferences[KEY_USER_CREATED_AT] = createdAt else preferences.remove(KEY_USER_CREATED_AT)
+            if (pushFilter != null) preferences[KEY_USER_PUSH_FILTER] = pushFilter else preferences.remove(KEY_USER_PUSH_FILTER)
+            if (statusMessage != null) preferences[KEY_USER_STATUS_MESSAGE] = statusMessage else preferences.remove(KEY_USER_STATUS_MESSAGE)
+            if (ts != null) preferences[KEY_USER_TS] = ts else preferences.remove(KEY_USER_TS)
+            if (itemNo != null) preferences[KEY_USER_ITEM_NO] = itemNo else preferences.remove(KEY_USER_ITEM_NO)
+            if (domain != null) preferences[KEY_USER_DOMAIN] = domain else preferences.remove(KEY_USER_DOMAIN)
+            if (giveHeart != null) preferences[KEY_USER_GIVE_HEART] = giveHeart else preferences.remove(KEY_USER_GIVE_HEART)
         }
 
         android.util.Log.d("USER_INFO", "[PreferencesManager] ✓ User info written to DataStore")

@@ -2,8 +2,11 @@ package net.ib.mn.presentation.main
 
 import android.app.Activity
 import android.content.res.Configuration
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
@@ -45,7 +49,9 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.gson.GsonBuilder
 import net.ib.mn.R
+import net.ib.mn.data.local.UserInfo
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.theme.ExodusTheme
 import net.ib.mn.util.ServerUrl
@@ -132,44 +138,32 @@ private fun HomeContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text("Home Screen", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // API URL
-        InfoSection(
-            title = "API URL",
-            content = apiUrl
+        Text(
+            text = apiUrl,
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // User Info
+        // User Info as Pretty JSON
         if (userInfo != null) {
-            InfoSection(
-                title = "User ID",
-                content = userInfo.id.toString()
-            )
-            InfoSection(
-                title = "Email",
-                content = userInfo.email
-            )
-            InfoSection(
-                title = "Username",
-                content = userInfo.username
-            )
-            if (userInfo.nickname != null) {
-                InfoSection(
-                    title = "Nickname",
-                    content = userInfo.nickname
-                )
-            }
-            if (userInfo.hearts != null) {
-                InfoSection(
-                    title = "Hearts",
-                    content = userInfo.hearts.toString()
+            // JSON 표시 영역
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    .padding(12.dp)
+            ) {
+                val horizontalScroll = rememberScrollState()
+
+                Text(
+                    text = userInfo.toPrettyJson(),
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 10.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.horizontalScroll(horizontalScroll)
                 )
             }
         } else {
@@ -179,8 +173,6 @@ private fun HomeContent(
                 fontSize = 14.sp
             )
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
 
         // 로그아웃 버튼 - 항상 표시
         androidx.compose.material3.Button(
@@ -196,24 +188,6 @@ private fun HomeContent(
     }
 }
 
-@Composable
-private fun InfoSection(title: String, content: String) {
-    Column(
-        horizontalAlignment = Alignment.Start
-    ) {
-        Text(
-            text = title,
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.SemiBold
-        )
-        Text(
-            text = content,
-            fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-    }
-}
 
 data class BottomNavItem(
     val label: String,
@@ -250,5 +224,16 @@ fun MainScreenPreviewLight() {
 fun MainScreenPreviewDark() {
     ExodusTheme(darkTheme = true) {
         MainScreen(onLogout = {})
+    }
+}
+/**
+ * UserInfo를 Pretty JSON 문자열로 변환
+ */
+private fun UserInfo.toPrettyJson(): String {
+    val gson = GsonBuilder().setPrettyPrinting().create()
+    return try {
+        gson.toJson(this)
+    } catch (e: Exception) {
+        "Error converting to JSON: ${e.message}"
     }
 }

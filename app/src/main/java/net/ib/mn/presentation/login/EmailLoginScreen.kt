@@ -9,8 +9,14 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import android.text.InputType
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +25,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -89,10 +96,28 @@ private fun EmailLoginContent(
     onIntent: (EmailLoginContract.Intent) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+
+    // 키보드를 내리는 공통 함수
+    val hideKeyboard = {
+        focusManager.clearFocus()
+        val imm = context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+        val currentFocus = (context as? android.app.Activity)?.currentFocus
+        currentFocus?.let {
+            imm.hideSoftInputFromWindow(it.windowToken, 0)
+        }
+    }
 
     ExoScaffold {
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    indication = null, // 클릭 시 ripple 효과 제거
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    hideKeyboard()
+                }
         ) {
             Column(
                 modifier = Modifier
@@ -106,7 +131,10 @@ private fun EmailLoginContent(
                     .padding(horizontal = 4.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
-                IconButton(onClick = { onIntent(EmailLoginContract.Intent.NavigateBack) }) {
+                IconButton(onClick = {
+                    hideKeyboard()
+                    onIntent(EmailLoginContract.Intent.NavigateBack)
+                }) {
                     Icon(
                         painter = painterResource(id = android.R.drawable.ic_menu_close_clear_cancel),
                         contentDescription = "Back",
@@ -168,7 +196,7 @@ private fun EmailLoginContent(
                 // Sign In Button
                 PressableButton(
                     onClick = {
-                        focusManager.clearFocus()
+                        hideKeyboard()
                         onIntent(EmailLoginContract.Intent.SignIn)
                     },
                     modifier = Modifier
@@ -187,7 +215,10 @@ private fun EmailLoginContent(
 
                 // Sign Up Button
                 OutlinedPressableButton(
-                    onClick = { onIntent(EmailLoginContract.Intent.SignUp) },
+                    onClick = {
+                        hideKeyboard()
+                        onIntent(EmailLoginContract.Intent.SignUp)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(36.dp),
@@ -211,7 +242,10 @@ private fun EmailLoginContent(
                         color = colorResource(id = R.color.text_default),
                         modifier = Modifier
                             .weight(1f)
-                            .clickable { onIntent(EmailLoginContract.Intent.ForgotId) }
+                            .clickable {
+                                hideKeyboard()
+                                onIntent(EmailLoginContract.Intent.ForgotId)
+                            }
                             .padding(vertical = 8.dp),
                         textAlign = TextAlign.Center
                     )
@@ -229,7 +263,10 @@ private fun EmailLoginContent(
                         color = colorResource(id = R.color.text_default),
                         modifier = Modifier
                             .weight(1f)
-                            .clickable { onIntent(EmailLoginContract.Intent.ForgotPassword) }
+                            .clickable {
+                                hideKeyboard()
+                                onIntent(EmailLoginContract.Intent.ForgotPassword)
+                            }
                             .padding(vertical = 8.dp),
                         textAlign = TextAlign.Center
                     )
@@ -257,6 +294,7 @@ private fun EmailLoginContent(
 /**
  * Input field with icon (이메일/비밀번호 입력 필드).
  * old XML의 LinearLayout + ImageView + EditText 구조를 Compose로 구현.
+ * Material3 TextField 사용 (자동 autofill 지원).
  */
 @Composable
 private fun InputFieldWithIcon(
@@ -299,41 +337,92 @@ private fun InputFieldWithIcon(
             contentScale = ContentScale.Fit
         )
 
-        // Text Input
+        // Text Input (AndroidView + EditText for reliable Autofill support)
         Box(
             modifier = Modifier
                 .weight(1f)
                 .padding(start = 10.dp, bottom = 5.dp)
                 .then(if (isPassword) Modifier.padding(top = 15.dp) else Modifier)
         ) {
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .onFocusChanged { onFocusChanged(it.isFocused) },
-                textStyle = TextStyle(
-                    fontSize = 14.sp,
-                    color = colorResource(id = R.color.text_default)
-                ),
-                singleLine = true,
-                visualTransformation = if (isPassword && !isPasswordVisible) {
-                    PasswordVisualTransformation()
-                } else {
-                    VisualTransformation.None
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-                cursorBrush = SolidColor(colorResource(id = R.color.main)),
-                decorationBox = { innerTextField ->
-                    if (value.isEmpty()) {
-                        Text(
-                            text = hint,
-                            fontSize = 14.sp,
-                            color = colorResource(id = R.color.text_dimmed)
+            val textColor = colorResource(id = R.color.text_default).toArgb()
+            val hintColor = colorResource(id = R.color.text_dimmed).toArgb()
+
+            AndroidView(
+                factory = { context ->
+                    EditText(context).apply {
+                        // Layout params
+                        layoutParams = android.view.ViewGroup.LayoutParams(
+                            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
                         )
+
+                        // Text style (old XML과 동일)
+                        textSize = 14f
+                        setTextColor(textColor)
+                        setHintTextColor(hintColor)
+                        this.hint = hint
+                        gravity = android.view.Gravity.BOTTOM
+                        setPadding(0, 0, 0, (5 * resources.displayMetrics.density).toInt())
+
+                        // InputType 설정 (Autofill을 위해 중요!)
+                        inputType = when {
+                            isPassword && !isPasswordVisible -> InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                            isPassword && isPasswordVisible -> InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                            keyboardType == KeyboardType.Email -> InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+                            else -> InputType.TYPE_CLASS_TEXT
+                        }
+
+                        // Autofill hints (Android 8.0+)
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            setAutofillHints(
+                                if (isPassword) android.view.View.AUTOFILL_HINT_PASSWORD
+                                else android.view.View.AUTOFILL_HINT_EMAIL_ADDRESS
+                            )
+                            importantForAutofill = android.view.View.IMPORTANT_FOR_AUTOFILL_YES
+                        }
+
+                        // 배경 투명 (Compose에서 처리)
+                        setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                        setSingleLine(true)
+
+                        // IME action
+                        imeOptions = if (isPassword) EditorInfo.IME_ACTION_DONE else EditorInfo.IME_ACTION_NEXT
+
+                        // Focus listener
+                        setOnFocusChangeListener { _, hasFocus ->
+                            onFocusChanged(hasFocus)
+                        }
+
+                        // Text change listener
+                        addTextChangedListener(object : android.text.TextWatcher {
+                            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                                if (s.toString() != value) {
+                                    onValueChange(s.toString())
+                                }
+                            }
+                            override fun afterTextChanged(s: android.text.Editable?) {}
+                        })
                     }
-                    innerTextField()
-                }
+                },
+                update = { editText ->
+                    // Update text if changed
+                    if (editText.text.toString() != value) {
+                        editText.setText(value)
+                        editText.setSelection(value.length)
+                    }
+
+                    // Update password visibility
+                    if (isPassword) {
+                        editText.inputType = if (isPasswordVisible) {
+                            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                        } else {
+                            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                        }
+                        editText.setSelection(value.length)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
             )
         }
 

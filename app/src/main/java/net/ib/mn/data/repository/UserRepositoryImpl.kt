@@ -24,11 +24,21 @@ class UserRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading)
 
         try {
-            // Get token from DataStore
-            val accessToken = preferencesManager.accessToken.first()
-            val token = "Bearer ${accessToken ?: ""}"
+            // Get ts (timestamp) from DataStore's UserInfo
+            // NOTE: old 프로젝트와 동일하게 ts parameter 전달
+            val userInfo = preferencesManager.userInfo.first()
+            val ts = userInfo?.ts ?: 0
 
-            val response = userApi.getUserSelf(token, etag)
+            android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ========================================")
+            android.util.Log.d("USER_INFO", "[UserRepositoryImpl] Calling getUserSelf API")
+            android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - UserInfo exists: ${userInfo != null}")
+            android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - TS from DataStore: ${userInfo?.ts}")
+            android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - TS to send: $ts")
+            android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - ETag: $etag")
+            android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ========================================")
+
+            // AuthInterceptor가 자동으로 Authorization 헤더를 추가하므로 여기서는 제거
+            val response = userApi.getUserSelf(ts, etag)
 
             // HTTP 304 Not Modified (캐시 유효)
             if (response.code() == 304) {
@@ -44,7 +54,9 @@ class UserRepositoryImpl @Inject constructor(
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
 
-                if (body.success) {
+                // NOTE: UserSelfResponse 구조가 {objects: [...], ...} 형식이므로
+                // success 필드가 없음. objects 배열이 있으면 성공으로 판단
+                if (body.objects.isNotEmpty()) {
                     // 새로운 ETag 저장
                     val newETag = response.headers()["ETag"]
                     newETag?.let {
@@ -55,7 +67,7 @@ class UserRepositoryImpl @Inject constructor(
                     emit(ApiResult.Success(body))
                 } else {
                     emit(ApiResult.Error(
-                        exception = Exception("API returned success=false"),
+                        exception = Exception("User data not found in response"),
                         code = response.code()
                     ))
                 }
@@ -88,9 +100,8 @@ class UserRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading)
 
         try {
-            val accessToken = preferencesManager.accessToken.first()
-            val token = "Bearer ${accessToken ?: ""}"
-            val response = userApi.getUserStatus(token)
+            // AuthInterceptor가 자동으로 Authorization 헤더를 추가
+            val response = userApi.getUserStatus()
 
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
@@ -132,9 +143,8 @@ class UserRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading)
 
         try {
-            val accessToken = preferencesManager.accessToken.first()
-            val token = "Bearer ${accessToken ?: ""}"
-            val response = userApi.getIabKey(token)
+            // AuthInterceptor가 자동으로 Authorization 헤더를 추가
+            val response = userApi.getIabKey()
 
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
@@ -176,9 +186,8 @@ class UserRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading)
 
         try {
-            val accessToken = preferencesManager.accessToken.first()
-            val token = "Bearer ${accessToken ?: ""}"
-            val response = userApi.getBlocks(token)
+            // AuthInterceptor가 자동으로 Authorization 헤더를 추가
+            val response = userApi.getBlocks()
 
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
