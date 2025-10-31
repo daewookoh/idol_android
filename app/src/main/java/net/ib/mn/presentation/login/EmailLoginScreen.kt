@@ -101,10 +101,21 @@ private fun EmailLoginContent(
     // 키보드를 내리는 공통 함수
     val hideKeyboard = {
         focusManager.clearFocus()
-        val imm = context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-        val currentFocus = (context as? android.app.Activity)?.currentFocus
-        currentFocus?.let {
-            imm.hideSoftInputFromWindow(it.windowToken, 0)
+
+        // Activity의 현재 포커스된 뷰에서 키보드 숨기기
+        val activity = context as? android.app.Activity
+        activity?.let {
+            val imm = it.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+
+            // 현재 포커스된 뷰가 있으면 그것을 사용
+            val currentFocus = it.currentFocus
+            if (currentFocus != null) {
+                imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
+            } else {
+                // 포커스된 뷰가 없으면 DecorView를 사용
+                val decorView = it.window.decorView
+                imm.hideSoftInputFromWindow(decorView.windowToken, 0)
+            }
         }
     }
 
