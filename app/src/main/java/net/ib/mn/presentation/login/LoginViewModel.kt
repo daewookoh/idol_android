@@ -213,8 +213,8 @@ class LoginViewModel @Inject constructor(
                         android.util.Log.d(loginTag, "User EXISTS - Calling performSignIn()")
                         android.util.Log.d(loginTag, "========================================")
                         
-                        // 기존 회원: 바로 로그인 API 호출
-                        performSignIn()
+                        // 기존 회원: 바로 로그인 API 호출 (isExistingUser = true 플래그 전달)
+                        performSignIn(isExistingUser = true)
                         
                     } else {
                         // 회원이 존재하지 않음 -> domain 확인 (old 프로젝트 로직)
@@ -330,8 +330,11 @@ class LoginViewModel @Inject constructor(
      *
      * NOTE: old 프로젝트 참고 - 서버는 로그인 성공 여부만 반환하고 토큰을 반환하지 않습니다.
      * 클라이언트가 소셜 플랫폼의 access token을 직접 저장하여 사용합니다.
+     *
+     * @param isExistingUser validate API에서 success == true를 반환한 경우 true (이미 회원임)
+     *                       이 경우 signIn API가 실패해도 회원가입으로 이동하지 않음
      */
-    private suspend fun performSignIn() {
+    private suspend fun performSignIn(isExistingUser: Boolean = false) {
         val email = tempEmail ?: return
         val password = tempPassword ?: return
         val domain = tempDomain ?: return
@@ -503,6 +506,7 @@ class LoginViewModel @Inject constructor(
                     } else {
                         // Old 프로젝트: response.optBoolean("success")가 false인 경우
                         // "이메일이 잘못되었습니다" 메시지가 포함된 경우 신규 회원으로 간주하고 회원가입 플로우로 이동
+                        // 구글 로그인의 경우: "이메일이 잘못되었습니다" 에러가 나오면 무조건 회원가입으로 이동
                         val errorMessage = response.message ?: ""
                         val isEmailError = errorMessage.contains("이메일이 잘못되었습니다", ignoreCase = true) ||
                                 errorMessage.contains("email", ignoreCase = true) ||
@@ -513,9 +517,13 @@ class LoginViewModel @Inject constructor(
                         android.util.Log.e(loginTag, "  response.success: ${response.success}")
                         android.util.Log.e(loginTag, "  response.message: $errorMessage")
                         android.util.Log.e(loginTag, "  isEmailError: $isEmailError")
+                        android.util.Log.e(loginTag, "  isExistingUser: $isExistingUser")
+                        android.util.Log.e(loginTag, "  domain: $domain")
                         android.util.Log.e(loginTag, "========================================")
                         
-                        if (isEmailError) {
+                        // 구글 로그인인 경우: "이메일이 잘못되었습니다" 에러가 나오면 무조건 회원가입으로 이동
+                        // validate API에서 success == true를 반환했지만, signIn API에서 "이메일이 잘못되었습니다" 에러가 나오면 신규 회원으로 간주
+                        if (isEmailError && (domain == Constants.DOMAIN_GOOGLE || !isExistingUser)) {
                             // 이메일 오류인 경우 신규 회원으로 간주하고 회원가입 플로우로 이동
                             android.util.Log.d(loginTag, "========================================")
                             android.util.Log.d(loginTag, "Email error detected - NavigateToSignUp")

@@ -754,10 +754,13 @@ class SignUpViewModel @Inject constructor(
                                 }
                             }
                             .addOnFailureListener { e ->
-                                android.util.Log.e(signUpTag, "========================================")
-                                android.util.Log.e(signUpTag, "Failed to get FCM token", e)
-                                android.util.Log.e(signUpTag, "  - Proceeding with empty token (old project behavior)")
-                                android.util.Log.e(signUpTag, "========================================")
+                                // Old 프로젝트: 에러 발생 시 조용히 처리하고 빈 문자열로 진행
+                                // IOException, FIS_AUTH_ERROR 등 모든 에러를 무시하고 진행
+                                android.util.Log.w(signUpTag, "========================================")
+                                android.util.Log.w(signUpTag, "Failed to get FCM token (proceeding with empty token)")
+                                android.util.Log.w(signUpTag, "  - error: ${e.javaClass.simpleName}: ${e.message}")
+                                android.util.Log.w(signUpTag, "  - Old project behavior: ignore error and proceed")
+                                android.util.Log.w(signUpTag, "========================================")
 
                                 // Old 프로젝트: FCM token 실패해도 빈 문자열로 진행
                                 viewModelScope.launch {
@@ -765,15 +768,31 @@ class SignUpViewModel @Inject constructor(
                                     performSignUp()
                                 }
                             }
+                    } catch (e: IllegalStateException) {
+                        // Old 프로젝트: IllegalStateException만 catch하고 진행
+                        android.util.Log.w(signUpTag, "========================================")
+                        android.util.Log.w(signUpTag, "IllegalStateException while getting FCM token")
+                        android.util.Log.w(signUpTag, "  - Proceeding with empty token (old project behavior)")
+                        android.util.Log.w(signUpTag, "========================================")
+
+                        // Old 프로젝트: IllegalStateException 발생해도 빈 문자열로 진행
+                        viewModelScope.launch {
+                            preferencesManager.setFcmToken("")
+                            performSignUp()
+                        }
                     } catch (e: Exception) {
-                        android.util.Log.e(signUpTag, "========================================")
-                        android.util.Log.e(signUpTag, "Exception while getting FCM token", e)
-                        android.util.Log.e(signUpTag, "  - Proceeding with empty token (old project behavior)")
-                        android.util.Log.e(signUpTag, "========================================")
+                        // Old 프로젝트: 모든 에러를 무시하고 진행
+                        android.util.Log.w(signUpTag, "========================================")
+                        android.util.Log.w(signUpTag, "Exception while getting FCM token (proceeding with empty token)")
+                        android.util.Log.w(signUpTag, "  - error: ${e.javaClass.simpleName}: ${e.message}")
+                        android.util.Log.w(signUpTag, "  - Old project behavior: ignore error and proceed")
+                        android.util.Log.w(signUpTag, "========================================")
 
                         // Old 프로젝트: FCM token 실패해도 빈 문자열로 진행
-                        preferencesManager.setFcmToken("")
-                        performSignUp()
+                        viewModelScope.launch {
+                            preferencesManager.setFcmToken("")
+                            performSignUp()
+                        }
                     }
                 } else {
                     // FCM token이 이미 있으면 바로 회원가입 진행
