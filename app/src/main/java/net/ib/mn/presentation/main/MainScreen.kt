@@ -14,7 +14,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -25,11 +24,9 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.Alignment
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import net.ib.mn.R
-import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.MainBottomNavigation
 import net.ib.mn.ui.components.MainTopBar
@@ -58,14 +55,11 @@ fun MainScreen(
     val userInfo by viewModel.userInfo.collectAsState()
     val logoutCompleted by viewModel.logoutCompleted.collectAsState()
     val timerText by topBarViewModel.timerText.collectAsState()
+    val defaultCategory by viewModel.preferencesManager.defaultCategory.collectAsState(initial = Constants.TYPE_MALE)
     
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    
-    // 기본 카테고리 가져오기
-    val preferencesManager = viewModel.preferencesManager
-    val defaultCategory by preferencesManager.defaultCategory.collectAsState(initial = Constants.TYPE_MALE)
 
     // 타이머 시작
     LaunchedEffect(Unit) {
@@ -79,51 +73,31 @@ fun MainScreen(
         }
     }
 
-    // Locale에 따른 Gender 문자열 리스트 구성 (old 프로젝트의 getGenderString과 동일)
-    fun getGenderString(locale: Locale, isExceptCondition: Boolean): List<Pair<String, String>> {
-        return if (isExceptCondition) {
-            // 나머지 언어일땐 무조건 M,F로 고정
-            listOf(
-                Constants.TYPE_MALE to Constants.TYPE_MALE,
-                Constants.TYPE_FEMALE to Constants.TYPE_FEMALE
-            )
-        } else {
-            // 한국어, 일본어, 중국어(간체/번체)는 locale에 맞는 문자열 사용
-            val config = Configuration(context.resources.configuration)
-            config.setLocale(locale)
-            val localizedContext = context.createConfigurationContext(config)
-            
-            val maleText = localizedContext.getString(R.string.male)
-            val femaleText = localizedContext.getString(R.string.female)
-            
-            listOf(
-                maleText to Constants.TYPE_MALE,
-                femaleText to Constants.TYPE_FEMALE
-            )
+    // Locale에 따른 Gender 문자열 리스트 구성
+    val genderStrings = remember {
+        val currentLocale = configuration.locales[0]
+        val localeString = "${currentLocale.language}_${currentLocale.country}"
+        
+        when (localeString) {
+            "ko_KR" -> getGenderString(context, Locale.KOREA, false)
+            "ja_JP" -> getGenderString(context, Locale.JAPAN, false)
+            "zh_CN" -> getGenderString(context, Locale("zh", "CN"), false)
+            "zh_TW" -> getGenderString(context, Locale("zh", "TW"), false)
+            else -> getGenderString(context, Locale.ENGLISH, true)
         }
     }
 
-    // 현재 Locale에 따라 genderList 구성
-    val currentLocale = configuration.locales[0]
-    val localeString = "${currentLocale.language}_${currentLocale.country}"
-    
-    val genderStrings = when (localeString) {
-        "ko_KR" -> getGenderString(Locale.KOREA, false)
-        "ja_JP" -> getGenderString(Locale.JAPAN, false)
-        "zh_CN" -> getGenderString(Locale("zh", "CN"), false)
-        "zh_TW" -> getGenderString(Locale("zh", "TW"), false)
-        else -> getGenderString(Locale.ENGLISH, true)
+    // SwitchToggleButton 상태 계산 (defaultCategory를 직접 사용)
+    val maleIndex = remember { genderStrings.indexOfFirst { it.second == Constants.TYPE_MALE } }
+    val isMaleSelected = remember(defaultCategory, maleIndex) {
+        if (maleIndex == 0) {
+            defaultCategory == Constants.TYPE_MALE
+        } else {
+            defaultCategory != Constants.TYPE_MALE
+        }
     }
 
-    // 초기 선택값 계산 (old 프로젝트와 동일)
-    val maleIndex = genderStrings.indexOfFirst { it.second == Constants.TYPE_MALE }
-    val isInitMaleSelected = if (maleIndex == 0) {
-        defaultCategory == Constants.TYPE_MALE
-    } else {
-        defaultCategory != Constants.TYPE_MALE
-    }
-
-    // 탭 메뉴 및 아이콘 설정 (Old 프로젝트와 동일)
+    // 탭 메뉴 및 아이콘 설정
     val menus = listOf(
         stringResource(id = R.string.hometab_title_rank),
         stringResource(id = R.string.hometab_title_myidol),
@@ -148,68 +122,41 @@ fun MainScreen(
         painterResource(id = R.drawable.btn_bottom_nav_menu_off)
     )
 
+    // 탭에 따른 TopBar 설정
+    val showToggleButton = selectedTab == 0
+    val showMainMenu = selectedTab in 0..3
+    val showMyInfoMenu = selectedTab == 4
+
     ExoScaffold(
         topBar = {
-            // 각 탭별로 다른 TopBar 표시
-            when (selectedTab) {
-                0 -> MainTopBar( // Ranking
-                    timerText = timerText,
-                    showToggleButton = true,
-                    showMainMenu = true,
-                    showMyInfoMenu = false,
-                    toggleButton = {
-                        SwitchToggleButton(
-                            genderList = genderStrings,
-                            initialIsMaleSelected = isInitMaleSelected,
-                            boxBackgroundColor = colorResource(id = R.color.gray100),
-                            boxTextColor = colorResource(id = R.color.text_gray),
-                            thumbBackgroundColor = colorResource(id = R.color.text_default),
-                            thumbTextColor = colorResource(id = R.color.text_white_black),
-                            category = { category ->
-                                coroutineScope.launch {
-                                    preferencesManager.setDefaultCategory(category)
-                                    // TODO: ViewModel에 카테고리 변경 알림 (나중에 구현)
-                                }
+            MainTopBar(
+                timerText = timerText,
+                showToggleButton = showToggleButton,
+                showMainMenu = showMainMenu,
+                showMyInfoMenu = showMyInfoMenu,
+                toggleButton = {
+                    SwitchToggleButton(
+                        genderList = genderStrings,
+                        isMaleSelected = isMaleSelected,
+                        boxBackgroundColor = colorResource(id = R.color.gray100),
+                        boxTextColor = colorResource(id = R.color.text_gray),
+                        thumbBackgroundColor = colorResource(id = R.color.text_default),
+                        thumbTextColor = colorResource(id = R.color.text_white_black),
+                        onCategoryChanged = { category ->
+                            coroutineScope.launch {
+                                // PreferencesManager에 저장 (영구 저장)
+                                viewModel.preferencesManager.setDefaultCategory(category)
+                                // defaultCategory Flow가 자동으로 업데이트되어 UI 반영
                             }
-                        )
-                    },
-                    onSearchClick = { /* TODO */ },
-                    onFriendsClick = { /* TODO */ }
-                )
-                1 -> MainTopBar( // MyIdol
-                    timerText = timerText,
-                    showToggleButton = false,
-                    showMainMenu = true,
-                    showMyInfoMenu = false,
-                    onSearchClick = { /* TODO */ },
-                    onFriendsClick = { /* TODO */ }
-                )
-                2 -> MainTopBar( // Profile
-                    timerText = timerText,
-                    showToggleButton = false,
-                    showMainMenu = true,
-                    showMyInfoMenu = false,
-                    onSearchClick = { /* TODO */ },
-                    onFriendsClick = { /* TODO */ }
-                )
-                3 -> MainTopBar( // FreeBoard
-                    timerText = timerText,
-                    showToggleButton = false,
-                    showMainMenu = true,
-                    showMyInfoMenu = false,
-                    onSearchClick = { /* TODO */ },
-                    onFriendsClick = { /* TODO */ }
-                )
-                4 -> MainTopBar( // Menu
-                    timerText = timerText,
-                    showToggleButton = false,
-                    showMainMenu = false,
-                    showMyInfoMenu = true,
-                    onAttendanceClick = { /* TODO */ },
-                    onNotificationClick = { /* TODO */ },
-                    onSettingClick = { /* TODO */ }
-                )
-            }
+                        }
+                    )
+                },
+                onSearchClick = { /* TODO */ },
+                onFriendsClick = { /* TODO */ },
+                onAttendanceClick = { /* TODO */ },
+                onNotificationClick = { /* TODO */ },
+                onSettingClick = { /* TODO */ }
+            )
         },
         bottomBar = {
             MainBottomNavigation(
@@ -220,9 +167,7 @@ fun MainScreen(
                 defaultBackgroundColor = colorResource(id = R.color.background_200),
                 defaultBorderColor = colorResource(id = R.color.gray150),
                 defaultTextColor = colorResource(id = R.color.text_default),
-                onTabSelected = { index ->
-                    selectedTab = index
-                }
+                onTabSelected = { selectedTab = it }
             )
         }
     ) { paddingValues ->
@@ -250,6 +195,31 @@ fun MainScreen(
                 }
             }
         }
+    }
+}
+
+/**
+ * Locale에 따른 Gender 문자열 리스트 구성
+ */
+private fun getGenderString(
+    context: android.content.Context,
+    locale: Locale,
+    isExceptCondition: Boolean
+): List<Pair<String, String>> {
+    return if (isExceptCondition) {
+        listOf(
+            Constants.TYPE_MALE to Constants.TYPE_MALE,
+            Constants.TYPE_FEMALE to Constants.TYPE_FEMALE
+        )
+    } else {
+        val config = Configuration(context.resources.configuration)
+        config.setLocale(locale)
+        val localizedContext = context.createConfigurationContext(config)
+        
+        listOf(
+            localizedContext.getString(R.string.male) to Constants.TYPE_MALE,
+            localizedContext.getString(R.string.female) to Constants.TYPE_FEMALE
+        )
     }
 }
 

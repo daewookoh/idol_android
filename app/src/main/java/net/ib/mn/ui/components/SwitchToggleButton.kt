@@ -17,7 +17,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,42 +37,54 @@ import net.ib.mn.util.HapticUtil
 
 /**
  * 남자/여자 스위치 토글 버튼
- * old 프로젝트의 SwitchToggleButton과 동일한 UI와 애니메이션 효과
+ * 
+ * 상태 관리:
+ * - isMaleSelected: 외부에서 관리되는 선택 상태 (단일 진실 원천)
+ * - 사용자 클릭 시에만 애니메이션 실행
+ * - 초기 렌더링 또는 외부 상태 변경 시 애니메이션 없이 즉시 반영
  */
 @Composable
 fun SwitchToggleButton(
     genderList: List<Pair<String, String>>,
-    initialIsMaleSelected: Boolean = true,
+    isMaleSelected: Boolean,
     boxBackgroundColor: Color,
     boxTextColor: Color,
     thumbBackgroundColor: Color,
     thumbTextColor: Color,
-    category: (String) -> Unit,
+    onCategoryChanged: (String) -> Unit,
 ) {
-    var isMaleSelected by remember { mutableStateOf(initialIsMaleSelected) }
-    var buttonWidthPx by remember { mutableStateOf(0) }
-
+    val context = LocalContext.current
     val density = LocalDensity.current
-    val buttonWidthDp = with(density) { (buttonWidthPx - 2.5.dp.toPx()).toDp() }
-
-    var thumbBoxText by remember {
-        mutableStateOf(if (isMaleSelected) genderList[0].first else genderList[1].first)
+    
+    // 버튼 너비 측정
+    var buttonWidthPx by remember { mutableStateOf(0) }
+    val buttonWidthDp = remember(buttonWidthPx) {
+        if (buttonWidthPx > 0) {
+            with(density) { (buttonWidthPx - 2.5.dp.toPx()).toDp() }
+        } else {
+            0.dp
+        }
     }
-
+    
+    // 사용자 클릭 여부 추적 (외부 상태 변경과 구분)
+    var isUserClick by remember { mutableStateOf(false) }
+    
+    // 썸네일 텍스트 (현재 선택된 상태에 따라 즉시 업데이트)
+    val thumbBoxText = if (isMaleSelected) genderList[0].first else genderList[1].first
+    
+    // 썸네일 오프셋 계산
     val thumbOffset by animateDpAsState(
-        targetValue = if (isMaleSelected) 0.dp else buttonWidthDp,
-        animationSpec = tween(durationMillis = 600), label = "",
+        targetValue = if (buttonWidthDp == 0.dp || isMaleSelected) 0.dp else buttonWidthDp,
+        animationSpec = if (isUserClick && buttonWidthDp > 0.dp) {
+            tween(durationMillis = 600)
+        } else {
+            tween(durationMillis = 0) // 즉시 이동
+        },
+        label = "thumb_offset",
         finishedListener = {
-            thumbBoxText = if (isMaleSelected) genderList[0].first else genderList[1].first
+            isUserClick = false // 애니메이션 완료 후 리셋
         }
     )
-
-    val context = LocalContext.current
-
-    // 외부 값이 변경되면 isMaleSelected 업데이트
-    LaunchedEffect(initialIsMaleSelected) {
-        isMaleSelected = initialIsMaleSelected
-    }
 
     Box(
         modifier = Modifier
@@ -82,9 +93,10 @@ fun SwitchToggleButton(
             .wrapContentSize()
             .padding(2.dp)
             .clickable {
-                isMaleSelected = !isMaleSelected
-                val selectedCategory = if (isMaleSelected) genderList[0].second else genderList[1].second
-                category(selectedCategory)
+                // 사용자 클릭 시 애니메이션 실행
+                isUserClick = true
+                val newCategory = if (isMaleSelected) genderList[1].second else genderList[0].second
+                onCategoryChanged(newCategory)
                 HapticUtil.vibrate(context)
             }
     ) {
@@ -94,10 +106,10 @@ fun SwitchToggleButton(
             modifier = Modifier
                 .wrapContentHeight()
                 .onGloballyPositioned { layoutCoordinates ->
-                    // Row 내부에 있는 2개 버튼의 중앙 x좌표 위치를 구합니다.
                     buttonWidthPx = (layoutCoordinates.size.width / 2)
                 }
         ) {
+            // 남자/첫 번째 옵션
             Box(
                 modifier = Modifier
                     .width(39.dp)
@@ -114,6 +126,8 @@ fun SwitchToggleButton(
                     ),
                 )
             }
+            
+            // 여자/두 번째 옵션
             Box(
                 modifier = Modifier
                     .width(39.dp)
@@ -131,6 +145,8 @@ fun SwitchToggleButton(
                 )
             }
         }
+        
+        // 썸네일 (움직이는 원)
         Box(
             modifier = Modifier
                 .offset { IntOffset(thumbOffset.roundToPx(), 0) }
