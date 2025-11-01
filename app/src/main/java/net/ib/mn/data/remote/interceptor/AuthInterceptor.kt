@@ -58,6 +58,7 @@ class AuthInterceptor @Inject constructor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
         val url = originalRequest.url.toString()
+        val method = originalRequest.method
 
         // User-Agent 헤더 구성
         val systemUserAgent = System.getProperty("http.agent") ?: ""
@@ -72,6 +73,11 @@ class AuthInterceptor @Inject constructor(
             .header("X-HTTP-APPID", Constants.APP_ID)
             .header("X-HTTP-VERSION", appVersion)
             .header("X-HTTP-NATION", systemLanguage)
+
+        // Old 프로젝트와 동일: POST/DELETE 요청 시 X-Nonce 헤더 추가
+        if (method == "POST" || method == "DELETE") {
+            requestBuilder.addHeader("X-Nonce", System.nanoTime().toString())
+        }
 
         if (originalRequest.header("Authorization") == null) {
             if (email != null && domain != null && token != null) {
