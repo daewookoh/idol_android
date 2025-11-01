@@ -48,6 +48,31 @@ android {
     }
 
     // ============================================================
+    // Signing Configs (old 프로젝트와 동일)
+    // ============================================================
+
+    signingConfigs {
+        register("release") {
+            storeFile = file("$projectDir/../mntalk.keystore")
+            storePassword = System.getenv("SIGNING_KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+            keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+        }
+        register("chinaRelease") {
+            storeFile = file("$projectDir/../china.jks")
+            storePassword = System.getenv("SIGNING_KEYSTORE_PASSWORD")
+            keyAlias = "key0"
+            keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+        }
+        register("celebRelease") {
+            storeFile = file("$projectDir/../celeb.keystore")
+            storePassword = System.getenv("SIGNING_KEYSTORE_PASSWORD_CELEB")
+            keyAlias = System.getenv("SIGNING_KEY_ALIAS_CELEB")
+            keyPassword = System.getenv("SIGNING_KEY_PASSWORD_CELEB")
+        }
+    }
+
+    // ============================================================
     // Product Flavors (4개 앱: app, onestore, china, celeb)
     // ============================================================
 
@@ -56,7 +81,7 @@ android {
     productFlavors {
         create("app") {
             dimension = "default"
-            // signingConfig = signingConfigs.getByName("release") // 개발 중에는 debug signing 사용
+            signingConfig = signingConfigs.getByName("release")
             applicationId = APP_ID_ORIGINAL
             firebaseAppDistribution {
                 appId = "1:444896554540:android:12a0be743c254073"
@@ -89,7 +114,7 @@ android {
         }
         create("onestore") {
             dimension = "default"
-            // signingConfig = signingConfigs.getByName("release") // 개발 중에는 debug signing 사용
+            signingConfig = signingConfigs.getByName("release")
             applicationId = APP_ID_ONESTORE
             firebaseAppDistribution {
                 appId = "1:444896554540:android:8c6d5bc2b11bbdb3"
@@ -123,7 +148,7 @@ android {
         }
         create("china") {
             dimension = "default"
-            // signingConfig = signingConfigs.getByName("chinaRelease") // 개발 중에는 debug signing 사용
+            signingConfig = signingConfigs.getByName("chinaRelease")
             applicationId = APP_ID_CHINA
             firebaseAppDistribution {
                 appId = "1:444896554540:android:69512595327f39b7e66b89"
@@ -154,7 +179,7 @@ android {
         }
         create("celeb") {
             dimension = "default"
-            // signingConfig = signingConfigs.getByName("celebRelease") // 개발 중에는 debug signing 사용
+            signingConfig = signingConfigs.getByName("celebRelease")
             applicationId = APP_ID_CELEB
             firebaseAppDistribution {
                 appId = "1:445540446080:android:f1790ef919f8e7bc"
@@ -197,6 +222,7 @@ android {
             }
         }
         release {
+            signingConfig = signingConfigs.getByName("release")
             try{
                 isMinifyEnabled = true
                 setProguardFiles(listOf(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"))
