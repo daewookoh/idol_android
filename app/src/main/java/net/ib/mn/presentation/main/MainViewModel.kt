@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val preferencesManager: PreferencesManager
+    val preferencesManager: PreferencesManager
 ) : ViewModel() {
 
     companion object {

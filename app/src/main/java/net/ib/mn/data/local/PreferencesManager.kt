@@ -123,6 +123,9 @@ class PreferencesManager @Inject constructor(
 
         // Server Config
         val KEY_SERVER_URL = stringPreferencesKey("server_url")
+
+        // Category
+        val KEY_DEFAULT_CATEGORY = stringPreferencesKey(Constants.PREF_DEFAULT_CATEGORY)
     }
 
     // ============================================================
@@ -251,6 +254,11 @@ class PreferencesManager @Inject constructor(
     val serverUrl: Flow<String?> = context.dataStore.data
         .map { preferences ->
             preferences[KEY_SERVER_URL]
+        }
+
+    val defaultCategory: Flow<String> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_DEFAULT_CATEGORY] ?: Constants.TYPE_MALE
         }
 
     // ============================================================
@@ -457,6 +465,12 @@ class PreferencesManager @Inject constructor(
     suspend fun setServerUrl(url: String) {
         context.dataStore.edit { preferences ->
             preferences[KEY_SERVER_URL] = url
+        }
+    }
+
+    suspend fun setDefaultCategory(category: String) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_DEFAULT_CATEGORY] = category
         }
     }
 

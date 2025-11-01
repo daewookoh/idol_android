@@ -41,7 +41,7 @@ fun MainTopBar(
     val fontScale = configuration.fontScale
     
     // OS 텍스트 크기에 따라 폰트 크기 조정 (기본 13sp)
-    val timerFontSize = (13 * fontScale).sp
+    val timerFontSize = (16 * fontScale).sp
     
     Box(
         modifier = Modifier

@@ -184,4 +184,11 @@ object Constants {
     const val POSTFIX_LINE = "@line.com"
     const val POSTFIX_GOOGLE = "@google.com"
     const val POSTFIX_FACEBOOK = "@facebook.com"
+
+    // ============================================================
+    // Category Types (old Const.kt)
+    // ============================================================
+    const val TYPE_MALE: String = "M"
+    const val TYPE_FEMALE: String = "F"
+    const val PREF_DEFAULT_CATEGORY: String = "default_category"
 }

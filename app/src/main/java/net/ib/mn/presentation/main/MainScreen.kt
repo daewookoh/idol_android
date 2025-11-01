@@ -14,25 +14,34 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Alignment
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.launch
 import net.ib.mn.R
+import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.MainBottomNavigation
 import net.ib.mn.ui.components.MainTopBar
+import net.ib.mn.ui.components.SwitchToggleButton
 import net.ib.mn.ui.theme.ExodusTheme
+import net.ib.mn.util.Constants
 import net.ib.mn.presentation.main.freeboard.FreeBoardPage
 import net.ib.mn.presentation.main.menu.MenuPage
 import net.ib.mn.presentation.main.myidol.MyIdolPage
 import net.ib.mn.presentation.main.profile.ProfilePage
 import net.ib.mn.presentation.main.ranking.RankingPage
+import java.util.Locale
 
 /**
  * 메인 화면.
@@ -49,6 +58,14 @@ fun MainScreen(
     val userInfo by viewModel.userInfo.collectAsState()
     val logoutCompleted by viewModel.logoutCompleted.collectAsState()
     val timerText by topBarViewModel.timerText.collectAsState()
+    
+    val configuration = LocalConfiguration.current
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    
+    // 기본 카테고리 가져오기
+    val preferencesManager = viewModel.preferencesManager
+    val defaultCategory by preferencesManager.defaultCategory.collectAsState(initial = Constants.TYPE_MALE)
 
     // 타이머 시작
     LaunchedEffect(Unit) {
@@ -60,6 +77,50 @@ fun MainScreen(
         if (logoutCompleted) {
             onLogout()
         }
+    }
+
+    // Locale에 따른 Gender 문자열 리스트 구성 (old 프로젝트의 getGenderString과 동일)
+    fun getGenderString(locale: Locale, isExceptCondition: Boolean): List<Pair<String, String>> {
+        return if (isExceptCondition) {
+            // 나머지 언어일땐 무조건 M,F로 고정
+            listOf(
+                Constants.TYPE_MALE to Constants.TYPE_MALE,
+                Constants.TYPE_FEMALE to Constants.TYPE_FEMALE
+            )
+        } else {
+            // 한국어, 일본어, 중국어(간체/번체)는 locale에 맞는 문자열 사용
+            val config = Configuration(context.resources.configuration)
+            config.setLocale(locale)
+            val localizedContext = context.createConfigurationContext(config)
+            
+            val maleText = localizedContext.getString(R.string.male)
+            val femaleText = localizedContext.getString(R.string.female)
+            
+            listOf(
+                maleText to Constants.TYPE_MALE,
+                femaleText to Constants.TYPE_FEMALE
+            )
+        }
+    }
+
+    // 현재 Locale에 따라 genderList 구성
+    val currentLocale = configuration.locales[0]
+    val localeString = "${currentLocale.language}_${currentLocale.country}"
+    
+    val genderStrings = when (localeString) {
+        "ko_KR" -> getGenderString(Locale.KOREA, false)
+        "ja_JP" -> getGenderString(Locale.JAPAN, false)
+        "zh_CN" -> getGenderString(Locale("zh", "CN"), false)
+        "zh_TW" -> getGenderString(Locale("zh", "TW"), false)
+        else -> getGenderString(Locale.ENGLISH, true)
+    }
+
+    // 초기 선택값 계산 (old 프로젝트와 동일)
+    val maleIndex = genderStrings.indexOfFirst { it.second == Constants.TYPE_MALE }
+    val isInitMaleSelected = if (maleIndex == 0) {
+        defaultCategory == Constants.TYPE_MALE
+    } else {
+        defaultCategory != Constants.TYPE_MALE
     }
 
     // 탭 메뉴 및 아이콘 설정 (Old 프로젝트와 동일)
@@ -97,7 +158,20 @@ fun MainScreen(
                     showMainMenu = true,
                     showMyInfoMenu = false,
                     toggleButton = {
-                        // Toggle 버튼은 나중에 추가
+                        SwitchToggleButton(
+                            genderList = genderStrings,
+                            initialIsMaleSelected = isInitMaleSelected,
+                            boxBackgroundColor = colorResource(id = R.color.gray100),
+                            boxTextColor = colorResource(id = R.color.text_gray),
+                            thumbBackgroundColor = colorResource(id = R.color.text_default),
+                            thumbTextColor = colorResource(id = R.color.text_white_black),
+                            category = { category ->
+                                coroutineScope.launch {
+                                    preferencesManager.setDefaultCategory(category)
+                                    // TODO: ViewModel에 카테고리 변경 알림 (나중에 구현)
+                                }
+                            }
+                        )
                     },
                     onSearchClick = { /* TODO */ },
                     onFriendsClick = { /* TODO */ }
