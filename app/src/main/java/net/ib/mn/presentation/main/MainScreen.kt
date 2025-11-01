@@ -1,65 +1,42 @@
 package net.ib.mn.presentation.main
 
-import android.app.Activity
 import android.content.res.Configuration
-import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import net.ib.mn.ui.components.ExoScaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsControllerCompat
+import androidx.compose.ui.Alignment
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.gson.GsonBuilder
 import net.ib.mn.R
-import net.ib.mn.data.local.UserInfo
 import net.ib.mn.ui.components.ExoAppBar
+import net.ib.mn.ui.components.ExoScaffold
+import net.ib.mn.ui.components.MainBottomNavigation
 import net.ib.mn.ui.theme.ExodusTheme
-import net.ib.mn.util.ServerUrl
+import net.ib.mn.presentation.main.freeboard.FreeBoardPage
+import net.ib.mn.presentation.main.menu.MenuPage
+import net.ib.mn.presentation.main.myidol.MyIdolPage
+import net.ib.mn.presentation.main.profile.ProfilePage
+import net.ib.mn.presentation.main.ranking.RankingPage
 
 /**
  * 메인 화면.
- * 하단 네비게이션 바를 포함한 메인 컨테이너.
- * AppScaffold를 사용하여 Safe Area 안에서 작동합니다.
+ * 하단 네비게이션 바와 상단 앱바를 포함한 메인 컨테이너.
+ * 각 탭은 별도의 Page로 구성되며, MainScreen에서 topBar를 관리합니다.
  */
 @Composable
 fun MainScreen(
@@ -70,16 +47,6 @@ fun MainScreen(
     val userInfo by viewModel.userInfo.collectAsState()
     val logoutCompleted by viewModel.logoutCompleted.collectAsState()
 
-    // 유저 정보 변경 시 로그
-    androidx.compose.runtime.LaunchedEffect(userInfo) {
-        if (userInfo != null) {
-            android.util.Log.d("USER_INFO", "[MainScreen] ✓ UI received user info from ViewModel")
-            android.util.Log.d("USER_INFO", "[MainScreen]   - Displaying user: ${userInfo?.username} (${userInfo?.email})")
-        } else {
-            android.util.Log.w("USER_INFO", "[MainScreen] ⚠️ UI received null user info")
-        }
-    }
-
     // 로그아웃 완료 시 네비게이션 처리
     androidx.compose.runtime.LaunchedEffect(logoutCompleted) {
         if (logoutCompleted) {
@@ -87,118 +54,81 @@ fun MainScreen(
         }
     }
 
+    // 탭 메뉴 및 아이콘 설정 (Old 프로젝트와 동일)
+    val menus = listOf(
+        stringResource(id = R.string.hometab_title_rank),
+        stringResource(id = R.string.hometab_title_myidol),
+        stringResource(id = R.string.hometab_title_profile),
+        stringResource(id = R.string.hometab_title_freeboard),
+        stringResource(id = R.string.hometab_title_menu)
+    )
+
+    val iconsOfSelected = listOf(
+        painterResource(id = R.drawable.btn_bottom_nav_ranking_on),
+        painterResource(id = R.drawable.btn_bottom_nav_favorite_on),
+        painterResource(id = R.drawable.btn_bottom_nav_my_on),
+        painterResource(id = R.drawable.btn_bottom_nav_board_on),
+        painterResource(id = R.drawable.btn_bottom_nav_menu_on)
+    )
+
+    val iconsOfUnSelected = listOf(
+        painterResource(id = R.drawable.btn_bottom_nav_ranking_off),
+        painterResource(id = R.drawable.btn_bottom_nav_favorite_off),
+        painterResource(id = R.drawable.btn_bottom_nav_my_off),
+        painterResource(id = R.drawable.btn_bottom_nav_board_off),
+        painterResource(id = R.drawable.btn_bottom_nav_menu_off)
+    )
+
+    // 현재 선택된 탭의 타이틀
+    val currentTitle = menus.getOrNull(selectedTab) ?: ""
+
     ExoScaffold(
         topBar = {
             ExoAppBar(
-                title = "app"
+                title = currentTitle
             )
         },
         bottomBar = {
-            NavigationBar {
-                bottomNavItems.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) },
-                        selected = selectedTab == index,
-                        onClick = { selectedTab = index }
+            MainBottomNavigation(
+                menus = menus,
+                iconsOfSelected = iconsOfSelected,
+                iconsOfUnSelected = iconsOfUnSelected,
+                initialSelectedIndex = selectedTab,
+                defaultBackgroundColor = colorResource(id = R.color.background_200),
+                defaultBorderColor = colorResource(id = R.color.gray150),
+                defaultTextColor = colorResource(id = R.color.text_default),
+                onTabSelected = { index ->
+                    selectedTab = index
+                }
+            )
+        }
+    ) { paddingValues ->
+        AnimatedContent(
+            targetState = selectedTab,
+            transitionSpec = {
+                fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
+            },
+            label = "tab_content"
+        ) { tab ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                when (tab) {
+                    0 -> RankingPage(
+                        userInfo = userInfo,
+                        onLogout = { viewModel.logout() }
                     )
+                    1 -> MyIdolPage()
+                    2 -> ProfilePage()
+                    3 -> FreeBoardPage()
+                    4 -> MenuPage()
                 }
             }
         }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
-        ) {
-            when (selectedTab) {
-                0 -> HomeContent(
-                    apiUrl = ServerUrl.BASE_URL,
-                    userInfo = userInfo,
-                    onLogout = { viewModel.logout() }
-                )
-                1 -> Text("Favorites Screen", fontSize = 24.sp)
-                2 -> Text("Profile Screen", fontSize = 24.sp)
-            }
-        }
     }
 }
-
-@Composable
-private fun HomeContent(
-    apiUrl: String,
-    userInfo: net.ib.mn.data.local.UserInfo?,
-    onLogout: () -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text(
-            text = apiUrl,
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        // User Info as Pretty JSON
-        if (userInfo != null) {
-            // JSON 표시 영역
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = MaterialTheme.shapes.medium
-                    )
-                    .padding(12.dp)
-            ) {
-                val horizontalScroll = rememberScrollState()
-
-                Text(
-                    text = userInfo.toPrettyJson(),
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 10.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.horizontalScroll(horizontalScroll)
-                )
-            }
-        } else {
-            Text(
-                "Loading user info...",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 14.sp
-            )
-        }
-
-        // 로그아웃 버튼 - 항상 표시
-        androidx.compose.material3.Button(
-            onClick = onLogout,
-            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.error
-            )
-        ) {
-            Text("로그아웃")
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-    }
-}
-
-
-data class BottomNavItem(
-    val label: String,
-    val icon: ImageVector
-)
-
-private val bottomNavItems = listOf(
-    BottomNavItem("Home", Icons.Default.Home),
-    BottomNavItem("Favorites", Icons.Default.Favorite),
-    BottomNavItem("Profile", Icons.Default.Person)
-)
 
 @Preview(
     name = "Light Mode",
@@ -224,16 +154,5 @@ fun MainScreenPreviewLight() {
 fun MainScreenPreviewDark() {
     ExodusTheme(darkTheme = true) {
         MainScreen(onLogout = {})
-    }
-}
-/**
- * UserInfo를 Pretty JSON 문자열로 변환
- */
-private fun UserInfo.toPrettyJson(): String {
-    val gson = GsonBuilder().setPrettyPrinting().create()
-    return try {
-        gson.toJson(this)
-    } catch (e: Exception) {
-        "Error converting to JSON: ${e.message}"
     }
 }

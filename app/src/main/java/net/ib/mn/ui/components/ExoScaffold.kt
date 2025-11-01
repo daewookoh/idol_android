@@ -53,7 +53,7 @@ fun ExoScaffold(
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     containerColor: Color = colorResource(id = R.color.background_100),
     contentColor: Color = colorResource(id = R.color.text_default),
-    content: @Composable () -> Unit
+    content: @Composable (PaddingValues) -> Unit
 ) {
     // applyContentWindowInsets 값에 따라 Scaffold에 전달할 인셋 결정
     val windowInsets = if (useFullScreen) {
@@ -72,14 +72,6 @@ fun ExoScaffold(
         containerColor = containerColor,
         contentColor = contentColor,
         contentWindowInsets = windowInsets,
-        content = { paddingValues ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                content()
-            }
-        }
+        content = content
     )
 }
