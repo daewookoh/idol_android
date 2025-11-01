@@ -163,7 +163,14 @@ object Constants {
     // ============================================================
     // Authentication / Login (old 프로젝트와 동일한 값)
     // ============================================================
-    const val CHANNEL_ID = "1654016030" // Line channel ID (old: Const.CHANNEL_ID)
+    /**
+     * LINE Channel ID (Flavor별로 다름)
+     * - app: 1474745561
+     * - onestore: 1594765998
+     * - china: 1474745561
+     * - celeb: 1537449973
+     */
+    val CHANNEL_ID: String = BuildConfig.LINE_CHANNEL_ID
 
     // Login domains (old Const.kt)
     const val DOMAIN_EMAIL = "email"

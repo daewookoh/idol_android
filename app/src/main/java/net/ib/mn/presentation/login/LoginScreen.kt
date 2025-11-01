@@ -461,17 +461,29 @@ fun LoginScreen(
                         val lineProfile = lineResult.lineProfile
                         val lineCredential = lineResult.lineCredential
 
+                        // Old 프로젝트: userId와 accessToken이 필수
+                        val userId = lineProfile?.userId
+                        val accessToken = lineCredential?.accessToken?.tokenString
+
+                        if (userId.isNullOrEmpty() || accessToken.isNullOrEmpty()) {
+                            android.util.Log.e("LoginScreen", "Line login failed - missing userId or accessToken")
+                            viewModel.handleSnsLoginError(context.getString(R.string.line_login_failed))
+                            return@rememberLauncherForActivityResult
+                        }
+
                         viewModel.handleLineLoginResult(
-                            userId = lineProfile?.userId ?: "",
+                            userId = userId,
                             displayName = lineProfile?.displayName,
-                            accessToken = lineCredential?.accessToken?.tokenString ?: ""
+                            accessToken = accessToken
                         )
                     }
                     com.linecorp.linesdk.LineApiResponseCode.CANCEL -> {
                         android.util.Log.d("LoginScreen", "Line login cancelled")
                         // Line 로그인 취소는 에러로 표시하지 않음
+                        viewModel.handleSnsLoginCancelled()
                     }
                     else -> {
+                        android.util.Log.e("LoginScreen", "Line login failed - responseCode: ${lineResult.responseCode}")
                         viewModel.handleSnsLoginError(context.getString(R.string.line_login_failed))
                     }
                 }
@@ -480,7 +492,9 @@ fun LoginScreen(
                 viewModel.handleSnsLoginError(context.getString(R.string.line_login_failed))
             }
         } else {
-            // 사용자가 취소했거나 결과가 실패한 경우 - 취소는 에러로 표시하지 않음
+            // 사용자가 취소했거나 결과가 실패한 경우
+            android.util.Log.d("LoginScreen", "Line login cancelled or failed - resultCode: ${result.resultCode}")
+            viewModel.handleSnsLoginCancelled()
         }
     }
 
@@ -513,6 +527,8 @@ fun LoginScreen(
 
                         val email = jsonObject.optString("email")
                         val name = jsonObject.optString("name")
+                        val facebookIdStr = jsonObject.optString("id")
+                        val facebookId = facebookIdStr.toLongOrNull()
                         val accessToken = loginResult.accessToken.token
 
                         if (email.isNullOrEmpty()) {
@@ -525,6 +541,7 @@ fun LoginScreen(
                         viewModel.handleFacebookLoginResult(
                             email = email,
                             name = name,
+                            facebookId = facebookId,
                             accessToken = accessToken
                         )
                     }

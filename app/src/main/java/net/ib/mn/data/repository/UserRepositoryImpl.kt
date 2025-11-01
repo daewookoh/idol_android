@@ -384,6 +384,7 @@ class UserRepositoryImpl @Inject constructor(
         val signUpTag = when (domain) {
             Constants.DOMAIN_KAKAO -> "KAKAO_SIGNUP"
             Constants.DOMAIN_GOOGLE -> "GOOGLE_SIGNUP"
+            Constants.DOMAIN_FACEBOOK -> "FACEBOOK_SIGNUP"
             else -> "SignUpAPI"
         }
 
@@ -420,7 +421,7 @@ class UserRepositoryImpl @Inject constructor(
                 deviceId = deviceId,
                 googleAccount = "N", // Old 프로젝트: 모든 경우에 "N"
                 time = time,
-                facebookId = null
+                facebookId = null  // 더 이상 사용하지 않음
             )
 
             android.util.Log.d(signUpTag, "========================================")

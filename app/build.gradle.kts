@@ -71,6 +71,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://www.myloveidol.com/api/v1/\"")
             buildConfigField("String", "HOST", "\"https://www.myloveidol.com\"")
             buildConfigField("String", "KAKAO_APP_KEY", "\"0dd43f929e357f51e61c2d82a683b29a\"")
+            buildConfigField("String", "LINE_CHANNEL_ID", "\"1474745561\"") // Line channel ID (old: AppConst.CHANNEL_ID)
             manifestPlaceholders["KAKAO_APP_KEY_FOR_MANIFEST"] = "0dd43f929e357f51e61c2d82a683b29a"
             manifestPlaceholders["FACEBOOK_CLIENT_ID"] = "d8c7bdf0d17c7e774d4f637d29d6db9a"
             manifestPlaceholders["host"] = "www.myloveidol.com"
@@ -103,6 +104,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://www.myloveidol.com/api/v1/\"")
             buildConfigField("String", "HOST", "\"https://www.myloveidol.com\"")
             buildConfigField("String", "KAKAO_APP_KEY", "\"8af2706fda8ad5ecc7b1b5c03bb0c457\"")
+            buildConfigField("String", "LINE_CHANNEL_ID", "\"1594765998\"") // Line channel ID (old: AppConst.CHANNEL_ID)
             manifestPlaceholders["KAKAO_APP_KEY_FOR_MANIFEST"] = "8af2706fda8ad5ecc7b1b5c03bb0c457"
             manifestPlaceholders["FACEBOOK_CLIENT_ID"] = "bb9ff280eeb8a9e3a1d839d276a643fe"
             manifestPlaceholders["host"] = "www.myloveidol.com"
@@ -135,6 +137,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://www.myloveidol.com/api/v1/\"")
             buildConfigField("String", "HOST", "\"https://www.myloveidol.com\"")
             buildConfigField("String", "KAKAO_APP_KEY", "\"0dd43f929e357f51e61c2d82a683b29a\"")
+            buildConfigField("String", "LINE_CHANNEL_ID", "\"1474745561\"") // Line channel ID (old: AppConst.CHANNEL_ID)
             manifestPlaceholders["KAKAO_APP_KEY_FOR_MANIFEST"] = "0dd43f929e357f51e61c2d82a683b29a"
             manifestPlaceholders["FACEBOOK_CLIENT_ID"] = "d8c7bdf0d17c7e774d4f637d29d6db9a"
             manifestPlaceholders["host"] = "www.myloveidol.com"
@@ -165,6 +168,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://www.myloveactor.com/api/v1/\"")
             buildConfigField("String", "HOST", "\"https://www.myloveactor.com\"")
             buildConfigField("String", "KAKAO_APP_KEY", "\"6715432cd074c4d0dd029b3e8995add2\"")
+            buildConfigField("String", "LINE_CHANNEL_ID", "\"1537449973\"") // Line channel ID (old: AppConst.CHANNEL_ID)
             manifestPlaceholders["KAKAO_APP_KEY_FOR_MANIFEST"] = "6715432cd074c4d0dd029b3e8995add2"
             manifestPlaceholders["FACEBOOK_CLIENT_ID"] = "a59d87d83c736f501cb6d7223010344d"
             manifestPlaceholders["host"] = "www.myloveactor.com"

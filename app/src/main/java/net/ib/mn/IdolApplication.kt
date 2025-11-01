@@ -50,6 +50,11 @@ class IdolApplication : Application() {
         // Facebook SDK 초기화
         FacebookSdk.sdkInitialize(applicationContext)
 
+        // DEBUG 빌드에서만 페이스북 Key Hash 로깅 (개발/테스트용)
+        if (BuildConfig.DEBUG) {
+            printFacebookKeyHash()
+        }
+
         // Line SDK: 별도 초기화 불필요 (사용 시 자동 초기화)
         // Google Sign-In: 별도 초기화 불필요
     }
@@ -111,6 +116,54 @@ class IdolApplication : Application() {
             }
         } catch (e: Exception) {
             Log.e("KAKAO_KEY_HASH", "Error getting key hash: ${e.message}", e)
+        }
+    }
+
+    /**
+     * 페이스북 Key Hash를 로그로 출력합니다 (DEBUG 빌드만).
+     *
+     * Facebook Developer Console에 등록해야 할 실제 Key Hash를 확인하기 위한 디버그용 함수입니다.
+     * Logcat에서 "FACEBOOK_KEY_HASH" 태그로 필터링하여 확인하세요.
+     * 
+     * 등록 방법:
+     * 1. 앱 실행 후 Logcat에서 "FACEBOOK_KEY_HASH" 태그로 검색
+     * 2. 출력된 Key Hash를 복사
+     * 3. Facebook Developer Console → Settings → Basic → Key Hashes에 추가
+     */
+    @Suppress("DEPRECATION")
+    private fun printFacebookKeyHash() {
+        try {
+            val packageInfo = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES)
+            } else {
+                packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+            }
+
+            val signatures = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                packageInfo.signingInfo?.apkContentsSigners
+            } else {
+                packageInfo.signatures
+            }
+
+            signatures?.forEach { signature ->
+                val md = MessageDigest.getInstance("SHA")
+                md.update(signature.toByteArray())
+                val keyHash = Base64.encodeToString(md.digest(), Base64.NO_WRAP)
+
+                Log.e("FACEBOOK_KEY_HASH", "========================================")
+                Log.e("FACEBOOK_KEY_HASH", "Facebook Key Hash:")
+                Log.e("FACEBOOK_KEY_HASH", "Package Name: $packageName")
+                Log.e("FACEBOOK_KEY_HASH", "Key Hash: $keyHash")
+                Log.e("FACEBOOK_KEY_HASH", "========================================")
+                Log.e("FACEBOOK_KEY_HASH", "Copy this Key Hash to Facebook Developer Console:")
+                Log.e("FACEBOOK_KEY_HASH", "https://developers.facebook.com/apps/")
+                Log.e("FACEBOOK_KEY_HASH", "Settings → Basic → Key Hashes")
+                Log.e("FACEBOOK_KEY_HASH", "Package: $packageName")
+                Log.e("FACEBOOK_KEY_HASH", "Key Hash: $keyHash")
+                Log.e("FACEBOOK_KEY_HASH", "========================================")
+            }
+        } catch (e: Exception) {
+            Log.e("FACEBOOK_KEY_HASH", "Error getting Facebook key hash: ${e.message}", e)
         }
     }
 }

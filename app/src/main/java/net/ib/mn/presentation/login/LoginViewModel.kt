@@ -56,6 +56,7 @@ class LoginViewModel @Inject constructor(
     private var tempDomain: String? = null
     private var tempDisplayName: String? = null
     private var tempProfileImageUrl: String? = null
+    private var tempFacebookId: Long? = null  // 페이스북 사용자 ID (회원가입 시 필요)
 
     override fun createInitialState(): LoginContract.State {
         return LoginContract.State()
@@ -959,22 +960,25 @@ class LoginViewModel @Inject constructor(
      *
      * @param email Facebook 계정 이메일
      * @param name 사용자 이름
+     * @param facebookId Facebook 사용자 ID (Long)
      * @param accessToken Facebook access token
      */
     fun handleFacebookLoginResult(
         email: String,
         name: String?,
+        facebookId: Long?,
         accessToken: String
     ) {
         viewModelScope.launch {
             try {
-                android.util.Log.d(TAG, "Facebook login success - email: $email, name: $name")
+                android.util.Log.d(TAG, "Facebook login success - email: $email, name: $name, facebookId: $facebookId")
 
                 tempEmail = email
                 tempPassword = accessToken // old 코드: mPasswd = mAuthToken
                 tempDomain = Constants.DOMAIN_FACEBOOK
                 tempDisplayName = name
                 tempProfileImageUrl = null // Facebook은 프로필 이미지 URL을 별도로 받지 않음
+                tempFacebookId = facebookId // Old 프로젝트: mFacebookId = jsonObject.optString("id").toLongOrNull()
 
                 // validate API 호출하여 회원 여부 확인
                 validateAndSignIn(email, Constants.DOMAIN_FACEBOOK)
@@ -1008,6 +1012,21 @@ class LoginViewModel @Inject constructor(
 
         setEffect { LoginContract.Effect.ShowError(errorMessage) }
         android.util.Log.e(TAG, "Login error: $errorMessage", exception)
+    }
+
+    /**
+     * SNS SDK 취소 처리 (LoginScreen에서 SDK 취소 발생 시 호출).
+     * 로딩 상태만 해제하고 에러 메시지를 표시하지 않습니다.
+     */
+    fun handleSnsLoginCancelled() {
+        android.util.Log.d(TAG, "SNS login cancelled")
+        setState {
+            copy(
+                isLoading = false,
+                error = null,
+                loginType = null
+            )
+        }
     }
 
     /**
