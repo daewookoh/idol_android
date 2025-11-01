@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -23,9 +24,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Alignment
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
-import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.MainBottomNavigation
+import net.ib.mn.ui.components.MainTopBar
 import net.ib.mn.ui.theme.ExodusTheme
 import net.ib.mn.presentation.main.freeboard.FreeBoardPage
 import net.ib.mn.presentation.main.menu.MenuPage
@@ -41,14 +42,21 @@ import net.ib.mn.presentation.main.ranking.RankingPage
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
+    topBarViewModel: MainTopBarViewModel = hiltViewModel(),
     onLogout: () -> Unit = {}
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
     val userInfo by viewModel.userInfo.collectAsState()
     val logoutCompleted by viewModel.logoutCompleted.collectAsState()
+    val timerText by topBarViewModel.timerText.collectAsState()
+
+    // 타이머 시작
+    LaunchedEffect(Unit) {
+        topBarViewModel.startTimer()
+    }
 
     // 로그아웃 완료 시 네비게이션 처리
-    androidx.compose.runtime.LaunchedEffect(logoutCompleted) {
+    LaunchedEffect(logoutCompleted) {
         if (logoutCompleted) {
             onLogout()
         }
@@ -79,14 +87,55 @@ fun MainScreen(
         painterResource(id = R.drawable.btn_bottom_nav_menu_off)
     )
 
-    // 현재 선택된 탭의 타이틀
-    val currentTitle = menus.getOrNull(selectedTab) ?: ""
-
     ExoScaffold(
         topBar = {
-            ExoAppBar(
-                title = currentTitle
-            )
+            // 각 탭별로 다른 TopBar 표시
+            when (selectedTab) {
+                0 -> MainTopBar( // Ranking
+                    timerText = timerText,
+                    showToggleButton = true,
+                    showMainMenu = true,
+                    showMyInfoMenu = false,
+                    toggleButton = {
+                        // Toggle 버튼은 나중에 추가
+                    },
+                    onSearchClick = { /* TODO */ },
+                    onFriendsClick = { /* TODO */ }
+                )
+                1 -> MainTopBar( // MyIdol
+                    timerText = timerText,
+                    showToggleButton = false,
+                    showMainMenu = true,
+                    showMyInfoMenu = false,
+                    onSearchClick = { /* TODO */ },
+                    onFriendsClick = { /* TODO */ }
+                )
+                2 -> MainTopBar( // Profile
+                    timerText = timerText,
+                    showToggleButton = false,
+                    showMainMenu = true,
+                    showMyInfoMenu = false,
+                    onSearchClick = { /* TODO */ },
+                    onFriendsClick = { /* TODO */ }
+                )
+                3 -> MainTopBar( // FreeBoard
+                    timerText = timerText,
+                    showToggleButton = false,
+                    showMainMenu = true,
+                    showMyInfoMenu = false,
+                    onSearchClick = { /* TODO */ },
+                    onFriendsClick = { /* TODO */ }
+                )
+                4 -> MainTopBar( // Menu
+                    timerText = timerText,
+                    showToggleButton = false,
+                    showMainMenu = false,
+                    showMyInfoMenu = true,
+                    onAttendanceClick = { /* TODO */ },
+                    onNotificationClick = { /* TODO */ },
+                    onSettingClick = { /* TODO */ }
+                )
+            }
         },
         bottomBar = {
             MainBottomNavigation(
