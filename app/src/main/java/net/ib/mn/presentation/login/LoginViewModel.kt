@@ -348,59 +348,10 @@ class LoginViewModel @Inject constructor(
                             android.util.Log.d(loginTag, "  domain: $domain")
                             android.util.Log.d(loginTag, "========================================")
                             
-                            // 기존 회원: local에 필요한 데이터 저장 후 StartupScreen으로 이동
-                            val password = tempPassword ?: run {
-                                android.util.Log.e(loginTag, "ERROR: tempPassword is null")
-                                setState { copy(isLoading = false) }
-                                setEffect {
-                                    LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
-                                }
-                                return@collect
-                            }
-                            
-                            // Old 프로젝트의 afterSignin 로직과 동일
-                            val hashToken = if (domain == Constants.DOMAIN_EMAIL) {
-                                password // Email 로그인의 경우 md5salt (현재는 구현하지 않음)
-                            } else {
-                                password // SNS 로그인의 경우 access token 그대로 사용
-                            }
-                            
-                            // 1. AuthInterceptor에 기본 정보 저장
-                            authInterceptor.setAuthCredentials(
-                                email = email,
-                                domain = domain,
-                                token = hashToken
-                            )
-                            
-                            // 2. DataStore에 로그인 정보 저장
-                            preferencesManager.setAccessToken(hashToken)
-                            preferencesManager.setLoginDomain(domain)
-                            
-                            // 3. 최소한의 사용자 정보 저장 (StartUpScreen에서 업데이트됨)
-                            preferencesManager.setUserInfo(
-                                id = 0,
-                                email = email,
-                                username = "",
-                                nickname = null,
-                                profileImage = null,
-                                hearts = null,
-                                domain = domain
-                            )
-                            
-                            android.util.Log.d(loginTag, "✓ Login credentials saved (existing user - duplicate email)")
-                            android.util.Log.d(loginTag, "  - Email: $email")
-                            android.util.Log.d(loginTag, "  - Domain: $domain")
-                            android.util.Log.d(loginTag, "  - Token: ${hashToken.take(20)}...")
-                            android.util.Log.d(loginTag, "  - Note: User info will be fetched in StartupScreen")
-                            
-                            // Old 프로젝트: 카카오 로그인 성공 후 unlink 호출
-                            if (domain == Constants.DOMAIN_KAKAO) {
-                                android.util.Log.d(loginTag, "Calling requestKakaoUnlink()")
-                                requestKakaoUnlink()
-                            }
-                            
-                            setState { copy(isLoading = false, loginType = null) }
-                            setEffect { LoginContract.Effect.NavigateToMain }
+                            // Old 프로젝트와 동일: 기존 회원인 경우에도 signIn API를 호출하여 서버에서 유저 정보를 받아옴
+                            // validate API는 회원 여부만 확인하고, 실제 로그인은 signIn API에서 처리
+                            android.util.Log.d(loginTag, "Calling performSignIn() for existing user")
+                            performSignIn(isExistingUser = true)
                             return@collect
                         }
                         
@@ -574,10 +525,13 @@ class LoginViewModel @Inject constructor(
                             android.util.Log.d(loginTag, "  userId: ${userData.userId}")
                             android.util.Log.d(loginTag, "  email: ${userData.email}")
                             android.util.Log.d(loginTag, "  username: ${userData.username}")
+                            android.util.Log.d(loginTag, "  nickname: ${userData.nickname}")
+                            android.util.Log.d(loginTag, "  profileImage: ${userData.profileImage}")
                             android.util.Log.d(loginTag, "  token: ${userData.token.take(20)}...")
                             android.util.Log.d(loginTag, "========================================")
 
                             // 1. 인증 정보 저장 (AuthInterceptor에 설정)
+                            // Old 프로젝트: IdolAccount.createAccount(this, email, hashToken, domain)
                             authInterceptor.setAuthCredentials(
                                 email = userData.email,
                                 domain = domain,
@@ -585,17 +539,29 @@ class LoginViewModel @Inject constructor(
                             )
                             android.util.Log.d(loginTag, "Auth credentials saved")
 
-                            // 2. 기본 사용자 정보 저장 (나머지는 getUserSelf에서 받아서 저장)
+                            // 2. DataStore에 로그인 정보 저장
+                            preferencesManager.setAccessToken(userData.token)
+                            preferencesManager.setLoginDomain(domain)
+
+                            // 3. signIn API 응답에서 받은 모든 사용자 정보 저장
+                            // 나머지 정보(hearts, diamond, level 등)는 StartUpScreen의 getUserSelf에서 받아서 저장됨
                             preferencesManager.setUserInfo(
                                 id = userData.userId,
                                 email = userData.email,
                                 username = userData.username,
-                                nickname = null, // getUserSelf에서 받음
-                                profileImage = null,
-                                hearts = null,
+                                nickname = userData.nickname, // signIn API 응답에서 받은 값 저장
+                                profileImage = userData.profileImage, // signIn API 응답에서 받은 값 저장
+                                hearts = null, // getUserSelf에서 받음
                                 domain = domain  // 로그인 타입 저장
                             )
-                            android.util.Log.d(loginTag, "User info saved")
+                            android.util.Log.d(loginTag, "User info saved from signIn API response")
+                            android.util.Log.d(loginTag, "  - id: ${userData.userId}")
+                            android.util.Log.d(loginTag, "  - email: ${userData.email}")
+                            android.util.Log.d(loginTag, "  - username: ${userData.username}")
+                            android.util.Log.d(loginTag, "  - nickname: ${userData.nickname}")
+                            android.util.Log.d(loginTag, "  - profileImage: ${userData.profileImage}")
+                            android.util.Log.d(loginTag, "  - domain: $domain")
+                            android.util.Log.d(loginTag, "  - Note: Additional info (hearts, level, etc.) will be fetched in StartUpScreen")
                         } else {
                             // response.data가 null인 경우 (Old 프로젝트와 동일)
                             // 사용자 정보는 이후에 별도로 가져옴 (StartUpScreen 또는 getUserSelf에서)
