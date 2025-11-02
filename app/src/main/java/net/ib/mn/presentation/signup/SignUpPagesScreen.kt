@@ -10,11 +10,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.delay
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -275,11 +275,26 @@ private fun SignUpFormPage(
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
+    val emailFocusRequester = remember { FocusRequester() }
     val nicknameFocusRequester = remember { FocusRequester() }
 
-    // 회원가입 페이지가 열릴 때 닉네임 필드에 자동 포커스
-    LaunchedEffect(Unit) {
-        nicknameFocusRequester.requestFocus()
+    // 회원가입 페이지가 열릴 때 적절한 필드에 자동 포커스
+    // 아이디가 보일 때는 아이디에, 안 보일 때는 닉네임에 포커스
+    LaunchedEffect(state.currentStep, state.domain) {
+        // 회원가입 폼 페이지(currentStep == 1)로 이동했을 때만 포커스 설정
+        if (state.currentStep == 1) {
+            // 필드가 조건부로 렌더링되므로 충분한 지연 필요
+            // ExoTextField 내부에서도 100ms 지연이 있으므로 총 400ms 지연
+            delay(400)
+            
+            if (state.domain == "email") {
+                // 이메일 로그인인 경우 아이디 필드에 포커스
+                emailFocusRequester.requestFocus()
+            } else {
+                // SNS 로그인인 경우 닉네임 필드에 포커스
+                nicknameFocusRequester.requestFocus()
+            }
+        }
     }
 
     val hideKeyboard = {
@@ -302,6 +317,7 @@ private fun SignUpFormPage(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .imePadding() // 키보드가 올라왔을 때 전체 영역이 줄어들도록
                 .clickable(
                     indication = null, // 클릭 시 ripple 효과 제거
                     interactionSource = remember { MutableInteractionSource() }
@@ -309,6 +325,7 @@ private fun SignUpFormPage(
                     hideKeyboard()
                 }
         ) {
+            // 스크롤 가능한 폼 영역
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -337,6 +354,7 @@ private fun SignUpFormPage(
                     errorMessage = state.emailError,
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next,
+                    focusRequester = emailFocusRequester,
                     onValueChangeDebounced = {
                         if (it.isNotEmpty()) {
                             onIntent(SignUpContract.Intent.ValidateEmail)
@@ -488,21 +506,21 @@ private fun SignUpFormPage(
                 fontSize = 12.sp,
                 color = colorResource(id = R.color.main)
             )
-            } // 스크롤 가능한 폼 영역 끝
+        } // Column 끝
 
-            // 하단 고정 버튼
-            ExoStatusButton(
-                text = stringResource(R.string.btn_signup_finish),
-                onClick = {
-                    hideKeyboard()
-                    onIntent(SignUpContract.Intent.SignUp)
-                },
-                enabled = state.canProceedStep2,
-                isLoading = state.isLoading,
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
+        // 하단 고정 버튼 (키보드가 올라왔을 때 함께 올라오도록)
+        ExoStatusButton(
+            text = stringResource(R.string.btn_signup_finish),
+            onClick = {
+                hideKeyboard()
+                onIntent(SignUpContract.Intent.SignUp)
+            },
+            enabled = state.canProceedStep2,
+            isLoading = state.isLoading,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
         } // Box 끝
-    }
+    } // ExoScaffold 끝
 }
 
 @Preview(
