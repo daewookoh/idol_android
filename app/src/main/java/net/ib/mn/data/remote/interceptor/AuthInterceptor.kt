@@ -79,13 +79,16 @@ class AuthInterceptor @Inject constructor(
 
         // 인증이 필요 없는 엔드포인트 목록 (정확한 경로 매칭)
         val noAuthEndpoints = listOf(
+            "/users/",              // 회원가입 (POST /users/)
             "/users/email_signin/", // 로그인
             "/users/validate/",     // 사용자 검증
             "/users/find_id/",      // 아이디 찾기
             "/users/find_passwd/",  // 비밀번호 찾기
         )
 
-        val requiresAuth = !noAuthEndpoints.any { url.contains(it) }
+        // URL 경로만 정확하게 비교 (쿼리 파라미터 제외)
+        val path = originalRequest.url.encodedPath
+        val requiresAuth = !noAuthEndpoints.contains(path)
 
         if (originalRequest.header("Authorization") == null && requiresAuth) {
             if (email != null && domain != null && token != null) {
