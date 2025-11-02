@@ -170,7 +170,29 @@ fun NavGraph(
             )
         }
 
-        // SignUp Pages 화면
+        // SignUp Pages 화면 (파라미터 없이 일반 회원가입)
+        composable(
+            route = Screen.SignUpPages.route
+        ) {
+            SignUpPagesScreen(
+                navController = navController,
+                email = null,
+                password = null,
+                displayName = null,
+                domain = null,
+                onSignUpComplete = {
+                    // 회원가입 완료 시 StartUp으로 이동 (API 호출 후 Main으로 이동)
+                    navController.navigate(Screen.StartUp.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // SignUp Pages 화면 (파라미터 포함 - SNS 로그인 후 신규 회원)
         composable(
             route = Screen.SignUpPages.routeWithArgs,
             arguments = listOf(
