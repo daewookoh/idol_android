@@ -151,11 +151,11 @@ fun MainScreen(
                         }
                     )
                 },
-                onSearchClick = { /* TODO */ },
-                onFriendsClick = { /* TODO */ },
-                onAttendanceClick = { /* TODO */ },
-                onNotificationClick = { /* TODO */ },
-                onSettingClick = { /* TODO */ }
+                onSearchClick = { },
+                onFriendsClick = { },
+                onAttendanceClick = { },
+                onNotificationClick = { },
+                onSettingClick = { }
             )
         },
         bottomBar = {

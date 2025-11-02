@@ -47,14 +47,6 @@ class AuthInterceptor @Inject constructor(
         android.util.Log.d("USER_INFO", "[AuthInterceptor] ✓ Auth credentials updated")
     }
 
-    /**
-     * 하위 호환성을 위한 메서드 (deprecated)
-     */
-    @Deprecated("Use setAuthCredentials instead")
-    fun setToken(newToken: String?) {
-        this.token = newToken
-    }
-
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
         val url = originalRequest.url.toString()
