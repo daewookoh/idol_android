@@ -102,9 +102,9 @@ fun MainBottomNavigation(
                 ), label = ""
             )
 
-            // 선택된 탭의 아이콘도 선택되지 않은 탭과 동일한 색상(#9b9b9b)으로 표시하되, filled 형태는 유지
+            // 선택된 탭의 아이콘은 텍스트 컬러와 동일한 색상으로 표시
             val iconColorFilter = if (isSelected) {
-                ColorFilter.tint(Color(0xFF9B9B9B))
+                ColorFilter.tint(defaultTextColor)
             } else {
                 null
             }
