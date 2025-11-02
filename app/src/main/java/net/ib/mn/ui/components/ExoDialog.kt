@@ -177,18 +177,25 @@ fun ExoSimpleDialog(
  * @param title 다이얼로그 타이틀
  * @param message 다이얼로그 메시지
  * @param onDismiss 다이얼로그 닫기 콜백
+ * @param confirmButtonText 확인 버튼 텍스트 (기본값: "확인")
+ * @param dismissOnBackPress 백버튼으로 다이얼로그 닫기 가능 여부 (기본값: true)
+ * @param dismissOnClickOutside 외부 클릭으로 다이얼로그 닫기 가능 여부 (기본값: true)
  */
 @Composable
 fun ExoTitleDialog(
     title: String,
     message: String,
     onDismiss: () -> Unit,
-    confirmButtonText: String = stringResource(R.string.confirm)
+    confirmButtonText: String = stringResource(R.string.confirm),
+    dismissOnBackPress: Boolean = true,
+    dismissOnClickOutside: Boolean = true
 ) {
     ExoDialog(
         title = title,
         message = message,
         onDismiss = onDismiss,
-        confirmButtonText = confirmButtonText
+        confirmButtonText = confirmButtonText,
+        dismissOnBackPress = dismissOnBackPress,
+        dismissOnClickOutside = dismissOnClickOutside
     )
 }

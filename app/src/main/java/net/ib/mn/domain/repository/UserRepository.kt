@@ -95,4 +95,12 @@ interface UserRepository {
         recommenderCode: String,
         appId: String
     ): Flow<ApiResult<CommonResponse>>
+
+    /**
+     * device id로 아이디 찾기
+     *
+     * @param deviceId 디바이스 ID
+     * @return Flow<ApiResult<String>> - 찾은 아이디 (이메일 또는 도메인 설명)
+     */
+    fun findId(deviceId: String?): Flow<ApiResult<String>>
 }

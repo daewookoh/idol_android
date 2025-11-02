@@ -10,12 +10,12 @@ import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.usecase.SignInUseCase
 import net.ib.mn.domain.usecase.ValidateUserUseCase
 import net.ib.mn.util.Constants
+import net.ib.mn.util.DeviceUtil
 import net.ib.mn.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.UUID
 import javax.inject.Inject
 
 /**
@@ -41,7 +41,8 @@ class LoginViewModel @Inject constructor(
     private val validateUserUseCase: ValidateUserUseCase,
     private val signInUseCase: SignInUseCase,
     private val preferencesManager: PreferencesManager,
-    private val authInterceptor: AuthInterceptor
+    private val authInterceptor: AuthInterceptor,
+    private val deviceUtil: DeviceUtil
 ) : BaseViewModel<LoginContract.State, LoginContract.Intent, LoginContract.Effect>() {
 
     companion object {
@@ -275,26 +276,32 @@ class LoginViewModel @Inject constructor(
                             }
                             return@collect
                         }
-                        
+
                         // Old 프로젝트의 afterSignin 로직과 동일
                         val hashToken = if (domain == Constants.DOMAIN_EMAIL) {
                             password // Email 로그인의 경우 md5salt (현재는 구현하지 않음)
                         } else {
                             password // SNS 로그인의 경우 access token 그대로 사용
                         }
-                        
+
                         // 1. AuthInterceptor에 기본 정보 저장
                         authInterceptor.setAuthCredentials(
                             email = email,
                             domain = domain,
                             token = hashToken
                         )
-                        
+
                         // 2. DataStore에 로그인 정보 저장
                         preferencesManager.setAccessToken(hashToken)
                         preferencesManager.setLoginDomain(domain)
+
+                        // 3. 디바이스 ID 저장 (아이디 찾기용)
+                        // old 프로젝트: 로그인 시 서버에 deviceId가 전달되지만, 로컬에도 저장하여 재설치 시에도 사용 가능하도록 함
+                        val deviceId = deviceUtil.getDeviceUUID()
+                        preferencesManager.setDeviceId(deviceId)
+                        android.util.Log.d(loginTag, "✓ Device ID saved: $deviceId")
                         
-                        // 3. 최소한의 사용자 정보 저장 (StartUpScreen에서 업데이트됨)
+                        // 4. 최소한의 사용자 정보 저장 (StartUpScreen에서 업데이트됨)
                         preferencesManager.setUserInfo(
                             id = 0,
                             email = email,
@@ -543,8 +550,13 @@ class LoginViewModel @Inject constructor(
                             // 2. DataStore에 로그인 정보 저장
                             preferencesManager.setAccessToken(userData.token)
                             preferencesManager.setLoginDomain(domain)
-
-                            // 3. signIn API 응답에서 받은 모든 사용자 정보 저장
+                            
+                            // 3. 디바이스 ID 저장 (아이디 찾기용)
+                            // old 프로젝트: 로그인 시 서버에 deviceId가 전달되지만, 로컬에도 저장하여 재설치 시에도 사용 가능하도록 함
+                            preferencesManager.setDeviceId(deviceId)
+                            android.util.Log.d(loginTag, "✓ Device ID saved: $deviceId")
+                            
+                            // 4. signIn API 응답에서 받은 모든 사용자 정보 저장
                             // 나머지 정보(hearts, diamond, level 등)는 StartUpScreen의 getUserSelf에서 받아서 저장됨
                             preferencesManager.setUserInfo(
                                 id = userData.userId,
@@ -598,7 +610,12 @@ class LoginViewModel @Inject constructor(
                             preferencesManager.setAccessToken(hashToken)
                             preferencesManager.setLoginDomain(domain)
                             
-                            // 3. 최소한의 사용자 정보 저장 (id는 임시로 0 사용, StartUpScreen에서 업데이트됨)
+                            // 3. 디바이스 ID 저장 (아이디 찾기용)
+                            // old 프로젝트: 로그인 시 서버에 deviceId가 전달되지만, 로컬에도 저장하여 재설치 시에도 사용 가능하도록 함
+                            preferencesManager.setDeviceId(deviceId)
+                            android.util.Log.d(loginTag, "✓ Device ID saved: $deviceId")
+                            
+                            // 4. 최소한의 사용자 정보 저장 (id는 임시로 0 사용, StartUpScreen에서 업데이트됨)
                             // Old 프로젝트: createAccount에서 사용자 정보를 가져와서 저장
                             // 현재 프로젝트: StartUpScreen의 loadUserSelf에서 사용자 정보를 가져와서 저장
                             preferencesManager.setUserInfo(
@@ -679,7 +696,12 @@ class LoginViewModel @Inject constructor(
                             preferencesManager.setAccessToken(hashToken)
                             preferencesManager.setLoginDomain(domain)
                             
-                            // 3. 최소한의 사용자 정보 저장 (StartUpScreen에서 업데이트됨)
+                            // 3. 디바이스 ID 저장 (아이디 찾기용)
+                            // old 프로젝트: 로그인 시 서버에 deviceId가 전달되지만, 로컬에도 저장하여 재설치 시에도 사용 가능하도록 함
+                            preferencesManager.setDeviceId(deviceId)
+                            android.util.Log.d(loginTag, "✓ Device ID saved: $deviceId")
+                            
+                            // 4. 최소한의 사용자 정보 저장 (StartUpScreen에서 업데이트됨)
                             preferencesManager.setUserInfo(
                                 id = 0,
                                 email = email,
@@ -1055,14 +1077,16 @@ class LoginViewModel @Inject constructor(
 
     /**
      * 디바이스 ID 가져오기 (UUID).
-     * DataStore에 저장된 UUID를 가져오거나, 없으면 새로 생성하여 저장.
+     * 저장된 deviceId를 우선 사용하고, 없으면 DeviceUtil.getDeviceUUID()를 사용하여 생성하고 저장.
+     * old 프로젝트의 Util.getDeviceUUID()와 동일한 로직.
      */
     private suspend fun getDeviceId(): String {
         val savedDeviceId = preferencesManager.deviceId.first()
         return if (savedDeviceId != null) {
             savedDeviceId
         } else {
-            val newDeviceId = UUID.randomUUID().toString()
+            // 저장된 deviceId가 없으면 DeviceUtil.getDeviceUUID() 사용 (old 프로젝트와 동일)
+            val newDeviceId = deviceUtil.getDeviceUUID()
             preferencesManager.setDeviceId(newDeviceId)
             newDeviceId
         }

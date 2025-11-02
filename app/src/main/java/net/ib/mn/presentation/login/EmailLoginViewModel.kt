@@ -6,11 +6,13 @@ import net.ib.mn.base.BaseViewModel
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.remote.interceptor.AuthInterceptor
 import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.domain.repository.UserRepository
 import net.ib.mn.domain.usecase.SignInUseCase
 import net.ib.mn.util.Constants
 import net.ib.mn.util.CryptoUtil
 import net.ib.mn.util.DeviceUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,7 +24,8 @@ class EmailLoginViewModel @Inject constructor(
     private val signInUseCase: SignInUseCase,
     private val preferencesManager: PreferencesManager,
     private val authInterceptor: AuthInterceptor,
-    private val deviceUtil: DeviceUtil
+    private val deviceUtil: DeviceUtil,
+    private val userRepository: UserRepository
 ) : BaseViewModel<EmailLoginContract.State, EmailLoginContract.Intent, EmailLoginContract.Effect>() {
 
     companion object {
@@ -55,7 +58,7 @@ class EmailLoginViewModel @Inject constructor(
                 setEffect { EmailLoginContract.Effect.NavigateToSignUp }
             }
             is EmailLoginContract.Intent.ForgotId -> {
-                setEffect { EmailLoginContract.Effect.NavigateToForgotId }
+                handleFindId()
             }
             is EmailLoginContract.Intent.ForgotPassword -> {
                 setEffect { EmailLoginContract.Effect.NavigateToForgotPassword }
@@ -261,7 +264,13 @@ class EmailLoginViewModel @Inject constructor(
         preferencesManager.setLoginTimestamp(loginTimestamp)
         android.util.Log.d(TAG, "✓ Login timestamp saved: $loginTimestamp")
 
-        // 5. AuthInterceptor에 인증 정보 설정 (API 호출용)
+        // 5. 디바이스 ID 저장 (아이디 찾기용)
+        // old 프로젝트: 로그인 시 서버에 deviceId가 전달되지만, 로컬에도 저장하여 재설치 시에도 사용 가능하도록 함
+        val deviceId = deviceUtil.getDeviceUUID()
+        preferencesManager.setDeviceId(deviceId)
+        android.util.Log.d(TAG, "✓ Device ID saved: $deviceId")
+
+        // 6. AuthInterceptor에 인증 정보 설정 (API 호출용)
         // old: IdolAccount.createAccount()는 sAccount 메모리 객체도 생성
         android.util.Log.d("USER_INFO", "[EmailLoginViewModel] Setting auth credentials in AuthInterceptor...")
         authInterceptor.setAuthCredentials(email, Constants.DOMAIN_EMAIL, tokenToSave)
@@ -314,6 +323,54 @@ class EmailLoginViewModel @Inject constructor(
                 EmailLoginContract.Effect.ShowError(
                     response.message ?: "로그인에 실패했습니다."
                 )
+            }
+        }
+    }
+
+    /**
+     * 아이디 찾기 처리
+     * old 프로젝트의 findId() 로직 참고
+     * 
+     * 앱 재설치 시에도 아이디를 찾을 수 있도록:
+     * 1. 저장된 deviceId 사용 (DataStore에 저장된 마지막 로그인 시 deviceId)
+     * 2. 저장된 deviceId가 없으면 현재 deviceId 사용
+     */
+    private fun handleFindId() {
+        viewModelScope.launch {
+            try {
+                // 저장된 deviceId 우선 사용 (마지막 로그인 시 저장된 deviceId)
+                val savedDeviceId = preferencesManager.deviceId.first()
+                val deviceId = savedDeviceId ?: deviceUtil.getDeviceUUID()
+                
+                android.util.Log.d(TAG, "Finding ID with deviceId: $deviceId (saved: ${savedDeviceId != null})")
+                
+                userRepository.findId(deviceId).collect { result ->
+                    when (result) {
+                        is ApiResult.Success -> {
+                            val email = result.data
+                            // 빈 문자열이면 아이디를 찾을 수 없음
+                            setEffect {
+                                EmailLoginContract.Effect.ShowFindIdDialog(
+                                    if (email.isNullOrEmpty()) null else email
+                                )
+                            }
+                        }
+                        is ApiResult.Error -> {
+                            android.util.Log.e(TAG, "Find ID error: ${result.message}")
+                            setEffect {
+                                EmailLoginContract.Effect.ShowFindIdDialog(null)
+                            }
+                        }
+                        is ApiResult.Loading -> {
+                            // 로딩 상태는 필요 없음 (다이얼로그만 표시)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e(TAG, "Find ID exception", e)
+                setEffect {
+                    EmailLoginContract.Effect.ShowFindIdDialog(null)
+                }
             }
         }
     }

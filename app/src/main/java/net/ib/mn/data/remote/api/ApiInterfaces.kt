@@ -1,6 +1,7 @@
 package net.ib.mn.data.remote.api
 
 import net.ib.mn.data.remote.dto.*
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -77,6 +78,14 @@ interface UserApi {
         @Header("SIGNATURE") signature: String,
         @Body body: SignUpRequest
     ): Response<CommonResponse>
+
+    /**
+     * device id로 아이디 찾기
+     */
+    @GET("users/find_id/")
+    suspend fun findId(
+        @Query("device_id") deviceId: String? = null,
+    ): Response<ResponseBody>
 
     // NOTE: 추가 가능한 User 엔드포인트 (필요 시 구현)
     // - POST /users/iab_verify/ - IAB 검증

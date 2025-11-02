@@ -49,5 +49,6 @@ object EmailLoginContract {
         data object NavigateBack : Effect()
         data class ShowError(val message: String) : Effect()
         data class ShowToast(val message: String) : Effect()
+        data class ShowFindIdDialog(val email: String?) : Effect()
     }
 }

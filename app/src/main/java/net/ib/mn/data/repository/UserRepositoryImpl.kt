@@ -495,6 +495,72 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun findId(deviceId: String?): Flow<ApiResult<String>> = flow {
+        emit(ApiResult.Loading)
+
+        try {
+            val response = userApi.findId(deviceId)
+
+            if (response.isSuccessful && response.body() != null) {
+                val responseBody = response.body()!!
+                val responseString = responseBody.string()
+
+                try {
+                    val jsonObject = org.json.JSONObject(responseString)
+                    val idsArray = jsonObject.optJSONArray("ids") ?: org.json.JSONArray()
+                    
+                    if (idsArray.length() > 0) {
+                        var ids = ""
+                        for (i in 0 until idsArray.length()) {
+                            val idInfo = idsArray.optJSONObject(i)
+                            if (idInfo != null) {
+                                val domain = idInfo.optString("domain", "")
+                                ids += if (domain.equals("E", ignoreCase = true)) {
+                                    // 이메일 도메인인 경우 email 반환
+                                    idInfo.optString("email", "")
+                                } else {
+                                    // SNS 도메인인 경우 domain_desc 반환
+                                    idInfo.optString("domain_desc", "")
+                                }
+                                ids += "\n"
+                            }
+                        }
+                        ids = ids.trim()
+                        emit(ApiResult.Success(ids))
+                    } else {
+                        // 아이디를 찾을 수 없음
+                        emit(ApiResult.Success(""))
+                    }
+                } catch (e: org.json.JSONException) {
+                    android.util.Log.e("FindIdAPI", "JSON parsing error", e)
+                    emit(ApiResult.Error(
+                        exception = e,
+                        message = "Failed to parse response"
+                    ))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                android.util.Log.e("FindIdAPI", "HTTP ${response.code()}: $errorBody")
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            android.util.Log.e("FindIdAPI", "HttpException", e)
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code()
+            ))
+        } catch (e: Exception) {
+            android.util.Log.e("FindIdAPI", "Exception", e)
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Find ID error: ${e.message}"
+            ))
+        }
+    }
+
     // ============================================================
     // Signature & Password Hashing (Old 프로젝트와 동일)
     // ============================================================

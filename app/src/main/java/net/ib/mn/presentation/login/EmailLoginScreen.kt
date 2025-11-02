@@ -44,6 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.LoadingOverlay
+import net.ib.mn.ui.components.ExoTitleDialog
 import net.ib.mn.ui.theme.ExodusTheme
 
 /**
@@ -62,6 +63,9 @@ fun EmailLoginScreen(
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
+    var showFindIdDialog by remember { mutableStateOf(false) }
+    var findIdEmail by remember { mutableStateOf<String?>(null) }
+
     // Effect 처리
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -77,13 +81,20 @@ fun EmailLoginScreen(
                 is EmailLoginContract.Effect.ShowToast -> {
                     ToastUtil.show(context, effect.message)
                 }
+                is EmailLoginContract.Effect.ShowFindIdDialog -> {
+                    findIdEmail = effect.email
+                    showFindIdDialog = true
+                }
             }
         }
     }
 
     EmailLoginContent(
         state = state,
-        onIntent = viewModel::sendIntent
+        onIntent = viewModel::sendIntent,
+        showFindIdDialog = showFindIdDialog,
+        findIdEmail = findIdEmail,
+        onDismissFindIdDialog = { showFindIdDialog = false }
     )
 }
 
@@ -94,7 +105,10 @@ fun EmailLoginScreen(
 @Composable
 private fun EmailLoginContent(
     state: EmailLoginContract.State,
-    onIntent: (EmailLoginContract.Intent) -> Unit
+    onIntent: (EmailLoginContract.Intent) -> Unit,
+    showFindIdDialog: Boolean = false,
+    findIdEmail: String? = null,
+    onDismissFindIdDialog: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val hideKeyboard = {
@@ -270,6 +284,21 @@ private fun EmailLoginContent(
         // 로딩 인디케이터
         LoadingOverlay(isLoading = state.isLoading)
         } // Box
+
+        // 아이디 찾기 다이얼로그
+        if (showFindIdDialog) {
+            ExoTitleDialog(
+                title = stringResource(id = R.string.title_find_id),
+                message = if (findIdEmail.isNullOrEmpty()) {
+                    stringResource(id = R.string.failed_to_find_id)
+                } else {
+                    "${stringResource(id = R.string.your_id_is1)}\n${findIdEmail}"
+                },
+                onDismiss = onDismissFindIdDialog,
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false
+            )
+        }
     } // ExoScaffold
 }
 
