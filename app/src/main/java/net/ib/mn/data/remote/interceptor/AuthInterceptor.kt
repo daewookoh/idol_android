@@ -85,10 +85,7 @@ class AuthInterceptor @Inject constructor(
             "/users/find_passwd/",  // 비밀번호 찾기
         )
 
-        // POST /users/ (회원가입)는 별도로 체크
-        val isSignUpRequest = method == "POST" && url.matches(Regex(".*/users/?$"))
-
-        val requiresAuth = !noAuthEndpoints.any { url.contains(it) } && !isSignUpRequest
+        val requiresAuth = !noAuthEndpoints.any { url.contains(it) }
 
         if (originalRequest.header("Authorization") == null && requiresAuth) {
             if (email != null && domain != null && token != null) {
