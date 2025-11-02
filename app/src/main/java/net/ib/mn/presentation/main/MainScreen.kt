@@ -170,7 +170,7 @@ fun MainScreen(
                 onTabSelected = { selectedTab = it }
             )
         }
-    ) { paddingValues ->
+    ) {
         AnimatedContent(
             targetState = selectedTab,
             transitionSpec = {
@@ -179,9 +179,7 @@ fun MainScreen(
             label = "tab_content"
         ) { tab ->
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
+                modifier = Modifier.fillMaxSize()
             ) {
                 when (tab) {
                     0 -> RankingPage(
