@@ -52,6 +52,12 @@ class AuthInterceptor @Inject constructor(
         val url = originalRequest.url.toString()
         val method = originalRequest.method
 
+        // 디버깅: 모든 요청 로깅
+        android.util.Log.d("AuthInterceptor", "========================================")
+        android.util.Log.d("AuthInterceptor", "Request: $method $url")
+        android.util.Log.d("AuthInterceptor", "  Current auth state: email=$email, domain=$domain, token=${token?.take(10)}")
+        android.util.Log.d("AuthInterceptor", "========================================")
+
         // User-Agent 헤더 구성
         val systemUserAgent = System.getProperty("http.agent") ?: ""
         val packageName = context.packageName
@@ -71,7 +77,21 @@ class AuthInterceptor @Inject constructor(
             requestBuilder.addHeader("X-Nonce", System.nanoTime().toString())
         }
 
-        if (originalRequest.header("Authorization") == null) {
+        // 인증이 필요 없는 엔드포인트 목록 (정확한 경로 매칭)
+        val noAuthEndpoints = listOf(
+            "/users/email_signin/", // 로그인
+            "/users/validate/",     // 사용자 검증
+            "/users/find_id/",      // 아이디 찾기
+            "/users/find_passwd/",  // 비밀번호 찾기
+            "/users/"               // 회원가입 (POST)도 포함 - 임시로 추가하여 테스트
+        )
+
+        // POST /users/ (회원가입)는 별도로 체크
+        val isSignUpRequest = method == "POST" && url.matches(Regex(".*/users/?$"))
+
+        val requiresAuth = !noAuthEndpoints.any { url.contains(it) } && !isSignUpRequest
+
+        if (originalRequest.header("Authorization") == null && requiresAuth) {
             if (email != null && domain != null && token != null) {
                 // old 프로젝트와 동일: "email:domain:token" 형식의 Basic 인증
                 val credential = "$email:$domain:$token"
@@ -89,6 +109,8 @@ class AuthInterceptor @Inject constructor(
                 android.util.Log.w("USER_INFO", "[AuthInterceptor]   - Email: $email, Domain: $domain, Token: ${if (token != null) "present" else "null"}")
                 android.util.Log.w("USER_INFO", "[AuthInterceptor]   - This will likely result in 401 Unauthorized")
             }
+        } else if (!requiresAuth) {
+            android.util.Log.d("USER_INFO", "[AuthInterceptor] Skipping auth for public endpoint: $url")
         }
 
         val request = requestBuilder.build()

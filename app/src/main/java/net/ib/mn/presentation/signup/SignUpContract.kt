@@ -41,10 +41,12 @@ class SignUpContract {
         val password: String = "",
         val passwordError: String? = null,
         val isPasswordValid: Boolean = false,
+        val isPasswordFocused: Boolean = false, // 비밀번호 필드 포커스 상태
 
         val passwordConfirm: String = "",
         val passwordConfirmError: String? = null,
         val isPasswordConfirmValid: Boolean = false,
+        val isPasswordConfirmFocused: Boolean = false, // 비밀번호 확인 필드 포커스 상태
 
         val nickname: String = "",
         val nicknameError: String? = null,
@@ -84,12 +86,15 @@ class SignUpContract {
         data class UpdateEmail(val email: String) : Intent()
         data class UpdatePassword(val password: String) : Intent()
         data class UpdatePasswordConfirm(val passwordConfirm: String) : Intent()
+        data class PasswordFocusChanged(val isFocused: Boolean) : Intent()
+        data class PasswordConfirmFocusChanged(val isFocused: Boolean) : Intent()
         data class UpdateNickname(val nickname: String) : Intent()
         data class UpdateRecommenderCode(val code: String) : Intent()
         object ValidateEmail : Intent()
         object ValidateNickname : Intent()
         object ValidateRecommenderCode : Intent()
         object SignUp : Intent()
+        object ConfirmEmailVerification : Intent() // 이메일 발송 확인 다이얼로그 확인 버튼 클릭 (old 프로젝트와 동일)
 
         // Navigation
         object GoBack : Intent()
@@ -101,10 +106,12 @@ class SignUpContract {
     sealed class Effect : UiEffect {
         data class ShowToast(val message: String) : Effect()
         data class ShowError(val message: String) : Effect()
+        data class ShowEmailVerificationDialog(val message: String) : Effect() // 이메일 발송 확인 다이얼로그 (old 프로젝트와 동일)
         object NavigateToTermsOfService : Effect()
         object NavigateToPrivacyPolicy : Effect()
         object NavigateToNextStep : Effect()
         object NavigateToPreviousStep : Effect()
         object NavigateToMain : Effect() // 회원가입 완료 후 메인으로 이동
+        object NavigateToStartUp : Effect() // 이메일 발송 확인 다이얼로그 확인 후 StartUp으로 이동 (old 프로젝트와 동일)
     }
 }

@@ -40,7 +40,7 @@ fun NavGraph(
         navController = navController,
         startDestination = startDestination
     ) {
-        // StartUp 화면
+        // StartUp 화면 (기본 route - startDestination과 매칭)
         composable(
             route = Screen.StartUp.route,
             enterTransition = {
@@ -59,6 +59,46 @@ fun NavGraph(
                 onNavigateToLogin = {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.StartUp.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+        
+        // StartUp 화면 (이메일 회원가입 후 - isEmailSignup 플래그 포함)
+        composable(
+            route = "${Screen.StartUp.route}?isEmailSignup={isEmailSignup}",
+            arguments = listOf(
+                navArgument("isEmailSignup") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
+            ),
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(600)
+                )
+            },
+        ) {
+            // 이메일 회원가입 후 이메일 인증이 필요한 경우를 위한 플래그 확인
+            val isEmailSignup = it.arguments?.getBoolean("isEmailSignup") ?: false
+            
+            StartUpScreen(
+                onNavigateToMain = {
+                    navController.navigate(Screen.Main.route) {
+                        popUpTo(Screen.StartUp.route) { inclusive = true }
+                    }
+                },
+                onNavigateToLogin = {
+                    // old 프로젝트: IS_EMAIL_SIGNUP 플래그가 있으면 EmailLogin 화면으로 이동
+                    if (isEmailSignup) {
+                        navController.navigate(Screen.EmailLogin.route) {
+                            popUpTo(Screen.StartUp.route) { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(Screen.StartUp.route) { inclusive = true }
+                        }
                     }
                 }
             )
@@ -138,6 +178,13 @@ fun NavGraph(
             }
         ) {
             EmailLoginScreen(
+                onNavigateToStartUp = {
+                    // 로그인 성공 시 StartUp으로 이동 (old 프로젝트의 StartupActivity와 동일)
+                    // StartUpScreen에서 API 호출 후 Main으로 이동
+                    navController.navigate(Screen.StartUp.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                },
                 onNavigateToMain = {
                     // 로그인 성공 시 StartUp으로 이동 (old 프로젝트의 StartupActivity와 동일)
                     // StartUpScreen에서 API 호출 후 Main으로 이동
@@ -210,8 +257,9 @@ fun NavGraph(
                 displayName = null,
                 domain = null,
                 onSignUpComplete = {
-                    // 회원가입 완료 시 StartUp으로 이동 (API 호출 후 Main으로 이동)
-                    navController.navigate(Screen.StartUp.route) {
+                    // 회원가입 완료 시 StartUp으로 이동 (old 프로젝트: IS_EMAIL_SIGNUP 플래그 포함)
+                    // old 프로젝트: startIntent.putExtra(Const.IS_EMAIL_SIGNUP, "true")
+                    navController.navigate(Screen.StartUp.createRoute(isEmailSignup = true)) {
                         popUpTo(0) { inclusive = true }
                     }
                 },
@@ -261,10 +309,9 @@ fun NavGraph(
                 displayName = displayName,
                 domain = domain.takeIf { it.isNotEmpty() },
                 onSignUpComplete = {
-                    // 회원가입 완료 시 StartUp으로 이동 (API 호출 후 Main으로 이동)
-                    // old 프로젝트: afterSignin()에서 StartupActivity로 이동하고 finish() 호출
-                    // 모든 이전 화면을 제거하고 StartUp으로 이동
-                    navController.navigate(Screen.StartUp.route) {
+                    // 회원가입 완료 시 StartUp으로 이동 (old 프로젝트: IS_EMAIL_SIGNUP 플래그 포함)
+                    // old 프로젝트: startIntent.putExtra(Const.IS_EMAIL_SIGNUP, "true")
+                    navController.navigate(Screen.StartUp.createRoute(isEmailSignup = true)) {
                         popUpTo(0) { inclusive = true }
                     }
                 },
@@ -373,7 +420,19 @@ fun NavGraph(
  * 화면 라우트 정의.
  */
 sealed class Screen(val route: String) {
-    data object StartUp : Screen("startup")
+    data object StartUp : Screen("startup") {
+        /**
+         * StartUp 화면으로 이동하는 라우트 생성 (이메일 회원가입 후 이메일 인증이 필요한 경우)
+         * @param isEmailSignup 이메일 회원가입 여부
+         */
+        fun createRoute(isEmailSignup: Boolean = false): String {
+            return if (isEmailSignup) {
+                "startup?isEmailSignup=true"
+            } else {
+                "startup"
+            }
+        }
+    }
     data object Login : Screen("login")
     data object EmailLogin : Screen("email_login")
     data object ForgotPassword : Screen("forgot_password")

@@ -53,6 +53,7 @@ import net.ib.mn.ui.theme.ExodusTheme
  */
 @Composable
 fun EmailLoginScreen(
+    onNavigateToStartUp: () -> Unit,
     onNavigateToMain: () -> Unit,
     onNavigateToSignUp: () -> Unit,
     onNavigateToForgotId: () -> Unit,
@@ -70,6 +71,7 @@ fun EmailLoginScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
+                is EmailLoginContract.Effect.NavigateToStartUp -> onNavigateToStartUp()
                 is EmailLoginContract.Effect.NavigateToMain -> onNavigateToMain()
                 is EmailLoginContract.Effect.NavigateToSignUp -> onNavigateToSignUp()
                 is EmailLoginContract.Effect.NavigateToForgotId -> onNavigateToForgotId()

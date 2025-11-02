@@ -473,6 +473,9 @@ data class CommonResponse(
     @SerializedName("message")
     val message: String? = null,
 
+    @SerializedName("msg")
+    val msg: String? = null,
+
     @SerializedName("code")
     val code: Int? = null,
 

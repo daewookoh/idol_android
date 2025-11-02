@@ -22,6 +22,7 @@ import net.ib.mn.util.DeviceUtil
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import net.ib.mn.data.remote.dto.SignInResponse
+import java.util.regex.Pattern
 import javax.inject.Inject
 
 /**
@@ -83,8 +84,6 @@ class SignUpViewModel @Inject constructor(
     }
 
     override fun handleIntent(intent: SignUpContract.Intent) {
-        android.util.Log.d(TAG, "[handleIntent] Received intent: ${intent::class.simpleName}")
-        
         when (intent) {
             // Step 1: 약관동의
             is SignUpContract.Intent.UpdateAgreeAll -> updateAgreeAll(intent.checked)
@@ -101,18 +100,38 @@ class SignUpViewModel @Inject constructor(
             is SignUpContract.Intent.UpdateEmail -> updateEmail(intent.email)
             is SignUpContract.Intent.UpdatePassword -> updatePassword(intent.password)
             is SignUpContract.Intent.UpdatePasswordConfirm -> updatePasswordConfirm(intent.passwordConfirm)
+            is SignUpContract.Intent.PasswordFocusChanged -> {
+                // old 프로젝트: 포커스가 벗어날 때만 검증
+                if (!intent.isFocused) {
+                    validatePassword()
+                } else {
+                    // 포커스가 있을 때는 아이콘 제거만 (ExoTextField에서 처리)
+                    setState { copy(isPasswordFocused = true) }
+                }
+            }
+            is SignUpContract.Intent.PasswordConfirmFocusChanged -> {
+                // old 프로젝트: 포커스가 벗어날 때만 검증
+                if (!intent.isFocused) {
+                    validatePasswordConfirm()
+                } else {
+                    // 포커스가 있을 때는 아이콘 제거만 (ExoTextField에서 처리)
+                    setState { copy(isPasswordConfirmFocused = true) }
+                }
+            }
             is SignUpContract.Intent.UpdateNickname -> {
-                android.util.Log.d(TAG, "[handleIntent] UpdateNickname called with: '${intent.nickname}'")
                 updateNickname(intent.nickname)
             }
             is SignUpContract.Intent.UpdateRecommenderCode -> updateRecommenderCode(intent.code)
             is SignUpContract.Intent.ValidateEmail -> validateEmail()
             is SignUpContract.Intent.ValidateNickname -> {
-                android.util.Log.d(TAG, "[handleIntent] ValidateNickname intent received")
                 validateNickname()
             }
             is SignUpContract.Intent.ValidateRecommenderCode -> validateRecommenderCode()
             is SignUpContract.Intent.SignUp -> signUp()
+            is SignUpContract.Intent.ConfirmEmailVerification -> {
+                // 이메일 발송 확인 다이얼로그 확인 버튼 클릭 시 StartUp으로 이동 (old 프로젝트와 동일)
+                setEffect { SignUpContract.Effect.NavigateToStartUp }
+            }
 
             // Navigation
             is SignUpContract.Intent.GoBack -> goBack()
@@ -187,22 +206,26 @@ class SignUpViewModel @Inject constructor(
         setState { copy(dialogMessage = null) }
     }
 
-    // ============================================================
-    // Step 2: 회원가입 폼
-    // ============================================================
-
     /**
-     * Navigation에서 전달받은 파라미터로 State 초기화
+     * canProceedStep2 계산 헬퍼 함수
+     * 중복 코드 제거를 위해 공통 로직 추출
      */
+    private fun calculateCanProceedStep2(
+        domain: String,
+        isEmailValid: Boolean,
+        isPasswordValid: Boolean,
+        isPasswordConfirmValid: Boolean,
+        isNicknameValid: Boolean
+    ): Boolean {
+        return if (domain != "email") {
+            // SNS 로그인: 닉네임만 체크
+            isNicknameValid
+        } else {
+            // 일반 가입: 모든 필드 체크
+            isEmailValid && isPasswordValid && isPasswordConfirmValid && isNicknameValid
+        }
+    }
     private fun initializeFromNavigation(intent: SignUpContract.Intent.InitializeFromNavigation) {
-        android.util.Log.d(TAG, "========================================")
-        android.util.Log.d(TAG, "initializeFromNavigation() called")
-        android.util.Log.d(TAG, "  email: ${intent.email}")
-        android.util.Log.d(TAG, "  password: ${intent.password?.take(20)}...")
-        android.util.Log.d(TAG, "  displayName: ${intent.displayName}")
-        android.util.Log.d(TAG, "  domain: ${intent.domain}")
-        android.util.Log.d(TAG, "========================================")
-
         // SavedStateHandle에 저장 (ViewModel 재생성 시에도 유지됨)
         intent.email?.let { savedStateHandle?.set(ARG_EMAIL, it) }
         intent.password?.let { savedStateHandle?.set(ARG_PASSWORD, it) }
@@ -214,127 +237,198 @@ class SignUpViewModel @Inject constructor(
             val newDomain = intent.domain ?: "email"
             copy(
                 domain = newDomain,
-                // SNS 로그인의 경우 이메일/비밀번호 자동 입력
                 email = intent.email ?: email,
                 password = intent.password ?: password,
                 nickname = intent.displayName ?: nickname,
                 isEmailValid = !intent.email.isNullOrEmpty() || isEmailValid,
                 isPasswordValid = !intent.password.isNullOrEmpty() || isPasswordValid,
-                // 서버 검증 전이므로 isNicknameValid는 false
                 isNicknameValid = false,
-                isBadWordsNickName = false, // Old 프로젝트: 초기화 시 false
-                // SNS 로그인인 경우 (domain != "email"): 닉네임만 체크, 일반 가입인 경우: 모든 필드 체크
-                canProceedStep2 = if (newDomain != "email") {
-                    // SNS 로그인: 닉네임만 체크 (서버 검증 통과해야 활성화)
-                    false
-                } else {
-                    // 일반 가입: 모든 필드 체크
-                    isEmailValid && isPasswordValid && isPasswordConfirmValid && false
-                }
+                isBadWordsNickName = false,
+                canProceedStep2 = calculateCanProceedStep2(
+                    domain = newDomain,
+                    isEmailValid = !intent.email.isNullOrEmpty() || isEmailValid,
+                    isPasswordValid = !intent.password.isNullOrEmpty() || isPasswordValid,
+                    isPasswordConfirmValid = isPasswordConfirmValid,
+                    isNicknameValid = false
+                )
             )
         }
     }
 
     private fun updateEmail(email: String) {
         setState {
-            val isValid = Patterns.EMAIL_ADDRESS.matcher(email).matches()
             copy(
                 email = email,
-                isEmailValid = isValid,
-                emailError = if (email.isNotEmpty() && !isValid) context.getString(net.ib.mn.R.string.invalid_format_email) else null,
-                canProceedStep2 = if (domain != "email") {
-                    // SNS 로그인: 닉네임만 체크
-                    isNicknameValid
-                } else {
-                    // 일반 가입: 모든 필드 체크
-                    isValid && isPasswordValid && isPasswordConfirmValid && isNicknameValid
-                }
+                isEmailValid = false, // 서버 검증 완료 전까지는 false
+                emailError = null, // 텍스트 변경 시 에러 제거
+                canProceedStep2 = calculateCanProceedStep2(
+                    domain = domain,
+                    isEmailValid = false,
+                    isPasswordValid = isPasswordValid,
+                    isPasswordConfirmValid = isPasswordConfirmValid,
+                    isNicknameValid = isNicknameValid
+                )
             )
         }
     }
 
     private fun updatePassword(password: String) {
         setState {
-            // 비밀번호 규칙: 8~20자, 영문+숫자 조합 (old 프로젝트 규칙)
-            val isValid = password.length in 8..20 &&
-                    password.any { it.isDigit() } &&
-                    password.any { it.isLetter() }
-
             copy(
                 password = password,
-                isPasswordValid = isValid,
-                passwordError = if (password.isNotEmpty() && !isValid) {
-                    context.getString(net.ib.mn.R.string.check_pwd_requirement)
-                } else null,
-                // 비밀번호 확인도 다시 검증
-                isPasswordConfirmValid = passwordConfirm.isNotEmpty() && passwordConfirm == password,
-                passwordConfirmError = if (passwordConfirm.isNotEmpty() && passwordConfirm != password) {
-                    context.getString(net.ib.mn.R.string.passwd_confirm_not_match)
-                } else null,
-                canProceedStep2 = if (domain != "email") {
-                    // SNS 로그인: 닉네임만 체크
-                    isNicknameValid
-                } else {
-                    // 일반 가입: 모든 필드 체크
-                    isValid &&
-                            (passwordConfirm.isEmpty() || passwordConfirm == password) &&
-                            isEmailValid && isNicknameValid
-                }
+                // 값이 변경되면 에러만 초기화 (검증 상태는 유지)
+                passwordError = null,
+                // 비밀번호가 변경되면 비밀번호 확인도 다시 검증해야 함
+                passwordConfirmError = null,
+                isPasswordConfirmValid = false,
+                canProceedStep2 = calculateCanProceedStep2(
+                    domain = domain,
+                    isEmailValid = isEmailValid,
+                    isPasswordValid = isPasswordValid,
+                    isPasswordConfirmValid = false,
+                    isNicknameValid = isNicknameValid
+                )
             )
         }
     }
 
     private fun updatePasswordConfirm(passwordConfirm: String) {
         setState {
-            val isValid = passwordConfirm == password
             copy(
                 passwordConfirm = passwordConfirm,
-                isPasswordConfirmValid = isValid,
-                passwordConfirmError = if (passwordConfirm.isNotEmpty() && !isValid) {
-                    context.getString(net.ib.mn.R.string.passwd_confirm_not_match)
-                } else null,
-                canProceedStep2 = if (domain != "email") {
-                    // SNS 로그인: 닉네임만 체크
-                    isNicknameValid
-                } else {
-                    // 일반 가입: 모든 필드 체크
-                    isValid && isPasswordValid && isEmailValid && isNicknameValid
-                }
+                // 값이 변경되면 에러만 초기화 (검증 상태는 유지)
+                passwordConfirmError = null,
+                canProceedStep2 = calculateCanProceedStep2(
+                    domain = domain,
+                    isEmailValid = isEmailValid,
+                    isPasswordValid = isPasswordValid,
+                    isPasswordConfirmValid = isPasswordConfirmValid,
+                    isNicknameValid = isNicknameValid
+                )
             )
         }
     }
 
-    private fun updateNickname(nickname: String) {
-        android.util.Log.d(TAG, "========================================")
-        android.util.Log.d(TAG, "[updateNickname] Nickname changed")
-        android.util.Log.d(TAG, "  - nickname: '$nickname'")
-        android.util.Log.d(TAG, "  - nickname length: ${nickname.length}")
-        android.util.Log.d(TAG, "========================================")
+    private fun validatePassword() {
+        val passwd = currentState.password
         
         setState {
-            // 닉네임 규칙: 2~10자 (old 프로젝트 규칙)
+            when {
+                passwd.isEmpty() -> copy(
+                    passwordError = context.getString(net.ib.mn.R.string.required_field),
+                    isPasswordValid = false,
+                    isPasswordFocused = false,
+                    canProceedStep2 = calculateCanProceedStep2(
+                        domain = domain,
+                        isEmailValid = isEmailValid,
+                        isPasswordValid = false,
+                        isPasswordConfirmValid = isPasswordConfirmValid,
+                        isNicknameValid = isNicknameValid
+                    )
+                )
+                !checkPwdRegex(passwd) -> copy(
+                    passwordError = context.getString(net.ib.mn.R.string.check_pwd_requirement),
+                    isPasswordValid = false,
+                    isPasswordFocused = false,
+                    canProceedStep2 = calculateCanProceedStep2(
+                        domain = domain,
+                        isEmailValid = isEmailValid,
+                        isPasswordValid = false,
+                        isPasswordConfirmValid = isPasswordConfirmValid,
+                        isNicknameValid = isNicknameValid
+                    )
+                )
+                else -> {
+                    // 비밀번호 확인도 다시 검증
+                    val currentPasswordConfirm = passwordConfirm
+                    val isPasswordConfirmValid = currentPasswordConfirm.isNotEmpty() && currentPasswordConfirm == passwd
+                    copy(
+                        passwordError = null,
+                        isPasswordValid = true,
+                        isPasswordFocused = false,
+                        isPasswordConfirmValid = isPasswordConfirmValid,
+                        passwordConfirmError = if (currentPasswordConfirm.isNotEmpty() && !isPasswordConfirmValid) {
+                            context.getString(net.ib.mn.R.string.passwd_confirm_not_match)
+                        } else null,
+                        canProceedStep2 = calculateCanProceedStep2(
+                            domain = domain,
+                            isEmailValid = isEmailValid,
+                            isPasswordValid = true,
+                            isPasswordConfirmValid = isPasswordConfirmValid,
+                            isNicknameValid = isNicknameValid
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun validatePasswordConfirm() {
+        val passwdConfirm = currentState.passwordConfirm
+        val passwd = currentState.password
+        
+        setState {
+            when {
+                passwdConfirm.isEmpty() -> copy(
+                    passwordConfirmError = context.getString(net.ib.mn.R.string.required_field),
+                    isPasswordConfirmValid = false,
+                    isPasswordConfirmFocused = false,
+                    canProceedStep2 = calculateCanProceedStep2(
+                        domain = domain,
+                        isEmailValid = isEmailValid,
+                        isPasswordValid = isPasswordValid,
+                        isPasswordConfirmValid = false,
+                        isNicknameValid = isNicknameValid
+                    )
+                )
+                passwdConfirm != passwd -> copy(
+                    passwordConfirmError = context.getString(net.ib.mn.R.string.passwd_confirm_not_match),
+                    isPasswordConfirmValid = false,
+                    isPasswordConfirmFocused = false,
+                    canProceedStep2 = calculateCanProceedStep2(
+                        domain = domain,
+                        isEmailValid = isEmailValid,
+                        isPasswordValid = isPasswordValid,
+                        isPasswordConfirmValid = false,
+                        isNicknameValid = isNicknameValid
+                    )
+                )
+                else -> copy(
+                    passwordConfirmError = null,
+                    isPasswordConfirmValid = true,
+                    isPasswordConfirmFocused = false,
+                    canProceedStep2 = calculateCanProceedStep2(
+                        domain = domain,
+                        isEmailValid = isEmailValid,
+                        isPasswordValid = isPasswordValid,
+                        isPasswordConfirmValid = true,
+                        isNicknameValid = isNicknameValid
+                    )
+                )
+            }
+        }
+    }
+
+    private fun updateNickname(nickname: String) {
+        setState {
             val isValid = nickname.length in 2..10
-            android.util.Log.d(TAG, "[updateNickname] Length validation: isValid=$isValid")
             
             copy(
                 nickname = nickname,
-                // 닉네임이 변경되면 서버 검증 결과를 초기화 (서버 검증 통과해야 true가 됨)
                 isNicknameValid = false,
-                isBadWordsNickName = false, // Old 프로젝트: 닉네임 변경 시 초기화
+                isBadWordsNickName = false,
                 nicknameError = if (nickname.isNotEmpty() && !isValid) {
                     context.getString(net.ib.mn.R.string.required_field)
-                } else null, // 닉네임이 변경되면 이전 서버 검증 에러도 초기화
-                canProceedStep2 = if (domain != "email") {
-                    // SNS 로그인: 닉네임만 체크 (서버 검증 통과해야 활성화)
-                    false
-                } else {
-                    // 일반 가입: 모든 필드 체크
-                    false // isNicknameValid가 false이므로 false
-                }
+                } else null,
+                canProceedStep2 = calculateCanProceedStep2(
+                    domain = domain,
+                    isEmailValid = isEmailValid,
+                    isPasswordValid = isPasswordValid,
+                    isPasswordConfirmValid = isPasswordConfirmValid,
+                    isNicknameValid = false
+                )
             )
         }
-        
-        android.util.Log.d(TAG, "[updateNickname] State updated: isNicknameValid=false, canProceedStep2=false")
     }
 
     private fun updateRecommenderCode(code: String) {
@@ -348,8 +442,29 @@ class SignUpViewModel @Inject constructor(
     }
 
     private fun validateEmail() {
-        val email = currentState.email
-        if (email.isEmpty()) return
+        val email = currentState.email.trim()
+        
+        if (email.isEmpty()) {
+            setState {
+                copy(
+                    emailError = context.getString(net.ib.mn.R.string.required_field),
+                    isEmailValid = false,
+                    canProceedStep2 = false
+                )
+            }
+            return
+        }
+        
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            setState {
+                copy(
+                    emailError = context.getString(net.ib.mn.R.string.invalid_format_email),
+                    isEmailValid = false,
+                    canProceedStep2 = false
+                )
+            }
+            return
+        }
 
         viewModelScope.launch {
             validateUserUseCase(
@@ -360,41 +475,50 @@ class SignUpViewModel @Inject constructor(
                 when (result) {
                     is ApiResult.Success -> {
                         val response = result.data
-                        if (response.success) {
-                            // 이미 존재하는 이메일
+                        
+                        if (!response.success) {
+                            val errorMessage = response.message ?: context.getString(net.ib.mn.R.string.error_1001)
                             setState {
                                 copy(
-                                    emailError = context.getString(net.ib.mn.R.string.error_1001),
+                                    emailError = errorMessage,
                                     isEmailValid = false,
                                     canProceedStep2 = false
                                 )
                             }
                         } else {
-                            // 사용 가능한 이메일
-                            // setState 블록 밖에서 현재 state 값들을 먼저 읽어야 함
-                            val currentDomain = currentState.domain
-                            val currentIsNicknameValid = currentState.isNicknameValid
-                            val currentIsPasswordValid = currentState.isPasswordValid
-                            val currentIsPasswordConfirmValid = currentState.isPasswordConfirmValid
-                            
-                            setState {
-                                copy(
-                                    emailError = null,
-                                    isEmailValid = true,
-                                    canProceedStep2 = if (currentDomain != "email") {
-                                        // SNS 로그인: 닉네임만 체크
-                                        currentIsNicknameValid
-                                    } else {
-                                        // 일반 가입: 모든 필드 체크
-                                        true && currentIsPasswordValid && currentIsPasswordConfirmValid && currentIsNicknameValid
-                                    }
-                                )
+                            val gcode = response.gcode ?: 0
+                            if (gcode == 0) {
+                                val currentDomain = currentState.domain
+                                val currentIsNicknameValid = currentState.isNicknameValid
+                                val currentIsPasswordValid = currentState.isPasswordValid
+                                val currentIsPasswordConfirmValid = currentState.isPasswordConfirmValid
+                                
+                                setState {
+                                    copy(
+                                        emailError = null,
+                                        isEmailValid = true,
+                                        canProceedStep2 = calculateCanProceedStep2(
+                                            domain = currentDomain,
+                                            isEmailValid = true,
+                                            isPasswordValid = currentIsPasswordValid,
+                                            isPasswordConfirmValid = currentIsPasswordConfirmValid,
+                                            isNicknameValid = currentIsNicknameValid
+                                        )
+                                    )
+                                }
+                            } else {
+                                val errorMessage = response.message ?: context.getString(net.ib.mn.R.string.error_1001)
+                                setState {
+                                    copy(
+                                        emailError = errorMessage,
+                                        isEmailValid = false,
+                                        canProceedStep2 = false
+                                    )
+                                }
                             }
-                            // Old 프로젝트: 토스트 없이 체크 아이콘만 표시
                         }
                     }
                     is ApiResult.Error -> {
-                        // Old 프로젝트: 에러 시 토스트 대신 TextField에 에러 메시지 표시
                         setState {
                             copy(
                                 emailError = result.message ?: context.getString(net.ib.mn.R.string.error_abnormal_exception),
@@ -403,9 +527,7 @@ class SignUpViewModel @Inject constructor(
                             )
                         }
                     }
-                    is ApiResult.Loading -> {
-                        // 로딩 중
-                    }
+                    is ApiResult.Loading -> { /* 로딩 중 */ }
                 }
             }
         }
@@ -414,163 +536,77 @@ class SignUpViewModel @Inject constructor(
     private fun validateNickname() {
         val nickname = currentState.nickname
         
-        android.util.Log.d(TAG, "========================================")
-        android.util.Log.d(TAG, "[validateNickname] Called")
-        android.util.Log.d(TAG, "  - nickname: '$nickname'")
-        android.util.Log.d(TAG, "  - nickname length: ${nickname.length}")
-        android.util.Log.d(TAG, "  - currentState.isNicknameValid: ${currentState.isNicknameValid}")
-        android.util.Log.d(TAG, "  - currentState.domain: ${currentState.domain}")
-        android.util.Log.d(TAG, "========================================")
-        
         if (nickname.isEmpty() || nickname.length < 2) {
-            android.util.Log.w(TAG, "[validateNickname] Early return: nickname is empty or too short")
             return
         }
 
-        android.util.Log.d(TAG, "[validateNickname] Calling validateUserUseCase")
-        android.util.Log.d(TAG, "  - type: nickname")
-        android.util.Log.d(TAG, "  - value: '$nickname'")
-        android.util.Log.d(TAG, "  - appId: ${Constants.APP_ID}")
-
         viewModelScope.launch {
             validateUserUseCase(
-                type = "nickname", // Old 프로젝트: "nickname" 사용 (현재는 "username"로 되어 있음)
+                type = "nickname",
                 value = nickname,
                 appId = Constants.APP_ID
             ).collect { result ->
-                android.util.Log.d(TAG, "[validateNickname] Received result: ${result::class.simpleName}")
-                
                 when (result) {
                     is ApiResult.Success -> {
                         val response = result.data
-
-                        // API 응답 로깅 (디버깅용)
-                        android.util.Log.d(TAG, "========================================")
-                        android.util.Log.d(TAG, "[validateNickname] API Response:")
-                        android.util.Log.d(TAG, "  - nickname: $nickname")
-                        android.util.Log.d(TAG, "  - success: ${response.success}")
-                        android.util.Log.d(TAG, "  - message: ${response.message}")
-                        android.util.Log.d(TAG, "  - domain: ${response.domain}")
-                        android.util.Log.d(TAG, "  - gcode: ${response.gcode}")
-                        android.util.Log.d(TAG, "  - mcode: ${response.mcode}")
-                        android.util.Log.d(TAG, "========================================")
-
-                        // Old 프로젝트 로직 분석 (SignupFragment.serverValidate, KakaoMoreFragment.serverValidate):
-                        // 
-                        // 1. success == false인 경우:
-                        //    - 에러 메시지 표시 (response.optString("msg") 또는 ErrorControl.parseError)
-                        //    - gcode == ERROR_88888 (88888)이면 isBadWords = true (금지어)
-                        //    - gcode == ERROR_1011 (1011)이면 isBadWords = false (중복 닉네임)
-                        //    - isNickName = false 설정
-                        //    - 버튼 비활성화 (changeSingupBtnStatus)
-                        //    - return@validate (여기서 끝)
-                        //
-                        // 2. success == true인 경우:
-                        //    - gcode == 0이면:
-                        //      - isNickName = true 설정
-                        //      - isBadWords = false 설정
-                        //    - 에러 메시지 제거 (error = null)
-                        //    - 체크 표시 추가 (setCompoundDrawables)
-                        //    - 버튼 활성화 (changeSingupBtnStatus)
-                        //
-                        // 중요: old 프로젝트에서는 response.optInt("gcode")를 사용하는데,
-                        // optInt는 키가 없거나 null이면 0을 반환합니다.
-                        // 따라서 success == false일 때도 gcode를 확인해야 합니다.
                         
                         if (!response.success) {
-                            // CASE 1: success == false -> 사용 불가 (이미 존재하거나 에러)
-                            val gcode = response.gcode ?: 0 // old: response.optInt("gcode")
-                            
-                            // Old 프로젝트: gcode에 따라 isBadWordsNickName 설정
+                            val gcode = response.gcode ?: 0
                             val isBadWords = when (gcode) {
-                                88888 -> true  // 욕설/부적절한 단어 필터링 (ERROR_88888)
-                                1011 -> false  // 중복 닉네임 (ERROR_1011)
+                                88888 -> true
+                                1011 -> false
                                 else -> false
                             }
-                            
                             val errorMessage = response.message ?: when (gcode) {
-                                1011 -> context.getString(net.ib.mn.R.string.error_1011) // 중복 닉네임 (ERROR_1011)
-                                88888 -> context.getString(net.ib.mn.R.string.bad_words) // 금지어 (ERROR_88888)
+                                1011 -> context.getString(net.ib.mn.R.string.error_1011)
+                                88888 -> context.getString(net.ib.mn.R.string.bad_words)
                                 else -> context.getString(net.ib.mn.R.string.error_1011)
                             }
                             
-                            android.util.Log.d(TAG, "[validateNickname] CASE 1: success=false -> Nickname unavailable")
-                            android.util.Log.d(TAG, "  - gcode: $gcode")
-                            android.util.Log.d(TAG, "  - isBadWordsNickName: $isBadWords")
-                            android.util.Log.d(TAG, "  - errorMessage: $errorMessage")
-                            
                             setState {
-                                android.util.Log.d(TAG, "[validateNickname] Setting state: isNicknameValid=false, isBadWordsNickName=$isBadWords, canProceedStep2=false")
                                 copy(
-                                    nicknameError = errorMessage, // Old: editText.setError(responseMsg)
-                                    isNicknameValid = false, // Old: isNickName = false
-                                    isBadWordsNickName = isBadWords, // Old: isBadWordsNickName = true/false
-                                    canProceedStep2 = false // Old: changeSingupBtnStatus() -> 버튼 비활성화
+                                    nicknameError = errorMessage,
+                                    isNicknameValid = false,
+                                    isBadWordsNickName = isBadWords,
+                                    canProceedStep2 = false
                                 )
                             }
-                            // Old: return@validate (여기서 끝)
                         } else {
-                            // CASE 2: success == true인 경우
-                            val gcode = response.gcode ?: 0 // null이면 0으로 처리 (old 프로젝트의 optInt 동작)
-                            android.util.Log.d(TAG, "[validateNickname] CASE 2: success=true, gcode=$gcode")
+                            val gcode = response.gcode ?: 0
                             
                             if (gcode == 0) {
-                                // CASE 2-1: success == true && gcode == 0 -> 사용 가능한 닉네임
-                                android.util.Log.d(TAG, "[validateNickname] CASE 2-1: gcode=0 -> Nickname available")
-
-                                // setState 블록 밖에서 현재 state 값들을 먼저 읽어야 함
                                 val currentDomain = currentState.domain
                                 val currentIsEmailValid = currentState.isEmailValid
                                 val currentIsPasswordValid = currentState.isPasswordValid
                                 val currentIsPasswordConfirmValid = currentState.isPasswordConfirmValid
 
-                                val isEmailLogin = currentDomain == "email"
-                                android.util.Log.d(TAG, "  - domain: $currentDomain")
-                                android.util.Log.d(TAG, "  - isEmailLogin: $isEmailLogin")
-                                android.util.Log.d(TAG, "  - isEmailValid: $currentIsEmailValid")
-                                android.util.Log.d(TAG, "  - isPasswordValid: $currentIsPasswordValid")
-                                android.util.Log.d(TAG, "  - isPasswordConfirmValid: $currentIsPasswordConfirmValid")
-
-                                val newCanProceedStep2 = if (isEmailLogin) {
-                                    // 일반 가입: 모든 필드 체크 (Old: isEmail && isPasswd && isPasswdConfirm && isNickName)
-                                    val result = currentIsEmailValid && currentIsPasswordValid && currentIsPasswordConfirmValid && true
-                                    android.util.Log.d(TAG, "  - canProceedStep2 (email): $result")
-                                    result
-                                } else {
-                                    // SNS 로그인: 닉네임만 체크 (Old: isNickName)
-                                    android.util.Log.d(TAG, "  - canProceedStep2 (SNS): true")
-                                    true
-                                }
-
                                 setState {
-                                    android.util.Log.d(TAG, "[validateNickname] Setting state: isNicknameValid=true, isBadWordsNickName=false, canProceedStep2=$newCanProceedStep2")
                                     copy(
-                                        nicknameError = null, // Old: editText.error = null
-                                        isNicknameValid = true, // Old: isNickName = true
-                                        isBadWordsNickName = false, // Old: isBadWordsNickName = false (gcode == 0)
-                                        canProceedStep2 = newCanProceedStep2 // Old: changeSingupBtnStatus() -> 버튼 활성화
+                                        nicknameError = null,
+                                        isNicknameValid = true,
+                                        isBadWordsNickName = false,
+                                        canProceedStep2 = calculateCanProceedStep2(
+                                            domain = currentDomain,
+                                            isEmailValid = currentIsEmailValid,
+                                            isPasswordValid = currentIsPasswordValid,
+                                            isPasswordConfirmValid = currentIsPasswordConfirmValid,
+                                            isNicknameValid = true
+                                        )
                                     )
                                 }
-                                // Old 프로젝트: 토스트 없이 체크 아이콘만 표시
                             } else {
-                                // CASE 2-2: success == true이지만 gcode != 0 -> 사용 불가 (이미 존재 등)
-                                // 이 경우는 이론적으로 발생하지 않아야 하지만, 안전을 위해 처리
                                 val isBadWords = when (gcode) {
                                     88888 -> true
                                     1011 -> false
                                     else -> false
                                 }
                                 val errorMessage = response.message ?: when (gcode) {
-                                    1011 -> context.getString(net.ib.mn.R.string.error_1011) // 중복 닉네임
-                                    88888 -> context.getString(net.ib.mn.R.string.bad_words) // 금지어
+                                    1011 -> context.getString(net.ib.mn.R.string.error_1011)
+                                    88888 -> context.getString(net.ib.mn.R.string.bad_words)
                                     else -> context.getString(net.ib.mn.R.string.error_1011)
                                 }
-                                android.util.Log.w(TAG, "[validateNickname] CASE 2-2: success=true but gcode=$gcode -> Nickname unavailable (unexpected)")
-                                android.util.Log.w(TAG, "  - isBadWordsNickName: $isBadWords")
-                                android.util.Log.w(TAG, "  - errorMessage: $errorMessage")
                                 
                                 setState {
-                                    android.util.Log.d(TAG, "[validateNickname] Setting state: isNicknameValid=false, isBadWordsNickName=$isBadWords, canProceedStep2=false")
                                     copy(
                                         nicknameError = errorMessage,
                                         isNicknameValid = false,
@@ -582,12 +618,6 @@ class SignUpViewModel @Inject constructor(
                         }
                     }
                     is ApiResult.Error -> {
-                        android.util.Log.e(TAG, "========================================")
-                        android.util.Log.e(TAG, "[validateNickname] API Error")
-                        android.util.Log.e(TAG, "  - error message: ${result.message}")
-                        android.util.Log.e(TAG, "  - error exception: ${result.exception}")
-                        android.util.Log.e(TAG, "========================================")
-                        // Old 프로젝트: 에러 시 토스트 대신 TextField에 에러 메시지 표시
                         setState {
                             copy(
                                 nicknameError = result.message ?: context.getString(net.ib.mn.R.string.error_abnormal_exception),
@@ -596,17 +626,14 @@ class SignUpViewModel @Inject constructor(
                             )
                         }
                     }
-                    is ApiResult.Loading -> {
-                        android.util.Log.d(TAG, "[validateNickname] Loading...")
-                        // 로딩 중
-                    }
+                    is ApiResult.Loading -> { /* 로딩 중 */ }
                 }
             }
         }
     }
 
     private fun validateRecommenderCode() {
-        val recommenderCode = currentState.recommenderCode
+        val recommenderCode = currentState.recommenderCode.trim()
         if (recommenderCode.isEmpty()) {
             // 추천인 코드가 비어있으면 검증하지 않음 (선택사항)
             setState {
@@ -627,28 +654,53 @@ class SignUpViewModel @Inject constructor(
                 when (result) {
                     is ApiResult.Success -> {
                         val response = result.data
-                        if (response.success) {
-                            // 유효한 추천인 코드
+                        
+                        // old 프로젝트 로직 분석:
+                        // if (!response.optBoolean("success")) {
+                        //     // success가 false면 에러 처리
+                        //     return@validate
+                        // }
+                        // if (response.optInt("gcode") == 0) {
+                        //     // success가 true이고 gcode가 0이면 유효한 추천인 코드
+                        //     // 체크 아이콘 표시
+                        // }
+                        
+                        if (!response.success) {
+                            // success가 false: 존재하지 않는 추천인 코드 또는 에러
+                            val errorMessage = response.message ?: context.getString(net.ib.mn.R.string.error_1012)
                             setState {
                                 copy(
-                                    recommenderError = null,
-                                    isRecommenderValid = true
+                                    recommenderError = errorMessage,
+                                    isRecommenderValid = false
                                 )
                             }
                         } else {
-                            // 존재하지 않는 추천인 코드 (error_1012: "추천인을 찾지 못했습니다.")
-                            setState {
-                                copy(
-                                    recommenderError = context.getString(net.ib.mn.R.string.error_1012),
-                                    isRecommenderValid = false
-                                )
+                            // success가 true인 경우
+                            val gcode = response.gcode ?: 0
+                            if (gcode == 0) {
+                                // success가 true이고 gcode가 0: 유효한 추천인 코드
+                                setState {
+                                    copy(
+                                        recommenderError = null,
+                                        isRecommenderValid = true
+                                    )
+                                }
+                            } else {
+                                // success가 true이지만 gcode가 0이 아닌 경우: 에러 처리
+                                val errorMessage = response.message ?: context.getString(net.ib.mn.R.string.error_1012)
+                                setState {
+                                    copy(
+                                        recommenderError = errorMessage,
+                                        isRecommenderValid = false
+                                    )
+                                }
                             }
                         }
                     }
                     is ApiResult.Error -> {
                         setState {
                             copy(
-                                recommenderError = result.message ?: context.getString(net.ib.mn.R.string.required_field),
+                                recommenderError = result.message ?: context.getString(net.ib.mn.R.string.error_1012),
                                 isRecommenderValid = false
                             )
                         }
@@ -675,12 +727,6 @@ class SignUpViewModel @Inject constructor(
 
         // Old 프로젝트: isBadWordsNickName이 true이면 회원가입 API를 호출하지 않음
         if (currentState.isBadWordsNickName) {
-            android.util.Log.w(TAG, "========================================")
-            android.util.Log.w(TAG, "[signUp] Skipped: isBadWordsNickName=true")
-            android.util.Log.w(TAG, "  - nickname: '${currentState.nickname}'")
-            android.util.Log.w(TAG, "========================================")
-            setState { copy(isLoading = false) }
-            // 닉네임 필드에 에러 표시 (old 프로젝트 동일)
             setState {
                 copy(
                     nicknameError = context.getString(net.ib.mn.R.string.bad_words),
@@ -832,14 +878,33 @@ class SignUpViewModel @Inject constructor(
                             android.util.Log.d(signUpTag, "SignUp API Response received")
                             android.util.Log.d(signUpTag, "  success: ${response.success}")
                             android.util.Log.d(signUpTag, "  message: ${response.message}")
+                            android.util.Log.d(signUpTag, "  msg: ${response.msg}")
                             android.util.Log.d(signUpTag, "  gcode: ${response.gcode}")
                             android.util.Log.d(signUpTag, "  mcode: ${response.mcode}")
                             android.util.Log.d(signUpTag, "========================================")
                             
                             if (response.success) {
-                                // Old 프로젝트: 회원가입 성공 후 trySignin() 호출
-                                android.util.Log.d(signUpTag, "SignUp success - calling signIn API")
-                                performSignInAfterSignUp()
+                                // Old 프로젝트: 회원가입 성공 후 msg가 있으면 다이얼로그 표시하고 로그인하지 않음
+                                // msg가 없으면 바로 로그인 진행
+                                // old 프로젝트: response.optString("msg") 사용
+                                val emailVerificationMessage = response.msg ?: response.message
+                                
+                                if (!emailVerificationMessage.isNullOrEmpty()) {
+                                    // 이메일 발송 확인 다이얼로그 표시 (old 프로젝트와 동일)
+                                    android.util.Log.d(signUpTag, "========================================")
+                                    android.util.Log.d(signUpTag, "SignUp success - showing email verification dialog")
+                                    android.util.Log.d(signUpTag, "  msg: ${response.msg}")
+                                    android.util.Log.d(signUpTag, "  message: ${response.message}")
+                                    android.util.Log.d(signUpTag, "  final message: $emailVerificationMessage")
+                                    android.util.Log.d(signUpTag, "========================================")
+                                    
+                                    setState { copy(isLoading = false) }
+                                    setEffect { SignUpContract.Effect.ShowEmailVerificationDialog(emailVerificationMessage) }
+                                } else {
+                                    // msg가 없으면 바로 로그인 진행 (old 프로젝트와 동일)
+                                    android.util.Log.d(signUpTag, "SignUp success - no message, calling signIn API")
+                                    performSignInAfterSignUp()
+                                }
                             } else {
                                 setState { copy(isLoading = false) }
                                 android.util.Log.e(signUpTag, "========================================")
@@ -851,14 +916,25 @@ class SignUpViewModel @Inject constructor(
                                 
                                 // Old 프로젝트: gcode에 따라 다른 필드에 에러 표시
                                 val gcode = response.gcode ?: 0
-                                val errorMessage = response.message
                                 
                                 when (gcode) {
+                                    9000 -> {
+                                        // 버전 관련 에러 (old 프로젝트: ERROR_9000 -> error_abnormal 사용)
+                                        // old 프로젝트: String.format(context.getString(R.string.error_abnormal), gcode.toString())
+                                        val versionErrorMessage = context.getString(
+                                            net.ib.mn.R.string.error_abnormal,
+                                            gcode.toString()
+                                        )
+                                        android.util.Log.e(signUpTag, "  -> Version error (gcode: 9000): $versionErrorMessage")
+                                        setEffect {
+                                            SignUpContract.Effect.ShowError(versionErrorMessage)
+                                        }
+                                    }
                                     88888 -> {
                                         // 욕설/부적절한 단어 필터링 (ERROR_88888)
                                         // Old 프로젝트: 회원가입 API에서도 gcode: 88888이 나올 수 있음
                                         // 닉네임 필드에 에러 표시하고 isBadWordsNickName = true로 설정
-                                        val badWordsMessage = errorMessage ?: context.getString(net.ib.mn.R.string.bad_words)
+                                        val badWordsMessage = context.getString(net.ib.mn.R.string.bad_words)
                                         android.util.Log.e(signUpTag, "  -> Setting nickname error: $badWordsMessage")
                                         android.util.Log.e(signUpTag, "  -> Setting isBadWordsNickName = true")
                                         setState {
@@ -873,7 +949,7 @@ class SignUpViewModel @Inject constructor(
                                     1011 -> {
                                         // 중복 닉네임 (ERROR_1011)
                                         // 닉네임 필드에 에러 표시
-                                        val duplicateMessage = errorMessage ?: context.getString(net.ib.mn.R.string.error_1011)
+                                        val duplicateMessage = context.getString(net.ib.mn.R.string.error_1011)
                                         android.util.Log.e(signUpTag, "  -> Setting nickname error: $duplicateMessage")
                                         setState {
                                             copy(
@@ -886,7 +962,7 @@ class SignUpViewModel @Inject constructor(
                                     1012 -> {
                                         // 추천인을 찾지 못함 (ERROR_1012)
                                         // 추천인 필드에 에러 표시
-                                        val recommenderMessage = errorMessage ?: context.getString(net.ib.mn.R.string.error_1012)
+                                        val recommenderMessage = context.getString(net.ib.mn.R.string.error_1012)
                                         android.util.Log.e(signUpTag, "  -> Setting recommender error: $recommenderMessage")
                                         setState {
                                             copy(
@@ -903,15 +979,15 @@ class SignUpViewModel @Inject constructor(
                                     1013 -> {
                                         // 10분 이내에 두번 이상 가입할 수 없음 (ERROR_1013)
                                         // 다이얼로그로 표시
-                                        val tooManyAttemptsMessage = errorMessage ?: context.getString(net.ib.mn.R.string.error_1013)
+                                        val tooManyAttemptsMessage = context.getString(net.ib.mn.R.string.error_1013)
                                         android.util.Log.e(signUpTag, "  -> Showing dialog: $tooManyAttemptsMessage")
                                         setEffect {
                                             SignUpContract.Effect.ShowError(tooManyAttemptsMessage)
                                         }
                                     }
                                     else -> {
-                                        // 그 외: 일반 에러 메시지 표시
-                                        val defaultMessage = errorMessage ?: context.getString(net.ib.mn.R.string.error_abnormal_exception)
+                                        // 그 외: 일반 에러 메시지 표시 (old 프로젝트: error_abnormal_default)
+                                        val defaultMessage = context.getString(net.ib.mn.R.string.error_abnormal_default)
                                         android.util.Log.e(signUpTag, "  -> Showing error: $defaultMessage")
                                         setEffect {
                                             SignUpContract.Effect.ShowError(defaultMessage)
@@ -1138,5 +1214,26 @@ class SignUpViewModel @Inject constructor(
             setState { copy(currentStep = currentStep - 1) }
             setEffect { SignUpContract.Effect.NavigateToPreviousStep }
         }
+    }
+
+    /**
+     * 비밀번호 정규식 체크 (old 프로젝트의 UtilK.checkPwdRegex와 동일)
+     * - 8자 이상
+     * - 영문, 숫자, 특수문자 중 2개 이상 포함
+     * - 가능한 특수문자: []"/;:'<>,.~!@#$%^&*()_+?!-=/\{}
+     */
+    private fun checkPwdRegex(passwd: String): Boolean {
+        var count = 0
+
+        val wordPattern = """^.*[A-Za-z].*$"""
+        val numberPattern = """^.*[0-9].*$"""
+        val specialPattern = """^.*[\[\]\"|;:'<>\\,.~@#\$%^&*()_+?!={}\/-].*$"""
+
+        val pwdPattern = """^[A-Za-z\d\[\]\"|;:'<>\\,.~@#\$%^&*()_+?!={}\/-]{8,}$"""
+        if (Pattern.matches(wordPattern, passwd)) count++
+        if (Pattern.matches(numberPattern, passwd)) count++
+        if (Pattern.matches(specialPattern, passwd)) count++
+
+        return Pattern.matches(pwdPattern, passwd) && count >= 2
     }
 }

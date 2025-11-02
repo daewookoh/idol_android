@@ -69,6 +69,12 @@ class LoginContract {
      */
     sealed class Effect : UiEffect {
         /**
+         * 로그인 성공 - StartUp 화면으로 이동 (old 프로젝트: StartupActivity로 이동).
+         * StartUp 화면에서 getUserSelf API를 호출하여 전체 사용자 정보를 가져옴.
+         */
+        data object NavigateToStartUp : Effect()
+
+        /**
          * 로그인 성공 - 메인 화면으로 이동.
          */
         data object NavigateToMain : Effect()

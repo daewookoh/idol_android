@@ -556,25 +556,23 @@ class LoginViewModel @Inject constructor(
                             preferencesManager.setDeviceId(deviceId)
                             android.util.Log.d(loginTag, "✓ Device ID saved: $deviceId")
                             
-                            // 4. signIn API 응답에서 받은 모든 사용자 정보 저장
-                            // 나머지 정보(hearts, diamond, level 등)는 StartUpScreen의 getUserSelf에서 받아서 저장됨
+                            // 4. old 프로젝트와 동일: 최소한의 정보만 저장 (email, domain, token)
+                            // 전체 사용자 정보는 StartUpScreen의 getUserSelf에서 가져옴
+                            // email을 저장하기 위해 setUserInfo를 최소한의 정보로 호출 (id는 0으로 설정, 나머지는 StartUpScreen에서 업데이트)
                             preferencesManager.setUserInfo(
-                                id = userData.userId,
+                                id = 0, // StartUpScreen에서 getUserSelf API로 실제 ID로 업데이트됨
                                 email = userData.email,
-                                username = userData.username,
-                                nickname = userData.nickname, // signIn API 응답에서 받은 값 저장
-                                profileImage = userData.profileImage, // signIn API 응답에서 받은 값 저장
-                                hearts = null, // getUserSelf에서 받음
-                                domain = domain  // 로그인 타입 저장
+                                username = "",
+                                nickname = null,
+                                profileImage = null,
+                                hearts = null,
+                                domain = domain
                             )
-                            android.util.Log.d(loginTag, "User info saved from signIn API response")
-                            android.util.Log.d(loginTag, "  - id: ${userData.userId}")
-                            android.util.Log.d(loginTag, "  - email: ${userData.email}")
-                            android.util.Log.d(loginTag, "  - username: ${userData.username}")
-                            android.util.Log.d(loginTag, "  - nickname: ${userData.nickname}")
-                            android.util.Log.d(loginTag, "  - profileImage: ${userData.profileImage}")
-                            android.util.Log.d(loginTag, "  - domain: $domain")
-                            android.util.Log.d(loginTag, "  - Note: Additional info (hearts, level, etc.) will be fetched in StartUpScreen")
+                            android.util.Log.d(loginTag, "✓ Auth credentials saved (email, domain, token)")
+                            android.util.Log.d(loginTag, "  - Email: ${userData.email}")
+                            android.util.Log.d(loginTag, "  - Domain: $domain")
+                            android.util.Log.d(loginTag, "  - Token: ${userData.token.take(20)}...")
+                            android.util.Log.d(loginTag, "  - Note: Full user info will be fetched in StartUpScreen")
                         } else {
                             // response.data가 null인 경우 (Old 프로젝트와 동일)
                             // 사용자 정보는 이후에 별도로 가져옴 (StartUpScreen 또는 getUserSelf에서)
@@ -615,24 +613,23 @@ class LoginViewModel @Inject constructor(
                             preferencesManager.setDeviceId(deviceId)
                             android.util.Log.d(loginTag, "✓ Device ID saved: $deviceId")
                             
-                            // 4. 최소한의 사용자 정보 저장 (id는 임시로 0 사용, StartUpScreen에서 업데이트됨)
-                            // Old 프로젝트: createAccount에서 사용자 정보를 가져와서 저장
-                            // 현재 프로젝트: StartUpScreen의 loadUserSelf에서 사용자 정보를 가져와서 저장
+                            // 4. old 프로젝트와 동일: 최소한의 정보만 저장 (email, domain, token)
+                            // 전체 사용자 정보는 StartUpScreen의 getUserSelf에서 가져옴
+                            // email을 저장하기 위해 setUserInfo를 최소한의 정보로 호출 (id는 0으로 설정, 나머지는 StartUpScreen에서 업데이트)
                             preferencesManager.setUserInfo(
-                                id = 0, // 임시 ID, StartUpScreen에서 실제 ID로 업데이트됨
+                                id = 0, // StartUpScreen에서 getUserSelf API로 실제 ID로 업데이트됨
                                 email = email,
-                                username = "", // StartUpScreen에서 업데이트됨
+                                username = "",
                                 nickname = null,
                                 profileImage = null,
                                 hearts = null,
                                 domain = domain
                             )
-                            
-                            android.util.Log.d(loginTag, "Basic auth credentials saved (token will be updated later)")
+                            android.util.Log.d(loginTag, "✓ Auth credentials saved (email, domain, token)")
                             android.util.Log.d(loginTag, "  - Email: $email")
                             android.util.Log.d(loginTag, "  - Domain: $domain")
                             android.util.Log.d(loginTag, "  - Token: ${hashToken.take(20)}...")
-                            android.util.Log.d(loginTag, "  - Note: User info will be fetched in StartUpScreen")
+                            android.util.Log.d(loginTag, "  - Note: Full user info will be fetched in StartUpScreen")
                         }
 
                         android.util.Log.d(TAG, "✓ Login successful")
@@ -701,9 +698,11 @@ class LoginViewModel @Inject constructor(
                             preferencesManager.setDeviceId(deviceId)
                             android.util.Log.d(loginTag, "✓ Device ID saved: $deviceId")
                             
-                            // 4. 최소한의 사용자 정보 저장 (StartUpScreen에서 업데이트됨)
+                            // 4. old 프로젝트와 동일: 최소한의 정보만 저장 (email, domain, token)
+                            // 전체 사용자 정보는 StartUpScreen의 getUserSelf에서 가져옴
+                            // email을 저장하기 위해 setUserInfo를 최소한의 정보로 호출 (id는 0으로 설정, 나머지는 StartUpScreen에서 업데이트)
                             preferencesManager.setUserInfo(
-                                id = 0,
+                                id = 0, // StartUpScreen에서 getUserSelf API로 실제 ID로 업데이트됨
                                 email = email,
                                 username = "",
                                 nickname = null,
@@ -711,10 +710,11 @@ class LoginViewModel @Inject constructor(
                                 hearts = null,
                                 domain = domain
                             )
-                            
-                            android.util.Log.d(loginTag, "✓ Login credentials saved (user exists in DB)")
+                            android.util.Log.d(loginTag, "✓ Auth credentials saved (email, domain, token)")
                             android.util.Log.d(loginTag, "  - Email: $email")
                             android.util.Log.d(loginTag, "  - Domain: $domain")
+                            android.util.Log.d(loginTag, "  - Token: ${hashToken.take(20)}...")
+                            android.util.Log.d(loginTag, "  - Note: Full user info will be fetched in StartUpScreen")
                             
                             setState { copy(isLoading = false, loginType = null) }
                             setEffect { LoginContract.Effect.NavigateToMain }

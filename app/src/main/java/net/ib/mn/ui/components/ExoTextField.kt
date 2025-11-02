@@ -158,6 +158,11 @@ fun ExoTextField(
 
                         // Focus listener
                         setOnFocusChangeListener { _, hasFocus ->
+                            // old 프로젝트: 포커스가 있을 때 아이콘 제거 (비밀번호, 비밀번호 확인 필드의 경우)
+                            if (hasFocus) {
+                                setCompoundDrawables(null, null, null, null)
+                            }
+                            
                             onFocusChanged?.invoke(
                                 object : FocusState {
                                     override val hasFocus: Boolean = hasFocus
@@ -171,10 +176,12 @@ fun ExoTextField(
                         addTextChangedListener(object : android.text.TextWatcher {
                             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                                // old 프로젝트: 텍스트 변경 시 아이콘 제거 (이메일 필드의 경우)
+                                setCompoundDrawables(null, null, null, null)
+                                
                                 // 값이 실제로 변경되었을 때만 onValueChange 호출
                                 val newText = s?.toString() ?: ""
                                 if (newText != value) {
-                                    android.util.Log.d("ExoTextField", "TextWatcher.onTextChanged: '$newText' (value: '$value')")
                                     onValueChange(newText)
                                 }
                             }
@@ -188,30 +195,19 @@ fun ExoTextField(
                     }
                 },
                 update = { editText ->
-                    // Update text - 사용자가 입력 중일 때는 값을 덮어쓰지 않도록 주의
-                    // editText.text.toString()이 현재 표시된 값, value가 Compose state 값
-                    // 사용자가 입력 중일 때는 editText의 값이 더 최신일 수 있으므로 주의
                     val currentText = editText.text.toString()
                     if (currentText != value) {
-                        // 포커스 상태 확인 - 포커스가 있으면 사용자가 입력 중일 수 있음
                         val hasFocus = editText.isFocused
                         
-                        if (hasFocus) {
-                            // 포커스가 있을 때는 값이 실제로 다를 때만 업데이트
-                            // (사용자가 입력 중일 때는 TextWatcher를 통해 이미 업데이트됨)
-                            android.util.Log.d("ExoTextField", "Update: hasFocus=true, currentText='$currentText', value='$value' - skipping update")
-                        } else {
+                        if (!hasFocus) {
                             // 포커스가 없을 때만 강제로 업데이트 (외부에서 값 변경 시)
-                            android.util.Log.d("ExoTextField", "Update: hasFocus=false, currentText='$currentText', value='$value' - updating")
-                            
-                            // 커서 위치 저장
                             val selectionStart = editText.selectionStart
                             val selectionEnd = editText.selectionEnd
                             val wasAtEnd = selectionStart == currentText.length && selectionEnd == currentText.length
                             
                             editText.setText(value)
                             
-                            // 커서 위치 복원 (끝에 있었으면 끝으로, 아니면 원래 위치로)
+                            // 커서 위치 복원
                             if (wasAtEnd || selectionStart > value.length) {
                                 editText.setSelection(value.length)
                             } else {
@@ -229,14 +225,12 @@ fun ExoTextField(
                         null
                     }
 
-                    // Update error message (old 프로젝트의 setError()와 동일)
-                    // old 프로젝트: editText.setError(responseMsg, mDrawableInputError)
-                    if (errorMessage != null && isValid == false && errorDrawable != null) {
+                    // Update error message and icons
+                    if (errorMessage != null && errorDrawable != null) {
                         editText.setError(errorMessage, errorDrawable)
+                        editText.setCompoundDrawables(null, null, errorDrawable, null)
                     } else {
                         editText.error = null
-                        // old 프로젝트: 성공 시 체크 아이콘 표시
-                        // editText.setCompoundDrawables(null, null, mDrawableInputOk, null)
                         if (isValid == true && successDrawable != null) {
                             editText.setCompoundDrawables(null, null, successDrawable, null)
                         } else {

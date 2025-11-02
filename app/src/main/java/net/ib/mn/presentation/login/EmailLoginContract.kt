@@ -42,6 +42,7 @@ object EmailLoginContract {
      * Effect (One-time Events).
      */
     sealed class Effect : UiEffect {
+        data object NavigateToStartUp : Effect() // old 프로젝트: StartupActivity로 이동
         data object NavigateToMain : Effect()
         data object NavigateToSignUp : Effect()
         data object NavigateToForgotId : Effect()

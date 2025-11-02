@@ -401,7 +401,8 @@ class UserRepositoryImpl @Inject constructor(
             val deviceId = deviceUtil.getDeviceUUID()
             val gmail = deviceUtil.getGmail()
             val deviceKey = preferencesManager.fcmToken.first() ?: ""
-            val version = context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.0"
+            // Old 프로젝트: getString(R.string.app_version) 사용
+            val version = context.getString(net.ib.mn.R.string.app_version)
             val time = System.currentTimeMillis()
 
             // Signature 생성

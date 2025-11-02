@@ -1,5 +1,6 @@
 package net.ib.mn.presentation.login
 
+import android.content.Context
 import android.util.Patterns
 import androidx.lifecycle.viewModelScope
 import net.ib.mn.base.BaseViewModel
@@ -12,6 +13,7 @@ import net.ib.mn.util.Constants
 import net.ib.mn.util.CryptoUtil
 import net.ib.mn.util.DeviceUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,6 +23,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class EmailLoginViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val signInUseCase: SignInUseCase,
     private val preferencesManager: PreferencesManager,
     private val authInterceptor: AuthInterceptor,
@@ -216,39 +219,30 @@ class EmailLoginViewModel @Inject constructor(
         android.util.Log.d("USER_INFO", "[EmailLoginViewModel]   - Token source: ${if (response.data?.token != null) "server response" else "hashed password"}")
         android.util.Log.d("USER_INFO", "[EmailLoginViewModel]   - Token preview: ${tokenToSave.take(20)}...")
 
-        // old 프로젝트와 동일: email, domain, token을 모두 저장
-        // old에서는 IdolAccount.createAccount(context, email, token, domain) 호출
+        // old 프로젝트와 동일: email, domain, token만 저장 (IdolAccount.createAccount)
+        // old: IdolAccount.createAccount(context, email, token, domain)
+        // old 프로젝트는 afterSignin에서 createAccount 호출 후 StartupActivity로 이동
+        // StartupActivity에서 getUserSelf API를 호출하여 전체 사용자 정보를 가져옴
         preferencesManager.setAccessToken(tokenToSave)
         preferencesManager.setLoginDomain(Constants.DOMAIN_EMAIL)
-
-        // IMPORTANT: Email도 명시적으로 저장 (StartUpViewModel에서 필요)
-        // setUserInfo에서도 email을 저장하지만, response.data가 null일 수 있으므로
-        // 여기서 미리 저장하여 StartUpViewModel이 즉시 사용할 수 있도록 함
-        if (response.data != null) {
-            // 서버에서 받은 전체 정보 저장
-            preferencesManager.setUserInfo(
-                id = response.data.userId,
-                email = response.data.email,
-                username = response.data.username,
-                nickname = response.data.nickname,
-                profileImage = response.data.profileImage,
-                hearts = null
-            )
-            android.util.Log.d("USER_INFO", "[EmailLoginViewModel] ✓ User info saved (from server response)")
-        } else {
-            // 서버가 user data를 보내지 않은 경우, email만 최소한 저장
-            // (id=0은 임시값, StartUpViewModel에서 /users/self/로 정확한 정보 가져옴)
-            preferencesManager.setUserInfo(
-                id = 0,  // 임시값
-                email = email,
-                username = email.substringBefore("@"),  // 임시값
-                nickname = null,
-                profileImage = null,
-                hearts = null
-            )
-            android.util.Log.d("USER_INFO", "[EmailLoginViewModel] ✓ Minimal user info saved (email only)")
-            android.util.Log.d("USER_INFO", "[EmailLoginViewModel]   - Full user info will be loaded from /users/self/")
-        }
+        
+        // old 프로젝트와 동일: email을 별도로 저장 (StartUpViewModel에서 loginEmail로 확인)
+        // setUserInfo를 최소한의 정보로 호출하여 email 저장 (id는 0으로 설정, 나머지는 StartUpScreen에서 업데이트)
+        preferencesManager.setUserInfo(
+            id = 0, // StartUpScreen에서 getUserSelf API로 실제 ID로 업데이트됨
+            email = email,
+            username = "",
+            nickname = null,
+            profileImage = null,
+            hearts = null,
+            domain = Constants.DOMAIN_EMAIL
+        )
+        
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel] ✓ Auth credentials saved (email, domain, token)")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel]   - Email: $email")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel]   - Domain: ${Constants.DOMAIN_EMAIL}")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel]   - Token: ${tokenToSave.take(20)}...")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel]   - Note: Full user info will be fetched in StartUpScreen")
 
         android.util.Log.d("USER_INFO", "[EmailLoginViewModel] ✓ Auth credentials saved to DataStore")
         android.util.Log.d("USER_INFO", "========================================")
@@ -282,6 +276,14 @@ class EmailLoginViewModel @Inject constructor(
         android.util.Log.d(TAG, "Navigating to StartUp screen...")
         android.util.Log.d(TAG, "========================================")
 
+        // 6. old 프로젝트와 동일: StartupActivity로 이동
+        // old: startActivity(StartupActivity.createIntent(this))
+        // StartupActivity에서 getUserSelf API를 호출하여 전체 사용자 정보를 가져옴
+        android.util.Log.d(TAG, "========================================")
+        android.util.Log.d(TAG, "All login data saved successfully!")
+        android.util.Log.d(TAG, "Navigating to StartUp screen...")
+        android.util.Log.d(TAG, "========================================")
+
         // NOTE: AppsFlyer 이벤트 로깅 구현 가이드 (필요 시 추가):
         // 1. build.gradle에 추가: implementation("com.appsflyer:af-android-sdk:6.x.x")
         // 2. Application 클래스에서 AppsFlyer 초기화
@@ -296,7 +298,7 @@ class EmailLoginViewModel @Inject constructor(
         // 6. StartupActivity로 이동 (old: startActivity(StartupActivity.createIntent(this)))
         // 모든 데이터 저장 완료 후 navigate
         setState { copy(isLoading = false) }
-        setEffect { EmailLoginContract.Effect.NavigateToMain }
+        setEffect { EmailLoginContract.Effect.NavigateToStartUp }
     }
 
     /**
@@ -304,25 +306,40 @@ class EmailLoginViewModel @Inject constructor(
      *
      * old 프로젝트의 trySignin() 에러 처리 로직:
      * - gcode=88888, mcode=1: 점검 중 메시지 표시
-     * - 그 외: 일반 에러 메시지 표시
+     * - gcode=1031: 비밀번호 확인 메시지 (ErrorControl.parseError 사용)
+     * - 그 외: ErrorControl.parseError로 gcode에 따른 메시지 표시
      */
     private fun handleSignInFailure(response: net.ib.mn.data.remote.dto.SignInResponse) {
         setState { copy(isLoading = false) }
 
+        android.util.Log.e(TAG, "========================================")
+        android.util.Log.e(TAG, "Login FAILURE")
+        android.util.Log.e(TAG, "  gcode: ${response.gcode}")
+        android.util.Log.e(TAG, "  mcode: ${response.mcode}")
+        android.util.Log.e(TAG, "  message: ${response.message}")
+        android.util.Log.e(TAG, "========================================")
+
         // 점검 중인지 확인
         if (response.gcode == 88888 && response.mcode == 1) {
             // 점검 중 메시지 표시
+            val errorMessage = response.message ?: "서비스 점검 중입니다."
             setEffect {
-                EmailLoginContract.Effect.ShowError(
-                    response.message ?: "서비스 점검 중입니다."
-                )
+                EmailLoginContract.Effect.ShowError(errorMessage)
             }
         } else {
-            // 일반 에러 메시지 표시
+            // old 프로젝트: ErrorControl.parseError 사용하여 gcode에 따른 메시지 표시
+            val errorMessage = when (response.gcode) {
+                1031 -> context.getString(net.ib.mn.R.string.error_1031) // "비밀번호를 확인해 주세요"
+                1030 -> context.getString(net.ib.mn.R.string.error_1030) // "닉네임이 잘못되었습니다"
+                1002 -> context.getString(net.ib.mn.R.string.error_1002) // "이메일을 확인해 주세요"
+                88888 -> response.message ?: context.getString(net.ib.mn.R.string.error_abnormal_default)
+                else -> {
+                    // message가 있으면 message 사용, 없으면 기본 메시지
+                    response.message ?: context.getString(net.ib.mn.R.string.error_abnormal_default)
+                }
+            }
             setEffect {
-                EmailLoginContract.Effect.ShowError(
-                    response.message ?: "로그인에 실패했습니다."
-                )
+                EmailLoginContract.Effect.ShowError(errorMessage)
             }
         }
     }

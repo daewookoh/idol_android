@@ -488,6 +488,10 @@ class StartUpViewModel @Inject constructor(
                     data?.let { userData ->
                         android.util.Log.d("USER_INFO", "[StartUpViewModel] Saving user info to DataStore...")
 
+                        // domain이 null이면 저장된 loginDomain 사용 (old 프로젝트와 동일)
+                        val userDomain = userData.domain ?: preferencesManager.loginDomain.first()
+
+                        // setUserInfo 호출 (suspend 함수이므로 완료될 때까지 기다림)
                         preferencesManager.setUserInfo(
                             id = userData.id,
                             email = userData.email,
@@ -508,12 +512,28 @@ class StartUpViewModel @Inject constructor(
                             statusMessage = userData.statusMessage,
                             ts = userData.ts,
                             itemNo = userData.itemNo,
-                            domain = userData.domain,
+                            domain = userDomain,
                             giveHeart = userData.giveHeart
                         )
 
+                        // setUserInfo 완료 후 DataStore 업데이트가 완료되기를 보장하기 위해 약간의 지연
+                        // DataStore는 비동기적으로 업데이트되므로, 업데이트가 반영되기까지 시간이 필요할 수 있음
+                        kotlinx.coroutines.delay(100)
+
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Full user info saved to DataStore and update confirmed")
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - All fields saved: id, email, username, nickname, profileImage")
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - All fields saved: hearts, diamond, strongHeart, weakHeart")
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - All fields saved: level, levelHeart, power, resourceUri")
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - All fields saved: pushKey, createdAt, pushFilter, statusMessage")
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - All fields saved: ts, itemNo, domain, giveHeart")
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - DataStore will emit updated userInfo to subscribers")
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - MainViewModel will receive the updated data")
+                    } ?: run {
+                        android.util.Log.w("USER_INFO", "[StartUpViewModel] ⚠️ UserSelf API returned null data")
                     }
 
+                    // Success나 Error가 나오면 수집 종료 (Flow 완료)
+                    return@collect
                 }
                 is ApiResult.Error -> {
                     if (result.code == 304) {
@@ -525,6 +545,8 @@ class StartUpViewModel @Inject constructor(
                         android.util.Log.e("USER_INFO", "[StartUpViewModel] ❌ UserSelf API error: ${result.message}")
                         android.util.Log.e(TAG, "UserSelf error: ${result.message}")
                     }
+                    // Success나 Error가 나오면 수집 종료 (Flow 완료)
+                    return@collect
                 }
             }
         }

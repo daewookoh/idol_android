@@ -40,6 +40,7 @@ import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoTextField
 import net.ib.mn.ui.components.ExoCheckBox
 import net.ib.mn.ui.components.ExoCheckBoxWithDetail
+import net.ib.mn.ui.components.ExoDialog
 import net.ib.mn.ui.components.ExoSimpleDialog
 import net.ib.mn.ui.components.ExoStatusButton
 import net.ib.mn.ui.theme.ExodusTheme
@@ -70,6 +71,8 @@ fun SignUpPagesScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+
+    var showEmailVerificationDialog by remember { mutableStateOf<String?>(null) }
 
     // SNS 로그인에서 전달받은 파라미터를 SavedStateHandle에 저장
     // Navigation Compose의 navArgument는 자동으로 SavedStateHandle에 저장되지 않으므로 수동으로 저장
@@ -117,6 +120,14 @@ fun SignUpPagesScreen(
                 is SignUpContract.Effect.NavigateToMain -> {
                     onSignUpComplete()
                 }
+                is SignUpContract.Effect.ShowEmailVerificationDialog -> {
+                    // 이메일 발송 확인 다이얼로그 표시 (old 프로젝트와 동일)
+                    showEmailVerificationDialog = effect.message
+                }
+                is SignUpContract.Effect.NavigateToStartUp -> {
+                    // 이 Effect는 더 이상 사용하지 않음 (다이얼로그 onConfirm에서 직접 처리)
+                    // 유지: 이전 버전 호환성을 위해 남겨둠
+                }
             }
         }
     }
@@ -151,6 +162,30 @@ fun SignUpPagesScreen(
         ExoSimpleDialog(
             message = message,
             onDismiss = { viewModel.handleIntent(SignUpContract.Intent.DismissDialog) }
+        )
+    }
+
+    // 이메일 발송 확인 다이얼로그 (old 프로젝트와 동일)
+    // old 프로젝트: Util.showDefaultIdolDialogWithBtn1에서 title = null로 호출
+    // 확인 버튼 클릭 시: StartUp으로 이동 (IS_EMAIL_SIGNUP 플래그 포함)
+    // old 프로젝트: setCancelable(false), setCanceledOnTouchOutside(false) 설정
+    showEmailVerificationDialog?.let { message ->
+        ExoDialog(
+            message = message,
+            onDismiss = {
+                showEmailVerificationDialog = null
+            },
+            onConfirm = {
+                // old 프로젝트와 동일: 다이얼로그 확인 버튼 클릭 시 StartUp으로 이동
+                // old 프로젝트: startIntent.putExtra(Const.IS_EMAIL_SIGNUP, "true")
+                // old 프로젝트: startActivity(startIntent), requireActivity().finish()
+                showEmailVerificationDialog = null
+                // 다이얼로그를 닫고 즉시 StartUp으로 이동 (old 프로젝트와 동일)
+                onSignUpComplete()
+            },
+            confirmButtonText = stringResource(id = R.string.confirm),
+            dismissOnBackPress = false, // old 프로젝트: setCancelable(false)
+            dismissOnClickOutside = false // old 프로젝트: setCanceledOnTouchOutside(false)
         )
     }
 }
@@ -392,11 +427,16 @@ private fun SignUpFormPage(
                 ExoTextField(
                     value = state.password,
                     onValueChange = { onIntent(SignUpContract.Intent.UpdatePassword(it)) },
-                    isValid = if (state.passwordError != null) false else if (state.isPasswordValid) true else null,
+                    isValid = if (state.passwordError != null) false 
+                              else if (!state.isPasswordFocused && state.isPasswordValid && state.password.isNotEmpty()) true 
+                              else null,
                     errorMessage = state.passwordError,
                     keyboardType = KeyboardType.Password,
                     visualTransformation = PasswordVisualTransformation(),
                     imeAction = ImeAction.Next,
+                    onFocusChanged = { focusState ->
+                        onIntent(SignUpContract.Intent.PasswordFocusChanged(focusState.isFocused))
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(36.dp)
@@ -426,11 +466,16 @@ private fun SignUpFormPage(
                 ExoTextField(
                     value = state.passwordConfirm,
                     onValueChange = { onIntent(SignUpContract.Intent.UpdatePasswordConfirm(it)) },
-                    isValid = if (state.passwordConfirmError != null) false else if (state.isPasswordConfirmValid) true else null,
+                    isValid = if (state.passwordConfirmError != null) false 
+                              else if (!state.isPasswordConfirmFocused && state.isPasswordConfirmValid && state.passwordConfirm.isNotEmpty()) true 
+                              else null,
                     errorMessage = state.passwordConfirmError,
                     keyboardType = KeyboardType.Password,
                     visualTransformation = PasswordVisualTransformation(),
                     imeAction = ImeAction.Next,
+                    onFocusChanged = { focusState ->
+                        onIntent(SignUpContract.Intent.PasswordConfirmFocusChanged(focusState.isFocused))
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(36.dp)

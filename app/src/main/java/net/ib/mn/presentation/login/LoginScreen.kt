@@ -572,6 +572,9 @@ fun LoginScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
+                is LoginContract.Effect.NavigateToStartUp -> {
+                    onNavigateToMain()
+                }
                 is LoginContract.Effect.NavigateToMain -> {
                     onNavigateToMain()
                 }
