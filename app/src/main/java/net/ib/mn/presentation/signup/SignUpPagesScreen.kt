@@ -1,7 +1,8 @@
 package net.ib.mn.presentation.signup
 
 import android.content.res.Configuration
-import android.widget.Toast
+import net.ib.mn.util.ToastUtil
+import net.ib.mn.util.KeyboardUtil
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -16,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -91,10 +91,10 @@ fun SignUpPagesScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is SignUpContract.Effect.ShowToast -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                    ToastUtil.show(context, effect.message)
                 }
                 is SignUpContract.Effect.ShowError -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                    ToastUtil.show(context, effect.message)
                 }
                 is SignUpContract.Effect.NavigateToTermsOfService -> {
                     // 이용약관 웹뷰로 이동
@@ -164,28 +164,9 @@ internal fun AgreementPage(
     onIntent: (SignUpContract.Intent) -> Unit,
     onNavigateBack: () -> Unit
 ) {
-    val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-
-    // 키보드를 내리는 공통 함수
     val hideKeyboard = {
-        focusManager.clearFocus()
-
-        // Activity의 현재 포커스된 뷰에서 키보드 숨기기
-        val activity = context as? android.app.Activity
-        activity?.let {
-            val imm = it.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-
-            // 현재 포커스된 뷰가 있으면 그것을 사용
-            val currentFocus = it.currentFocus
-            if (currentFocus != null) {
-                imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
-            } else {
-                // 포커스된 뷰가 없으면 DecorView를 사용
-                val decorView = it.window.decorView
-                imm.hideSoftInputFromWindow(decorView.windowToken, 0)
-            }
-        }
+        KeyboardUtil.hideKeyboard(context)
     }
 
     ExoScaffold(
@@ -293,34 +274,16 @@ private fun SignUpFormPage(
     onNavigateBack: () -> Unit
 ) {
     val scrollState = rememberScrollState()
-    val focusManager = LocalFocusManager.current
     val context = LocalContext.current
     val nicknameFocusRequester = remember { FocusRequester() }
-    
+
     // 회원가입 페이지가 열릴 때 닉네임 필드에 자동 포커스
     LaunchedEffect(Unit) {
         nicknameFocusRequester.requestFocus()
     }
 
-    // 키보드를 내리는 공통 함수
     val hideKeyboard = {
-        focusManager.clearFocus()
-
-        // Activity의 현재 포커스된 뷰에서 키보드 숨기기
-        val activity = context as? android.app.Activity
-        activity?.let {
-            val imm = it.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-
-            // 현재 포커스된 뷰가 있으면 그것을 사용
-            val currentFocus = it.currentFocus
-            if (currentFocus != null) {
-                imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
-            } else {
-                // 포커스된 뷰가 없으면 DecorView를 사용
-                val decorView = it.window.decorView
-                imm.hideSoftInputFromWindow(decorView.windowToken, 0)
-            }
-        }
+        KeyboardUtil.hideKeyboard(context)
     }
 
     ExoScaffold(

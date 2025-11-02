@@ -14,6 +14,7 @@ import net.ib.mn.presentation.main.MainScreen
 import net.ib.mn.presentation.signup.SignUpPagesScreen
 import net.ib.mn.presentation.startup.StartUpScreen
 import net.ib.mn.presentation.webview.WebViewScreen
+import net.ib.mn.util.ToastUtil
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -148,21 +149,17 @@ fun NavGraph(
                 },
                 onNavigateToForgotId = {
                     // NOTE: 아이디 찾기 화면 미구현 - 구현 시 Screen.ForgotId.route로 navigate
-                    // navController.navigate(Screen.ForgotId.route)
-                    android.widget.Toast.makeText(
+                    ToastUtil.show(
                         navController.context,
-                        "아이디 찾기 화면은 추후 구현 예정입니다",
-                        android.widget.Toast.LENGTH_SHORT
-                    ).show()
+                        "아이디 찾기 화면은 추후 구현 예정입니다"
+                    )
                 },
                 onNavigateToForgotPassword = {
                     // NOTE: 비밀번호 찾기 화면 미구현 - 구현 시 Screen.ForgotPassword.route로 navigate
-                    // navController.navigate(Screen.ForgotPassword.route)
-                    android.widget.Toast.makeText(
+                    ToastUtil.show(
                         navController.context,
-                        "비밀번호 찾기 화면은 추후 구현 예정입니다",
-                        android.widget.Toast.LENGTH_SHORT
-                    ).show()
+                        "비밀번호 찾기 화면은 추후 구현 예정입니다"
+                    )
                 },
                 onNavigateBack = {
                     navController.popBackStack()

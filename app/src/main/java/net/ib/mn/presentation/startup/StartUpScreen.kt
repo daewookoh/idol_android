@@ -1,7 +1,7 @@
 package net.ib.mn.presentation.startup
 
 import android.content.res.Configuration
-import android.widget.Toast
+import net.ib.mn.util.ToastUtil
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -69,11 +69,7 @@ fun StartUpScreen(
                 }
                 is StartUpContract.Effect.ShowError -> {
                     // 에러 메시지를 Toast로 표시
-                    Toast.makeText(
-                        context,
-                        effect.message,
-                        Toast.LENGTH_LONG
-                    ).show()
+                    ToastUtil.show(context, effect.message, android.widget.Toast.LENGTH_LONG)
                 }
             }
         }

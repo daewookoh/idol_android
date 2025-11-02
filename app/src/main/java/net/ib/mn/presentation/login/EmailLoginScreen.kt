@@ -1,7 +1,8 @@
 package net.ib.mn.presentation.login
 
 import android.content.res.Configuration
-import android.widget.Toast
+import net.ib.mn.util.ToastUtil
+import net.ib.mn.util.KeyboardUtil
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,7 +29,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
 import net.ib.mn.ui.components.ExoScaffold
+import net.ib.mn.ui.components.LoadingOverlay
 import net.ib.mn.ui.theme.ExodusTheme
 
 /**
@@ -71,10 +72,10 @@ fun EmailLoginScreen(
                 is EmailLoginContract.Effect.NavigateToForgotPassword -> onNavigateToForgotPassword()
                 is EmailLoginContract.Effect.NavigateBack -> onNavigateBack()
                 is EmailLoginContract.Effect.ShowError -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                    ToastUtil.show(context, effect.message)
                 }
                 is EmailLoginContract.Effect.ShowToast -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                    ToastUtil.show(context, effect.message)
                 }
             }
         }
@@ -95,28 +96,9 @@ private fun EmailLoginContent(
     state: EmailLoginContract.State,
     onIntent: (EmailLoginContract.Intent) -> Unit
 ) {
-    val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-
-    // 키보드를 내리는 공통 함수
     val hideKeyboard = {
-        focusManager.clearFocus()
-
-        // Activity의 현재 포커스된 뷰에서 키보드 숨기기
-        val activity = context as? android.app.Activity
-        activity?.let {
-            val imm = it.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-
-            // 현재 포커스된 뷰가 있으면 그것을 사용
-            val currentFocus = it.currentFocus
-            if (currentFocus != null) {
-                imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
-            } else {
-                // 포커스된 뷰가 없으면 DecorView를 사용
-                val decorView = it.window.decorView
-                imm.hideSoftInputFromWindow(decorView.windowToken, 0)
-            }
-        }
+        KeyboardUtil.hideKeyboard(context)
     }
 
     ExoScaffold {
@@ -286,18 +268,7 @@ private fun EmailLoginContent(
         }
 
         // 로딩 인디케이터
-        if (state.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f)),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
+        LoadingOverlay(isLoading = state.isLoading)
         } // Box
     } // ExoScaffold
 }

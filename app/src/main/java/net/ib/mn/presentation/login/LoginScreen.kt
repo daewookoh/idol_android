@@ -7,7 +7,7 @@ import android.content.ContextWrapper
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
-import android.widget.Toast
+import net.ib.mn.util.ToastUtil
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -67,6 +67,7 @@ import net.ib.mn.MainActivity
 import net.ib.mn.R
 import net.ib.mn.ui.components.ExoDialog
 import net.ib.mn.ui.components.ExoScaffold
+import net.ib.mn.ui.components.LoadingOverlay
 import net.ib.mn.ui.theme.ExodusTheme
 import net.ib.mn.util.Constants
 
@@ -631,7 +632,7 @@ fun LoginScreen(
                                 )
                             } ?: run {
                                 android.util.Log.e("LoginScreen", "Activity not found for Facebook login")
-                                Toast.makeText(context, R.string.msg_error_ok, Toast.LENGTH_SHORT).show()
+                                ToastUtil.show(context, R.string.msg_error_ok)
                             }
                         }
                         LoginContract.LoginType.EMAIL -> {
@@ -644,7 +645,7 @@ fun LoginScreen(
                     showErrorDialog = effect.message
                 }
                 is LoginContract.Effect.ShowToast -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                    ToastUtil.show(context, effect.message)
                 }
             }
         }
@@ -1001,18 +1002,7 @@ private fun LoginContent(
         }
 
         // 로딩 인디케이터
-        if (state.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f)),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
+        LoadingOverlay(isLoading = state.isLoading)
         } // Box
     } // ExoScaffold
 }
