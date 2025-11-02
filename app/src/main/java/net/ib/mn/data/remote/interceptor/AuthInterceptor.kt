@@ -83,7 +83,6 @@ class AuthInterceptor @Inject constructor(
             "/users/validate/",     // 사용자 검증
             "/users/find_id/",      // 아이디 찾기
             "/users/find_passwd/",  // 비밀번호 찾기
-            "/users/"               // 회원가입 (POST)도 포함 - 임시로 추가하여 테스트
         )
 
         // POST /users/ (회원가입)는 별도로 체크
