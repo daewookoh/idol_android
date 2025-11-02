@@ -103,4 +103,12 @@ interface UserRepository {
      * @return Flow<ApiResult<String>> - 찾은 아이디 (이메일 또는 도메인 설명)
      */
     fun findId(deviceId: String?): Flow<ApiResult<String>>
+
+    /**
+     * 비밀번호 찾기 (이메일로 비밀번호 재설정 링크 전송)
+     *
+     * @param email 이메일 주소
+     * @return Flow<ApiResult<CommonResponse>>
+     */
+    fun findPassword(email: String): Flow<ApiResult<CommonResponse>>
 }

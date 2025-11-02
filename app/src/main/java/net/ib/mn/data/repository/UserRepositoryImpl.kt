@@ -561,6 +561,40 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun findPassword(email: String): Flow<ApiResult<CommonResponse>> = flow {
+        emit(ApiResult.Loading)
+
+        try {
+            val request = FindPasswordRequest(email = email)
+            val response = userApi.findPassword(request)
+
+            if (response.isSuccessful && response.body() != null) {
+                val body = response.body()!!
+                android.util.Log.d("FindPasswordAPI", "Success: ${body.success}, message: ${body.message}")
+                emit(ApiResult.Success(body))
+            } else {
+                val errorBody = response.errorBody()?.string()
+                android.util.Log.e("FindPasswordAPI", "HTTP ${response.code()}: $errorBody")
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            android.util.Log.e("FindPasswordAPI", "HttpException", e)
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code()
+            ))
+        } catch (e: Exception) {
+            android.util.Log.e("FindPasswordAPI", "Exception", e)
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Find password error: ${e.message}"
+            ))
+        }
+    }
+
     // ============================================================
     // Signature & Password Hashing (Old 프로젝트와 동일)
     // ============================================================

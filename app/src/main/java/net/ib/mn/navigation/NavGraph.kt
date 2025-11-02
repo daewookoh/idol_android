@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import net.ib.mn.presentation.login.EmailLoginScreen
 import net.ib.mn.presentation.login.LoginScreen
+import net.ib.mn.presentation.login.PasswordResetScreen
 import net.ib.mn.presentation.main.MainScreen
 import net.ib.mn.presentation.signup.SignUpPagesScreen
 import net.ib.mn.presentation.startup.StartUpScreen
@@ -155,12 +156,43 @@ fun NavGraph(
                     )
                 },
                 onNavigateToForgotPassword = {
-                    // NOTE: 비밀번호 찾기 화면 미구현 - 구현 시 Screen.ForgotPassword.route로 navigate
-                    ToastUtil.show(
-                        navController.context,
-                        "비밀번호 찾기 화면은 추후 구현 예정입니다"
-                    )
+                    navController.navigate(Screen.ForgotPassword.route)
                 },
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // Password Reset 화면 (비밀번호 찾기)
+        composable(
+            route = Screen.ForgotPassword.route,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(600)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(600)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(600)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(600)
+                )
+            }
+        ) {
+            PasswordResetScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }
@@ -344,6 +376,7 @@ sealed class Screen(val route: String) {
     data object StartUp : Screen("startup")
     data object Login : Screen("login")
     data object EmailLogin : Screen("email_login")
+    data object ForgotPassword : Screen("forgot_password")
     data object SignUpPages : Screen("signup_pages") {
         // 파라미터 없이 회원가입 화면 이동 (일반 회원가입)
         val routeWithArgs = "signup_pages/{email}/{password}?displayName={displayName}&domain={domain}&profileImageUrl={profileImageUrl}"

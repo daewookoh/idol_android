@@ -437,6 +437,14 @@ data class SignUpRequest(
     val facebookId: Long? = null
 )
 
+// ============================================================
+// /users/find_passwd/ - 비밀번호 찾기
+// ============================================================
+data class FindPasswordRequest(
+    @SerializedName("email")
+    val email: String
+)
+
 /*
  * ============================================================
  * NOTE: 추가 가능한 API Response 모델 (필요 시 구현)

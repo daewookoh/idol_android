@@ -87,6 +87,14 @@ interface UserApi {
         @Query("device_id") deviceId: String? = null,
     ): Response<ResponseBody>
 
+    /**
+     * 비밀번호 찾기 (이메일로 비밀번호 재설정 링크 전송)
+     */
+    @POST("users/find_passwd/")
+    suspend fun findPassword(
+        @Body body: FindPasswordRequest
+    ): Response<CommonResponse>
+
     // NOTE: 추가 가능한 User 엔드포인트 (필요 시 구현)
     // - POST /users/iab_verify/ - IAB 검증
     // - POST /users/payments/google_item/ - Google Play 아이템 검증
