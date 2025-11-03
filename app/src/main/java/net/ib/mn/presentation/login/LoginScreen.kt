@@ -504,10 +504,9 @@ fun LoginScreen(
     // ============================================================
 
     LaunchedEffect(Unit) {
-        // Facebook SDK 초기화 (필요 시)
-        if (!FacebookSdk.isInitialized()) {
-            FacebookSdk.sdkInitialize(context)
-        }
+        // Facebook SDK 완전 초기화 대기
+        // IdolApplication에서 이미 초기화했지만, 완전히 초기화될 때까지 대기
+        FacebookSdk.fullyInitialize()
 
         // Facebook 로그아웃 (이전 세션 제거)
         LoginManager.getInstance().logOut()

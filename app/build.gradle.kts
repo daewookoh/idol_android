@@ -225,6 +225,7 @@ android {
             signingConfig = signingConfigs.getByName("release")
             try{
                 isMinifyEnabled = true
+                isShrinkResources = false  // 리소스 최적화 비활성화 (Baseline Profile 오류 방지)
                 setProguardFiles(listOf(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"))
 
                 lint.disable += "MissingTranslation"
@@ -263,9 +264,19 @@ android {
         buildConfig = true  // BuildConfig 활성화
     }
 
-    packagingOptions {
+    packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/maven/com.google.guava/guava/pom.properties"
+            excludes += "META-INF/maven/com.google.guava/guava/pom.xml"
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/NOTICE.txt"
+        }
+        jniLibs {
+            useLegacyPackaging = true
         }
     }
 
@@ -279,6 +290,11 @@ android {
     androidComponents {
         onVariants { variant ->
             variant.androidResources.ignoreAssetsPatterns.add("**/.*")
+
+            // Baseline Profile 완전 비활성화 (설치 오류 방지)
+            variant.packaging.resources.excludes.add("**.prof")
+            variant.packaging.resources.excludes.add("**.profm")
+            variant.packaging.resources.excludes.add("META-INF/com.android.tools/**")
         }
     }
 
@@ -286,6 +302,11 @@ android {
         abortOnError = false
         checkReleaseBuilds = false
     }
+}
+
+// Baseline Profile 라이브러리 완전 제외 (설치 오류 방지)
+configurations.all {
+    exclude(group = "androidx.profileinstaller", module = "profileinstaller")
 }
 
 dependencies {
