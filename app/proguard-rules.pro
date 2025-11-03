@@ -40,3 +40,30 @@
 -keep class com.google.android.gms.auth.** { *; }
 -keep class com.google.android.gms.common.** { *; }
 -dontwarn com.google.android.gms.**
+
+# ============================================================
+# Gson ProGuard Rules
+# ============================================================
+
+# Gson uses generic type information stored in a class file when working with fields.
+# Proguard removes such information by default, so configure it to keep all of it.
+-keepattributes Signature
+
+# For using GSON @Expose annotation
+-keepattributes *Annotation*
+
+# Gson specific classes
+-keep class sun.misc.Unsafe { *; }
+
+# Keep all data models and DTOs for Gson serialization
+-keep class net.ib.mn.data.** { *; }
+-keep class net.ib.mn.domain.model.** { *; }
+
+# Specifically keep UserInfo for JSON serialization in RankingPage
+-keep class net.ib.mn.data.local.UserInfo { *; }
+
+# Keep TypeAdapter classes
+-keep class * implements com.google.gson.TypeAdapter
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer

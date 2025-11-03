@@ -196,16 +196,37 @@ class LoginViewModel @Inject constructor(
                 }
                 is ApiResult.Success -> {
                     val response = result.data
+                    val registeredDomain = response.domain
                     android.util.Log.d(loginTag, "========================================")
                     android.util.Log.d(loginTag, "Validate API: Success")
                     android.util.Log.d(loginTag, "  response.success: ${response.success}")
-                    android.util.Log.d(loginTag, "  response.domain: ${response.domain}")
+                    android.util.Log.d(loginTag, "  response.domain: $registeredDomain")
                     android.util.Log.d(loginTag, "  response.message: ${response.message}")
+                    android.util.Log.d(loginTag, "  current domain: $domain")
                     android.util.Log.d(loginTag, "========================================")
 
+                    // **핵심 수정**: registeredDomain이 있고 현재 domain과 일치하면 기존 회원으로 처리
+                    // success 값에 관계없이 도메인이 일치하면 이미 가입된 회원입니다.
+                    // signIn API를 호출하여 서버 토큰을 받아옵니다.
+                    if (registeredDomain != null && registeredDomain.equals(domain, ignoreCase = true)) {
+                        android.util.Log.d(loginTag, "========================================")
+                        android.util.Log.d(loginTag, "EXISTING USER - Domain matches (regardless of success value)")
+                        android.util.Log.d(loginTag, "  email: $email")
+                        android.util.Log.d(loginTag, "  domain: $domain")
+                        android.util.Log.d(loginTag, "  registeredDomain: $registeredDomain")
+                        android.util.Log.d(loginTag, "  response.success: ${response.success}")
+                        android.util.Log.d(loginTag, "  Calling performSignIn() to get server token")
+                        android.util.Log.d(loginTag, "========================================")
+
+                        // Old 프로젝트와 동일: 기존 회원인 경우에도 signIn API를 호출하여 서버 토큰을 받아옴
+                        // validate API는 회원 여부만 확인하고, 실제 로그인(서버 토큰 발급)은 signIn API에서 처리
+                        performSignIn(isExistingUser = true)
+                        return@collect
+                    }
+
+                    // registeredDomain이 null이거나 현재 domain과 다른 경우 기존 로직 처리
                     if (response.success) {
                         // success == true이지만 domain이 null이면 미가입자로 처리
-                        val registeredDomain = response.domain
                         if (registeredDomain == null) {
                             android.util.Log.d(loginTag, "========================================")
                             android.util.Log.d(loginTag, "NEW USER - success=true but domain is null")
@@ -255,82 +276,26 @@ class LoginViewModel @Inject constructor(
                             }
                             return@collect
                         }
-                        
-                        // 새로운 로직: validate API에서 success == true이고 domain이 있으면 기존 회원
-                        // 회원정보를 기준으로 local에 필요한 데이터 저장하고 StartupScreen에서 로그인 처리
-                        android.util.Log.d(loginTag, "========================================")
-                        android.util.Log.d(loginTag, "EXISTING USER - Saving login info and navigating to StartupScreen")
-                        android.util.Log.d(loginTag, "  email: $email")
-                        android.util.Log.d(loginTag, "  domain: $domain")
-                        android.util.Log.d(loginTag, "  registeredDomain: $registeredDomain")
-                        android.util.Log.d(loginTag, "========================================")
-                        
-                        // 기존 회원: local에 필요한 데이터 저장 후 StartupScreen으로 이동
-                        val password = tempPassword ?: run {
-                            android.util.Log.e(loginTag, "========================================")
-                            android.util.Log.e(loginTag, "ERROR: tempPassword is null")
-                            android.util.Log.e(loginTag, "========================================")
-                            setState { copy(isLoading = false) }
-                            setEffect {
-                                LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
-                            }
-                            return@collect
+
+                        // success==true이고 registeredDomain이 null이 아닌 경우
+                        // 이미 line 210에서 domain이 일치하는 경우를 처리했으므로
+                        // 여기 도달했다면 다른 도메인으로 가입된 경우입니다.
+                        android.util.Log.w(loginTag, "========================================")
+                        android.util.Log.w(loginTag, "User registered with different domain")
+                        android.util.Log.w(loginTag, "  email: $email")
+                        android.util.Log.w(loginTag, "  current domain: $domain")
+                        android.util.Log.w(loginTag, "  registeredDomain: $registeredDomain")
+                        android.util.Log.w(loginTag, "========================================")
+                        setState { copy(isLoading = false) }
+                        setEffect {
+                            LoginContract.Effect.ShowError(
+                                context.getString(R.string.error_1031)
+                            )
                         }
 
-                        // Old 프로젝트의 afterSignin 로직과 동일
-                        val hashToken = if (domain == Constants.DOMAIN_EMAIL) {
-                            password // Email 로그인의 경우 md5salt (현재는 구현하지 않음)
-                        } else {
-                            password // SNS 로그인의 경우 access token 그대로 사용
-                        }
-
-                        // 1. AuthInterceptor에 기본 정보 저장
-                        authInterceptor.setAuthCredentials(
-                            email = email,
-                            domain = domain,
-                            token = hashToken
-                        )
-
-                        // 2. DataStore에 로그인 정보 저장
-                        preferencesManager.setAccessToken(hashToken)
-                        preferencesManager.setLoginDomain(domain)
-
-                        // 3. 디바이스 ID 저장 (아이디 찾기용)
-                        // old 프로젝트: 로그인 시 서버에 deviceId가 전달되지만, 로컬에도 저장하여 재설치 시에도 사용 가능하도록 함
-                        val deviceId = deviceUtil.getDeviceUUID()
-                        preferencesManager.setDeviceId(deviceId)
-                        android.util.Log.d(loginTag, "✓ Device ID saved: $deviceId")
-                        
-                        // 4. 최소한의 사용자 정보 저장 (StartUpScreen에서 업데이트됨)
-                        preferencesManager.setUserInfo(
-                            id = 0,
-                            email = email,
-                            username = "",
-                            nickname = null,
-                            profileImage = null,
-                            hearts = null,
-                            domain = domain
-                        )
-                        
-                        android.util.Log.d(loginTag, "✓ Login credentials saved (existing user)")
-                        android.util.Log.d(loginTag, "  - Email: $email")
-                        android.util.Log.d(loginTag, "  - Domain: $domain")
-                        android.util.Log.d(loginTag, "  - Token: ${hashToken.take(20)}...")
-                        android.util.Log.d(loginTag, "  - Note: User info will be fetched in StartupScreen")
-                        
-                        // Old 프로젝트: 카카오 로그인 성공 후 unlink 호출
-                        if (domain == Constants.DOMAIN_KAKAO) {
-                            android.util.Log.d(loginTag, "Calling requestKakaoUnlink()")
-                            requestKakaoUnlink()
-                        }
-                        
-                        setState { copy(isLoading = false, loginType = null) }
-                        setEffect { LoginContract.Effect.NavigateToMain }
-                        
                     } else {
                         // 새로운 로직: validate API에서 success == false면 신규 회원 또는 email이 없음
                         // email이 없거나 이메일이 잘못되었다고 나올 경우 회원가입화면으로 이동
-                        val registeredDomain = response.domain
                         val errorMessage = response.message ?: ""
                         val isEmailError = errorMessage.contains("이메일이 잘못되었습니다", ignoreCase = true) ||
                                 errorMessage.contains("email", ignoreCase = true) ||
@@ -347,23 +312,10 @@ class LoginViewModel @Inject constructor(
                         android.util.Log.d(loginTag, "  isEmailError: $isEmailError")
                         android.util.Log.d(loginTag, "  isDuplicateEmail: $isDuplicateEmail")
                         android.util.Log.d(loginTag, "========================================")
-                        
-                        // "중복되는 이메일입니다." 메시지가 있고 registeredDomain이 현재 domain과 일치하면 기존 회원으로 처리
-                        if (isDuplicateEmail && registeredDomain != null && registeredDomain.equals(domain, ignoreCase = true)) {
-                            android.util.Log.d(loginTag, "========================================")
-                            android.util.Log.d(loginTag, "EXISTING USER - Duplicate email with same domain")
-                            android.util.Log.d(loginTag, "  email: $email")
-                            android.util.Log.d(loginTag, "  domain: $domain")
-                            android.util.Log.d(loginTag, "========================================")
-                            
-                            // Old 프로젝트와 동일: 기존 회원인 경우에도 signIn API를 호출하여 서버에서 유저 정보를 받아옴
-                            // validate API는 회원 여부만 확인하고, 실제 로그인은 signIn API에서 처리
-                            android.util.Log.d(loginTag, "Calling performSignIn() for existing user")
-                            performSignIn(isExistingUser = true)
-                            return@collect
-                        }
-                        
+
                         // 다른 소셜 로그인으로 가입된 경우 에러 표시
+                        // 이미 line 210에서 domain이 일치하는 경우를 처리했으므로,
+                        // 여기서는 다른 도메인으로 가입된 경우만 체크
                         if (registeredDomain != null && !registeredDomain.equals(domain, ignoreCase = true)) {
                             android.util.Log.w(loginTag, "User registered with different method: $registeredDomain")
                             setState { copy(isLoading = false) }
