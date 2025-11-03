@@ -13,7 +13,7 @@ object ServerUrl {
 
     // 실서버
     val HOST_REAL: String =
-        if (Constants.IS_CELEB) "https://www.myloveactor.com" else "https://www.myloveidol.com"
+        if (Constants.IS_CELEB) "https://test.myloveactor.com" else "https://test.myloveidol.com"
 
     // 테스트 서버
     val HOST_TEST: String =
@@ -22,9 +22,6 @@ object ServerUrl {
     // BBB 테스트 서버
     val HOST_BBB_TEST: String =
         if (Constants.IS_CELEB) "https://bbb.test.myloveactor.com" else "https://bbb.test.myloveidol.com"
-
-    const val HOST_ACTOR: String = "www.myloveactor.com"
-    const val HOST_IDOL: String = "www.myloveidol.com"
 
     /**
      * 현재 사용 중인 서버 HOST
