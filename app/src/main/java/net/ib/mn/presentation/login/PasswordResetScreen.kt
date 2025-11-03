@@ -211,12 +211,52 @@ private fun PasswordResetContent(
                     hideKeyboard()
                     onIntent(PasswordResetContract.Intent.Submit)
                 },
-                enabled = state.email.isNotEmpty() && 
-                         state.emailError == null && 
+                enabled = state.email.isNotEmpty() &&
+                         state.emailError == null &&
                          state.isEmailValid, // 이메일 검증이 완료되었을 때만 활성화
                 isLoading = state.isLoading,
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
+    }
+}
+
+@androidx.compose.ui.tooling.preview.Preview(
+    name = "Light Mode",
+    showSystemUi = true,
+    showBackground = true,
+    locale = "ko"
+)
+@Composable
+fun PasswordResetScreenPreviewLight() {
+    net.ib.mn.ui.theme.ExodusTheme(darkTheme = false) {
+        PasswordResetContent(
+            state = PasswordResetContract.State(),
+            onIntent = {},
+            emailFocusRequester = remember { FocusRequester() },
+            onNavigateBack = {}
+        )
+    }
+}
+
+@androidx.compose.ui.tooling.preview.Preview(
+    name = "Dark Mode",
+    showSystemUi = true,
+    showBackground = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
+    locale = "ko"
+)
+@Composable
+fun PasswordResetScreenPreviewDark() {
+    net.ib.mn.ui.theme.ExodusTheme(darkTheme = true) {
+        PasswordResetContent(
+            state = PasswordResetContract.State(
+                email = "user@example.com",
+                isEmailValid = true
+            ),
+            onIntent = {},
+            emailFocusRequester = remember { FocusRequester() },
+            onNavigateBack = {}
+        )
     }
 }
