@@ -45,16 +45,16 @@
 ## 🌐 호출 API 및 사용 Field
 
 ### [그룹명] API
-* **GET /api/endpoint1**
-  * field1, field2, field3
-  * field4, field5
+* GET /api/endpoint1
+  * 파라미터: param1, param2
+  * 응담: field1, field2  
+  * 사용: field1
 
-* **POST /api/endpoint2**
-  * requestField1, requestField2
-
-* **PUT /api/endpoint3** (설명 추가 가능)
-  * field (request body)
-
+* POST /api/endpoint2
+  * 파라미터: param1, param2
+  * 응담: field1, field2
+  * 사용: field1
+    
 ---
 
 ## 🔄 화면 플로우
