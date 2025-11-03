@@ -30,6 +30,24 @@ fun getBuildNumber(): Int {
     }
 }
 
+// ============================================================
+// Baseline Profile 태스크 완전 비활성화
+// ============================================================
+afterEvaluate {
+    tasks.configureEach {
+        // Baseline Profile 관련 모든 태스크 비활성화
+        if (name.contains("ArtProfile", ignoreCase = true) ||
+            name.contains("BaselineProfile", ignoreCase = true) ||
+            name.contains("compileArt", ignoreCase = true) ||
+            name.contains("mergeArt", ignoreCase = true) ||
+            name.contains("expandArt", ignoreCase = true)
+        ) {
+            enabled = false
+            println("⚠️  Baseline Profile task disabled: $name")
+        }
+    }
+}
+
 android {
     namespace = "net.ib.mn"
     compileSdk = 36
@@ -396,4 +414,74 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+// ============================================================
+// APK 빌드 후 Baseline Profile 파일 강제 제거
+// ============================================================
+tasks.register("removeBaselineProfileFromApk") {
+    description = "APK에서 Baseline Profile 파일 강제 제거"
+    group = "build"
+
+    doLast {
+        val apkDir = layout.buildDirectory.dir("outputs/apk").get().asFile
+        if (apkDir.exists()) {
+            apkDir.walkTopDown().forEach { file ->
+                if (file.isFile && file.extension == "apk") {
+                    println("🔍 Checking APK: ${file.name}")
+
+                    // APK 임시 압축 해제
+                    val tempDir = file("${file.absolutePath}_temp")
+                    tempDir.mkdirs()
+
+                    try {
+                        // APK를 ZIP으로 처리하여 압축 해제
+                        copy {
+                            from(zipTree(file))
+                            into(tempDir)
+                        }
+
+                        // .prof, .profm 파일 제거
+                        var removedCount = 0
+                        tempDir.walkTopDown().forEach { innerFile ->
+                            if (innerFile.isFile &&
+                                (innerFile.extension == "prof" || innerFile.extension == "profm")) {
+                                println("  🗑️  Removing: ${innerFile.relativeTo(tempDir)}")
+                                innerFile.delete()
+                                removedCount++
+                            }
+                        }
+
+                        if (removedCount > 0) {
+                            println("  ✅ Removed $removedCount Baseline Profile file(s) from ${file.name}")
+
+                            // 수정된 파일들로 APK 재생성
+                            val backupFile = file("${file.absolutePath}.backup")
+                            file.renameTo(backupFile)
+
+                            ant.invokeMethod("zip", mapOf(
+                                "destfile" to file.absolutePath,
+                                "basedir" to tempDir.absolutePath
+                            ))
+
+                            backupFile.delete()
+                            println("  ✅ APK repackaged: ${file.name}")
+                        } else {
+                            println("  ℹ️  No Baseline Profile files found in ${file.name}")
+                        }
+                    } catch (e: Exception) {
+                        println("  ⚠️  Error processing ${file.name}: ${e.message}")
+                    } finally {
+                        // 임시 디렉토리 정리
+                        tempDir.deleteRecursively()
+                    }
+                }
+            }
+        }
+    }
+}
+
+// 모든 package 태스크 후 자동으로 실행
+tasks.matching { it.name.contains("package") && it.name.contains("Release") }.configureEach {
+    finalizedBy("removeBaselineProfileFromApk")
 }

@@ -868,11 +868,13 @@ class LoginViewModel @Inject constructor(
 
     /**
      * Line 로그인.
+     * Line SDK가 자체 UI를 표시하므로 로딩바는 표시하지 않음
      */
     private fun loginWithLine() {
         viewModelScope.launch {
             try {
-                setState { copy(isLoading = true, loginType = LoginContract.LoginType.LINE) }
+                // Line SDK 자체 로딩 UI가 있으므로 isLoading은 false로 유지
+                setState { copy(loginType = LoginContract.LoginType.LINE) }
                 android.util.Log.d(TAG, "Line login started")
                 setEffect { LoginContract.Effect.StartSocialLogin(LoginContract.LoginType.LINE) }
             } catch (e: Exception) {
@@ -883,6 +885,7 @@ class LoginViewModel @Inject constructor(
 
     /**
      * Line 로그인 결과 처리.
+     * Line SDK에서 결과를 받은 후 로딩바 시작
      *
      * @param userId Line user ID
      * @param displayName 사용자 닉네임
@@ -895,6 +898,9 @@ class LoginViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             try {
+                // Line SDK UI가 닫힌 후 우리의 로딩바 시작
+                setState { copy(isLoading = true) }
+
                 // old 코드: mEmail = "$mid${Const.POSTFIX_LINE}"
                 val email = "$userId${Constants.POSTFIX_LINE}"
                 tempEmail = email
@@ -916,11 +922,13 @@ class LoginViewModel @Inject constructor(
 
     /**
      * Facebook 로그인.
+     * Facebook SDK가 자체 UI를 표시하므로 로딩바는 표시하지 않음
      */
     private fun loginWithFacebook() {
         viewModelScope.launch {
             try {
-                setState { copy(isLoading = true, loginType = LoginContract.LoginType.FACEBOOK) }
+                // Facebook SDK 자체 로딩 UI가 있으므로 isLoading은 false로 유지
+                setState { copy(loginType = LoginContract.LoginType.FACEBOOK) }
                 android.util.Log.d(TAG, "Facebook login started")
                 setEffect { LoginContract.Effect.StartSocialLogin(LoginContract.LoginType.FACEBOOK) }
             } catch (e: Exception) {
@@ -931,6 +939,7 @@ class LoginViewModel @Inject constructor(
 
     /**
      * Facebook 로그인 결과 처리.
+     * Facebook SDK에서 결과를 받은 후 로딩바 시작
      *
      * @param email Facebook 계정 이메일
      * @param name 사용자 이름
@@ -945,6 +954,9 @@ class LoginViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             try {
+                // Facebook SDK UI가 닫힌 후 우리의 로딩바 시작
+                setState { copy(isLoading = true) }
+
                 android.util.Log.d(TAG, "Facebook login success - email: $email, name: $name, facebookId: $facebookId")
 
                 tempEmail = email
