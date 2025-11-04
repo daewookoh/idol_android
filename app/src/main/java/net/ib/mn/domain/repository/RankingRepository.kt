@@ -1,7 +1,7 @@
 package net.ib.mn.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import net.ib.mn.domain.model.RankingResponse
+import net.ib.mn.domain.model.ApiResult
 
 /**
  * Ranking Repository 인터페이스
@@ -13,31 +13,13 @@ import net.ib.mn.domain.model.RankingResponse
 interface RankingRepository {
 
     /**
-     * 특정 타입의 랭킹 데이터를 가져옵니다.
+     * 특정 차트 코드의 아이돌 ID 리스트 조회
      *
-     * @param type 랭킹 타입 (SOLO, GROUP, MALE_ACTOR 등)
-     * @param page 페이지 번호 (기본값: 1)
-     * @param limit 페이지당 아이템 수 (기본값: 100)
-     * @return Flow<Result<RankingResponse>> 랭킹 응답
-     */
-    fun getRankingByType(
-        type: String,
-        page: Int = 1,
-        limit: Int = 100
-    ): Flow<Result<RankingResponse>>
-
-    /**
-     * 랭킹 데이터를 실시간으로 관찰합니다.
+     * old 프로젝트와 동일한 방식
+     * charts/idol_ids/ API를 사용하여 해당 차트에 속한 아이돌들의 ID 리스트 획득
      *
-     * @param type 랭킹 타입
-     * @return Flow<Result<RankingResponse>> 실시간 랭킹 스트림
+     * @param code 차트 코드 (예: "PR_S_M", "PR_G_F")
+     * @return Flow<ApiResult<List<Int>>> 아이돌 ID 리스트
      */
-    fun observeRanking(type: String): Flow<Result<RankingResponse>>
-
-    /**
-     * 랭킹 데이터를 새로고침합니다.
-     *
-     * @param type 랭킹 타입
-     */
-    suspend fun refreshRanking(type: String): Result<Unit>
+    fun getChartIdolIds(code: String): Flow<ApiResult<List<Int>>>
 }

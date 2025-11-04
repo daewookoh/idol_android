@@ -64,3 +64,23 @@ data class RecordRoomModel(
     @SerializedName("code") val code: String? = null,
     @SerializedName("name") val name: String? = null
 )
+
+/**
+ * charts/idol_ids/ API 응답
+ *
+ * old 프로젝트와 동일
+ * 특정 차트 코드의 아이돌 ID 리스트 반환
+ *
+ * 실제 응답:
+ * {
+ *   "gcode": 0,
+ *   "objects": [4, 5, 6, 18, ...],
+ *   "success": true
+ * }
+ */
+data class ChartIdolIdsResponse(
+    @SerializedName("success") val success: Boolean,
+    @SerializedName("gcode") val gcode: Int? = null,
+    @SerializedName("objects") val data: List<Int>? = null,  // objects 필드를 data로 매핑
+    @SerializedName("msg") val msg: String? = null
+)

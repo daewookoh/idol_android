@@ -2,95 +2,83 @@ package net.ib.mn.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import net.ib.mn.domain.model.RankingItem
-import net.ib.mn.domain.model.RankingResponse
+import net.ib.mn.data.remote.api.ChartsApi
+import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.RankingRepository
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
  * Ranking Repository 구현체
- *
- * TODO: 실제 API 연동 시 ApiService를 주입받아 사용
- * 현재는 Mock 데이터로 구현
  */
 @Singleton
 class RankingRepositoryImpl @Inject constructor(
-    // private val apiService: ApiService,
-    // private val rankingDao: RankingDao
+    private val chartsApi: ChartsApi
 ) : RankingRepository {
 
-    override fun getRankingByType(
-        type: String,
-        page: Int,
-        limit: Int
-    ): Flow<Result<RankingResponse>> = flow {
+    override fun getChartIdolIds(code: String): Flow<ApiResult<List<Int>>> = flow {
+        emit(ApiResult.Loading)
+
         try {
-            // TODO: 실제 API 호출
-            // val response = apiService.getRanking(type, page, limit)
+            android.util.Log.d("RankingRepo", "========================================")
+            android.util.Log.d("RankingRepo", "🔵 Calling getChartIdolIds API (charts/idol_ids/)")
+            android.util.Log.d("RankingRepo", "  - code: $code")
+            android.util.Log.d("RankingRepo", "========================================")
 
-            // Mock 데이터 (개발용)
-            val mockData = createMockRankingData(type)
-            emit(Result.success(mockData))
-        } catch (e: Exception) {
-            emit(Result.failure(e))
-        }
-    }
+            val response = chartsApi.getChartIdolIds(code)
 
-    override fun observeRanking(type: String): Flow<Result<RankingResponse>> = flow {
-        try {
-            // TODO: Room DB나 실시간 데이터 소스 관찰
-            // rankingDao.observeRankingByType(type).collect { ... }
+            android.util.Log.d("RankingRepo", "📦 Response received:")
+            android.util.Log.d("RankingRepo", "  - HTTP Code: ${response.code()}")
+            android.util.Log.d("RankingRepo", "  - isSuccessful: ${response.isSuccessful}")
 
-            val mockData = createMockRankingData(type)
-            emit(Result.success(mockData))
-        } catch (e: Exception) {
-            emit(Result.failure(e))
-        }
-    }
+            if (response.isSuccessful && response.body() != null) {
+                val body = response.body()!!
 
-    override suspend fun refreshRanking(type: String): Result<Unit> {
-        return try {
-            // TODO: 서버에서 최신 데이터 가져와서 캐시 업데이트
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+                android.util.Log.d("RankingRepo", "📋 Parsed body:")
+                android.util.Log.d("RankingRepo", "  - success: ${body.success}")
+                android.util.Log.d("RankingRepo", "  - data size: ${body.data?.size ?: 0}")
 
-    /**
-     * Mock 랭킹 데이터 생성 (개발/테스트용)
-     */
-    private fun createMockRankingData(type: String): RankingResponse {
-        val items = (1..20).map { index ->
-            RankingItem(
-                id = index,
-                rank = index,
-                name = when (type) {
-                    "SOLO" -> "아이돌 $index"
-                    "GROUP" -> "그룹 $index"
-                    "MALE_ACTOR" -> "남자배우 $index"
-                    "FEMALE_ACTOR" -> "여자배우 $index"
-                    "MALE_SINGER" -> "남자가수 $index"
-                    "FEMALE_SINGER" -> "여자가수 $index"
-                    else -> "인물 $index"
-                },
-                imageUrl = "https://via.placeholder.com/150",
-                hearts = (1000000L - (index * 10000)),
-                rankChange = when (index % 4) {
-                    0 -> RankingItem.RankChange.UP
-                    1 -> RankingItem.RankChange.DOWN
-                    2 -> RankingItem.RankChange.SAME
-                    else -> RankingItem.RankChange.NEW
+                if (body.success && body.data != null) {
+                    android.util.Log.d("RankingRepo", "✅ getChartIdolIds SUCCESS")
+                    android.util.Log.d("RankingRepo", "  - Idol IDs: ${body.data.take(10)}...")
+                    emit(ApiResult.Success(body.data))
+                } else {
+                    android.util.Log.e("RankingRepo", "❌ API returned success=false or null data")
+                    emit(ApiResult.Error(
+                        exception = Exception(body.msg ?: "API returned success=false"),
+                        code = response.code(),
+                        message = body.msg ?: "Unknown error"
+                    ))
                 }
-            )
+            } else {
+                android.util.Log.e("RankingRepo", "❌ Response not successful or body null")
+                android.util.Log.e("RankingRepo", "  - Error body: ${response.errorBody()?.string()}")
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            android.util.Log.e("RankingRepo", "❌ HttpException: ${e.code()} - ${e.message()}", e)
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code(),
+                message = "HTTP ${e.code()}: ${e.message()}"
+            ))
+        } catch (e: IOException) {
+            android.util.Log.e("RankingRepo", "❌ IOException: ${e.message}", e)
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Network error: ${e.message}"
+            ))
+        } catch (e: Exception) {
+            android.util.Log.e("RankingRepo", "❌ Exception: ${e.message}", e)
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Unknown error: ${e.message}"
+            ))
         }
-
-        return RankingResponse(
-            type = type,
-            items = items,
-            totalCount = items.size,
-            lastUpdated = "2025-01-04 12:00:00"
-        )
     }
 }

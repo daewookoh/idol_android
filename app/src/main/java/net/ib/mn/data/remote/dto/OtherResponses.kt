@@ -236,11 +236,37 @@ data class TimezoneData(
 // /idols/ - Idol 리스트
 // ============================================================
 data class IdolListResponse(
-    @SerializedName("success")
-    val success: Boolean,
+    @SerializedName("all_idol_update")
+    val allIdolUpdate: String?,
 
-    @SerializedName("data")
+    @SerializedName("daily_idol_update")
+    val dailyIdolUpdate: String?,
+
+    @SerializedName("gcode")
+    val gcode: Int?,
+
+    @SerializedName("meta")
+    val meta: IdolMeta?,
+
+    @SerializedName("objects")
     val data: List<IdolData>?
+)
+
+data class IdolMeta(
+    @SerializedName("limit")
+    val limit: Int?,
+
+    @SerializedName("next")
+    val next: String?,
+
+    @SerializedName("offset")
+    val offset: Int?,
+
+    @SerializedName("previous")
+    val previous: String?,
+
+    @SerializedName("total_count")
+    val totalCount: Int?
 )
 
 data class IdolData(
@@ -250,17 +276,104 @@ data class IdolData(
     @SerializedName("name")
     val name: String,
 
+    @SerializedName("name_en")
+    val nameEn: String?,
+
+    @SerializedName("name_jp")
+    val nameJp: String?,
+
+    @SerializedName("name_zh")
+    val nameZh: String?,
+
+    @SerializedName("name_zh_tw")
+    val nameZhTw: String?,
+
     @SerializedName("image_url")
     val imageUrl: String?,
 
+    @SerializedName("image_url2")
+    val imageUrl2: String?,
+
+    @SerializedName("image_url3")
+    val imageUrl3: String?,
+
     @SerializedName("type")
-    val type: Int, // 0: all, 1: solo, 2: group, 3: actor
+    val type: String?, // "S": solo, "G": group
 
-    @SerializedName("debut_date")
-    val debutDate: String?,
+    @SerializedName("category")
+    val category: String?, // "M": male, "F": female
 
-    @SerializedName("group")
-    val group: String? = null,
+    @SerializedName("heart")
+    val heart: Int?,
+
+    @SerializedName("group_id")
+    val groupId: Int?,
+
+    @SerializedName("birthday")
+    val birthday: String?,
+
+    @SerializedName("is_lunar_birthday")
+    val isLunarBirthday: String?,
+
+    @SerializedName("debut_day")
+    val debutDay: String?,
+
+    @SerializedName("comeback_day")
+    val comebackDay: String?,
+
+    @SerializedName("anniversary")
+    val anniversary: String?,
+
+    @SerializedName("burning_day")
+    val burningDay: String?,
+
+    @SerializedName("deathday")
+    val deathday: String?,
+
+    @SerializedName("description")
+    val description: String?,
+
+    @SerializedName("fd_name")
+    val fdName: String?,
+
+    @SerializedName("fd_name_en")
+    val fdNameEn: String?,
+
+    @SerializedName("is_viewable")
+    val isViewable: String?,
+
+    @SerializedName("league")
+    val league: String?,
+
+    @SerializedName("most_count")
+    val mostCount: Int?,
+
+    @SerializedName("most_count_desc")
+    val mostCountDesc: String?,
+
+    @SerializedName("angel_count")
+    val angelCount: Int?,
+
+    @SerializedName("fairy_count")
+    val fairyCount: Int?,
+
+    @SerializedName("miracle_count")
+    val miracleCount: Int?,
+
+    @SerializedName("rookie_count")
+    val rookieCount: Int?,
+
+    @SerializedName("top3")
+    val top3: String?,
+
+    @SerializedName("top3_image_ver")
+    val top3ImageVer: String?,
+
+    @SerializedName("top3_type")
+    val top3Type: String?,
+
+    @SerializedName("resource_uri")
+    val resourceUri: String?
 
     // NOTE: 추가 필드는 실제 API 스펙 확인 후 추가 (old 프로젝트 참조)
 )
@@ -272,9 +385,9 @@ fun IdolData.toEntity(): net.ib.mn.data.local.entity.IdolEntity {
     return net.ib.mn.data.local.entity.IdolEntity(
         id = id,
         name = name,
-        group = group,
+        group = if (groupId != null && groupId > 0) "Group #$groupId" else null, // group_id를 사용
         imageUrl = imageUrl,
-        heartCount = 0, // 초기값
+        heartCount = heart ?: 0, // heart 필드 사용
         isTop3 = false, // 초기값
         timestamp = System.currentTimeMillis()
     )

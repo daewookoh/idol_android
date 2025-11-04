@@ -8,6 +8,8 @@ import net.ib.mn.data.remote.dto.ConfigStartupResponse
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.ConfigRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -18,6 +20,11 @@ import javax.inject.Inject
  * Config Repository 구현체
  *
  * Retrofit API를 사용하여 실제 네트워크 요청 수행
+ *
+ * 실시간 데이터 최적화:
+ * - StateFlow를 통한 reactive data stream
+ * - 캐시 업데이트 시 자동으로 모든 구독자에게 알림
+ * - 메모리 캐시와 StateFlow 동기화
  */
 class ConfigRepositoryImpl @Inject constructor(
     private val configsApi: ConfigsApi,
@@ -28,13 +35,22 @@ class ConfigRepositoryImpl @Inject constructor(
     @Volatile
     private var cachedTypeList: List<TypeListModel>? = null
 
+    // typeList StateFlow (실시간 업데이트용)
+    private val _typeListFlow = MutableStateFlow<List<TypeListModel>>(emptyList())
+
     // MainChartModel 캐시 (메모리 캐시)
     @Volatile
     private var cachedMainChartModel: net.ib.mn.data.remote.dto.MainChartModel? = null
 
+    // MainChartModel StateFlow (실시간 업데이트용)
+    private val _mainChartModelFlow = MutableStateFlow<net.ib.mn.data.remote.dto.MainChartModel?>(null)
+
     // ChartObjects 캐시 (메모리 캐시)
     @Volatile
     private var cachedChartObjects: List<net.ib.mn.data.remote.dto.ChartModel>? = null
+
+    // ChartObjects StateFlow (실시간 업데이트용)
+    private val _chartObjectsFlow = MutableStateFlow<List<net.ib.mn.data.remote.dto.ChartModel>>(emptyList())
 
     override fun getConfigStartup(): Flow<ApiResult<ConfigStartupResponse>> = flow {
         emit(ApiResult.Loading)
@@ -219,8 +235,14 @@ class ConfigRepositoryImpl @Inject constructor(
     }
 
     /**
+     * TypeList StateFlow 노출 (실시간 업데이트)
+     */
+    override fun observeTypeList(): StateFlow<List<TypeListModel>> = _typeListFlow
+
+    /**
      * 처리된 typeList를 캐시에 저장
      * StartupViewModel에서 API 응답을 가공한 후 캐시 업데이트용
+     * StateFlow도 함께 업데이트하여 모든 구독자에게 알림
      */
     override fun setTypeListCache(typeList: List<TypeListModel>) {
         android.util.Log.d("API_RESPONSE", "========================================")
@@ -228,14 +250,21 @@ class ConfigRepositoryImpl @Inject constructor(
         android.util.Log.d("API_RESPONSE", "  - typeList size: ${typeList.size}")
 
         cachedTypeList = typeList
+        _typeListFlow.value = typeList // StateFlow 업데이트 -> 모든 구독자에게 자동 알림
 
-        android.util.Log.d("API_RESPONSE", "✓ TypeList cache updated with processed data")
+        android.util.Log.d("API_RESPONSE", "✓ TypeList cache & StateFlow updated")
         android.util.Log.d("API_RESPONSE", "========================================")
     }
 
     /**
+     * MainChartModel StateFlow 노출 (실시간 업데이트)
+     */
+    override fun observeMainChartModel(): StateFlow<net.ib.mn.data.remote.dto.MainChartModel?> = _mainChartModelFlow
+
+    /**
      * MainChartModel 캐시에 저장
      * charts/current/ API 응답의 main 필드
+     * StateFlow도 함께 업데이트하여 모든 구독자에게 알림
      */
     override fun setMainChartModel(mainChartModel: net.ib.mn.data.remote.dto.MainChartModel) {
         android.util.Log.d("API_RESPONSE", "========================================")
@@ -244,8 +273,9 @@ class ConfigRepositoryImpl @Inject constructor(
         android.util.Log.d("API_RESPONSE", "  - females: ${mainChartModel.females?.size ?: 0}")
 
         cachedMainChartModel = mainChartModel
+        _mainChartModelFlow.value = mainChartModel // StateFlow 업데이트
 
-        android.util.Log.d("API_RESPONSE", "✓ MainChartModel cache updated")
+        android.util.Log.d("API_RESPONSE", "✓ MainChartModel cache & StateFlow updated")
         android.util.Log.d("API_RESPONSE", "========================================")
     }
 
@@ -257,8 +287,14 @@ class ConfigRepositoryImpl @Inject constructor(
     }
 
     /**
+     * ChartObjects StateFlow 노출 (실시간 업데이트)
+     */
+    override fun observeChartObjects(): StateFlow<List<net.ib.mn.data.remote.dto.ChartModel>> = _chartObjectsFlow
+
+    /**
      * ChartObjects 캐시에 저장
      * charts/current/ API 응답의 objects 필드
+     * StateFlow도 함께 업데이트하여 모든 구독자에게 알림
      */
     override fun setChartObjects(chartObjects: List<net.ib.mn.data.remote.dto.ChartModel>) {
         android.util.Log.d("API_RESPONSE", "========================================")
@@ -266,8 +302,9 @@ class ConfigRepositoryImpl @Inject constructor(
         android.util.Log.d("API_RESPONSE", "  - objects size: ${chartObjects.size}")
 
         cachedChartObjects = chartObjects
+        _chartObjectsFlow.value = chartObjects // StateFlow 업데이트
 
-        android.util.Log.d("API_RESPONSE", "✓ ChartObjects cache updated")
+        android.util.Log.d("API_RESPONSE", "✓ ChartObjects cache & StateFlow updated")
         android.util.Log.d("API_RESPONSE", "========================================")
     }
 

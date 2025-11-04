@@ -5,11 +5,16 @@ import net.ib.mn.data.remote.dto.ConfigSelfResponse
 import net.ib.mn.data.remote.dto.ConfigStartupResponse
 import net.ib.mn.domain.model.ApiResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Config Repository 인터페이스
  *
  * 앱 설정 관련 데이터 접근 추상화
+ *
+ * 실시간 데이터 최적화:
+ * - StateFlow를 통한 reactive data stream
+ * - 캐시 업데이트 시 자동으로 모든 구독자에게 알림
  */
 interface ConfigRepository {
 
@@ -37,12 +42,29 @@ interface ConfigRepository {
     fun getTypeList(forceRefresh: Boolean = false): Flow<List<TypeListModel>>
 
     /**
+     * TypeList StateFlow (실시간 업데이트)
+     * - 캐시 변경 시 자동으로 모든 구독자에게 알림
+     * - 중복 collect 없이 효율적
+     *
+     * @return StateFlow<List<TypeListModel>>
+     */
+    fun observeTypeList(): StateFlow<List<TypeListModel>>
+
+    /**
      * 처리된 typeList를 캐시에 저장
      * StartupViewModel에서 API 응답을 가공한 후 캐시 업데이트용
      *
      * @param typeList 처리된 typeList
      */
     fun setTypeListCache(typeList: List<TypeListModel>)
+
+    /**
+     * MainChartModel StateFlow (실시간 업데이트)
+     * - 캐시 변경 시 자동으로 모든 구독자에게 알림
+     *
+     * @return StateFlow<MainChartModel?>
+     */
+    fun observeMainChartModel(): StateFlow<net.ib.mn.data.remote.dto.MainChartModel?>
 
     /**
      * MainChartModel 캐시에 저장
@@ -58,6 +80,13 @@ interface ConfigRepository {
      * @return MainChartModel?
      */
     fun getMainChartModel(): net.ib.mn.data.remote.dto.MainChartModel?
+
+    /**
+     * ChartObjects StateFlow (실시간 업데이트)
+     *
+     * @return StateFlow<List<ChartModel>>
+     */
+    fun observeChartObjects(): StateFlow<List<net.ib.mn.data.remote.dto.ChartModel>>
 
     /**
      * ChartObjects 캐시에 저장

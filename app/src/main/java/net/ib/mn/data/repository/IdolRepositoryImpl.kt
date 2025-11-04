@@ -69,11 +69,12 @@ class IdolRepositoryImpl @Inject constructor(
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
 
-                if (body.success) {
+                // IdolListResponse는 success 필드가 없고 바로 objects 배열을 가짐
+                if (body.data != null) {
                     emit(ApiResult.Success(body))
                 } else {
                     emit(ApiResult.Error(
-                        exception = Exception("API returned success=false"),
+                        exception = Exception("API returned null data"),
                         code = response.code()
                     ))
                 }

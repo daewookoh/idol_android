@@ -252,15 +252,6 @@ fun RankingPage(
                         )
                 )
             }
-
-            // TabRow 하단에 1px 보더 추가
-            HorizontalDivider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter),
-                thickness = 1.dp,
-                color = borderColor
-            )
             }
         }
 
@@ -319,19 +310,25 @@ private fun buildIdolAppTabList(
     chartObjects?.forEach { chart ->
         when (chart.type) {
             "M" -> { // MIRACLE (기적)
+                // code에서 성별 추출 (예: "PR_G_M" -> M, "PR_S_F" -> F)
+                val isFemaleFromCode = chart.code?.endsWith("_F") == true
+
                 tabList.add(
                     net.ib.mn.data.model.TypeListModel(
                         id = 0,
                         name = "MIRACLE",
                         type = "MIRACLE",
-                        code = chart.code, // API의 원본 code 사용 (예: "PR_G_M")
+                        code = chart.code, // API의 원본 code 사용 (예: "PR_G_M", "PR_S_F")
                         isDivided = "N",
-                        isFemale = false,
+                        isFemale = isFemaleFromCode,
                         showDivider = false
                     )
                 )
             }
             "R" -> { // ROOKIE (루키)
+                // code에서 성별 추출 (예: "PR_G_M" -> M, "PR_S_F" -> F)
+                val isFemaleFromCode = chart.code?.endsWith("_F") == true
+
                 tabList.add(
                     net.ib.mn.data.model.TypeListModel(
                         id = 0,
@@ -339,7 +336,7 @@ private fun buildIdolAppTabList(
                         type = "ROOKIE",
                         code = chart.code, // API의 원본 code 사용
                         isDivided = "N",
-                        isFemale = false,
+                        isFemale = isFemaleFromCode,
                         showDivider = false
                     )
                 )

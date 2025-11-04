@@ -1,8 +1,10 @@
 package net.ib.mn.data.remote.api
 
+import net.ib.mn.data.remote.dto.ChartIdolIdsResponse
 import net.ib.mn.data.remote.dto.CurrentChartResponse
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 /**
  * Charts API
@@ -22,4 +24,18 @@ interface ChartsApi {
      */
     @GET("charts/current/")
     suspend fun getChartsCurrent(): Response<CurrentChartResponse>
+
+    /**
+     * 특정 차트 코드의 아이돌 ID 리스트 가져오기
+     *
+     * old 프로젝트의 getChartIdolIds와 동일
+     * 차트에 속한 아이돌들의 ID 리스트만 반환
+     *
+     * @param code 차트 코드 (예: "PR_S_M", "PR_G_F")
+     * @return Response<ChartIdolIdsResponse>
+     */
+    @GET("charts/idol_ids/")
+    suspend fun getChartIdolIds(
+        @Query("code") code: String
+    ): Response<ChartIdolIdsResponse>
 }

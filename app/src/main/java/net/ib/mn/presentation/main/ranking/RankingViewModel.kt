@@ -14,99 +14,44 @@ import net.ib.mn.domain.repository.ConfigRepository
 import javax.inject.Inject
 
 /**
- * RankingPage ViewModel
+ * RankingPage ViewModel (Optimized for real-time data)
  *
  * CELEB: typeList 사용 (StartupViewModel.loadTypeList에서 캐시됨)
  * 일반: MainChartModel 사용 (old 프로젝트와 동일하게 성별에 따라 males/females 선택)
  *
- * old 프로젝트와 동일하게 StartupView에서 모든 데이터를 처리하고
- * RankingPage에서는 뿌려주기만 함
+ * 최적화:
+ * 1. ConfigRepository의 StateFlow를 직접 노출 (zero-copy, 중복 collect 방지)
+ * 2. 캐시 업데이트 시 자동으로 UI 업데이트 (reactive)
+ * 3. 불필요한 중간 StateFlow 제거 (메모리 효율)
  */
 @HiltViewModel
 class RankingViewModel @Inject constructor(
     val configRepository: ConfigRepository // public으로 변경 (RankingPage에서 접근)
 ) : ViewModel() {
 
-    private val _typeList = MutableStateFlow<List<TypeListModel>>(emptyList())
-    val typeList: StateFlow<List<TypeListModel>> = _typeList.asStateFlow()
+    /**
+     * CELEB 전용: typeList StateFlow를 직접 노출
+     * - ConfigRepository의 StateFlow를 그대로 사용
+     * - StartupViewModel에서 캐시 업데이트 시 자동으로 UI 업데이트
+     * - Zero-copy, 최대 효율
+     */
+    val typeList: StateFlow<List<TypeListModel>> = configRepository.observeTypeList()
 
-    private val _mainChartModel = MutableStateFlow<MainChartModel?>(null)
-    val mainChartModel: StateFlow<MainChartModel?> = _mainChartModel.asStateFlow()
+    /**
+     * 일반 앱 전용: MainChartModel StateFlow를 직접 노출
+     * - ConfigRepository의 StateFlow를 그대로 사용
+     * - 실시간 업데이트 자동 반영
+     */
+    val mainChartModel: StateFlow<MainChartModel?> = configRepository.observeMainChartModel()
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error.asStateFlow()
+    val isLoading: StateFlow<Boolean> = MutableStateFlow(false)
+    val error: StateFlow<String?> = MutableStateFlow<String?>(null)
 
     init {
-        loadRankingData()
-    }
-
-    /**
-     * 랭킹 데이터 로드
-     *
-     * CELEB: typeList 사용
-     * 일반: MainChartModel 사용
-     */
-    private fun loadRankingData() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
-
-            android.util.Log.d("RankingViewModel", "========================================")
-            android.util.Log.d("RankingViewModel", "[RankingViewModel] Loading ranking data")
-            android.util.Log.d("RankingViewModel", "  - BuildConfig.CELEB: ${BuildConfig.CELEB}")
-
-            try {
-                if (BuildConfig.CELEB) {
-                    // CELEB: typeList 사용 (StartupViewModel에서 캐시됨)
-                    loadTypeListForCeleb()
-                } else {
-                    // 일반: MainChartModel 사용 (old 프로젝트와 동일)
-                    loadMainChartModelForIdol()
-                }
-            } catch (e: Exception) {
-                android.util.Log.e("RankingViewModel", "Exception: ${e.message}", e)
-                _error.value = "Failed to load ranking data: ${e.message}"
-            } finally {
-                _isLoading.value = false
-                android.util.Log.d("RankingViewModel", "========================================")
-            }
-        }
-    }
-
-    /**
-     * CELEB 전용: typeList 로드
-     *
-     * StartupViewModel에서 이미 처리한 캐시 데이터 사용
-     */
-    private suspend fun loadTypeListForCeleb() {
-        android.util.Log.d("RankingViewModel", "[CELEB] Loading typeList from cache")
-
-        configRepository.getTypeList(forceRefresh = false).collect { typeListData ->
-            android.util.Log.d("RankingViewModel", "[CELEB] TypeList received: ${typeListData.size} items")
-            _typeList.value = typeListData
-        }
-    }
-
-    /**
-     * 일반 앱 전용: MainChartModel 로드
-     *
-     * old 프로젝트와 동일하게 MainChartModel 사용
-     * RankingPage에서 성별에 따라 males/females 선택하여 탭 생성
-     */
-    private fun loadMainChartModelForIdol() {
-        android.util.Log.d("RankingViewModel", "[IDOL] Loading MainChartModel from cache")
-
-        val mainChartModel = configRepository.getMainChartModel()
-        if (mainChartModel != null) {
-            android.util.Log.d("RankingViewModel", "[IDOL] MainChartModel received")
-            android.util.Log.d("RankingViewModel", "  - males: ${mainChartModel.males?.size ?: 0}")
-            android.util.Log.d("RankingViewModel", "  - females: ${mainChartModel.females?.size ?: 0}")
-            _mainChartModel.value = mainChartModel
-        } else {
-            android.util.Log.w("RankingViewModel", "[IDOL] MainChartModel not found in cache")
-        }
+        android.util.Log.d("RankingViewModel", "========================================")
+        android.util.Log.d("RankingViewModel", "[RankingViewModel] Initialized")
+        android.util.Log.d("RankingViewModel", "  - BuildConfig.CELEB: ${BuildConfig.CELEB}")
+        android.util.Log.d("RankingViewModel", "  - Using direct StateFlow from ConfigRepository (zero-copy)")
+        android.util.Log.d("RankingViewModel", "========================================")
     }
 }

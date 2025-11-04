@@ -683,11 +683,17 @@ class StartUpViewModel @Inject constructor(
             when (result) {
                 is ApiResult.Loading -> {}
                 is ApiResult.Success -> {
-                    val data = result.data.data
+                    val response = result.data
+                    val data = response.data
 
                     android.util.Log.d(TAG, "========================================")
                     android.util.Log.d(TAG, "Idols API Response")
                     android.util.Log.d(TAG, "========================================")
+                    android.util.Log.d(TAG, "All Idol Update: ${response.allIdolUpdate}")
+                    android.util.Log.d(TAG, "Daily Idol Update: ${response.dailyIdolUpdate}")
+                    android.util.Log.d(TAG, "Meta - Total Count: ${response.meta?.totalCount}")
+                    android.util.Log.d(TAG, "Meta - Limit: ${response.meta?.limit}")
+                    android.util.Log.d(TAG, "Meta - Offset: ${response.meta?.offset}")
                     android.util.Log.d(TAG, "Total Idols count: ${data?.size ?: 0}")
                     android.util.Log.d(TAG, "----------------------------------------")
 
@@ -696,8 +702,11 @@ class StartUpViewModel @Inject constructor(
                         android.util.Log.d(TAG, "Idol: ${idol.name}")
                         android.util.Log.d(TAG, "  - ID: ${idol.id}")
                         android.util.Log.d(TAG, "  - Type: ${idol.type}")
+                        android.util.Log.d(TAG, "  - Category: ${idol.category}")
+                        android.util.Log.d(TAG, "  - Heart: ${idol.heart}")
+                        android.util.Log.d(TAG, "  - Group ID: ${idol.groupId}")
                         android.util.Log.d(TAG, "  - Image: ${idol.imageUrl}")
-                        android.util.Log.d(TAG, "  - Debut Date: ${idol.debutDate}")
+                        android.util.Log.d(TAG, "  - Debut Day: ${idol.debutDay}")
                         android.util.Log.d(TAG, "----------------------------------------")
                     }
 
@@ -711,6 +720,20 @@ class StartUpViewModel @Inject constructor(
                         val entities = idolList.map { it.toEntity() }
                         idolDao.insertIdols(entities)
                         android.util.Log.d(TAG, "✓ ${entities.size} idols saved to Room Database")
+
+                        // DB에서 저장된 데이터 확인
+                        val savedIdolsCount = idolDao.getAllIdolsSync().size
+                        android.util.Log.d(TAG, "========================================")
+                        android.util.Log.d(TAG, "📊 DB Verification")
+                        android.util.Log.d(TAG, "========================================")
+                        android.util.Log.d(TAG, "Total Idols in DB: $savedIdolsCount")
+
+                        // 상위 5개 출력
+                        val savedIdols = idolDao.getAllIdolsSync().take(5)
+                        savedIdols.forEachIndexed { index, idol ->
+                            android.util.Log.d(TAG, "[$index] ID: ${idol.id}, Name: ${idol.name}, Group: ${idol.group}")
+                        }
+                        android.util.Log.d(TAG, "========================================")
                     }
                 }
                 is ApiResult.Error -> {

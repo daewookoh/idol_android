@@ -24,6 +24,12 @@ interface IdolDao {
     fun getAllIdols(): Flow<List<IdolEntity>>
 
     /**
+     * Get all idols synchronously (for debugging/verification).
+     */
+    @Query("SELECT * FROM idols ORDER BY heartCount DESC")
+    suspend fun getAllIdolsSync(): List<IdolEntity>
+
+    /**
      * Get top 3 favorite idols.
      */
     @Query("SELECT * FROM idols WHERE isTop3 = 1 ORDER BY heartCount DESC LIMIT 3")
@@ -34,6 +40,16 @@ interface IdolDao {
      */
     @Query("SELECT * FROM idols WHERE id = :idolId")
     suspend fun getIdolById(idolId: Int): IdolEntity?
+
+    /**
+     * Get idols by ID list.
+     * old 프로젝트와 동일한 방식으로 ID 리스트로 아이돌 조회
+     *
+     * @param idList 아이돌 ID 리스트
+     * @return List<IdolEntity> ID 리스트에 해당하는 아이돌들
+     */
+    @Query("SELECT * FROM idols WHERE id IN (:idList)")
+    suspend fun getIdolsByIds(idList: List<Int>): List<IdolEntity>
 
     /**
      * Insert or update an idol.
