@@ -1,6 +1,7 @@
 package net.ib.mn.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import net.ib.mn.data.remote.dto.AggregateRankModel
 import net.ib.mn.domain.model.ApiResult
 
 /**
@@ -18,8 +19,23 @@ interface RankingRepository {
      * old 프로젝트와 동일한 방식
      * charts/idol_ids/ API를 사용하여 해당 차트에 속한 아이돌들의 ID 리스트 획득
      *
+     * 사용 탭: Solo (개인), Group (그룹)
+     *
      * @param code 차트 코드 (예: "PR_S_M", "PR_G_F")
      * @return Flow<ApiResult<List<Int>>> 아이돌 ID 리스트
      */
     fun getChartIdolIds(code: String): Flow<ApiResult<List<Int>>>
+
+    /**
+     * 특정 차트 코드의 누적 랭킹 조회
+     *
+     * old 프로젝트와 동일한 방식
+     * charts/ranks/ API를 사용하여 해당 차트의 누적 집계 결과 획득
+     *
+     * 사용 탭: Miracle (기적), Rookie (루키), HeartPick (하트픽), OnePick (원픽), HallOfFame (명예전당)
+     *
+     * @param code 차트 코드 (예: "PR_G_M", "HEARTPICK", "ONEPICK", "HOF")
+     * @return Flow<ApiResult<List<AggregateRankModel>>> 누적 랭킹 리스트
+     */
+    fun getChartRanks(code: String): Flow<ApiResult<List<AggregateRankModel>>>
 }

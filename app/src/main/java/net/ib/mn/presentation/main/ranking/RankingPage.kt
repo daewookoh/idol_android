@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -25,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,7 +55,7 @@ import net.ib.mn.util.ServerUrl
  */
 @Composable
 fun RankingPage(
-    viewModel: RankingViewModel = hiltViewModel(),
+    viewModel: RankingPageViewModel = hiltViewModel(),
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
     // CELEB: typeList 사용
@@ -97,6 +99,17 @@ fun RankingPage(
 
     val subPagerState = rememberPagerState(pageCount = { tabDataList.size })
     val coroutineScope = rememberCoroutineScope()
+
+    // 모든 탭의 SubPage를 미리 생성하여 완전히 독립적으로 관리
+    // 각 탭은 자체 ViewModel, LazyListState, UI State를 가짐
+    // tabDataList가 변경되면 모든 페이지를 재생성
+    val subPages = remember(tabDataList) {
+        android.util.Log.d("RankingPage", "📦 [Creating] All ${tabDataList.size} independent SubPages")
+        tabDataList.mapIndexed { index, type ->
+            android.util.Log.d("RankingPage", "  📄 Creating SubPage for: code=${type.code}, type=${type.type}")
+            Pair(type.code ?: "page_$index", type)
+        }
+    }
 
     // TabRow의 스크롤 상태
     val tabScrollState = rememberScrollState()
@@ -260,25 +273,72 @@ fun RankingPage(
             }
         }
 
-        // 탭별 컨텐츠 (type에 따라 동적으로 SubPage 표시)
-        // CELEB: 순수 Swiper, 기타: Swiper (탭과 연동)
+        // 탭별 컨텐츠 - 완전히 독립적인 8개의 SubPage
+        // 각 페이지는 미리 생성되어 독립적으로 존재함
+        // HorizontalPager는 단순히 보여주기만 함
         HorizontalPager(
             state = subPagerState,
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),
+            beyondViewportPageCount = 1,  // 양쪽 1페이지씩 미리 렌더링 (리소스 최적화)
             key = { pageIndex ->
-                // tabDataList가 변경되면 페이지를 재생성하도록 key 사용
-                tabDataList.getOrNull(pageIndex)?.code ?: "page_$pageIndex"
+                // 고유한 key로 각 페이지를 구분
+                subPages.getOrNull(pageIndex)?.first ?: "page_$pageIndex"
             }
         ) { pageIndex ->
-            // pageIndex에 해당하는 type 정보 가져오기
-            val currentType = tabDataList.getOrNull(pageIndex)
-            if (currentType != null) {
-                RankingSubPage(
-                    type = currentType,
-                    isVisible = subPagerState.currentPage == pageIndex  // 현재 페이지만 visible
-                )
+            val (pageKey, currentType) = subPages.getOrNull(pageIndex) ?: return@HorizontalPager
+
+            // 각 페이지를 완전히 독립적으로 렌더링
+            // key()를 사용하여 Compose가 각 페이지를 별도의 인스턴스로 인식
+            // Hilt의 ViewModelStoreOwner를 유지하여 DI가 제대로 작동하도록 함
+            androidx.compose.runtime.key(pageKey) {
+                android.util.Log.d("RankingPage", "🎨 [Rendering] SubPage for pageIndex=$pageIndex, key=$pageKey")
+
+                // 타입에 따라 적절한 SubPage 호출
+                when (currentType.type) {
+                    "SOLO" -> net.ib.mn.presentation.main.ranking.idol_subpage.SoloRankingSubPage(
+                        chartCode = currentType.code ?: "",
+                        isVisible = subPagerState.currentPage == pageIndex
+                    )
+                    "GROUP" -> net.ib.mn.presentation.main.ranking.idol_subpage.GroupRankingSubPage(
+                        chartCode = currentType.code ?: "",
+                        isVisible = subPagerState.currentPage == pageIndex
+                    )
+                    "MIRACLE" -> net.ib.mn.presentation.main.ranking.idol_subpage.MiracleRankingSubPage(
+                        chartCode = currentType.code ?: "",
+                        isVisible = subPagerState.currentPage == pageIndex
+                    )
+                    "ROOKIE" -> net.ib.mn.presentation.main.ranking.idol_subpage.RookieRankingSubPage(
+                        chartCode = currentType.code ?: "",
+                        isVisible = subPagerState.currentPage == pageIndex
+                    )
+                    "HEARTPICK" -> net.ib.mn.presentation.main.ranking.idol_subpage.HeartPickRankingSubPage(
+                        chartCode = currentType.code ?: "",
+                        isVisible = subPagerState.currentPage == pageIndex
+                    )
+                    "ONEPICK" -> net.ib.mn.presentation.main.ranking.idol_subpage.OnePickRankingSubPage(
+                        chartCode = currentType.code ?: "",
+                        isVisible = subPagerState.currentPage == pageIndex
+                    )
+                    "HOF" -> net.ib.mn.presentation.main.ranking.idol_subpage.HallOfFameRankingSubPage(
+                        chartCode = currentType.code ?: "",
+                        isVisible = subPagerState.currentPage == pageIndex
+                    )
+                    "GLOBAL" -> net.ib.mn.presentation.main.ranking.idol_subpage.GlobalRankingSubPage(
+                        chartCode = currentType.code ?: "",
+                        isVisible = subPagerState.currentPage == pageIndex
+                    )
+                    else -> {
+                        // 기본값 또는 에러 처리
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("Unsupported type: ${currentType.type}")
+                        }
+                    }
+                }
             }
         }
     }
@@ -295,7 +355,7 @@ fun RankingPage(
 @Composable
 private fun buildIdolAppTabList(
     mainChartModel: net.ib.mn.data.remote.dto.MainChartModel?,
-    viewModel: RankingViewModel,
+    viewModel: RankingPageViewModel,
     isMale: Boolean
 ): List<net.ib.mn.data.model.TypeListModel> {
     val tabList = mutableListOf<net.ib.mn.data.model.TypeListModel>()
@@ -397,12 +457,14 @@ private fun buildIdolAppTabList(
 /**
  * 차트 코드에서 타입 추출
  *
- * 예: "SOLO_M" -> "SOLO", "GROUP_F" -> "GROUP"
+ * 예: "SOLO_M" -> "SOLO", "GROUP_F" -> "GROUP", "PR_S_M" -> "SOLO", "PR_G_M" -> "GROUP"
  */
 private fun extractTypeFromCode(code: String): String {
     return when {
         code.startsWith("SOLO") -> "SOLO"
         code.startsWith("GROUP") -> "GROUP"
+        code.contains("_S_") -> "SOLO"   // PR_S_M, PR_S_F 등 처리
+        code.contains("_G_") -> "GROUP"  // PR_G_M, PR_G_F 등 처리
         else -> code
     }
 }

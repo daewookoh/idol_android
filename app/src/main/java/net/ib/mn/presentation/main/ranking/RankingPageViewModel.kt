@@ -25,7 +25,7 @@ import javax.inject.Inject
  * 3. 불필요한 중간 StateFlow 제거 (메모리 효율)
  */
 @HiltViewModel
-class RankingViewModel @Inject constructor(
+class RankingPageViewModel @Inject constructor(
     val configRepository: ConfigRepository // public으로 변경 (RankingPage에서 접근)
 ) : ViewModel() {
 

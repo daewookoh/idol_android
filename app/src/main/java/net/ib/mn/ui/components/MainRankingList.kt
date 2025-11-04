@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
@@ -51,15 +53,18 @@ data class ExoTop3Data(
  *
  * @param items 랭킹 아이템 리스트
  * @param exoTop3Data ExoTop3 배너 데이터 (nullable)
+ * @param listState LazyColumn의 스크롤 상태 (탭 전환 시에도 유지됨)
  * @param onItemClick 아이템 클릭 이벤트 (index, item)
  */
 @Composable
 fun MainRankingList(
     items: List<RankingItemData>,
     exoTop3Data: ExoTop3Data? = null,
+    listState: LazyListState = rememberLazyListState(),
     onItemClick: (Int, RankingItemData) -> Unit = { _, _ -> }
 ) {
     LazyColumn(
+        state = listState,
         modifier = Modifier
             .fillMaxSize()
             .background(colorResource(R.color.background_100)),

@@ -3,6 +3,7 @@ package net.ib.mn.data.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import net.ib.mn.data.remote.api.ChartsApi
+import net.ib.mn.data.remote.dto.AggregateRankModel
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.RankingRepository
 import retrofit2.HttpException
@@ -43,6 +44,70 @@ class RankingRepositoryImpl @Inject constructor(
                 if (body.success && body.data != null) {
                     android.util.Log.d("RankingRepo", "✅ getChartIdolIds SUCCESS")
                     android.util.Log.d("RankingRepo", "  - Idol IDs: ${body.data.take(10)}...")
+                    emit(ApiResult.Success(body.data))
+                } else {
+                    android.util.Log.e("RankingRepo", "❌ API returned success=false or null data")
+                    emit(ApiResult.Error(
+                        exception = Exception(body.msg ?: "API returned success=false"),
+                        code = response.code(),
+                        message = body.msg ?: "Unknown error"
+                    ))
+                }
+            } else {
+                android.util.Log.e("RankingRepo", "❌ Response not successful or body null")
+                android.util.Log.e("RankingRepo", "  - Error body: ${response.errorBody()?.string()}")
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            android.util.Log.e("RankingRepo", "❌ HttpException: ${e.code()} - ${e.message()}", e)
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code(),
+                message = "HTTP ${e.code()}: ${e.message()}"
+            ))
+        } catch (e: IOException) {
+            android.util.Log.e("RankingRepo", "❌ IOException: ${e.message}", e)
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Network error: ${e.message}"
+            ))
+        } catch (e: Exception) {
+            android.util.Log.e("RankingRepo", "❌ Exception: ${e.message}", e)
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Unknown error: ${e.message}"
+            ))
+        }
+    }
+
+    override fun getChartRanks(code: String): Flow<ApiResult<List<AggregateRankModel>>> = flow {
+        emit(ApiResult.Loading)
+
+        try {
+            android.util.Log.d("RankingRepo", "========================================")
+            android.util.Log.d("RankingRepo", "🟢 Calling getChartRanks API (charts/ranks/)")
+            android.util.Log.d("RankingRepo", "  - code: $code")
+            android.util.Log.d("RankingRepo", "========================================")
+
+            val response = chartsApi.getChartRanks(code)
+
+            android.util.Log.d("RankingRepo", "📦 Response received:")
+            android.util.Log.d("RankingRepo", "  - HTTP Code: ${response.code()}")
+            android.util.Log.d("RankingRepo", "  - isSuccessful: ${response.isSuccessful}")
+
+            if (response.isSuccessful && response.body() != null) {
+                val body = response.body()!!
+
+                android.util.Log.d("RankingRepo", "📋 Parsed body:")
+                android.util.Log.d("RankingRepo", "  - success: ${body.success}")
+                android.util.Log.d("RankingRepo", "  - data size: ${body.data?.size ?: 0}")
+
+                if (body.success && body.data != null) {
+                    android.util.Log.d("RankingRepo", "✅ getChartRanks SUCCESS")
+                    android.util.Log.d("RankingRepo", "  - Ranks: ${body.data.take(5)}")
                     emit(ApiResult.Success(body.data))
                 } else {
                     android.util.Log.e("RankingRepo", "❌ API returned success=false or null data")
