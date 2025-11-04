@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,7 +24,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import net.ib.mn.R
+import androidx.compose.ui.platform.LocalContext
+import coil.size.Scale
 
 /**
  * MainRankingItem - 랭킹 리스트 아이템
@@ -37,6 +41,14 @@ import net.ib.mn.R
  * @param showDivider 상단 구분선 표시 여부
  * @param onClick 클릭 이벤트
  */
+/**
+ * MainRankingItem - 최적화된 랭킹 아이템
+ *
+ * 최적화 전략:
+ * 1. ImageRequest를 remember로 캐싱 (photoUrl이 같으면 재사용)
+ * 2. 순위 텍스트를 remember로 캐싱
+ * 3. @Immutable 데이터만 받아서 리컴포지션 최소화
+ */
 @Composable
 fun MainRankingItem(
     rank: Int,
@@ -46,6 +58,20 @@ fun MainRankingItem(
     showDivider: Boolean = true,
     onClick: () -> Unit = {}
 ) {
+    // ImageRequest를 remember로 캐싱 (photoUrl이 변경될 때만 재생성)
+    val imageRequest = remember(photoUrl) {
+        ImageRequest.Builder(null as android.content.Context? ?: return@remember null)
+            .data(photoUrl)
+            .size(70)  // 2x density
+            .scale(Scale.FILL)
+            .crossfade(true)
+            .crossfade(150)
+            .build()
+    }
+
+    // 순위 텍스트를 remember로 캐싱 (rank가 변경될 때만 재생성)
+    val rankText = remember(rank) { "${rank}위" }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -68,25 +94,35 @@ fun MainRankingItem(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 순위 표시 (45dp 고정 너비)
+            // 순위 표시 (45dp 고정 너비) - remember로 캐싱된 텍스트 사용
             Text(
-                text = "${rank}위",
+                text = rankText,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(R.color.text_default),
                 modifier = Modifier.width(45.dp)
             )
 
-            // 프로필 이미지
-            AsyncImage(
-                model = photoUrl,
-                contentDescription = "프로필 이미지",
-                modifier = Modifier
-                    .size(35.dp)
-                    .clip(CircleShape)
-                    .background(colorResource(R.color.gray100)),
-                contentScale = ContentScale.Crop
-            )
+            // 프로필 이미지 (최적화: remember로 캐싱된 ImageRequest 사용)
+            if (imageRequest != null) {
+                AsyncImage(
+                    model = imageRequest,
+                    contentDescription = "프로필 이미지",
+                    modifier = Modifier
+                        .size(35.dp)
+                        .clip(CircleShape)
+                        .background(colorResource(R.color.gray100)),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                // photoUrl이 null인 경우 기본 배경만 표시
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier
+                        .size(35.dp)
+                        .clip(CircleShape)
+                        .background(colorResource(R.color.gray100))
+                )
+            }
 
             Spacer(modifier = Modifier.width(10.dp))
 

@@ -118,7 +118,8 @@ interface IdolApi {
     @GET("idols/")
     suspend fun getIdols(
         @Query("type") type: Int? = null,
-        @Query("category") category: String? = null
+        @Query("category") category: String? = null,
+        @Query(value = "fields", encoded = true) fields: String? = "heart,top3,image_url,image_url2,image_url3,top3_type,top3_image_ver"
     ): Response<IdolListResponse>
 
     // NOTE: 추가 가능한 Idol 엔드포인트 (필요 시 구현)

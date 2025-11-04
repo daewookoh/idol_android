@@ -44,7 +44,10 @@ class RankingSubPageViewModel @AssistedInject constructor(
      */
     sealed interface UiState {
         data object Loading : UiState
-        data class Success(val items: List<RankItem>) : UiState
+        data class Success(
+            val items: List<RankItem>,
+            val topIdol: IdolEntity? = null  // 1위 아이돌 (ExoTop3용)
+        ) : UiState
         data class Error(val message: String) : UiState
     }
 
@@ -63,18 +66,39 @@ class RankingSubPageViewModel @AssistedInject constructor(
     }
 
     /**
+     * 차트 코드가 변경되었을 때 데이터 새로고침
+     * (성별 카테고리 변경 시 호출)
+     */
+    fun reloadWithNewCode(newCode: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            android.util.Log.d("RankingSubPageVM", "🔄 Reloading with new code: $newCode (previous: ${type.code})")
+
+            // 코드가 변경되었으면 캐시 초기화
+            if (newCode != currentChartCode) {
+                android.util.Log.d("RankingSubPageVM", "  ✓ Code changed, clearing cache")
+                currentChartCode = ""
+                idList.clear()
+            }
+
+            loadRankingData(newCode)
+        }
+    }
+
+    /**
      * 랭킹 데이터 로드
      *
      * old 프로젝트와 동일한 방식:
      * 1. PR_ 또는 GLOBAL로 시작하는 코드는 getChartIdolIds API 사용
      * 2. 캐시된 idList가 있으면 API 호출 없이 DB만 조회
      * 3. ID 리스트로 DB 조회 후 정렬 및 순위 계산
+     *
+     * @param overrideCode 코드를 덮어쓸 경우 사용 (성별 변경 시)
      */
-    private fun loadRankingData() {
+    private fun loadRankingData(overrideCode: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = UiState.Loading
 
-            val code = type.code
+            val code = overrideCode ?: type.code
             android.util.Log.d("RankingSubPageVM", "========================================")
             android.util.Log.d("RankingSubPageVM", "[RankingSubPageViewModel] Loading ranking data")
             android.util.Log.d("RankingSubPageVM", "  - type: ${type.type}")
@@ -170,7 +194,8 @@ class RankingSubPageViewModel @AssistedInject constructor(
                     rank = idolWithRank.rank,
                     name = idolWithRank.idol.name,
                     voteCount = formatHeartCount(idolWithRank.idol.heartCount),
-                    photoUrl = idolWithRank.idol.imageUrl
+                    photoUrl = idolWithRank.idol.imageUrl,
+                    idolId = idolWithRank.idol.id  // 아이돌 고유 ID 추가
                 )
             }
 
@@ -179,7 +204,13 @@ class RankingSubPageViewModel @AssistedInject constructor(
                 android.util.Log.d("RankingSubPageVM", "  - Rank ${item.rank}: ${item.name} (${item.voteCount})")
             }
 
-            _uiState.value = UiState.Success(rankItems)
+            // 1위 아이돌 (ExoTop3용)
+            val topIdol = sortedIdols.firstOrNull()?.idol
+
+            _uiState.value = UiState.Success(
+                items = rankItems,
+                topIdol = topIdol
+            )
         } catch (e: Exception) {
             android.util.Log.e("RankingSubPageVM", "❌ Exception querying DB: ${e.message}", e)
             _uiState.value = UiState.Error(
@@ -268,7 +299,8 @@ data class RankItem(
     val rank: Int,
     val name: String,
     val voteCount: String,
-    val photoUrl: String?
+    val photoUrl: String?,
+    val idolId: Int  // 아이돌 고유 ID (LazyColumn key로 사용)
 )
 
 /**

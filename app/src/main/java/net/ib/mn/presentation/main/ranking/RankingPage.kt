@@ -87,6 +87,11 @@ fun RankingPage(
     val tabDataList = if (BuildConfig.CELEB) {
         typeList
     } else {
+        android.util.Log.d("RankingPage", "========================================")
+        android.util.Log.d("RankingPage", "[RankingPage] Building tab list")
+        android.util.Log.d("RankingPage", "  - defaultCategory: $defaultCategory")
+        android.util.Log.d("RankingPage", "  - isMale: $isMale")
+        android.util.Log.d("RankingPage", "========================================")
         buildIdolAppTabList(mainChartModel, viewModel, isMale)
     }
 
@@ -261,13 +266,18 @@ fun RankingPage(
             state = subPagerState,
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
+            key = { pageIndex ->
+                // tabDataList가 변경되면 페이지를 재생성하도록 key 사용
+                tabDataList.getOrNull(pageIndex)?.code ?: "page_$pageIndex"
+            }
         ) { pageIndex ->
             // pageIndex에 해당하는 type 정보 가져오기
             val currentType = tabDataList.getOrNull(pageIndex)
             if (currentType != null) {
                 RankingSubPage(
-                    type = currentType
+                    type = currentType,
+                    isVisible = subPagerState.currentPage == pageIndex  // 현재 페이지만 visible
                 )
             }
         }

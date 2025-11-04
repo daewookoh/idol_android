@@ -281,14 +281,15 @@ class StartUpViewModel @Inject constructor(
     private suspend fun loadConfigStartup(): Boolean {
         var isSuccess = false
 
-        getConfigStartupUseCase().collect { result ->
-            when (result) {
-                is ApiResult.Loading -> {
-                    // 로딩 중 (이미 프로그레스로 표시 중)
-                }
-                is ApiResult.Success -> {
-                    isSuccess = true
-                    val data = result.data.data
+        try {
+            getConfigStartupUseCase().collect { result ->
+                when (result) {
+                    is ApiResult.Loading -> {
+                        // 로딩 중 (이미 프로그레스로 표시 중)
+                    }
+                    is ApiResult.Success -> {
+                        isSuccess = true
+                        val data = result.data.data
 
                     android.util.Log.d(TAG, "========================================")
                     android.util.Log.d(TAG, "ConfigStartup API Response")
@@ -345,14 +346,18 @@ class StartUpViewModel @Inject constructor(
                     // 2. 또는 Hilt SingletonComponent로 ConfigRepository 제공
                     // 3. 현재는 DataStore만 사용하며, 필요시 Flow로 실시간 데이터 접근 가능
                 }
-                is ApiResult.Error -> {
-                    // 에러 처리
-                    isSuccess = false
-                    android.util.Log.e("StartUpViewModel", "ConfigStartup error: ${result.message}")
+                    is ApiResult.Error -> {
+                        // 에러 처리
+                        isSuccess = false
+                        android.util.Log.e("StartUpViewModel", "ConfigStartup error: ${result.message}")
 
-                    // ConfigStartup은 critical path이므로 실패 시 전체 초기화 중단
+                        // ConfigStartup은 critical path이므로 실패 시 전체 초기화 중단
+                    }
                 }
             }
+        } catch (e: Exception) {
+            android.util.Log.e("StartUpViewModel", "ConfigStartup exception: ${e.message}", e)
+            isSuccess = false
         }
 
         return isSuccess
@@ -362,10 +367,11 @@ class StartUpViewModel @Inject constructor(
      * ConfigSelf API 호출 (사용자 설정)
      */
     private suspend fun loadConfigSelf() {
-        getConfigSelfUseCase().collect { result ->
-            when (result) {
-                is ApiResult.Loading -> {}
-                is ApiResult.Success -> {
+        try {
+            getConfigSelfUseCase().collect { result ->
+                when (result) {
+                    is ApiResult.Loading -> {}
+                    is ApiResult.Success -> {
                     val data = result.data.data
 
                     android.util.Log.d(TAG, "========================================")
@@ -384,10 +390,13 @@ class StartUpViewModel @Inject constructor(
                         android.util.Log.d(TAG, "✓ ConfigSelf data saved to DataStore")
                     }
                 }
-                is ApiResult.Error -> {
-                    android.util.Log.e(TAG, "ConfigSelf error: ${result.message}")
+                    is ApiResult.Error -> {
+                        android.util.Log.e(TAG, "ConfigSelf error: ${result.message}")
+                    }
                 }
             }
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "ConfigSelf exception: ${e.message}", e)
         }
     }
 
@@ -395,7 +404,8 @@ class StartUpViewModel @Inject constructor(
      * UpdateInfo API 호출 (Idol 업데이트 플래그)
      */
     private suspend fun loadUpdateInfo() {
-        getUpdateInfoUseCase().collect { result ->
+        try {
+            getUpdateInfoUseCase().collect { result ->
             when (result) {
                 is ApiResult.Loading -> {}
                 is ApiResult.Success -> {
@@ -446,21 +456,25 @@ class StartUpViewModel @Inject constructor(
                 }
             }
         }
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "UpdateInfo exception: ${e.message}", e)
+        }
     }
 
     /**
      * UserSelf API 호출 (사용자 프로필, ETag 지원)
      */
     private suspend fun loadUserSelf() {
-        // DataStore에서 저장된 ETag 가져오기
-        val etag = preferencesManager.userSelfETag.first()
+        try {
+            // DataStore에서 저장된 ETag 가져오기
+            val etag = preferencesManager.userSelfETag.first()
 
-        android.util.Log.d("USER_INFO", "========================================")
-        android.util.Log.d("USER_INFO", "[StartUpViewModel] Loading user info from server")
-        android.util.Log.d("USER_INFO", "[StartUpViewModel] ETag: $etag")
-        android.util.Log.d("USER_INFO", "========================================")
+            android.util.Log.d("USER_INFO", "========================================")
+            android.util.Log.d("USER_INFO", "[StartUpViewModel] Loading user info from server")
+            android.util.Log.d("USER_INFO", "[StartUpViewModel] ETag: $etag")
+            android.util.Log.d("USER_INFO", "========================================")
 
-        getUserSelfUseCase(etag).collect { result ->
+            getUserSelfUseCase(etag).collect { result ->
             when (result) {
                 is ApiResult.Loading -> {
                     android.util.Log.d("USER_INFO", "[StartUpViewModel] Loading user info...")
@@ -544,9 +558,6 @@ class StartUpViewModel @Inject constructor(
                     } ?: run {
                         android.util.Log.w("USER_INFO", "[StartUpViewModel] ⚠️ UserSelf API returned null data")
                     }
-
-                    // Success나 Error가 나오면 수집 종료 (Flow 완료)
-                    return@collect
                 }
                 is ApiResult.Error -> {
                     if (result.code == 304) {
@@ -558,10 +569,11 @@ class StartUpViewModel @Inject constructor(
                         android.util.Log.e("USER_INFO", "[StartUpViewModel] ❌ UserSelf API error: ${result.message}")
                         android.util.Log.e(TAG, "UserSelf error: ${result.message}")
                     }
-                    // Success나 Error가 나오면 수집 종료 (Flow 완료)
-                    return@collect
                 }
             }
+        }
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "UserSelf exception: ${e.message}", e)
         }
     }
 
@@ -679,7 +691,8 @@ class StartUpViewModel @Inject constructor(
      * Idols 리스트 조회
      */
     private suspend fun loadIdols() {
-        getIdolsUseCase().collect { result ->
+        try {
+            getIdolsUseCase().collect { result ->
             when (result) {
                 is ApiResult.Loading -> {}
                 is ApiResult.Success -> {
@@ -740,6 +753,9 @@ class StartUpViewModel @Inject constructor(
                     android.util.Log.e(TAG, "Idols error: ${result.message}")
                 }
             }
+        }
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "Idols exception: ${e.message}", e)
         }
     }
 

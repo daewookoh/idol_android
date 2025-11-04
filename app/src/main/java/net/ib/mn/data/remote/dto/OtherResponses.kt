@@ -384,9 +384,14 @@ data class IdolData(
 fun IdolData.toEntity(): net.ib.mn.data.local.entity.IdolEntity {
     return net.ib.mn.data.local.entity.IdolEntity(
         id = id,
-        name = name,
+        name = name ?: "",  // null인 경우 빈 문자열로
         group = if (groupId != null && groupId > 0) "Group #$groupId" else null, // group_id를 사용
         imageUrl = imageUrl,
+        imageUrl2 = imageUrl2,
+        imageUrl3 = imageUrl3,
+        top3 = top3,
+        top3Type = top3Type,
+        top3ImageVer = top3ImageVer,
         heartCount = heart ?: 0, // heart 필드 사용
         isTop3 = false, // 초기값
         timestamp = System.currentTimeMillis()

@@ -11,7 +11,7 @@ import net.ib.mn.data.local.entity.IdolEntity
  */
 @Database(
     entities = [IdolEntity::class],
-    version = 1,
+    version = 3,
     exportSchema = false
 )
 abstract class IdolDatabase : RoomDatabase() {

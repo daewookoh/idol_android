@@ -4,6 +4,15 @@ import android.app.Application
 import android.content.pm.PackageManager
 import android.util.Base64
 import android.util.Log
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.decode.VideoFrameDecoder
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
+import coil.request.CachePolicy
+import coil.util.DebugLogger
 import com.facebook.FacebookSdk
 import com.kakao.sdk.common.KakaoSdk
 import dagger.hilt.android.HiltAndroidApp
@@ -25,10 +34,61 @@ import javax.inject.Inject
  * 4. Google Sign-In: 별도 초기화 불필요
  */
 @HiltAndroidApp
-class IdolApplication : Application() {
+class IdolApplication : Application(), ImageLoaderFactory {
 
     @Inject
     lateinit var preferencesManager: PreferencesManager
+
+    /**
+     * Coil ImageLoader 설정 (메모리 최적화)
+     *
+     * 최적화 전략:
+     * 1. 메모리 캐시 크기 제한 (앱 메모리의 25%)
+     * 2. 디스크 캐시 설정 (100MB)
+     * 3. GIF/Video 디코더 지원
+     * 4. 자동 리사이징 활성화
+     * 5. Bitmap pooling 활성화
+     */
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            // 메모리 캐시 설정 (앱 메모리의 25%)
+            .memoryCache {
+                MemoryCache.Builder(this)
+                    .maxSizePercent(0.25)  // 메모리의 25%만 사용
+                    .build()
+            }
+            // 디스크 캐시 설정 (100MB)
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(cacheDir.resolve("image_cache"))
+                    .maxSizeBytes(100 * 1024 * 1024)  // 100MB
+                    .build()
+            }
+            // GIF 디코더 (Android 9 이상은 ImageDecoder, 이하는 GifDecoder)
+            .components {
+                if (android.os.Build.VERSION.SDK_INT >= 28) {
+                    add(ImageDecoderDecoder.Factory())
+                } else {
+                    add(GifDecoder.Factory())
+                }
+                // Video frame 디코더
+                add(VideoFrameDecoder.Factory())
+            }
+            // 캐시 정책: 메모리 & 디스크 모두 사용
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .networkCachePolicy(CachePolicy.ENABLED)
+            // 크로스페이드 애니메이션 활성화
+            .crossfade(true)
+            .crossfade(200)
+            // DEBUG 빌드에서만 로깅
+            .apply {
+                if (BuildConfig.DEBUG) {
+                    logger(DebugLogger())
+                }
+            }
+            .build()
+    }
 
     override fun onCreate() {
         super.onCreate()

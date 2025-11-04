@@ -368,6 +368,12 @@ dependencies {
 
     // Coil
     implementation(libs.coil.compose)
+    implementation(libs.coil.gif)
+    implementation(libs.coil.video)
+
+    // Media3 (ExoPlayer)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
 
     // Room
     implementation(libs.androidx.room.runtime)

@@ -1,75 +1,207 @@
 package net.ib.mn.ui.components
 
+import android.view.ViewGroup
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.size.Scale
+import dagger.hilt.android.UnstableApi
 import net.ib.mn.R
 
 /**
- * ExoTop3 - 랭킹 리스트 상단 배너 (구 MainRankingBanner)
+ * ExoTop3 - 랭킹 리스트 상단 TOP3 배너
  *
- * 화면을 꽉 채우는 배너 컴포넌트 (padding 없음, radius 없음)
- * 광고, 이벤트, 또는 주요 정보를 표시
+ * Old 프로젝트의 ranking_header.xml 로직을 Compose로 구현
  *
- * @param title 배너 제목
- * @param imageUrl 배너 이미지 URL
- * @param onClick 클릭 이벤트
+ * 핵심 로직:
+ * - 높이 = 너비 / 3 (정사각형의 1/3)
+ * - 3개 이미지를 1/3씩 균등 분할
+ * - Layer1: 스틸 이미지 (기본)
+ * - Layer2: 움짤/동영상 (있는 경우만, 재생되면 스틸 숨김)
+ * - 전역 관리: 한 화면에 여러 ExoTop3가 있을 때 최근 활성화된 것만 재생
+ *
+ * @param id 고유 식별자 (예: "ranking_page_0")
+ * @param imageUrls 3개 이미지 URL (imageUrl, imageUrl2, imageUrl3)
+ * @param videoUrls 3개 동영상 URL (.mp4 또는 _m_mv.mp4)
+ * @param isVisible 현재 화면에 표시 여부 (HorizontalPager의 currentPage로 제어)
  */
+@androidx.annotation.OptIn(UnstableApi::class)
 @Composable
 fun ExoTop3(
-    title: String? = null,
-    imageUrl: String? = null,
-    onClick: () -> Unit = {}
+    id: String,
+    imageUrls: List<String?>,
+    videoUrls: List<String?> = listOf(null, null, null),
+    isVisible: Boolean = true,
+    onItemClick: (Int) -> Unit = {}
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(120.dp)
-            .background(colorResource(R.color.gray100))
-            .clickable { onClick() }
-    ) {
-        // 배너 이미지
-        if (imageUrl != null) {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = "배너 이미지",
-                modifier = Modifier.fillMaxWidth(),
-                contentScale = ContentScale.Crop
-            )
+    val context = LocalContext.current
+    val manager = LocalExoTop3Manager.current
+
+    // 전역 활성 상태 확인
+    val activePlayerId by manager.activePlayerId.collectAsState()
+    val isActive = isVisible && activePlayerId == id
+
+    // 화면에 보일 때 활성 플레이어로 등록
+    DisposableEffect(id, isVisible) {
+        if (isVisible) {
+            manager.setActivePlayer(id)
         }
 
-        // 배너 제목 (이미지가 없거나 오버레이로 표시)
-        if (title != null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = title,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (imageUrl != null) {
-                        colorResource(R.color.white)
-                    } else {
-                        colorResource(R.color.text_default)
-                    }
-                )
+        onDispose {
+            if (manager.isActive(id)) {
+                manager.clearActivePlayer()
             }
         }
+    }
+
+    // 3개 이미지 보장
+    val images = imageUrls.take(3).let { list ->
+        list + List(3 - list.size) { null }
+    }
+    val videos = videoUrls.take(3).let { list ->
+        list + List(3 - list.size) { null }
+    }
+
+    // 높이 = 너비 / 3 계산을 위한 BoxWithConstraints
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(colorResource(R.color.gray100))
+    ) {
+        val screenWidth = with(LocalDensity.current) { maxWidth.toPx() }
+        val itemWidth = screenWidth / 3
+        val height = itemWidth // 정사각형이므로 높이 = 너비
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(with(LocalDensity.current) { height.toDp() })
+        ) {
+            // 3개 아이템 (각 1/3)
+            for (index in 0..2) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                ) {
+                    // Layer1: 스틸 이미지
+                    val stillImageUrl = images[index]
+                    val videoUrl = videos[index]
+
+                    var isVideoReady by remember { mutableStateOf(false) }
+
+                    // 스틸 이미지 (최적화: 정확한 크기로 리사이징)
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(stillImageUrl)
+                            .size(itemWidth.toInt(), height.toInt())  // 정확한 크기로 다운샘플링
+                            .scale(Scale.FILL)
+                            .crossfade(true)
+                            .crossfade(200)
+                            .build(),
+                        contentDescription = "Top ${index + 1} 이미지",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        error = androidx.compose.ui.res.painterResource(getDefaultImageRes(index)),
+                        placeholder = androidx.compose.ui.res.painterResource(getDefaultImageRes(index))
+                    )
+
+                    // Layer2: 동영상 (있는 경우만)
+                    if (videoUrl != null) {
+                        // .mp4 또는 _s_mv.jpg → _m_mv.mp4 변환
+                        val actualVideoUrl = remember(videoUrl) {
+                            when {
+                                videoUrl.contains(".mp4") -> videoUrl
+                                videoUrl.contains("_s_mv.jpg") -> videoUrl.replace("_s_mv.jpg", "_m_mv.mp4")
+                                else -> null
+                            }
+                        }
+
+                        if (actualVideoUrl != null) {
+                            val exoPlayer = remember(actualVideoUrl) {
+                                ExoPlayer.Builder(context)
+                                    // 메모리 최적화: 작은 버퍼 사이즈 사용
+                                    .setLoadControl(
+                                        androidx.media3.exoplayer.DefaultLoadControl.Builder()
+                                            .setBufferDurationsMs(
+                                                15000,  // minBufferMs: 15초
+                                                30000,  // maxBufferMs: 30초
+                                                1000,   // bufferForPlaybackMs: 1초
+                                                2000    // bufferForPlaybackAfterRebufferMs: 2초
+                                            )
+                                            .build()
+                                    )
+                                    .build().apply {
+                                        repeatMode = Player.REPEAT_MODE_ALL
+                                        // 비디오만 재생 (오디오 트랙 비활성화로 메모리 절약)
+                                        volume = 0f
+                                        setMediaItem(MediaItem.fromUri(actualVideoUrl))
+                                        prepare()
+
+                                        addListener(object : Player.Listener {
+                                            override fun onPlaybackStateChanged(playbackState: Int) {
+                                                if (playbackState == Player.STATE_READY) {
+                                                    isVideoReady = true
+                                                }
+                                            }
+                                        })
+                                    }
+                            }
+
+                            // isActive 상태에 따라 재생/정지 제어
+                            LaunchedEffect(isActive) {
+                                exoPlayer.playWhenReady = isActive
+                            }
+
+                            DisposableEffect(Unit) {
+                                onDispose {
+                                    exoPlayer.release()
+                                }
+                            }
+
+                            // PlayerView
+                            AndroidView(
+                                factory = { ctx ->
+                                    PlayerView(ctx).apply {
+                                        player = exoPlayer
+                                        useController = false
+                                        layoutParams = ViewGroup.LayoutParams(
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.MATCH_PARENT
+                                        )
+                                    }
+                                },
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 기본 이미지 리소스 ID 반환 (이미지가 없을 때)
+ * Old 프로젝트의 Util.noProfileImage() 로직
+ */
+@Composable
+private fun getDefaultImageRes(index: Int): Int {
+    return if (index % 2 == 0) {
+        R.drawable.menu_profile_2
+    } else {
+        R.drawable.menu_profile_1
     }
 }

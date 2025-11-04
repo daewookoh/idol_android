@@ -12,9 +12,14 @@ import net.ib.mn.data.model.Idol
 data class IdolEntity(
     @PrimaryKey
     val id: Int,
-    val name: String,
-    val group: String?,
-    val imageUrl: String?,
+    val name: String = "",                 // 기본값 추가 (old 프로젝트와 동일)
+    val group: String? = null,
+    val imageUrl: String? = null,
+    val imageUrl2: String? = null,
+    val imageUrl3: String? = null,
+    val top3: String? = null,              // comma-separated top3 image IDs
+    val top3Type: String? = null,          // comma-separated top3 types
+    val top3ImageVer: String? = null,      // comma-separated version numbers for cache busting
     val heartCount: Int = 0,
     val isTop3: Boolean = false,
     val timestamp: Long = System.currentTimeMillis()
