@@ -18,6 +18,8 @@ import net.ib.mn.R
 /**
  * 랭킹 아이템 데이터 클래스
  * @Immutable: 불변 데이터로 표시하여 불필요한 리컴포지션 방지
+ *
+ * old 프로젝트의 ranking_item.xml 및 NewRankingAdapter.kt 기반
  */
 @Immutable
 data class RankingItemData(
@@ -25,7 +27,23 @@ data class RankingItemData(
     val name: String,
     val voteCount: String,
     val photoUrl: String? = null,
-    val id: String = ""  // 고유 ID로 사용 (변경 추적에 중요)
+    val id: String = "",  // 고유 ID로 사용 (변경 추적에 중요)
+
+    // 추가 필드 (old 프로젝트 기반)
+    val groupName: String? = null,  // 그룹명 (예: "TWICE")
+    val anniversary: String? = null,  // 기념일 타입 ("BIRTH", "DEBUT", "COMEBACK", "MEMORIAL_DAY", "ALL_IN_DAY")
+    val anniversaryDays: Int = 0,  // 몰빵일 일수
+    val miracleCount: Int = 0,  // 미라클 배지 수
+    val fairyCount: Int = 0,  // 요정 배지 수
+    val angelCount: Int = 0,  // 천사 배지 수
+    val rookieCount: Int = 0,  // 루키 배지 수
+    val superRookieCount: Int = 0,  // 슈퍼 루키 배지 수
+    val isFavorite: Boolean = false,  // 최애 여부 (배경색 하이라이트)
+    val heartCount: Long = 0,  // 실제 하트 수 (프로그레스 바 계산용)
+    val maxHeartCount: Long = 0,  // 1등 하트 수 (프로그레스 바 계산용)
+    val minHeartCount: Long = 0,  // 꼴등 하트 수 (프로그레스 바 계산용)
+    val top3ImageUrls: List<String?> = listOf(null, null, null),  // 펼치기 이미지 3개
+    val top3VideoUrls: List<String?> = listOf(null, null, null),  // 펼치기 동영상 3개
 ) {
     // equals/hashCode는 data class가 자동 생성하지만,
     // LazyColumn의 key로 사용할 고유 식별자
