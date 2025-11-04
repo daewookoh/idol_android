@@ -69,8 +69,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideConfigApi(retrofit: Retrofit): ConfigApi =
-        retrofit.create(ConfigApi::class.java)
+    fun provideConfigsApi(retrofit: Retrofit): ConfigsApi =
+        retrofit.create(ConfigsApi::class.java)
 
     @Provides
     @Singleton
@@ -96,4 +96,9 @@ object NetworkModule {
     @Singleton
     fun provideUtilityApi(retrofit: Retrofit): UtilityApi =
         retrofit.create(UtilityApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideChartsApi(retrofit: Retrofit): ChartsApi =
+        retrofit.create(ChartsApi::class.java)
 }

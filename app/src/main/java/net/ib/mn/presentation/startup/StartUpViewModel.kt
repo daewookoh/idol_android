@@ -62,6 +62,9 @@ class StartUpViewModel @Inject constructor(
     private val getIdolsUseCase: GetIdolsUseCase,
     private val getIabKeyUseCase: GetIabKeyUseCase,
     private val getBlocksUseCase: GetBlocksUseCase,
+    private val getTypeListUseCase: GetTypeListUseCase,
+    private val configRepository: net.ib.mn.domain.repository.ConfigRepository,
+    private val chartsApi: net.ib.mn.data.remote.api.ChartsApi,
     private val preferencesManager: net.ib.mn.data.local.PreferencesManager,
     private val authInterceptor: net.ib.mn.data.remote.interceptor.AuthInterceptor,
     private val idolDao: net.ib.mn.data.local.dao.IdolDao,
@@ -238,16 +241,26 @@ class StartUpViewModel @Inject constructor(
 
         // Phase 3: 나머지 APIs 병렬 호출
         coroutineScope {
-            awaitAll(
+            val tasks = mutableListOf(
                 async { loadUpdateInfo() },
                 async { loadUserSelf() },
                 async { loadUserStatus() },
                 async { loadAdTypeList() },
                 async { loadMessageCoupon() },
                 async { loadTimezone() },
-                async { loadIdols() },
+                async { loadIdols() }
                 // 조건부: loadBlocks() - 첫 사용자만
             )
+
+            // CELEB 전용: TypeList API 호출
+            if (net.ib.mn.BuildConfig.CELEB) {
+                tasks.add(async { loadTypeList() })
+            }
+
+            // 모든 앱: ChartsCurrent API 호출
+            tasks.add(async { loadChartsCurrent() })
+
+            awaitAll(*tasks.toTypedArray())
         }
 
         android.util.Log.d(TAG, "✓ All APIs completed successfully")
@@ -704,6 +717,190 @@ class StartUpViewModel @Inject constructor(
                     android.util.Log.e(TAG, "Idols error: ${result.message}")
                 }
             }
+        }
+    }
+
+    /**
+     * TypeList API 호출 (old 프로젝트와 동일)
+     *
+     * CELEB 전용 API
+     * 랭킹 탭 타입 목록을 조회하고 ConfigRepository 캐시에 저장
+     * old 프로젝트의 StartupViewModel.getTypeList()와 동일한 로직
+     */
+    private suspend fun loadTypeList() {
+        android.util.Log.d(TAG, "========================================")
+        android.util.Log.d(TAG, "Loading TypeList (old logic)...")
+
+        try {
+            getTypeListUseCase(forceRefresh = true).collect { typeListData ->
+                android.util.Log.d("API_RESPONSE", "TypeList received: ${typeListData.size} items")
+
+                // old 프로젝트와 동일: A, S 타입은 isDivided = "Y"로 설정
+                val arrayTypeList = typeListData.toMutableList()
+
+                for (i in arrayTypeList.indices) {
+                    arrayTypeList[i].type?.let {
+                        if (it == "A" || it == "S") {
+                            arrayTypeList[i].isDivided = "Y"
+                        }
+                    }
+                }
+
+                // old 프로젝트와 동일: isDivided == "Y"인 경우 여성 버전 추가
+                var insertOffset = 0
+                for (i in 0 until arrayTypeList.size + insertOffset) {
+                    if (i < arrayTypeList.size && arrayTypeList[i].isDivided == "Y") {
+                        val model = arrayTypeList[i].copy()
+                        model.isDivided = "N" // N으로 만드는 이유는 Y로 했을 경우 무한루프가 돌 수 있음
+                        model.isFemale = true // Y인 경우 여자가 있는 경우이므로 추가
+                        model.showDivider = true // 구분선 보여주기
+                        arrayTypeList.add(i + 1, model)
+                        insertOffset++
+                    }
+                }
+
+                // old 프로젝트와 동일: 해외 배우 카테고리(G) 끼워넣기
+                val globalIndex = arrayTypeList.indexOfFirst { it.type == "G" }
+                if (globalIndex != -1) {
+                    val globalModel = arrayTypeList[globalIndex]
+                    globalModel.showDivider = true
+
+                    // type이 A이고 isFemale이 true인 카테고리를 찾는다
+                    val insertIndex = arrayTypeList.indexOfFirst { it.type == "A" && it.isFemale }
+                    if (insertIndex != -1) {
+                        arrayTypeList.removeAt(globalIndex)
+                        arrayTypeList.add(insertIndex + 1, globalModel)
+                        arrayTypeList[insertIndex].showDivider = false
+                    }
+                }
+
+                // ConfigRepository 캐시에 처리된 typeList 저장
+                configRepository.setTypeListCache(arrayTypeList)
+                android.util.Log.d("API_RESPONSE", "✓ TypeList cached in ConfigRepository (${arrayTypeList.size} items)")
+
+                arrayTypeList.forEachIndexed { index, type ->
+                    android.util.Log.d("API_RESPONSE", "  [$index] id=${type.id}, name=${type.name}, type=${type.type}, isDivided=${type.isDivided}, isFemale=${type.isFemale}, showDivider=${type.showDivider}")
+                }
+
+                android.util.Log.d("API_RESPONSE", "========================================")
+            }
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "TypeList error: ${e.message}", e)
+        }
+    }
+
+    /**
+     * ChartsCurrent API 호출 (old 프로젝트와 동일)
+     *
+     * 일반 앱 전용 API
+     * charts/current/를 호출하여 main.males/females를 TypeListModel로 변환
+     * ConfigRepository 캐시에 저장
+     */
+    private suspend fun loadChartsCurrent() {
+        android.util.Log.d(TAG, "========================================")
+        android.util.Log.d(TAG, "Loading ChartsCurrent (non-CELEB logic)...")
+
+        try {
+            val response = chartsApi.getChartsCurrent()
+
+            android.util.Log.d("API_RESPONSE", "ChartsCurrent Response code: ${response.code()}")
+            android.util.Log.d("API_RESPONSE", "ChartsCurrent Response successful: ${response.isSuccessful}")
+
+            if (response.isSuccessful && response.body() != null) {
+                val body = response.body()!!
+
+                if (body.success) {
+                    // MainChartModel 저장 (old 프로젝트와 동일)
+                    body.main?.let { mainChartModel ->
+                        configRepository.setMainChartModel(mainChartModel)
+                        android.util.Log.d("API_RESPONSE", "✓ MainChartModel saved to cache")
+                    }
+
+                    // ChartObjects 저장 (MIRACLE, ROOKIE 등)
+                    body.objects?.let { objects ->
+                        configRepository.setChartObjects(objects)
+                        android.util.Log.d("API_RESPONSE", "✓ ChartObjects saved to cache")
+                    }
+
+                    // main.males/females를 TypeListModel로 변환
+                    val typeListData = mutableListOf<net.ib.mn.data.model.TypeListModel>()
+
+                    // males 차트 변환 (예: SOLO_M, GROUP_M)
+                    body.main?.males?.forEach { chartInfo ->
+                        chartInfo.code?.let { code ->
+                            val typeListModel = net.ib.mn.data.model.TypeListModel(
+                                id = 0,
+                                name = chartInfo.name ?: "",
+                                type = extractTypeFromCode(code), // "SOLO", "GROUP" 등
+                                isDivided = "N",
+                                isFemale = false,
+                                showDivider = false
+                            )
+                            typeListData.add(typeListModel)
+                        }
+                    }
+
+                    // females 차트 변환 (예: SOLO_F, GROUP_F)
+                    body.main?.females?.forEach { chartInfo ->
+                        chartInfo.code?.let { code ->
+                            val typeListModel = net.ib.mn.data.model.TypeListModel(
+                                id = 0,
+                                name = chartInfo.name ?: "",
+                                type = extractTypeFromCode(code), // "SOLO", "GROUP" 등
+                                isDivided = "N",
+                                isFemale = true,
+                                showDivider = false
+                            )
+                            typeListData.add(typeListModel)
+                        }
+                    }
+
+                    // objects에서 추가 차트 정보 (MIRACLE, ROOKIE, HEARTPICK 등)
+                    body.objects?.forEach { chart ->
+                        chart.type?.let { type ->
+                            val typeListModel = net.ib.mn.data.model.TypeListModel(
+                                id = 0,
+                                name = chart.type ?: "", // type을 name으로 사용
+                                type = type,
+                                isDivided = "N",
+                                isFemale = false,
+                                showDivider = false
+                            )
+                            typeListData.add(typeListModel)
+                        }
+                    }
+
+                    // ConfigRepository 캐시에 처리된 typeList 저장
+                    configRepository.setTypeListCache(typeListData)
+                    android.util.Log.d("API_RESPONSE", "✓ ChartsCurrent converted and cached (${typeListData.size} items)")
+
+                    typeListData.forEachIndexed { index, type ->
+                        android.util.Log.d("API_RESPONSE", "  [$index] name=${type.name}, type=${type.type}, isFemale=${type.isFemale}")
+                    }
+                } else {
+                    android.util.Log.e("API_RESPONSE", "ChartsCurrent API returned success=false")
+                }
+            } else {
+                android.util.Log.e("API_RESPONSE", "ChartsCurrent Response not successful: ${response.code()}")
+                android.util.Log.e("API_RESPONSE", "Error body: ${response.errorBody()?.string()}")
+            }
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "ChartsCurrent error: ${e.message}", e)
+        }
+
+        android.util.Log.d("API_RESPONSE", "========================================")
+    }
+
+    /**
+     * 차트 코드에서 타입 추출
+     *
+     * 예: "SOLO_M" -> "SOLO", "GROUP_F" -> "GROUP"
+     */
+    private fun extractTypeFromCode(code: String): String {
+        return when {
+            code.startsWith("SOLO") -> "SOLO"
+            code.startsWith("GROUP") -> "GROUP"
+            else -> code
         }
     }
 }

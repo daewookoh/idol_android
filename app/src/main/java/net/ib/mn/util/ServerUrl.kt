@@ -19,10 +19,6 @@ object ServerUrl {
     val HOST_TEST: String =
         if (Constants.IS_CELEB) "https://test.myloveactor.com" else "https://test.myloveidol.com"
 
-    // BBB 테스트 서버
-    val HOST_BBB_TEST: String =
-        if (Constants.IS_CELEB) "https://bbb.test.myloveactor.com" else "https://bbb.test.myloveidol.com"
-
     /**
      * 현재 사용 중인 서버 HOST
      * 런타임에 변경 가능 (Deep link, 설정 등)
@@ -49,7 +45,7 @@ object ServerUrl {
      * 테스트 서버인지 확인
      */
     fun isTestServer(): Boolean {
-        return HOST == HOST_TEST || HOST == HOST_BBB_TEST
+        return !HOST.contains("www.")
     }
 
     /**
@@ -66,10 +62,4 @@ object ServerUrl {
         HOST = HOST_TEST
     }
 
-    /**
-     * BBB 테스트 서버로 변경
-     */
-    fun useBBBTestServer() {
-        HOST = HOST_BBB_TEST
-    }
 }

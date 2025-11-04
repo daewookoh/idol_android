@@ -1,7 +1,8 @@
 package net.ib.mn.data.repository
 
 import net.ib.mn.data.local.PreferencesManager
-import net.ib.mn.data.remote.api.ConfigApi
+import net.ib.mn.data.model.TypeListModel
+import net.ib.mn.data.remote.api.ConfigsApi
 import net.ib.mn.data.remote.dto.ConfigSelfResponse
 import net.ib.mn.data.remote.dto.ConfigStartupResponse
 import net.ib.mn.domain.model.ApiResult
@@ -19,9 +20,21 @@ import javax.inject.Inject
  * Retrofit API를 사용하여 실제 네트워크 요청 수행
  */
 class ConfigRepositoryImpl @Inject constructor(
-    private val configApi: ConfigApi,
+    private val configsApi: ConfigsApi,
     private val preferencesManager: PreferencesManager
 ) : ConfigRepository {
+
+    // typeList 캐시 (메모리 캐시)
+    @Volatile
+    private var cachedTypeList: List<TypeListModel>? = null
+
+    // MainChartModel 캐시 (메모리 캐시)
+    @Volatile
+    private var cachedMainChartModel: net.ib.mn.data.remote.dto.MainChartModel? = null
+
+    // ChartObjects 캐시 (메모리 캐시)
+    @Volatile
+    private var cachedChartObjects: List<net.ib.mn.data.remote.dto.ChartModel>? = null
 
     override fun getConfigStartup(): Flow<ApiResult<ConfigStartupResponse>> = flow {
         emit(ApiResult.Loading)
@@ -31,7 +44,7 @@ class ConfigRepositoryImpl @Inject constructor(
             android.util.Log.d("ConfigRepo", "🔵 Calling ConfigStartup API")
             android.util.Log.d("ConfigRepo", "========================================")
 
-            val response = configApi.getConfigStartup()
+            val response = configsApi.getConfigStartup()
 
             android.util.Log.d("ConfigRepo", "📦 Response received:")
             android.util.Log.d("ConfigRepo", "  - HTTP Code: ${response.code()}")
@@ -107,23 +120,17 @@ class ConfigRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading)
 
         try {
-            // Get token from DataStore
-            val accessToken = preferencesManager.accessToken.first()
-            val token = "Bearer ${accessToken ?: ""}"
-
-            val response = configApi.getConfigSelf(token)
+            val response = configsApi.getConfigSelf()
 
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
 
-                if (body.success) {
-                    emit(ApiResult.Success(body))
-                } else {
-                    emit(ApiResult.Error(
-                        exception = Exception("API returned success=false"),
-                        code = response.code()
-                    ))
-                }
+                // String 응답을 ConfigSelfResponse로 파싱
+                // TODO: JSON 파싱 필요
+                android.util.Log.d("ConfigRepo", "ConfigSelf response: $body")
+
+                // 임시로 빈 ConfigSelfResponse 반환
+                emit(ApiResult.Success(ConfigSelfResponse(success = true, data = null)))
             } else {
                 emit(ApiResult.Error(
                     exception = HttpException(response),
@@ -147,5 +154,127 @@ class ConfigRepositoryImpl @Inject constructor(
                 message = "Unknown error: ${e.message}"
             ))
         }
+    }
+
+    /**
+     * TypeList 조회 (캐시 우선)
+     * startup에서 호출되어 캐시된 경우 API 호출하지 않음
+     */
+    override fun getTypeList(forceRefresh: Boolean): Flow<List<TypeListModel>> = flow {
+        android.util.Log.d("API_RESPONSE", "========================================")
+        android.util.Log.d("API_RESPONSE", "[ConfigRepository] getTypeList called")
+        android.util.Log.d("API_RESPONSE", "  - forceRefresh: $forceRefresh")
+        android.util.Log.d("API_RESPONSE", "  - cachedTypeList: ${cachedTypeList?.size ?: 0} items")
+
+        // 캐시가 있고 forceRefresh가 false면 캐시 반환
+        if (!forceRefresh && cachedTypeList != null) {
+            android.util.Log.d("API_RESPONSE", "✓ Returning cached typeList (${cachedTypeList!!.size} items)")
+            android.util.Log.d("API_RESPONSE", "========================================")
+            emit(cachedTypeList!!)
+            return@flow
+        }
+
+        // API 호출
+        android.util.Log.d("API_RESPONSE", "Calling TypeList API: GET configs/typelist/")
+        try {
+            val response = configsApi.getTypeList()
+
+            android.util.Log.d("API_RESPONSE", "Response Code: ${response.code()}")
+            android.util.Log.d("API_RESPONSE", "Response Success: ${response.isSuccessful}")
+
+            if (response.isSuccessful && response.body() != null) {
+                val body = response.body()!!
+
+                if (body.success) {
+                    val typeListData = body.objects
+
+                    android.util.Log.d("API_RESPONSE", "TypeList API Response:")
+                    android.util.Log.d("API_RESPONSE", "Success: ${body.success}")
+                    android.util.Log.d("API_RESPONSE", "Total types: ${typeListData.size}")
+
+                    typeListData.forEachIndexed { index, type ->
+                        android.util.Log.d("API_RESPONSE", "  [$index] id=${type.id}, name=${type.name}, type=${type.type}, isDivided=${type.isDivided}, isFemale=${type.isFemale}")
+                    }
+
+                    // 캐시 저장
+                    cachedTypeList = typeListData
+                    android.util.Log.d("API_RESPONSE", "✓ TypeList cached successfully")
+
+                    emit(typeListData)
+                } else {
+                    android.util.Log.e("API_RESPONSE", "Error: API returned success=false")
+                    emit(emptyList())
+                }
+            } else {
+                android.util.Log.e("API_RESPONSE", "Error: HTTP ${response.code()}")
+                android.util.Log.e("API_RESPONSE", "Error body: ${response.errorBody()?.string()}")
+                emit(emptyList())
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("API_RESPONSE", "Exception: ${e.message}", e)
+            emit(emptyList())
+        }
+
+        android.util.Log.d("API_RESPONSE", "========================================")
+    }
+
+    /**
+     * 처리된 typeList를 캐시에 저장
+     * StartupViewModel에서 API 응답을 가공한 후 캐시 업데이트용
+     */
+    override fun setTypeListCache(typeList: List<TypeListModel>) {
+        android.util.Log.d("API_RESPONSE", "========================================")
+        android.util.Log.d("API_RESPONSE", "[ConfigRepository] setTypeListCache called")
+        android.util.Log.d("API_RESPONSE", "  - typeList size: ${typeList.size}")
+
+        cachedTypeList = typeList
+
+        android.util.Log.d("API_RESPONSE", "✓ TypeList cache updated with processed data")
+        android.util.Log.d("API_RESPONSE", "========================================")
+    }
+
+    /**
+     * MainChartModel 캐시에 저장
+     * charts/current/ API 응답의 main 필드
+     */
+    override fun setMainChartModel(mainChartModel: net.ib.mn.data.remote.dto.MainChartModel) {
+        android.util.Log.d("API_RESPONSE", "========================================")
+        android.util.Log.d("API_RESPONSE", "[ConfigRepository] setMainChartModel called")
+        android.util.Log.d("API_RESPONSE", "  - males: ${mainChartModel.males?.size ?: 0}")
+        android.util.Log.d("API_RESPONSE", "  - females: ${mainChartModel.females?.size ?: 0}")
+
+        cachedMainChartModel = mainChartModel
+
+        android.util.Log.d("API_RESPONSE", "✓ MainChartModel cache updated")
+        android.util.Log.d("API_RESPONSE", "========================================")
+    }
+
+    /**
+     * MainChartModel 캐시에서 가져오기
+     */
+    override fun getMainChartModel(): net.ib.mn.data.remote.dto.MainChartModel? {
+        return cachedMainChartModel
+    }
+
+    /**
+     * ChartObjects 캐시에 저장
+     * charts/current/ API 응답의 objects 필드
+     */
+    override fun setChartObjects(chartObjects: List<net.ib.mn.data.remote.dto.ChartModel>) {
+        android.util.Log.d("API_RESPONSE", "========================================")
+        android.util.Log.d("API_RESPONSE", "[ConfigRepository] setChartObjects called")
+        android.util.Log.d("API_RESPONSE", "  - objects size: ${chartObjects.size}")
+
+        cachedChartObjects = chartObjects
+
+        android.util.Log.d("API_RESPONSE", "✓ ChartObjects cache updated")
+        android.util.Log.d("API_RESPONSE", "========================================")
+    }
+
+    /**
+     * ChartObjects 캐시에서 가져오기
+     */
+    override fun getChartObjects(): List<net.ib.mn.data.remote.dto.ChartModel>? {
+        return cachedChartObjects
     }
 }

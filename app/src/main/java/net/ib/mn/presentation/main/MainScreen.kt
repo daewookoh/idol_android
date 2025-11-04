@@ -182,10 +182,7 @@ fun MainScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 when (tab) {
-                    0 -> RankingPage(
-                        userInfo = userInfo,
-                        onLogout = { viewModel.logout() }
-                    )
+                    0 -> RankingPage()
                     1 -> MyIdolPage()
                     2 -> ProfilePage()
                     3 -> FreeBoardPage()
