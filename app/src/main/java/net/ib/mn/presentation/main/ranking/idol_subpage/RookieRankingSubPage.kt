@@ -50,6 +50,17 @@ fun RookieRankingSubPage(
         viewModel.reloadIfNeeded()
     }
 
+    // 화면 가시성 변경 시 UDP 구독 관리 및 데이터 새로고침
+    LaunchedEffect(isVisible) {
+        if (isVisible) {
+            android.util.Log.d("RookieRankingSubPage", "[SubPage] 👁️ Screen became visible")
+            viewModel.onScreenVisible()
+        } else {
+            android.util.Log.d("RookieRankingSubPage", "[SubPage] 🙈 Screen hidden")
+            viewModel.onScreenHidden()
+        }
+    }
+
     when (uiState) {
         is RookieRankingSubPageViewModel.UiState.Loading -> {
             Box(

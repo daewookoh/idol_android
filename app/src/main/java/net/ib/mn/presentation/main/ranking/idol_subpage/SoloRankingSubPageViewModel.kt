@@ -9,6 +9,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -56,13 +57,65 @@ class SoloRankingSubPageViewModel @AssistedInject constructor(
     // 코드별 캐시 (남녀 변경 시에도 이전 데이터 유지)
     private val codeToIdListMap = mutableMapOf<String, ArrayList<Int>>()
 
+    // UDP 구독 Job (화면에 보일 때만 활성화)
+    private var udpSubscriptionJob: Job? = null
+
+    // 화면 가시성 상태
+    private var isScreenVisible = false
+
     init {
         android.util.Log.d("SoloRankingVM", "🆕 ViewModel created for chartCode: $chartCode")
         loadRankingData()
+    }
 
-        // UDP 업데이트 이벤트 구독 (실시간 랭킹 업데이트)
-        viewModelScope.launch {
+    /**
+     * 화면이 보일 때 호출 - UDP 구독 시작 및 데이터 새로고침
+     */
+    fun onScreenVisible() {
+        android.util.Log.d("SoloRankingVM", "👁️ Screen became visible for chartCode: $currentChartCode")
+        isScreenVisible = true
+
+        // DB에서 최신 데이터 로드
+        val cachedIds = codeToIdListMap[currentChartCode]
+        if (cachedIds != null && cachedIds.isNotEmpty()) {
+            android.util.Log.d("SoloRankingVM", "🔄 Refreshing data from DB (${cachedIds.size} items)")
+            viewModelScope.launch(Dispatchers.IO) {
+                queryIdolsByIdsFromDb(cachedIds)
+            }
+        }
+
+        // UDP 구독 시작
+        startUdpSubscription()
+    }
+
+    /**
+     * 화면이 사라질 때 호출 - UDP 구독 중지
+     */
+    fun onScreenHidden() {
+        android.util.Log.d("SoloRankingVM", "🙈 Screen hidden for chartCode: $currentChartCode")
+        isScreenVisible = false
+        stopUdpSubscription()
+    }
+
+    /**
+     * UDP 구독 시작
+     */
+    private fun startUdpSubscription() {
+        // 이미 구독 중이면 중복 방지
+        if (udpSubscriptionJob?.isActive == true) {
+            android.util.Log.d("SoloRankingVM", "⚠️ UDP already subscribed, skipping")
+            return
+        }
+
+        android.util.Log.d("SoloRankingVM", "📡 Starting UDP subscription")
+        udpSubscriptionJob = viewModelScope.launch {
             broadcastManager.updateEvent.collect { changedIds ->
+                // 화면이 보이지 않으면 무시
+                if (!isScreenVisible) {
+                    android.util.Log.d("SoloRankingVM", "⏭️ Screen not visible, ignoring UDP update")
+                    return@collect
+                }
+
                 android.util.Log.d("SoloRankingVM", "🔄 UDP update event received - ${changedIds.size} idols changed")
 
                 // 현재 캐시된 ID 리스트가 있으면 DB에서 전체 재조회
@@ -79,7 +132,7 @@ class SoloRankingSubPageViewModel @AssistedInject constructor(
                         android.util.Log.d("SoloRankingVM", "   → StateFlow emit → LazyColumn diff → 변경된 아이템만 리컴포지션")
 
                         launch(Dispatchers.IO) {
-                            queryIdolsByIdsFromDb(cachedIds)
+                            queryIdolsByIdsFromDb(cachedIds, isUdpUpdate = true)
                         }
                     } else {
                         android.util.Log.d("SoloRankingVM", "⏭️ No relevant changes for this chart - skipping update")
@@ -87,6 +140,21 @@ class SoloRankingSubPageViewModel @AssistedInject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * UDP 구독 중지
+     */
+    private fun stopUdpSubscription() {
+        udpSubscriptionJob?.cancel()
+        udpSubscriptionJob = null
+        android.util.Log.d("SoloRankingVM", "🛑 Stopped UDP subscription")
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopUdpSubscription()
+        android.util.Log.d("SoloRankingVM", "♻️ ViewModel cleared")
     }
 
     /**
@@ -152,7 +220,7 @@ class SoloRankingSubPageViewModel @AssistedInject constructor(
         }
     }
 
-    private suspend fun queryIdolsByIdsFromDb(ids: List<Int>) {
+    private suspend fun queryIdolsByIdsFromDb(ids: List<Int>, isUdpUpdate: Boolean = false) {
         if (ids.isEmpty()) {
             _uiState.value = UiState.Success(emptyList())
             return

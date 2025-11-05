@@ -50,6 +50,17 @@ fun OnePickRankingSubPage(
         viewModel.reloadIfNeeded()
     }
 
+    // 화면 가시성 변경 시 UDP 구독 관리 및 데이터 새로고침
+    LaunchedEffect(isVisible) {
+        if (isVisible) {
+            android.util.Log.d("OnePickRankingSubPage", "[SubPage] 👁️ Screen became visible")
+            viewModel.onScreenVisible()
+        } else {
+            android.util.Log.d("OnePickRankingSubPage", "[SubPage] 🙈 Screen hidden")
+            viewModel.onScreenHidden()
+        }
+    }
+
     when (uiState) {
         is OnePickRankingSubPageViewModel.UiState.Loading -> {
             Box(

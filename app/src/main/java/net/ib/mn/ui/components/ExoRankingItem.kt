@@ -38,6 +38,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -95,6 +96,18 @@ fun LazyListScope.exoRankingItem(
         items = items,
         key = { _, item -> item.itemKey() }
     ) { index, item ->
+        // 리컴포지션 카운터 (디버그용)
+        var recompositionCount by remember { mutableStateOf(0) }
+        SideEffect {
+            recompositionCount++
+            // 5회 이상 리컴포지션되면 경고 로그 (최적화 필요 신호)
+            if (recompositionCount == 5) {
+                android.util.Log.w("Recomposition", "⚠️ Item ${item.id} (${item.name}) recomposed $recompositionCount times")
+            } else if (recompositionCount > 10) {
+                android.util.Log.e("Recomposition", "🔴 Item ${item.id} (${item.name}) recomposed $recompositionCount times - Optimization needed!")
+            }
+        }
+
         // 타입에 따른 프로필 이미지 사이즈
         val (profileAreaWidth, borderSize, imageSize) = remember(type) {
             when (type) {
