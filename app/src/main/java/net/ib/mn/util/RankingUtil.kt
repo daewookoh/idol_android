@@ -138,4 +138,50 @@ object RankingUtil {
             topIdol = topIdol
         )
     }
+
+    /**
+     * IdolEntity를 RankingItemData로 변환하고 1위 아이돌 정보 가져오기
+     * (Group, Solo 랭킹용 - 정렬은 UI에서 수행)
+     *
+     * @param idols IdolEntity 리스트
+     * @param formatHeartCount 하트 수 포맷팅 함수
+     * @return ProcessedRankData (rankItems, topIdol)
+     */
+    fun processIdolsData(
+        idols: List<IdolEntity>,
+        formatHeartCount: (Int) -> String
+    ): ProcessedRankData {
+        val idolMap = idols.associateBy { it.id }
+
+        // IdolEntity를 RankingItemData로 변환 (정렬은 MainRankingList에서 수행)
+        // rank는 임시값 0, max/min도 임시값 0 (MainRankingList에서 재계산됨)
+        val rankItems = idols.map { idol ->
+            RankingItemData(
+                rank = 0,  // MainRankingList에서 계산
+                name = idol.name,  // "이름_그룹명" 형식 그대로 사용
+                voteCount = formatHeartCount(idol.heart.toInt()),
+                photoUrl = idol.imageUrl,
+                id = idol.id.toString(),
+                miracleCount = idol.miracleCount,
+                fairyCount = idol.fairyCount,
+                angelCount = idol.angelCount,
+                rookieCount = idol.rookieCount,
+                heartCount = idol.heart,
+                maxHeartCount = 0L,  // MainRankingList에서 계산
+                minHeartCount = 0L,  // MainRankingList에서 계산
+                top3ImageUrls = IdolImageUtil.getTop3ImageUrls(idol),
+                top3VideoUrls = IdolImageUtil.getTop3VideoUrls(idol)
+            )
+        }
+
+        // 1위 아이돌 정보 가져오기 (ExoTop3용)
+        val topIdol = getTopRank(rankItems)?.let { topRankItem ->
+            idolMap[topRankItem.id.toInt()]
+        }
+
+        return ProcessedRankData(
+            rankItems = rankItems,
+            topIdol = topIdol
+        )
+    }
 }

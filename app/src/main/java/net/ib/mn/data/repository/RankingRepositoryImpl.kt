@@ -106,12 +106,12 @@ class RankingRepositoryImpl @Inject constructor(
 
                 android.util.Log.d("RankingRepo", "📋 Parsed body:")
                 android.util.Log.d("RankingRepo", "  - success: ${body.success}")
-                android.util.Log.d("RankingRepo", "  - data size: ${body.data?.size ?: 0}")
+                android.util.Log.d("RankingRepo", "  - objects size: ${body.objects?.size ?: 0}")
 
-                if (body.success && body.data != null) {
+                if (body.success && body.objects != null) {
                     android.util.Log.d("RankingRepo", "✅ getChartRanks SUCCESS")
-                    android.util.Log.d("RankingRepo", "  - Ranks: ${body.data.take(5)}")
-                    emit(ApiResult.Success(body.data))
+                    android.util.Log.d("RankingRepo", "  - Ranks: ${body.objects.take(5)}")
+                    emit(ApiResult.Success(body.objects))
                 } else {
                     android.util.Log.e("RankingRepo", "❌ API returned success=false or null data")
                     emit(ApiResult.Error(

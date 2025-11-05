@@ -11,8 +11,8 @@ data class ChartRanksResponse(
     @SerializedName("success")
     val success: Boolean = false,
 
-    @SerializedName("data")
-    val data: List<AggregateRankModel>? = null,
+    @SerializedName("objects")
+    val objects: List<AggregateRankModel>? = null,
 
     @SerializedName("msg")
     val msg: String? = null

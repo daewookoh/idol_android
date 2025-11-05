@@ -233,39 +233,16 @@ class SoloRankingSubPageViewModel @AssistedInject constructor(
                 return
             }
 
-            val idolMap = idols.associateBy { it.id }
+            val result = net.ib.mn.util.RankingUtil.processIdolsData(
+                idols = idols,
+                formatHeartCount = ::formatHeartCount
+            )
 
-            // RankingItemData로 변환 (정렬은 MainRankingList에서 수행)
-            // rank는 임시값 0, max/min도 임시값 0 (MainRankingList에서 재계산됨)
-            val rankItems = idols.map { idol ->
-                RankingItemData(
-                    rank = 0,  // MainRankingList에서 계산
-                    name = idol.name,  // "이름_그룹명" 형식 그대로 사용
-                    voteCount = formatHeartCount(idol.heart.toInt()),
-                    photoUrl = idol.imageUrl,
-                    id = idol.id.toString(),
-                    miracleCount = idol.miracleCount,
-                    fairyCount = idol.fairyCount,
-                    angelCount = idol.angelCount,
-                    rookieCount = idol.rookieCount,
-                    heartCount = idol.heart,
-                    maxHeartCount = 0L,  // MainRankingList에서 계산
-                    minHeartCount = 0L,  // MainRankingList에서 계산
-                    top3ImageUrls = IdolImageUtil.getTop3ImageUrls(idol),
-                    top3VideoUrls = IdolImageUtil.getTop3VideoUrls(idol)
-                )
-            }
-
-            android.util.Log.d("SoloRankingVM", "✅ Processed ${rankItems.size} items (정렬 전)")
-
-            // 1위 아이돌 정보 가져오기 (ExoTop3용)
-            val topIdol = net.ib.mn.util.RankingUtil.getTopRank(rankItems)?.let { topRankItem ->
-                idolMap[topRankItem.id.toInt()]
-            }
+            android.util.Log.d("SoloRankingVM", "✅ Processed ${result.rankItems.size} items (정렬 전)")
 
             _uiState.value = UiState.Success(
-                items = rankItems,
-                topIdol = topIdol
+                items = result.rankItems,
+                topIdol = result.topIdol
             )
         } catch (e: Exception) {
             android.util.Log.e("SoloRankingVM", "❌ Exception: ${e.message}", e)

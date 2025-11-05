@@ -192,7 +192,7 @@ fun RankingPage(
 
         // baseurl에 www가 포함되지 않으면 개인, 그룹, 글로벌에 (테섭) 추가
         val finalName = if (ServerUrl.isTestServer() &&
-            (type.type == "SOLO" || type.type == "GROUP" || type.type == "GLOBAL")) {
+            (type.type == "SOLO" || type.type == "GROUP")) {
             "(테섭)$baseName(테섭)"
         } else {
             baseName
@@ -332,7 +332,7 @@ fun RankingPage(
                         chartCode = currentType.code ?: "",
                         isVisible = subPagerState.currentPage == pageIndex
                     )
-                    "GLOBAL" -> net.ib.mn.presentation.main.ranking.idol_subpage.GlobalRankingSubPage(
+                    "GLOBALS" -> net.ib.mn.presentation.main.ranking.idol_subpage.GlobalRankingSubPage(
                         chartCode = currentType.code ?: "",
                         isVisible = subPagerState.currentPage == pageIndex
                     )
