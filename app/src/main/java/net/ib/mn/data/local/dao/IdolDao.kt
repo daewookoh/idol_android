@@ -70,4 +70,7 @@ interface IdolDao {
 
     @Upsert
     suspend fun upsert(idol: IdolEntity)
+
+    @Upsert
+    suspend fun upsertIdols(idols: List<IdolEntity>)
 }

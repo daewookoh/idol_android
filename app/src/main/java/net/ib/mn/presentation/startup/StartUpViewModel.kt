@@ -365,6 +365,10 @@ class StartUpViewModel @Inject constructor(
 
     /**
      * ConfigSelf API 호출 (사용자 설정)
+     *
+     * UDP 설정 포함:
+     * - udpBroadcastUrl: UDP 브로드캐스트 서버 URL (테스트/실서버 구분)
+     * - udpStage: UDP 활성화 플래그 (> 0일 때만 UDP 연결)
      */
     private suspend fun loadConfigSelf() {
         try {
@@ -372,23 +376,37 @@ class StartUpViewModel @Inject constructor(
                 when (result) {
                     is ApiResult.Loading -> {}
                     is ApiResult.Success -> {
-                    val data = result.data.data
+                    val data = result.data
 
                     android.util.Log.d(TAG, "========================================")
                     android.util.Log.d(TAG, "ConfigSelf API Response")
                     android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "Language: ${data?.language}")
-                    android.util.Log.d(TAG, "Theme: ${data?.theme}")
-                    android.util.Log.d(TAG, "Push Enabled: ${data?.pushEnabled}")
+                    android.util.Log.d(TAG, "UDP Broadcast URL: ${data.udpBroadcastUrl}")
+                    android.util.Log.d(TAG, "UDP Stage: ${data.udpStage}")
+                    android.util.Log.d(TAG, "CDN URL: ${data.cdnUrl}")
+                    android.util.Log.d(TAG, "----------------------------------------")
+                    android.util.Log.d(TAG, "Daily Idol Update: ${data.dailyIdolUpdate}")
+                    android.util.Log.d(TAG, "All Idol Update: ${data.allIdolUpdate}")
+                    android.util.Log.d(TAG, "Show Miracle Tab: ${data.showMiracleTab}")
+                    android.util.Log.d(TAG, "Show Award Tab: ${data.showAwardTab}")
                     android.util.Log.d(TAG, "========================================")
 
-                    // DataStore에 저장
-                    data?.let { configData ->
-                        configData.language?.let { preferencesManager.setLanguage(it) }
-                        configData.theme?.let { preferencesManager.setTheme(it) }
-                        configData.pushEnabled?.let { preferencesManager.setPushEnabled(it) }
-                        android.util.Log.d(TAG, "✓ ConfigSelf data saved to DataStore")
+                    // DataStore에 UDP 설정 저장
+                    data.udpBroadcastUrl?.let {
+                        preferencesManager.setUdpBroadcastUrl(it)
+                        android.util.Log.d(TAG, "✓ UDP Broadcast URL saved: $it")
                     }
+
+                    preferencesManager.setUdpStage(data.udpStage)
+                    android.util.Log.d(TAG, "✓ UDP Stage saved: ${data.udpStage}")
+
+                    // CDN URL 저장
+                    data.cdnUrl?.let {
+                        preferencesManager.setCdnUrl(it)
+                        android.util.Log.d(TAG, "✓ CDN URL saved: $it")
+                    }
+
+                    android.util.Log.d(TAG, "✓ ConfigSelf data saved to DataStore")
                 }
                     is ApiResult.Error -> {
                         android.util.Log.e(TAG, "ConfigSelf error: ${result.message}")

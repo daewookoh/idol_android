@@ -47,6 +47,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var preferencesManager: PreferencesManager
 
+    @Inject
+    lateinit var broadcastManager: net.ib.mn.data.remote.udp.IdolBroadcastManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
 
@@ -69,6 +72,43 @@ class MainActivity : AppCompatActivity() {
         }
 
         enableEdgeToEdge()
+
+        // UDP 브로드캐스트 연결 시작 (실시간 아이돌 데이터 업데이트)
+        // StartupViewModel의 loadConfigSelf()에서 /configs/self/ API를 호출하여 UDP 설정을 저장함
+        lifecycleScope.launch {
+            try {
+                // 사용자 ID 조회
+                val userInfo = preferencesManager.userInfo.first()
+                val userId = userInfo?.id ?: 0
+
+                // UDP 설정 조회 (ConfigSelf API 응답에서 저장된 값)
+                val udpBroadcastUrl = preferencesManager.udpBroadcastUrl.first()
+                val udpStage = preferencesManager.udpStage.first()
+
+                android.util.Log.d("MainActivity", "========================================")
+                android.util.Log.d("MainActivity", "🔌 UDP Configuration")
+                android.util.Log.d("MainActivity", "  - UDP Broadcast URL: $udpBroadcastUrl")
+                android.util.Log.d("MainActivity", "  - UDP Stage: $udpStage")
+                android.util.Log.d("MainActivity", "  - User ID: $userId")
+                android.util.Log.d("MainActivity", "========================================")
+
+                // UDP Stage가 0보다 클 때만 연결 (old 프로젝트와 동일)
+                if (udpStage > 0 && !udpBroadcastUrl.isNullOrEmpty()) {
+                    android.util.Log.d("MainActivity", "✓ UDP enabled - Starting connection...")
+                    broadcastManager.setupConnection(udpBroadcastUrl, userId)
+                } else {
+                    if (udpStage <= 0) {
+                        android.util.Log.w("MainActivity", "⚠️ UDP disabled (stage=$udpStage)")
+                    }
+                    if (udpBroadcastUrl.isNullOrEmpty()) {
+                        android.util.Log.w("MainActivity", "⚠️ UDP URL not configured")
+                    }
+                    android.util.Log.w("MainActivity", "Skipping UDP connection")
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("MainActivity", "❌ Failed to setup UDP connection", e)
+            }
+        }
 
         setContent {
             ExodusTheme {
@@ -151,6 +191,38 @@ class MainActivity : AppCompatActivity() {
             // 액티비티 재시작이 필요한 경우 종료
             return
         }
+    }
+
+    /**
+     * Activity가 화면에 보이지 않을 때 (백그라운드 진입)
+     * UDP heartbeat 중지하여 배터리 절약
+     */
+    override fun onPause() {
+        super.onPause()
+        android.util.Log.d("MainActivity", "⏸️ onPause - Stopping UDP heartbeat")
+        broadcastManager.stopHeartbeat()
+    }
+
+    /**
+     * Activity가 화면에 보일 때 (포그라운드 복귀)
+     * UDP heartbeat 재시작하여 실시간 업데이트 재개
+     */
+    override fun onResume() {
+        super.onResume()
+        android.util.Log.d("MainActivity", "▶️ onResume - Starting UDP heartbeat")
+        broadcastManager.startHeartbeat()
+    }
+
+    /**
+     * Activity가 완전히 종료될 때
+     * UDP 연결 해제 및 리소스 정리
+     */
+    override fun onDestroy() {
+        android.util.Log.d("MainActivity", "🔴 onDestroy - Disconnecting UDP")
+        lifecycleScope.launch {
+            broadcastManager.disconnect()
+        }
+        super.onDestroy()
     }
 
     /**

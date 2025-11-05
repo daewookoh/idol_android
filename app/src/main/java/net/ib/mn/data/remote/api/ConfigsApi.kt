@@ -1,5 +1,6 @@
 package net.ib.mn.data.remote.api
 
+import net.ib.mn.data.remote.dto.ConfigSelfResponse
 import net.ib.mn.data.remote.dto.ConfigStartupResponse
 import net.ib.mn.data.remote.dto.TypeListResponse
 import retrofit2.Response
@@ -19,9 +20,10 @@ interface ConfigsApi {
 
     /**
      * 사용자별 설정 정보 조회
+     * UDP URL, CDN URL 등 사용자별 설정 포함
      */
     @GET("configs/self/")
-    suspend fun getConfigSelf(): Response<String>
+    suspend fun getConfigSelf(): Response<ConfigSelfResponse>
 
     /**
      * 타입 리스트 조회 (랭킹 탭 정보)

@@ -136,35 +136,48 @@ class ConfigRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading)
 
         try {
+            android.util.Log.d("ConfigRepo", "========================================")
+            android.util.Log.d("ConfigRepo", "🔵 Calling ConfigSelf API")
+            android.util.Log.d("ConfigRepo", "========================================")
+
             val response = configsApi.getConfigSelf()
+
+            android.util.Log.d("ConfigRepo", "📦 ConfigSelf Response:")
+            android.util.Log.d("ConfigRepo", "  - HTTP Code: ${response.code()}")
+            android.util.Log.d("ConfigRepo", "  - isSuccessful: ${response.isSuccessful}")
 
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
 
-                // String 응답을 ConfigSelfResponse로 파싱
-                // TODO: JSON 파싱 필요
-                android.util.Log.d("ConfigRepo", "ConfigSelf response: $body")
+                android.util.Log.d("ConfigRepo", "✅ ConfigSelf SUCCESS")
+                android.util.Log.d("ConfigRepo", "  - udpBroadcastUrl: ${body.udpBroadcastUrl}")
+                android.util.Log.d("ConfigRepo", "  - udpStage: ${body.udpStage}")
+                android.util.Log.d("ConfigRepo", "  - cdnUrl: ${body.cdnUrl}")
 
-                // 임시로 빈 ConfigSelfResponse 반환
-                emit(ApiResult.Success(ConfigSelfResponse(success = true, data = null)))
+                emit(ApiResult.Success(body))
             } else {
+                android.util.Log.e("ConfigRepo", "❌ ConfigSelf failed")
+                android.util.Log.e("ConfigRepo", "  - Error body: ${response.errorBody()?.string()}")
                 emit(ApiResult.Error(
                     exception = HttpException(response),
                     code = response.code()
                 ))
             }
         } catch (e: HttpException) {
+            android.util.Log.e("ConfigRepo", "❌ HttpException: ${e.code()} - ${e.message()}", e)
             emit(ApiResult.Error(
                 exception = e,
                 code = e.code(),
                 message = "HTTP ${e.code()}: ${e.message()}"
             ))
         } catch (e: IOException) {
+            android.util.Log.e("ConfigRepo", "❌ IOException: ${e.message}", e)
             emit(ApiResult.Error(
                 exception = e,
                 message = "Network error: ${e.message}"
             ))
         } catch (e: Exception) {
+            android.util.Log.e("ConfigRepo", "❌ Exception: ${e.message}", e)
             emit(ApiResult.Error(
                 exception = e,
                 message = "Unknown error: ${e.message}"

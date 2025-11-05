@@ -90,6 +90,7 @@ fun LazyListScope.exoRankingItem(
 ) {
     // 랭킹 아이템 리스트
     // key를 사용하여 아이템이 변경될 때 올바른 리컴포지션 수행
+    // animateItemPlacement: 순위 변경 시 리스트 내 위치 이동 애니메이션
     itemsIndexed(
         items = items,
         key = { _, item -> item.itemKey() }
@@ -111,6 +112,14 @@ fun LazyListScope.exoRankingItem(
 
         Column(
             modifier = Modifier
+                .animateItem(
+                    fadeInSpec = null,
+                    fadeOutSpec = null,
+                    placementSpec = tween(
+                        durationMillis = 500,
+                        easing = androidx.compose.animation.core.FastOutSlowInEasing
+                    )
+                )
                 .fillMaxWidth()
                 .background(colorResource(backgroundColor))
         ) {
@@ -396,40 +405,21 @@ fun LazyListScope.exoRankingItem(
                                     )
                             ) {
                                 // type A가 아닐 때만 반짝이는 애니메이션 효과
+                                // 최적화: progressPercent 변경 시에만 애니메이션 실행 (10초 타이머 제거)
                                 if (!isTypeA) {
-                                    var shouldAnimate by remember { mutableStateOf(false) }
-                                    var animationTrigger by remember { mutableStateOf(0) }
-
-                                    // 10초마다 자동으로 애니메이션 트리거
-                                    LaunchedEffect(Unit) {
-                                        while (true) {
-                                            kotlinx.coroutines.delay(10000) // 10초 대기
-                                            shouldAnimate = true
-                                            animationTrigger++
-                                        }
-                                    }
-
-                                    // 포커스 인 시 애니메이션 트리거 (progressPercent 변경 시)
-                                    LaunchedEffect(progressPercent) {
-                                        shouldAnimate = true
-                                        animationTrigger++
-                                    }
-
                                     // 애니메이션 진행도
                                     val shimmerProgress = remember { androidx.compose.animation.core.Animatable(0f) }
 
-                                    LaunchedEffect(animationTrigger) {
-                                        if (shouldAnimate && animationTrigger > 0) {
-                                            shimmerProgress.snapTo(0f)
-                                            shimmerProgress.animateTo(
-                                                targetValue = 1f,
-                                                animationSpec = tween(
-                                                    durationMillis = 1000,
-                                                    easing = LinearEasing
-                                                )
+                                    // progressPercent 변경 시 애니메이션 트리거
+                                    LaunchedEffect(progressPercent) {
+                                        shimmerProgress.snapTo(0f)
+                                        shimmerProgress.animateTo(
+                                            targetValue = 1f,
+                                            animationSpec = tween(
+                                                durationMillis = 1000,
+                                                easing = LinearEasing
                                             )
-                                            shouldAnimate = false
-                                        }
+                                        )
                                     }
 
                                     // 반짝임 효과 Canvas
@@ -465,15 +455,15 @@ fun LazyListScope.exoRankingItem(
                                 }
                             }
 
-                            // 투표수 텍스트 - 애니메이션 위에 오버레이 (절대 경로 방식)
-                            // 텍스트 오른쪽 끝을 기준으로 위치 지정
+                            // 투표수 텍스트 - 애니메이션 위에 오버레이
+                            // 최적화: voteCount가 변경될 때만 너비 재측정
                             BoxWithConstraints(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 val barWidth = maxWidth * animatedProgress
 
-                                // 텍스트 너비 측정
-                                var textWidthPx by remember { mutableStateOf(0) }
+                                // 텍스트 너비 측정 - voteCount 변경 시에만 재측정
+                                var textWidthPx by remember(item.voteCount) { mutableStateOf(0) }
                                 val density = LocalDensity.current
                                 val textWidthDp = remember(textWidthPx) {
                                     with(density) { textWidthPx.toDp() }
@@ -481,11 +471,15 @@ fun LazyListScope.exoRankingItem(
 
                                 Box(
                                     modifier = Modifier
-                                        .offset(x = barWidth - textWidthDp - 6.dp)
+                                        .offset(x = (barWidth - textWidthDp - 6.dp).coerceAtLeast(0.dp))
                                         .wrapContentWidth()
                                         .height(17.dp)
                                         .onGloballyPositioned { coordinates ->
-                                            textWidthPx = coordinates.size.width
+                                            // voteCount가 같으면 재측정하지 않음
+                                            val newWidth = coordinates.size.width
+                                            if (textWidthPx != newWidth) {
+                                                textWidthPx = newWidth
+                                            }
                                         },
                                     contentAlignment = Alignment.CenterStart
                                 ) {

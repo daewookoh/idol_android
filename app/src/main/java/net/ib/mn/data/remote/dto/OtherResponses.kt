@@ -7,31 +7,9 @@ import com.google.gson.annotations.SerializedName
  *
  * NOTE: 프로젝트 확장 시 각 API마다 별도 파일로 분리하고 상세 필드 추가 권장
  * 현재는 ConfigStartup 플로우 완성을 위한 기본 구조만 제공
+ *
+ * ConfigSelfResponse는 ConfigSelfResponse.kt 파일에 별도로 정의됨
  */
-
-// ============================================================
-// /configs/self/ - 사용자별 설정
-// ============================================================
-data class ConfigSelfResponse(
-    @SerializedName("success")
-    val success: Boolean,
-
-    @SerializedName("data")
-    val data: ConfigSelfData?
-)
-
-data class ConfigSelfData(
-    @SerializedName("language")
-    val language: String?,
-
-    @SerializedName("theme")
-    val theme: String?,
-
-    @SerializedName("push_enabled")
-    val pushEnabled: Boolean?
-
-    // NOTE: 추가 필드는 실제 API 스펙 확인 후 추가 (old 프로젝트 참조)
-)
 
 // ============================================================
 // /update/ - Idol 업데이트 정보

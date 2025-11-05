@@ -1,3 +1,7 @@
+import org.w3c.dom.Document
+import java.io.File
+import javax.xml.parsers.DocumentBuilderFactory
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -30,6 +34,43 @@ fun getBuildNumber(): Int {
     }
 }
 
+// XML 파일에서 특정 값 읽기 (old 프로젝트와 동일)
+fun getXmlValue(xmlFile: File, elementTag: String, attributeName: String, targetValue: String): String? {
+    if (!xmlFile.exists()) {
+        println("🚨 XML 파일을 찾을 수 없음: ${xmlFile.absolutePath}")
+        return null
+    }
+    return try {
+        val document: Document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlFile)
+        document.documentElement.normalize()
+
+        val nodeList = document.getElementsByTagName(elementTag)
+        for (i in 0 until nodeList.length) {
+            val node = nodeList.item(i)
+            val attributes = node.attributes
+            val nameAttr = attributes.getNamedItem(attributeName)
+            if (nameAttr != null && nameAttr.nodeValue == targetValue) {
+                return node.textContent.trim()
+            }
+        }
+        null
+    } catch (e: Exception) {
+        println("Error parsing XML: ${e.message}")
+        null
+    }
+}
+
+// Version name getter (old 프로젝트와 동일)
+fun getVersionName(): String {
+    return try {
+        val stringsFile = file("$projectDir/src/main/res/values/version.xml")
+        getXmlValue(stringsFile, "string", "name", "app_version") ?: "1.0.0"
+    } catch (e: Exception) {
+        println(e)
+        "1.0.0"
+    }
+}
+
 // ============================================================
 // Baseline Profile 태스크 완전 비활성화
 // ============================================================
@@ -52,17 +93,25 @@ android {
     namespace = "net.ib.mn"
     compileSdk = 36
 
+    // old 프로젝트와 동일: 동적 버전 설정
+    val currentBuildNumber = getBuildNumber()
+    val versionString = getVersionName()
+
     defaultConfig {
         applicationId = APP_ID_ORIGINAL
         minSdk = 26
         targetSdk = 36
-        versionCode = 6104
-        versionName = "10.10.0"
+        versionCode = currentBuildNumber
+        versionName = versionString
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
         buildConfigField("int", "VERSION_CODE", "${versionCode}")
+
+        println("📱 Build Configuration:")
+        println("   versionCode: $versionCode (from BITBUCKET_BUILD_NUMBER or default 1)")
+        println("   versionName: $versionName (from version.xml)")
     }
 
     // ============================================================

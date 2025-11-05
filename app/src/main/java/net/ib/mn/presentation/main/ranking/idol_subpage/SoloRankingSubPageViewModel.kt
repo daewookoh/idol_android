@@ -34,7 +34,8 @@ class SoloRankingSubPageViewModel @AssistedInject constructor(
     @Assisted private val chartCode: String,
     @ApplicationContext private val context: Context,
     private val rankingRepository: RankingRepository,
-    private val idolDao: IdolDao
+    private val idolDao: IdolDao,
+    private val broadcastManager: net.ib.mn.data.remote.udp.IdolBroadcastManager
 ) : ViewModel() {
 
     sealed interface UiState {
@@ -58,6 +59,34 @@ class SoloRankingSubPageViewModel @AssistedInject constructor(
     init {
         android.util.Log.d("SoloRankingVM", "🆕 ViewModel created for chartCode: $chartCode")
         loadRankingData()
+
+        // UDP 업데이트 이벤트 구독 (실시간 랭킹 업데이트)
+        viewModelScope.launch {
+            broadcastManager.updateEvent.collect { changedIds ->
+                android.util.Log.d("SoloRankingVM", "🔄 UDP update event received - ${changedIds.size} idols changed")
+
+                // 현재 캐시된 ID 리스트가 있으면 DB에서 전체 재조회
+                // → 전체 순위 재계산 → data class의 equals로 변경된 아이템만 리컴포지션
+                val cachedIds = codeToIdListMap[currentChartCode]
+                if (cachedIds != null && cachedIds.isNotEmpty()) {
+                    // 변경된 아이돌 중 현재 차트에 포함된 아이돌이 있는지 확인
+                    val hasRelevantChanges = changedIds.any { it in cachedIds }
+
+                    if (hasRelevantChanges) {
+                        android.util.Log.d("SoloRankingVM", "📊 Reloading all ${cachedIds.size} idols from DB")
+                        android.util.Log.d("SoloRankingVM", "   → Changed IDs in this chart: ${changedIds.filter { it in cachedIds }}")
+                        android.util.Log.d("SoloRankingVM", "   → Full ranking recalculation (순위 변경 가능)")
+                        android.util.Log.d("SoloRankingVM", "   → StateFlow emit → LazyColumn diff → 변경된 아이템만 리컴포지션")
+
+                        launch(Dispatchers.IO) {
+                            queryIdolsByIdsFromDb(cachedIds)
+                        }
+                    } else {
+                        android.util.Log.d("SoloRankingVM", "⏭️ No relevant changes for this chart - skipping update")
+                    }
+                }
+            }
+        }
     }
 
     /**

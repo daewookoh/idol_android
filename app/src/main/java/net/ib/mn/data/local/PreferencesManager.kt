@@ -124,6 +124,11 @@ class PreferencesManager @Inject constructor(
         // Server Config
         val KEY_SERVER_URL = stringPreferencesKey("server_url")
 
+        // UDP Config (from /configs/self/ API)
+        val KEY_UDP_BROADCAST_URL = stringPreferencesKey("udp_broadcast_url")
+        val KEY_UDP_STAGE = intPreferencesKey("udp_stage")
+        val KEY_CDN_URL = stringPreferencesKey("cdn_url")
+
         // Category
         val KEY_DEFAULT_CATEGORY = stringPreferencesKey(Constants.PREF_DEFAULT_CATEGORY)
     }
@@ -254,6 +259,22 @@ class PreferencesManager @Inject constructor(
     val serverUrl: Flow<String?> = context.dataStore.data
         .map { preferences ->
             preferences[KEY_SERVER_URL]
+        }
+
+    // UDP Config
+    val udpBroadcastUrl: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_UDP_BROADCAST_URL]
+        }
+
+    val udpStage: Flow<Int> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_UDP_STAGE] ?: 0
+        }
+
+    val cdnUrl: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_CDN_URL]
         }
 
     val defaultCategory: Flow<String> = context.dataStore.data
@@ -465,6 +486,25 @@ class PreferencesManager @Inject constructor(
     suspend fun setServerUrl(url: String) {
         context.dataStore.edit { preferences ->
             preferences[KEY_SERVER_URL] = url
+        }
+    }
+
+    // UDP Config setters
+    suspend fun setUdpBroadcastUrl(url: String) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_UDP_BROADCAST_URL] = url
+        }
+    }
+
+    suspend fun setUdpStage(stage: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_UDP_STAGE] = stage
+        }
+    }
+
+    suspend fun setCdnUrl(url: String) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_CDN_URL] = url
         }
     }
 

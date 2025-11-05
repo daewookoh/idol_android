@@ -20,6 +20,11 @@ import net.ib.mn.R
  * @Immutable: 불변 데이터로 표시하여 불필요한 리컴포지션 방지
  *
  * old 프로젝트의 ranking_item.xml 및 NewRankingAdapter.kt 기반
+ *
+ * equals 최적화:
+ * - data class의 자동 equals는 모든 필드를 비교하므로 비효율적
+ * - 실제 UI에 영향을 미치는 주요 필드만 비교하여 불필요한 리컴포지션 방지
+ * - 순위, 이름, 투표수, 배지 수 등 핵심 필드만 비교
  */
 @Immutable
 data class RankingItemData(
@@ -45,9 +50,64 @@ data class RankingItemData(
     val top3ImageUrls: List<String?> = listOf(null, null, null),  // 펼치기 이미지 3개
     val top3VideoUrls: List<String?> = listOf(null, null, null),  // 펼치기 동영상 3개
 ) {
-    // equals/hashCode는 data class가 자동 생성하지만,
     // LazyColumn의 key로 사용할 고유 식별자
     fun itemKey(): String = id.ifEmpty { "$rank-$name" }
+
+    // equals 최적화: UI에 영향을 미치는 필드만 비교
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is RankingItemData) return false
+
+        // 1. ID가 다르면 다른 아이템
+        if (id != other.id) return false
+
+        // 2. 핵심 UI 필드만 비교 (순서는 변경 빈도가 높은 순)
+        if (rank != other.rank) return false
+        if (heartCount != other.heartCount) return false
+        if (voteCount != other.voteCount) return false
+
+        // 3. 배지 수 비교
+        if (miracleCount != other.miracleCount) return false
+        if (fairyCount != other.fairyCount) return false
+        if (angelCount != other.angelCount) return false
+        if (rookieCount != other.rookieCount) return false
+        if (superRookieCount != other.superRookieCount) return false
+
+        // 4. 기념일 비교
+        if (anniversary != other.anniversary) return false
+        if (anniversaryDays != other.anniversaryDays) return false
+
+        // 5. 최애 여부
+        if (isFavorite != other.isFavorite) return false
+
+        // 6. 이름, 그룹명, 사진 URL (거의 변경되지 않음)
+        if (name != other.name) return false
+        if (groupName != other.groupName) return false
+        if (photoUrl != other.photoUrl) return false
+
+        // 7. 프로그레스 바 계산용 (전체 리스트에서 공통)
+        if (maxHeartCount != other.maxHeartCount) return false
+        if (minHeartCount != other.minHeartCount) return false
+
+        // 8. Top3 URL (확장 시에만 사용, 거의 변경 안 됨)
+        if (top3ImageUrls != other.top3ImageUrls) return false
+        if (top3VideoUrls != other.top3VideoUrls) return false
+
+        return true
+    }
+
+    // equals를 override하면 hashCode도 override 필요
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + rank
+        result = 31 * result + heartCount.hashCode()
+        result = 31 * result + voteCount.hashCode()
+        result = 31 * result + miracleCount
+        result = 31 * result + fairyCount
+        result = 31 * result + angelCount
+        result = 31 * result + isFavorite.hashCode()
+        return result
+    }
 }
 
 /**
