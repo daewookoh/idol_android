@@ -233,6 +233,8 @@ class GroupRankingSubPageViewModel @AssistedInject constructor(
                 return
             }
 
+            val idolMap = idols.associateBy { it.id }
+
             // RankingItemData로 변환 (정렬은 MainRankingList에서 수행)
             // rank는 임시값 0, max/min도 임시값 0 (MainRankingList에서 재계산됨)
             val rankItems = idols.map { idol ->
@@ -256,8 +258,10 @@ class GroupRankingSubPageViewModel @AssistedInject constructor(
 
             android.util.Log.d("GroupRankingVM", "✅ Processed ${rankItems.size} items (정렬 전)")
 
-            // topIdol은 heart 기준으로 최대값을 가진 아이돌
-            val topIdol = idols.maxByOrNull { it.heart }
+            // 1위 아이돌 정보 가져오기 (ExoTop3용)
+            val topIdol = net.ib.mn.util.RankingUtil.getTopRank(rankItems)?.let { topRankItem ->
+                idolMap[topRankItem.id.toInt()]
+            }
 
             _uiState.value = UiState.Success(
                 items = rankItems,

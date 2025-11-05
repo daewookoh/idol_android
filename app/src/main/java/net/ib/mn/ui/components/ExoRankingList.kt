@@ -156,13 +156,7 @@ fun ExoRankingList(
             emptyList()
         } else {
             // 1. 정렬 및 순위 계산
-            val sorted = net.ib.mn.util.RankingUtil.sortAndRank(
-                items = items,
-                getHeart = { it.heartCount },
-                getName = { it.name },
-                getRank = { it.rank },
-                createRankedItem = { item, rank -> item.copy(rank = rank) }
-            )
+            val sorted = net.ib.mn.util.RankingUtil.sortAndRank(items)
 
             // 2. max/min 계산
             val maxHeart = sorted.maxOfOrNull { it.heartCount } ?: 0L
@@ -202,13 +196,7 @@ fun ExoRankingList(
         }
 
         // 2. 재정렬 및 랭킹 재계산 (RankingUtil 사용)
-        val rerankedItems = net.ib.mn.util.RankingUtil.sortAndRank(
-            items = updatedItems,
-            getHeart = { it.heartCount },
-            getName = { it.name },
-            getRank = { it.rank },
-            createRankedItem = { item, rank -> item.copy(rank = rank) }
-        )
+        val rerankedItems = net.ib.mn.util.RankingUtil.sortAndRank(updatedItems)
 
         // 4. 최대/최소 하트 수 재계산
         val maxHeart = rerankedItems.maxOfOrNull { it.heartCount } ?: 0L

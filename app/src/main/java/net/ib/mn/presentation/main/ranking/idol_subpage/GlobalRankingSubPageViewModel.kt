@@ -193,52 +193,20 @@ class GlobalRankingSubPageViewModel @AssistedInject constructor(
 
     private suspend fun processRanksData(ranks: List<net.ib.mn.data.remote.dto.AggregateRankModel>) {
         try {
-            // 모든 idol ID 추출
-            val idolIds = ranks.map { it.idolId }
+            val result = net.ib.mn.util.RankingUtil.processRanksData(
+                ranks = ranks,
+                idolDao = idolDao,
+                formatScore = ::formatScore
+            )
 
-            // DB에서 idol 정보 가져오기
-            val idols = idolDao.getIdolsByIds(idolIds)
-            val idolMap = idols.associateBy { it.id }
+            android.util.Log.d("GlobalRankingVM", "✅ Processed ${result.rankItems.size} items")
 
-            // 프로그레스 바 계산을 위한 최대/최소 점수
-            val maxScore = ranks.maxOfOrNull { it.score.toLong() } ?: 0L
-            val minScore = ranks.minOfOrNull { it.score.toLong() } ?: 0L
-
-            // AggregateRankModel을 RankingItemData로 변환
-            val rankItems = ranks.map { rank ->
-                val idol = idolMap[rank.idolId]
-
-                RankingItemData(
-                    rank = rank.scoreRank,
-                    name = rank.name,  // "이름_그룹명" 형식 그대로 사용
-                    voteCount = formatScore(rank.score),
-                    photoUrl = idol?.imageUrl,
-                    id = rank.idolId.toString(),
-                    miracleCount = idol?.miracleCount ?: 0,
-                    fairyCount = idol?.fairyCount ?: 0,
-                    angelCount = idol?.angelCount ?: 0,
-                    rookieCount = idol?.rookieCount ?: 0,
-                    heartCount = rank.score.toLong(),
-                    maxHeartCount = maxScore,
-                    minHeartCount = minScore,
-                    top3ImageUrls = idol?.let { IdolImageUtil.getTop3ImageUrls(it) } ?: listOf(null, null, null),
-                    top3VideoUrls = idol?.let { IdolImageUtil.getTop3VideoUrls(it) } ?: listOf(null, null, null)
-                )
-            }
-
-            android.util.Log.d("GlobalRankingVM", "✅ Processed ${rankItems.size} items")
-
-            // 1위 아이돌 정보 가져오기 (ExoTop3용)
-            val topIdol = ranks.firstOrNull()?.let { topRank ->
-                idolDao.getIdolById(topRank.idolId)
-            }
-
-            cachedData = rankItems
-            topIdolCached = topIdol
+            cachedData = result.rankItems
+            topIdolCached = result.topIdol
 
             _uiState.value = UiState.Success(
-                items = rankItems,
-                topIdol = topIdol
+                items = result.rankItems,
+                topIdol = result.topIdol
             )
         } catch (e: Exception) {
             android.util.Log.e("GlobalRankingVM", "❌ Exception: ${e.message}", e)
