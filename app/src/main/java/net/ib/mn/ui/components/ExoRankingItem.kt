@@ -316,43 +316,25 @@ fun LazyListScope.exoRankingItem(
                 ) {
                     // 순위 + 이름 + 그룹명 (old: line 145-184)
                     Row(
-                        horizontalArrangement = Arrangement.Start
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.Bottom
                     ) {
                         // 순위 (old: line 145-154, @color/main, 15sp, bold)
                         Text(
                             text = stringResource(R.string.rank_count_format, item.rank),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
-                            color = colorResource(R.color.main),
-                            modifier = Modifier.alignByBaseline()
+                            color = colorResource(R.color.main)
                         )
 
                         Spacer(modifier = Modifier.width(5.dp))
 
-                        // 이름 (old: line 156-168, @color/text_default, 15sp, bold)
-                        Text(
-                            text = item.name,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colorResource(R.color.text_default),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.alignByBaseline()
+                        // 이름 + 그룹명 (ExoNameWithGroup 사용)
+                        ExoNameWithGroup(
+                            fullName = item.name,  // name은 이미 "이름_그룹명" 형식
+                            nameFontSize = 15.sp,
+                            groupFontSize = 10.sp
                         )
-
-                        // 그룹명 (old: line 170-184, @color/text_dimmed, 10sp, bold, baseline aligned to name)
-                        if (!item.groupName.isNullOrEmpty()) {
-                            Spacer(modifier = Modifier.width(5.dp))
-                            Text(
-                                text = item.groupName,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = colorResource(R.color.text_dimmed),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.alignByBaseline()
-                            )
-                        }
                     }
 
                     Spacer(modifier = Modifier.height(1.dp))
@@ -631,23 +613,13 @@ fun LazyListScope.exoRankingItem(
 
                 // 하트 투표 버튼 (old: line 327-335)
                 // layout_width/height: 50dp, padding: 10dp, layout_margin: 5dp
-                Box(
-                    modifier = Modifier.padding(5.dp)
-                ) {
-                    IconButton(
-                        onClick = { },
-                        modifier = Modifier.size(50.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.btn_ranking_vote_heart),
-                            contentDescription = "투표",
-                            tint = colorResource(R.color.main),
-                            modifier = Modifier
-                                .size(50.dp)
-                                .padding(10.dp)
-                        )
+                ExoVoteIcon(
+                    idolId = item.id.toIntOrNull() ?: 0,
+                    fullName = item.name,  // name은 이미 "이름_그룹명" 형식
+                    onVoteSuccess = { votedHeart ->
+                        android.util.Log.d("ExoRankingItem", "💗 Voted $votedHeart hearts to ${item.name}")
                     }
-                }
+                )
             }
 
             // 펼치기 영역 (ExoTop3)

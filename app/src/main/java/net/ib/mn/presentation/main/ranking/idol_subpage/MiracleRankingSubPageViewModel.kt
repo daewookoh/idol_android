@@ -207,18 +207,12 @@ class MiracleRankingSubPageViewModel @AssistedInject constructor(
             val rankItems = ranks.map { rank ->
                 val idol = idolMap[rank.idolId]
 
-                // name에서 이름과 그룹명 분리 (예: "디오_EXO" -> name="디오", groupName="EXO")
-                val nameParts = rank.name.split("_")
-                val actualName = nameParts.getOrNull(0) ?: rank.name
-                val actualGroupName = nameParts.getOrNull(1)
-
                 RankingItemData(
                     rank = rank.scoreRank,
-                    name = actualName,
+                    name = rank.name,  // "이름_그룹명" 형식 그대로 사용
                     voteCount = formatScore(rank.score),
                     photoUrl = idol?.imageUrl,
                     id = rank.idolId.toString(),
-                    groupName = actualGroupName,
                     miracleCount = idol?.miracleCount ?: 0,
                     fairyCount = idol?.fairyCount ?: 0,
                     angelCount = idol?.angelCount ?: 0,

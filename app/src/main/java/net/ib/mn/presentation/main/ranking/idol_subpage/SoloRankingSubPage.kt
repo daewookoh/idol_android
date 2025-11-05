@@ -122,16 +122,14 @@ fun SoloRankingSubPage(
                 val testItems = listOf(
                     net.ib.mn.ui.components.RankingItemData(
                         rank = 1,
-                        name = "테스트 아이돌1",
+                        name = "테스트 아이돌1_테스트 그룹",
                         voteCount = "1,234,567",
-                        groupName = "테스트 그룹",
                         id = "test1"
                     ),
                     net.ib.mn.ui.components.RankingItemData(
                         rank = 2,
-                        name = "Test Idol 2",
+                        name = "Test Idol 2_TEST GROUP",
                         voteCount = "987,654",
-                        groupName = "TEST GROUP",
                         id = "test2"
                     )
                 )

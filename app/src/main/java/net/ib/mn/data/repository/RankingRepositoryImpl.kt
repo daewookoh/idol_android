@@ -3,7 +3,9 @@ package net.ib.mn.data.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import net.ib.mn.data.remote.api.ChartsApi
+import net.ib.mn.data.remote.api.IdolApi
 import net.ib.mn.data.remote.dto.AggregateRankModel
+import net.ib.mn.data.remote.dto.VoteResponse
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.RankingRepository
 import retrofit2.HttpException
@@ -16,7 +18,8 @@ import javax.inject.Singleton
  */
 @Singleton
 class RankingRepositoryImpl @Inject constructor(
-    private val chartsApi: ChartsApi
+    private val chartsApi: ChartsApi,
+    private val idolApi: IdolApi
 ) : RankingRepository {
 
     override fun getChartIdolIds(code: String): Flow<ApiResult<List<Int>>> = flow {
@@ -113,6 +116,77 @@ class RankingRepositoryImpl @Inject constructor(
                     android.util.Log.e("RankingRepo", "❌ API returned success=false or null data")
                     emit(ApiResult.Error(
                         exception = Exception(body.msg ?: "API returned success=false"),
+                        code = response.code(),
+                        message = body.msg ?: "Unknown error"
+                    ))
+                }
+            } else {
+                android.util.Log.e("RankingRepo", "❌ Response not successful or body null")
+                android.util.Log.e("RankingRepo", "  - Error body: ${response.errorBody()?.string()}")
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            android.util.Log.e("RankingRepo", "❌ HttpException: ${e.code()} - ${e.message()}", e)
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code(),
+                message = "HTTP ${e.code()}: ${e.message()}"
+            ))
+        } catch (e: IOException) {
+            android.util.Log.e("RankingRepo", "❌ IOException: ${e.message}", e)
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Network error: ${e.message}"
+            ))
+        } catch (e: Exception) {
+            android.util.Log.e("RankingRepo", "❌ Exception: ${e.message}", e)
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Unknown error: ${e.message}"
+            ))
+        }
+    }
+
+    override fun voteIdol(idolId: Int, heart: Long): Flow<ApiResult<VoteResponse>> = flow {
+        emit(ApiResult.Loading)
+
+        try {
+            android.util.Log.d("RankingRepo", "========================================")
+            android.util.Log.d("RankingRepo", "💗 Calling voteIdol API (POST idols/give_heart/)")
+            android.util.Log.d("RankingRepo", "  - idolId: $idolId")
+            android.util.Log.d("RankingRepo", "  - heart: $heart")
+            android.util.Log.d("RankingRepo", "========================================")
+
+            // old 프로젝트와 동일: {"idol_id": "123", "number": 100}
+            val response = idolApi.voteIdol(
+                net.ib.mn.data.remote.dto.VoteRequest(
+                    idolId = idolId.toString(),
+                    number = heart
+                )
+            )
+
+            android.util.Log.d("RankingRepo", "📦 Response received:")
+            android.util.Log.d("RankingRepo", "  - HTTP Code: ${response.code()}")
+            android.util.Log.d("RankingRepo", "  - isSuccessful: ${response.isSuccessful}")
+
+            if (response.isSuccessful && response.body() != null) {
+                val body = response.body()!!
+
+                android.util.Log.d("RankingRepo", "📋 Parsed body:")
+                android.util.Log.d("RankingRepo", "  - success: ${body.success}")
+                android.util.Log.d("RankingRepo", "  - msg: ${body.msg}")
+                android.util.Log.d("RankingRepo", "  - bonusHeart: ${body.bonusHeart}")
+
+                if (body.success) {
+                    android.util.Log.d("RankingRepo", "✅ voteIdol SUCCESS")
+                    emit(ApiResult.Success(body))
+                } else {
+                    android.util.Log.e("RankingRepo", "❌ API returned success=false")
+                    emit(ApiResult.Error(
+                        exception = Exception(body.msg ?: "Vote failed"),
                         code = response.code(),
                         message = body.msg ?: "Unknown error"
                     ))

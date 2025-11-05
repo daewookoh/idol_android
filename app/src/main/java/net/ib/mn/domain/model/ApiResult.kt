@@ -17,11 +17,13 @@ sealed class ApiResult<out T> {
      * API 호출 실패
      * @param exception 에러 정보
      * @param code HTTP 상태 코드 (optional)
+     * @param data HTTP 304인 경우 캐시된 데이터 (optional)
      */
     data class Error(
         val exception: Throwable,
         val code: Int? = null,
-        val message: String? = exception.message
+        val message: String? = exception.message,
+        val data: Any? = null
     ) : ApiResult<Nothing>()
 
     /**

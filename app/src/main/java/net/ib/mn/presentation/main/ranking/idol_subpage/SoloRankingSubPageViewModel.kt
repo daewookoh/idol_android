@@ -243,18 +243,12 @@ class SoloRankingSubPageViewModel @AssistedInject constructor(
 
             // RankingItemData로 변환
             val rankItems = sortedIdols.mapIndexed { index, idolWithRank ->
-                // name에서 이름과 그룹명 분리 (예: "디오_EXO" -> name="디오", groupName="EXO")
-                val nameParts = idolWithRank.idol.name.split("_")
-                val actualName = nameParts.getOrNull(0) ?: idolWithRank.idol.name
-                val actualGroupName = nameParts.getOrNull(1)
-
                 val item = RankingItemData(
                     rank = idolWithRank.rank,
-                    name = actualName,
+                    name = idolWithRank.idol.name,  // "이름_그룹명" 형식 그대로 사용
                     voteCount = formatHeartCount(idolWithRank.idol.heart.toInt()),
                     photoUrl = idolWithRank.idol.imageUrl,
                     id = idolWithRank.idol.id.toString(),
-                    groupName = actualGroupName,
                     miracleCount = idolWithRank.idol.miracleCount,
                     fairyCount = idolWithRank.idol.fairyCount,
                     angelCount = idolWithRank.idol.angelCount,
@@ -273,7 +267,6 @@ class SoloRankingSubPageViewModel @AssistedInject constructor(
                     android.util.Log.d("SoloRankingVM", "  DB idol.groupId: ${idolWithRank.idol.groupId}")
                     android.util.Log.d("SoloRankingVM", "  DB idol.heart: ${idolWithRank.idol.heart}")
                     android.util.Log.d("SoloRankingVM", "  → RankingItemData.name: '${item.name}'")
-                    android.util.Log.d("SoloRankingVM", "  → RankingItemData.groupName: '${item.groupName}'")
                     android.util.Log.d("SoloRankingVM", "  → RankingItemData.voteCount: '${item.voteCount}'")
                 }
 

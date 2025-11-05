@@ -514,6 +514,22 @@ class PreferencesManager @Inject constructor(
         }
     }
 
+    /**
+     * 하트 값만 업데이트 (투표 후 사용)
+     */
+    suspend fun updateUserHearts(strongHeart: Long, weakHeart: Long) {
+        android.util.Log.d("PreferencesManager", "💗 Updating user hearts in DataStore...")
+        android.util.Log.d("PreferencesManager", "  - strongHeart: $strongHeart")
+        android.util.Log.d("PreferencesManager", "  - weakHeart: $weakHeart")
+
+        context.dataStore.edit { preferences ->
+            preferences[KEY_USER_STRONG_HEART] = strongHeart
+            preferences[KEY_USER_WEAK_HEART] = weakHeart
+        }
+
+        android.util.Log.d("PreferencesManager", "✅ User hearts updated in DataStore")
+    }
+
     suspend fun clearAll() {
         context.dataStore.edit { preferences ->
             preferences.clear()

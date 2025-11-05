@@ -122,10 +122,19 @@ interface IdolApi {
         @Query(value = "fields", encoded = true) fields: String? = null  // 모든 필드 요청 (fields 파라미터 없으면 모든 필드 반환)
     ): Response<IdolListResponse>
 
+    /**
+     * 아이돌에게 하트 투표
+     * old 프로젝트와 동일: POST idols/give_heart/
+     * @param body VoteRequest with idol_id and number
+     */
+    @POST("idols/give_heart/")
+    suspend fun voteIdol(
+        @Body body: VoteRequest
+    ): Response<VoteResponse>
+
     // NOTE: 추가 가능한 Idol 엔드포인트 (필요 시 구현)
     // - GET /idols/{id}/ - Idol 상세
     // - GET /types/ - Type 리스트 (CELEB flavor)
-    // - POST /idols/{id}/vote/ - 투표
 }
 
 // ============================================================

@@ -2,6 +2,7 @@ package net.ib.mn.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import net.ib.mn.data.remote.dto.AggregateRankModel
+import net.ib.mn.data.remote.dto.VoteResponse
 import net.ib.mn.domain.model.ApiResult
 
 /**
@@ -38,4 +39,16 @@ interface RankingRepository {
      * @return Flow<ApiResult<List<AggregateRankModel>>> 누적 랭킹 리스트
      */
     fun getChartRanks(code: String): Flow<ApiResult<List<AggregateRankModel>>>
+
+    /**
+     * 아이돌에게 하트 투표
+     *
+     * old 프로젝트의 GiveHeartToIdolUseCase와 동일
+     * idols/{idol_id}/vote/ API를 사용하여 하트 투표
+     *
+     * @param idolId 아이돌 ID
+     * @param heart 투표할 하트 개수
+     * @return Flow<ApiResult<VoteResponse>> 투표 결과
+     */
+    fun voteIdol(idolId: Int, heart: Long): Flow<ApiResult<VoteResponse>>
 }

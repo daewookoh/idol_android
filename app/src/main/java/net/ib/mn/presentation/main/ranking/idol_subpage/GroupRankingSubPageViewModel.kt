@@ -243,18 +243,12 @@ class GroupRankingSubPageViewModel @AssistedInject constructor(
 
             // RankingItemData로 변환
             val rankItems = sortedIdols.map { idolWithRank ->
-                // name에서 이름과 그룹명 분리 (예: "디오_EXO" -> name="디오", groupName="EXO")
-                val nameParts = idolWithRank.idol.name.split("_")
-                val actualName = nameParts.getOrNull(0) ?: idolWithRank.idol.name
-                val actualGroupName = nameParts.getOrNull(1)
-
                 RankingItemData(
                     rank = idolWithRank.rank,
-                    name = actualName,
+                    name = idolWithRank.idol.name,  // "이름_그룹명" 형식 그대로 사용
                     voteCount = formatHeartCount(idolWithRank.idol.heart.toInt()),
                     photoUrl = idolWithRank.idol.imageUrl,
                     id = idolWithRank.idol.id.toString(),
-                    groupName = actualGroupName,
                     miracleCount = idolWithRank.idol.miracleCount,
                     fairyCount = idolWithRank.idol.fairyCount,
                     angelCount = idolWithRank.idol.angelCount,

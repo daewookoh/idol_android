@@ -29,13 +29,12 @@ import net.ib.mn.R
 @Immutable
 data class RankingItemData(
     val rank: Int,
-    val name: String,
+    val name: String,  // "이름_그룹명" 형식 (예: "디오_EXO")
     val voteCount: String,
     val photoUrl: String? = null,
     val id: String = "",  // 고유 ID로 사용 (변경 추적에 중요)
 
     // 추가 필드 (old 프로젝트 기반)
-    val groupName: String? = null,  // 그룹명 (예: "TWICE")
     val anniversary: String? = null,  // 기념일 타입 ("BIRTH", "DEBUT", "COMEBACK", "MEMORIAL_DAY", "ALL_IN_DAY")
     val anniversaryDays: Int = 0,  // 몰빵일 일수
     val miracleCount: Int = 0,  // 미라클 배지 수
@@ -80,9 +79,8 @@ data class RankingItemData(
         // 5. 최애 여부
         if (isFavorite != other.isFavorite) return false
 
-        // 6. 이름, 그룹명, 사진 URL (거의 변경되지 않음)
+        // 6. 이름, 사진 URL (거의 변경되지 않음)
         if (name != other.name) return false
-        if (groupName != other.groupName) return false
         if (photoUrl != other.photoUrl) return false
 
         // 7. 프로그레스 바 계산용 (전체 리스트에서 공통)

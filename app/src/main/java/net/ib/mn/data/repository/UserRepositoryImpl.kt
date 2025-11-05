@@ -60,9 +60,12 @@ class UserRepositoryImpl @Inject constructor(
             if (response.code() == 304) {
                 // 캐시된 데이터 사용 - DataStore의 userInfo를 그대로 사용
                 // 304는 데이터가 변경되지 않았음을 의미하므로 로컬 데이터가 최신 상태
+                android.util.Log.d("UserRepositoryImpl", "📦 HTTP 304: Using cached data")
+
                 emit(ApiResult.Error(
                     exception = Exception("Cache valid - use local data"),
-                    code = 304
+                    code = 304,
+                    data = userInfo  // 캐시된 데이터를 함께 전달
                 ))
                 return@flow
             }
