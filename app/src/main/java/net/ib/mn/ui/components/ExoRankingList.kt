@@ -10,10 +10,16 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import net.ib.mn.R
+import java.text.NumberFormat
+import java.util.Locale
 
 /**
  * 랭킹 아이템 데이터 클래스
@@ -121,11 +127,15 @@ data class ExoTop3Data(
 )
 
 /**
- * MainRankingList - 스크롤 가능한 랭킹 리스트
+ * ExoRankingList - 스크롤 가능한 랭킹 리스트
  *
  * 구조:
  * - 상단: ExoTop3 (exoTop3Data가 있으면 자동 표시)
  * - 중간~하단: ExoRanking (아이템 리스트)
+ *
+ * 투표 업데이트 처리:
+ * - 투표 성공 시 내부 State를 업데이트하여 자동 재정렬 및 리렌더링
+ * - DB나 API를 사용하지 않고 메모리 데이터만 업데이트
  *
  * @param items 랭킹 아이템 리스트
  * @param exoTop3Data ExoTop3 배너 데이터 (nullable)
@@ -134,12 +144,90 @@ data class ExoTop3Data(
  * @param onItemClick 아이템 클릭 이벤트 (index, item)
  */
 @Composable
-fun MainRankingList(
+fun ExoRankingList(
     items: List<RankingItemData>,
     exoTop3Data: ExoTop3Data? = null,
     listState: LazyListState = rememberLazyListState(),
     onItemClick: (Int, RankingItemData) -> Unit = { _, _ -> }
 ) {
+    // 초기 데이터 정렬 및 순위/max/min 계산
+    val initialSortedItems = remember(items) {
+        if (items.isEmpty()) {
+            emptyList()
+        } else {
+            // 1. 정렬 및 순위 계산
+            val sorted = net.ib.mn.util.RankingUtil.sortAndRank(
+                items = items,
+                getHeart = { it.heartCount },
+                getName = { it.name },
+                getRank = { it.rank },
+                createRankedItem = { item, rank -> item.copy(rank = rank) }
+            )
+
+            // 2. max/min 계산
+            val maxHeart = sorted.maxOfOrNull { it.heartCount } ?: 0L
+            val minHeart = sorted.minOfOrNull { it.heartCount } ?: 0L
+
+            // 3. 모든 아이템에 max/min 적용
+            sorted.map { item ->
+                item.copy(
+                    maxHeartCount = maxHeart,
+                    minHeartCount = minHeart
+                )
+            }
+        }
+    }
+
+    // 내부 State로 아이템 관리 (투표 업데이트 시 자동 리컴포지션)
+    var currentItems by remember(initialSortedItems) { mutableStateOf(initialSortedItems) }
+
+    // 투표 성공 시 로컬 데이터 업데이트 및 재정렬
+    fun handleVoteSuccess(idolId: Int, voteCount: Long) {
+        android.util.Log.d("ExoRankingList", "💗 Updating vote: idol=$idolId, votes=$voteCount")
+
+        // 1. 투표한 아이돌의 하트 수 업데이트
+        val updatedItems = currentItems.map { item ->
+            if (item.id == idolId.toString()) {
+                // voteCount 문자열을 Long으로 파싱 (콤마 제거)
+                val currentHeart = item.voteCount.replace(",", "").toLongOrNull() ?: 0L
+                val newHeart = currentHeart + voteCount
+
+                item.copy(
+                    voteCount = NumberFormat.getNumberInstance(Locale.US).format(newHeart),
+                    heartCount = newHeart
+                )
+            } else {
+                item
+            }
+        }
+
+        // 2. 재정렬 및 랭킹 재계산 (RankingUtil 사용)
+        val rerankedItems = net.ib.mn.util.RankingUtil.sortAndRank(
+            items = updatedItems,
+            getHeart = { it.heartCount },
+            getName = { it.name },
+            getRank = { it.rank },
+            createRankedItem = { item, rank -> item.copy(rank = rank) }
+        )
+
+        // 4. 최대/최소 하트 수 재계산
+        val maxHeart = rerankedItems.maxOfOrNull { it.heartCount } ?: 0L
+        val minHeart = rerankedItems.minOfOrNull { it.heartCount } ?: 0L
+
+        // 5. 모든 아이템에 새로운 max/min 값 적용
+        val finalItems = rerankedItems.map { item ->
+            item.copy(
+                maxHeartCount = maxHeart,
+                minHeartCount = minHeart
+            )
+        }
+
+        // 6. State 업데이트 -> 자동 리컴포지션
+        currentItems = finalItems
+        android.util.Log.d("ExoRankingList", "✅ Vote updated and re-ranked (${finalItems.size} items)")
+        android.util.Log.d("ExoRankingList", "   → New max: $maxHeart, min: $minHeart")
+    }
+
     LazyColumn(
         state = listState,
         modifier = Modifier
@@ -161,9 +249,10 @@ fun MainRankingList(
         }
 
         exoRankingItem(
-            items = items,
+            items = currentItems,
             type = "S",
-            onItemClick = onItemClick
+            onItemClick = onItemClick,
+            onVoteSuccess = ::handleVoteSuccess
         )
     }
 }

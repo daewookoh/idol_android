@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
-import net.ib.mn.ui.components.MainRankingList
+import net.ib.mn.ui.components.ExoRankingList
 import net.ib.mn.util.IdolImageUtil
 
 /**
@@ -137,7 +137,7 @@ fun SoloRankingSubPage(
                 android.util.Log.d("SoloRankingSubPage", "📊 Items count: ${success.items.size}")
                 android.util.Log.d("SoloRankingSubPage", "📊 First item: ${success.items.firstOrNull()}")
 
-                MainRankingList(
+                ExoRankingList(
                     items = if (success.items.isEmpty()) testItems else success.items,
                     exoTop3Data = exoTop3Data,
                     listState = scrollState,

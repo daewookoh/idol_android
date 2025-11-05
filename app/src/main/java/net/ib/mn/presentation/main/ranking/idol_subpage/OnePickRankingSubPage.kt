@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
-import net.ib.mn.ui.components.MainRankingList
+import net.ib.mn.ui.components.ExoRankingList
 import net.ib.mn.util.IdolImageUtil
 
 /**
@@ -117,7 +117,7 @@ fun OnePickRankingSubPage(
                     )
                 }
 
-                MainRankingList(
+                ExoRankingList(
                     items = success.items,
                     exoTop3Data = exoTop3Data,
                     listState = scrollState,

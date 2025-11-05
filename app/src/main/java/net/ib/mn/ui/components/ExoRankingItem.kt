@@ -87,7 +87,8 @@ import net.ib.mn.R
 fun LazyListScope.exoRankingItem(
     items: List<RankingItemData>,
     type: String = "S",
-    onItemClick: (Int, RankingItemData) -> Unit = { _, _ -> }
+    onItemClick: (Int, RankingItemData) -> Unit = { _, _ -> },
+    onVoteSuccess: (idolId: Int, voteCount: Long) -> Unit = { _, _ -> }
 ) {
     // 랭킹 아이템 리스트
     // key를 사용하여 아이템이 변경될 때 올바른 리컴포지션 수행
@@ -618,6 +619,9 @@ fun LazyListScope.exoRankingItem(
                     fullName = item.name,  // name은 이미 "이름_그룹명" 형식
                     onVoteSuccess = { votedHeart ->
                         android.util.Log.d("ExoRankingItem", "💗 Voted $votedHeart hearts to ${item.name}")
+                        // 부모 컴포넌트에 투표 성공 알림
+                        val idolId = item.id.toIntOrNull() ?: 0
+                        onVoteSuccess(idolId, votedHeart)
                     }
                 )
             }

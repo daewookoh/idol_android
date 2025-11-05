@@ -20,7 +20,6 @@ import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.RankingRepository
 import net.ib.mn.ui.components.RankingItemData
 import net.ib.mn.util.IdolImageUtil
-import java.text.Collator
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -234,38 +233,35 @@ class GroupRankingSubPageViewModel @AssistedInject constructor(
                 return
             }
 
-            // Heart 기준 정렬 및 순위 계산
-            val sortedIdols = sortAndRankIdols(idols)
-
-            // 프로그레스 바 계산을 위한 최대/최소 점수
-            val maxScore = sortedIdols.maxOfOrNull { it.idol.heart } ?: 0L
-            val minScore = sortedIdols.minOfOrNull { it.idol.heart } ?: 0L
-
-            // RankingItemData로 변환
-            val rankItems = sortedIdols.map { idolWithRank ->
+            // RankingItemData로 변환 (정렬은 MainRankingList에서 수행)
+            // rank는 임시값 0, max/min도 임시값 0 (MainRankingList에서 재계산됨)
+            val rankItems = idols.map { idol ->
                 RankingItemData(
-                    rank = idolWithRank.rank,
-                    name = idolWithRank.idol.name,  // "이름_그룹명" 형식 그대로 사용
-                    voteCount = formatHeartCount(idolWithRank.idol.heart.toInt()),
-                    photoUrl = idolWithRank.idol.imageUrl,
-                    id = idolWithRank.idol.id.toString(),
-                    miracleCount = idolWithRank.idol.miracleCount,
-                    fairyCount = idolWithRank.idol.fairyCount,
-                    angelCount = idolWithRank.idol.angelCount,
-                    rookieCount = idolWithRank.idol.rookieCount,
-                    heartCount = idolWithRank.idol.heart,
-                    maxHeartCount = maxScore,
-                    minHeartCount = minScore,
-                    top3ImageUrls = IdolImageUtil.getTop3ImageUrls(idolWithRank.idol),
-                    top3VideoUrls = IdolImageUtil.getTop3VideoUrls(idolWithRank.idol)
+                    rank = 0,  // MainRankingList에서 계산
+                    name = idol.name,  // "이름_그룹명" 형식 그대로 사용
+                    voteCount = formatHeartCount(idol.heart.toInt()),
+                    photoUrl = idol.imageUrl,
+                    id = idol.id.toString(),
+                    miracleCount = idol.miracleCount,
+                    fairyCount = idol.fairyCount,
+                    angelCount = idol.angelCount,
+                    rookieCount = idol.rookieCount,
+                    heartCount = idol.heart,
+                    maxHeartCount = 0L,  // MainRankingList에서 계산
+                    minHeartCount = 0L,  // MainRankingList에서 계산
+                    top3ImageUrls = IdolImageUtil.getTop3ImageUrls(idol),
+                    top3VideoUrls = IdolImageUtil.getTop3VideoUrls(idol)
                 )
             }
 
-            android.util.Log.d("GroupRankingVM", "✅ Processed ${rankItems.size} items")
+            android.util.Log.d("GroupRankingVM", "✅ Processed ${rankItems.size} items (정렬 전)")
+
+            // topIdol은 heart 기준으로 최대값을 가진 아이돌
+            val topIdol = idols.maxByOrNull { it.heart }
 
             _uiState.value = UiState.Success(
                 items = rankItems,
-                topIdol = sortedIdols.firstOrNull()?.idol
+                topIdol = topIdol
             )
         } catch (e: Exception) {
             android.util.Log.e("GroupRankingVM", "❌ Exception: ${e.message}", e)
@@ -273,34 +269,9 @@ class GroupRankingSubPageViewModel @AssistedInject constructor(
         }
     }
 
-    private fun sortAndRankIdols(idols: List<IdolEntity>): List<IdolWithRank> {
-        val collator = Collator.getInstance(Locale.ROOT).apply {
-            strength = Collator.PRIMARY
-        }
-
-        val sorted = idols.sortedWith(
-            compareByDescending<IdolEntity> { it.heart }
-                .thenComparator { a, b -> collator.compare(a.name, b.name) }
-        )
-
-        val result = mutableListOf<IdolWithRank>()
-        sorted.forEachIndexed { index, idol ->
-            val rank = if (index > 0 && sorted[index - 1].heart == idol.heart) {
-                result[index - 1].rank
-            } else {
-                index + 1
-            }
-            result.add(IdolWithRank(idol, rank))
-        }
-
-        return result
-    }
-
     private fun formatHeartCount(count: Int): String {
         return NumberFormat.getNumberInstance(Locale.US).format(count)
     }
-
-    data class IdolWithRank(val idol: IdolEntity, val rank: Int)
 
     @AssistedFactory
     interface Factory {
