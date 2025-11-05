@@ -21,7 +21,57 @@ import dagger.hilt.android.UnstableApi
 import net.ib.mn.R
 
 /**
- * ExoTop3 - 랭킹 리스트 상단 TOP3 배너
+ * ExoTop3 - 랭킹 리스트 상단 TOP3 배너 (IdolEntity 버전)
+ *
+ * @param idol 1위 아이돌 엔티티 (이미지/동영상 URL 포함)
+ * @param isVisible 현재 화면에 표시 여부
+ * @param onItemClick 아이템 클릭 콜백
+ */
+@androidx.annotation.OptIn(UnstableApi::class)
+@Composable
+fun ExoTop3(
+    idol: net.ib.mn.data.local.entity.IdolEntity,
+    isVisible: Boolean = true,
+    onItemClick: (Int) -> Unit = {}
+) {
+    ExoTop3Internal(
+        id = "exo_top3_${idol.id}",
+        imageUrls = net.ib.mn.util.IdolImageUtil.getTop3ImageUrls(idol),
+        videoUrls = net.ib.mn.util.IdolImageUtil.getTop3VideoUrls(idol),
+        isVisible = isVisible,
+        onItemClick = onItemClick
+    )
+}
+
+/**
+ * ExoTop3 - 랭킹 아이템 확장 시 표시용 (URL 직접 전달 버전)
+ *
+ * @param id 고유 ID
+ * @param imageUrls 이미지 URL 리스트 (3개)
+ * @param videoUrls 동영상 URL 리스트 (3개)
+ * @param isVisible 현재 화면에 표시 여부
+ * @param onItemClick 아이템 클릭 콜백
+ */
+@androidx.annotation.OptIn(UnstableApi::class)
+@Composable
+fun ExoTop3(
+    id: String,
+    imageUrls: List<String?>,
+    videoUrls: List<String?>,
+    isVisible: Boolean = true,
+    onItemClick: (Int) -> Unit = {}
+) {
+    ExoTop3Internal(
+        id = id,
+        imageUrls = imageUrls,
+        videoUrls = videoUrls,
+        isVisible = isVisible,
+        onItemClick = onItemClick
+    )
+}
+
+/**
+ * ExoTop3 내부 구현
  *
  * Old 프로젝트의 ranking_header.xml 로직을 Compose로 구현
  *
@@ -31,18 +81,13 @@ import net.ib.mn.R
  * - Layer1: 스틸 이미지 (기본)
  * - Layer2: 움짤/동영상 (있는 경우만, 재생되면 스틸 숨김)
  * - 전역 관리: 한 화면에 여러 ExoTop3가 있을 때 최근 활성화된 것만 재생
- *
- * @param id 고유 식별자 (예: "ranking_page_0")
- * @param imageUrls 3개 이미지 URL (imageUrl, imageUrl2, imageUrl3)
- * @param videoUrls 3개 동영상 URL (.mp4 또는 _m_mv.mp4)
- * @param isVisible 현재 화면에 표시 여부 (HorizontalPager의 currentPage로 제어)
  */
 @androidx.annotation.OptIn(UnstableApi::class)
 @Composable
-fun ExoTop3(
+private fun ExoTop3Internal(
     id: String,
     imageUrls: List<String?>,
-    videoUrls: List<String?> = listOf(null, null, null),
+    videoUrls: List<String?>,
     isVisible: Boolean = true,
     onItemClick: (Int) -> Unit = {}
 ) {

@@ -17,23 +17,33 @@ import kotlinx.coroutines.launch
 import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.data.local.entity.IdolEntity
 import net.ib.mn.domain.model.ApiResult
-import net.ib.mn.domain.repository.RankingRepository
+import net.ib.mn.domain.ranking.RankingDataSource
 import net.ib.mn.ui.components.RankingItemData
-import net.ib.mn.util.IdolImageUtil
 import java.text.NumberFormat
 import java.util.Locale
 
 /**
- * Group (그룹) 랭킹 ViewModel
+ * 통합 랭킹 ViewModel (Global, Group, Solo 모두 지원)
  *
- * charts/idol_ids/ API 사용
- * 남녀 변경에 영향을 받음
+ * Strategy Pattern을 사용하여 세 개의 ViewModel을 하나로 통합:
+ * - GlobalRankingSubPageViewModel
+ * - GroupRankingSubPageViewModel
+ * - SoloRankingSubPageViewModel
+ *
+ * 주요 기능:
+ * 1. RankingDataSource를 통한 유연한 데이터 로딩
+ * 2. UDP 리스닝 (화면 visible 시에만)
+ * 3. 남녀 변경 지원 (dataSource에서 결정)
+ * 4. 데이터 캐싱
+ *
+ * @param chartCode 초기 차트 코드
+ * @param dataSource 랭킹 데이터 소스 (Global/Group/Solo)
  */
-@HiltViewModel(assistedFactory = GroupRankingSubPageViewModel.Factory::class)
-class GroupRankingSubPageViewModel @AssistedInject constructor(
+@HiltViewModel(assistedFactory = UnifiedRankingSubPageViewModel.Factory::class)
+class UnifiedRankingSubPageViewModel @AssistedInject constructor(
     @Assisted private val chartCode: String,
+    @Assisted private val dataSource: RankingDataSource,
     @ApplicationContext private val context: Context,
-    private val rankingRepository: RankingRepository,
     private val idolDao: IdolDao,
     private val broadcastManager: net.ib.mn.data.remote.udp.IdolBroadcastManager
 ) : ViewModel() {
@@ -62,8 +72,10 @@ class GroupRankingSubPageViewModel @AssistedInject constructor(
     // 화면 가시성 상태
     private var isScreenVisible = false
 
+    private val logTag = "UnifiedRankingVM[${dataSource.type}]"
+
     init {
-        android.util.Log.d("GroupRankingVM", "🆕 ViewModel created for chartCode: $chartCode")
+        android.util.Log.d(logTag, "🆕 ViewModel created for chartCode: $chartCode")
         loadRankingData()
     }
 
@@ -71,13 +83,13 @@ class GroupRankingSubPageViewModel @AssistedInject constructor(
      * 화면이 보일 때 호출 - UDP 구독 시작 및 데이터 새로고침
      */
     fun onScreenVisible() {
-        android.util.Log.d("GroupRankingVM", "👁️ Screen became visible for chartCode: $currentChartCode")
+        android.util.Log.d(logTag, "👁️ Screen became visible for chartCode: $currentChartCode")
         isScreenVisible = true
 
         // DB에서 최신 데이터 로드
         val cachedIds = codeToIdListMap[currentChartCode]
         if (cachedIds != null && cachedIds.isNotEmpty()) {
-            android.util.Log.d("GroupRankingVM", "🔄 Refreshing data from DB (${cachedIds.size} items)")
+            android.util.Log.d(logTag, "🔄 Refreshing data from DB (${cachedIds.size} items)")
             viewModelScope.launch(Dispatchers.IO) {
                 queryIdolsByIdsFromDb(cachedIds)
             }
@@ -91,7 +103,7 @@ class GroupRankingSubPageViewModel @AssistedInject constructor(
      * 화면이 사라질 때 호출 - UDP 구독 중지
      */
     fun onScreenHidden() {
-        android.util.Log.d("GroupRankingVM", "🙈 Screen hidden for chartCode: $currentChartCode")
+        android.util.Log.d(logTag, "🙈 Screen hidden for chartCode: $currentChartCode")
         isScreenVisible = false
         stopUdpSubscription()
     }
@@ -102,39 +114,37 @@ class GroupRankingSubPageViewModel @AssistedInject constructor(
     private fun startUdpSubscription() {
         // 이미 구독 중이면 중복 방지
         if (udpSubscriptionJob?.isActive == true) {
-            android.util.Log.d("GroupRankingVM", "⚠️ UDP already subscribed, skipping")
+            android.util.Log.d(logTag, "⚠️ UDP already subscribed, skipping")
             return
         }
 
-        android.util.Log.d("GroupRankingVM", "📡 Starting UDP subscription")
+        android.util.Log.d(logTag, "📡 Starting UDP subscription")
         udpSubscriptionJob = viewModelScope.launch {
             broadcastManager.updateEvent.collect { changedIds ->
                 // 화면이 보이지 않으면 무시
                 if (!isScreenVisible) {
-                    android.util.Log.d("GroupRankingVM", "⏭️ Screen not visible, ignoring UDP update")
+                    android.util.Log.d(logTag, "⏭️ Screen not visible, ignoring UDP update")
                     return@collect
                 }
 
-                android.util.Log.d("GroupRankingVM", "🔄 UDP update event received - ${changedIds.size} idols changed")
+                android.util.Log.d(logTag, "🔄 UDP update event received - ${changedIds.size} idols changed")
 
                 // 현재 캐시된 ID 리스트가 있으면 DB에서 전체 재조회
-                // → 전체 순위 재계산 → data class의 equals로 변경된 아이템만 리컴포지션
                 val cachedIds = codeToIdListMap[currentChartCode]
                 if (cachedIds != null && cachedIds.isNotEmpty()) {
                     // 변경된 아이돌 중 현재 차트에 포함된 아이돌이 있는지 확인
                     val hasRelevantChanges = changedIds.any { it in cachedIds }
 
                     if (hasRelevantChanges) {
-                        android.util.Log.d("GroupRankingVM", "📊 Reloading all ${cachedIds.size} idols from DB")
-                        android.util.Log.d("GroupRankingVM", "   → Changed IDs in this chart: ${changedIds.filter { it in cachedIds }}")
-                        android.util.Log.d("GroupRankingVM", "   → Full ranking recalculation (순위 변경 가능)")
-                        android.util.Log.d("GroupRankingVM", "   → StateFlow emit → LazyColumn diff → 변경된 아이템만 리컴포지션")
+                        android.util.Log.d(logTag, "📊 Reloading all ${cachedIds.size} idols from DB")
+                        android.util.Log.d(logTag, "   → Changed IDs in this chart: ${changedIds.filter { it in cachedIds }}")
+                        android.util.Log.d(logTag, "   → Full ranking recalculation (순위 변경 가능)")
 
                         launch(Dispatchers.IO) {
                             queryIdolsByIdsFromDb(cachedIds)
                         }
                     } else {
-                        android.util.Log.d("GroupRankingVM", "⏭️ No relevant changes for this chart - skipping update")
+                        android.util.Log.d(logTag, "⏭️ No relevant changes for this chart - skipping update")
                     }
                 }
             }
@@ -147,26 +157,32 @@ class GroupRankingSubPageViewModel @AssistedInject constructor(
     private fun stopUdpSubscription() {
         udpSubscriptionJob?.cancel()
         udpSubscriptionJob = null
-        android.util.Log.d("GroupRankingVM", "🛑 Stopped UDP subscription")
+        android.util.Log.d(logTag, "🛑 Stopped UDP subscription")
     }
 
     override fun onCleared() {
         super.onCleared()
         stopUdpSubscription()
-        android.util.Log.d("GroupRankingVM", "♻️ ViewModel cleared")
+        android.util.Log.d(logTag, "♻️ ViewModel cleared")
     }
 
     /**
      * 남녀 변경 시 호출 - 새로운 차트 코드로 데이터 로드
+     * (Group/Solo에서만 사용, Global은 reloadIfNeeded 사용)
      */
     fun reloadWithNewCode(newCode: String) {
-        android.util.Log.d("GroupRankingVM", "🔄 Reloading with new code: $newCode (previous: $currentChartCode)")
+        if (!dataSource.supportGenderChange()) {
+            android.util.Log.w(logTag, "⚠️ Gender change not supported for ${dataSource.type}")
+            return
+        }
+
+        android.util.Log.d(logTag, "🔄 Reloading with new code: $newCode (previous: $currentChartCode)")
 
         // 같은 코드면 캐시된 데이터 사용
         if (newCode == currentChartCode) {
             val cachedIds = codeToIdListMap[newCode]
             if (cachedIds != null && cachedIds.isNotEmpty()) {
-                android.util.Log.d("GroupRankingVM", "✓ Using cached data for $newCode")
+                android.util.Log.d(logTag, "✓ Using cached data for $newCode")
                 viewModelScope.launch(Dispatchers.IO) {
                     queryIdolsByIdsFromDb(cachedIds)
                 }
@@ -179,12 +195,28 @@ class GroupRankingSubPageViewModel @AssistedInject constructor(
 
         val cachedIds = codeToIdListMap[newCode]
         if (cachedIds != null && cachedIds.isNotEmpty()) {
-            android.util.Log.d("GroupRankingVM", "✓ Using cached data for $newCode")
+            android.util.Log.d(logTag, "✓ Using cached data for $newCode")
             viewModelScope.launch(Dispatchers.IO) {
                 queryIdolsByIdsFromDb(cachedIds)
             }
         } else {
-            android.util.Log.d("GroupRankingVM", "📡 Fetching new data for $newCode")
+            android.util.Log.d(logTag, "📡 Fetching new data for $newCode")
+            loadRankingData()
+        }
+    }
+
+    /**
+     * 캐시된 데이터가 있으면 사용하고, 없으면 새로 로드
+     * (Global에서 사용)
+     */
+    fun reloadIfNeeded() {
+        val cachedIds = codeToIdListMap[currentChartCode]
+        if (cachedIds != null && cachedIds.isNotEmpty()) {
+            android.util.Log.d(logTag, "✓ Using cached data")
+            viewModelScope.launch(Dispatchers.IO) {
+                queryIdolsByIdsFromDb(cachedIds)
+            }
+        } else {
             loadRankingData()
         }
     }
@@ -193,25 +225,24 @@ class GroupRankingSubPageViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = UiState.Loading
 
-            android.util.Log.d("GroupRankingVM", "========================================")
-            android.util.Log.d("GroupRankingVM", "[Group] Loading ranking data")
-            android.util.Log.d("GroupRankingVM", "  - currentChartCode: $currentChartCode")
-            android.util.Log.d("GroupRankingVM", "  - API: charts/idol_ids/")
+            android.util.Log.d(logTag, "========================================")
+            android.util.Log.d(logTag, "[${dataSource.type}] Loading ranking data")
+            android.util.Log.d(logTag, "  - currentChartCode: $currentChartCode")
 
-            // charts/idol_ids/ API 호출
-            rankingRepository.getChartIdolIds(currentChartCode).collect { result ->
+            // DataSource를 통해 idol_ids 로드
+            dataSource.loadIdolIds(currentChartCode).collect { result ->
                 when (result) {
                     is ApiResult.Loading -> {
-                        android.util.Log.d("GroupRankingVM", "⏳ Loading...")
+                        android.util.Log.d(logTag, "⏳ Loading...")
                     }
                     is ApiResult.Success -> {
-                        android.util.Log.d("GroupRankingVM", "✅ SUCCESS - IDs count: ${result.data.size}")
+                        android.util.Log.d(logTag, "✅ SUCCESS - IDs count: ${result.data.size}")
                         val ids = ArrayList(result.data)
                         codeToIdListMap[currentChartCode] = ids
                         queryIdolsByIdsFromDb(ids)
                     }
                     is ApiResult.Error -> {
-                        android.util.Log.e("GroupRankingVM", "❌ ERROR: ${result.message}")
+                        android.util.Log.e(logTag, "❌ ERROR: ${result.message}")
                         _uiState.value = UiState.Error(result.message ?: "Error loading data")
                     }
                 }
@@ -238,16 +269,80 @@ class GroupRankingSubPageViewModel @AssistedInject constructor(
                 formatHeartCount = ::formatHeartCount
             )
 
-            android.util.Log.d("GroupRankingVM", "✅ Processed ${result.rankItems.size} items (정렬 전)")
+            // 정렬 및 순위 계산
+            val sortedItems = net.ib.mn.util.RankingUtil.sortAndRank(result.rankItems)
+
+            // max/min 하트 수 계산
+            val maxHeart = sortedItems.maxOfOrNull { it.heartCount } ?: 0L
+            val minHeart = sortedItems.minOfOrNull { it.heartCount } ?: 0L
+
+            // 모든 아이템에 max/min 적용
+            val finalItems = sortedItems.map { item ->
+                item.copy(
+                    maxHeartCount = maxHeart,
+                    minHeartCount = minHeart
+                )
+            }
+
+            android.util.Log.d(logTag, "✅ Processed ${finalItems.size} items (sorted, max=$maxHeart, min=$minHeart)")
 
             _uiState.value = UiState.Success(
-                items = result.rankItems,
+                items = finalItems,
                 topIdol = result.topIdol
             )
         } catch (e: Exception) {
-            android.util.Log.e("GroupRankingVM", "❌ Exception: ${e.message}", e)
+            android.util.Log.e(logTag, "❌ Exception: ${e.message}", e)
             _uiState.value = UiState.Error(e.message ?: "Error")
         }
+    }
+
+    /**
+     * 투표 성공 시 로컬 데이터 업데이트 및 재정렬
+     */
+    fun updateVote(idolId: Int, voteCount: Long) {
+        val currentState = _uiState.value
+        if (currentState !is UiState.Success) return
+
+        android.util.Log.d(logTag, "💗 Updating vote: idol=$idolId, votes=$voteCount")
+
+        // 1. 투표한 아이돌의 하트 수 업데이트
+        val updatedItems = currentState.items.map { item ->
+            if (item.id == idolId.toString()) {
+                val currentHeart = item.heartCount
+                val newHeart = currentHeart + voteCount
+
+                item.copy(
+                    voteCount = formatHeartCount(newHeart.toInt()),
+                    heartCount = newHeart
+                )
+            } else {
+                item
+            }
+        }
+
+        // 2. 재정렬 및 순위 재계산
+        val sortedItems = net.ib.mn.util.RankingUtil.sortAndRank(updatedItems)
+
+        // 3. max/min 재계산
+        val maxHeart = sortedItems.maxOfOrNull { it.heartCount } ?: 0L
+        val minHeart = sortedItems.minOfOrNull { it.heartCount } ?: 0L
+
+        // 4. 모든 아이템에 새로운 max/min 적용
+        val finalItems = sortedItems.map { item ->
+            item.copy(
+                maxHeartCount = maxHeart,
+                minHeartCount = minHeart
+            )
+        }
+
+        // 5. State 업데이트 -> 자동 리컴포지션
+        _uiState.value = UiState.Success(
+            items = finalItems,
+            topIdol = currentState.topIdol
+        )
+
+        android.util.Log.d(logTag, "✅ Vote updated and re-ranked (${finalItems.size} items)")
+        android.util.Log.d(logTag, "   → New max: $maxHeart, min: $minHeart")
     }
 
     private fun formatHeartCount(count: Int): String {
@@ -256,6 +351,9 @@ class GroupRankingSubPageViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(chartCode: String): GroupRankingSubPageViewModel
+        fun create(
+            chartCode: String,
+            dataSource: RankingDataSource
+        ): UnifiedRankingSubPageViewModel
     }
 }

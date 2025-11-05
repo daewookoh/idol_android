@@ -25,6 +25,11 @@ data class ProcessedRankData(
 
 object RankingUtil {
 
+    // 공통 Collator (이름 정렬용) - 불변 객체로 재사용
+    private val nameCollator = Collator.getInstance(Locale.ROOT).apply {
+        strength = Collator.PRIMARY
+    }
+
     /**
      * RankingItemData 정렬 및 순위 계산
      *
@@ -35,13 +40,9 @@ object RankingUtil {
         if (items.isEmpty()) return emptyList()
 
         // 1. 정렬: 하트 수 내림차순 -> 이름 오름차순
-        val collator = Collator.getInstance(Locale.ROOT).apply {
-            strength = Collator.PRIMARY
-        }
-
         val sorted = items.sortedWith(
             compareByDescending<RankingItemData> { it.heartCount }
-                .thenComparator { a, b -> collator.compare(a.name, b.name) }
+                .thenComparator { a, b -> nameCollator.compare(a.name, b.name) }
         )
 
         // 2. 랭킹 계산 (동점자 처리)
@@ -62,25 +63,13 @@ object RankingUtil {
     }
 
     /**
-     * 1위 RankingItemData 가져오기
+     * 1위 RankingItemData 가져오기 (하트 수 기준)
      *
-     * @param items 정렬할 RankingItemData 리스트
-     * @return 1위 RankingItemData (없으면 null)
+     * @param items RankingItemData 리스트
+     * @return 하트 수가 가장 많은 RankingItemData (없으면 null)
      */
-    fun getTopRank(items: List<RankingItemData>): RankingItemData? {
-        if (items.isEmpty()) return null
-
-        // 정렬: 하트 수 내림차순 -> 이름 오름차순
-        val collator = Collator.getInstance(Locale.ROOT).apply {
-            strength = Collator.PRIMARY
-        }
-
-        val topItem = items.maxWithOrNull(
-            compareBy<RankingItemData> { it.heartCount }
-                .thenComparator { a, b -> -collator.compare(a.name, b.name) }
-        )
-
-        return topItem
+    private fun getTopRank(items: List<RankingItemData>): RankingItemData? {
+        return items.maxByOrNull { it.heartCount }
     }
 
     /**
@@ -131,7 +120,7 @@ object RankingUtil {
         }
 
         // 1위 아이돌 정보 가져오기 (ExoTop3용)
-        val topIdol = getTopRank(rankItems)?.let { topRankItem ->
+        val topIdol = rankItems.firstOrNull()?.let { topRankItem ->
             idolMap[topRankItem.id.toInt()]
         }
 

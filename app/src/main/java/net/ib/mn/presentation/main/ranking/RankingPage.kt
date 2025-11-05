@@ -35,11 +35,15 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 import net.ib.mn.BuildConfig
 import net.ib.mn.R
+import net.ib.mn.domain.ranking.GlobalRankingDataSource
+import net.ib.mn.domain.ranking.IdolIdsRankingDataSource
 import net.ib.mn.presentation.main.MainViewModel
 import net.ib.mn.util.ServerUrl
 
@@ -62,6 +66,32 @@ fun RankingPage(
     // 일반: MainChartModel 사용 (old 프로젝트와 동일)
     val typeList by viewModel.typeList.collectAsState()
     val mainChartModel by viewModel.mainChartModel.collectAsState()
+
+    // RankingRepository EntryPoint를 통해 주입
+    val context = LocalContext.current
+    val rankingRepository = remember {
+        EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            net.ib.mn.di.RankingRepositoryEntryPoint::class.java
+        ).rankingRepository()
+    }
+
+    // DataSource 생성 (remember로 캐싱)
+    val globalDataSource = remember {
+        val ds = GlobalRankingDataSource(rankingRepository)
+        android.util.Log.d("RankingPage", "📦 Created GlobalDataSource: ${ds.hashCode()}, type=${ds.type}")
+        ds
+    }
+    val groupDataSource = remember {
+        val ds = IdolIdsRankingDataSource.forGroup(rankingRepository)
+        android.util.Log.d("RankingPage", "📦 Created GroupDataSource: ${ds.hashCode()}, type=${ds.type}")
+        ds
+    }
+    val soloDataSource = remember {
+        val ds = IdolIdsRankingDataSource.forSolo(rankingRepository)
+        android.util.Log.d("RankingPage", "📦 Created SoloDataSource: ${ds.hashCode()}, type=${ds.type}")
+        ds
+    }
 
     // MainScreen에서 관리하는 성별 카테고리 (old 프로젝트와 동일)
     // 즉시 반응하는 로컬 카테고리 상태 사용 (UI 반응성 개선)
@@ -304,14 +334,22 @@ fun RankingPage(
 
                 // 타입에 따라 적절한 SubPage 호출
                 when (currentType.type) {
-                    "SOLO" -> net.ib.mn.presentation.main.ranking.idol_subpage.SoloRankingSubPage(
-                        chartCode = currentType.code ?: "",
-                        isVisible = subPagerState.currentPage == pageIndex
-                    )
-                    "GROUP" -> net.ib.mn.presentation.main.ranking.idol_subpage.GroupRankingSubPage(
-                        chartCode = currentType.code ?: "",
-                        isVisible = subPagerState.currentPage == pageIndex
-                    )
+                    "SOLO" -> {
+                        android.util.Log.d("RankingPage", "🎯 Rendering SOLO with dataSource: ${soloDataSource.hashCode()}, type=${soloDataSource.type}")
+                        net.ib.mn.presentation.main.ranking.idol_subpage.UnifiedRankingSubPage(
+                            chartCode = currentType.code ?: "",
+                            dataSource = soloDataSource,
+                            isVisible = subPagerState.currentPage == pageIndex
+                        )
+                    }
+                    "GROUP" -> {
+                        android.util.Log.d("RankingPage", "🎯 Rendering GROUP with dataSource: ${groupDataSource.hashCode()}, type=${groupDataSource.type}")
+                        net.ib.mn.presentation.main.ranking.idol_subpage.UnifiedRankingSubPage(
+                            chartCode = currentType.code ?: "",
+                            dataSource = groupDataSource,
+                            isVisible = subPagerState.currentPage == pageIndex
+                        )
+                    }
                     "MIRACLE" -> net.ib.mn.presentation.main.ranking.idol_subpage.MiracleRankingSubPage(
                         chartCode = currentType.code ?: "",
                         isVisible = subPagerState.currentPage == pageIndex
@@ -332,10 +370,14 @@ fun RankingPage(
                         chartCode = currentType.code ?: "",
                         isVisible = subPagerState.currentPage == pageIndex
                     )
-                    "GLOBALS" -> net.ib.mn.presentation.main.ranking.idol_subpage.GlobalRankingSubPage(
-                        chartCode = currentType.code ?: "",
-                        isVisible = subPagerState.currentPage == pageIndex
-                    )
+                    "GLOBALS" -> {
+                        android.util.Log.d("RankingPage", "🎯 Rendering GLOBALS with dataSource: ${globalDataSource.hashCode()}, type=${globalDataSource.type}")
+                        net.ib.mn.presentation.main.ranking.idol_subpage.UnifiedRankingSubPage(
+                            chartCode = currentType.code ?: "",
+                            dataSource = globalDataSource,
+                            isVisible = subPagerState.currentPage == pageIndex
+                        )
+                    }
                     else -> {
                         // 기본값 또는 에러 처리
                         Box(

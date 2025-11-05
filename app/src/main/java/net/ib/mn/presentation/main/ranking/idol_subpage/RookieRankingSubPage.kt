@@ -104,22 +104,8 @@ fun RookieRankingSubPage(
                     )
                 }
             } else {
-                // ExoTop3 데이터 생성
-                val exoTop3Data = success.topIdol?.let { topIdol ->
-                    val imageUrls = IdolImageUtil.getTop3ImageUrls(topIdol)
-                    val videoUrls = IdolImageUtil.getTop3VideoUrls(topIdol)
-
-                    net.ib.mn.ui.components.ExoTop3Data(
-                        id = "ranking_rookie_$chartCode",
-                        imageUrls = imageUrls,
-                        videoUrls = videoUrls,
-                        isVisible = isVisible
-                    )
-                }
-
                 ExoRankingList(
                     items = success.items,
-                    exoTop3Data = exoTop3Data,
                     listState = scrollState,
                     onItemClick = { rank, item ->
                         android.util.Log.d("RookieRankingSubPage", "Clicked: Rank $rank - ${item.name}")
