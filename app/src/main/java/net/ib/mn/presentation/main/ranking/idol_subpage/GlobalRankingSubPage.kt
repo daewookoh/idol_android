@@ -110,7 +110,7 @@ fun GlobalRankingSubPage(
                     val videoUrls = IdolImageUtil.getTop3VideoUrls(topIdol)
 
                     net.ib.mn.ui.components.ExoTop3Data(
-                        id = "ranking_global_$chartCode",
+                        id = "ranking_global_${chartCode}_${topIdol.id}",  // topIdol.id 포함으로 1위 변경 시 재생성
                         imageUrls = imageUrls,
                         videoUrls = videoUrls,
                         isVisible = isVisible

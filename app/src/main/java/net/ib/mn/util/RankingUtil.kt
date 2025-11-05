@@ -104,25 +104,27 @@ object RankingUtil {
         val idolMap = idols.associateBy { it.id }
 
         // AggregateRankModel을 RankingItemData로 변환
-        val maxScore = ranks.maxOfOrNull { it.score.toLong() } ?: 0L
-        val minScore = ranks.minOfOrNull { it.score.toLong() } ?: 0L
+        // Global(기적) 랭킹에서는 score는 기적 점수이고, 실제 투표수는 idol.heart 사용
+        val maxHeart = idols.maxOfOrNull { it.heart } ?: 0L
+        val minHeart = idols.minOfOrNull { it.heart } ?: 0L
 
         val rankItems = ranks.map { rank ->
             val idol = idolMap[rank.idolId]
+            val actualHeart = idol?.heart ?: 0L  // DB에서 실제 투표수 가져오기
 
             RankingItemData(
                 rank = rank.scoreRank,
                 name = rank.name,  // "이름_그룹명" 형식 그대로 사용
-                voteCount = formatScore(rank.score),
+                voteCount = formatScore(actualHeart.toInt()),  // 실제 투표수 표시
                 photoUrl = idol?.imageUrl,
                 id = rank.idolId.toString(),
                 miracleCount = idol?.miracleCount ?: 0,
                 fairyCount = idol?.fairyCount ?: 0,
                 angelCount = idol?.angelCount ?: 0,
                 rookieCount = idol?.rookieCount ?: 0,
-                heartCount = rank.score.toLong(),
-                maxHeartCount = maxScore,
-                minHeartCount = minScore,
+                heartCount = actualHeart,  // 실제 투표수 사용
+                maxHeartCount = maxHeart,
+                minHeartCount = minHeart,
                 top3ImageUrls = idol?.let { IdolImageUtil.getTop3ImageUrls(it) } ?: listOf(null, null, null),
                 top3VideoUrls = idol?.let { IdolImageUtil.getTop3VideoUrls(it) } ?: listOf(null, null, null)
             )
