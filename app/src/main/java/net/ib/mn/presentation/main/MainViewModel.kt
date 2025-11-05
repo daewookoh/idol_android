@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.local.UserInfo
+import net.ib.mn.util.Constants
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,6 +26,10 @@ class MainViewModel @Inject constructor(
 
     private val _logoutCompleted = MutableStateFlow(false)
     val logoutCompleted: StateFlow<Boolean> = _logoutCompleted.asStateFlow()
+
+    // 즉시 반응하는 로컬 카테고리 상태 (UI 반응성 개선)
+    private val _currentCategory = MutableStateFlow<String?>(null)
+    val currentCategory: StateFlow<String?> = _currentCategory.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -68,6 +73,29 @@ class MainViewModel @Inject constructor(
                     _userInfo.value = null
                 }
             }
+        }
+
+        // DataStore의 카테고리를 구독하여 _currentCategory 초기화
+        viewModelScope.launch {
+            preferencesManager.defaultCategory.collect { category ->
+                if (_currentCategory.value == null) {
+                    // 초기 로드 시에만 DataStore 값으로 설정
+                    _currentCategory.value = category
+                }
+            }
+        }
+    }
+
+    /**
+     * 카테고리 변경 (즉시 UI 업데이트 + 백그라운드 DataStore 저장)
+     */
+    fun setCategory(category: String) {
+        // 1. 즉시 로컬 상태 업데이트 (UI가 바로 반응)
+        _currentCategory.value = category
+
+        // 2. 백그라운드에서 DataStore에 저장
+        viewModelScope.launch {
+            preferencesManager.setDefaultCategory(category)
         }
     }
 

@@ -55,7 +55,10 @@ fun MainScreen(
     val userInfo by viewModel.userInfo.collectAsState()
     val logoutCompleted by viewModel.logoutCompleted.collectAsState()
     val timerText by topBarViewModel.timerText.collectAsState()
-    val defaultCategory by viewModel.preferencesManager.defaultCategory.collectAsState(initial = Constants.TYPE_MALE)
+
+    // 즉시 반응하는 로컬 카테고리 상태 사용 (UI 반응성 개선)
+    val currentCategory by viewModel.currentCategory.collectAsState()
+    val defaultCategory = currentCategory ?: Constants.TYPE_MALE
     
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
@@ -143,11 +146,8 @@ fun MainScreen(
                         thumbBackgroundColor = colorResource(id = R.color.text_default),
                         thumbTextColor = colorResource(id = R.color.text_white_black),
                         onCategoryChanged = { category ->
-                            coroutineScope.launch {
-                                // PreferencesManager에 저장 (영구 저장)
-                                viewModel.preferencesManager.setDefaultCategory(category)
-                                // defaultCategory Flow가 자동으로 업데이트되어 UI 반영
-                            }
+                            // 즉시 UI 업데이트 (setCategory 함수가 로컬 상태를 먼저 업데이트)
+                            viewModel.setCategory(category)
                         }
                     )
                 },

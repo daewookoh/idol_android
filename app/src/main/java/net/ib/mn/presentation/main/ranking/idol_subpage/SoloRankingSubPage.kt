@@ -107,8 +107,29 @@ fun SoloRankingSubPage(
                     )
                 }
 
+                // 강제 테스트 데이터 추가
+                val testItems = listOf(
+                    net.ib.mn.ui.components.RankingItemData(
+                        rank = 1,
+                        name = "테스트 아이돌1",
+                        voteCount = "1,234,567",
+                        groupName = "테스트 그룹",
+                        id = "test1"
+                    ),
+                    net.ib.mn.ui.components.RankingItemData(
+                        rank = 2,
+                        name = "Test Idol 2",
+                        voteCount = "987,654",
+                        groupName = "TEST GROUP",
+                        id = "test2"
+                    )
+                )
+
+                android.util.Log.d("SoloRankingSubPage", "📊 Items count: ${success.items.size}")
+                android.util.Log.d("SoloRankingSubPage", "📊 First item: ${success.items.firstOrNull()}")
+
                 MainRankingList(
-                    items = success.items,
+                    items = if (success.items.isEmpty()) testItems else success.items,
                     exoTop3Data = exoTop3Data,
                     listState = scrollState,
                     onItemClick = { rank, item ->

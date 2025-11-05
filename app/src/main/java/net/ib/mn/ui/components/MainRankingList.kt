@@ -67,10 +67,11 @@ data class ExoTop3Data(
  *
  * 구조:
  * - 상단: ExoTop3 (exoTop3Data가 있으면 자동 표시)
- * - 중간~하단: MainRankingItem 리스트
+ * - 중간~하단: ExoRanking (아이템 리스트)
  *
  * @param items 랭킹 아이템 리스트
  * @param exoTop3Data ExoTop3 배너 데이터 (nullable)
+ * @param type 랭킹 타입 ("S" = Standard, "A" = Advanced, 기본값: "S")
  * @param listState LazyColumn의 스크롤 상태 (탭 전환 시에도 유지됨)
  * @param onItemClick 아이템 클릭 이벤트 (index, item)
  */
@@ -101,21 +102,10 @@ fun MainRankingList(
             }
         }
 
-        // 랭킹 아이템 리스트
-        // key를 사용하여 아이템이 변경될 때 올바른 리컴포지션 수행
-        // 랭킹이 바뀌면 item.id는 유지되므로 순서만 바뀌고 불필요한 리렌더링 방지
-        itemsIndexed(
+        exoRankingItem(
             items = items,
-            key = { _, item -> item.itemKey() }  // 고유 ID로 아이템 추적
-        ) { index, item ->
-            MainRankingItem(
-                rank = item.rank,
-                name = item.name,
-                voteCount = item.voteCount,
-                photoUrl = item.photoUrl,
-                showDivider = false,
-                onClick = { onItemClick(index, item) }
-            )
-        }
+            type = "S",
+            onItemClick = onItemClick
+        )
     }
 }

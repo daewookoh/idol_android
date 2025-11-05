@@ -731,20 +731,20 @@ class StartUpViewModel @Inject constructor(
                     // Room Database에 저장
                     data?.let { idolList ->
                         val entities = idolList.map { it.toEntity() }
-                        idolDao.insertIdols(entities)
+                        idolDao.insert(entities)  // old 프로젝트와 동일한 메서드명
                         android.util.Log.d(TAG, "✓ ${entities.size} idols saved to Room Database")
 
                         // DB에서 저장된 데이터 확인
-                        val savedIdolsCount = idolDao.getAllIdolsSync().size
+                        val savedIdolsCount = idolDao.getAll().size  // old 프로젝트와 동일
                         android.util.Log.d(TAG, "========================================")
                         android.util.Log.d(TAG, "📊 DB Verification")
                         android.util.Log.d(TAG, "========================================")
                         android.util.Log.d(TAG, "Total Idols in DB: $savedIdolsCount")
 
                         // 상위 5개 출력
-                        val savedIdols = idolDao.getAllIdolsSync().take(5)
+                        val savedIdols = idolDao.getAll().take(5)  // old 프로젝트와 동일
                         savedIdols.forEachIndexed { index, idol ->
-                            android.util.Log.d(TAG, "[$index] ID: ${idol.id}, Name: ${idol.name}, Group: ${idol.group}")
+                            android.util.Log.d(TAG, "[$index] ID: ${idol.id}, Name: ${idol.name}, GroupId: ${idol.groupId}")
                         }
                         android.util.Log.d(TAG, "========================================")
                     }

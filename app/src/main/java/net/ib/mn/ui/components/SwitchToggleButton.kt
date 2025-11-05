@@ -76,7 +76,7 @@ fun SwitchToggleButton(
     val thumbOffset by animateDpAsState(
         targetValue = if (buttonWidthDp == 0.dp || isMaleSelected) 0.dp else buttonWidthDp,
         animationSpec = if (isUserClick && buttonWidthDp > 0.dp) {
-            tween(durationMillis = 600)
+            tween(durationMillis = 250) // 애니메이션 속도 (250ms)
         } else {
             tween(durationMillis = 0) // 즉시 이동
         },

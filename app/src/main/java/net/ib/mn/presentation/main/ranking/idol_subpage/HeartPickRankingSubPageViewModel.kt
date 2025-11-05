@@ -18,6 +18,7 @@ import net.ib.mn.data.local.entity.IdolEntity
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.RankingRepository
 import net.ib.mn.ui.components.RankingItemData
+import net.ib.mn.util.IdolImageUtil
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -94,14 +95,41 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
 
     private suspend fun processRanksData(ranks: List<net.ib.mn.data.remote.dto.AggregateRankModel>) {
         try {
+            // 모든 idol ID 추출
+            val idolIds = ranks.map { it.idolId }
+
+            // DB에서 idol 정보 가져오기
+            val idols = idolDao.getIdolsByIds(idolIds)
+            val idolMap = idols.associateBy { it.id }
+
             // AggregateRankModel을 RankingItemData로 변환
+            val maxScore = ranks.maxOfOrNull { it.score.toLong() } ?: 0L
+            val minScore = ranks.minOfOrNull { it.score.toLong() } ?: 0L
+
             val rankItems = ranks.map { rank ->
+                val idol = idolMap[rank.idolId]
+
+                // name에서 이름과 그룹명 분리 (예: "디오_EXO" -> name="디오", groupName="EXO")
+                val nameParts = rank.name.split("_")
+                val actualName = nameParts.getOrNull(0) ?: rank.name
+                val actualGroupName = nameParts.getOrNull(1)
+
                 RankingItemData(
                     rank = rank.scoreRank,
-                    name = rank.name,
+                    name = actualName,
                     voteCount = formatScore(rank.score),
-                    photoUrl = null,  // charts/ranks는 이미지 URL을 제공하지 않음
-                    id = rank.idolId.toString()
+                    photoUrl = idol?.imageUrl,
+                    id = rank.idolId.toString(),
+                    groupName = actualGroupName,
+                    miracleCount = idol?.miracleCount ?: 0,
+                    fairyCount = idol?.fairyCount ?: 0,
+                    angelCount = idol?.angelCount ?: 0,
+                    rookieCount = idol?.rookieCount ?: 0,
+                    heartCount = rank.score.toLong(),
+                    maxHeartCount = maxScore,
+                    minHeartCount = minScore,
+                    top3ImageUrls = idol?.let { IdolImageUtil.getTop3ImageUrls(it) } ?: listOf(null, null, null),
+                    top3VideoUrls = idol?.let { IdolImageUtil.getTop3VideoUrls(it) } ?: listOf(null, null, null)
                 )
             }
 

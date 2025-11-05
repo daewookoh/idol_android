@@ -309,6 +309,9 @@ data class IdolData(
     @SerializedName("group_id")
     val groupId: Int?,
 
+    @SerializedName("group_name")
+    val groupName: String?,  // 그룹명 추가
+
     @SerializedName("birthday")
     val birthday: String?,
 
@@ -380,21 +383,48 @@ data class IdolData(
 
 /**
  * Extension function to convert IdolData to IdolEntity for Room Database.
+ * old 프로젝트와 완전히 동일한 매핑 (IdolLocal.kt의 toLocal() 참조)
  */
 fun IdolData.toEntity(): net.ib.mn.data.local.entity.IdolEntity {
     return net.ib.mn.data.local.entity.IdolEntity(
         id = id,
-        name = name ?: "",  // null인 경우 빈 문자열로
-        group = if (groupId != null && groupId > 0) "Group #$groupId" else null, // group_id를 사용
+        miracleCount = miracleCount ?: 0,
+        angelCount = angelCount ?: 0,
+        rookieCount = rookieCount ?: 0,
+        anniversary = anniversary ?: "N",
+        anniversaryDays = null,  // API에 없음
+        birthDay = birthday,
+        burningDay = burningDay,
+        category = category ?: "",
+        comebackDay = comebackDay,
+        debutDay = debutDay,
+        description = description ?: "",
+        fairyCount = fairyCount ?: 0,
+        groupId = groupId ?: 0,
+        heart = heart?.toLong() ?: 0L,
         imageUrl = imageUrl,
         imageUrl2 = imageUrl2,
         imageUrl3 = imageUrl3,
+        isViewable = isViewable ?: "Y",
+        name = name ?: "",
+        nameEn = nameEn ?: "",
+        nameJp = nameJp ?: "",
+        nameZh = nameZh ?: "",
+        nameZhTw = nameZhTw ?: "",
+        resourceUri = resourceUri ?: "",
         top3 = top3,
         top3Type = top3Type,
-        top3ImageVer = top3ImageVer,
-        heartCount = heart ?: 0, // heart 필드 사용
-        isTop3 = false, // 초기값
-        timestamp = System.currentTimeMillis()
+        top3Seq = -1,  // API에 없음
+        top3ImageVer = top3ImageVer ?: "",
+        type = type ?: "",
+        infoSeq = -1,  // API에 없음
+        isLunarBirthday = isLunarBirthday,
+        mostCount = mostCount ?: 0,
+        mostCountDesc = mostCountDesc,
+        updateTs = 0,  // API에 없음
+        sourceApp = null,  // API에 없음
+        fdName = fdName,
+        fdNameEn = fdNameEn
     )
 }
 

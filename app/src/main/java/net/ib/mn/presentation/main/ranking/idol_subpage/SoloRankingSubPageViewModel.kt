@@ -18,6 +18,7 @@ import net.ib.mn.data.local.entity.IdolEntity
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.RankingRepository
 import net.ib.mn.ui.components.RankingItemData
+import net.ib.mn.util.IdolImageUtil
 import java.text.Collator
 import java.text.NumberFormat
 import java.util.Locale
@@ -139,15 +140,47 @@ class SoloRankingSubPageViewModel @AssistedInject constructor(
             // Heart 기준 정렬 및 순위 계산
             val sortedIdols = sortAndRankIdols(idols)
 
+            // 프로그레스 바 계산을 위한 최대/최소 점수
+            val maxScore = sortedIdols.maxOfOrNull { it.idol.heart } ?: 0L
+            val minScore = sortedIdols.minOfOrNull { it.idol.heart } ?: 0L
+
             // RankingItemData로 변환
-            val rankItems = sortedIdols.map { idolWithRank ->
-                RankingItemData(
+            val rankItems = sortedIdols.mapIndexed { index, idolWithRank ->
+                // name에서 이름과 그룹명 분리 (예: "디오_EXO" -> name="디오", groupName="EXO")
+                val nameParts = idolWithRank.idol.name.split("_")
+                val actualName = nameParts.getOrNull(0) ?: idolWithRank.idol.name
+                val actualGroupName = nameParts.getOrNull(1)
+
+                val item = RankingItemData(
                     rank = idolWithRank.rank,
-                    name = idolWithRank.idol.name,
-                    voteCount = formatHeartCount(idolWithRank.idol.heartCount),
+                    name = actualName,
+                    voteCount = formatHeartCount(idolWithRank.idol.heart.toInt()),
                     photoUrl = idolWithRank.idol.imageUrl,
-                    id = idolWithRank.idol.id.toString()
+                    id = idolWithRank.idol.id.toString(),
+                    groupName = actualGroupName,
+                    miracleCount = idolWithRank.idol.miracleCount,
+                    fairyCount = idolWithRank.idol.fairyCount,
+                    angelCount = idolWithRank.idol.angelCount,
+                    rookieCount = idolWithRank.idol.rookieCount,
+                    heartCount = idolWithRank.idol.heart,
+                    maxHeartCount = maxScore,
+                    minHeartCount = minScore,
+                    top3ImageUrls = IdolImageUtil.getTop3ImageUrls(idolWithRank.idol),
+                    top3VideoUrls = IdolImageUtil.getTop3VideoUrls(idolWithRank.idol)
                 )
+
+                // 첫 3개 아이템 상세 로그
+                if (index < 3) {
+                    android.util.Log.d("SoloRankingVM", "=== Item #$index ===")
+                    android.util.Log.d("SoloRankingVM", "  DB idol.name: '${idolWithRank.idol.name}'")
+                    android.util.Log.d("SoloRankingVM", "  DB idol.groupId: ${idolWithRank.idol.groupId}")
+                    android.util.Log.d("SoloRankingVM", "  DB idol.heart: ${idolWithRank.idol.heart}")
+                    android.util.Log.d("SoloRankingVM", "  → RankingItemData.name: '${item.name}'")
+                    android.util.Log.d("SoloRankingVM", "  → RankingItemData.groupName: '${item.groupName}'")
+                    android.util.Log.d("SoloRankingVM", "  → RankingItemData.voteCount: '${item.voteCount}'")
+                }
+
+                item
             }
 
             android.util.Log.d("SoloRankingVM", "✅ Processed ${rankItems.size} items")
@@ -168,13 +201,13 @@ class SoloRankingSubPageViewModel @AssistedInject constructor(
         }
 
         val sorted = idols.sortedWith(
-            compareByDescending<IdolEntity> { it.heartCount }
+            compareByDescending<IdolEntity> { it.heart }
                 .thenComparator { a, b -> collator.compare(a.name, b.name) }
         )
 
         val result = mutableListOf<IdolWithRank>()
         sorted.forEachIndexed { index, idol ->
-            val rank = if (index > 0 && sorted[index - 1].heartCount == idol.heartCount) {
+            val rank = if (index > 0 && sorted[index - 1].heart == idol.heart) {
                 result[index - 1].rank
             } else {
                 index + 1

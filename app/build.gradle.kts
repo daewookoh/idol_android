@@ -56,7 +56,7 @@ android {
         applicationId = APP_ID_ORIGINAL
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
+        versionCode = 6104
         versionName = "10.10.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -374,6 +374,9 @@ dependencies {
     // Media3 (ExoPlayer)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
+
+    // Lottie
+    implementation(libs.lottie.compose)
 
     // Room
     implementation(libs.androidx.room.runtime)

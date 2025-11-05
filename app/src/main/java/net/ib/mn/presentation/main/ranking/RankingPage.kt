@@ -64,8 +64,15 @@ fun RankingPage(
     val mainChartModel by viewModel.mainChartModel.collectAsState()
 
     // MainScreen에서 관리하는 성별 카테고리 (old 프로젝트와 동일)
-    val defaultCategory by mainViewModel.preferencesManager.defaultCategory.collectAsState(initial = net.ib.mn.util.Constants.TYPE_MALE)
-    val isMale = defaultCategory == net.ib.mn.util.Constants.TYPE_MALE
+    // 즉시 반응하는 로컬 카테고리 상태 사용 (UI 반응성 개선)
+    val currentCategory by mainViewModel.currentCategory.collectAsState()
+
+    // 카테고리 로딩 중이면 화면을 보여주지 않음
+    if (currentCategory == null) {
+        return
+    }
+
+    val isMale = currentCategory == net.ib.mn.util.Constants.TYPE_MALE
 
     // CELEB: typeList 확인
     // 일반: mainChartModel 확인
@@ -91,7 +98,7 @@ fun RankingPage(
     } else {
         android.util.Log.d("RankingPage", "========================================")
         android.util.Log.d("RankingPage", "[RankingPage] Building tab list")
-        android.util.Log.d("RankingPage", "  - defaultCategory: $defaultCategory")
+        android.util.Log.d("RankingPage", "  - currentCategory: $currentCategory")
         android.util.Log.d("RankingPage", "  - isMale: $isMale")
         android.util.Log.d("RankingPage", "========================================")
         buildIdolAppTabList(mainChartModel, viewModel, isMale)
