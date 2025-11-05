@@ -33,7 +33,8 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
     @Assisted private val chartCode: String,
     @ApplicationContext private val context: Context,
     private val rankingRepository: RankingRepository,
-    private val idolDao: IdolDao
+    private val idolDao: IdolDao,
+    private val broadcastManager: net.ib.mn.data.remote.udp.IdolBroadcastManager
 ) : ViewModel() {
 
     sealed interface UiState {
@@ -50,10 +51,38 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
 
     private var cachedData: List<RankingItemData>? = null
     private var topIdolCached: IdolEntity? = null
+    private var cachedRanks: List<net.ib.mn.data.remote.dto.AggregateRankModel>? = null
 
     init {
         android.util.Log.d("HeartPickRankingVM", "🆕 ViewModel created for chartCode: $chartCode")
         loadRankingData()
+
+        // UDP 업데이트 이벤트 구독 (실시간 랭킹 업데이트)
+        viewModelScope.launch {
+            broadcastManager.updateEvent.collect { changedIds ->
+                android.util.Log.d("HeartPickRankingVM", "🔄 UDP update event received - ${changedIds.size} idols changed")
+
+                // 캐시된 ranks 데이터가 있으면 재가공
+                val ranks = cachedRanks
+                if (ranks != null && ranks.isNotEmpty()) {
+                    // 변경된 아이돌 중 현재 차트에 포함된 아이돌이 있는지 확인
+                    val cachedIdolIds = ranks.map { it.idolId }
+                    val hasRelevantChanges = changedIds.any { it in cachedIdolIds }
+
+                    if (hasRelevantChanges) {
+                        android.util.Log.d("HeartPickRankingVM", "📊 Reprocessing ${ranks.size} ranks")
+                        android.util.Log.d("HeartPickRankingVM", "   → Changed IDs in this chart: ${changedIds.filter { it in cachedIdolIds }}")
+                        android.util.Log.d("HeartPickRankingVM", "   → DB에서 업데이트된 데이터 재조회 → 변경된 아이템만 리컴포지션")
+
+                        launch(Dispatchers.IO) {
+                            processRanksData(ranks)
+                        }
+                    } else {
+                        android.util.Log.d("HeartPickRankingVM", "⏭️ No relevant changes for this chart - skipping update")
+                    }
+                }
+            }
+        }
     }
 
     fun reloadIfNeeded() {
@@ -82,6 +111,7 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
                     }
                     is ApiResult.Success -> {
                         android.util.Log.d("HeartPickRankingVM", "✅ SUCCESS - Ranks count: ${result.data.size}")
+                        cachedRanks = result.data
                         processRanksData(result.data)
                     }
                     is ApiResult.Error -> {
