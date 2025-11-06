@@ -44,6 +44,29 @@ fun ExoTop3(
 }
 
 /**
+ * ExoTop3 - RankingItemData 버전
+ *
+ * @param rankingItemData 랭킹 아이템 데이터
+ * @param isVisible 현재 화면에 표시 여부
+ * @param onItemClick 아이템 클릭 콜백
+ */
+@androidx.annotation.OptIn(UnstableApi::class)
+@Composable
+fun ExoTop3(
+    rankingItemData: net.ib.mn.ui.components.RankingItemData,
+    isVisible: Boolean = true,
+    onItemClick: (Int) -> Unit = {}
+) {
+    ExoTop3Internal(
+        id = "exo_top3_${rankingItemData.id}",
+        imageUrls = rankingItemData.top3ImageUrls,
+        videoUrls = rankingItemData.top3VideoUrls,
+        isVisible = isVisible,
+        onItemClick = onItemClick
+    )
+}
+
+/**
  * ExoTop3 - 랭킹 아이템 확장 시 표시용 (URL 직접 전달 버전)
  *
  * @param id 고유 ID

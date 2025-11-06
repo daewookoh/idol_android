@@ -52,7 +52,7 @@ class UnifiedRankingSubPageViewModel @AssistedInject constructor(
         data object Loading : UiState
         data class Success(
             val items: List<RankingItemData>,
-            val topIdol: IdolEntity? = null
+            val topIdol: RankingItemData? = null
         ) : UiState
         data class Error(val message: String) : UiState
     }
@@ -288,7 +288,7 @@ class UnifiedRankingSubPageViewModel @AssistedInject constructor(
 
             _uiState.value = UiState.Success(
                 items = finalItems,
-                topIdol = result.topIdol
+                topIdol = finalItems.firstOrNull()
             )
         } catch (e: Exception) {
             android.util.Log.e(logTag, "❌ Exception: ${e.message}", e)
@@ -305,42 +305,22 @@ class UnifiedRankingSubPageViewModel @AssistedInject constructor(
 
         android.util.Log.d(logTag, "💗 Updating vote: idol=$idolId, votes=$voteCount")
 
-        // 1. 투표한 아이돌의 하트 수 업데이트
-        val updatedItems = currentState.items.map { item ->
-            if (item.id == idolId.toString()) {
-                val currentHeart = item.heartCount
-                val newHeart = currentHeart + voteCount
-
-                item.copy(
-                    voteCount = formatHeartCount(newHeart.toInt()),
-                    heartCount = newHeart
-                )
-            } else {
-                item
-            }
-        }
-
-        // 2. 재정렬 및 순위 재계산
-        val sortedItems = net.ib.mn.util.RankingUtil.sortAndRank(updatedItems)
-
-        // 3. max/min 재계산
-        val maxHeart = sortedItems.maxOfOrNull { it.heartCount } ?: 0L
-        val minHeart = sortedItems.minOfOrNull { it.heartCount } ?: 0L
-
-        // 4. 모든 아이템에 새로운 max/min 적용
-        val finalItems = sortedItems.map { item ->
-            item.copy(
-                maxHeartCount = maxHeart,
-                minHeartCount = minHeart
-            )
-        }
-
-        // 5. State 업데이트 -> 자동 리컴포지션
-        _uiState.value = UiState.Success(
-            items = finalItems,
-            topIdol = currentState.topIdol
+        // RankingUtil을 사용하여 투표 업데이트 및 재정렬
+        val finalItems = net.ib.mn.util.RankingUtil.updateVoteAndRerank(
+            items = currentState.items,
+            idolId = idolId,
+            voteCount = voteCount,
+            formatHeartCount = { count -> formatHeartCount(count.toInt()) }
         )
 
+        // State 업데이트 -> 자동 리컴포지션
+        _uiState.value = UiState.Success(
+            items = finalItems,
+            topIdol = finalItems.firstOrNull()
+        )
+
+        val maxHeart = finalItems.firstOrNull()?.maxHeartCount ?: 0L
+        val minHeart = finalItems.firstOrNull()?.minHeartCount ?: 0L
         android.util.Log.d(logTag, "✅ Vote updated and re-ranked (${finalItems.size} items)")
         android.util.Log.d(logTag, "   → New max: $maxHeart, min: $minHeart")
     }

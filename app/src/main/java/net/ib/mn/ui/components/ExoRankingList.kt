@@ -127,7 +127,7 @@ data class RankingItemData(
  * - 정렬, 순위 계산, max/min 계산 등의 비즈니스 로직은 ViewModel에서 처리
  *
  * @param items 완전히 정렬되고 가공된 랭킹 아이템 리스트
- * @param topIdol 1위 아이돌 (ExoTop3 표시용, nullable)
+ * @param topIdol 1위 아이돌 RankingItemData (ExoTop3 표시용, nullable)
  * @param isVisible 화면 가시성 (ExoTop3 동영상 재생 제어)
  * @param listState LazyColumn의 스크롤 상태 (탭 전환 시에도 유지됨)
  * @param onItemClick 아이템 클릭 이벤트 (index, item)
@@ -136,7 +136,7 @@ data class RankingItemData(
 @Composable
 fun ExoRankingList(
     items: List<RankingItemData>,
-    topIdol: net.ib.mn.data.local.entity.IdolEntity? = null,
+    topIdol: RankingItemData? = null,
     isVisible: Boolean = true,
     listState: LazyListState = rememberLazyListState(),
     onItemClick: (Int, RankingItemData) -> Unit = { _, _ -> },
@@ -154,7 +154,7 @@ fun ExoRankingList(
         if (topIdol != null) {
             item(key = "exo_top3_${topIdol.id}") {
                 ExoTop3(
-                    idol = topIdol,
+                    rankingItemData = topIdol,
                     isVisible = isVisible
                 )
             }

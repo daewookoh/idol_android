@@ -73,6 +73,54 @@ object RankingUtil {
     }
 
     /**
+     * 투표 성공 후 랭킹 데이터 업데이트
+     *
+     * 1. 투표한 아이돌의 하트 수 증가
+     * 2. 재정렬 및 순위 재계산
+     * 3. max/min 재계산 및 적용
+     *
+     * @param items 현재 랭킹 아이템 리스트
+     * @param idolId 투표한 아이돌 ID
+     * @param voteCount 투표한 하트 수
+     * @param formatHeartCount 하트 수 포맷팅 함수
+     * @return 업데이트되고 정렬된 랭킹 아이템 리스트
+     */
+    fun updateVoteAndRerank(
+        items: List<RankingItemData>,
+        idolId: Int,
+        voteCount: Long,
+        formatHeartCount: (Long) -> String
+    ): List<RankingItemData> {
+        // 1. 투표한 아이돌의 하트 수 업데이트
+        val updatedItems = items.map { item ->
+            if (item.id == idolId.toString()) {
+                val newHeart = item.heartCount + voteCount
+                item.copy(
+                    voteCount = formatHeartCount(newHeart),
+                    heartCount = newHeart
+                )
+            } else {
+                item
+            }
+        }
+
+        // 2. 재정렬 및 순위 재계산
+        val sortedItems = sortAndRank(updatedItems)
+
+        // 3. max/min 재계산
+        val maxHeart = sortedItems.maxOfOrNull { it.heartCount } ?: 0L
+        val minHeart = sortedItems.minOfOrNull { it.heartCount } ?: 0L
+
+        // 4. 모든 아이템에 새로운 max/min 적용
+        return sortedItems.map { item ->
+            item.copy(
+                maxHeartCount = maxHeart,
+                minHeartCount = minHeart
+            )
+        }
+    }
+
+    /**
      * AggregateRankModel을 RankingItemData로 변환하고 1위 아이돌 정보 가져오기
      *
      * @param ranks AggregateRankModel 리스트
