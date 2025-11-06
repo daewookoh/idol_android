@@ -101,4 +101,9 @@ object NetworkModule {
     @Singleton
     fun provideChartsApi(retrofit: Retrofit): ChartsApi =
         retrofit.create(ChartsApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideHeartpickApi(retrofit: Retrofit): HeartpickApi =
+        retrofit.create(HeartpickApi::class.java)
 }

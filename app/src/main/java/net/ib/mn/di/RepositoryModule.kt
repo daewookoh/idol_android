@@ -2,12 +2,14 @@ package net.ib.mn.di
 
 import net.ib.mn.data.repository.AdRepositoryImpl
 import net.ib.mn.data.repository.ConfigRepositoryImpl
+import net.ib.mn.data.repository.HeartpickRepositoryImpl
 import net.ib.mn.data.repository.IdolRepositoryImpl
 import net.ib.mn.data.repository.MessageRepositoryImpl
 import net.ib.mn.data.repository.UserRepositoryImpl
 import net.ib.mn.data.repository.UtilityRepositoryImpl
 import net.ib.mn.domain.repository.AdRepository
 import net.ib.mn.domain.repository.ConfigRepository
+import net.ib.mn.domain.repository.HeartpickRepository
 import net.ib.mn.domain.repository.IdolRepository
 import net.ib.mn.domain.repository.MessageRepository
 import net.ib.mn.domain.repository.UserRepository
@@ -62,4 +64,10 @@ abstract class RepositoryModule {
     abstract fun bindUtilityRepository(
         impl: UtilityRepositoryImpl
     ): UtilityRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindHeartpickRepository(
+        impl: HeartpickRepositoryImpl
+    ): HeartpickRepository
 }

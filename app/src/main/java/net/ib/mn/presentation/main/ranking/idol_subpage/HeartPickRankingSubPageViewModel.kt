@@ -9,40 +9,38 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import net.ib.mn.data.local.dao.IdolDao
-import net.ib.mn.data.local.entity.IdolEntity
 import net.ib.mn.domain.model.ApiResult
-import net.ib.mn.domain.repository.RankingRepository
-import net.ib.mn.ui.components.RankingItemData
+import net.ib.mn.domain.model.HeartPickModel
+import net.ib.mn.domain.repository.HeartpickRepository
+import net.ib.mn.ui.components.HeartPickState
+import net.ib.mn.ui.components.IdolRankInfo
 import net.ib.mn.util.IdolImageUtil
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 /**
- * HeartPick (기적) 랭킹 ViewModel
+ * HeartPick 랭킹 ViewModel
  *
- * charts/ranks/ API 사용
- * 남녀 변경에 영향 받지 않음
+ * heartpick/ API 사용
  */
 @HiltViewModel(assistedFactory = HeartPickRankingSubPageViewModel.Factory::class)
 class HeartPickRankingSubPageViewModel @AssistedInject constructor(
     @Assisted private val chartCode: String,
     @ApplicationContext private val context: Context,
-    private val rankingRepository: RankingRepository,
-    private val idolDao: IdolDao,
-    private val broadcastManager: net.ib.mn.data.remote.udp.IdolBroadcastManager
+    private val heartpickRepository: HeartpickRepository
 ) : ViewModel() {
 
     sealed interface UiState {
         data object Loading : UiState
         data class Success(
-            val items: List<RankingItemData>,
-            val topIdol: IdolEntity? = null
+            val items: List<HeartPickCardData>
         ) : UiState
         data class Error(val message: String) : UiState
     }
@@ -50,172 +48,218 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    private var cachedData: List<RankingItemData>? = null
-    private var topIdolCached: IdolEntity? = null
-    private var cachedRanks: List<net.ib.mn.data.remote.dto.AggregateRankModel>? = null
-
-    // UDP 구독 Job (화면에 보일 때만 활성화)
-    private var udpSubscriptionJob: Job? = null
-
-    // 화면 가시성 상태
-    private var isScreenVisible = false
+    private var cachedData: List<HeartPickCardData>? = null
 
     init {
         android.util.Log.d("HeartPickRankingVM", "🆕 ViewModel created for chartCode: $chartCode")
-        loadRankingData()
-    }
-
-    /**
-     * 화면이 보일 때 호출 - UDP 구독 시작 및 데이터 새로고침
-     */
-    fun onScreenVisible() {
-        android.util.Log.d("HeartPickRankingVM", "👁️ Screen became visible")
-        isScreenVisible = true
-
-        // DB에서 최신 데이터 로드
-        val ranks = cachedRanks
-        if (ranks != null && ranks.isNotEmpty()) {
-            android.util.Log.d("HeartPickRankingVM", "🔄 Refreshing data from DB (${ranks.size} items)")
-            viewModelScope.launch(Dispatchers.IO) {
-                processRanksData(ranks)
-            }
-        }
-
-        // UDP 구독 시작
-        startUdpSubscription()
-    }
-
-    /**
-     * 화면이 사라질 때 호출 - UDP 구독 중지
-     */
-    fun onScreenHidden() {
-        android.util.Log.d("HeartPickRankingVM", "🙈 Screen hidden")
-        isScreenVisible = false
-        stopUdpSubscription()
-    }
-
-    /**
-     * UDP 구독 시작
-     */
-    private fun startUdpSubscription() {
-        // 이미 구독 중이면 중복 방지
-        if (udpSubscriptionJob?.isActive == true) {
-            android.util.Log.d("HeartPickRankingVM", "⚠️ UDP already subscribed, skipping")
-            return
-        }
-
-        android.util.Log.d("HeartPickRankingVM", "📡 Starting UDP subscription")
-        udpSubscriptionJob = viewModelScope.launch {
-            broadcastManager.updateEvent.collect { changedIds ->
-                // 화면이 보이지 않으면 무시
-                if (!isScreenVisible) {
-                    android.util.Log.d("HeartPickRankingVM", "⏭️ Screen not visible, ignoring UDP update")
-                    return@collect
-                }
-
-                android.util.Log.d("HeartPickRankingVM", "🔄 UDP update event received - ${changedIds.size} idols changed")
-
-                // 캐시된 ranks 데이터가 있으면 재가공
-                val ranks = cachedRanks
-                if (ranks != null && ranks.isNotEmpty()) {
-                    // 변경된 아이돌 중 현재 차트에 포함된 아이돌이 있는지 확인
-                    val cachedIdolIds = ranks.map { it.idolId }
-                    val hasRelevantChanges = changedIds.any { it in cachedIdolIds }
-
-                    if (hasRelevantChanges) {
-                        android.util.Log.d("HeartPickRankingVM", "📊 Reprocessing ${ranks.size} ranks")
-                        android.util.Log.d("HeartPickRankingVM", "   → Changed IDs in this chart: ${changedIds.filter { it in cachedIdolIds }}")
-                        android.util.Log.d("HeartPickRankingVM", "   → DB에서 업데이트된 데이터 재조회 → 변경된 아이템만 리컴포지션")
-
-                        launch(Dispatchers.IO) {
-                            processRanksData(ranks)
-                        }
-                    } else {
-                        android.util.Log.d("HeartPickRankingVM", "⏭️ No relevant changes for this chart - skipping update")
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * UDP 구독 중지
-     */
-    private fun stopUdpSubscription() {
-        udpSubscriptionJob?.cancel()
-        udpSubscriptionJob = null
-        android.util.Log.d("HeartPickRankingVM", "🛑 Stopped UDP subscription")
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        stopUdpSubscription()
-        android.util.Log.d("HeartPickRankingVM", "♻️ ViewModel cleared")
+        loadHeartPickList()
     }
 
     fun reloadIfNeeded() {
         if (cachedData != null) {
             android.util.Log.d("HeartPickRankingVM", "✓ Using cached data")
-            _uiState.value = UiState.Success(cachedData!!, topIdolCached)
+            _uiState.value = UiState.Success(cachedData!!)
         } else {
-            loadRankingData()
+            loadHeartPickList()
         }
     }
 
-    private fun loadRankingData() {
+    private fun loadHeartPickList() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = UiState.Loading
 
             android.util.Log.d("HeartPickRankingVM", "========================================")
-            android.util.Log.d("HeartPickRankingVM", "[HeartPick] Loading ranking data")
-            android.util.Log.d("HeartPickRankingVM", "  - chartCode: $chartCode")
-            android.util.Log.d("HeartPickRankingVM", "  - API: charts/ranks/")
+            android.util.Log.d("HeartPickRankingVM", "[HeartPick] Loading heart pick list")
+            android.util.Log.d("HeartPickRankingVM", "  - API: heartpick/")
 
-            // charts/ranks/ API 호출
-            rankingRepository.getChartRanks(chartCode).collect { result ->
+            // heartpick/ API 호출
+            heartpickRepository.getHeartPickList(offset = 0, limit = 100).collect { result ->
                 when (result) {
                     is ApiResult.Loading -> {
                         android.util.Log.d("HeartPickRankingVM", "⏳ Loading...")
                     }
                     is ApiResult.Success -> {
-                        android.util.Log.d("HeartPickRankingVM", "✅ SUCCESS - Ranks count: ${result.data.size}")
-                        cachedRanks = result.data
-                        processRanksData(result.data)
+                        android.util.Log.d("HeartPickRankingVM", "✅ SUCCESS - HeartPicks count: ${result.data.size}")
+                        processHeartPickData(result.data)
                     }
                     is ApiResult.Error -> {
                         android.util.Log.e("HeartPickRankingVM", "❌ ERROR: ${result.message}")
-                        _uiState.value = UiState.Error(result.message ?: "Error loading data")
+                        _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
                     }
                 }
             }
         }
     }
 
-    private suspend fun processRanksData(ranks: List<net.ib.mn.data.remote.dto.AggregateRankModel>) {
+    private fun processHeartPickData(heartPicks: List<HeartPickModel>) {
         try {
-            val result = net.ib.mn.util.RankingUtil.processRanksData(
-                ranks = ranks,
-                idolDao = idolDao,
-                formatScore = ::formatScore
-            )
+            val cardDataList = heartPicks.map { heartPick ->
+                val state = when (heartPick.status) {
+                    0 -> HeartPickState.UPCOMING  // 진행예정
+                    1 -> HeartPickState.ACTIVE     // 진행중
+                    else -> HeartPickState.ENDED   // 종료
+                }
 
-            android.util.Log.d("HeartPickRankingVM", "✅ Processed ${result.rankItems.size} items")
+                val dDay = calculateDDay(heartPick.endAt, heartPick.status)
 
-            cachedData = result.rankItems
-            topIdolCached = result.topIdol
+                val firstPlaceIdol = if (state != HeartPickState.UPCOMING && heartPick.heartPickIdols?.isNotEmpty() == true) {
+                    val first = heartPick.heartPickIdols[0]
+                    val percentage = if (heartPick.vote > 0) {
+                        (100.0 * first.vote / heartPick.vote).toInt()
+                    } else 0
 
-            _uiState.value = UiState.Success(
-                items = result.rankItems,
-                topIdol = result.topIdol
-            )
+                    IdolRankInfo(
+                        name = first.title,
+                        groupName = first.subtitle,
+                        photoUrl = first.imageUrl ?: "",
+                        voteCount = NumberFormat.getNumberInstance(Locale.US).format(first.vote),
+                        percentage = percentage
+                    )
+                } else null
+
+                val otherIdols = if (state != HeartPickState.UPCOMING && heartPick.heartPickIdols != null && heartPick.heartPickIdols.size > 1) {
+                    heartPick.heartPickIdols.drop(1).take(10).map { idol ->
+                        IdolRankInfo(
+                            name = idol.title,
+                            groupName = idol.subtitle,
+                            photoUrl = idol.imageUrl ?: "",
+                            voteCount = NumberFormat.getNumberInstance(Locale.US).format(idol.vote),
+                            percentage = 0
+                        )
+                    }
+                } else emptyList()
+
+                val periodDate = formatPeriodDate(heartPick.beginAt, heartPick.endAt)
+                val (openDate, openPeriod) = if (state == HeartPickState.UPCOMING) {
+                    calculateOpenDate(heartPick.beginAt) to formatPeriod(heartPick.beginAt, heartPick.endAt)
+                } else {
+                    "" to ""
+                }
+
+                // 언어별 배너 URL 적용
+                val localizedBannerUrl = IdolImageUtil.getLocalizedBannerUrl(context, heartPick.bannerUrl)
+
+                val cardData = HeartPickCardData(
+                    id = heartPick.id,
+                    state = state,
+                    title = heartPick.title,
+                    subTitle = heartPick.subtitle,
+                    backgroundImageUrl = localizedBannerUrl,
+                    dDay = dDay,
+                    firstPlaceIdol = firstPlaceIdol,
+                    otherIdols = otherIdols,
+                    heartVoteCount = NumberFormat.getNumberInstance(Locale.US).format(heartPick.vote),
+                    commentCount = NumberFormat.getNumberInstance(Locale.US).format(heartPick.numComments),
+                    periodDate = periodDate,
+                    openDate = openDate,
+                    openPeriod = openPeriod,
+                    isNew = false  // TODO: 신규 판별 로직 추가
+                )
+
+                cardData
+            }
+
+            android.util.Log.d("HeartPickRankingVM", "✅ Processed ${cardDataList.size} heart picks")
+
+            cachedData = cardDataList
+
+            _uiState.value = UiState.Success(cardDataList)
         } catch (e: Exception) {
             android.util.Log.e("HeartPickRankingVM", "❌ Exception: ${e.message}", e)
             _uiState.value = UiState.Error(e.message ?: "Error")
         }
     }
 
-    private fun formatScore(score: Int): String {
-        return NumberFormat.getNumberInstance(Locale.US).format(score)
+    private fun calculateDDay(endAt: String, status: Int): String {
+        return try {
+            if (status == 0) {
+                context.getString(net.ib.mn.R.string.upcoming)
+            } else if (status == 2) {
+                context.getString(net.ib.mn.R.string.vote_finish)
+            } else {
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+                val now = Calendar.getInstance().time
+                val endDate = dateFormat.parse(endAt)
+
+                if (endDate != null) {
+                    val diff = endDate.time - now.time
+                    val days = diff / (1000 * 60 * 60 * 24)
+
+                    when {
+                        diff < 0 -> context.getString(net.ib.mn.R.string.vote_finish)
+                        diff < 86400000 -> {
+                            val hours = diff / (1000 * 60 * 60)
+                            val minutes = (diff % (1000 * 60 * 60)) / (1000 * 60)
+                            String.format(Locale.US, "%02d:%02d", hours, minutes)
+                        }
+                        else -> "D-$days"
+                    }
+                } else {
+                    "D-Day"
+                }
+            }
+        } catch (e: Exception) {
+            "D-Day"
+        }
+    }
+
+    private fun calculateOpenDate(beginAt: String): String {
+        return try {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            val now = Calendar.getInstance().time
+            val beginDate = dateFormat.parse(beginAt)
+
+            if (beginDate != null) {
+                val diff = beginDate.time - now.time
+                val days = diff / (1000 * 60 * 60 * 24)
+
+                if (days > 0) {
+                    "Vote Open D-$days"
+                } else {
+                    "Vote Open"
+                }
+            } else {
+                "Vote Open"
+            }
+        } catch (e: Exception) {
+            "Vote Open"
+        }
+    }
+
+    private fun formatPeriodDate(beginAt: String, endAt: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
+
+            val beginDate = inputFormat.parse(beginAt)
+            val endDate = inputFormat.parse(endAt)
+
+            if (beginDate != null && endDate != null) {
+                "${outputFormat.format(beginDate)} ~ ${outputFormat.format(endDate)}"
+            } else {
+                ""
+            }
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+    private fun formatPeriod(beginAt: String, endAt: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
+
+            val beginDate = inputFormat.parse(beginAt)
+            val endDate = inputFormat.parse(endAt)
+
+            if (beginDate != null && endDate != null) {
+                "${outputFormat.format(beginDate)} ~ ${outputFormat.format(endDate)}"
+            } else {
+                ""
+            }
+        } catch (e: Exception) {
+            ""
+        }
     }
 
     @AssistedFactory
@@ -223,3 +267,20 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
         fun create(chartCode: String): HeartPickRankingSubPageViewModel
     }
 }
+
+data class HeartPickCardData(
+    val id: Int,
+    val state: HeartPickState,
+    val title: String,
+    val subTitle: String,
+    val backgroundImageUrl: String,
+    val dDay: String,
+    val firstPlaceIdol: IdolRankInfo?,
+    val otherIdols: List<IdolRankInfo>,
+    val heartVoteCount: String,
+    val commentCount: String,
+    val periodDate: String,
+    val openDate: String,
+    val openPeriod: String,
+    val isNew: Boolean
+)

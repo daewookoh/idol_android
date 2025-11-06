@@ -3,7 +3,9 @@ package net.ib.mn.presentation.main.ranking.idol_subpage
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -16,16 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
-import net.ib.mn.ui.components.ExoRankingList
-import net.ib.mn.util.IdolImageUtil
+import net.ib.mn.ui.components.ExoHeartPickCard
 
 /**
  * 기적(HeartPick) 랭킹 SubPage
  *
- * 완전히 독립적인 페이지로, 자체 ViewModel과 상태를 관리합니다.
- * charts/ranks/ API 사용, 남녀 변경에 영향 받지 않음
+ * heartpick/ API 사용
  */
 @Composable
 fun HeartPickRankingSubPage(
@@ -50,17 +51,6 @@ fun HeartPickRankingSubPage(
         viewModel.reloadIfNeeded()
     }
 
-    // 화면 가시성 변경 시 UDP 구독 관리 및 데이터 새로고침
-    LaunchedEffect(isVisible) {
-        if (isVisible) {
-            android.util.Log.d("HeartPickRankingSubPage", "[SubPage] 👁️ Screen became visible")
-            viewModel.onScreenVisible()
-        } else {
-            android.util.Log.d("HeartPickRankingSubPage", "[SubPage] 🙈 Screen hidden")
-            viewModel.onScreenHidden()
-        }
-    }
-
     when (uiState) {
         is HeartPickRankingSubPageViewModel.UiState.Loading -> {
             Box(
@@ -80,7 +70,7 @@ fun HeartPickRankingSubPage(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "오류: ${error.message}",
+                    text = stringResource(R.string.msg_error_ok),
                     fontSize = 16.sp,
                     color = colorResource(R.color.main)
                 )
@@ -98,22 +88,41 @@ fun HeartPickRankingSubPage(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "랭킹 데이터가 없습니다.",
+                        text = stringResource(R.string.msg_no_data),
                         fontSize = 16.sp,
                         color = colorResource(R.color.text_dimmed)
                     )
                 }
             } else {
-
-                ExoRankingList(
-                    items = success.items,
-                    listState = scrollState,
-                    onItemClick = { rank, item ->
-                        android.util.Log.d("HeartPickRankingSubPage", "Clicked: Rank $rank - ${item.name}")
+                LazyColumn(
+                    state = scrollState,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(success.items) { cardData ->
+                        ExoHeartPickCard(
+                            state = cardData.state,
+                            title = cardData.title,
+                            subTitle = cardData.subTitle,
+                            backgroundImageUrl = cardData.backgroundImageUrl,
+                            dDay = cardData.dDay,
+                            firstPlaceIdol = cardData.firstPlaceIdol,
+                            otherIdols = cardData.otherIdols,
+                            heartVoteCount = cardData.heartVoteCount,
+                            commentCount = cardData.commentCount,
+                            periodDate = cardData.periodDate,
+                            openDate = cardData.openDate,
+                            openPeriod = cardData.openPeriod,
+                            isNew = cardData.isNew,
+                            onCardClick = {
+                                android.util.Log.d("HeartPickRankingSubPage", "Card clicked: ${cardData.title}")
+                            },
+                            onVoteClick = {
+                                android.util.Log.d("HeartPickRankingSubPage", "Vote clicked: ${cardData.title}")
+                            }
+                        )
                     }
-                )
+                }
             }
         }
     }
 }
-

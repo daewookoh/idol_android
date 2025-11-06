@@ -1,7 +1,10 @@
 package net.ib.mn.util
 
+import android.content.Context
 import android.net.Uri
+import android.os.LocaleList
 import net.ib.mn.data.local.entity.IdolEntity
+import java.util.Locale
 
 /**
  * Idol 이미지 관련 유틸리티
@@ -75,6 +78,68 @@ object IdolImageUtil {
                 url.contains("_s_mv.jpg") -> url.replace("_s_mv.jpg", "_m_mv.mp4")
                 else -> null
             }
+        }
+    }
+
+    /**
+     * HeartPick 배너 이미지 URL에 언어별 분기 적용
+     *
+     * 지원 언어: 한국어(ko), 영어(en), 일본어(ja), 중국어 간체(zh-CN), 중국어 번체(zh-TW), 스페인어(es)
+     *
+     * URL 변환 예시:
+     * - 한국어/영어: https://example.com/banner.png (그대로)
+     * - 일본어: https://example.com/banner_ja.png
+     * - 중국어 간체: https://example.com/banner_zhcn.png
+     * - 중국어 번체: https://example.com/banner_zhtw.png
+     * - 스페인어: https://example.com/banner_es.png
+     *
+     * @param context Context
+     * @param bannerUrl 원본 배너 URL
+     * @return 언어별 배너 URL (지원하지 않는 언어는 영어로 fallback)
+     */
+    fun getLocalizedBannerUrl(context: Context, bannerUrl: String?): String {
+        if (bannerUrl.isNullOrEmpty()) return ""
+
+        val locale = getSystemLocale()
+        val language = locale.language
+        val country = locale.country
+
+        // 언어 코드 결정: 한국어/영어는 suffix 없음, 나머지는 suffix 추가
+        val languageSuffix = when {
+            language == "ko" -> ""  // 한국어: suffix 없음
+            language == "ja" -> "_ja"  // 일본어
+            language == "zh" && country == "CN" -> "_zhcn"  // 중국어 간체
+            language == "zh" && country == "TW" -> "_zhtw"  // 중국어 번체
+            language == "es" -> "_es"  // 스페인어
+            else -> ""  // 기본값(영어): suffix 없음
+        }
+
+        // suffix가 없으면 원본 URL 반환
+        if (languageSuffix.isEmpty()) {
+            return bannerUrl
+        }
+
+        // 확장자 분리 및 언어 코드 삽입
+        // 예: banner.png -> banner_ja.png
+        val lastDotIndex = bannerUrl.lastIndexOf('.')
+        return if (lastDotIndex > 0) {
+            val nameWithoutExt = bannerUrl.substring(0, lastDotIndex)
+            val extension = bannerUrl.substring(lastDotIndex)
+            "$nameWithoutExt$languageSuffix$extension"
+        } else {
+            // 확장자가 없는 경우 (드물지만) 그냥 뒤에 추가
+            "$bannerUrl$languageSuffix"
+        }
+    }
+
+    /**
+     * 시스템 로케일 가져오기
+     */
+    private fun getSystemLocale(): Locale {
+        return try {
+            LocaleList.getDefault()[0]
+        } catch (e: Exception) {
+            Locale.getDefault()
         }
     }
 
