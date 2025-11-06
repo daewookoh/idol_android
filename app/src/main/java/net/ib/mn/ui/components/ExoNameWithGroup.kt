@@ -58,27 +58,31 @@ fun ExoNameWithGroup(
     val groupName = parts.getOrNull(1)
 
     Row(
-        modifier = modifier
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically  // 이름은 세로 중앙 정렬
     ) {
-        // 이름
+        // 이름 (세로 중앙 정렬)
         Text(
             text = name,
             fontSize = nameFontSize,
+            lineHeight = nameFontSize,
             fontWeight = nameFontWeight,
             color = colorResource(nameColor),
-            textAlign = textAlign,
-            modifier = Modifier.alignByBaseline()
+            textAlign = textAlign
         )
 
         // 그룹명 (있는 경우만 표시)
+        // 그룹명은 이름의 bottom에 맞춤
         if (!groupName.isNullOrEmpty()) {
             Spacer(modifier = Modifier.width(spacing))
             Text(
                 text = groupName,
                 fontSize = groupFontSize,
+                lineHeight = groupFontSize,
+                fontWeight = FontWeight.Bold,
                 color = colorResource(groupColor),
                 textAlign = textAlign,
-                modifier = Modifier.alignByBaseline()
+                modifier = Modifier.align(Alignment.Bottom)  // 그룹명은 Row의 bottom에 맞춤
             )
         }
     }

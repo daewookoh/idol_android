@@ -39,13 +39,19 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
     @Assisted private val dataSource: RankingDataSource,
     @ApplicationContext private val context: Context,
     private val idolDao: IdolDao,
-    private val broadcastManager: net.ib.mn.data.remote.udp.IdolBroadcastManager
+    private val broadcastManager: net.ib.mn.data.remote.udp.IdolBroadcastManager,
+    private val chartsApi: net.ib.mn.data.remote.api.ChartsApi,
+    private val configsApi: net.ib.mn.data.remote.api.ConfigsApi
 ) : ViewModel() {
 
     sealed interface UiState {
         data object Loading : UiState
         data class Success(
-            val items: List<RankingItemData>
+            val items: List<RankingItemData>,
+            val bannerUrl: String? = null,
+            val accumulatedChartCode: String? = null,
+            val accumulatedBannerUrl: String? = null,
+            val infoEventId: Int = 0
         ) : UiState
         data class Error(val message: String) : UiState
     }
@@ -62,10 +68,18 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
     // 화면 가시성 상태
     private var isScreenVisible = false
 
+    // 배너 URL, 누적 차트 정보, 정보 이벤트 ID (한 번만 로드)
+    private var bannerUrl: String? = null
+    private var accumulatedChartCode: String? = null
+    private var accumulatedBannerUrl: String? = null
+    private var infoEventId: Int = 0
+
     private val logTag = "MiracleRookieVM[${dataSource.type}]"
 
     init {
         android.util.Log.d(logTag, "🆕 ViewModel created for chartCode: $chartCode")
+        loadConfigInfo()
+        loadChartInfo()
         loadRankingData()
     }
 
@@ -171,6 +185,99 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
         }
     }
 
+    /**
+     * configs/self/ API를 호출하여 정보 이벤트 ID 로드
+     */
+    private fun loadConfigInfo() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = configsApi.getConfigSelf()
+
+                if (response.isSuccessful && response.body()?.success == true) {
+                    val config = response.body()
+
+                    // dataSource.type에 따라 적절한 정보 ID 선택
+                    infoEventId = when (dataSource.type) {
+                        "Miracle" -> config?.showMiracleInfo ?: 0
+                        "Rookie" -> config?.showRookieInfo ?: 0
+                        else -> 0
+                    }
+
+                    android.util.Log.d(logTag, "✅ Config info loaded: infoEventId=$infoEventId")
+
+                    // 이미 Success 상태면 infoEventId 포함하여 재업데이트
+                    val currentState = _uiState.value
+                    if (currentState is UiState.Success) {
+                        _uiState.value = currentState.copy(infoEventId = infoEventId)
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e(logTag, "❌ Exception loading config info: ${e.message}", e)
+            }
+        }
+    }
+
+    /**
+     * charts/current/ API를 호출하여 배너 URL 및 누적 차트 정보 로드
+     * Old 프로젝트의 MiracleMainFragment 로직 기반:
+     * - realTimeChartModel.imageUrl -> 실시간 배너
+     * - accumulateChartModel?.imageRankUrl -> 누적 배너
+     * - aggregateType "A" = 누적, "D" = 실시간
+     */
+    private fun loadChartInfo() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                android.util.Log.d(logTag, "🖼️ Loading chart info from charts/current/ API")
+
+                val response = chartsApi.getChartsCurrent()
+
+                if (!response.isSuccessful || response.body()?.success != true) {
+                    android.util.Log.e(logTag, "❌ Failed to load chart info: ${response.code()}")
+                    return@launch
+                }
+
+                val chartModels = response.body()?.objects ?: emptyList()
+
+                // 현재 차트 타입에 맞는 ChartModel 찾기
+                // API는 "M"/"R"을 사용하므로 변환 필요
+                val targetType = when (dataSource.type) {
+                    "Miracle" -> "M"
+                    "Rookie" -> "R"
+                    else -> dataSource.type
+                }
+
+                // API는 aggregateType=[D, A]로 한 차트에 실시간/누적 모두 포함
+                // targetType과 일치하는 차트를 찾고, 해당 차트에서:
+                // - imageUrl: 실시간 배너
+                // - imageRankUrl: 누적 배너
+                val targetChart = chartModels.find { chart ->
+                    chart.type.equals(targetType, ignoreCase = true) &&
+                    chart.aggregateType?.contains("D") == true &&
+                    chart.aggregateType?.contains("A") == true
+                }
+
+                // 배너 URL 저장
+                bannerUrl = targetChart?.imageUrl  // 실시간 배너
+                accumulatedChartCode = targetChart?.code
+                accumulatedBannerUrl = targetChart?.imageRankUrl  // 누적 배너
+
+                // 이미 Success 상태면 배너 URL 포함하여 재업데이트
+                val currentState = _uiState.value
+                if (currentState is UiState.Success) {
+                    _uiState.value = currentState.copy(
+                        bannerUrl = bannerUrl,
+                        accumulatedChartCode = accumulatedChartCode,
+                        accumulatedBannerUrl = accumulatedBannerUrl,
+                        infoEventId = infoEventId
+                    )
+                }
+
+            } catch (e: Exception) {
+                android.util.Log.e(logTag, "❌ Exception loading chart info: ${e.message}", e)
+            }
+        }
+    }
+
     private fun loadRankingData() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = UiState.Loading
@@ -236,7 +343,11 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
             android.util.Log.d(logTag, "✅ Processed ${finalItems.size} items (sorted, max=$maxHeart, min=$minHeart)")
 
             _uiState.value = UiState.Success(
-                items = finalItems
+                items = finalItems,
+                bannerUrl = bannerUrl,
+                accumulatedChartCode = accumulatedChartCode,
+                accumulatedBannerUrl = accumulatedBannerUrl,
+                infoEventId = infoEventId
             )
         } catch (e: Exception) {
             android.util.Log.e(logTag, "❌ Exception: ${e.message}", e)
@@ -261,9 +372,13 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
             formatHeartCount = { count -> formatHeartCount(count.toInt()) }
         )
 
-        // State 업데이트 -> 자동 리컴포지션
+        // State 업데이트 -> 자동 리컴포지션 (배너 정보 유지)
         _uiState.value = UiState.Success(
-            items = finalItems
+            items = finalItems,
+            bannerUrl = bannerUrl,
+            accumulatedChartCode = accumulatedChartCode,
+            accumulatedBannerUrl = accumulatedBannerUrl,
+            infoEventId = infoEventId
         )
 
         val maxHeart = finalItems.firstOrNull()?.maxHeartCount ?: 0L

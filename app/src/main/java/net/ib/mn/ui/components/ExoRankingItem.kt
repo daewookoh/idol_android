@@ -81,12 +81,12 @@ import net.ib.mn.R
  * 8. 펼치기 기능 (ExoTop3 사용)
  *
  * @param items 랭킹 아이템 리스트
- * @param type 랭킹 타입 ("S" = 큰 이미지, "A" = 작은 이미지, 기본값: "S")
+ * @param type 랭킹 타입 ("MAIN" = 큰 이미지, "DAILY" = 작은 이미지, "AGGREGATE" = 누적 랭킹 아이템, 기본값: "MAIN")
  * @param onItemClick 아이템 클릭 이벤트
  */
 fun LazyListScope.exoRankingItem(
     items: List<RankingItemData>,
-    type: String = "S",
+    type: String = "MAIN",
     onItemClick: (Int, RankingItemData) -> Unit = { _, _ -> },
     onVoteSuccess: (idolId: Int, voteCount: Long) -> Unit = { _, _ -> }
 ) {
@@ -109,11 +109,22 @@ fun LazyListScope.exoRankingItem(
             }
         }
 
+        // AGGREGATE 타입: 완전히 다른 UI 구조 (누적 랭킹용)
+        if (type == "AGGREGATE") {
+            AggregatedRankingItem(
+                index = index,
+                item = item,
+                totalItems = items.size,
+                onItemClick = onItemClick
+            )
+            return@itemsIndexed
+        }
+
         // 타입에 따른 프로필 이미지 사이즈
         val (profileAreaWidth, borderSize, imageSize) = remember(type) {
             when (type) {
-                "A" -> Triple(60.dp, 40.dp, 32.dp)  // A급: 작은 사이즈
-                else -> Triple(81.dp, 55.dp, 45.dp)  // S급: 기본 사이즈
+                "DAILY" -> Triple(60.dp, 40.dp, 32.dp)  // DAILY: 작은 사이즈
+                else -> Triple(81.dp, 55.dp, 45.dp)  // MAIN: 기본 사이즈
             }
         }
 
@@ -309,36 +320,38 @@ fun LazyListScope.exoRankingItem(
                 }
 
                 // 정보 영역 (old: line 137-323)
-                // marginStart: 10dp (old: line 142)
+                // paddingStart: 15dp (old: line 140)
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(start = 10.dp)
+                        .padding(start = 15.dp)
                 ) {
-                    // 순위 + 이름 + 그룹명 (old: line 145-184)
+                    // 순위 + 이름 + 그룹명
+                    // 순위: 세로 중앙, 이름: 순위와 세로 중앙 정렬, 그룹명: 이름의 bottom에 맞춤
                     Row(
                         horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.Bottom
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // 순위 (old: line 145-154, @color/main, 15sp, bold)
+                        // 순위 (세로 중앙 정렬)
                         Text(
                             text = stringResource(R.string.rank_count_format, item.rank),
                             fontSize = 15.sp,
+                            lineHeight = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = colorResource(R.color.main)
                         )
 
                         Spacer(modifier = Modifier.width(5.dp))
 
-                        // 이름 + 그룹명 (ExoNameWithGroup 사용)
+                        // 이름 + 그룹명 (이름은 세로 중앙, 그룹명은 이름 bottom에 맞춤)
                         ExoNameWithGroup(
-                            fullName = item.name,  // name은 이미 "이름_그룹명" 형식
+                            fullName = item.name,
                             nameFontSize = 15.sp,
                             groupFontSize = 10.sp
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(1.dp))
+                    Spacer(modifier = Modifier.height(3.dp))
 
                     // 프로그레스 바 + 투표수 + 배지 아이콘 (old: line 195-330)
                     // old: FrameLayout으로 배지를 프로그레스바 위에 겹침
@@ -372,24 +385,25 @@ fun LazyListScope.exoRankingItem(
                             val animatedProgress by animateFloatAsState(targetValue = progressPercent, label = "progress")
 
                             // 색칠된 프로그레스 바 영역
-                            // type "A"일 때만 gradient와 애니메이션 제거
-                            val isTypeA = type == "A"
+                            // type "DAILY": a_league_progress 단색, 애니메이션 없음
+                            // type "MAIN": s_league_progress → main gradient, 10초마다 반복 애니메이션
+                            val isTypeDaily = type == "DAILY"
 
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth(animatedProgress)
                                     .fillMaxHeight()
                                     .background(
-                                        brush = if (isTypeA) {
-                                            // type A: 단색
+                                        brush = if (isTypeDaily) {
+                                            // DAILY: a_league_progress 단색 (Old 프로젝트 기준)
                                             Brush.horizontalGradient(
                                                 colors = listOf(
-                                                    colorResource(R.color.main),
-                                                    colorResource(R.color.main)
+                                                    colorResource(R.color.a_league_progress),
+                                                    colorResource(R.color.a_league_progress)
                                                 )
                                             )
                                         } else {
-                                            // 기타: gradient
+                                            // MAIN: gradient
                                             Brush.horizontalGradient(
                                                 colors = listOf(
                                                     colorResource(R.color.s_league_progress),
@@ -400,22 +414,43 @@ fun LazyListScope.exoRankingItem(
                                         shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
                                     )
                             ) {
-                                // type A가 아닐 때만 반짝이는 애니메이션 효과
-                                // 최적화: progressPercent 변경 시에만 애니메이션 실행 (10초 타이머 제거)
-                                if (!isTypeA) {
+                                // type에 따른 애니메이션 처리
+                                // type "MAIN": 10초마다 반복 애니메이션
+                                // type "DAILY": 애니메이션 없음
+                                // 기타: progressPercent 변경 시에만 애니메이션
+                                val isTypeMain = type == "MAIN"
+
+                                if (!isTypeDaily) {
                                     // 애니메이션 진행도
                                     val shimmerProgress = remember { androidx.compose.animation.core.Animatable(0f) }
 
-                                    // progressPercent 변경 시 애니메이션 트리거
-                                    LaunchedEffect(progressPercent) {
-                                        shimmerProgress.snapTo(0f)
-                                        shimmerProgress.animateTo(
-                                            targetValue = 1f,
-                                            animationSpec = tween(
-                                                durationMillis = 1000,
-                                                easing = LinearEasing
+                                    if (isTypeMain) {
+                                        // type "MAIN": 10초마다 반복 애니메이션
+                                        LaunchedEffect(Unit) {
+                                            while (true) {
+                                                kotlinx.coroutines.delay(10000) // 10초 대기
+                                                shimmerProgress.snapTo(0f)
+                                                shimmerProgress.animateTo(
+                                                    targetValue = 1f,
+                                                    animationSpec = tween(
+                                                        durationMillis = 1000,
+                                                        easing = LinearEasing
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    } else {
+                                        // 기타: progressPercent 변경 시 애니메이션 트리거
+                                        LaunchedEffect(progressPercent) {
+                                            shimmerProgress.snapTo(0f)
+                                            shimmerProgress.animateTo(
+                                                targetValue = 1f,
+                                                animationSpec = tween(
+                                                    durationMillis = 1000,
+                                                    easing = LinearEasing
+                                                )
                                             )
-                                        )
+                                        }
                                     }
 
                                     // 반짝임 효과 Canvas
@@ -649,6 +684,165 @@ fun LazyListScope.exoRankingItem(
                     color = colorResource(R.color.gray200)
                 )
             }
+        }
+    }
+}
+
+/**
+ * AggregatedRankingItem - 누적 랭킹 아이템 (old: aggregated_hof_item.xml 기반)
+ *
+ * 주요 차이점:
+ * - 순위 아이콘 (1/2/3위 왕관, 나머지 숫자)
+ * - 순위 변동 표시 (NEW, UP/DOWN)
+ * - 작은 원형 프로필 이미지 (테두리 없음)
+ * - 점수 표시 (하트 개수 대신)
+ * - 날짜 표시
+ * - 투표 버튼 없음
+ * - 프로그레스 바 없음
+ */
+@Composable
+private fun AggregatedRankingItem(
+    index: Int,
+    item: RankingItemData,
+    totalItems: Int,
+    onItemClick: (Int, RankingItemData) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(colorResource(R.color.background_100))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onItemClick(index, item) }
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 순위 영역 (old: container_ranking, 45dp width)
+            Column(
+                modifier = Modifier.width(45.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterVertically)  // old: constraintTop_toBottomOf with no margin
+            ) {
+                // 1,2,3위 왕관 아이콘 (old: icon_ranking)
+                when (item.rank) {
+                    1 -> Icon(
+                        painter = painterResource(R.drawable.icon_rating_heart_voting_1st),
+                        contentDescription = "1st",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(width = 24.dp, height = 18.dp)
+                    )
+                    2 -> Icon(
+                        painter = painterResource(R.drawable.icon_rating_heart_voting_2nd),
+                        contentDescription = "2nd",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(width = 24.dp, height = 18.dp)
+                    )
+                    3 -> Icon(
+                        painter = painterResource(R.drawable.icon_rating_heart_voting_3rd),
+                        contentDescription = "3rd",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(width = 24.dp, height = 18.dp)
+                    )
+                }
+
+                // 순위 텍스트 (old: rank)
+                // 1,2,3등은 main 컬러, 그 외는 gray580 컬러 (old: HallOfFameAggAdapter.kt line 263, 266)
+                Text(
+                    text = stringResource(R.string.rank_count_format, item.rank),
+                    fontSize = 11.sp,
+                    lineHeight = 11.sp,  // Explicit lineHeight to match fontSize
+                    color = colorResource(
+                        if (item.rank <= 3) R.color.main else R.color.gray580
+                    )
+                )
+
+                // 순위 변동 표시 (TODO: rankChange 필드 추가 필요)
+                // icon_change_ranking_new, icon_change_ranking_up, icon_change_ranking_down
+            }
+
+            // 프로필 이미지 (old: photo, 41dp)
+            val context = LocalContext.current
+            val imageRequest = remember(item.photoUrl) {
+                ImageRequest.Builder(context)
+                    .data(item.photoUrl)
+                    .memoryCacheKey(item.photoUrl)
+                    .diskCacheKey(item.photoUrl)
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .crossfade(true)
+                    .build()
+            }
+
+            AsyncImage(
+                model = imageRequest,
+                contentDescription = "프로필 이미지",
+                modifier = Modifier
+                    .size(41.dp)
+                    .clip(CircleShape)
+                    .background(colorResource(R.color.gray100)),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            // 이름 + 그룹 + 점수 + 날짜 영역 (old: cl_name with chainStyle="packed", marginStart="10dp")
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterVertically)  // chainStyle="packed" 재현
+            ) {
+                // 이름 + 그룹명 (old: name, group)
+                Row(
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    ExoNameWithGroup(
+                        fullName = item.name,
+                        nameFontSize = 14.sp,
+                        groupFontSize = 10.sp
+                    )
+                }
+
+                // 점수 + 날짜 (old: score, date)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // 점수 (TODO: score 필드 추가 필요, 현재는 voteCount 사용)
+                    Text(
+                        text = "${item.voteCount}점",
+                        fontSize = 11.sp,
+                        lineHeight = 11.sp,  // Explicit lineHeight to eliminate default spacing
+                        color = colorResource(R.color.text_gray)
+                    )
+
+                    // 날짜 (TODO: date 필드 추가 필요)
+                    // Text(
+                    //     text = item.date ?: "",
+                    //     fontSize = 12.sp,
+                    //     color = colorResource(R.color.gray200)
+                    // )
+                }
+            }
+
+            // 우측 화살표 (old: iv_arrow_go, 8dp)
+            Icon(
+                painter = painterResource(R.drawable.btn_go),
+                contentDescription = "Go",
+                modifier = Modifier
+                    .size(8.dp)
+                    .padding(end = 20.dp),
+                tint = Color.Unspecified
+            )
+        }
+
+        // 하단 Divider
+        if (index < totalItems - 1) {
+            HorizontalDivider(
+                thickness = 0.5.dp,
+                color = colorResource(R.color.gray200)
+            )
         }
     }
 }

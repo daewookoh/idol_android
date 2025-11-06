@@ -138,6 +138,7 @@ fun ExoRankingList(
     items: List<RankingItemData>,
     topIdol: RankingItemData? = null,
     isVisible: Boolean = true,
+    itemType: String = "MAIN",
     listState: LazyListState = rememberLazyListState(),
     onItemClick: (Int, RankingItemData) -> Unit = { _, _ -> },
     onVoteSuccess: (Int, Long) -> Unit = { _, _ -> }
@@ -162,7 +163,7 @@ fun ExoRankingList(
 
         exoRankingItem(
             items = items,
-            type = "S",
+            type = itemType,
             onItemClick = onItemClick,
             onVoteSuccess = onVoteSuccess
         )

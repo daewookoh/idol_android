@@ -68,6 +68,10 @@ fun RankingPage(
     val typeList by viewModel.typeList.collectAsState()
     val mainChartModel by viewModel.mainChartModel.collectAsState()
 
+    // WebView 상태 관리
+    var webViewEventId by rememberSaveable { mutableStateOf<Int?>(null) }
+    var webViewTitle by rememberSaveable { mutableStateOf("") }
+
     // RankingRepository EntryPoint를 통해 주입
     val context = LocalContext.current
     val rankingRepository = remember {
@@ -366,7 +370,11 @@ fun RankingPage(
                         net.ib.mn.presentation.main.ranking.idol_subpage.MiracleRookieRankingSubPage(
                             chartCode = currentType.code ?: "",
                             dataSource = miracleDataSource,
-                            isVisible = subPagerState.currentPage == pageIndex
+                            isVisible = subPagerState.currentPage == pageIndex,
+                            onInfoClick = { eventId ->
+                                webViewEventId = eventId
+                                webViewTitle = context.getString(R.string.title_miracle_month)
+                            }
                         )
                     }
                     "ROOKIE" -> {
@@ -374,7 +382,11 @@ fun RankingPage(
                         net.ib.mn.presentation.main.ranking.idol_subpage.MiracleRookieRankingSubPage(
                             chartCode = currentType.code ?: "",
                             dataSource = rookieDataSource,
-                            isVisible = subPagerState.currentPage == pageIndex
+                            isVisible = subPagerState.currentPage == pageIndex,
+                            onInfoClick = { eventId ->
+                                webViewEventId = eventId
+                                webViewTitle = "Rookie"
+                            }
                         )
                     }
                     "HEARTPICK" -> net.ib.mn.presentation.main.ranking.idol_subpage.HeartPickRankingSubPage(
@@ -408,6 +420,19 @@ fun RankingPage(
                     }
                 }
             }
+        }
+    }
+
+    // WebView 다이얼로그 표시
+    webViewEventId?.let { eventId ->
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { webViewEventId = null }
+        ) {
+            net.ib.mn.presentation.webview.WebViewScreen(
+                url = "${ServerUrl.HOST}/api/v1/events/$eventId/",
+                title = webViewTitle,
+                onNavigateBack = { webViewEventId = null }
+            )
         }
     }
 }
