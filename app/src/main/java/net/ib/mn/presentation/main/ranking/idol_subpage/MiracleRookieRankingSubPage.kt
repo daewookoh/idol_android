@@ -18,51 +18,66 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
+import net.ib.mn.domain.ranking.RankingDataSource
 import net.ib.mn.ui.components.ExoRankingList
-import net.ib.mn.util.IdolImageUtil
 
 /**
- * 기적(Rookie) 랭킹 SubPage
+ * 통합 Miracle/Rookie 랭킹 SubPage
  *
- * 완전히 독립적인 페이지로, 자체 ViewModel과 상태를 관리합니다.
- * charts/ranks/ API 사용, 남녀 변경에 영향 받지 않음
+ * UnifiedRankingSubPage와 동일한 구조이지만, Top3 기능 없음
+ *
+ * @param chartCode 차트 코드
+ * @param dataSource 랭킹 데이터 소스 (Miracle/Rookie)
+ * @param isVisible 화면 가시성
+ * @param listState 리스트 스크롤 상태
+ * @param modifier Modifier
  */
 @Composable
-fun RookieRankingSubPage(
+fun MiracleRookieRankingSubPage(
     chartCode: String,
+    dataSource: RankingDataSource,
     isVisible: Boolean = true,
     listState: LazyListState? = null,
     modifier: Modifier = Modifier
 ) {
-    android.util.Log.d("RookieRankingSubPage", "🎨 [Composing] Rookie for chartCode: $chartCode")
+    android.util.Log.d("MiracleRookieSubPage", "🎨 [Composing] ${dataSource.type} for chartCode: $chartCode")
 
-    // 독립적인 RookieRankingSubPageViewModel
-    val viewModel: RookieRankingSubPageViewModel = hiltViewModel<RookieRankingSubPageViewModel, RookieRankingSubPageViewModel.Factory> { factory ->
-        factory.create(chartCode)
+    // ViewModel key 생성 (각 chartCode별로 독립적인 ViewModel 인스턴스 생성)
+    val viewModelKey = "miracle_rookie_${dataSource.type}_$chartCode"
+    android.util.Log.d("MiracleRookieSubPage", "🔑 ViewModel key: $viewModelKey")
+
+    // ViewModel 생성
+    val viewModel: MiracleRookieRankingSubPageViewModel = hiltViewModel<MiracleRookieRankingSubPageViewModel, MiracleRookieRankingSubPageViewModel.Factory>(
+        key = viewModelKey  // 🔑 독립적인 인스턴스를 위한 key
+    ) { factory ->
+        android.util.Log.d("MiracleRookieSubPage", "🏭 Factory creating ViewModel for type=${dataSource.type}, chartCode=$chartCode")
+        factory.create(chartCode, dataSource)
     }
+
+    android.util.Log.d("MiracleRookieSubPage", "✅ ViewModel instance: ${viewModel.hashCode()}, type=${dataSource.type}")
 
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = listState ?: rememberLazyListState()
 
-    // 초기 로드
-    LaunchedEffect(Unit) {
-        android.util.Log.d("RookieRankingSubPage", "[Rookie] LaunchedEffect triggered")
+    // chartCode가 변경되면 새로운 데이터 로드
+    LaunchedEffect(chartCode) {
+        android.util.Log.d("MiracleRookieSubPage", "[${dataSource.type}] LaunchedEffect triggered for: $chartCode")
         viewModel.reloadIfNeeded()
     }
 
     // 화면 가시성 변경 시 UDP 구독 관리 및 데이터 새로고침
     LaunchedEffect(isVisible) {
         if (isVisible) {
-            android.util.Log.d("RookieRankingSubPage", "[SubPage] 👁️ Screen became visible")
+            android.util.Log.d("MiracleRookieSubPage", "[SubPage] 👁️ Screen became visible")
             viewModel.onScreenVisible()
         } else {
-            android.util.Log.d("RookieRankingSubPage", "[SubPage] 🙈 Screen hidden")
+            android.util.Log.d("MiracleRookieSubPage", "[SubPage] 🙈 Screen hidden")
             viewModel.onScreenHidden()
         }
     }
 
     when (uiState) {
-        is RookieRankingSubPageViewModel.UiState.Loading -> {
+        is MiracleRookieRankingSubPageViewModel.UiState.Loading -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -71,8 +86,8 @@ fun RookieRankingSubPage(
             }
         }
 
-        is RookieRankingSubPageViewModel.UiState.Error -> {
-            val error = uiState as RookieRankingSubPageViewModel.UiState.Error
+        is MiracleRookieRankingSubPageViewModel.UiState.Error -> {
+            val error = uiState as MiracleRookieRankingSubPageViewModel.UiState.Error
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -87,8 +102,8 @@ fun RookieRankingSubPage(
             }
         }
 
-        is RookieRankingSubPageViewModel.UiState.Success -> {
-            val success = uiState as RookieRankingSubPageViewModel.UiState.Success
+        is MiracleRookieRankingSubPageViewModel.UiState.Success -> {
+            val success = uiState as MiracleRookieRankingSubPageViewModel.UiState.Success
 
             if (success.items.isEmpty()) {
                 Box(
@@ -104,15 +119,21 @@ fun RookieRankingSubPage(
                     )
                 }
             } else {
+                // Top3 없이 리스트만 표시
                 ExoRankingList(
                     items = success.items,
+                    topIdol = null,  // Top3 없음
+                    isVisible = isVisible,
                     listState = scrollState,
                     onItemClick = { rank, item ->
-                        android.util.Log.d("RookieRankingSubPage", "Clicked: Rank $rank - ${item.name}")
+                        android.util.Log.d("MiracleRookieSubPage", "Clicked: Rank $rank - ${item.name}")
+                    },
+                    onVoteSuccess = { idolId, voteCount ->
+                        android.util.Log.d("MiracleRookieSubPage", "Vote success: idol=$idolId, votes=$voteCount")
+                        viewModel.updateVote(idolId, voteCount)
                     }
                 )
             }
         }
     }
 }
-

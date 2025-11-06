@@ -44,6 +44,7 @@ import net.ib.mn.BuildConfig
 import net.ib.mn.R
 import net.ib.mn.domain.ranking.GlobalRankingDataSource
 import net.ib.mn.domain.ranking.IdolIdsRankingDataSource
+import net.ib.mn.domain.ranking.MiracleRookieRankingDataSource
 import net.ib.mn.presentation.main.MainViewModel
 import net.ib.mn.util.ServerUrl
 
@@ -90,6 +91,16 @@ fun RankingPage(
     val soloDataSource = remember {
         val ds = IdolIdsRankingDataSource.forSolo(rankingRepository)
         android.util.Log.d("RankingPage", "📦 Created SoloDataSource: ${ds.hashCode()}, type=${ds.type}")
+        ds
+    }
+    val miracleDataSource = remember {
+        val ds = MiracleRookieRankingDataSource.forMiracle(rankingRepository)
+        android.util.Log.d("RankingPage", "📦 Created MiracleDataSource: ${ds.hashCode()}, type=${ds.type}")
+        ds
+    }
+    val rookieDataSource = remember {
+        val ds = MiracleRookieRankingDataSource.forRookie(rankingRepository)
+        android.util.Log.d("RankingPage", "📦 Created RookieDataSource: ${ds.hashCode()}, type=${ds.type}")
         ds
     }
 
@@ -350,14 +361,22 @@ fun RankingPage(
                             isVisible = subPagerState.currentPage == pageIndex
                         )
                     }
-                    "MIRACLE" -> net.ib.mn.presentation.main.ranking.idol_subpage.MiracleRankingSubPage(
-                        chartCode = currentType.code ?: "",
-                        isVisible = subPagerState.currentPage == pageIndex
-                    )
-                    "ROOKIE" -> net.ib.mn.presentation.main.ranking.idol_subpage.RookieRankingSubPage(
-                        chartCode = currentType.code ?: "",
-                        isVisible = subPagerState.currentPage == pageIndex
-                    )
+                    "MIRACLE" -> {
+                        android.util.Log.d("RankingPage", "🎯 Rendering MIRACLE with dataSource: ${miracleDataSource.hashCode()}, type=${miracleDataSource.type}, code=${currentType.code}")
+                        net.ib.mn.presentation.main.ranking.idol_subpage.MiracleRookieRankingSubPage(
+                            chartCode = currentType.code ?: "",
+                            dataSource = miracleDataSource,
+                            isVisible = subPagerState.currentPage == pageIndex
+                        )
+                    }
+                    "ROOKIE" -> {
+                        android.util.Log.d("RankingPage", "🎯 Rendering ROOKIE with dataSource: ${rookieDataSource.hashCode()}, type=${rookieDataSource.type}, code=${currentType.code}")
+                        net.ib.mn.presentation.main.ranking.idol_subpage.MiracleRookieRankingSubPage(
+                            chartCode = currentType.code ?: "",
+                            dataSource = rookieDataSource,
+                            isVisible = subPagerState.currentPage == pageIndex
+                        )
+                    }
                     "HEARTPICK" -> net.ib.mn.presentation.main.ranking.idol_subpage.HeartPickRankingSubPage(
                         chartCode = currentType.code ?: "",
                         isVisible = subPagerState.currentPage == pageIndex
@@ -429,25 +448,19 @@ private fun buildIdolAppTabList(
     chartObjects?.forEach { chart ->
         when (chart.type) {
             "M" -> { // MIRACLE (기적)
-                // code에서 성별 추출 (예: "PR_G_M" -> M, "PR_S_F" -> F)
-                val isFemaleFromCode = chart.code?.endsWith("_F") == true
-
                 tabList.add(
                     net.ib.mn.data.model.TypeListModel(
                         id = 0,
                         name = "MIRACLE",
                         type = "MIRACLE",
-                        code = chart.code, // API의 원본 code 사용 (예: "PR_G_M", "PR_S_F")
+                        code = chart.code, // API의 원본 code 사용
                         isDivided = "N",
-                        isFemale = isFemaleFromCode,
+                        isFemale = false,
                         showDivider = false
                     )
                 )
             }
             "R" -> { // ROOKIE (루키)
-                // code에서 성별 추출 (예: "PR_G_M" -> M, "PR_S_F" -> F)
-                val isFemaleFromCode = chart.code?.endsWith("_F") == true
-
                 tabList.add(
                     net.ib.mn.data.model.TypeListModel(
                         id = 0,
@@ -455,7 +468,7 @@ private fun buildIdolAppTabList(
                         type = "ROOKIE",
                         code = chart.code, // API의 원본 code 사용
                         isDivided = "N",
-                        isFemale = isFemaleFromCode,
+                        isFemale = false,
                         showDivider = false
                     )
                 )
