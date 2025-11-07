@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyListScope
@@ -50,6 +51,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
@@ -196,28 +198,14 @@ fun LazyListScope.exoRankingItem(
                             tint = Color.Unspecified
                         )
 
-                        // 프로필 이미지 - 24시간 캐싱
-                        val context = LocalContext.current
-                        val imageRequest = remember(item.photoUrl) {
-                            ImageRequest.Builder(context)
-                                .data(item.photoUrl)
-                                .memoryCacheKey(item.photoUrl)
-                                .diskCacheKey(item.photoUrl)
-                                .diskCachePolicy(CachePolicy.ENABLED)
-                                .memoryCachePolicy(CachePolicy.ENABLED)
-                                .crossfade(true)
-                                .build()
-                        }
-
-                        AsyncImage(
-                            model = imageRequest,
+                        // 프로필 이미지
+                        ExoProfileImage(
+                            imageUrl = item.photoUrl,
+                            rank = item.rank,
                             contentDescription = "프로필 이미지",
                             modifier = Modifier
                                 .size(imageSize)
-                                .clip(CircleShape)
-                                .background(colorResource(R.color.gray100))
-                                .clickable { isExpanded = !isExpanded },
-                            contentScale = ContentScale.Crop
+                                .clickable { isExpanded = !isExpanded }
                         )
                     }
 
@@ -762,27 +750,12 @@ private fun AggregatedRankingItem(
                 // icon_change_ranking_new, icon_change_ranking_up, icon_change_ranking_down
             }
 
-            // 프로필 이미지 (old: photo, 41dp)
-            val context = LocalContext.current
-            val imageRequest = remember(item.photoUrl) {
-                ImageRequest.Builder(context)
-                    .data(item.photoUrl)
-                    .memoryCacheKey(item.photoUrl)
-                    .diskCacheKey(item.photoUrl)
-                    .diskCachePolicy(CachePolicy.ENABLED)
-                    .memoryCachePolicy(CachePolicy.ENABLED)
-                    .crossfade(true)
-                    .build()
-            }
-
-            AsyncImage(
-                model = imageRequest,
+            // 프로필 이미지
+            ExoProfileImage(
+                imageUrl = item.photoUrl,
+                rank = item.rank,
                 contentDescription = "프로필 이미지",
-                modifier = Modifier
-                    .size(41.dp)
-                    .clip(CircleShape)
-                    .background(colorResource(R.color.gray100)),
-                contentScale = ContentScale.Crop
+                modifier = Modifier.size(41.dp)
             )
 
             Spacer(modifier = Modifier.width(10.dp))
@@ -843,6 +816,163 @@ private fun AggregatedRankingItem(
                 thickness = 0.5.dp,
                 color = colorResource(R.color.gray200)
             )
+        }
+    }
+}
+
+/**
+ * HeartPickRankingItem for use in LazyRow
+ * LazyRow 내부에서 사용할 수 있는 단일 ExoRankingItem
+ */
+@Composable
+fun HeartPickRankingItem(
+    item: RankingItemData,
+) {
+    // HeartPick용 고정 사이즈
+    val imageSize = 50.dp
+
+    // 기기 너비 가져오기
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val minWidth = screenWidth * 0.6f
+
+    // 메인 랭킹 아이템 Row
+    Row(
+        modifier = Modifier
+            .widthIn(min = minWidth)
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // 순위 번호 (왼쪽 큰 숫자)
+        Text(
+            text = "${item.rank}",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = colorResource(R.color.text_default),
+            modifier = Modifier.width(24.dp)
+        )
+
+        // 프로필 이미지
+        ExoProfileImage(
+            imageUrl = item.photoUrl,
+            rank = item.rank,
+            contentDescription = "프로필 이미지",
+            modifier = Modifier.size(imageSize)
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // 정보 영역
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            // 이름
+            ExoNameWithGroup(
+                fullName = item.name,
+                nameFontSize = 12.sp,
+                groupFontSize = 10.sp
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // 프로그레스 바 (MAIN 스타일 gradient)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(20.dp)
+            ) {
+                // 프로그레스 계산: 20% ~ 80% 범위, 4th root 사용
+                val progressPercent = remember(item.heartCount, item.maxHeartCount) {
+                    if (item.maxHeartCount == 0L) {
+                        0.2f
+                    } else if (item.heartCount == 0L) {
+                        0.2f
+                    } else {
+                        val voteRoot = kotlin.math.sqrt(kotlin.math.sqrt(item.heartCount.toDouble()))
+                        val maxRoot = kotlin.math.sqrt(kotlin.math.sqrt(item.maxHeartCount.toDouble()))
+                        val p = 20 + (voteRoot * 60 / maxRoot)
+                        (p / 100f).toFloat().coerceIn(0.2f, 0.8f)
+                    }
+                }
+
+                // 배경 (회색)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            color = colorResource(R.color.gray100),
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                        )
+                )
+
+                // 프로그레스 바 (MAIN 스타일 - gradient)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(progressPercent)
+                        .fillMaxHeight()
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(
+                                    colorResource(R.color.s_league_progress),
+                                    colorResource(R.color.main)
+                                )
+                            ),
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp)
+                        )
+                )
+
+                // 퍼센트 계산
+                val percentage = remember(item.heartCount, item.maxHeartCount) {
+                    android.util.Log.d("HeartPickPercentage", "Rank ${item.rank}: heartCount=${item.heartCount}, maxHeartCount=${item.maxHeartCount}")
+                    if (item.maxHeartCount > 0) {
+                        val percent = (100.0 * item.heartCount / item.maxHeartCount).toInt()
+                        android.util.Log.d("HeartPickPercentage", "Rank ${item.rank}: Calculated percentage=${percent}%")
+                        "${percent}%"
+                    } else {
+                        "0%"
+                    }
+                }
+
+                // 투표수와 퍼센트를 함께 배치
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // 투표수: 색상바 우측에 배치
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(progressPercent)
+                            .fillMaxHeight(),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        Text(
+                            text = item.voteCount,
+                            fontSize = 10.sp,
+                            lineHeight = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            modifier = Modifier.padding(end = 4.dp)
+                        )
+                    }
+
+                    // 퍼센트: 나머지 영역의 우측에 배치
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        Text(
+                            text = percentage,
+                            fontSize = 10.sp,
+                            lineHeight = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }

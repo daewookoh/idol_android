@@ -133,6 +133,19 @@ object IdolImageUtil {
     }
 
     /**
+     * HTTP URL을 HTTPS로 변환
+     *
+     * Android 네트워크 보안 정책으로 인해 HTTP (cleartext) 통신이 차단되므로
+     * 모든 이미지 URL을 HTTPS로 변환하여 사용
+     *
+     * @return HTTPS로 변환된 URL
+     */
+    fun String?.toSecureUrl(): String {
+        if (this.isNullOrEmpty()) return ""
+        return this.replace("http://", "https://")
+    }
+
+    /**
      * 시스템 로케일 가져오기
      */
     private fun getSystemLocale(): Locale {

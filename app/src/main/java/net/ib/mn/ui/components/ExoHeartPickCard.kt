@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -15,9 +16,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -34,10 +38,15 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import net.ib.mn.R
 
 /**
@@ -96,7 +105,6 @@ fun ExoHeartPickCard(
             backgroundImageUrl = backgroundImageUrl,
             dDay = dDay,
             firstPlaceIdol = firstPlaceIdol,
-            otherIdols = otherIdols,
             heartVoteCount = heartVoteCount,
             commentCount = commentCount,
             periodDate = periodDate,
@@ -152,19 +160,40 @@ private fun UpcomingHeartPickCard(
                 ) {
                     // 배경 이미지
                     if (backgroundImageUrl.isNotEmpty()) {
+                        android.util.Log.d("HeartPickUpcoming", "Loading background image: $backgroundImageUrl")
+
+                        val context = LocalContext.current
+                        val imageModel = remember(backgroundImageUrl) {
+                            coil.request.ImageRequest.Builder(context)
+                                .data(backgroundImageUrl)
+                                .crossfade(true)
+                                .listener(
+                                    onStart = {
+                                        android.util.Log.d("HeartPickUpcoming", "Image load started: $backgroundImageUrl")
+                                    },
+                                    onSuccess = { _, _ ->
+                                        android.util.Log.d("HeartPickUpcoming", "Image load SUCCESS: $backgroundImageUrl")
+                                    },
+                                    onError = { _, result ->
+                                        android.util.Log.e("HeartPickUpcoming", "Image load FAILED: $backgroundImageUrl, error: ${result.throwable.message}")
+                                    }
+                                )
+                                .build()
+                        }
+
                         AsyncImage(
-                            model = backgroundImageUrl,
+                            model = imageModel,
                             contentDescription = "Background",
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .aspectRatio(1f / 0.3f),
+                                .aspectRatio(1f / 0.4f),
                             contentScale = ContentScale.Crop
                         )
                     } else {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .aspectRatio(1f / 0.3f)
+                                .aspectRatio(1f / 0.4f)
                                 .background(colorResource(R.color.background_400))
                         )
                     }
@@ -173,7 +202,7 @@ private fun UpcomingHeartPickCard(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(1f / 0.3f)
+                            .aspectRatio(1f / 0.4f)
                             .background(
                                 brush = Brush.verticalGradient(
                                     colors = listOf(
@@ -187,7 +216,7 @@ private fun UpcomingHeartPickCard(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(1f / 0.3f)
+                            .aspectRatio(1f / 0.42f)
                     ) {
                         // D-Day 배지
                         Row(
@@ -212,7 +241,8 @@ private fun UpcomingHeartPickCard(
                             Text(
                                 text = dDay,
                                 fontSize = 12.sp,
-                                color = colorResource(R.color.fix_white)
+                                lineHeight = 20.sp,
+                                color = colorResource(R.color.fix_white),
                             )
                         }
 
@@ -222,7 +252,6 @@ private fun UpcomingHeartPickCard(
                         Text(
                             text = title,
                             fontSize = 19.sp,
-                            fontWeight = FontWeight.Bold,
                             color = colorResource(R.color.fix_white),
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
@@ -408,17 +437,17 @@ private fun ActiveHeartPickCard(
                             Text(
                                 text = dDay,
                                 fontSize = 12.sp,
+                                lineHeight = 20.sp,
                                 color = colorResource(R.color.fix_white)
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(40.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
 
                         // 제목
                         Text(
                             text = title,
                             fontSize = 19.sp,
-                            fontWeight = FontWeight.Bold,
                             color = colorResource(R.color.fix_white),
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
@@ -446,29 +475,27 @@ private fun ActiveHeartPickCard(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .aspectRatio(1f / 0.23f)
+                                    .height(90.dp)
                                     .background(colorResource(R.color.background_200))
                             ) {
-                        // 1위 프로필 이미지
+                        // 1위 프로필 이미지 (타이틀 영역을 침범하도록 위로 이동)
                         Box(
                             modifier = Modifier
-                                .padding(start = 16.dp, bottom = 10.dp)
-                                .align(Alignment.BottomStart)
+                                .offset(y = (-20).dp, x=16.dp)
+                                .size(90.dp)
+                                .align(Alignment.TopStart)
                         ) {
-                            AsyncImage(
-                                model = firstPlaceIdol.photoUrl,
+                            ExoProfileImage(
+                                imageUrl = firstPlaceIdol.photoUrl,
+                                rank = 1,
                                 contentDescription = "First Place",
-                                modifier = Modifier
-                                    .size(90.dp)
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop
+                                modifier = Modifier.fillMaxSize()
                             )
                             Icon(
                                 painter = painterResource(R.drawable.icon_heartpick_1st),
                                 contentDescription = "1st",
                                 modifier = Modifier
-                                    .size(30.dp)
-                                    .offset(x = 7.dp),
+                                    .size(30.dp),
                                 tint = Color.Unspecified
                             )
                         }
@@ -477,12 +504,14 @@ private fun ActiveHeartPickCard(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 125.dp, top = 5.dp, end = 15.dp),
+                                .align(Alignment.BottomStart)
+                                .padding(start = 125.dp, bottom = 20.dp),
                             verticalArrangement = Arrangement.Center
                         ) {
                             Text(
                                 text = firstPlaceIdol.name,
                                 fontSize = 16.sp,
+                                lineHeight = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = colorResource(R.color.text_default),
                                 maxLines = 1,
@@ -491,6 +520,7 @@ private fun ActiveHeartPickCard(
                             Text(
                                 text = firstPlaceIdol.groupName,
                                 fontSize = 12.sp,
+                                lineHeight = 12.sp,
                                 color = colorResource(R.color.text_dimmed),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -499,6 +529,7 @@ private fun ActiveHeartPickCard(
                             Text(
                                 text = firstPlaceIdol.voteCount,
                                 fontSize = 14.sp,
+                                lineHeight = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = colorResource(R.color.main_light),
                                 modifier = Modifier.padding(top = 1.dp)
@@ -508,7 +539,7 @@ private fun ActiveHeartPickCard(
                         // 퍼센트 박스 (우하단 고정)
                         Box(
                             modifier = Modifier
-                                .padding(end = 10.dp, bottom = 10.dp)
+                                .padding(end = 10.dp, bottom = 20.dp)
                                 .align(Alignment.BottomEnd)
                                 .size(width = 49.dp, height = 27.dp)
                                 .background(
@@ -542,14 +573,39 @@ private fun ActiveHeartPickCard(
                                 )
                             )
                     ) {
+                        // RankingItemData 리스트 생성
+                        val rankingItems = remember(otherIdols, firstPlaceIdol) {
+                            val firstPlaceVotes = firstPlaceIdol?.voteCount?.replace(",", "")?.toLongOrNull() ?: 0L
+                            android.util.Log.d("HeartPickCard", "firstPlaceIdol voteCount: ${firstPlaceIdol?.voteCount}, parsed: $firstPlaceVotes")
+
+                            otherIdols.mapIndexed { index, idol ->
+                                val idolVotes = idol.voteCount.replace(",", "").toLongOrNull() ?: 0L
+                                android.util.Log.d("HeartPickCard", "Rank ${index + 2}: ${idol.name}, votes=${idol.voteCount}, parsed=$idolVotes, maxHeartCount=$firstPlaceVotes")
+
+                                RankingItemData(
+                                    rank = index + 2,
+                                    name = "${idol.name}_${idol.groupName}",
+                                    voteCount = idol.voteCount,
+                                    photoUrl = idol.photoUrl,
+                                    id = "${index + 2}_${idol.name}",
+                                    heartCount = idolVotes,
+                                    maxHeartCount = firstPlaceVotes
+                                )
+                            }
+                        }
+
                         LazyRow(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(horizontal = 20.dp),
+                            horizontalArrangement = Arrangement.spacedBy(15.dp)
                         ) {
-                            items(otherIdols) { idol ->
-                                IdolRankItem(idol)
+                            items(
+                                items = rankingItems,
+                                key = { item -> item.itemKey() }
+                            ) { item ->
+                                HeartPickRankingItem(
+                                    item = item,
+                                )
                             }
                         }
                     }
@@ -650,7 +706,6 @@ private fun EndedHeartPickCard(
     backgroundImageUrl: String,
     dDay: String,
     firstPlaceIdol: IdolRankInfo?,
-    otherIdols: List<IdolRankInfo>,
     heartVoteCount: String,
     commentCount: String,
     periodDate: String,
@@ -676,10 +731,17 @@ private fun EndedHeartPickCard(
                 containerColor = colorResource(R.color.background_200)
             )
         ) {
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    // cl_top: 상단 영역 (배경 이미지 + 제목 + 1위 아이돌)
-                    Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                // Layer 1: Column with background and content
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // 상단 영역 (배경 이미지 + 그라데이션)
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
                         // 배경 이미지
                         if (backgroundImageUrl.isNotEmpty()) {
                             AsyncImage(
@@ -687,14 +749,14 @@ private fun EndedHeartPickCard(
                                 contentDescription = "Background",
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .aspectRatio(1f / 0.92f),
+                                    .aspectRatio(1f / 0.42f),
                                 contentScale = ContentScale.Crop
                             )
                         } else {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .aspectRatio(1f / 0.92f)
+                                    .aspectRatio(1f / 0.42f)
                                     .background(colorResource(R.color.background_400))
                             )
                         }
@@ -703,7 +765,7 @@ private fun EndedHeartPickCard(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .aspectRatio(1f / 0.92f)
+                                .aspectRatio(1f / 0.42f)
                                 .background(
                                     brush = Brush.verticalGradient(
                                         colors = listOf(
@@ -713,189 +775,101 @@ private fun EndedHeartPickCard(
                                     )
                                 )
                         )
+                    }
 
+                    // 1위 아이돌 정보
+                    if (firstPlaceIdol != null) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(90.dp)
+                                .background(colorResource(R.color.background_200))
+                        ) {
+                        // 1위 프로필 이미지 (타이틀 영역을 침범하도록 위로 이동)
+                        Box(
+                            modifier = Modifier
+                                .offset(y = (-20).dp, x=16.dp)
+                                .size(90.dp)
+                                .align(Alignment.TopStart)
+                        ) {
+                            ExoProfileImage(
+                                imageUrl = firstPlaceIdol.photoUrl,
+                                rank = 1,
+                                contentDescription = "First Place",
+                                modifier = Modifier.fillMaxSize()
+                            )
+                            Icon(
+                                painter = painterResource(R.drawable.icon_heartpick_1st),
+                                contentDescription = "1st",
+                                modifier = Modifier
+                                    .size(30.dp),
+                                tint = Color.Unspecified
+                            )
+                        }
+
+                        // 1위 정보 텍스트
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .aspectRatio(1f / 0.92f)
+                                .align(Alignment.BottomStart)
+                                .padding(start = 125.dp, bottom = 20.dp),
+                            verticalArrangement = Arrangement.Center
                         ) {
-                            Spacer(modifier = Modifier.height(56.dp))
-
-                            // 제목
                             Text(
-                                text = title,
-                                fontSize = 19.sp,
+                                text = firstPlaceIdol.name,
+                                fontSize = 16.sp,
+                                lineHeight = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = colorResource(R.color.fix_white),
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.padding(horizontal = 16.dp)
+                                color = colorResource(R.color.text_default),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
-
-                            Spacer(modifier = Modifier.height(2.dp))
-
-                            // 부제목
                             Text(
-                                text = subTitle,
-                                fontSize = 13.sp,
-                                color = colorResource(R.color.fix_white),
-                                maxLines = 2,
+                                text = firstPlaceIdol.groupName,
+                                fontSize = 12.sp,
+                                lineHeight = 12.sp,
+                                color = colorResource(R.color.text_dimmed),
+                                maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.padding(horizontal = 16.dp)
+                                modifier = Modifier.padding(top = 1.dp)
                             )
-
-                            Spacer(modifier = Modifier.height(38.dp))
-
-                            // 1위 아이돌 정보
-                            if (firstPlaceIdol != null) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(colorResource(R.color.background_200))
-                                ) {
-                                    // 1위 프로필 이미지
-                                    Box(
-                                        modifier = Modifier
-                                            .padding(start = 16.dp, bottom = 10.dp)
-                                            .align(Alignment.BottomStart)
-                                    ) {
-                                        AsyncImage(
-                                            model = firstPlaceIdol.photoUrl,
-                                            contentDescription = "First Place",
-                                            modifier = Modifier
-                                                .size(90.dp)
-                                                .clip(CircleShape),
-                                            contentScale = ContentScale.Crop
-                                        )
-                                        Icon(
-                                            painter = painterResource(R.drawable.icon_heartpick_1st),
-                                            contentDescription = "1st",
-                                            modifier = Modifier
-                                                .size(30.dp)
-                                                .offset(x = 7.dp),
-                                            tint = Color.Unspecified
-                                        )
-                                    }
-
-                                    // 1위 정보 텍스트 (ConstraintLayout의 vertical chain 효과)
-                                    Column(
-                                        modifier = Modifier
-                                            .align(Alignment.CenterStart)
-                                            .padding(start = 125.dp, end = 15.dp),
-                                        verticalArrangement = Arrangement.spacedBy(1.dp, Alignment.CenterVertically)
-                                    ) {
-                                        Text(
-                                            text = firstPlaceIdol.name,
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colorResource(R.color.text_default),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                        if (firstPlaceIdol.groupName.isNotEmpty()) {
-                                            Text(
-                                                text = firstPlaceIdol.groupName,
-                                                fontSize = 12.sp,
-                                                color = colorResource(R.color.text_dimmed),
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis
-                                            )
-                                        }
-                                        Text(
-                                            text = firstPlaceIdol.voteCount,
-                                            fontSize = 14.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colorResource(R.color.main_light)
-                                        )
-                                    }
-
-                                    // 퍼센트 박스
-                                    Box(
-                                        modifier = Modifier
-                                            .padding(end = 10.dp, bottom = 10.dp)
-                                            .align(Alignment.BottomEnd)
-                                            .size(width = 49.dp, height = 27.dp)
-                                            .background(
-                                                color = colorResource(R.color.main200),
-                                                shape = RoundedCornerShape(9.dp)
-                                            ),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = "${firstPlaceIdol.percentage}%",
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colorResource(R.color.main_light)
-                                        )
-                                    }
-                                }
-                            }
+                            Text(
+                                text = firstPlaceIdol.voteCount,
+                                fontSize = 14.sp,
+                                lineHeight = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = colorResource(R.color.main_light),
+                                modifier = Modifier.padding(top = 1.dp)
+                            )
                         }
-                    }
 
-                    // 하단 영역 (하트, 댓글, 기간)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(40.dp)
-                            .background(colorResource(R.color.background_200))
-                            .padding(horizontal = 20.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.icon_community_heart),
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = Color.Unspecified
-                        )
-                        Spacer(modifier = Modifier.width(3.dp))
-                        Text(
-                            text = heartVoteCount,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colorResource(R.color.text_gray)
-                        )
-
-                        Spacer(modifier = Modifier.width(11.dp))
-
-                        Icon(
-                            painter = painterResource(R.drawable.icon_community_comment),
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = Color.Unspecified
-                        )
-                        Spacer(modifier = Modifier.width(3.dp))
-                        Text(
-                            text = commentCount,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colorResource(R.color.text_gray)
-                        )
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        Text(
-                            text = periodDate,
-                            fontSize = 12.sp,
-                            color = colorResource(R.color.text_dimmed)
-                        )
+                        // 퍼센트 박스 (우하단 고정)
+                        Box(
+                            modifier = Modifier
+                                .padding(end = 10.dp, bottom = 20.dp)
+                                .align(Alignment.BottomEnd)
+                                .size(width = 49.dp, height = 27.dp)
+                                .background(
+                                    color = colorResource(R.color.main200),
+                                    shape = RoundedCornerShape(9.dp)
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "${firstPlaceIdol.percentage}%",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = colorResource(R.color.main_light)
+                            )
+                        }
                     }
                 }
 
-                // cl_shadow: 딤드 오버레이 (전체를 덮지만 D-Day와 버튼은 위에)
+                // 결과보기 버튼
                 Box(
                     modifier = Modifier
-                        .matchParentSize()
-                        .background(colorResource(R.color.gray1000_opacity_60))
-                )
-
-                // 결과보기 버튼 (cl_shadow 위에, 딤드 영향 안받음)
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .offset(y = (-50).dp)
                         .height(41.dp)
                         .background(
                             color = colorResource(R.color.fix_gray900),
@@ -905,37 +879,127 @@ private fun EndedHeartPickCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = stringResource(R.string.see_result),
+                        text = stringResource(R.string.vote_finish),
                         fontSize = 14.sp,
-                        color = colorResource(R.color.fix_white)
+                        color = colorResource(R.color.text_default)
                     )
                 }
 
-                // D-Day 배지 (cl_shadow 위에)
+                // 하단 정보 (하트 투표, 댓글, 기간)
                 Row(
                     modifier = Modifier
-                        .padding(start = 16.dp, top = 16.dp)
-                        .background(
-                            color = colorResource(R.color.fix_gray900),
-                            shape = RoundedCornerShape(10.dp)
-                        )
-                        .padding(horizontal = 8.dp, vertical = 2.dp)
-                        .height(20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                        .fillMaxWidth()
+                        .height(40.dp)
+                        .background(colorResource(R.color.background_200))
+                        .padding(horizontal = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.icon_heartpick_timer),
+                        painter = painterResource(R.drawable.icon_community_heart),
                         contentDescription = null,
-                        modifier = Modifier.size(11.dp),
+                        modifier = Modifier.size(14.dp),
                         tint = Color.Unspecified
                     )
-                    Spacer(modifier = Modifier.width(3.dp))
                     Text(
-                        text = dDay,
+                        text = heartVoteCount,
                         fontSize = 12.sp,
-                        color = colorResource(R.color.fix_white)
+                        fontWeight = FontWeight.Bold,
+                        color = colorResource(R.color.text_gray),
+                        modifier = Modifier.padding(start = 3.dp)
                     )
+
+                    Spacer(modifier = Modifier.width(11.dp))
+
+                    Icon(
+                        painter = painterResource(R.drawable.icon_community_comment),
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = Color.Unspecified
+                    )
+                    Text(
+                        text = commentCount,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = colorResource(R.color.text_gray),
+                        modifier = Modifier.padding(start = 3.dp)
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = periodDate,
+                        fontSize = 12.sp,
+                        color = colorResource(R.color.text_dimmed)
+                    )
+                }
+            }
+
+                // Layer 2: Dimmed 박스 (전체 어둡게)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.5f))
+                )
+
+                // Layer 3: 뱃지 박스 + 콘텐츠 박스
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f / 0.42f)
+                ) {
+                    // D-Day 배지
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 16.dp, top = 16.dp)
+                            .background(
+                                color = colorResource(R.color.fix_gray900),
+                                shape = RoundedCornerShape(10.dp)
+                            )
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                            .height(20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.icon_heartpick_timer),
+                            contentDescription = null,
+                            modifier = Modifier.size(11.dp),
+                            tint = Color.Unspecified
+                        )
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Text(
+                            text = dDay,
+                            fontSize = 12.sp,
+                            lineHeight = 20.sp,
+                            color = colorResource(R.color.fix_white)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // 제목
+                    Text(
+                        text = title,
+                        fontSize = 19.sp,
+                        color = colorResource(R.color.fix_white),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(2.dp))
+
+                    // 부제목
+                    Text(
+                        text = subTitle,
+                        fontSize = 13.sp,
+                        color = colorResource(R.color.fix_white),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(38.dp))
                 }
             }
         }
@@ -952,29 +1016,6 @@ private fun EndedHeartPickCard(
                 tint = Color.Unspecified
             )
         }
-    }
-}
-
-@Composable
-private fun IdolRankItem(idol: IdolRankInfo) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        AsyncImage(
-            model = idol.photoUrl,
-            contentDescription = idol.name,
-            modifier = Modifier
-                .size(60.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
-        )
-        Text(
-            text = idol.name,
-            fontSize = 12.sp,
-            color = colorResource(R.color.text_default),
-            maxLines = 1,
-            modifier = Modifier.padding(top = 4.dp)
-        )
     }
 }
 

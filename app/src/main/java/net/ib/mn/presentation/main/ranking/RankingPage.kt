@@ -149,7 +149,10 @@ fun RankingPage(
         buildIdolAppTabList(mainChartModel, viewModel, isMale)
     }
 
-    val subPagerState = rememberPagerState(pageCount = { tabDataList.size })
+    val subPagerState = rememberPagerState(
+        initialPage = 5, // 6번째 탭 (HEARTPICK)을 기본 선택
+        pageCount = { tabDataList.size }
+    )
     val coroutineScope = rememberCoroutineScope()
 
     // 모든 탭의 SubPage를 미리 생성하여 완전히 독립적으로 관리

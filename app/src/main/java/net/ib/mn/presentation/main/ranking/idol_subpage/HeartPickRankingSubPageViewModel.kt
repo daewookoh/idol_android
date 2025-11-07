@@ -19,6 +19,7 @@ import net.ib.mn.domain.repository.HeartpickRepository
 import net.ib.mn.ui.components.HeartPickState
 import net.ib.mn.ui.components.IdolRankInfo
 import net.ib.mn.util.IdolImageUtil
+import net.ib.mn.util.IdolImageUtil.toSecureUrl
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -111,7 +112,7 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
                     IdolRankInfo(
                         name = first.title,
                         groupName = first.subtitle,
-                        photoUrl = first.imageUrl ?: "",
+                        photoUrl = first.imageUrl.toSecureUrl(),
                         voteCount = NumberFormat.getNumberInstance(Locale.US).format(first.vote),
                         percentage = percentage
                     )
@@ -122,7 +123,7 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
                         IdolRankInfo(
                             name = idol.title,
                             groupName = idol.subtitle,
-                            photoUrl = idol.imageUrl ?: "",
+                            photoUrl = idol.imageUrl.toSecureUrl(),
                             voteCount = NumberFormat.getNumberInstance(Locale.US).format(idol.vote),
                             percentage = 0
                         )
@@ -136,15 +137,16 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
                     "" to ""
                 }
 
-                // 언어별 배너 URL 적용
+                // 언어별 배너 URL 적용 및 HTTPS로 변환
                 val localizedBannerUrl = IdolImageUtil.getLocalizedBannerUrl(context, heartPick.bannerUrl)
+                val secureUrl = localizedBannerUrl.toSecureUrl()
 
                 val cardData = HeartPickCardData(
                     id = heartPick.id,
                     state = state,
                     title = heartPick.title,
                     subTitle = heartPick.subtitle,
-                    backgroundImageUrl = localizedBannerUrl,
+                    backgroundImageUrl = secureUrl,
                     dDay = dDay,
                     firstPlaceIdol = firstPlaceIdol,
                     otherIdols = otherIdols,
