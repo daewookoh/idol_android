@@ -6,6 +6,8 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
@@ -111,7 +113,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContent {
-            ExodusTheme {
+            // PreferencesManager에서 테마 설정 구독
+            val themeString by preferencesManager.theme.collectAsState(initial = null)
+
+            // theme 문자열을 Boolean?으로 변환
+            // null or "system" -> null (시스템 설정 사용)
+            // "light" -> false
+            // "dark" -> true
+            val darkTheme = when (themeString?.lowercase()) {
+                "dark" -> true
+                "light" -> false
+                else -> null  // "system" or null -> 시스템 설정 사용
+            }
+
+            ExodusTheme(darkTheme = darkTheme) {
                 val navController = rememberNavController()
                 NavGraph(navController = navController)
             }

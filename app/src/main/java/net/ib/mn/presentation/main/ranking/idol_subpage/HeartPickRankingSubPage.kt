@@ -15,7 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
+import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
@@ -57,7 +57,7 @@ fun HeartPickRankingSubPage(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = colorResource(R.color.main))
+                CircularProgressIndicator(color = ColorPalette.main)
             }
         }
 
@@ -72,7 +72,7 @@ fun HeartPickRankingSubPage(
                 Text(
                     text = stringResource(R.string.msg_error_ok),
                     fontSize = 16.sp,
-                    color = colorResource(R.color.main)
+                    color = ColorPalette.main
                 )
             }
         }
@@ -90,7 +90,7 @@ fun HeartPickRankingSubPage(
                     Text(
                         text = stringResource(R.string.msg_no_data),
                         fontSize = 16.sp,
-                        color = colorResource(R.color.text_dimmed)
+                        color = ColorPalette.textDimmed
                     )
                 }
             } else {

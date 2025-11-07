@@ -34,7 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
+import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -95,8 +95,8 @@ fun ExoVoteDialog(
             modifier = Modifier
                 .width(270.dp)
                 .clip(RoundedCornerShape(6.dp))
-                .background(colorResource(R.color.text_white_black))
-                .border(1.dp, colorResource(R.color.gray150), RoundedCornerShape(6.dp))
+                .background(ColorPalette.textWhiteBlack)
+                .border(1.dp, ColorPalette.gray150, RoundedCornerShape(6.dp))
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -107,7 +107,7 @@ fun ExoVoteDialog(
                     text = stringResource(R.string.title_vote_heart),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = colorResource(R.color.main),
+                    color = ColorPalette.main,
                     modifier = Modifier.padding(top = 20.dp, bottom = 5.dp),
                     textAlign = TextAlign.Center
                 )
@@ -134,7 +134,7 @@ fun ExoVoteDialog(
                         .padding(start = 20.dp, end = 20.dp, top = 15.dp),
                     shape = RoundedCornerShape(8.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = colorResource(R.color.background_200)
+                        containerColor = ColorPalette.background200
                     ),
                     elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
                 ) {
@@ -148,14 +148,14 @@ fun ExoVoteDialog(
                         Text(
                             text = stringResource(R.string.my_heart),
                             fontSize = 12.sp,
-                            color = colorResource(R.color.text_default)
+                            color = ColorPalette.textDefault
                         )
                         Spacer(modifier = Modifier.height(5.dp))
                         Text(
                             text = NumberFormat.getNumberInstance(Locale.US).format(totalHeart),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = colorResource(R.color.main_light)
+                            color = ColorPalette.mainLight
                         )
 
                         Spacer(modifier = Modifier.height(10.dp))
@@ -174,7 +174,7 @@ fun ExoVoteDialog(
                                 Text(
                                     text = stringResource(R.string.ever_heart),
                                     fontSize = 12.sp,
-                                    color = colorResource(R.color.text_dimmed),
+                                    color = ColorPalette.textDimmed,
                                     textAlign = TextAlign.Center
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
@@ -182,7 +182,7 @@ fun ExoVoteDialog(
                                     text = NumberFormat.getNumberInstance(Locale.US).format(strongHeart),
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = colorResource(R.color.text_gray),
+                                    color = ColorPalette.textGray,
                                     textAlign = TextAlign.Center
                                 )
                             }
@@ -191,7 +191,7 @@ fun ExoVoteDialog(
                             Text(
                                 text = "+",
                                 fontSize = 15.sp,
-                                color = colorResource(R.color.text_dimmed),
+                                color = ColorPalette.textDimmed,
                                 modifier = Modifier.padding(horizontal = 5.dp)
                             )
 
@@ -203,7 +203,7 @@ fun ExoVoteDialog(
                                 Text(
                                     text = stringResource(R.string.weak_heart),
                                     fontSize = 12.sp,
-                                    color = colorResource(R.color.text_dimmed),
+                                    color = ColorPalette.textDimmed,
                                     textAlign = TextAlign.Center
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
@@ -211,7 +211,7 @@ fun ExoVoteDialog(
                                     text = NumberFormat.getNumberInstance(Locale.US).format(freeHeart),
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = colorResource(R.color.text_gray),
+                                    color = ColorPalette.textGray,
                                     textAlign = TextAlign.Center
                                 )
                             }
@@ -324,11 +324,11 @@ fun ExoVoteDialog(
                         .padding(start = 20.dp, end = 20.dp, top = 8.dp)
                         .height(30.dp)
                         .clip(RoundedCornerShape(6.dp))
-                        .background(colorResource(R.color.background_300))
+                        .background(ColorPalette.background300)
                         .padding(horizontal = 10.dp),
                     textStyle = TextStyle(
                         fontSize = 14.sp,
-                        color = colorResource(R.color.main),
+                        color = ColorPalette.main,
                         textAlign = TextAlign.Start
                     ),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -346,7 +346,7 @@ fun ExoVoteDialog(
                 // 구분선 (old: line 417-421)
                 HorizontalDivider(
                     thickness = 1.dp,
-                    color = colorResource(R.color.gray100),
+                    color = ColorPalette.gray100,
                     modifier = Modifier.padding(top = 12.dp)
                 )
 
@@ -369,7 +369,7 @@ fun ExoVoteDialog(
                         Text(
                             text = stringResource(R.string.confirm),
                             fontSize = 13.sp,
-                            color = colorResource(R.color.text_gray)
+                            color = ColorPalette.textGray
                         )
                     }
 
@@ -378,7 +378,7 @@ fun ExoVoteDialog(
                         modifier = Modifier
                             .width(1.dp)
                             .height(44.dp)
-                            .background(colorResource(R.color.gray100))
+                            .background(ColorPalette.gray100)
                     )
 
                     // 취소 버튼
@@ -391,7 +391,7 @@ fun ExoVoteDialog(
                         Text(
                             text = stringResource(R.string.btn_cancel),
                             fontSize = 13.sp,
-                            color = colorResource(R.color.text_gray)
+                            color = ColorPalette.textGray
                         )
                     }
                 }
@@ -414,7 +414,7 @@ private fun HeartButton(
         modifier = modifier
             .height(30.dp)
             .clip(RoundedCornerShape(6.dp))
-            .background(colorResource(R.color.background_300))
+            .background(ColorPalette.background300)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.CenterStart
     ) {
@@ -432,7 +432,7 @@ private fun HeartButton(
             Text(
                 text = "X $count",
                 fontSize = 11.sp,
-                color = colorResource(R.color.text_default)
+                color = ColorPalette.textDefault
             )
         }
     }
@@ -452,7 +452,7 @@ private fun HeartAllButton(
         modifier = modifier
             .height(30.dp)
             .clip(RoundedCornerShape(6.dp))
-            .background(colorResource(R.color.background_300))
+            .background(ColorPalette.background300)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.CenterStart
     ) {
@@ -470,7 +470,7 @@ private fun HeartAllButton(
             Text(
                 text = label,
                 fontSize = 11.sp,
-                color = colorResource(R.color.text_default)
+                color = ColorPalette.textDefault
             )
         }
     }

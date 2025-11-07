@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
+import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -94,13 +94,13 @@ fun ExoArticle(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(colorResource(R.color.gray80))
+            .background(ColorPalette.gray80)
     ) {
         // 게시글 컨테이너
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(colorResource(R.color.background_100))
+                .background(ColorPalette.background100)
         ) {
             // 1. 사용자 프로필 섹션
             Row(
@@ -116,7 +116,7 @@ fun ExoArticle(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
-                        .background(colorResource(R.color.gray110))
+                        .background(ColorPalette.gray110)
                         .clickable(onClick = onProfileClick),
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(R.drawable.menu_profile_default2),
@@ -159,7 +159,7 @@ fun ExoArticle(
                         Text(
                             text = userName,
                             fontSize = 14.sp,
-                            color = colorResource(R.color.main),
+                            color = ColorPalette.main,
                             fontWeight = FontWeight.Normal
                         )
                     }
@@ -172,7 +172,7 @@ fun ExoArticle(
                         Text(
                             text = createdAt,
                             fontSize = 12.sp,
-                            color = colorResource(R.color.text_dimmed)
+                            color = ColorPalette.textDimmed
                         )
 
                         if (isPrivate) {
@@ -206,7 +206,7 @@ fun ExoArticle(
                     modifier = Modifier
                         .padding(start = 20.dp, top = 9.dp, end = 20.dp, bottom = 6.dp)
                         .background(
-                            color = colorResource(R.color.main200),
+                            color = ColorPalette.main200,
                             shape = RoundedCornerShape(6.dp)
                         )
                         .padding(horizontal = 7.dp, vertical = 3.dp)
@@ -214,7 +214,7 @@ fun ExoArticle(
                     Text(
                         text = tag,
                         fontSize = 13.sp,
-                        color = colorResource(R.color.main_light)
+                        color = ColorPalette.mainLight
                     )
                 }
             }
@@ -240,7 +240,7 @@ fun ExoArticle(
                         text = title,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        color = colorResource(R.color.text_default),
+                        color = ColorPalette.textDefault,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -251,7 +251,7 @@ fun ExoArticle(
             Text(
                 text = content,
                 fontSize = 14.sp,
-                color = colorResource(R.color.text_default),
+                color = ColorPalette.textDefault,
                 maxLines = if (isExpanded) Int.MAX_VALUE else 3,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
@@ -264,7 +264,7 @@ fun ExoArticle(
                 Text(
                     text = "... 더보기",
                     fontSize = 13.sp,
-                    color = colorResource(R.color.text_dimmed),
+                    color = ColorPalette.textDimmed,
                     modifier = Modifier
                         .padding(start = 20.dp, top = 13.dp, end = 20.dp)
                         .clickable { isExpanded = true }
@@ -277,7 +277,7 @@ fun ExoArticle(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f)
-                        .background(colorResource(R.color.background_100))
+                        .background(ColorPalette.background100)
                 ) {
                     AsyncImage(
                         model = mediaUrls.first(),
@@ -293,7 +293,7 @@ fun ExoArticle(
                                 .padding(top = 29.dp, end = 16.dp)
                                 .height(24.dp)
                                 .background(
-                                    color = colorResource(R.color.text_default).copy(alpha = 0.7f),
+                                    color = ColorPalette.textDefault.copy(alpha = 0.7f),
                                     shape = RoundedCornerShape(13.dp)
                                 )
                                 .padding(horizontal = 8.dp)
@@ -301,7 +301,7 @@ fun ExoArticle(
                             Text(
                                 text = "1/${mediaUrls.size}",
                                 fontSize = 10.sp,
-                                color = colorResource(R.color.fix_white),
+                                color = ColorPalette.textWhiteBlack,
                                 modifier = Modifier.align(Alignment.Center)
                             )
                         }
@@ -318,12 +318,12 @@ fun ExoArticle(
             ) {
                 StatItem(R.drawable.icon_community_heart, heartCount)
                 StatItem(R.drawable.icon_board_like, likeCount)
-                StatItem(R.drawable.icon_community_comment, commentCount, tintColor = colorResource(R.color.text_default))
-                StatItem(R.drawable.icon_board_hits, viewCount, tintColor = colorResource(R.color.text_default))
+                StatItem(R.drawable.icon_community_comment, commentCount, tintColor = ColorPalette.textDefault)
+                StatItem(R.drawable.icon_board_hits, viewCount, tintColor = ColorPalette.textDefault)
             }
 
             Divider(
-                color = colorResource(R.color.gray110),
+                color = ColorPalette.gray110,
                 thickness = 0.3.dp
             )
 
@@ -340,7 +340,7 @@ fun ExoArticle(
                     modifier = Modifier.weight(1f)
                 )
                 Divider(
-                    color = colorResource(R.color.gray110),
+                    color = ColorPalette.gray110,
                     modifier = Modifier
                         .width(0.3.dp)
                         .height(40.dp)
@@ -352,7 +352,7 @@ fun ExoArticle(
                     modifier = Modifier.weight(1f)
                 )
                 Divider(
-                    color = colorResource(R.color.gray110),
+                    color = ColorPalette.gray110,
                     modifier = Modifier
                         .width(0.3.dp)
                         .height(40.dp)
@@ -362,7 +362,7 @@ fun ExoArticle(
                     label = stringResource(R.string.lable_community_comment),
                     onClick = onCommentClick,
                     modifier = Modifier.weight(1f),
-                    tintColor = colorResource(R.color.text_default)
+                    tintColor = ColorPalette.textDefault
                 )
             }
         }
@@ -396,7 +396,7 @@ private fun StatItem(
         Text(
             text = count.toString(),
             fontSize = 13.sp,
-            color = colorResource(R.color.text_default)
+            color = ColorPalette.textDefault
         )
     }
 }
@@ -431,7 +431,7 @@ private fun ActionButton(
             Text(
                 text = label,
                 fontSize = 14.sp,
-                color = colorResource(R.color.text_gray)
+                color = ColorPalette.textGray
             )
         }
     }

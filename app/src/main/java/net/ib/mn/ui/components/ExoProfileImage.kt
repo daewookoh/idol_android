@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
+import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -67,7 +67,7 @@ fun ExoProfileImage(
         finalModifier = finalModifier.clip(CircleShape)
     }
     if (useGrayBackground) {
-        finalModifier = finalModifier.background(colorResource(R.color.gray100))
+        finalModifier = finalModifier.background(ColorPalette.gray100)
     }
 
     AsyncImage(

@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.colorResource
+import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -146,7 +146,7 @@ private fun ExoTop3Internal(
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
-            .background(colorResource(R.color.gray100))
+            .background(ColorPalette.gray100)
     ) {
         val screenWidth = with(LocalDensity.current) { maxWidth.toPx() }
         val itemWidth = screenWidth / 3

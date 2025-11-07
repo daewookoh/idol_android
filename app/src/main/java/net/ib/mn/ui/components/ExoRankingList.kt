@@ -15,7 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
+import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.unit.dp
 import net.ib.mn.R
 import java.text.NumberFormat
@@ -147,7 +147,7 @@ fun ExoRankingList(
         state = listState,
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(R.color.background_100)),
+            .background(ColorPalette.background100),
         contentPadding = PaddingValues(bottom = 16.dp),
         verticalArrangement = Arrangement.Top
     ) {

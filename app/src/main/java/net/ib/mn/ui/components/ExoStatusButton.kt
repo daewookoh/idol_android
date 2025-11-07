@@ -17,11 +17,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import net.ib.mn.R
+import net.ib.mn.ui.theme.ColorPalette
 
 /**
  * 하단 고정 상태 버튼
@@ -63,17 +61,17 @@ fun ExoStatusButton(
             .padding(bottom = 28.dp)
             .height(40.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (enabled) colorResource(id = R.color.main) else colorResource(id = R.color.gray200),
-            contentColor = Color.White,
-            disabledContainerColor = colorResource(id = R.color.gray200),
-            disabledContentColor = Color.White
+            containerColor = if (enabled) ColorPalette.main else ColorPalette.gray200,
+            contentColor = ColorPalette.fixWhite,
+            disabledContainerColor = ColorPalette.gray200,
+            disabledContentColor = ColorPalette.fixWhite
         ),
         shape = RoundedCornerShape(10.dp)
     ) {
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.size(20.dp),
-                color = Color.White,
+                color = ColorPalette.fixWhite,
                 strokeWidth = 2.dp
             )
         } else {

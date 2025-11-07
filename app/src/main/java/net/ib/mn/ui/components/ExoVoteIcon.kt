@@ -13,7 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
+import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -115,7 +115,7 @@ fun ExoVoteIcon(
             Icon(
                 painter = painterResource(R.drawable.btn_ranking_vote_heart),
                 contentDescription = "투표",
-                tint = colorResource(R.color.main),
+                tint = ColorPalette.main,
                 modifier = Modifier
                     .size(50.dp)
                     .padding(10.dp)

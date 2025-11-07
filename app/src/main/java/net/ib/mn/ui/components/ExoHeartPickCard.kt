@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -34,7 +35,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +48,7 @@ import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ColorPalette
 
 /**
  * ExoHeartPickCard - 하트픽 투표 카드 컴포넌트
@@ -135,7 +136,7 @@ private fun UpcomingHeartPickCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(colorResource(R.color.background_400))
+            .background(ColorPalette.background400)
             .padding(vertical = 7.5.dp)
     ) {
         Card(
@@ -146,7 +147,7 @@ private fun UpcomingHeartPickCard(
             shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(0.dp),
             colors = CardDefaults.cardColors(
-                containerColor = colorResource(R.color.background_200)
+                containerColor = ColorPalette.background200
             )
         ) {
             Column(
@@ -194,7 +195,7 @@ private fun UpcomingHeartPickCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(1f / 0.4f)
-                                .background(colorResource(R.color.background_400))
+                                .background(ColorPalette.background400)
                         )
                     }
 
@@ -223,7 +224,7 @@ private fun UpcomingHeartPickCard(
                             modifier = Modifier
                                 .padding(start = 16.dp, top = 16.dp)
                                 .background(
-                                    color = colorResource(R.color.fix_gray900),
+                                    color = ColorPalette.fixGray900,
                                     shape = RoundedCornerShape(10.dp)
                                 )
                                 .padding(horizontal = 8.dp, vertical = 2.dp)
@@ -242,7 +243,7 @@ private fun UpcomingHeartPickCard(
                                 text = dDay,
                                 fontSize = 12.sp,
                                 lineHeight = 20.sp,
-                                color = colorResource(R.color.fix_white),
+                                color = ColorPalette.fixWhite,
                             )
                         }
 
@@ -252,7 +253,7 @@ private fun UpcomingHeartPickCard(
                         Text(
                             text = title,
                             fontSize = 19.sp,
-                            color = colorResource(R.color.fix_white),
+                            color = ColorPalette.fixWhite,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -264,7 +265,7 @@ private fun UpcomingHeartPickCard(
                         Text(
                             text = subTitle,
                             fontSize = 13.sp,
-                            color = colorResource(R.color.fix_white),
+                            color = ColorPalette.fixWhite,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -285,35 +286,29 @@ private fun UpcomingHeartPickCard(
                         text = openDate,
                         fontSize = 21.sp,
                         fontWeight = FontWeight.Bold,
-                        color = colorResource(R.color.main_light)
+                        color = ColorPalette.mainLight
                     )
                     Text(
                         text = openPeriod,
                         fontSize = 12.sp,
-                        color = colorResource(R.color.text_dimmed),
+                        color = ColorPalette.textDimmed,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
 
                 // 투표 버튼
-                Box(
+                ExoButton(
+                    onClick = onVoteClick,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .height(41.dp)
-                        .background(
-                            color = colorResource(R.color.main200),
-                            shape = RoundedCornerShape(20.dp)
-                        )
-                        .clickable(onClick = onVoteClick),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.vote_preview),
-                        fontSize = 14.sp,
-                        color = colorResource(R.color.main_light)
-                    )
-                }
+                        .padding(horizontal = 16.dp),
+                    text = stringResource(R.string.vote_preview),
+                    fontSize = 14.sp,
+                    height = 41.dp,
+                    shape = RoundedCornerShape(20.dp),
+                    containerColor = ColorPalette.main200,
+                    contentColor = ColorPalette.mainLight
+                )
             }
         }
 
@@ -354,7 +349,7 @@ private fun ActiveHeartPickCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(colorResource(R.color.background_400))
+            .background(ColorPalette.background400)
             .padding(vertical = 7.5.dp)
     ) {
         Card(
@@ -365,7 +360,7 @@ private fun ActiveHeartPickCard(
             shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(0.dp),
             colors = CardDefaults.cardColors(
-                containerColor = colorResource(R.color.background_200)
+                containerColor = ColorPalette.background200
             )
         ) {
             Column(
@@ -390,7 +385,7 @@ private fun ActiveHeartPickCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(1f / 0.42f)
-                                .background(colorResource(R.color.background_400))
+                                .background(ColorPalette.background400)
                         )
                     }
 
@@ -419,7 +414,7 @@ private fun ActiveHeartPickCard(
                             modifier = Modifier
                                 .padding(start = 16.dp, top = 16.dp)
                                 .background(
-                                    color = colorResource(R.color.fix_gray900),
+                                    color = ColorPalette.fixGray900,
                                     shape = RoundedCornerShape(10.dp)
                                 )
                                 .padding(horizontal = 8.dp, vertical = 2.dp)
@@ -438,7 +433,7 @@ private fun ActiveHeartPickCard(
                                 text = dDay,
                                 fontSize = 12.sp,
                                 lineHeight = 20.sp,
-                                color = colorResource(R.color.fix_white)
+                                color = ColorPalette.fixWhite
                             )
                         }
 
@@ -448,7 +443,7 @@ private fun ActiveHeartPickCard(
                         Text(
                             text = title,
                             fontSize = 19.sp,
-                            color = colorResource(R.color.fix_white),
+                            color = ColorPalette.fixWhite,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -460,7 +455,7 @@ private fun ActiveHeartPickCard(
                         Text(
                             text = subTitle,
                             fontSize = 13.sp,
-                            color = colorResource(R.color.fix_white),
+                            color = ColorPalette.fixWhite,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -476,7 +471,7 @@ private fun ActiveHeartPickCard(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(90.dp)
-                                    .background(colorResource(R.color.background_200))
+                                    .background(ColorPalette.background200)
                             ) {
                         // 1위 프로필 이미지 (타이틀 영역을 침범하도록 위로 이동)
                         Box(
@@ -513,7 +508,7 @@ private fun ActiveHeartPickCard(
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = colorResource(R.color.text_default),
+                                color = ColorPalette.textDefault,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -521,7 +516,7 @@ private fun ActiveHeartPickCard(
                                 text = firstPlaceIdol.groupName,
                                 fontSize = 12.sp,
                                 lineHeight = 12.sp,
-                                color = colorResource(R.color.text_dimmed),
+                                color = ColorPalette.textDimmed,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.padding(top = 1.dp)
@@ -531,7 +526,7 @@ private fun ActiveHeartPickCard(
                                 fontSize = 14.sp,
                                 lineHeight = 14.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = colorResource(R.color.main_light),
+                                color = ColorPalette.mainLight,
                                 modifier = Modifier.padding(top = 1.dp)
                             )
                         }
@@ -543,7 +538,7 @@ private fun ActiveHeartPickCard(
                                 .align(Alignment.BottomEnd)
                                 .size(width = 49.dp, height = 27.dp)
                                 .background(
-                                    color = colorResource(R.color.main200),
+                                    color = ColorPalette.main200,
                                     shape = RoundedCornerShape(9.dp)
                                 ),
                             contentAlignment = Alignment.Center
@@ -552,7 +547,7 @@ private fun ActiveHeartPickCard(
                                 text = "${firstPlaceIdol.percentage}%",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = colorResource(R.color.main_light)
+                                color = ColorPalette.mainLight
                             )
                         }
                     }
@@ -567,8 +562,8 @@ private fun ActiveHeartPickCard(
                             .background(
                                 brush = Brush.verticalGradient(
                                     colors = listOf(
-                                        colorResource(R.color.background_200).copy(alpha = 0f),
-                                        colorResource(R.color.background_200)
+                                        ColorPalette.background200.copy(alpha = 0f),
+                                        ColorPalette.background200
                                     )
                                 )
                             )
@@ -612,31 +607,25 @@ private fun ActiveHeartPickCard(
                 }
 
                 // 투표 버튼
-                Box(
+                ExoButton(
+                    onClick = onVoteClick,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .height(41.dp)
-                        .background(
-                            color = colorResource(R.color.main_light),
-                            shape = RoundedCornerShape(20.dp)
-                        )
-                        .clickable(onClick = onVoteClick),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.guide_vote_title),
-                        fontSize = 14.sp,
-                        color = colorResource(R.color.text_white_black)
-                    )
-                }
+                        .padding(horizontal = 16.dp),
+                    text = stringResource(R.string.guide_vote_title),
+                    fontSize = 14.sp,
+                    height = 41.dp,
+                    shape = RoundedCornerShape(20.dp),
+                    containerColor = ColorPalette.mainLight,
+                    contentColor = ColorPalette.textWhiteBlack
+                )
 
                 // 하단 정보 (하트 투표, 댓글, 기간)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(40.dp)
-                        .background(colorResource(R.color.background_200))
+                        .background(ColorPalette.background200)
                         .padding(horizontal = 20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -650,7 +639,7 @@ private fun ActiveHeartPickCard(
                         text = heartVoteCount,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = colorResource(R.color.text_gray),
+                        color = ColorPalette.textGray,
                         modifier = Modifier.padding(start = 3.dp)
                     )
 
@@ -666,7 +655,7 @@ private fun ActiveHeartPickCard(
                         text = commentCount,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = colorResource(R.color.text_gray),
+                        color = ColorPalette.textGray,
                         modifier = Modifier.padding(start = 3.dp)
                     )
 
@@ -675,7 +664,7 @@ private fun ActiveHeartPickCard(
                     Text(
                         text = periodDate,
                         fontSize = 12.sp,
-                        color = colorResource(R.color.text_dimmed)
+                        color = ColorPalette.textDimmed
                     )
                 }
             }
@@ -717,7 +706,7 @@ private fun EndedHeartPickCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(colorResource(R.color.background_400))
+            .background(ColorPalette.background400)
             .padding(vertical = 7.5.dp)
     ) {
         Card(
@@ -728,7 +717,7 @@ private fun EndedHeartPickCard(
             shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(0.dp),
             colors = CardDefaults.cardColors(
-                containerColor = colorResource(R.color.background_200)
+                containerColor = ColorPalette.background200
             )
         ) {
             Box(
@@ -757,7 +746,7 @@ private fun EndedHeartPickCard(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .aspectRatio(1f / 0.42f)
-                                    .background(colorResource(R.color.background_400))
+                                    .background(ColorPalette.background400)
                             )
                         }
 
@@ -788,7 +777,7 @@ private fun EndedHeartPickCard(
                             Text(
                                 text = title,
                                 fontSize = 19.sp,
-                                color = colorResource(R.color.fix_white),
+                                color = ColorPalette.fixWhite,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -799,7 +788,7 @@ private fun EndedHeartPickCard(
                             Text(
                                 text = subTitle,
                                 fontSize = 13.sp,
-                                color = colorResource(R.color.fix_white),
+                                color = ColorPalette.fixWhite,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -812,7 +801,7 @@ private fun EndedHeartPickCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(90.dp)
-                                .background(colorResource(R.color.background_200))
+                                .background(ColorPalette.background200)
                         ) {
                         // 1위 프로필 이미지 (타이틀 영역을 침범하도록 위로 이동)
                         Box(
@@ -849,7 +838,7 @@ private fun EndedHeartPickCard(
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = colorResource(R.color.text_default),
+                                color = ColorPalette.textDefault,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -857,7 +846,7 @@ private fun EndedHeartPickCard(
                                 text = firstPlaceIdol.groupName,
                                 fontSize = 12.sp,
                                 lineHeight = 12.sp,
-                                color = colorResource(R.color.text_dimmed),
+                                color = ColorPalette.textDimmed,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.padding(top = 1.dp)
@@ -867,7 +856,7 @@ private fun EndedHeartPickCard(
                                 fontSize = 14.sp,
                                 lineHeight = 14.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = colorResource(R.color.main_light),
+                                color = ColorPalette.mainLight,
                                 modifier = Modifier.padding(top = 1.dp)
                             )
                         }
@@ -879,7 +868,7 @@ private fun EndedHeartPickCard(
                                 .align(Alignment.BottomEnd)
                                 .size(width = 49.dp, height = 27.dp)
                                 .background(
-                                    color = colorResource(R.color.main200),
+                                    color = ColorPalette.main200,
                                     shape = RoundedCornerShape(9.dp)
                                 ),
                             contentAlignment = Alignment.Center
@@ -888,38 +877,22 @@ private fun EndedHeartPickCard(
                                 text = "${firstPlaceIdol.percentage}%",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = colorResource(R.color.main_light)
+                                color = ColorPalette.mainLight
                             )
                         }
                     }
+                } else {
+                    Spacer(modifier = Modifier.height(20.dp))
                 }
 
-                // 결과보기 버튼
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .height(41.dp)
-                        .background(
-                            color = colorResource(R.color.fix_gray900),
-                            shape = RoundedCornerShape(20.dp)
-                        )
-                        .clickable(onClick = onVoteClick),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.see_result),
-                        fontSize = 14.sp,
-                        color = colorResource(R.color.text_default)
-                    )
-                }
+                Spacer(Modifier.height(40.dp))
 
                 // 하단 정보 (하트 투표, 댓글, 기간)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(40.dp)
-                        .background(colorResource(R.color.background_200))
+                        .background(ColorPalette.background200)
                         .padding(horizontal = 20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -933,7 +906,7 @@ private fun EndedHeartPickCard(
                         text = heartVoteCount,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = colorResource(R.color.text_gray),
+                        color = ColorPalette.textGray,
                         modifier = Modifier.padding(start = 3.dp)
                     )
 
@@ -949,7 +922,7 @@ private fun EndedHeartPickCard(
                         text = commentCount,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = colorResource(R.color.text_gray),
+                        color = ColorPalette.textGray,
                         modifier = Modifier.padding(start = 3.dp)
                     )
 
@@ -958,7 +931,7 @@ private fun EndedHeartPickCard(
                     Text(
                         text = periodDate,
                         fontSize = 12.sp,
-                        color = colorResource(R.color.text_dimmed)
+                        color = ColorPalette.textDimmed
                     )
                 }
             }
@@ -970,18 +943,18 @@ private fun EndedHeartPickCard(
                         .background(Color.Black.copy(alpha = 0.5f))
                 )
 
-                // Layer 3: 뱃지 박스 + 콘텐츠 박스
-                Column(
+                // Layer 3: 뱃지 + 버튼
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f / 0.42f)
+                        .matchParentSize()
                 ) {
                     // D-Day 배지
                     Row(
                         modifier = Modifier
+                            .align(Alignment.TopStart)
                             .padding(start = 16.dp, top = 16.dp)
                             .background(
-                                color = colorResource(R.color.fix_gray900),
+                                color = ColorPalette.fixGray900,
                                 shape = RoundedCornerShape(10.dp)
                             )
                             .padding(horizontal = 8.dp, vertical = 2.dp)
@@ -1000,35 +973,25 @@ private fun EndedHeartPickCard(
                             text = dDay,
                             fontSize = 12.sp,
                             lineHeight = 20.sp,
-                            color = colorResource(R.color.fix_white)
+                            color = ColorPalette.fixWhite
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // 제목
-                    Text(
-                        text = title,
-                        fontSize = 19.sp,
-                        color = colorResource(R.color.fix_white),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                    // 결과보기 버튼
+                    ExoButton(
+                        onClick = onVoteClick,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 44.dp),
+                        text = stringResource(R.string.see_result),
+                        fontSize = 14.sp,
+                        height = 41.dp,
+                        shape = RoundedCornerShape(20.dp),
+                        containerColor = ColorPalette.fixGray900,
+                        contentColor = ColorPalette.fixWhite,
                     )
-
-                    Spacer(modifier = Modifier.height(2.dp))
-
-                    // 부제목
-                    Text(
-                        text = subTitle,
-                        fontSize = 13.sp,
-                        color = colorResource(R.color.fix_white),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(38.dp))
                 }
             }
         }

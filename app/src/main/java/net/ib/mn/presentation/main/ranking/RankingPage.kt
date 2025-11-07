@@ -31,7 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.res.colorResource
+import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -133,7 +133,7 @@ fun RankingPage(
             contentAlignment = Alignment.Center
         ) {
             androidx.compose.material3.CircularProgressIndicator(
-                color = colorResource(R.color.main)
+                color = ColorPalette.main
             )
         }
         return
@@ -150,7 +150,7 @@ fun RankingPage(
                 contentAlignment = Alignment.Center
             ) {
                 androidx.compose.material3.CircularProgressIndicator(
-                    color = colorResource(R.color.main)
+                    color = ColorPalette.main
                 )
             }
             return
@@ -162,7 +162,7 @@ fun RankingPage(
                 contentAlignment = Alignment.Center
             ) {
                 androidx.compose.material3.CircularProgressIndicator(
-                    color = colorResource(R.color.main)
+                    color = ColorPalette.main
                 )
             }
             return
@@ -219,11 +219,11 @@ fun RankingPage(
     }
 
     // old 프로젝트 색상 (R.color 사용)
-    val mainColor = colorResource(R.color.main)
-    val textDimmedColor = colorResource(R.color.text_dimmed)
-    val borderColor = colorResource(R.color.gray100)
-    val backgroundColor = colorResource(R.color.background_100)
-    val backgroundTransparent = colorResource(R.color.background_100_transparent)
+    val mainColor = ColorPalette.main
+    val textDimmedColor = ColorPalette.textDimmed
+    val borderColor = ColorPalette.gray100
+    val backgroundColor = ColorPalette.background100
+    val backgroundTransparent = ColorPalette.background100Transparent
 
     // 탭 이름 리스트 생성 (old 프로젝트 로직과 동일)
     val tabs = tabDataList.map { type ->

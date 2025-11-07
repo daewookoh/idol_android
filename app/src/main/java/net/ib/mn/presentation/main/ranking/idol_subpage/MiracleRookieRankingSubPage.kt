@@ -32,7 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
+import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -131,7 +131,7 @@ fun MiracleRookieRankingSubPage(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(colorResource(R.color.background_100))
+            .background(ColorPalette.background100)
     ) {
         // 1. 상단 배너 + 정보 버튼 + 공유 버튼
         Box(
@@ -249,12 +249,12 @@ fun MiracleRookieRankingSubPage(
         // 2. 탭 (누적 랭킹 / 실시간 랭킹)
         TabRow(
             selectedTabIndex = selectedTabIndex,
-            containerColor = colorResource(R.color.background_100),
-            contentColor = colorResource(R.color.main),
+            containerColor = ColorPalette.background100,
+            contentColor = ColorPalette.main,
             indicator = { tabPositions ->
                 TabRowDefaults.SecondaryIndicator(
                     Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                    color = colorResource(R.color.main)
+                    color = ColorPalette.main
                 )
             }
         ) {
@@ -266,9 +266,9 @@ fun MiracleRookieRankingSubPage(
                             text = stringResource(R.string.cumulative_rankings),
                             fontSize = 15.sp,
                             color = if (selectedTabIndex == 0) {
-                                colorResource(R.color.text_default)
+                                ColorPalette.textDefault
                             } else {
-                                colorResource(R.color.text_dimmed)
+                                ColorPalette.textDimmed
                             }
                         )
                     },
@@ -282,9 +282,9 @@ fun MiracleRookieRankingSubPage(
                             text = stringResource(R.string.award_realtime),
                             fontSize = 15.sp,
                             color = if (selectedTabIndex == 1) {
-                                colorResource(R.color.text_default)
+                                ColorPalette.textDefault
                             } else {
-                                colorResource(R.color.text_dimmed)
+                                ColorPalette.textDimmed
                             }
                         )
                     },
@@ -299,7 +299,7 @@ fun MiracleRookieRankingSubPage(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = colorResource(R.color.main))
+                    CircularProgressIndicator(color = ColorPalette.main)
                 }
             }
 
@@ -313,7 +313,7 @@ fun MiracleRookieRankingSubPage(
                     Text(
                         text = "오류: ${currentState.message}",
                         fontSize = 16.sp,
-                        color = colorResource(R.color.main)
+                        color = ColorPalette.main
                     )
                 }
             }
@@ -329,7 +329,7 @@ fun MiracleRookieRankingSubPage(
                         Text(
                             text = "랭킹 데이터가 없습니다.",
                             fontSize = 16.sp,
-                            color = colorResource(R.color.text_dimmed)
+                            color = ColorPalette.textDimmed
                         )
                     }
                 } else {

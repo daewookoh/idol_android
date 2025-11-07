@@ -54,7 +54,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.colorResource
+import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -133,9 +133,7 @@ fun LazyListScope.exoRankingItem(
         var isExpanded by remember { mutableStateOf(false) }
 
         // 최애 여부에 따른 배경색
-        val backgroundColor = remember(item.isFavorite) {
-            if (item.isFavorite) R.color.main100 else R.color.background_100
-        }
+        val backgroundColor = if (item.isFavorite) ColorPalette.main100 else ColorPalette.background100
 
         Column(
             modifier = Modifier
@@ -148,7 +146,7 @@ fun LazyListScope.exoRankingItem(
                     )
                 )
                 .fillMaxWidth()
-                .background(colorResource(backgroundColor))
+                .background(backgroundColor)
         ) {
             // 메인 랭킹 아이템 (old: line 16-337)
             Row(
@@ -218,14 +216,14 @@ fun LazyListScope.exoRankingItem(
                                         .align(Alignment.TopStart)
                                         .padding(start = 5.dp, top = 3.dp)
                                         .size(16.dp)
-                                        .background(colorResource(R.color.badge_birth), CircleShape),
+                                        .background(ColorPalette.badgeBirth, CircleShape),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
                                         text = "B",
                                         fontSize = 8.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = colorResource(R.color.white)
+                                        color = ColorPalette.white
                                     )
                                 }
                             }
@@ -235,14 +233,14 @@ fun LazyListScope.exoRankingItem(
                                         .align(Alignment.TopStart)
                                         .padding(start = 5.dp, top = 3.dp)
                                         .size(16.dp)
-                                        .background(colorResource(R.color.badge_debut), CircleShape),
+                                        .background(ColorPalette.badgeDebut, CircleShape),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
                                         text = "D",
                                         fontSize = 8.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = colorResource(R.color.white)
+                                        color = ColorPalette.white
                                     )
                                 }
                             }
@@ -252,14 +250,14 @@ fun LazyListScope.exoRankingItem(
                                         .align(Alignment.BottomStart)
                                         .padding(start = 3.dp)
                                         .size(16.dp)
-                                        .background(colorResource(R.color.badge_comeback), CircleShape),
+                                        .background(ColorPalette.badgeComeback, CircleShape),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
                                         text = "C",
                                         fontSize = 8.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = colorResource(R.color.white)
+                                        color = ColorPalette.white
                                     )
                                 }
                             }
@@ -270,7 +268,7 @@ fun LazyListScope.exoRankingItem(
                                     modifier = Modifier
                                         .align(Alignment.BottomEnd)
                                         .background(
-                                            color = colorResource(R.color.badge_memorial_day),
+                                            color = ColorPalette.badgeMemorialDay,
                                             shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp)
                                         )
                                         .padding(horizontal = 5.dp, vertical = 2.dp)
@@ -282,7 +280,7 @@ fun LazyListScope.exoRankingItem(
                                         },
                                         fontSize = 7.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = colorResource(R.color.white)
+                                        color = ColorPalette.white
                                     )
                                 }
                             }
@@ -292,14 +290,14 @@ fun LazyListScope.exoRankingItem(
                                         .align(Alignment.TopStart)
                                         .padding(start = 15.dp, top = 5.dp)
                                         .size(16.dp)
-                                        .background(colorResource(R.color.badge_allin_day), CircleShape),
+                                        .background(ColorPalette.badgeAllinDay, CircleShape),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
                                         text = "A",
                                         fontSize = 8.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = colorResource(R.color.white)
+                                        color = ColorPalette.white
                                     )
                                 }
                             }
@@ -326,7 +324,7 @@ fun LazyListScope.exoRankingItem(
                             fontSize = 15.sp,
                             lineHeight = 15.sp,
                             fontWeight = FontWeight.Bold,
-                            color = colorResource(R.color.main)
+                            color = ColorPalette.main
                         )
 
                         Spacer(modifier = Modifier.width(5.dp))
@@ -386,16 +384,16 @@ fun LazyListScope.exoRankingItem(
                                             // DAILY: a_league_progress 단색 (Old 프로젝트 기준)
                                             Brush.horizontalGradient(
                                                 colors = listOf(
-                                                    colorResource(R.color.a_league_progress),
-                                                    colorResource(R.color.a_league_progress)
+                                                    ColorPalette.aLeagueProgress,
+                                                    ColorPalette.aLeagueProgress
                                                 )
                                             )
                                         } else {
                                             // MAIN: gradient
                                             Brush.horizontalGradient(
                                                 colors = listOf(
-                                                    colorResource(R.color.s_league_progress),
-                                                    colorResource(R.color.main)
+                                                    ColorPalette.sLeagueProgress,
+                                                    ColorPalette.main
                                                 )
                                             )
                                         },
@@ -460,9 +458,9 @@ fun LazyListScope.exoRankingItem(
                                             drawRect(
                                                 brush = Brush.horizontalGradient(
                                                     colors = listOf(
-                                                        Color.White.copy(alpha = 0f),
-                                                        Color.White.copy(alpha = 0.3f),
-                                                        Color.White.copy(alpha = 0f)
+                                                        ColorPalette.fixWhite.copy(alpha = 0f),
+                                                        ColorPalette.fixWhite.copy(alpha = 0.3f),
+                                                        ColorPalette.fixWhite.copy(alpha = 0f)
                                                     ),
                                                     startX = shimmerPosition,
                                                     endX = shimmerPosition + shimmerWidth
@@ -506,7 +504,7 @@ fun LazyListScope.exoRankingItem(
                                         text = item.voteCount,
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Normal,
-                                        color = colorResource(R.color.background_100),
+                                        color = ColorPalette.background100,
                                         lineHeight = 17.sp
                                     )
                                 }
@@ -538,7 +536,7 @@ fun LazyListScope.exoRankingItem(
                                     text = remember(item.angelCount) { item.angelCount.toString() },
                                     fontSize = 7.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = colorResource(R.color.text_angel),
+                                    color = ColorPalette.textAngel,
                                     modifier = Modifier.offset(y = (-3).dp)
                                 )
                             }
@@ -560,7 +558,7 @@ fun LazyListScope.exoRankingItem(
                                     text = remember(item.fairyCount) { item.fairyCount.toString() },
                                     fontSize = 7.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = colorResource(R.color.text_fairy),
+                                    color = ColorPalette.textFairy,
                                     modifier = Modifier.offset(y = (-3).dp)
                                 )
                             }
@@ -582,7 +580,7 @@ fun LazyListScope.exoRankingItem(
                                     text = remember(item.miracleCount) { item.miracleCount.toString() },
                                     fontSize = 7.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = colorResource(R.color.text_miracle),
+                                    color = ColorPalette.textMiracle,
                                     modifier = Modifier.offset(y = (-3).dp)
                                 )
                             }
@@ -604,7 +602,7 @@ fun LazyListScope.exoRankingItem(
                                     text = remember(item.rookieCount) { item.rookieCount.toString() },
                                     fontSize = 7.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = colorResource(R.color.text_rookie),
+                                    color = ColorPalette.textRookie,
                                     modifier = Modifier.offset(y = (-3).dp)
                                 )
                             }
@@ -626,7 +624,7 @@ fun LazyListScope.exoRankingItem(
                                     text = "S",
                                     fontSize = 7.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = colorResource(R.color.text_super_rookie),
+                                    color = ColorPalette.textSuperRookie,
                                     modifier = Modifier.offset(y = (-3).dp)
                                 )
                             }
@@ -669,7 +667,7 @@ fun LazyListScope.exoRankingItem(
             if (index < items.size - 1) {
                 HorizontalDivider(
                     thickness = 0.5.dp,
-                    color = colorResource(R.color.gray200)
+                    color = ColorPalette.gray200
                 )
             }
         }
@@ -698,7 +696,7 @@ private fun AggregatedRankingItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(colorResource(R.color.background_100))
+            .background(ColorPalette.background100)
     ) {
         Row(
             modifier = Modifier
@@ -741,9 +739,7 @@ private fun AggregatedRankingItem(
                     text = stringResource(R.string.rank_count_format, item.rank),
                     fontSize = 11.sp,
                     lineHeight = 11.sp,  // Explicit lineHeight to match fontSize
-                    color = colorResource(
-                        if (item.rank <= 3) R.color.main else R.color.gray580
-                    )
+                    color = if (item.rank <= 3) ColorPalette.main else ColorPalette.gray580
                 )
 
                 // 순위 변동 표시 (TODO: rankChange 필드 추가 필요)
@@ -787,14 +783,14 @@ private fun AggregatedRankingItem(
                         text = "${item.voteCount}점",
                         fontSize = 11.sp,
                         lineHeight = 11.sp,  // Explicit lineHeight to eliminate default spacing
-                        color = colorResource(R.color.text_gray)
+                        color = ColorPalette.textGray
                     )
 
                     // 날짜 (TODO: date 필드 추가 필요)
                     // Text(
                     //     text = item.date ?: "",
                     //     fontSize = 12.sp,
-                    //     color = colorResource(R.color.gray200)
+                    //     color = ColorPalette.gray200
                     // )
                 }
             }
@@ -814,7 +810,7 @@ private fun AggregatedRankingItem(
         if (index < totalItems - 1) {
             HorizontalDivider(
                 thickness = 0.5.dp,
-                color = colorResource(R.color.gray200)
+                color = ColorPalette.gray200
             )
         }
     }
@@ -848,7 +844,7 @@ fun HeartPickRankingItem(
             text = "${item.rank}",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = colorResource(R.color.text_default),
+            color = ColorPalette.textDefault,
             modifier = Modifier.width(24.dp)
         )
 
@@ -900,7 +896,7 @@ fun HeartPickRankingItem(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
-                            color = colorResource(R.color.gray100),
+                            color = ColorPalette.gray100,
                             shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
                         )
                 )
@@ -913,8 +909,8 @@ fun HeartPickRankingItem(
                         .background(
                             brush = Brush.horizontalGradient(
                                 colors = listOf(
-                                    colorResource(R.color.s_league_progress),
-                                    colorResource(R.color.main)
+                                    ColorPalette.sLeagueProgress,
+                                    ColorPalette.main
                                 )
                             ),
                             shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp)
@@ -950,7 +946,7 @@ fun HeartPickRankingItem(
                             fontSize = 10.sp,
                             lineHeight = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White,
+                            color = ColorPalette.fixWhite,
                             modifier = Modifier.padding(end = 4.dp)
                         )
                     }
@@ -967,7 +963,7 @@ fun HeartPickRankingItem(
                             fontSize = 10.sp,
                             lineHeight = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White,
+                            color = ColorPalette.fixWhite,
                             modifier = Modifier.padding(end = 8.dp)
                         )
                     }

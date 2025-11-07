@@ -13,7 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
+import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -91,7 +91,7 @@ fun UnifiedRankingSubPage(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = colorResource(R.color.main))
+                CircularProgressIndicator(color = ColorPalette.main)
             }
         }
 
@@ -106,7 +106,7 @@ fun UnifiedRankingSubPage(
                 Text(
                     text = "오류: ${error.message}",
                     fontSize = 16.sp,
-                    color = colorResource(R.color.main)
+                    color = ColorPalette.main
                 )
             }
         }
@@ -124,7 +124,7 @@ fun UnifiedRankingSubPage(
                     Text(
                         text = "랭킹 데이터가 없습니다.",
                         fontSize = 16.sp,
-                        color = colorResource(R.color.text_dimmed)
+                        color = ColorPalette.textDimmed
                     )
                 }
             } else {
