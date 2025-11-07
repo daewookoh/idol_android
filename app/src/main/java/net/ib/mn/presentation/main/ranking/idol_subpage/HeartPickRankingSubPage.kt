@@ -1,5 +1,6 @@
 package net.ib.mn.presentation.main.ranking.idol_subpage
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -96,7 +97,9 @@ fun HeartPickRankingSubPage(
             } else {
                 LazyColumn(
                     state = scrollState,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(ColorPalette.background400)
                 ) {
                     items(success.items) { cardData ->
                         ExoHeartPickCard(

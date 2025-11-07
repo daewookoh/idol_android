@@ -104,7 +104,7 @@ private val NoticeBackgroundLight = Color(0xFFFFF4F4)
 
 // ==================== Dark Mode Colors ====================
 private val MainDark = Color(0xFFE24848)
-private val MainLightVariantDark = Color(0xFFE24848)
+private val MainLightVariantDark = Color(0xFFEC716C)
 private val NavigationBarDark = Color(0xFF1F1F1F)
 private val BottomSheetTitleDark = Color(0xFF8F8F8F)
 
@@ -132,7 +132,7 @@ private val Gray50Dark = Color(0xFF101010)
 private val Gray80Dark = Color(0xFF1a1a1a)
 private val Gray100Dark = Color(0xFF303030)
 private val Gray110Dark = Color(0xFF3a3a3a)
-private val Gray120Dark = Color(0xFF3c3c3c)
+private val Gray120Dark = Color(0xFF262626)
 private val Gray150Dark = Color(0xFF404040)
 private val Gray200Dark = Color(0xFF606060)
 private val Gray250Dark = Color(0xFF707070)
@@ -174,7 +174,7 @@ private val ALeagueProgressDark = Color(0xFFFF6666)
 
 // Main Color Variants - Dark
 private val Main100Dark = Color(0xFF2a1a1a)
-private val Main200Dark = Color(0xFF351f1f)
+private val Main200Dark = Color(0xFF312626)
 private val Main300Dark = Color(0xFF4a2626)
 
 // Actionbar - Dark
@@ -186,7 +186,7 @@ private val Pink400Dark = Color(0xFFFF9BC1)
 private val Pink500Dark = Color(0xFFFF7AAD)
 
 // White - Dark
-private val WhiteDark = Color(0xFFFFFFFF)
+private val WhiteDark = Color(0xFF414243)
 
 // Notice - Dark
 private val NoticeBackgroundDark = Color(0xFF2a1a1a)
@@ -197,6 +197,7 @@ private val FixGray1000 = Color(0xFF000000)
 private val FixGray900 = Color(0xFF222222)
 private val FixWhite = Color(0xFFFFFFFF)
 private val FixMain = Color(0xFFFF4444)
+private val FixTransparent = Color(0x00000000)
 
 // 기부 뱃지 COLOR (고정)
 private val TextAngel = Color(0xFF10CDDD)
@@ -507,6 +508,7 @@ object ColorPalette {
     val fixGray900: Color get() = FixGray900
     val fixWhite: Color get() = FixWhite
     val fixMain: Color get() = FixMain
+    val fixTransparent: Color get() = FixTransparent
 
     // ==================== awards ====================
     val awardsYellow: Color get() = AwardsYellow

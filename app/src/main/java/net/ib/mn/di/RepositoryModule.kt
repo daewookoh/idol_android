@@ -5,6 +5,8 @@ import net.ib.mn.data.repository.ConfigRepositoryImpl
 import net.ib.mn.data.repository.HeartpickRepositoryImpl
 import net.ib.mn.data.repository.IdolRepositoryImpl
 import net.ib.mn.data.repository.MessageRepositoryImpl
+import net.ib.mn.data.repository.OnepickRepositoryImpl
+import net.ib.mn.data.repository.ThemepickRepositoryImpl
 import net.ib.mn.data.repository.UserRepositoryImpl
 import net.ib.mn.data.repository.UtilityRepositoryImpl
 import net.ib.mn.domain.repository.AdRepository
@@ -12,6 +14,8 @@ import net.ib.mn.domain.repository.ConfigRepository
 import net.ib.mn.domain.repository.HeartpickRepository
 import net.ib.mn.domain.repository.IdolRepository
 import net.ib.mn.domain.repository.MessageRepository
+import net.ib.mn.domain.repository.OnepickRepository
+import net.ib.mn.domain.repository.ThemepickRepository
 import net.ib.mn.domain.repository.UserRepository
 import net.ib.mn.domain.repository.UtilityRepository
 import dagger.Binds
@@ -70,4 +74,16 @@ abstract class RepositoryModule {
     abstract fun bindHeartpickRepository(
         impl: HeartpickRepositoryImpl
     ): HeartpickRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindThemepickRepository(
+        impl: ThemepickRepositoryImpl
+    ): ThemepickRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindOnepickRepository(
+        impl: OnepickRepositoryImpl
+    ): OnepickRepository
 }

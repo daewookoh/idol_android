@@ -5,6 +5,7 @@
 2. [Activity 분석 및 구조 파악](#activity-분석-및-구조-파악)
 3. [Compose Screen 생성](#compose-screen-생성)
 4. [UI 레이아웃 변환](#ui-레이아웃-변환)
+   - [리소스 마이그레이션 규칙 (필수)](#4-리소스-마이그레이션-규칙)
 5. [이벤트 처리 변환](#이벤트-처리-변환)
 6. [실제 변환 예시](#실제-변환-예시)
 7. [주의사항 및 트러블슈팅](#주의사항-및-트러블슈팅)
@@ -306,6 +307,109 @@ Text(
     modifier = Modifier.background(painterResource(R.drawable.bg_button))
 )
 ```
+
+### 4. 리소스 마이그레이션 규칙
+
+#### ⚠️ 필수 규칙: 기존 리소스 재사용
+
+**Rule 1: XML 레이아웃 및 이미지 파일 복사**
+- **MUST**: Old 프로젝트에서 사용하는 XML 레이아웃 파일 및 이미지 리소스는 **모두 복사**하여 사용
+- **WHY**: 동일한 디자인을 유지하고, 기존 리소스 재사용으로 작업 효율성 향상
+- **HOW**:
+  - Old 프로젝트의 `res/layout/`, `res/drawable/` 폴더에서 해당 파일들을 찾아 복사
+  - 같은 경로에 동일한 이름으로 배치
+
+```bash
+# 예시: XML 레이아웃 복사
+old/app/src/main/res/layout/activity_feed.xml
+  → app/src/main/res/layout/activity_feed.xml (참고용)
+
+# 예시: 이미지 리소스 복사
+old/app/src/main/res/drawable/icon_heart.xml
+  → app/src/main/res/drawable/icon_heart.xml
+```
+
+**Rule 2: String 리소스는 절대 새로 추가하지 말 것**
+- **MUST**: 모든 String 리소스는 **이미 `strings.xml`에 정의되어 있음**
+- **DO**: 기존 `strings.xml`에서 적절한 키를 찾아서 사용
+- **DON'T**: 새로운 String 리소스를 추가하지 말 것
+- **WHY**: 다국어 지원이 이미 완료되어 있으며, 중복 키 방지 및 일관성 유지
+
+```kotlin
+// ✅ GOOD: 기존 String 리소스 사용
+Text(stringResource(R.string.guide_vote_title))
+Text(stringResource(R.string.see_result))
+
+// ❌ BAD: 하드코딩하지 말 것
+Text("투표하기")
+
+// ❌ BAD: 새로운 String 리소스 추가하지 말 것
+// <string name="new_vote_text">투표하기</string>
+```
+
+**String 리소스 검색 방법**:
+```kotlin
+// 1. 프로젝트 내 검색
+// app/src/main/res/values/strings.xml 파일에서 키워드 검색
+
+// 2. Old 프로젝트 참고
+// old/app/src/main/res/values/strings.xml에서 사용된 키 확인
+// old/app/src/main/res/values-ko/strings.xml (한국어)
+// old/app/src/main/res/values-en/strings.xml (영어)
+// old/app/src/main/res/values-ja/strings.xml (일본어)
+```
+
+**Rule 3: Color 값은 ColorPalette 사용 필수**
+- **MUST**: 모든 Color 값은 **`ColorPalette` 객체에서만** 가져와 사용
+- **DO NOT**: `colorResource(R.color.xxx)` 사용 금지
+- **DO NOT**: `Color(0xFFXXXXXX)` 하드코딩 금지
+- **IMPORTANT**: 필요한 색상이 `ColorPalette`에 없을 경우, **작업 시작 전에 반드시 알려줄 것**
+
+```kotlin
+// ✅ GOOD: ColorPalette 사용
+Text(
+    text = "Title",
+    color = ColorPalette.textDefault
+)
+
+Box(
+    modifier = Modifier.background(ColorPalette.main)
+)
+
+// ❌ BAD: colorResource 사용 금지
+Text(
+    color = colorResource(R.color.main)  // ❌ 사용하지 말 것
+)
+
+// ❌ BAD: 하드코딩 금지
+Text(
+    color = Color(0xFF6200EE)  // ❌ 사용하지 말 것
+)
+```
+
+**ColorPalette에 색상이 없는 경우 대응 방법**:
+```kotlin
+// ⚠️ 작업 시작 전 체크 필수
+// 1. Old 프로젝트에서 사용하는 색상 확인
+//    old/app/src/main/res/values/colors.xml
+
+// 2. 해당 색상이 ColorPalette에 있는지 확인
+//    app/src/main/java/net/ib/mn/ui/theme/Color.kt
+
+// 3. 없으면 작업 시작 전에 알림
+//    "ColorPalette에 'primary_variant' 색상이 없습니다.
+//     Old 프로젝트의 @color/primary_variant (#FF03DAC5) 색상을
+//     ColorPalette에 추가해야 합니다."
+```
+
+**리소스 사용 체크리스트**:
+- [ ] XML 레이아웃 파일을 Old 프로젝트에서 복사했는가?
+- [ ] 이미지 리소스(drawable)를 Old 프로젝트에서 복사했는가?
+- [ ] 모든 텍스트에 `stringResource(R.string.xxx)` 사용했는가?
+- [ ] 새로운 String 리소스를 추가하지 않았는가?
+- [ ] 모든 색상을 `ColorPalette`에서 가져왔는가?
+- [ ] `colorResource()` 또는 하드코딩된 `Color()`를 사용하지 않았는가?
+- [ ] 필요한 색상이 ColorPalette에 없는 경우 사전에 알렸는가?
 
 ---
 

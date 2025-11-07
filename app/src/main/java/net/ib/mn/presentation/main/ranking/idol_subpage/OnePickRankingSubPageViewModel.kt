@@ -9,40 +9,47 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import net.ib.mn.data.local.dao.IdolDao
-import net.ib.mn.data.local.entity.IdolEntity
 import net.ib.mn.domain.model.ApiResult
-import net.ib.mn.domain.repository.RankingRepository
-import net.ib.mn.ui.components.RankingItemData
-import net.ib.mn.util.IdolImageUtil
-import java.text.NumberFormat
+import net.ib.mn.domain.model.ImagePickModel
+import net.ib.mn.domain.model.ThemePickModel
+import net.ib.mn.domain.repository.OnepickRepository
+import net.ib.mn.domain.repository.ThemepickRepository
+import net.ib.mn.ui.components.OnePickState
+import net.ib.mn.util.IdolImageUtil.toSecureUrl
+import net.ib.mn.util.NumberFormatUtil
+import java.text.SimpleDateFormat
 import java.util.Locale
 
 /**
- * OnePick (기적) 랭킹 ViewModel
+ * OnePick (테마픽/이미지픽) ViewModel
  *
- * charts/ranks/ API 사용
- * 남녀 변경에 영향 받지 않음
+ * 테마픽과 이미지픽을 탭으로 전환하며 표시
  */
 @HiltViewModel(assistedFactory = OnePickRankingSubPageViewModel.Factory::class)
 class OnePickRankingSubPageViewModel @AssistedInject constructor(
     @Assisted private val chartCode: String,
     @ApplicationContext private val context: Context,
-    private val rankingRepository: RankingRepository,
-    private val idolDao: IdolDao,
-    private val broadcastManager: net.ib.mn.data.remote.udp.IdolBroadcastManager
+    private val themepickRepository: ThemepickRepository,
+    private val onepickRepository: OnepickRepository
 ) : ViewModel() {
+
+    /**
+     * 탭 타입
+     */
+    enum class TabType {
+        THEME_PICK,  // 테마픽
+        IMAGE_PICK   // 이미지픽
+    }
 
     sealed interface UiState {
         data object Loading : UiState
         data class Success(
-            val items: List<RankingItemData>,
-            val topIdol: IdolEntity? = null
+            val items: List<OnePickCardData>,
+            val selectedTab: TabType
         ) : UiState
         data class Error(val message: String) : UiState
     }
@@ -50,172 +57,237 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    private var cachedData: List<RankingItemData>? = null
-    private var topIdolCached: IdolEntity? = null
-    private var cachedRanks: List<net.ib.mn.data.remote.dto.AggregateRankModel>? = null
-
-    // UDP 구독 Job (화면에 보일 때만 활성화)
-    private var udpSubscriptionJob: Job? = null
-
-    // 화면 가시성 상태
-    private var isScreenVisible = false
+    private var cachedThemePickData: List<OnePickCardData>? = null
+    private var cachedImagePickData: List<OnePickCardData>? = null
+    private var currentTab: TabType = TabType.THEME_PICK
 
     init {
         android.util.Log.d("OnePickRankingVM", "🆕 ViewModel created for chartCode: $chartCode")
-        loadRankingData()
-    }
-
-    /**
-     * 화면이 보일 때 호출 - UDP 구독 시작 및 데이터 새로고침
-     */
-    fun onScreenVisible() {
-        android.util.Log.d("OnePickRankingVM", "👁️ Screen became visible")
-        isScreenVisible = true
-
-        // DB에서 최신 데이터 로드
-        val ranks = cachedRanks
-        if (ranks != null && ranks.isNotEmpty()) {
-            android.util.Log.d("OnePickRankingVM", "🔄 Refreshing data from DB (${ranks.size} items)")
-            viewModelScope.launch(Dispatchers.IO) {
-                processRanksData(ranks)
-            }
-        }
-
-        // UDP 구독 시작
-        startUdpSubscription()
-    }
-
-    /**
-     * 화면이 사라질 때 호출 - UDP 구독 중지
-     */
-    fun onScreenHidden() {
-        android.util.Log.d("OnePickRankingVM", "🙈 Screen hidden")
-        isScreenVisible = false
-        stopUdpSubscription()
-    }
-
-    /**
-     * UDP 구독 시작
-     */
-    private fun startUdpSubscription() {
-        // 이미 구독 중이면 중복 방지
-        if (udpSubscriptionJob?.isActive == true) {
-            android.util.Log.d("OnePickRankingVM", "⚠️ UDP already subscribed, skipping")
-            return
-        }
-
-        android.util.Log.d("OnePickRankingVM", "📡 Starting UDP subscription")
-        udpSubscriptionJob = viewModelScope.launch {
-            broadcastManager.updateEvent.collect { changedIds ->
-                // 화면이 보이지 않으면 무시
-                if (!isScreenVisible) {
-                    android.util.Log.d("OnePickRankingVM", "⏭️ Screen not visible, ignoring UDP update")
-                    return@collect
-                }
-
-                android.util.Log.d("OnePickRankingVM", "🔄 UDP update event received - ${changedIds.size} idols changed")
-
-                // 캐시된 ranks 데이터가 있으면 재가공
-                val ranks = cachedRanks
-                if (ranks != null && ranks.isNotEmpty()) {
-                    // 변경된 아이돌 중 현재 차트에 포함된 아이돌이 있는지 확인
-                    val cachedIdolIds = ranks.map { it.idolId }
-                    val hasRelevantChanges = changedIds.any { it in cachedIdolIds }
-
-                    if (hasRelevantChanges) {
-                        android.util.Log.d("OnePickRankingVM", "📊 Reprocessing ${ranks.size} ranks")
-                        android.util.Log.d("OnePickRankingVM", "   → Changed IDs in this chart: ${changedIds.filter { it in cachedIdolIds }}")
-                        android.util.Log.d("OnePickRankingVM", "   → DB에서 업데이트된 데이터 재조회 → 변경된 아이템만 리컴포지션")
-
-                        launch(Dispatchers.IO) {
-                            processRanksData(ranks)
-                        }
-                    } else {
-                        android.util.Log.d("OnePickRankingVM", "⏭️ No relevant changes for this chart - skipping update")
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * UDP 구독 중지
-     */
-    private fun stopUdpSubscription() {
-        udpSubscriptionJob?.cancel()
-        udpSubscriptionJob = null
-        android.util.Log.d("OnePickRankingVM", "🛑 Stopped UDP subscription")
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        stopUdpSubscription()
-        android.util.Log.d("OnePickRankingVM", "♻️ ViewModel cleared")
+        loadThemePickList()
     }
 
     fun reloadIfNeeded() {
-        if (cachedData != null) {
-            android.util.Log.d("OnePickRankingVM", "✓ Using cached data")
-            _uiState.value = UiState.Success(cachedData!!, topIdolCached)
-        } else {
-            loadRankingData()
+        when (currentTab) {
+            TabType.THEME_PICK -> {
+                if (cachedThemePickData != null) {
+                    android.util.Log.d("OnePickRankingVM", "✓ Using cached ThemePick data")
+                    _uiState.value = UiState.Success(cachedThemePickData!!, currentTab)
+                } else {
+                    loadThemePickList()
+                }
+            }
+            TabType.IMAGE_PICK -> {
+                if (cachedImagePickData != null) {
+                    android.util.Log.d("OnePickRankingVM", "✓ Using cached ImagePick data")
+                    _uiState.value = UiState.Success(cachedImagePickData!!, currentTab)
+                } else {
+                    loadImagePickList()
+                }
+            }
         }
     }
 
-    private fun loadRankingData() {
+    /**
+     * 탭 전환
+     */
+    fun switchTab(tabType: TabType) {
+        if (currentTab == tabType) return
+
+        currentTab = tabType
+        android.util.Log.d("OnePickRankingVM", "🔄 Switching tab to: $tabType")
+
+        when (tabType) {
+            TabType.THEME_PICK -> {
+                if (cachedThemePickData != null) {
+                    _uiState.value = UiState.Success(cachedThemePickData!!, currentTab)
+                } else {
+                    loadThemePickList()
+                }
+            }
+            TabType.IMAGE_PICK -> {
+                if (cachedImagePickData != null) {
+                    _uiState.value = UiState.Success(cachedImagePickData!!, currentTab)
+                } else {
+                    loadImagePickList()
+                }
+            }
+        }
+    }
+
+    /**
+     * 테마픽 목록 로드
+     */
+    private fun loadThemePickList() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = UiState.Loading
 
             android.util.Log.d("OnePickRankingVM", "========================================")
-            android.util.Log.d("OnePickRankingVM", "[OnePick] Loading ranking data")
-            android.util.Log.d("OnePickRankingVM", "  - chartCode: $chartCode")
-            android.util.Log.d("OnePickRankingVM", "  - API: charts/ranks/")
+            android.util.Log.d("OnePickRankingVM", "[ThemePick] Loading theme pick list")
+            android.util.Log.d("OnePickRankingVM", "  - API: themepick/")
 
-            // charts/ranks/ API 호출
-            rankingRepository.getChartRanks(chartCode).collect { result ->
+            themepickRepository.getThemePickList(offset = 0, limit = 30).collect { result ->
                 when (result) {
                     is ApiResult.Loading -> {
                         android.util.Log.d("OnePickRankingVM", "⏳ Loading...")
                     }
                     is ApiResult.Success -> {
-                        android.util.Log.d("OnePickRankingVM", "✅ SUCCESS - Ranks count: ${result.data.size}")
-                        cachedRanks = result.data
-                        processRanksData(result.data)
+                        android.util.Log.d("OnePickRankingVM", "✅ SUCCESS - ThemePicks count: ${result.data.size}")
+                        processThemePickData(result.data)
                     }
                     is ApiResult.Error -> {
                         android.util.Log.e("OnePickRankingVM", "❌ ERROR: ${result.message}")
-                        _uiState.value = UiState.Error(result.message ?: "Error loading data")
+                        _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
                     }
                 }
             }
         }
     }
 
-    private suspend fun processRanksData(ranks: List<net.ib.mn.data.remote.dto.AggregateRankModel>) {
+    /**
+     * 이미지픽 목록 로드
+     */
+    private fun loadImagePickList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.value = UiState.Loading
+
+            android.util.Log.d("OnePickRankingVM", "========================================")
+            android.util.Log.d("OnePickRankingVM", "[ImagePick] Loading image pick list")
+            android.util.Log.d("OnePickRankingVM", "  - API: onepick/")
+
+            onepickRepository.getImagePickList(offset = 0, limit = 30).collect { result ->
+                when (result) {
+                    is ApiResult.Loading -> {
+                        android.util.Log.d("OnePickRankingVM", "⏳ Loading...")
+                    }
+                    is ApiResult.Success -> {
+                        android.util.Log.d("OnePickRankingVM", "✅ SUCCESS - ImagePicks count: ${result.data.size}")
+                        processImagePickData(result.data)
+                    }
+                    is ApiResult.Error -> {
+                        android.util.Log.e("OnePickRankingVM", "❌ ERROR: ${result.message}")
+                        _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun processThemePickData(themePickList: List<ThemePickModel>) {
         try {
-            val result = net.ib.mn.util.RankingUtil.processRanksData(
-                ranks = ranks,
-                idolDao = idolDao,
-                formatScore = ::formatScore
-            )
+            val cardDataList = themePickList.map { themePick ->
+                val state = when (themePick.status) {
+                    ThemePickModel.STATUS_PREPARING -> OnePickState.UPCOMING
+                    ThemePickModel.STATUS_PROGRESS -> OnePickState.ACTIVE
+                    else -> OnePickState.ENDED
+                }
 
-            android.util.Log.d("OnePickRankingVM", "✅ Processed ${result.rankItems.size} items")
+                val periodDate = formatPeriodDate(themePick.beginAt, themePick.expiredAt)
+                val voteCount = NumberFormatUtil.formatNumberShort(themePick.count)
 
-            cachedData = result.rankItems
-            topIdolCached = result.topIdol
+                // UPCOMING 상태일 때 D-Day 계산
+                val subTitle = if (state == OnePickState.UPCOMING) {
+                    calculateDDay(themePick.beginAt)
+                } else {
+                    themePick.subtitle
+                }
 
-            _uiState.value = UiState.Success(
-                items = result.rankItems,
-                topIdol = result.topIdol
-            )
+                OnePickCardData(
+                    id = themePick.id,
+                    state = state,
+                    title = themePick.title,
+                    subTitle = subTitle,
+                    imageUrl = themePick.imageUrl.toSecureUrl(),
+                    voteCount = voteCount,
+                    periodDate = periodDate
+                )
+            }
+
+            android.util.Log.d("OnePickRankingVM", "✅ Processed ${cardDataList.size} theme picks")
+
+            cachedThemePickData = cardDataList
+            _uiState.value = UiState.Success(cardDataList, currentTab)
         } catch (e: Exception) {
             android.util.Log.e("OnePickRankingVM", "❌ Exception: ${e.message}", e)
             _uiState.value = UiState.Error(e.message ?: "Error")
         }
     }
 
-    private fun formatScore(score: Int): String {
-        return NumberFormat.getNumberInstance(Locale.US).format(score)
+    private fun processImagePickData(imagePickList: List<ImagePickModel>) {
+        try {
+            val cardDataList = imagePickList.map { imagePick ->
+                val state = when (imagePick.status) {
+                    ImagePickModel.STATUS_PREPARING -> OnePickState.UPCOMING
+                    ImagePickModel.STATUS_PROGRESS -> OnePickState.ACTIVE
+                    else -> OnePickState.ENDED
+                }
+
+                val periodDate = formatPeriodDate(imagePick.createdAt, imagePick.expiredAt)
+                val voteCount = NumberFormatUtil.formatNumberShort(imagePick.count)
+
+                // UPCOMING 상태일 때 D-Day 계산
+                val subTitle = if (state == OnePickState.UPCOMING) {
+                    calculateDDay(imagePick.createdAt)
+                } else {
+                    imagePick.subtitle
+                }
+
+                OnePickCardData(
+                    id = imagePick.id,
+                    state = state,
+                    title = imagePick.title,
+                    subTitle = subTitle,
+                    imageUrl = "", // 이미지픽은 별도 이미지 URL이 없음
+                    voteCount = voteCount,
+                    periodDate = periodDate
+                )
+            }
+
+            android.util.Log.d("OnePickRankingVM", "✅ Processed ${cardDataList.size} image picks")
+
+            cachedImagePickData = cardDataList
+            _uiState.value = UiState.Success(cardDataList, currentTab)
+        } catch (e: Exception) {
+            android.util.Log.e("OnePickRankingVM", "❌ Exception: ${e.message}", e)
+            _uiState.value = UiState.Error(e.message ?: "Error")
+        }
+    }
+
+    private fun formatPeriodDate(beginAt: String, expiredAt: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("yyyy. M. d.", Locale.getDefault())
+
+            val beginDate = inputFormat.parse(beginAt)
+            val endDate = inputFormat.parse(expiredAt)
+
+            if (beginDate != null && endDate != null) {
+                "${outputFormat.format(beginDate)} ~ ${outputFormat.format(endDate)}"
+            } else {
+                ""
+            }
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+    private fun calculateDDay(beginAt: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            val beginDate = inputFormat.parse(beginAt)
+
+            if (beginDate != null) {
+                val currentTime = System.currentTimeMillis()
+                val beginTime = beginDate.time
+                val diffInMillis = beginTime - currentTime
+                val diffInDays = (diffInMillis / (1000 * 60 * 60 * 24)).toInt()
+
+                "투표시작 D-$diffInDays"
+            } else {
+                ""
+            }
+        } catch (e: Exception) {
+            ""
+        }
     }
 
     @AssistedFactory
@@ -223,3 +295,16 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
         fun create(chartCode: String): OnePickRankingSubPageViewModel
     }
 }
+
+/**
+ * OnePick 카드 데이터
+ */
+data class OnePickCardData(
+    val id: Int,
+    val state: OnePickState,
+    val title: String,
+    val subTitle: String,
+    val imageUrl: String,
+    val voteCount: String,
+    val periodDate: String
+)

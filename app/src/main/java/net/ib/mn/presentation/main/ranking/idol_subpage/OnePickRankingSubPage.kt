@@ -1,9 +1,10 @@
 package net.ib.mn.presentation.main.ranking.idol_subpage
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -13,19 +14,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import net.ib.mn.ui.theme.ColorPalette
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
-import net.ib.mn.ui.components.ExoRankingList
-import net.ib.mn.util.IdolImageUtil
+import net.ib.mn.ui.components.ExoOnePickCard
+import net.ib.mn.ui.components.ExoTabSwitch
+import net.ib.mn.ui.theme.ColorPalette
 
 /**
- * 기적(OnePick) 랭킹 SubPage
+ * OnePick (테마픽/이미지픽) 랭킹 SubPage
  *
- * 완전히 독립적인 페이지로, 자체 ViewModel과 상태를 관리합니다.
- * charts/ranks/ API 사용, 남녀 변경에 영향 받지 않음
+ * 테마픽과 이미지픽을 탭으로 전환하며 표시
  */
 @Composable
 fun OnePickRankingSubPage(
@@ -36,7 +37,6 @@ fun OnePickRankingSubPage(
 ) {
     android.util.Log.d("OnePickRankingSubPage", "🎨 [Composing] OnePick for chartCode: $chartCode")
 
-    // 독립적인 OnePickRankingSubPageViewModel
     val viewModel: OnePickRankingSubPageViewModel = hiltViewModel<OnePickRankingSubPageViewModel, OnePickRankingSubPageViewModel.Factory> { factory ->
         factory.create(chartCode)
     }
@@ -50,47 +50,67 @@ fun OnePickRankingSubPage(
         viewModel.reloadIfNeeded()
     }
 
-    // 화면 가시성 변경 시 UDP 구독 관리 및 데이터 새로고침
-    LaunchedEffect(isVisible) {
-        if (isVisible) {
-            android.util.Log.d("OnePickRankingSubPage", "[SubPage] 👁️ Screen became visible")
-            viewModel.onScreenVisible()
-        } else {
-            android.util.Log.d("OnePickRankingSubPage", "[SubPage] 🙈 Screen hidden")
-            viewModel.onScreenHidden()
-        }
-    }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(ColorPalette.background400)
+    ) {
+        // 탭 영역
+        val tabs = listOf(
+            stringResource(R.string.themepick),
+            stringResource(R.string.imagepick)
+        )
 
-    when (uiState) {
-        is OnePickRankingSubPageViewModel.UiState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = ColorPalette.main)
+        when (val state = uiState) {
+            is OnePickRankingSubPageViewModel.UiState.Success -> {
+                val selectedIndex = when (state.selectedTab) {
+                    OnePickRankingSubPageViewModel.TabType.THEME_PICK -> 0
+                    OnePickRankingSubPageViewModel.TabType.IMAGE_PICK -> 1
+                }
+                ExoTabSwitch(
+                    tabs = tabs,
+                    selectedIndex = selectedIndex,
+                    onTabSelected = { index ->
+                        val tabType = if (index == 0) {
+                            OnePickRankingSubPageViewModel.TabType.THEME_PICK
+                        } else {
+                            OnePickRankingSubPageViewModel.TabType.IMAGE_PICK
+                        }
+                        viewModel.switchTab(tabType)
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
-        }
-
-        is OnePickRankingSubPageViewModel.UiState.Error -> {
-            val error = uiState as OnePickRankingSubPageViewModel.UiState.Error
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "오류: ${error.message}",
-                    fontSize = 16.sp,
-                    color = ColorPalette.main
+            else -> {
+                // Loading이나 Error 상태에서도 탭 표시
+                ExoTabSwitch(
+                    tabs = tabs,
+                    selectedIndex = 0,
+                    onTabSelected = { index ->
+                        val tabType = if (index == 0) {
+                            OnePickRankingSubPageViewModel.TabType.THEME_PICK
+                        } else {
+                            OnePickRankingSubPageViewModel.TabType.IMAGE_PICK
+                        }
+                        viewModel.switchTab(tabType)
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
 
-        is OnePickRankingSubPageViewModel.UiState.Success -> {
-            val success = uiState as OnePickRankingSubPageViewModel.UiState.Success
+        // 컨텐츠 영역
+        when (val state = uiState) {
+            is OnePickRankingSubPageViewModel.UiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = ColorPalette.main)
+                }
+            }
 
-            if (success.items.isEmpty()) {
+            is OnePickRankingSubPageViewModel.UiState.Error -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -98,21 +118,51 @@ fun OnePickRankingSubPage(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "랭킹 데이터가 없습니다.",
+                        text = stringResource(R.string.msg_error_ok),
                         fontSize = 16.sp,
-                        color = ColorPalette.textDimmed
+                        color = ColorPalette.main
                     )
                 }
-            } else {
-                ExoRankingList(
-                    items = success.items,
-                    listState = scrollState,
-                    onItemClick = { rank, item ->
-                        android.util.Log.d("OnePickRankingSubPage", "Clicked: Rank $rank - ${item.name}")
+            }
+
+            is OnePickRankingSubPageViewModel.UiState.Success -> {
+                if (state.items.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.msg_no_data),
+                            fontSize = 16.sp,
+                            color = ColorPalette.textDimmed
+                        )
                     }
-                )
+                } else {
+                    LazyColumn(
+                        state = scrollState,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(state.items) { cardData ->
+                            ExoOnePickCard(
+                                state = cardData.state,
+                                title = cardData.title,
+                                subTitle = cardData.subTitle,
+                                imageUrl = cardData.imageUrl,
+                                voteCount = cardData.voteCount,
+                                periodDate = cardData.periodDate,
+                                onCardClick = {
+                                    android.util.Log.d("OnePickRankingSubPage", "Card clicked: ${cardData.title}")
+                                },
+                                onVoteClick = {
+                                    android.util.Log.d("OnePickRankingSubPage", "Vote clicked: ${cardData.title}")
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
     }
 }
-

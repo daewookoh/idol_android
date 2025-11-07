@@ -186,7 +186,7 @@ fun RankingPage(
     }
 
     val subPagerState = rememberPagerState(
-        initialPage = 5, // 6번째 탭 (HEARTPICK)을 기본 선택
+        initialPage = 6, // 기본 선택 탭
         pageCount = { tabDataList.size }
     )
     val coroutineScope = rememberCoroutineScope()
