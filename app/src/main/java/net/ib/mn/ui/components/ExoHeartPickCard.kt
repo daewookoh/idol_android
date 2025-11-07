@@ -49,6 +49,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.util.NumberFormatUtil
 
 /**
  * ExoHeartPickCard - 하트픽 투표 카드 컴포넌트
@@ -136,7 +137,7 @@ private fun UpcomingHeartPickCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(ColorPalette.background400)
+            .background(ColorPalette.background200)
             .padding(vertical = 7.5.dp)
     ) {
         Card(
@@ -195,7 +196,7 @@ private fun UpcomingHeartPickCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(1f / 0.4f)
-                                .background(ColorPalette.background400)
+                                .background(ColorPalette.background200)
                         )
                     }
 
@@ -349,7 +350,7 @@ private fun ActiveHeartPickCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(ColorPalette.background400)
+            .background(ColorPalette.background200)
             .padding(vertical = 7.5.dp)
     ) {
         Card(
@@ -385,7 +386,7 @@ private fun ActiveHeartPickCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(1f / 0.42f)
-                                .background(ColorPalette.background400)
+                                .background(ColorPalette.background200)
                         )
                     }
 
@@ -636,7 +637,7 @@ private fun ActiveHeartPickCard(
                         tint = Color.Unspecified
                     )
                     Text(
-                        text = heartVoteCount,
+                        text = NumberFormatUtil.formatNumberShort(heartVoteCount),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = ColorPalette.textGray,
@@ -652,7 +653,7 @@ private fun ActiveHeartPickCard(
                         tint = Color.Unspecified
                     )
                     Text(
-                        text = commentCount,
+                        text = NumberFormatUtil.formatNumberShort(commentCount),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = ColorPalette.textGray,
@@ -706,7 +707,7 @@ private fun EndedHeartPickCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(ColorPalette.background400)
+            .background(ColorPalette.background200)
             .padding(vertical = 7.5.dp)
     ) {
         Card(
@@ -746,7 +747,7 @@ private fun EndedHeartPickCard(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .aspectRatio(1f / 0.42f)
-                                    .background(ColorPalette.background400)
+                                    .background(ColorPalette.background200)
                             )
                         }
 
@@ -903,7 +904,7 @@ private fun EndedHeartPickCard(
                         tint = Color.Unspecified
                     )
                     Text(
-                        text = heartVoteCount,
+                        text = NumberFormatUtil.formatNumberShort(heartVoteCount),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = ColorPalette.textGray,
@@ -919,7 +920,7 @@ private fun EndedHeartPickCard(
                         tint = Color.Unspecified
                     )
                     Text(
-                        text = commentCount,
+                        text = NumberFormatUtil.formatNumberShort(commentCount),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = ColorPalette.textGray,

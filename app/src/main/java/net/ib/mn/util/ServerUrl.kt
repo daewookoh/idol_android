@@ -13,7 +13,7 @@ object ServerUrl {
 
     // 실서버
     val HOST_REAL: String =
-        if (Constants.IS_CELEB) "https://test.myloveactor.com" else "https://www.myloveidol.com"
+        if (Constants.IS_CELEB) "https://test.myloveactor.com" else "https://test.myloveidol.com"
 
     // 테스트 서버
     val HOST_TEST: String =
