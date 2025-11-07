@@ -738,7 +738,7 @@ private fun EndedHeartPickCard(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    // 상단 영역 (배경 이미지 + 그라데이션)
+                    // 상단 영역 (배경 이미지 + 그라데이션 + 타이틀)
                     Box(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -775,6 +775,35 @@ private fun EndedHeartPickCard(
                                     )
                                 )
                         )
+
+                        // 타이틀과 서브타이틀 (Layer 1)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f / 0.42f)
+                                .padding(horizontal = 16.dp)
+                                .padding(top = 56.dp)
+                        ) {
+                            // 제목
+                            Text(
+                                text = title,
+                                fontSize = 19.sp,
+                                color = colorResource(R.color.fix_white),
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+
+                            Spacer(modifier = Modifier.height(2.dp))
+
+                            // 부제목
+                            Text(
+                                text = subTitle,
+                                fontSize = 13.sp,
+                                color = colorResource(R.color.fix_white),
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
 
                     // 1위 아이돌 정보
@@ -879,7 +908,7 @@ private fun EndedHeartPickCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = stringResource(R.string.vote_finish),
+                        text = stringResource(R.string.see_result),
                         fontSize = 14.sp,
                         color = colorResource(R.color.text_default)
                     )
@@ -937,7 +966,7 @@ private fun EndedHeartPickCard(
                 // Layer 2: Dimmed 박스 (전체 어둡게)
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .matchParentSize()
                         .background(Color.Black.copy(alpha = 0.5f))
                 )
 
