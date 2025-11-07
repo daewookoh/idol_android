@@ -112,8 +112,30 @@ fun RankingPage(
     // 즉시 반응하는 로컬 카테고리 상태 사용 (UI 반응성 개선)
     val currentCategory by mainViewModel.currentCategory.collectAsState()
 
-    // 카테고리 로딩 중이면 화면을 보여주지 않음
+    // 프로세스 복원 시 데이터 재로드
+    androidx.compose.runtime.LaunchedEffect(mainChartModel, typeList) {
+        if (BuildConfig.CELEB) {
+            if (typeList.isEmpty()) {
+                android.util.Log.d("RankingPage", "⚠️ TypeList is empty - data may need to be reloaded")
+            }
+        } else {
+            if (mainChartModel == null) {
+                android.util.Log.d("RankingPage", "⚠️ MainChartModel is null - RankingPageViewModel will reload")
+                // RankingPageViewModel의 init에서 자동으로 재로드됨
+            }
+        }
+    }
+
+    // 카테고리 로딩 중이거나 데이터가 없으면 로딩 표시
     if (currentCategory == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            androidx.compose.material3.CircularProgressIndicator(
+                color = colorResource(R.color.main)
+            )
+        }
         return
     }
 
@@ -123,12 +145,26 @@ fun RankingPage(
     // 일반: mainChartModel 확인
     if (BuildConfig.CELEB) {
         if (typeList.isEmpty()) {
-            // 로딩 중
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                androidx.compose.material3.CircularProgressIndicator(
+                    color = colorResource(R.color.main)
+                )
+            }
             return
         }
     } else {
         if (mainChartModel == null) {
-            // 로딩 중
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                androidx.compose.material3.CircularProgressIndicator(
+                    color = colorResource(R.color.main)
+                )
+            }
             return
         }
     }

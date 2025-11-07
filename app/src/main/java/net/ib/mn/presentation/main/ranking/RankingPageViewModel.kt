@@ -26,7 +26,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class RankingPageViewModel @Inject constructor(
-    val configRepository: ConfigRepository // public으로 변경 (RankingPage에서 접근)
+    val configRepository: ConfigRepository, // public으로 변경 (RankingPage에서 접근)
+    private val chartsApi: net.ib.mn.data.remote.api.ChartsApi
 ) : ViewModel() {
 
     /**
@@ -44,8 +45,11 @@ class RankingPageViewModel @Inject constructor(
      */
     val mainChartModel: StateFlow<MainChartModel?> = configRepository.observeMainChartModel()
 
-    val isLoading: StateFlow<Boolean> = MutableStateFlow(false)
-    val error: StateFlow<String?> = MutableStateFlow<String?>(null)
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
 
     init {
         android.util.Log.d("RankingViewModel", "========================================")
@@ -53,5 +57,60 @@ class RankingPageViewModel @Inject constructor(
         android.util.Log.d("RankingViewModel", "  - BuildConfig.CELEB: ${BuildConfig.CELEB}")
         android.util.Log.d("RankingViewModel", "  - Using direct StateFlow from ConfigRepository (zero-copy)")
         android.util.Log.d("RankingViewModel", "========================================")
+
+        // 프로세스 복원 시 데이터가 없으면 재로드
+        if (!BuildConfig.CELEB && configRepository.getMainChartModel() == null) {
+            android.util.Log.w("RankingViewModel", "⚠️ MainChartModel is null (process restored) - reloading data")
+            reloadChartData()
+        }
+    }
+
+    /**
+     * 차트 데이터 재로드 (프로세스 복원 시 사용)
+     */
+    fun reloadChartData() {
+        if (BuildConfig.CELEB) {
+            android.util.Log.d("RankingViewModel", "CELEB app - skipping chart reload")
+            return
+        }
+
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+
+            try {
+                android.util.Log.d("RankingViewModel", "📡 Reloading ChartsCurrent...")
+                val response = chartsApi.getChartsCurrent()
+
+                if (response.isSuccessful && response.body() != null) {
+                    val body = response.body()!!
+
+                    if (body.success) {
+                        // MainChartModel 저장
+                        body.main?.let { mainChartModel ->
+                            configRepository.setMainChartModel(mainChartModel)
+                            android.util.Log.d("RankingViewModel", "✓ MainChartModel reloaded and cached")
+                        }
+
+                        // ChartObjects 저장 (MIRACLE, ROOKIE 등)
+                        body.objects?.let { objects ->
+                            configRepository.setChartObjects(objects)
+                            android.util.Log.d("RankingViewModel", "✓ ChartObjects reloaded and cached")
+                        }
+                    } else {
+                        _error.value = "API returned success=false"
+                        android.util.Log.e("RankingViewModel", "❌ API returned success=false")
+                    }
+                } else {
+                    _error.value = "Failed to load chart data"
+                    android.util.Log.e("RankingViewModel", "❌ Chart API failed: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                _error.value = e.message
+                android.util.Log.e("RankingViewModel", "❌ Exception: ${e.message}", e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
     }
 }
