@@ -11,11 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * 앱 전체에서 사용하는 공통 CheckBox 컴포넌트
@@ -73,17 +72,13 @@ fun ExoCheckBox(
                 is String -> {
                     Text(
                         text = text,
-                        fontSize = if (isMain) 17.sp else 16.sp,
-                        fontWeight = if (isMain) FontWeight.Bold else FontWeight.Medium,
-                        color = colorResource(id = R.color.text_default)
+                        style = if (isMain) ExoTypo.checkboxMain else ExoTypo.checkboxSub
                     )
                 }
                 is AnnotatedString -> {
                     Text(
                         text = text,
-                        fontSize = if (isMain) 17.sp else 16.sp,
-                        fontWeight = if (isMain) FontWeight.Bold else FontWeight.Medium,
-                        color = colorResource(id = R.color.text_default)
+                        style = if (isMain) ExoTypo.checkboxMain else ExoTypo.checkboxSub
                     )
                 }
             }

@@ -39,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * ExoArticle - 게시글 아티클 컴포넌트
@@ -158,9 +159,7 @@ fun ExoArticle(
 
                         Text(
                             text = userName,
-                            fontSize = 14.sp,
-                            color = ColorPalette.main,
-                            fontWeight = FontWeight.Normal
+                            style = ExoTypo.body14Main
                         )
                     }
 
@@ -171,8 +170,7 @@ fun ExoArticle(
                     ) {
                         Text(
                             text = createdAt,
-                            fontSize = 12.sp,
-                            color = ColorPalette.textDimmed
+                            style = ExoTypo.body12
                         )
 
                         if (isPrivate) {
@@ -213,8 +211,7 @@ fun ExoArticle(
                 ) {
                     Text(
                         text = tag,
-                        fontSize = 13.sp,
-                        color = ColorPalette.mainLight
+                        style = ExoTypo.label13
                     )
                 }
             }
@@ -238,9 +235,7 @@ fun ExoArticle(
 
                     Text(
                         text = title,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = ColorPalette.textDefault,
+                        style = ExoTypo.title15Default,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -250,8 +245,7 @@ fun ExoArticle(
             // 4. 내용
             Text(
                 text = content,
-                fontSize = 14.sp,
-                color = ColorPalette.textDefault,
+                style = ExoTypo.body14,
                 maxLines = if (isExpanded) Int.MAX_VALUE else 3,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
@@ -263,8 +257,7 @@ fun ExoArticle(
             if (!isExpanded && content.length > 100) {
                 Text(
                     text = "... 더보기",
-                    fontSize = 13.sp,
-                    color = ColorPalette.textDimmed,
+                    style = ExoTypo.body13.copy(color = ColorPalette.textDimmed),
                     modifier = Modifier
                         .padding(start = 20.dp, top = 13.dp, end = 20.dp)
                         .clickable { isExpanded = true }
@@ -300,8 +293,7 @@ fun ExoArticle(
                         ) {
                             Text(
                                 text = "1/${mediaUrls.size}",
-                                fontSize = 10.sp,
-                                color = ColorPalette.textWhiteBlack,
+                                style = ExoTypo.stat10.copy(color = ColorPalette.textWhiteBlack),
                                 modifier = Modifier.align(Alignment.Center)
                             )
                         }
@@ -395,8 +387,7 @@ private fun StatItem(
         Spacer(modifier = Modifier.width(3.dp))
         Text(
             text = count.toString(),
-            fontSize = 13.sp,
-            color = ColorPalette.textDefault
+            style = ExoTypo.stat13
         )
     }
 }
@@ -430,8 +421,7 @@ private fun ActionButton(
             Spacer(modifier = Modifier.width(7.dp))
             Text(
                 text = label,
-                fontSize = 14.sp,
-                color = ColorPalette.textGray
+                style = ExoTypo.body14.copy(color = ColorPalette.textGray)
             )
         }
     }

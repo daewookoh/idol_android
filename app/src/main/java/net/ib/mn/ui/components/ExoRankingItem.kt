@@ -65,6 +65,7 @@ import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * ExoRankingItem - 랭킹 아이템 리스트 렌더링 (로우레벨 구현)
@@ -221,9 +222,7 @@ fun LazyListScope.exoRankingItem(
                                 ) {
                                     Text(
                                         text = "B",
-                                        fontSize = 8.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = ColorPalette.white
+                                        style = ExoTypo.label8
                                     )
                                 }
                             }
@@ -238,9 +237,7 @@ fun LazyListScope.exoRankingItem(
                                 ) {
                                     Text(
                                         text = "D",
-                                        fontSize = 8.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = ColorPalette.white
+                                        style = ExoTypo.label8
                                     )
                                 }
                             }
@@ -255,9 +252,7 @@ fun LazyListScope.exoRankingItem(
                                 ) {
                                     Text(
                                         text = "C",
-                                        fontSize = 8.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = ColorPalette.white
+                                        style = ExoTypo.label8
                                     )
                                 }
                             }
@@ -278,9 +273,7 @@ fun LazyListScope.exoRankingItem(
                                         text = remember(item.anniversaryDays, dayLabel) {
                                             "${item.anniversaryDays}$dayLabel"
                                         },
-                                        fontSize = 7.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = ColorPalette.white
+                                        style = ExoTypo.label7.copy(color = ColorPalette.white)
                                     )
                                 }
                             }
@@ -295,9 +288,7 @@ fun LazyListScope.exoRankingItem(
                                 ) {
                                     Text(
                                         text = "A",
-                                        fontSize = 8.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = ColorPalette.white
+                                        style = ExoTypo.label8
                                     )
                                 }
                             }
@@ -321,10 +312,7 @@ fun LazyListScope.exoRankingItem(
                         // 순위 (세로 중앙 정렬)
                         Text(
                             text = stringResource(R.string.rank_count_format, item.rank),
-                            fontSize = 15.sp,
-                            lineHeight = 15.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorPalette.main
+                            style = ExoTypo.title15
                         )
 
                         Spacer(modifier = Modifier.width(5.dp))
@@ -502,10 +490,10 @@ fun LazyListScope.exoRankingItem(
                                 ) {
                                     Text(
                                         text = item.voteCount,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Normal,
-                                        color = ColorPalette.background100,
-                                        lineHeight = 17.sp
+                                        style = ExoTypo.stat11.copy(
+                                            fontWeight = FontWeight.Normal,
+                                            lineHeight = 17.sp
+                                        )
                                     )
                                 }
                             }
@@ -534,9 +522,7 @@ fun LazyListScope.exoRankingItem(
                                 )
                                 Text(
                                     text = remember(item.angelCount) { item.angelCount.toString() },
-                                    fontSize = 7.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = ColorPalette.textAngel,
+                                    style = ExoTypo.label7.copy(color = ColorPalette.textAngel),
                                     modifier = Modifier.offset(y = (-3).dp)
                                 )
                             }
@@ -556,9 +542,7 @@ fun LazyListScope.exoRankingItem(
                                 )
                                 Text(
                                     text = remember(item.fairyCount) { item.fairyCount.toString() },
-                                    fontSize = 7.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = ColorPalette.textFairy,
+                                    style = ExoTypo.label7.copy(color = ColorPalette.textFairy),
                                     modifier = Modifier.offset(y = (-3).dp)
                                 )
                             }
@@ -578,9 +562,7 @@ fun LazyListScope.exoRankingItem(
                                 )
                                 Text(
                                     text = remember(item.miracleCount) { item.miracleCount.toString() },
-                                    fontSize = 7.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = ColorPalette.textMiracle,
+                                    style = ExoTypo.label7.copy(color = ColorPalette.textMiracle),
                                     modifier = Modifier.offset(y = (-3).dp)
                                 )
                             }
@@ -600,9 +582,7 @@ fun LazyListScope.exoRankingItem(
                                 )
                                 Text(
                                     text = remember(item.rookieCount) { item.rookieCount.toString() },
-                                    fontSize = 7.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = ColorPalette.textRookie,
+                                    style = ExoTypo.label7.copy(color = ColorPalette.textRookie),
                                     modifier = Modifier.offset(y = (-3).dp)
                                 )
                             }
@@ -622,9 +602,7 @@ fun LazyListScope.exoRankingItem(
                                 )
                                 Text(
                                     text = "S",
-                                    fontSize = 7.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = ColorPalette.textSuperRookie,
+                                    style = ExoTypo.label7.copy(color = ColorPalette.textSuperRookie),
                                     modifier = Modifier.offset(y = (-3).dp)
                                 )
                             }
@@ -737,9 +715,9 @@ private fun AggregatedRankingItem(
                 // 1,2,3등은 main 컬러, 그 외는 gray580 컬러 (old: HallOfFameAggAdapter.kt line 263, 266)
                 Text(
                     text = stringResource(R.string.rank_count_format, item.rank),
-                    fontSize = 11.sp,
-                    lineHeight = 11.sp,  // Explicit lineHeight to match fontSize
-                    color = if (item.rank <= 3) ColorPalette.main else ColorPalette.gray580
+                    style = ExoTypo.body11.copy(
+                        color = if (item.rank <= 3) ColorPalette.main else ColorPalette.gray580
+                    )
                 )
 
                 // 순위 변동 표시 (TODO: rankChange 필드 추가 필요)
@@ -781,9 +759,7 @@ private fun AggregatedRankingItem(
                     // 점수 (TODO: score 필드 추가 필요, 현재는 voteCount 사용)
                     Text(
                         text = "${item.voteCount}점",
-                        fontSize = 11.sp,
-                        lineHeight = 11.sp,  // Explicit lineHeight to eliminate default spacing
-                        color = ColorPalette.textGray
+                        style = ExoTypo.body11
                     )
 
                     // 날짜 (TODO: date 필드 추가 필요)
@@ -842,9 +818,7 @@ fun HeartPickRankingItem(
         // 순위 번호 (왼쪽 큰 숫자)
         Text(
             text = "${item.rank}",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.textDefault,
+            style = ExoTypo.title20,
             modifier = Modifier.width(24.dp)
         )
 
@@ -943,10 +917,7 @@ fun HeartPickRankingItem(
                     ) {
                         Text(
                             text = item.voteCount,
-                            fontSize = 10.sp,
-                            lineHeight = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorPalette.fixWhite,
+                            style = ExoTypo.stat10.copy(lineHeight = 20.sp),
                             modifier = Modifier.padding(end = 4.dp)
                         )
                     }
@@ -960,10 +931,7 @@ fun HeartPickRankingItem(
                     ) {
                         Text(
                             text = percentage,
-                            fontSize = 10.sp,
-                            lineHeight = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorPalette.fixWhite,
+                            style = ExoTypo.stat10.copy(lineHeight = 20.sp),
                             modifier = Modifier.padding(end = 8.dp)
                         )
                     }

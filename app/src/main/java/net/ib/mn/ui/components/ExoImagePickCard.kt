@@ -15,12 +15,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * 이미지픽 카드 상태
@@ -186,7 +185,7 @@ private fun ImagePickUpcomingCard(
             // 제목
             ExoNoticeBox(
                 text = title,
-                fontSize = 16.sp
+                style = ExoTypo.title16
             )
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -194,11 +193,7 @@ private fun ImagePickUpcomingCard(
             // 부제목 (D-Day)
             Text(
                 text = subTitle,
-                fontSize = 21.sp,
-                lineHeight = 21.sp,
-                fontWeight = FontWeight.Bold,
-                color = ColorPalette.mainLight,
-                textAlign = TextAlign.Center,
+                style = ExoTypo.title21,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
@@ -207,11 +202,7 @@ private fun ImagePickUpcomingCard(
             // 투표 기간
             Text(
                 text = "${stringResource(R.string.onepick_period)} : $periodDate",
-                fontSize = 10.sp,
-                lineHeight = 10.sp,
-                letterSpacing = (-0.5).sp,
-                color = ColorPalette.textDimmed,
-                textAlign = TextAlign.Center,
+                style = ExoTypo.caption10,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 30.dp)
@@ -284,8 +275,7 @@ private fun ImagePickActiveCard(
             ) {
                 Text(
                     text = stringResource(R.string.see_current_ranking),
-                    fontSize = 13.sp,
-                    color = ColorPalette.mainLight
+                    style = ExoTypo.body13.copy(color = ColorPalette.mainLight)
                 )
                 Spacer(modifier = Modifier.width(3.dp))
                 Icon(
@@ -325,17 +315,14 @@ private fun ImagePickCardContent(
     voteCountLabel: Int,
 ) {
     // 타이틀
-    ExoNoticeBox(
-        text = title,
-        fontSize = 13.sp
-    )
+    ExoNoticeBox(text = title)
 
     Spacer(modifier = Modifier.height(10.dp))
 
+    // 부제목
     Text(
         text = subTitle,
-        fontSize = 13.sp,
-        color = ColorPalette.textDefault
+        style = ExoTypo.body13
     )
 
     Spacer(modifier = Modifier.height(10.dp))
@@ -343,9 +330,7 @@ private fun ImagePickCardContent(
     // 투표 기간
     Text(
         text = "${stringResource(R.string.onepick_period)} : $periodDate",
-        fontSize = 13.sp,
-        lineHeight = 13.sp,
-        color = ColorPalette.textDefault
+        style = ExoTypo.body13
     )
 
     Spacer(modifier = Modifier.height(6.dp))
@@ -353,8 +338,6 @@ private fun ImagePickCardContent(
     // 투표수 (전체 투표수 or 참여인원)
     Text(
         text = "${stringResource(voteCountLabel)} : $voteCount${if (voteCountLabel == R.string.themepick_total_votes) stringResource(R.string.votes) else ""}",
-        fontSize = 13.sp,
-        lineHeight = 13.sp,
-        color = ColorPalette.textDefault
+        style = ExoTypo.body13
     )
 }
