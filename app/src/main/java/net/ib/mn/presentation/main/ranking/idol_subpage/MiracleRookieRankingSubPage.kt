@@ -27,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -105,8 +106,8 @@ fun MiracleRookieRankingSubPage(
     val effectiveAccumulatedChartCode = vmAccumulatedChartCode ?: accumulatedChartCode
 
     // 탭 상태: 0 = 누적 랭킹, 1 = 실시간 랭킹
-    // 초기 탭은 항상 실시간 랭킹(1)
-    var selectedTabIndex by remember { mutableIntStateOf(1) }
+    // ViewModel에서 관리하여 바텀 네비게이션 이동 시에도 유지
+    val selectedTabIndex by viewModel.selectedTabIndex.collectAsState()
 
     // 현재 탭에 따른 배너 이미지 결정 (ViewModel 상태 우선)
     // remember를 사용하여 selectedTabIndex 변경 시 재계산되도록 함
@@ -261,7 +262,7 @@ fun MiracleRookieRankingSubPage(
         ) {
                 Tab(
                     selected = selectedTabIndex == 0,
-                    onClick = { selectedTabIndex = 0 },
+                    onClick = { viewModel.setSelectedTabIndex(0) },
                     text = {
                         Text(
                             text = stringResource(R.string.cumulative_rankings),
@@ -277,7 +278,7 @@ fun MiracleRookieRankingSubPage(
                 )
                 Tab(
                     selected = selectedTabIndex == 1,
-                    onClick = { selectedTabIndex = 1 },
+                    onClick = { viewModel.setSelectedTabIndex(1) },
                     text = {
                         Text(
                             text = stringResource(R.string.award_realtime),

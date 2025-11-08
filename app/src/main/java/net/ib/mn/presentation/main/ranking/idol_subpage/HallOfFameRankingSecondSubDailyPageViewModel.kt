@@ -1,5 +1,6 @@
 package net.ib.mn.presentation.main.ranking.idol_subpage
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
@@ -20,17 +21,26 @@ import java.util.Locale
  * 명예전당 - 일일 순위 ViewModel
  *
  * hofs/ API를 호출하여 일일 순위 데이터를 가져옵니다.
+ *
+ * SavedStateHandle을 사용하여 기간 선택 상태를 저장:
+ * - 앱을 내렸다 올려도 유지 (바텀 네비게이션 이동 시에도 유지)
+ * - 앱을 재시작하면 리셋 (프로세스 종료 후)
  */
 @HiltViewModel(assistedFactory = HallOfFameRankingSecondSubDailyPageViewModel.Factory::class)
 class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
     @Assisted private val chartCode: String,
     @Assisted private val exoTabSwitchType: Int,
-    private val rankingRepository: RankingRepository
+    private val rankingRepository: RankingRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     @AssistedFactory
     interface Factory {
         fun create(chartCode: String, exoTabSwitchType: Int): HallOfFameRankingSecondSubDailyPageViewModel
+    }
+
+    companion object {
+        private const val KEY_CURRENT_POSITION = "currentPosition"
     }
 
     private val _jsonData = MutableStateFlow<String>("")
@@ -56,13 +66,21 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
     val showNextButton: StateFlow<Boolean> = _showNextButton.asStateFlow()
 
     private var historyList = mutableListOf<HistoryItem>()
-    private var currentPosition = 0
+
+    // 현재 기간 선택 위치 (0 = 최신, 1 이상 = 과거 달)
+    // SavedStateHandle을 사용하여 바텀 네비게이션 이동 시에도 유지
+    private var currentPosition: Int
+        get() = savedStateHandle.get<Int>(KEY_CURRENT_POSITION) ?: 0
+        set(value) {
+            savedStateHandle[KEY_CURRENT_POSITION] = value
+        }
 
     init {
         android.util.Log.d("HoF_Daily_VM", "========================================")
         android.util.Log.d("HoF_Daily_VM", "📦 ViewModel initialized")
         android.util.Log.d("HoF_Daily_VM", "  - chartCode: $chartCode")
         android.util.Log.d("HoF_Daily_VM", "  - exoTabSwitchType: $exoTabSwitchType")
+        android.util.Log.d("HoF_Daily_VM", "  - restored currentPosition: $currentPosition")
         android.util.Log.d("HoF_Daily_VM", "========================================")
 
         loadData()
@@ -90,6 +108,15 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
                         // Parse history only when historyParam is null (initial load)
                         if (historyParam == null) {
                             parseHistory(result.data)
+
+                            // 저장된 currentPosition이 있으면 해당 위치로 이동
+                            if (currentPosition > 0 && currentPosition <= historyList.size) {
+                                android.util.Log.d("HoF_Daily_VM", "📌 Restoring saved position: $currentPosition")
+                                val item = historyList[currentPosition - 1]
+                                val restoredHistoryParam = "${item.historyParam}&${item.nextHistoryParam}"
+                                loadData(codeToUse, restoredHistoryParam)
+                                return@collect // 복원된 데이터 로드 후 리턴
+                            }
                         }
 
                         updatePrevNextVisibility()

@@ -1,5 +1,6 @@
 package net.ib.mn.presentation.main.ranking
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,12 +24,22 @@ import javax.inject.Inject
  * 1. ConfigRepository의 StateFlow를 직접 노출 (zero-copy, 중복 collect 방지)
  * 2. 캐시 업데이트 시 자동으로 UI 업데이트 (reactive)
  * 3. 불필요한 중간 StateFlow 제거 (메모리 효율)
+ *
+ * SavedStateHandle을 사용하여 메인 탭 선택을 저장:
+ * - 앱을 내렸다 올려도 유지 (바텀 네비게이션 이동 시에도 유지)
+ * - 앱을 재시작하면 리셋 (프로세스 종료 후)
  */
 @HiltViewModel
 class RankingPageViewModel @Inject constructor(
     val configRepository: ConfigRepository, // public으로 변경 (RankingPage에서 접근)
-    private val chartsApi: net.ib.mn.data.remote.api.ChartsApi
+    private val chartsApi: net.ib.mn.data.remote.api.ChartsApi,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    companion object {
+        private const val KEY_SELECTED_TAB_INDEX = "selectedTabIndex"
+        private const val DEFAULT_TAB_INDEX = 7  // 기본 선택 탭 (하트픽)
+    }
 
     /**
      * CELEB 전용: typeList StateFlow를 직접 노출
@@ -52,17 +63,16 @@ class RankingPageViewModel @Inject constructor(
     val error: StateFlow<String?> = _error
 
     /**
-     * 랭킹 페이지 내 상위 탭 선택 인덱스
-     * 탭 전환 시에도 유지되지만, 앱 종료 시에는 초기화됨
+     * 랭킹 페이지 내 메인 탭 선택 인덱스
+     * SavedStateHandle을 사용하여 바텀 네비게이션 이동 시에도 유지
      */
-    private val _selectedTabIndex = MutableStateFlow(0)
-    val selectedTabIndex: StateFlow<Int> = _selectedTabIndex.asStateFlow()
+    val selectedTabIndex: StateFlow<Int> = savedStateHandle.getStateFlow(KEY_SELECTED_TAB_INDEX, DEFAULT_TAB_INDEX)
 
     /**
      * 선택된 탭 인덱스 업데이트
      */
     fun setSelectedTabIndex(index: Int) {
-        _selectedTabIndex.value = index
+        savedStateHandle[KEY_SELECTED_TAB_INDEX] = index
         android.util.Log.d("RankingViewModel", "📌 Selected tab index updated: $index")
     }
 

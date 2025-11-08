@@ -1,6 +1,7 @@
 package net.ib.mn.presentation.main.ranking.idol_subpage
 
 import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
@@ -30,6 +31,10 @@ import java.util.Locale
  * 3. 성별 변경 미지원 (고정된 차트 코드 사용)
  * 4. 단순 캐싱
  *
+ * SavedStateHandle을 사용하여 탭 선택을 저장:
+ * - 앱을 내렸다 올려도 유지 (바텀 네비게이션 이동 시에도 유지)
+ * - 앱을 재시작하면 리셋 (프로세스 종료 후)
+ *
  * @param chartCode 차트 코드 (고정, 성별 변경 없음)
  * @param dataSource 랭킹 데이터 소스 (Miracle/Rookie)
  */
@@ -41,7 +46,8 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
     private val idolDao: IdolDao,
     private val broadcastManager: net.ib.mn.data.remote.udp.IdolBroadcastManager,
     private val chartsApi: net.ib.mn.data.remote.api.ChartsApi,
-    private val configsApi: net.ib.mn.data.remote.api.ConfigsApi
+    private val configsApi: net.ib.mn.data.remote.api.ConfigsApi,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     sealed interface UiState {
@@ -56,8 +62,27 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
         data class Error(val message: String) : UiState
     }
 
+    companion object {
+        private const val KEY_SELECTED_TAB_INDEX = "selectedTabIndex"
+        private const val DEFAULT_TAB_INDEX = 1  // 기본값: 실시간 랭킹
+    }
+
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+
+    /**
+     * 탭 선택 인덱스: 0 = 누적 랭킹, 1 = 실시간 랭킹
+     * SavedStateHandle을 사용하여 바텀 네비게이션 이동 시에도 유지
+     */
+    val selectedTabIndex: StateFlow<Int> = savedStateHandle.getStateFlow(KEY_SELECTED_TAB_INDEX, DEFAULT_TAB_INDEX)
+
+    /**
+     * 탭 선택 변경
+     */
+    fun setSelectedTabIndex(index: Int) {
+        savedStateHandle[KEY_SELECTED_TAB_INDEX] = index
+        android.util.Log.d(logTag, "📌 Selected tab index updated: $index")
+    }
 
     // 캐시된 아이돌 ID 리스트
     private var cachedIdolIds: List<Int>? = null

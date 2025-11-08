@@ -1,6 +1,7 @@
 package net.ib.mn.presentation.main.ranking.idol_subpage
 
 import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
@@ -29,13 +30,18 @@ import java.util.Locale
  * OnePick (테마픽/이미지픽) ViewModel
  *
  * 테마픽과 이미지픽을 탭으로 전환하며 표시
+ *
+ * SavedStateHandle을 사용하여 탭 선택을 저장:
+ * - 앱을 내렸다 올려도 유지 (프로세스가 살아있을 때)
+ * - 앱을 재시작하면 리셋 (프로세스 종료 후)
  */
 @HiltViewModel(assistedFactory = OnePickRankingSubPageViewModel.Factory::class)
 class OnePickRankingSubPageViewModel @AssistedInject constructor(
     @Assisted private val chartCode: String,
     @ApplicationContext private val context: Context,
     private val themepickRepository: ThemepickRepository,
-    private val onepickRepository: OnepickRepository
+    private val onepickRepository: OnepickRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     /**
@@ -53,16 +59,31 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
         data class Error(val message: String) : UiState
     }
 
+    companion object {
+        private const val KEY_CURRENT_TAB = "currentTab"
+    }
+
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     private var cachedThemePickData: List<ThemePickCardData>? = null
     private var cachedImagePickData: List<ImagePickCardData>? = null
-    private var currentTab: TabType = TabType.THEME_PICK
+
+    // SavedStateHandle을 사용하여 탭 선택 저장/복원
+    private var currentTab: TabType
+        get() = TabType.valueOf(savedStateHandle.get<String>(KEY_CURRENT_TAB) ?: TabType.THEME_PICK.name)
+        set(value) {
+            savedStateHandle[KEY_CURRENT_TAB] = value.name
+        }
 
     init {
         android.util.Log.d("OnePickRankingVM", "🆕 ViewModel created for chartCode: $chartCode")
-        loadThemePickList()
+        android.util.Log.d("OnePickRankingVM", "📌 Restored tab: $currentTab")
+        // 저장된 탭 상태에 따라 로드
+        when (currentTab) {
+            TabType.THEME_PICK -> loadThemePickList()
+            TabType.IMAGE_PICK -> loadImagePickList()
+        }
     }
 
     fun reloadIfNeeded() {

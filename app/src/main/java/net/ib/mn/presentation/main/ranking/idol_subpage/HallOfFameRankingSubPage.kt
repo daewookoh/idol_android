@@ -118,7 +118,8 @@ fun HallOfFameRankingSubPage(
                     isVisible = isVisible && selectedTabIndex == 0,
                     topThreeTabs = topThreeTabs,
                     topThreeChartCodes = topThreeChartCodes,
-                    listState = scrollState
+                    listState = scrollState,
+                    viewModel = viewModel
                 )
             }
             1 -> {
@@ -129,7 +130,8 @@ fun HallOfFameRankingSubPage(
                     isVisible = isVisible && selectedTabIndex == 1,
                     topThreeTabs = topThreeTabs,
                     topThreeChartCodes = topThreeChartCodes,
-                    listState = scrollState
+                    listState = scrollState,
+                    viewModel = viewModel
                 )
             }
         }

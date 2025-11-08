@@ -21,6 +21,7 @@ import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -187,11 +188,21 @@ fun RankingPage(
         buildIdolAppTabList(mainChartModel, viewModel, isMale)
     }
 
+    // 메인 탭 선택 상태 (ViewModel에서 관리, 바텀 네비게이션 이동 시에도 유지)
+    val savedMainTabIndex by viewModel.selectedTabIndex.collectAsState()
+
     val subPagerState = rememberPagerState(
-        initialPage = 7, // 기본 선택 탭
+        initialPage = savedMainTabIndex, // 저장된 탭에서 시작
         pageCount = { tabDataList.size }
     )
     val coroutineScope = rememberCoroutineScope()
+
+    // 탭 변경 시 ViewModel에 저장
+    LaunchedEffect(subPagerState.currentPage, subPagerState.isScrollInProgress) {
+        if (!subPagerState.isScrollInProgress) {
+            viewModel.setSelectedTabIndex(subPagerState.currentPage)
+        }
+    }
 
     // 모든 탭의 SubPage를 미리 생성하여 완전히 독립적으로 관리
     // 각 탭은 자체 ViewModel, LazyListState, UI State를 가짐

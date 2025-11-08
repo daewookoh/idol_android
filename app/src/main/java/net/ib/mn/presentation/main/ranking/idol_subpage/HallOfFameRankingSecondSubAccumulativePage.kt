@@ -16,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +35,11 @@ import net.ib.mn.ui.theme.ColorPalette
  * @param isVisible 화면 가시성
  * @param topThreeTabs RankingPage 최상단 탭 중 처음 3개
  * @param listState LazyList 스크롤 상태
+ * @param viewModel 상위 ViewModel (탭 선택 상태 관리)
+ *
+ * selectedSubTabIndex는 ViewModel의 SavedStateHandle로 저장되어:
+ * - 앱을 내렸다 올려도 유지 (바텀 네비게이션 이동 시에도 유지)
+ * - 앱을 재시작하면 리셋 (프로세스 종료 후)
  */
 @Composable
 fun HallOfFameRankingSecondSubAccumulativePage(
@@ -42,27 +48,28 @@ fun HallOfFameRankingSecondSubAccumulativePage(
     isVisible: Boolean,
     topThreeTabs: List<String> = emptyList(),
     topThreeChartCodes: List<String> = emptyList(),
-    listState: LazyListState = rememberLazyListState()
+    listState: LazyListState = rememberLazyListState(),
+    viewModel: HallOfFameRankingSubPageViewModel
 ) {
-    var selectedSubTabIndex by remember { mutableStateOf(0) }
+    val selectedSubTabIndex by viewModel.accumulativeSubTabIndex.collectAsState()
 
     // ExoTabSwitch 선택에 따른 차트 코드 결정
     val currentChartCode = topThreeChartCodes.getOrNull(selectedSubTabIndex) ?: chartCode
 
-    // ViewModel 생성
-    val viewModel: HallOfFameRankingSecondSubAccumulativePageViewModel =
+    // 데이터 로딩용 ViewModel 생성
+    val dataViewModel: HallOfFameRankingSecondSubAccumulativePageViewModel =
         hiltViewModel<HallOfFameRankingSecondSubAccumulativePageViewModel, HallOfFameRankingSecondSubAccumulativePageViewModel.Factory> { factory ->
             factory.create(currentChartCode, selectedSubTabIndex)
         }
 
-    val jsonData by viewModel.jsonData.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
+    val jsonData by dataViewModel.jsonData.collectAsState()
+    val isLoading by dataViewModel.isLoading.collectAsState()
+    val error by dataViewModel.error.collectAsState()
 
     // ExoTabSwitch 선택이 바뀔 때 새로운 차트 코드로 데이터 로드
     LaunchedEffect(selectedSubTabIndex) {
         android.util.Log.d("HoF_Accumulative", "🔄 ExoTabSwitch changed to index $selectedSubTabIndex")
-        viewModel.loadData(currentChartCode)
+        dataViewModel.loadData(currentChartCode)
     }
 
     android.util.Log.d("HoF_Accumulative", "========================================")
@@ -84,7 +91,7 @@ fun HallOfFameRankingSecondSubAccumulativePage(
                 tabs = topThreeTabs.take(3),
                 selectedIndex = selectedSubTabIndex,
                 onTabSelected = { index ->
-                    selectedSubTabIndex = index
+                    viewModel.setAccumulativeSubTabIndex(index)
                     android.util.Log.d("HoF_Accumulative", "Sub-tab selected: $index")
                 }
             )
