@@ -530,9 +530,52 @@ class PreferencesManager @Inject constructor(
         android.util.Log.d("PreferencesManager", "✅ User hearts updated in DataStore")
     }
 
+    /**
+     * 모든 데이터 삭제
+     */
     suspend fun clearAll() {
         context.dataStore.edit { preferences ->
             preferences.clear()
+        }
+    }
+
+    /**
+     * 토큰 및 로그인 정보를 제외한 모든 데이터 삭제
+     *
+     * URL scheme으로 서버 변경 시 사용:
+     * - 유저 정보, 하트, 다이아몬드 등 삭제
+     * - 캐시 데이터 삭제 (BadWords, BoardTags, Notices, Events)
+     * - 설정 데이터 삭제 (UDP, CDN, Category 등)
+     *
+     * 유지되는 데이터:
+     * - ACCESS_TOKEN (로그인 토큰)
+     * - USER_EMAIL (로그인 이메일)
+     * - LOGIN_DOMAIN (로그인 도메인)
+     * - SERVER_URL (서버 URL)
+     */
+    suspend fun clearAllExceptAuth() {
+        android.util.Log.d("PreferencesManager", "🔄 Clearing all data except auth credentials...")
+
+        context.dataStore.edit { preferences ->
+            // 토큰 및 로그인 정보 백업 (serverUrl은 백업하지 않음 - 서버 변경 시 새 URL로 교체되어야 함)
+            val savedToken = preferences[KEY_ACCESS_TOKEN]
+            val savedEmail = preferences[KEY_USER_EMAIL]
+            val savedDomain = preferences[KEY_LOGIN_DOMAIN]
+
+            android.util.Log.d("PreferencesManager", "  - Backing up auth credentials:")
+            android.util.Log.d("PreferencesManager", "    Token: ${if (savedToken != null) "present" else "null"}")
+            android.util.Log.d("PreferencesManager", "    Email: $savedEmail")
+            android.util.Log.d("PreferencesManager", "    Domain: $savedDomain")
+
+            // 모든 데이터 삭제
+            preferences.clear()
+
+            // 토큰 및 로그인 정보 복원 (serverUrl은 복원하지 않음)
+            savedToken?.let { preferences[KEY_ACCESS_TOKEN] = it }
+            savedEmail?.let { preferences[KEY_USER_EMAIL] = it }
+            savedDomain?.let { preferences[KEY_LOGIN_DOMAIN] = it }
+
+            android.util.Log.d("PreferencesManager", "✅ All data cleared except auth credentials")
         }
     }
 }

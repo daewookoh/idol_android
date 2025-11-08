@@ -18,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryScrollableTabRow
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -46,6 +47,7 @@ import net.ib.mn.domain.ranking.GlobalRankingDataSource
 import net.ib.mn.domain.ranking.IdolIdsRankingDataSource
 import net.ib.mn.domain.ranking.MiracleRookieRankingDataSource
 import net.ib.mn.presentation.main.MainViewModel
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.ServerUrl
 
 /**
@@ -186,7 +188,7 @@ fun RankingPage(
     }
 
     val subPagerState = rememberPagerState(
-        initialPage = 6, // 기본 선택 탭
+        initialPage = 0, // 기본 선택 탭
         pageCount = { tabDataList.size }
     )
     val coroutineScope = rememberCoroutineScope()
@@ -303,8 +305,16 @@ fun RankingPage(
                 selectedTabIndex = subPagerState.currentPage,
                 containerColor = backgroundColor,
                 contentColor = mainColor,
-                edgePadding = 0.dp,
-                divider = {}
+                edgePadding = 4.dp,
+                divider = {},
+                indicator = @Composable {
+                    TabRowDefaults.SecondaryIndicator(
+                        modifier = Modifier
+                            .tabIndicatorOffset(subPagerState.currentPage)
+                            .padding(horizontal = 8.dp),
+                        color = mainColor
+                    )
+                }
             ) {
                 tabs.forEachIndexed { index, tabName ->
                     Box(
@@ -319,14 +329,12 @@ fun RankingPage(
                                     subPagerState.animateScrollToPage(index)
                                 }
                             }
-                            .padding(horizontal = 16.dp),
+                            .padding(horizontal = 10.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = tabName,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (subPagerState.currentPage == index) mainColor else textDimmedColor,
+                            style = ExoTypo.title14.copy(lineHeight = 14.sp, color=if (subPagerState.currentPage == index) mainColor else textDimmedColor)
                         )
                     }
                 }

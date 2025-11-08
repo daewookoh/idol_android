@@ -102,4 +102,10 @@ interface ConfigRepository {
      * @return List<ChartModel>?
      */
     fun getChartObjects(): List<net.ib.mn.data.remote.dto.ChartModel>?
+
+    /**
+     * 모든 캐시 데이터 삭제 (서버 URL 변경 시 사용)
+     * 메모리 캐시와 StateFlow를 모두 초기화
+     */
+    fun clearAllCache()
 }

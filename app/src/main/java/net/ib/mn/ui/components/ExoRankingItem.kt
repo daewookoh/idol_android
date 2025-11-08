@@ -523,7 +523,7 @@ fun LazyListScope.exoRankingItem(
                                 Text(
                                     text = remember(item.angelCount) { item.angelCount.toString() },
                                     style = ExoTypo.label7.copy(color = ColorPalette.textAngel),
-                                    modifier = Modifier.offset(y = (-3).dp)
+                                    modifier = Modifier.offset(y = 6.dp)
                                 )
                             }
                         }
@@ -543,7 +543,7 @@ fun LazyListScope.exoRankingItem(
                                 Text(
                                     text = remember(item.fairyCount) { item.fairyCount.toString() },
                                     style = ExoTypo.label7.copy(color = ColorPalette.textFairy),
-                                    modifier = Modifier.offset(y = (-3).dp)
+                                    modifier = Modifier.offset(y = 6.dp)
                                 )
                             }
                         }
@@ -563,7 +563,7 @@ fun LazyListScope.exoRankingItem(
                                 Text(
                                     text = remember(item.miracleCount) { item.miracleCount.toString() },
                                     style = ExoTypo.label7.copy(color = ColorPalette.textMiracle),
-                                    modifier = Modifier.offset(y = (-3).dp)
+                                    modifier = Modifier.offset(y = 6.dp)
                                 )
                             }
                         }
@@ -583,7 +583,7 @@ fun LazyListScope.exoRankingItem(
                                 Text(
                                     text = remember(item.rookieCount) { item.rookieCount.toString() },
                                     style = ExoTypo.label7.copy(color = ColorPalette.textRookie),
-                                    modifier = Modifier.offset(y = (-3).dp)
+                                    modifier = Modifier.offset(y = 6.dp)
                                 )
                             }
                         }
@@ -603,7 +603,7 @@ fun LazyListScope.exoRankingItem(
                                 Text(
                                     text = "S",
                                     style = ExoTypo.label7.copy(color = ColorPalette.textSuperRookie),
-                                    modifier = Modifier.offset(y = (-3).dp)
+                                    modifier = Modifier.offset(y = 6.dp)
                                 )
                             }
                         }

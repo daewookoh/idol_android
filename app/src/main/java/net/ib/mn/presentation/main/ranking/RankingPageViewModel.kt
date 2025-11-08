@@ -51,6 +51,21 @@ class RankingPageViewModel @Inject constructor(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    /**
+     * 랭킹 페이지 내 상위 탭 선택 인덱스
+     * 탭 전환 시에도 유지되지만, 앱 종료 시에는 초기화됨
+     */
+    private val _selectedTabIndex = MutableStateFlow(0)
+    val selectedTabIndex: StateFlow<Int> = _selectedTabIndex.asStateFlow()
+
+    /**
+     * 선택된 탭 인덱스 업데이트
+     */
+    fun setSelectedTabIndex(index: Int) {
+        _selectedTabIndex.value = index
+        android.util.Log.d("RankingViewModel", "📌 Selected tab index updated: $index")
+    }
+
     init {
         android.util.Log.d("RankingViewModel", "========================================")
         android.util.Log.d("RankingViewModel", "[RankingViewModel] Initialized")

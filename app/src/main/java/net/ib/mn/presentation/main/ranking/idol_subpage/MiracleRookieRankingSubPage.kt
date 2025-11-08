@@ -42,6 +42,7 @@ import coil.compose.AsyncImage
 import net.ib.mn.R
 import net.ib.mn.domain.ranking.RankingDataSource
 import net.ib.mn.ui.components.ExoRankingList
+import net.ib.mn.util.IdolImageUtil.toSecureUrl
 
 /**
  * 통합 Miracle/Rookie 랭킹 SubPage
@@ -141,7 +142,7 @@ fun MiracleRookieRankingSubPage(
         ) {
             // 배너 이미지
             AsyncImage(
-                model = currentBannerUrl,
+                model = currentBannerUrl.toSecureUrl(),
                 contentDescription = "Banner",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop

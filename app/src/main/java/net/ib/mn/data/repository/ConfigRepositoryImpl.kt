@@ -327,4 +327,26 @@ class ConfigRepositoryImpl @Inject constructor(
     override fun getChartObjects(): List<net.ib.mn.data.remote.dto.ChartModel>? {
         return cachedChartObjects
     }
+
+    /**
+     * 모든 캐시 데이터 삭제 (서버 URL 변경 시 사용)
+     * 메모리 캐시와 StateFlow를 모두 초기화
+     */
+    override fun clearAllCache() {
+        android.util.Log.d("ConfigRepo", "========================================")
+        android.util.Log.d("ConfigRepo", "🗑️ Clearing all cache data")
+        android.util.Log.d("ConfigRepo", "========================================")
+
+        // 메모리 캐시 초기화
+        cachedTypeList = null
+        cachedMainChartModel = null
+        cachedChartObjects = null
+
+        // StateFlow 초기화
+        _typeListFlow.value = emptyList()
+        _mainChartModelFlow.value = null
+        _chartObjectsFlow.value = emptyList()
+
+        android.util.Log.d("ConfigRepo", "✅ All cache cleared")
+    }
 }

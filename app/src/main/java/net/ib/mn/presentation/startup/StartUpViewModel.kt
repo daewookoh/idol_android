@@ -536,10 +536,19 @@ class StartUpViewModel @Inject constructor(
                         // domain이 null이면 저장된 loginDomain 사용 (old 프로젝트와 동일)
                         val userDomain = userData.domain ?: preferencesManager.loginDomain.first()
 
+                        // 로그인 시 저장한 이메일 보존 (getUserSelf 응답의 이메일로 덮어쓰지 않음)
+                        val savedLoginEmail = preferencesManager.loginEmail.first()
+                        val emailToSave = savedLoginEmail ?: userData.email
+
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel] Email preservation:")
+                        android.util.Log.d("USER_INFO", "  - Login email (saved): $savedLoginEmail")
+                        android.util.Log.d("USER_INFO", "  - API response email: ${userData.email}")
+                        android.util.Log.d("USER_INFO", "  - Email to save: $emailToSave")
+
                         // setUserInfo 호출 (suspend 함수이므로 완료될 때까지 기다림)
                         preferencesManager.setUserInfo(
                             id = userData.id,
-                            email = userData.email,
+                            email = emailToSave,  // 로그인 시 저장한 이메일 사용
                             username = userData.username,
                             nickname = userData.nickname,
                             profileImage = userData.profileImage,
@@ -583,8 +592,25 @@ class StartUpViewModel @Inject constructor(
                         android.util.Log.d("USER_INFO", "[StartUpViewModel] UserSelf cache valid (304 Not Modified)")
                         android.util.Log.d("USER_INFO", "[StartUpViewModel] Using cached user info from DataStore")
                         android.util.Log.d(TAG, "UserSelf cache valid (304 Not Modified)")
+                    } else if (result.code == 401) {
+                        // 토큰이 유효하지 않음 - 토큰 삭제 및 로그인 페이지로 이동
+                        android.util.Log.e("USER_INFO", "[StartUpViewModel] ❌ Token invalid (401 Unauthorized)")
+                        android.util.Log.e("USER_INFO", "[StartUpViewModel] Clearing auth credentials and navigating to Login")
+
+                        // 토큰 및 로그인 정보 삭제
+                        preferencesManager.setAccessToken("")
+                        // loginEmail과 loginDomain도 삭제하기 위해 clearAll 호출 후 네비게이션
+                        preferencesManager.clearAll()
+
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Auth credentials cleared")
+
+                        // 로그인 페이지로 이동
+                        setEffect { StartUpContract.Effect.NavigateToLogin }
+
+                        // 초기화 중단
+                        return@collect
                     } else {
-                        android.util.Log.e("USER_INFO", "[StartUpViewModel] ❌ UserSelf API error: ${result.message}")
+                        android.util.Log.e("USER_INFO", "[StartUpViewModel] ❌ UserSelf API error: ${result.message} (code: ${result.code})")
                         android.util.Log.e(TAG, "UserSelf error: ${result.message}")
                     }
                 }

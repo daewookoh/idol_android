@@ -68,6 +68,10 @@ interface IdolDao {
     @Query("UPDATE idols SET heart=:heart, top3=:top3, top3Type=:top3Type, top3ImageVer=:top3ImageVer, imageUrl=:imageUrl, imageUrl2=:imageUrl2, imageUrl3=:imageUrl3 WHERE id=:id")
     suspend fun update(id: Int, heart: Long, top3: String?, top3Type: String?, top3ImageVer: String, imageUrl: String?, imageUrl2: String?, imageUrl3: String?)
 
+    @Transaction
+    @Query("UPDATE idols SET heart=:heart WHERE id=:id")
+    suspend fun updateIdolHeart(id: Int, heart: Long)
+
     @Upsert
     suspend fun upsert(idol: IdolEntity)
 

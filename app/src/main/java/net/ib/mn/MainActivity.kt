@@ -52,6 +52,12 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var broadcastManager: net.ib.mn.data.remote.udp.IdolBroadcastManager
 
+    @Inject
+    lateinit var idolDao: net.ib.mn.data.local.dao.IdolDao
+
+    @Inject
+    lateinit var configRepository: net.ib.mn.domain.repository.ConfigRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
 
@@ -164,21 +170,58 @@ class MainActivity : AppCompatActivity() {
                 host
             }
 
-            // ServerUrl 변경
-            ServerUrl.setHost(fullHost)
+            android.util.Log.d("MainActivity", "========================================")
+            android.util.Log.d("MainActivity", "🔄 URL Scheme: Server Change Detected")
+            android.util.Log.d("MainActivity", "  - New Server: $fullHost")
+            android.util.Log.d("MainActivity", "========================================")
 
-            // PreferencesManager에 저장 (동기적으로 처리하여 저장 완료 후 재시작)
+            // 서버 변경 시 데이터 리셋 (로그인 정보는 유지)
             runBlocking {
+                android.util.Log.d("MainActivity", "🗑️ Clearing local data (keeping auth credentials)...")
+
+                // 1. 로그인 정보(토큰, 이메일, 도메인)를 제외한 모든 로컬 데이터 삭제
+                preferencesManager.clearAllExceptAuth()
+                android.util.Log.d("MainActivity", "✅ Local data cleared (auth credentials preserved)")
+
+                // 2. Room DB 데이터 삭제 (Idol 데이터 등)
+                try {
+                    idolDao.deleteAll()
+                    android.util.Log.d("MainActivity", "✅ Room DB data cleared")
+                } catch (e: Exception) {
+                    android.util.Log.e("MainActivity", "❌ Failed to clear Room DB: ${e.message}", e)
+                }
+
+                // 3. ConfigRepository 메모리 캐시 삭제
+                configRepository.clearAllCache()
+                android.util.Log.d("MainActivity", "✅ ConfigRepository cache cleared")
+
+                // 4. 새 서버 URL 저장
                 preferencesManager.setServerUrl(fullHost)
+                android.util.Log.d("MainActivity", "✅ New server URL saved: $fullHost")
             }
 
-            // 변경된 호스트가 retrofit에 반영되도록 액티비티 재시작
-            // old 프로젝트와 동일: onCreate에서 return하여 StartupScreen이 두 번 실행되지 않도록 함
+            // ServerUrl 변경 (Retrofit 인스턴스 재생성에 필요)
+            ServerUrl.setHost(fullHost)
+
+            // 이미지 캐시 삭제
+            try {
+                cacheDir.deleteRecursively()
+                android.util.Log.d("MainActivity", "✅ Image cache cleared")
+            } catch (e: Exception) {
+                android.util.Log.e("MainActivity", "⚠️ Failed to clear image cache: ${e.message}", e)
+            }
+
+            android.util.Log.d("MainActivity", "🔄 Killing process to fully restart app...")
+            android.util.Log.d("MainActivity", "========================================")
+
+            // 프로세스 완전 종료 및 재시작 (모든 메모리, ViewModel, 싱글톤 등 완전 초기화)
             val restartIntent = Intent(this@MainActivity, MainActivity::class.java)
-            restartIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            restartIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(restartIntent)
-            finish()
-            return true  // 액티비티 재시작 필요
+
+            // 프로세스 완전 종료 (모든 것이 완전히 초기화됨)
+            android.os.Process.killProcess(android.os.Process.myPid())
+            return true  // 프로세스 종료
         }
 
         // 2. reset_auth 파라미터 처리 - 인증 정보 삭제

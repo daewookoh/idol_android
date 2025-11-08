@@ -305,24 +305,27 @@ class UnifiedRankingSubPageViewModel @AssistedInject constructor(
 
         android.util.Log.d(logTag, "💗 Updating vote: idol=$idolId, votes=$voteCount")
 
-        // RankingUtil을 사용하여 투표 업데이트 및 재정렬
-        val finalItems = net.ib.mn.util.RankingUtil.updateVoteAndRerank(
-            items = currentState.items,
-            idolId = idolId,
-            voteCount = voteCount,
-            formatHeartCount = { count -> formatHeartCount(count.toInt()) }
-        )
+        viewModelScope.launch(Dispatchers.IO) {
+            // RankingUtil을 사용하여 투표 업데이트 및 재정렬 (DB + 메모리)
+            val finalItems = net.ib.mn.util.RankingUtil.updateVoteAndRerank(
+                items = currentState.items,
+                idolId = idolId,
+                voteCount = voteCount,
+                idolDao = idolDao,
+                formatHeartCount = { count -> formatHeartCount(count.toInt()) }
+            )
 
-        // State 업데이트 -> 자동 리컴포지션
-        _uiState.value = UiState.Success(
-            items = finalItems,
-            topIdol = finalItems.firstOrNull()
-        )
+            // State 업데이트 -> 자동 리컴포지션
+            _uiState.value = UiState.Success(
+                items = finalItems,
+                topIdol = finalItems.firstOrNull()
+            )
 
-        val maxHeart = finalItems.firstOrNull()?.maxHeartCount ?: 0L
-        val minHeart = finalItems.firstOrNull()?.minHeartCount ?: 0L
-        android.util.Log.d(logTag, "✅ Vote updated and re-ranked (${finalItems.size} items)")
-        android.util.Log.d(logTag, "   → New max: $maxHeart, min: $minHeart")
+            val maxHeart = finalItems.firstOrNull()?.maxHeartCount ?: 0L
+            val minHeart = finalItems.firstOrNull()?.minHeartCount ?: 0L
+            android.util.Log.d(logTag, "✅ Vote updated and re-ranked (${finalItems.size} items)")
+            android.util.Log.d(logTag, "   → New max: $maxHeart, min: $minHeart")
+        }
     }
 
     private fun formatHeartCount(count: Int): String {
