@@ -188,7 +188,7 @@ fun RankingPage(
     }
 
     val subPagerState = rememberPagerState(
-        initialPage = 0, // 기본 선택 탭
+        initialPage = 7, // 기본 선택 탭
         pageCount = { tabDataList.size }
     )
     val coroutineScope = rememberCoroutineScope()
@@ -446,7 +446,8 @@ fun RankingPage(
                     )
                     "HOF" -> net.ib.mn.presentation.main.ranking.idol_subpage.HallOfFameRankingSubPage(
                         chartCode = currentType.code ?: "",
-                        isVisible = subPagerState.currentPage == pageIndex
+                        isVisible = subPagerState.currentPage == pageIndex,
+                        topThreeTabs = tabs.take(3)
                     )
                     "GLOBALS" -> {
                         android.util.Log.d("RankingPage", "🎯 Rendering GLOBALS with dataSource: ${globalDataSource.hashCode()}, type=${globalDataSource.type}")
@@ -550,11 +551,13 @@ private fun buildIdolAppTabList(
 
     // 3. 하드코딩 메뉴 (old 프로젝트와 동일)
     // HEARTPICK
+    val heartPickChartCode = if (isMale) "HEARTPICK_M" else "HEARTPICK_F"
     tabList.add(
         net.ib.mn.data.model.TypeListModel(
             id = 0,
             name = "HEARTPICK",
             type = "HEARTPICK",
+            code = heartPickChartCode,
             isDivided = "N",
             isFemale = false,
             showDivider = false
@@ -562,11 +565,13 @@ private fun buildIdolAppTabList(
     )
 
     // ONEPICK
+    val onePickChartCode = if (isMale) "ONEPICK_M" else "ONEPICK_F"
     tabList.add(
         net.ib.mn.data.model.TypeListModel(
             id = 0,
             name = "ONEPICK",
             type = "ONEPICK",
+            code = onePickChartCode,
             isDivided = "N",
             isFemale = false,
             showDivider = false
@@ -574,11 +579,18 @@ private fun buildIdolAppTabList(
     )
 
     // HOF (명예의 전당)
+    // objects에서 HOF 차트를 찾거나, 없으면 기본값 사용
+    val hofChart = chartObjects?.firstOrNull { chart ->
+        chart.code?.contains("HOF", ignoreCase = true) == true ||
+        chart.code?.contains("HALL", ignoreCase = true) == true
+    }
+    val hofChartCode = hofChart?.code ?: if (isMale) "HOF_M" else "HOF_F"
     tabList.add(
         net.ib.mn.data.model.TypeListModel(
             id = 0,
             name = "HOF",
             type = "HOF",
+            code = hofChartCode,
             isDivided = "N",
             isFemale = false,
             showDivider = false
