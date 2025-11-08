@@ -1,5 +1,6 @@
 package net.ib.mn.presentation.main.ranking.idol_subpage
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,12 +44,14 @@ fun HallOfFameRankingSubPage(
     modifier: Modifier = Modifier,
     isVisible: Boolean = true,
     topThreeTabs: List<String> = emptyList(),
+    topThreeChartCodes: List<String> = emptyList(),
     listState: LazyListState? = null
 ) {
     android.util.Log.d("HallOfFameRankingSubPage", "========================================")
     android.util.Log.d("HallOfFameRankingSubPage", "🎨 [Composing] HallOfFame")
     android.util.Log.d("HallOfFameRankingSubPage", "  - chartCode: '$chartCode' (isEmpty: ${chartCode.isEmpty()})")
     android.util.Log.d("HallOfFameRankingSubPage", "  - topTabs: $topThreeTabs")
+    android.util.Log.d("HallOfFameRankingSubPage", "  - topThreeChartCodes: $topThreeChartCodes")
     android.util.Log.d("HallOfFameRankingSubPage", "  - isVisible: $isVisible")
     android.util.Log.d("HallOfFameRankingSubPage", "========================================")
 
@@ -114,6 +117,7 @@ fun HallOfFameRankingSubPage(
                     tabbarType = selectedTabIndex, // 0 = 30일 누적
                     isVisible = isVisible && selectedTabIndex == 0,
                     topThreeTabs = topThreeTabs,
+                    topThreeChartCodes = topThreeChartCodes,
                     listState = scrollState
                 )
             }
@@ -124,6 +128,7 @@ fun HallOfFameRankingSubPage(
                     tabbarType = selectedTabIndex, // 1 = 일일
                     isVisible = isVisible && selectedTabIndex == 1,
                     topThreeTabs = topThreeTabs,
+                    topThreeChartCodes = topThreeChartCodes,
                     listState = scrollState
                 )
             }

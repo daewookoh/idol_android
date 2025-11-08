@@ -1,23 +1,42 @@
 package net.ib.mn.presentation.main.ranking.idol_subpage
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import net.ib.mn.R
 import net.ib.mn.ui.components.ExoTabSwitch
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * 명예전당 - 일일 순위 서브 페이지
@@ -34,13 +53,38 @@ fun HallOfFameRankingSecondSubDailyPage(
     tabbarType: Int,
     isVisible: Boolean,
     topThreeTabs: List<String> = emptyList(),
+    topThreeChartCodes: List<String> = emptyList(),
     listState: LazyListState = rememberLazyListState()
 ) {
     var selectedSubTabIndex by remember { mutableStateOf(0) }
 
+    // ExoTabSwitch 선택에 따른 차트 코드 결정
+    val currentChartCode = topThreeChartCodes.getOrNull(selectedSubTabIndex) ?: chartCode
+
+    // ViewModel 생성
+    val viewModel: HallOfFameRankingSecondSubDailyPageViewModel =
+        hiltViewModel<HallOfFameRankingSecondSubDailyPageViewModel, HallOfFameRankingSecondSubDailyPageViewModel.Factory> { factory ->
+            factory.create(currentChartCode, selectedSubTabIndex)
+        }
+
+    val jsonData by viewModel.jsonData.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+    val historyYear by viewModel.historyYear.collectAsState()
+    val historyMonth by viewModel.historyMonth.collectAsState()
+    val showPrevButton by viewModel.showPrevButton.collectAsState()
+    val showNextButton by viewModel.showNextButton.collectAsState()
+
+    // ExoTabSwitch 선택이 바뀔 때 새로운 차트 코드로 데이터 로드
+    LaunchedEffect(selectedSubTabIndex) {
+        android.util.Log.d("HoF_Daily", "🔄 ExoTabSwitch changed to index $selectedSubTabIndex")
+        viewModel.loadData(currentChartCode)
+    }
+
     android.util.Log.d("HoF_Daily", "========================================")
     android.util.Log.d("HoF_Daily", "🎨 Daily Page State")
     android.util.Log.d("HoF_Daily", "  - chartCode: $chartCode")
+    android.util.Log.d("HoF_Daily", "  - currentChartCode: $currentChartCode")
     android.util.Log.d("HoF_Daily", "  - tabbarType: $tabbarType (0=30일누적, 1=일일)")
     android.util.Log.d("HoF_Daily", "  - exoTabSwitchType: $selectedSubTabIndex (선택된 서브탭)")
     android.util.Log.d("HoF_Daily", "  - topThreeTabs: $topThreeTabs")
@@ -62,23 +106,146 @@ fun HallOfFameRankingSecondSubDailyPage(
             )
         }
 
-        // TODO: 여기에 자체 ViewModel을 생성하고 데이터 로드 로직 구현
-        // 현재는 placeholder UI만 표시
+        // 기간 선택 영역
+        Box(
+            modifier = Modifier
+                .width(150.dp)
+                .height(50.dp)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            // Previous button (왼쪽)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(end = 20.dp)
+            ) {
+                AndroidView(
+                    factory = { context ->
+                        android.widget.ImageView(context).apply {
+                            setImageResource(R.drawable.btn_arrow_left_state)
+                            val density = context.resources.displayMetrics.density
+                            val paddingStartPx = (18 * density).toInt()
+                            val paddingTopPx = (16 * density).toInt()
+                            val paddingEndPx = (18 * density).toInt()
+                            val paddingBottomPx = (16 * density).toInt()
+                            setPadding(paddingStartPx, paddingTopPx, paddingEndPx, paddingBottomPx)
+                            setOnClickListener {
+                                viewModel.onPrevClicked(currentChartCode)
+                            }
+                        }
+                    },
+                    update = { imageView ->
+                        imageView.visibility = if (showPrevButton) {
+                            android.view.View.VISIBLE
+                        } else {
+                            android.view.View.GONE
+                        }
+                    },
+                    modifier = Modifier.size(45.dp)
+                )
+            }
+
+            // Year and Month display (중앙)
+            Column(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = historyYear ?: stringResource(R.string.recent),
+                    style = ExoTypo.body11,
+                )
+                Text(
+                    text = historyMonth ?: stringResource(R.string.thirty_days),
+                    style = ExoTypo.body15.copy(fontWeight = FontWeight.Bold),
+                )
+            }
+
+            // Next button (오른쪽, 영역은 항상 유지)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(start = 20.dp)
+            ) {
+                AndroidView(
+                    factory = { context ->
+                        android.widget.ImageView(context).apply {
+                            setImageResource(R.drawable.btn_arrow_right_state)
+                            val density = context.resources.displayMetrics.density
+                            val paddingStartPx = (18 * density).toInt()
+                            val paddingTopPx = (16 * density).toInt()
+                            val paddingEndPx = (18 * density).toInt()
+                            val paddingBottomPx = (16 * density).toInt()
+                            setPadding(paddingStartPx, paddingTopPx, paddingEndPx, paddingBottomPx)
+                            setOnClickListener {
+                                viewModel.onNextClicked(currentChartCode)
+                            }
+                        }
+                    },
+                    update = { imageView ->
+                        imageView.visibility = if (showNextButton) {
+                            android.view.View.VISIBLE
+                        } else {
+                            android.view.View.INVISIBLE // INVISIBLE로 공간 유지
+                        }
+                    },
+                    modifier = Modifier.size(45.dp)
+                )
+            }
+        }
+
+        HorizontalDivider(
+            thickness = 1.dp,
+            color = ColorPalette.gray100
+        )
+
+        // 데이터 표시
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
+                .padding(16.dp)
         ) {
-            Text(
-                text = """
-                    tabbarType: $tabbarType (일일)
-                    exoTabSwitchType: $selectedSubTabIndex
-                    hofChartCode: $chartCode
-                """.trimIndent(),
-                fontSize = 14.sp,
-                color = ColorPalette.textDimmed
-            )
+            when {
+                isLoading -> {
+                    null
+                }
+                error != null -> {
+                    Text(
+                        text = "Error: $error",
+                        fontSize = 14.sp,
+                        color = ColorPalette.textDimmed,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                else -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Text(
+                            text = """
+                                일일 순위
+
+                                tabbarType: $tabbarType (일일)
+                                exoTabSwitchType: $selectedSubTabIndex
+                                hofChartCode: $chartCode
+
+                                JSON Data:
+                            """.trimIndent(),
+                            fontSize = 12.sp,
+                            color = ColorPalette.textDimmed
+                        )
+
+                        Text(
+                            text = jsonData,
+                            fontSize = 10.sp,
+                            fontFamily = FontFamily.Monospace,
+                            color = ColorPalette.textDefault,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }

@@ -6,16 +6,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.ui.components.ExoTabSwitch
 import net.ib.mn.ui.theme.ColorPalette
 
@@ -34,13 +41,34 @@ fun HallOfFameRankingSecondSubAccumulativePage(
     tabbarType: Int,
     isVisible: Boolean,
     topThreeTabs: List<String> = emptyList(),
+    topThreeChartCodes: List<String> = emptyList(),
     listState: LazyListState = rememberLazyListState()
 ) {
     var selectedSubTabIndex by remember { mutableStateOf(0) }
 
+    // ExoTabSwitch 선택에 따른 차트 코드 결정
+    val currentChartCode = topThreeChartCodes.getOrNull(selectedSubTabIndex) ?: chartCode
+
+    // ViewModel 생성
+    val viewModel: HallOfFameRankingSecondSubAccumulativePageViewModel =
+        hiltViewModel<HallOfFameRankingSecondSubAccumulativePageViewModel, HallOfFameRankingSecondSubAccumulativePageViewModel.Factory> { factory ->
+            factory.create(currentChartCode, selectedSubTabIndex)
+        }
+
+    val jsonData by viewModel.jsonData.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+    // ExoTabSwitch 선택이 바뀔 때 새로운 차트 코드로 데이터 로드
+    LaunchedEffect(selectedSubTabIndex) {
+        android.util.Log.d("HoF_Accumulative", "🔄 ExoTabSwitch changed to index $selectedSubTabIndex")
+        viewModel.loadData(currentChartCode)
+    }
+
     android.util.Log.d("HoF_Accumulative", "========================================")
     android.util.Log.d("HoF_Accumulative", "🎨 Accumulative Page State")
     android.util.Log.d("HoF_Accumulative", "  - chartCode: $chartCode")
+    android.util.Log.d("HoF_Accumulative", "  - currentChartCode: $currentChartCode")
     android.util.Log.d("HoF_Accumulative", "  - tabbarType: $tabbarType (0=30일누적, 1=일일)")
     android.util.Log.d("HoF_Accumulative", "  - exoTabSwitchType: $selectedSubTabIndex (선택된 서브탭)")
     android.util.Log.d("HoF_Accumulative", "  - topThreeTabs: $topThreeTabs")
@@ -62,23 +90,54 @@ fun HallOfFameRankingSecondSubAccumulativePage(
             )
         }
 
-        // TODO: 여기에 자체 ViewModel을 생성하고 데이터 로드 로직 구현
-        // 현재는 placeholder UI만 표시
+        // 데이터 표시
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
+                .padding(16.dp)
         ) {
-            Text(
-                text = """
-                    tabbarType: $tabbarType (30일 누적)
-                    exoTabSwitchType: $selectedSubTabIndex
-                    hofChartCode: $chartCode
-                """.trimIndent(),
-                fontSize = 14.sp,
-                color = ColorPalette.textDimmed
-            )
+            when {
+                isLoading -> {
+                    null
+                }
+                error != null -> {
+                    Text(
+                        text = "Error: $error",
+                        fontSize = 14.sp,
+                        color = ColorPalette.textDimmed,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                else -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Text(
+                            text = """
+                                30일 누적 순위
+
+                                tabbarType: $tabbarType (30일 누적)
+                                exoTabSwitchType: $selectedSubTabIndex
+                                hofChartCode: $chartCode
+
+                                JSON Data:
+                            """.trimIndent(),
+                            fontSize = 12.sp,
+                            color = ColorPalette.textDimmed
+                        )
+
+                        Text(
+                            text = jsonData,
+                            fontSize = 10.sp,
+                            fontFamily = FontFamily.Monospace,
+                            color = ColorPalette.textDefault,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }

@@ -147,6 +147,12 @@ object ExoTypo {
             color = ColorPalette.textDefault
         )
 
+    val body15
+        @Composable get() = TextStyle(
+            fontSize = 14.sp,
+            color = ColorPalette.textDefault
+        )
+
     /**
      * 일반 텍스트 스타일 (14.sp, Main 컬러)
      */

@@ -3,6 +3,7 @@ package net.ib.mn.data.remote.api
 import net.ib.mn.data.remote.dto.ChartIdolIdsResponse
 import net.ib.mn.data.remote.dto.ChartRanksResponse
 import net.ib.mn.data.remote.dto.CurrentChartResponse
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -57,4 +58,20 @@ interface ChartsApi {
     suspend fun getChartRanks(
         @Query("code") code: String
     ): Response<ChartRanksResponse>
+
+    /**
+     * 명예전당 일일 데이터 가져오기
+     *
+     * old 프로젝트의 hofs/ API와 동일
+     * 명예전당 일일 순위 데이터 조회
+     *
+     * @param code 차트 코드 (예: "HOF_M", "HOF_F")
+     * @param historyParam 이전 기간 조회용 파라미터 (optional)
+     * @return Response<ResponseBody> JSON 형식의 응답
+     */
+    @GET("hofs/")
+    suspend fun getHofs(
+        @Query("code") code: String,
+        @Query("history_param") historyParam: String? = null
+    ): Response<ResponseBody>
 }

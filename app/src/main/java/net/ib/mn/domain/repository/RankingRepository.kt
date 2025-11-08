@@ -51,4 +51,16 @@ interface RankingRepository {
      * @return Flow<ApiResult<VoteResponse>> 투표 결과
      */
     fun voteIdol(idolId: Int, heart: Long): Flow<ApiResult<VoteResponse>>
+
+    /**
+     * 명예전당 일일 데이터 조회
+     *
+     * old 프로젝트의 hofs/ API와 동일
+     * 명예전당 일일 순위 데이터 조회
+     *
+     * @param code 차트 코드 (예: "HOF_M", "HOF_F")
+     * @param historyParam 이전 기간 조회용 파라미터 (optional)
+     * @return Flow<ApiResult<String>> JSON 형식의 응답
+     */
+    fun getHofs(code: String, historyParam: String? = null): Flow<ApiResult<String>>
 }

@@ -447,7 +447,8 @@ fun RankingPage(
                     "HOF" -> net.ib.mn.presentation.main.ranking.idol_subpage.HallOfFameRankingSubPage(
                         chartCode = currentType.code ?: "",
                         isVisible = subPagerState.currentPage == pageIndex,
-                        topThreeTabs = tabs.take(3)
+                        topThreeTabs = tabs.take(3),
+                        topThreeChartCodes = tabDataList.take(3).map { it.code ?: "" }
                     )
                     "GLOBALS" -> {
                         android.util.Log.d("RankingPage", "🎯 Rendering GLOBALS with dataSource: ${globalDataSource.hashCode()}, type=${globalDataSource.type}")
