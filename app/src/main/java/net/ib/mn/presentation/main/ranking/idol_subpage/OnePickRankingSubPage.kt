@@ -171,7 +171,6 @@ fun OnePickRankingSubPage(
                                 state = cardData.state,
                                 title = cardData.title,
                                 subTitle = cardData.subTitle,
-                                imageUrl = cardData.imageUrl,
                                 voteCount = cardData.voteCount,
                                 periodDate = cardData.periodDate,
                                 onCardClick = {

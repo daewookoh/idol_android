@@ -189,7 +189,8 @@ private val Pink500Dark = Color(0xFFFF7AAD)
 private val WhiteDark = Color(0xFF414243)
 
 // Notice - Dark
-private val NoticeBackgroundDark = Color(0xFF2a1a1a)
+private val NoticeBackgroundDark = Color(0xFF1d1a19)
+//private val NoticeBackgroundDark = Color(0xFF2a1a1a)
 
 // ==================== Fixed Colors (테마 변경 없음) ====================
 // 고정 색상 (라이트/다크 모드에서 변하지 않음)

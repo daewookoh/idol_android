@@ -13,14 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ColorPalette
 
@@ -39,7 +37,6 @@ enum class ImagePickState {
  * @param state 카드 상태 (UPCOMING, ACTIVE, ENDED)
  * @param title 제목
  * @param subTitle 부제목
- * @param imageUrl 배경 이미지 URL
  * @param voteCount 전체 투표수
  * @param periodDate 투표 기간
  * @param onCardClick 카드 클릭 이벤트
@@ -51,7 +48,6 @@ fun ExoImagePickCard(
     state: ImagePickState,
     title: String,
     subTitle: String,
-    imageUrl: String,
     voteCount: String,
     periodDate: String,
     onCardClick: () -> Unit,
@@ -60,8 +56,8 @@ fun ExoImagePickCard(
 ) {
     when (state) {
         ImagePickState.ENDED -> ImagePickEndedCard(
-            imageUrl = imageUrl,
             title = title,
+            subTitle = subTitle,
             periodDate = periodDate,
             voteCount = voteCount,
             onCardClick = onCardClick,
@@ -69,7 +65,6 @@ fun ExoImagePickCard(
             modifier = modifier
         )
         ImagePickState.UPCOMING -> ImagePickUpcomingCard(
-            imageUrl = imageUrl,
             title = title,
             subTitle = subTitle,
             periodDate = periodDate,
@@ -77,8 +72,8 @@ fun ExoImagePickCard(
             modifier = modifier
         )
         ImagePickState.ACTIVE -> ImagePickActiveCard(
-            imageUrl = imageUrl,
             title = title,
+            subTitle = subTitle,
             periodDate = periodDate,
             voteCount = voteCount,
             onCardClick = onCardClick,
@@ -93,8 +88,8 @@ fun ExoImagePickCard(
  */
 @Composable
 private fun ImagePickEndedCard(
-    imageUrl: String,
     title: String,
+    subTitle: String,
     periodDate: String,
     voteCount: String,
     onCardClick: () -> Unit,
@@ -118,9 +113,16 @@ private fun ImagePickEndedCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp)
+                    .padding(16.dp)
             ) {
-                ImagePickCardContent(imageUrl, title, periodDate, voteCount)
+                ImagePickCardContent(
+                    title = title,
+                    subTitle = subTitle,
+                    periodDate = periodDate,
+                    voteCount = voteCount,
+                    voteCountLabel = R.string.themepick_total_votes,
+                )
+
                 Spacer(Modifier.height(50.dp))
             }
 
@@ -157,7 +159,6 @@ private fun ImagePickEndedCard(
  */
 @Composable
 private fun ImagePickUpcomingCard(
-    imageUrl: String,
     title: String,
     subTitle: String,
     periodDate: String,
@@ -179,85 +180,53 @@ private fun ImagePickUpcomingCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-        // 배경 이미지
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 10.dp, end = 10.dp, top = 16.dp)
-        ) {
-            if (imageUrl.isNotEmpty()) {
-                AsyncImage(
-                    model = imageUrl,
-                    contentDescription = "ImagePick Image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(3.3f / 1f)
-                        .clip(RoundedCornerShape(10.dp)),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(3.3f / 1f)
-                        .background(ColorPalette.background200, RoundedCornerShape(10.dp))
-                )
-            }
-        }
+            // 제목
+            ExoNoticeBox(
+                text = title,
+                fontSize = 16.sp
+            )
 
-        // 제목
-        Text(
-            text = title,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.mainLight,
-            modifier = Modifier
-                .padding(start = 16.dp)
-                .padding(top = 10.dp)
-        )
+            Spacer(modifier = Modifier.height(30.dp))
 
-        // 부제목 (D-Day)
-        Text(
-            text = subTitle,
-            fontSize = 21.sp,
-            lineHeight = 21.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.mainLight,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(top = 12.dp)
-        )
-
-        // 투표 기간
-        Text(
-            text = "${stringResource(R.string.onepick_period)} : $periodDate",
-            fontSize = 12.sp,
-            lineHeight = 12.sp,
-            letterSpacing = (-0.5).sp,
-            color = ColorPalette.textDimmed,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(top = 4.dp)
-        )
-
-            // 투표 미리보기 버튼
-            ExoButton(
-                onClick = onCardClick,
+            // 부제목 (D-Day)
+            Text(
+                text = subTitle,
+                fontSize = 21.sp,
+                lineHeight = 21.sp,
+                fontWeight = FontWeight.Bold,
+                color = ColorPalette.mainLight,
+                textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp, start = 16.dp, end = 16.dp),
-                text = stringResource(R.string.vote_preview),
+                    .padding(bottom = 16.dp)
+            )
+
+            // 투표 기간
+            Text(
+                text = "${stringResource(R.string.onepick_period)} : $periodDate",
+                fontSize = 10.sp,
+                lineHeight = 10.sp,
+                letterSpacing = (-0.5).sp,
+                color = ColorPalette.textDimmed,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 30.dp)
+            )
+
+            // 투표 알림 설정 버튼
+            ExoButton(
+                onClick = onCardClick,
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.vote_alert_before),
                 fontSize = 14.sp,
                 height = 41.dp,
                 shape = RoundedCornerShape(20.dp),
-                containerColor = ColorPalette.main200,
-                contentColor = ColorPalette.mainLight
+                containerColor = ColorPalette.mainLight,
+                contentColor = ColorPalette.textWhiteBlack
             )
         }
     }
@@ -268,8 +237,8 @@ private fun ImagePickUpcomingCard(
  */
 @Composable
 private fun ImagePickActiveCard(
-    imageUrl: String,
     title: String,
+    subTitle: String,
     periodDate: String,
     voteCount: String,
     onCardClick: () -> Unit,
@@ -291,124 +260,101 @@ private fun ImagePickActiveCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .padding(16.dp)
         ) {
-            ImagePickCardContent(imageUrl, title, periodDate, voteCount)
+            ImagePickCardContent(
+                title = title,
+                subTitle = subTitle,
+                periodDate = periodDate,
+                voteCount = voteCount,
+                voteCountLabel = R.string.num_participants
+            )
 
-            // 하단 컨텐츠
-            Column(
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 현재 순위 보기
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp, start = 16.dp, end = 16.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(ColorPalette.main200)
+                    .clickable(onClick = onVoteClick)
+                    .padding(horizontal = 7.dp, vertical = 3.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
             ) {
-                // 현재 순위 보기
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(ColorPalette.main200)
-                        .clickable(onClick = onVoteClick)
-                        .padding(horizontal = 7.dp, vertical = 3.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Text(
-                        text = stringResource(R.string.see_current_ranking),
-                        fontSize = 13.sp,
-                        color = ColorPalette.mainLight
-                    )
-                    Spacer(modifier = Modifier.width(3.dp))
-                    Icon(
-                        painter = painterResource(R.drawable.arrow_left_to_right),
-                        contentDescription = null,
-                        modifier = Modifier.size(8.dp),
-                        tint = ColorPalette.mainLight
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                // 투표 참여 버튼
-                ExoButton(
-                    onClick = onVoteClick,
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(R.string.guide_vote_title),
-                    fontSize = 14.sp,
-                    height = 41.dp,
-                    shape = RoundedCornerShape(20.dp),
-                    containerColor = ColorPalette.mainLight,
-                    contentColor = ColorPalette.textWhiteBlack
+                Text(
+                    text = stringResource(R.string.see_current_ranking),
+                    fontSize = 13.sp,
+                    color = ColorPalette.mainLight
+                )
+                Spacer(modifier = Modifier.width(3.dp))
+                Icon(
+                    painter = painterResource(R.drawable.arrow_left_to_right),
+                    contentDescription = null,
+                    modifier = Modifier.size(8.dp),
+                    tint = ColorPalette.mainLight
                 )
             }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // 투표 참여 버튼
+            ExoButton(
+                onClick = onVoteClick,
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.guide_vote_title),
+                fontSize = 14.sp,
+                height = 41.dp,
+                shape = RoundedCornerShape(20.dp),
+                containerColor = ColorPalette.mainLight,
+                contentColor = ColorPalette.textWhiteBlack
+            )
         }
     }
 }
 
 /**
- * 이미지픽 카드 공통 콘텐츠 (이미지, 제목, 투표 정보)
+ * 이미지픽 카드 공통 콘텐츠 (Active/Ended 공용)
  */
 @Composable
 private fun ImagePickCardContent(
-    imageUrl: String,
     title: String,
+    subTitle: String,
     periodDate: String,
-    voteCount: String
+    voteCount: String,
+    voteCountLabel: Int,
 ) {
-    // 배경 이미지
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 10.dp, end = 10.dp, top = 16.dp)
-    ) {
-        if (imageUrl.isNotEmpty()) {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = "ImagePick Image",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(3.3f / 1f)
-                    .clip(RoundedCornerShape(10.dp)),
-                contentScale = ContentScale.Crop
-            )
-        } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(3.3f / 1f)
-                    .background(ColorPalette.background200, RoundedCornerShape(10.dp))
-            )
-        }
-    }
-
-    // 제목
-    Text(
+    // 타이틀
+    ExoNoticeBox(
         text = title,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Bold,
-        color = ColorPalette.mainLight,
-        modifier = Modifier
-            .padding(start = 16.dp)
-            .padding(top = 10.dp)
+        fontSize = 13.sp
     )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    Text(
+        text = subTitle,
+        fontSize = 13.sp,
+        color = ColorPalette.textDefault
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
 
     // 투표 기간
     Text(
         text = "${stringResource(R.string.onepick_period)} : $periodDate",
         fontSize = 13.sp,
         lineHeight = 13.sp,
-        color = ColorPalette.textDefault,
-        modifier = Modifier
-            .padding(start = 16.dp)
-            .padding(top = 10.dp)
+        color = ColorPalette.textDefault
     )
 
-    // 전체 투표수
+    Spacer(modifier = Modifier.height(6.dp))
+
+    // 투표수 (전체 투표수 or 참여인원)
     Text(
-        text = "${stringResource(R.string.themepick_total_votes)} : $voteCount${stringResource(R.string.votes)}",
+        text = "${stringResource(voteCountLabel)} : $voteCount${if (voteCountLabel == R.string.themepick_total_votes) stringResource(R.string.votes) else ""}",
         fontSize = 13.sp,
         lineHeight = 13.sp,
-        color = ColorPalette.textDefault,
-        modifier = Modifier
-            .padding(start = 16.dp)
-            .padding(top = 6.dp)
+        color = ColorPalette.textDefault
     )
 }
