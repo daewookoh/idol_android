@@ -305,13 +305,13 @@ fun RankingPage(
                 selectedTabIndex = subPagerState.currentPage,
                 containerColor = backgroundColor,
                 contentColor = mainColor,
-                edgePadding = 4.dp,
+                edgePadding = 3.dp,
                 divider = {},
                 indicator = @Composable {
                     TabRowDefaults.SecondaryIndicator(
                         modifier = Modifier
                             .tabIndicatorOffset(subPagerState.currentPage)
-                            .padding(horizontal = 8.dp),
+                            .padding(horizontal = 12.dp),
                         color = mainColor
                     )
                 }
@@ -329,7 +329,7 @@ fun RankingPage(
                                     subPagerState.animateScrollToPage(index)
                                 }
                             }
-                            .padding(horizontal = 10.dp),
+                            .padding(horizontal = 12.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
