@@ -161,7 +161,7 @@ fun ExoRankingList(
             }
         }
 
-        exoRankingItem(
+        exoRankingItems(
             items = items,
             type = itemType,
             onItemClick = onItemClick,

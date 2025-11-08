@@ -87,7 +87,7 @@ import net.ib.mn.ui.theme.ExoTypo
  * @param type 랭킹 타입 ("MAIN" = 큰 이미지, "DAILY" = 작은 이미지, "AGGREGATE" = 누적 랭킹 아이템, 기본값: "MAIN")
  * @param onItemClick 아이템 클릭 이벤트
  */
-fun LazyListScope.exoRankingItem(
+fun LazyListScope.exoRankingItems(
     items: List<RankingItemData>,
     type: String = "MAIN",
     onItemClick: (Int, RankingItemData) -> Unit = { _, _ -> },
@@ -399,8 +399,19 @@ fun LazyListScope.exoRankingItem(
                                     val shimmerProgress = remember { androidx.compose.animation.core.Animatable(0f) }
 
                                     if (isTypeMain) {
-                                        // type "MAIN": 10초마다 반복 애니메이션
+                                        // type "MAIN": 처음 렌더링 시 바로 반짝임 + 10초마다 반복 애니메이션
                                         LaunchedEffect(Unit) {
+                                            // 처음 렌더링 시 즉시 반짝임 실행
+                                            shimmerProgress.snapTo(0f)
+                                            shimmerProgress.animateTo(
+                                                targetValue = 1f,
+                                                animationSpec = tween(
+                                                    durationMillis = 1000,
+                                                    easing = LinearEasing
+                                                )
+                                            )
+
+                                            // 그 후 10초마다 반복
                                             while (true) {
                                                 kotlinx.coroutines.delay(10000) // 10초 대기
                                                 shimmerProgress.snapTo(0f)
