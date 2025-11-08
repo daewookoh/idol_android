@@ -19,7 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
-import net.ib.mn.ui.components.ExoOnePickCard
+import net.ib.mn.ui.components.ExoThemePickCard
+import net.ib.mn.ui.components.ExoImagePickCard
 import net.ib.mn.ui.components.ExoTabSwitch
 import net.ib.mn.ui.theme.ColorPalette
 
@@ -61,43 +62,25 @@ fun OnePickRankingSubPage(
             stringResource(R.string.imagepick)
         )
 
-        when (val state = uiState) {
-            is OnePickRankingSubPageViewModel.UiState.Success -> {
-                val selectedIndex = when (state.selectedTab) {
-                    OnePickRankingSubPageViewModel.TabType.THEME_PICK -> 0
-                    OnePickRankingSubPageViewModel.TabType.IMAGE_PICK -> 1
-                }
-                ExoTabSwitch(
-                    tabs = tabs,
-                    selectedIndex = selectedIndex,
-                    onTabSelected = { index ->
-                        val tabType = if (index == 0) {
-                            OnePickRankingSubPageViewModel.TabType.THEME_PICK
-                        } else {
-                            OnePickRankingSubPageViewModel.TabType.IMAGE_PICK
-                        }
-                        viewModel.switchTab(tabType)
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            else -> {
-                // Loading이나 Error 상태에서도 탭 표시
-                ExoTabSwitch(
-                    tabs = tabs,
-                    selectedIndex = 0,
-                    onTabSelected = { index ->
-                        val tabType = if (index == 0) {
-                            OnePickRankingSubPageViewModel.TabType.THEME_PICK
-                        } else {
-                            OnePickRankingSubPageViewModel.TabType.IMAGE_PICK
-                        }
-                        viewModel.switchTab(tabType)
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+        val selectedIndex = when (uiState) {
+            is OnePickRankingSubPageViewModel.UiState.ThemePickSuccess -> 0
+            is OnePickRankingSubPageViewModel.UiState.ImagePickSuccess -> 1
+            else -> 0
         }
+
+        ExoTabSwitch(
+            tabs = tabs,
+            selectedIndex = selectedIndex,
+            onTabSelected = { index ->
+                val tabType = if (index == 0) {
+                    OnePickRankingSubPageViewModel.TabType.THEME_PICK
+                } else {
+                    OnePickRankingSubPageViewModel.TabType.IMAGE_PICK
+                }
+                viewModel.switchTab(tabType)
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
 
         // 컨텐츠 영역
         when (val state = uiState) {
@@ -125,7 +108,7 @@ fun OnePickRankingSubPage(
                 }
             }
 
-            is OnePickRankingSubPageViewModel.UiState.Success -> {
+            is OnePickRankingSubPageViewModel.UiState.ThemePickSuccess -> {
                 if (state.items.isEmpty()) {
                     Box(
                         modifier = Modifier
@@ -145,7 +128,7 @@ fun OnePickRankingSubPage(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(state.items) { cardData ->
-                            ExoOnePickCard(
+                            ExoThemePickCard(
                                 state = cardData.state,
                                 title = cardData.title,
                                 subTitle = cardData.subTitle,
@@ -153,10 +136,49 @@ fun OnePickRankingSubPage(
                                 voteCount = cardData.voteCount,
                                 periodDate = cardData.periodDate,
                                 onCardClick = {
-                                    android.util.Log.d("OnePickRankingSubPage", "Card clicked: ${cardData.title}")
+                                    android.util.Log.d("OnePickRankingSubPage", "ThemePick Card clicked: ${cardData.title}")
                                 },
                                 onVoteClick = {
-                                    android.util.Log.d("OnePickRankingSubPage", "Vote clicked: ${cardData.title}")
+                                    android.util.Log.d("OnePickRankingSubPage", "ThemePick Vote clicked: ${cardData.title}")
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            is OnePickRankingSubPageViewModel.UiState.ImagePickSuccess -> {
+                if (state.items.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.msg_no_data),
+                            fontSize = 16.sp,
+                            color = ColorPalette.textDimmed
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        state = scrollState,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(state.items) { cardData ->
+                            ExoImagePickCard(
+                                state = cardData.state,
+                                title = cardData.title,
+                                subTitle = cardData.subTitle,
+                                imageUrl = cardData.imageUrl,
+                                voteCount = cardData.voteCount,
+                                periodDate = cardData.periodDate,
+                                onCardClick = {
+                                    android.util.Log.d("OnePickRankingSubPage", "ImagePick Card clicked: ${cardData.title}")
+                                },
+                                onVoteClick = {
+                                    android.util.Log.d("OnePickRankingSubPage", "ImagePick Vote clicked: ${cardData.title}")
                                 }
                             )
                         }

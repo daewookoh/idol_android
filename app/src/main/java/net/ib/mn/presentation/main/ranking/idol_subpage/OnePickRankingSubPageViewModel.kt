@@ -18,7 +18,8 @@ import net.ib.mn.domain.model.ImagePickModel
 import net.ib.mn.domain.model.ThemePickModel
 import net.ib.mn.domain.repository.OnepickRepository
 import net.ib.mn.domain.repository.ThemepickRepository
-import net.ib.mn.ui.components.OnePickState
+import net.ib.mn.ui.components.ThemePickState
+import net.ib.mn.ui.components.ImagePickState
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
 import net.ib.mn.util.NumberFormatUtil
 import java.text.SimpleDateFormat
@@ -47,18 +48,16 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
 
     sealed interface UiState {
         data object Loading : UiState
-        data class Success(
-            val items: List<OnePickCardData>,
-            val selectedTab: TabType
-        ) : UiState
+        data class ThemePickSuccess(val items: List<ThemePickCardData>) : UiState
+        data class ImagePickSuccess(val items: List<ImagePickCardData>) : UiState
         data class Error(val message: String) : UiState
     }
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    private var cachedThemePickData: List<OnePickCardData>? = null
-    private var cachedImagePickData: List<OnePickCardData>? = null
+    private var cachedThemePickData: List<ThemePickCardData>? = null
+    private var cachedImagePickData: List<ImagePickCardData>? = null
     private var currentTab: TabType = TabType.THEME_PICK
 
     init {
@@ -71,7 +70,7 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
             TabType.THEME_PICK -> {
                 if (cachedThemePickData != null) {
                     android.util.Log.d("OnePickRankingVM", "✓ Using cached ThemePick data")
-                    _uiState.value = UiState.Success(cachedThemePickData!!, currentTab)
+                    _uiState.value = UiState.ThemePickSuccess(cachedThemePickData!!)
                 } else {
                     loadThemePickList()
                 }
@@ -79,7 +78,7 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
             TabType.IMAGE_PICK -> {
                 if (cachedImagePickData != null) {
                     android.util.Log.d("OnePickRankingVM", "✓ Using cached ImagePick data")
-                    _uiState.value = UiState.Success(cachedImagePickData!!, currentTab)
+                    _uiState.value = UiState.ImagePickSuccess(cachedImagePickData!!)
                 } else {
                     loadImagePickList()
                 }
@@ -99,14 +98,14 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
         when (tabType) {
             TabType.THEME_PICK -> {
                 if (cachedThemePickData != null) {
-                    _uiState.value = UiState.Success(cachedThemePickData!!, currentTab)
+                    _uiState.value = UiState.ThemePickSuccess(cachedThemePickData!!)
                 } else {
                     loadThemePickList()
                 }
             }
             TabType.IMAGE_PICK -> {
                 if (cachedImagePickData != null) {
-                    _uiState.value = UiState.Success(cachedImagePickData!!, currentTab)
+                    _uiState.value = UiState.ImagePickSuccess(cachedImagePickData!!)
                 } else {
                     loadImagePickList()
                 }
@@ -176,22 +175,22 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
         try {
             val cardDataList = themePickList.map { themePick ->
                 val state = when (themePick.status) {
-                    ThemePickModel.STATUS_PREPARING -> OnePickState.UPCOMING
-                    ThemePickModel.STATUS_PROGRESS -> OnePickState.ACTIVE
-                    else -> OnePickState.ENDED
+                    ThemePickModel.STATUS_PREPARING -> ThemePickState.UPCOMING
+                    ThemePickModel.STATUS_PROGRESS -> ThemePickState.ACTIVE
+                    else -> ThemePickState.ENDED
                 }
 
                 val periodDate = formatPeriodDate(themePick.beginAt, themePick.expiredAt)
                 val voteCount = NumberFormatUtil.formatNumberShort(themePick.count)
 
                 // UPCOMING 상태일 때 D-Day 계산
-                val subTitle = if (state == OnePickState.UPCOMING) {
+                val subTitle = if (state == ThemePickState.UPCOMING) {
                     calculateDDay(themePick.beginAt)
                 } else {
                     themePick.subtitle
                 }
 
-                OnePickCardData(
+                ThemePickCardData(
                     id = themePick.id,
                     state = state,
                     title = themePick.title,
@@ -205,7 +204,7 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
             android.util.Log.d("OnePickRankingVM", "✅ Processed ${cardDataList.size} theme picks")
 
             cachedThemePickData = cardDataList
-            _uiState.value = UiState.Success(cardDataList, currentTab)
+            _uiState.value = UiState.ThemePickSuccess(cardDataList)
         } catch (e: Exception) {
             android.util.Log.e("OnePickRankingVM", "❌ Exception: ${e.message}", e)
             _uiState.value = UiState.Error(e.message ?: "Error")
@@ -216,22 +215,22 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
         try {
             val cardDataList = imagePickList.map { imagePick ->
                 val state = when (imagePick.status) {
-                    ImagePickModel.STATUS_PREPARING -> OnePickState.UPCOMING
-                    ImagePickModel.STATUS_PROGRESS -> OnePickState.ACTIVE
-                    else -> OnePickState.ENDED
+                    ImagePickModel.STATUS_PREPARING -> ImagePickState.UPCOMING
+                    ImagePickModel.STATUS_PROGRESS -> ImagePickState.ACTIVE
+                    else -> ImagePickState.ENDED
                 }
 
                 val periodDate = formatPeriodDate(imagePick.createdAt, imagePick.expiredAt)
                 val voteCount = NumberFormatUtil.formatNumberShort(imagePick.count)
 
                 // UPCOMING 상태일 때 D-Day 계산
-                val subTitle = if (state == OnePickState.UPCOMING) {
+                val subTitle = if (state == ImagePickState.UPCOMING) {
                     calculateDDay(imagePick.createdAt)
                 } else {
                     imagePick.subtitle
                 }
 
-                OnePickCardData(
+                ImagePickCardData(
                     id = imagePick.id,
                     state = state,
                     title = imagePick.title,
@@ -245,7 +244,7 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
             android.util.Log.d("OnePickRankingVM", "✅ Processed ${cardDataList.size} image picks")
 
             cachedImagePickData = cardDataList
-            _uiState.value = UiState.Success(cardDataList, currentTab)
+            _uiState.value = UiState.ImagePickSuccess(cardDataList)
         } catch (e: Exception) {
             android.util.Log.e("OnePickRankingVM", "❌ Exception: ${e.message}", e)
             _uiState.value = UiState.Error(e.message ?: "Error")
@@ -297,11 +296,24 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
 }
 
 /**
- * OnePick 카드 데이터
+ * 테마픽 카드 데이터
  */
-data class OnePickCardData(
+data class ThemePickCardData(
     val id: Int,
-    val state: OnePickState,
+    val state: ThemePickState,
+    val title: String,
+    val subTitle: String,
+    val imageUrl: String,
+    val voteCount: String,
+    val periodDate: String
+)
+
+/**
+ * 이미지픽 카드 데이터
+ */
+data class ImagePickCardData(
+    val id: Int,
+    val state: ImagePickState,
     val title: String,
     val subTitle: String,
     val imageUrl: String,

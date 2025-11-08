@@ -137,7 +137,6 @@ private fun UpcomingHeartPickCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(ColorPalette.background200)
             .padding(vertical = 7.5.dp)
     ) {
         Card(
@@ -350,7 +349,6 @@ private fun ActiveHeartPickCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(ColorPalette.background200)
             .padding(vertical = 7.5.dp)
     ) {
         Card(
@@ -707,7 +705,6 @@ private fun EndedHeartPickCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(ColorPalette.background200)
             .padding(vertical = 7.5.dp)
     ) {
         Card(
