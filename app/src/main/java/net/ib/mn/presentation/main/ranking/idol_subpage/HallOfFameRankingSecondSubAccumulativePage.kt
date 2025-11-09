@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -25,7 +27,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.ui.components.ExoTabSwitch
+import net.ib.mn.ui.components.HofAccumulativeRankingItem
+import net.ib.mn.ui.components.HofAccumulativeTop1RankingItem
 import net.ib.mn.ui.theme.ColorPalette
+import java.text.DateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.GregorianCalendar
+import java.util.Locale
 
 /**
  * 명예전당 - 30일 누적 순위 서브 페이지
@@ -62,9 +71,10 @@ fun HallOfFameRankingSecondSubAccumulativePage(
             factory.create(currentChartCode, selectedSubTabIndex)
         }
 
-    val jsonData by dataViewModel.jsonData.collectAsState()
+    val rankingData by dataViewModel.rankingData.collectAsState()
     val isLoading by dataViewModel.isLoading.collectAsState()
     val error by dataViewModel.error.collectAsState()
+    val cdnUrl by dataViewModel.cdnUrl.collectAsState()
 
     // ExoTabSwitch 선택이 바뀔 때 새로운 차트 코드로 데이터 로드
     LaunchedEffect(selectedSubTabIndex) {
@@ -99,13 +109,14 @@ fun HallOfFameRankingSecondSubAccumulativePage(
 
         // 데이터 표시
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+            modifier = Modifier.fillMaxSize()
         ) {
             when {
                 isLoading -> {
-                    null
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = ColorPalette.main
+                    )
                 }
                 error != null -> {
                     Text(
@@ -115,33 +126,78 @@ fun HallOfFameRankingSecondSubAccumulativePage(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
+                rankingData.isEmpty() -> {
+                    Text(
+                        text = "데이터가 없습니다",
+                        fontSize = 14.sp,
+                        color = ColorPalette.textDimmed,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
                 else -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
+                    // 기간 계산 (old: TopViewHolder.bind() 로직과 동일)
+                    val period = remember {
+                        val today = Date()
+                        var cal = GregorianCalendar()
+                        cal.time = today
+                        cal.add(Calendar.DATE, -30)
+                        cal[Calendar.HOUR_OF_DAY] = 11
+                        val fromDate = cal.time
+
+                        cal = GregorianCalendar()
+                        cal.time = today
+                        cal[Calendar.HOUR_OF_DAY] = 23
+                        var toDate = cal.time
+
+                        val f = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
+                        val fromText = f.format(fromDate)
+
+                        if (today.time < toDate.time) {
+                            cal = GregorianCalendar()
+                            cal.time = today
+                            cal.add(Calendar.DATE, -1)
+                            cal[Calendar.HOUR_OF_DAY] = 23
+                            toDate = cal.time
+                        }
+                        val toText = f.format(toDate)
+                        "$fromText ~ $toText"
+                    }
+
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        Text(
-                            text = """
-                                30일 누적 순위
+                        // 1위 (헤더)
+                        if (rankingData.isNotEmpty()) {
+                            item(key = "top1_${rankingData[0].idolId}") {
+                                HofAccumulativeTop1RankingItem(
+                                    item = rankingData[0],
+                                    cdnUrl = cdnUrl,
+                                    period = period,
+                                    onItemClick = {
+                                        android.util.Log.d("HoF_Accumulative", "Clicked on 1st: ${rankingData[0].name}")
+                                    },
+                                    onInfoClick = {
+                                        android.util.Log.d("HoF_Accumulative", "Info button clicked")
+                                        // TODO: LevelHeartGuideActivity로 이동
+                                    }
+                                )
+                            }
+                        }
 
-                                tabbarType: $tabbarType (30일 누적)
-                                exoTabSwitchType: $selectedSubTabIndex
-                                hofChartCode: $chartCode
-
-                                JSON Data:
-                            """.trimIndent(),
-                            fontSize = 12.sp,
-                            color = ColorPalette.textDimmed
-                        )
-
-                        Text(
-                            text = jsonData,
-                            fontSize = 10.sp,
-                            fontFamily = FontFamily.Monospace,
-                            color = ColorPalette.textDefault,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
+                        // 2위 이하
+                        items(
+                            items = rankingData.drop(1),
+                            key = { item -> item.idolId }
+                        ) { item ->
+                            HofAccumulativeRankingItem(
+                                item = item,
+                                cdnUrl = cdnUrl,
+                                onItemClick = {
+                                    android.util.Log.d("HoF_Accumulative", "Clicked on ${item.name} (rank: ${item.scoreRank})")
+                                }
+                            )
+                        }
                     }
                 }
             }

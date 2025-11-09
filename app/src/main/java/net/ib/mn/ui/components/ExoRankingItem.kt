@@ -11,6 +11,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -66,6 +68,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ExoTypo
+import java.text.NumberFormat
 
 /**
  * ExoRankingItem - 랭킹 아이템 리스트 렌더링 (로우레벨 구현)
@@ -801,6 +804,464 @@ private fun AggregatedRankingItem(
             )
         }
     }
+}
+
+/**
+ * HofAccumulativeTop1RankingItem - 명예의 전당 누적 랭킹 1위 전용 아이템
+ *
+ * old 프로젝트의 aggregated_hof_header.xml 및 HallOfFameAggAdapter TopViewHolder 기반
+ *
+ * 주요 기능:
+ * 1. 기간 표시 영역 (우측 info 버튼)
+ * 2. 1위 프로필 영역 (날개 배경 + 큰 프로필 이미지)
+ * 3. 급상승 표시 (우측 상단)
+ * 4. 순위 변동 표시 (NEW, UP/DOWN)
+ * 5. 1위 텍스트 + 이름 + 그룹 + 점수
+ *
+ * @param item 1위 랭킹 아이템 데이터
+ * @param cdnUrl CDN 베이스 URL (PreferencesManager에서 가져온 값)
+ * @param period 기간 텍스트 (예: "2024.01.01 ~ 2024.01.30")
+ * @param onItemClick 아이템 클릭 이벤트
+ * @param onInfoClick info 버튼 클릭 이벤트
+ */
+@Composable
+fun HofAccumulativeTop1RankingItem(
+    item: net.ib.mn.data.remote.dto.AggregateRankModel,
+    cdnUrl: String,
+    period: String,
+    onItemClick: () -> Unit = {},
+    onInfoClick: () -> Unit = {}
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // 기간 표시 영역 (old: ConstraintLayout, height: 40dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp)
+                .background(ColorPalette.gray50),
+            contentAlignment = Alignment.Center
+        ) {
+            // 기간 텍스트
+            Text(
+                text = period,
+                style = ExoTypo.body14.copy(color = ColorPalette.textDimmed),
+                modifier = Modifier.align(Alignment.Center)
+            )
+
+            // Info 버튼 (우측)
+            IconButton(
+                onClick = onInfoClick,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(36.dp)
+                    .padding(9.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.btn_info_black),
+                    contentDescription = "Info",
+                    tint = Color.Unspecified
+                )
+            }
+        }
+
+        // 1위 프로필 영역 (old: btn_idol)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(ColorPalette.background100)
+                .clickable { onItemClick() }
+        ) {
+            // 배경 이미지 (old: bg_cumulative_voting, 78dp height)
+            Icon(
+                painter = painterResource(R.drawable.bg_cumulative_voting),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(78.dp)
+                    .align(Alignment.TopCenter),
+                tint = Color.Unspecified
+            )
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // 프로필 영역 (old: best1_profile, 180dp x 98dp)
+                Box(
+                    modifier = Modifier
+                        .width(180.dp)
+                        .height(98.dp)
+                        .padding(top = 15.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    // 날개 배경 (old: bg_cumulative_voting_wing_2)
+                    Icon(
+                        painter = painterResource(R.drawable.bg_cumulative_voting_wing_2),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        tint = Color.Unspecified
+                    )
+
+                    // 프로필 이미지 (old: 72dp x 72dp, marginTop=5dp, marginBottom=26dp)
+                    // old: UtilK.trendImageUrl(context, trendId) → ${cdnUrl}/t/${id}.1_200x200.webp
+                    val imageUrl = remember(item.trendId, cdnUrl) {
+                        net.ib.mn.util.IdolImageUtil.getTrendImageUrl(
+                            cdnUrl = cdnUrl,
+                            trendId = item.trendId
+                        )
+                    }
+
+                    // padding을 size 안에 넣으면 찌그러지므로 Box로 감싸서 margin 효과
+                    Box(
+                        modifier = Modifier.padding(top = 5.dp, bottom = 26.dp)
+                    ) {
+                        ExoProfileImage(
+                            imageUrl = imageUrl,
+                            rank = item.scoreRank,
+                            modifier = Modifier.size(72.dp),
+                            contentDescription = "프로필 이미지"
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(5.dp))
+
+                // 하단 정보 영역 (old: ll_best1_info)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 5.dp, bottom = 10.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // 순위 변동 표시 (old: icon_new_ranking, ll_change_ranking)
+                    when (item.status.lowercase()) {
+                        "new" -> {
+                            Icon(
+                                painter = painterResource(R.drawable.icon_change_ranking_new),
+                                contentDescription = "NEW",
+                                tint = Color.Unspecified,
+                                modifier = Modifier
+                                    .size(width = 15.dp, height = 8.dp)
+                                    .padding(end = 5.dp)
+                            )
+                        }
+                        "increase", "decrease" -> {
+                            Row(
+                                modifier = Modifier.padding(end = 5.dp, top = 2.dp),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                val iconRes = when (item.status.lowercase()) {
+                                    "increase" -> R.drawable.icon_change_ranking_up
+                                    else -> R.drawable.icon_change_ranking_down
+                                }
+                                Icon(
+                                    painter = painterResource(iconRes),
+                                    contentDescription = item.status,
+                                    tint = Color.Unspecified,
+                                    modifier = Modifier.size(8.dp)
+                                )
+                                if (item.difference != 0) {
+                                    Text(
+                                        text = remember(item.difference) {
+                                            NumberFormat.getNumberInstance().format(item.difference)
+                                        },
+                                        style = ExoTypo.label9.copy(color = ColorPalette.gray580)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // "1위" 텍스트 (old: title_rank)
+                    Text(
+                        text = stringResource(R.string.first_rank),
+                        style = ExoTypo.title15.copy(
+                            fontSize = 17.sp,
+                            color = ColorPalette.mainLight,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    // 이름 + 그룹명
+                    ExoNameWithGroupColor(
+                        fullName = item.name,
+                        nameFontSize = 17.sp,
+                        groupFontSize = 11.sp,
+                        nameColor = ColorPalette.mainLight,
+                        groupColor = ColorPalette.mainLight
+                    )
+
+                    Spacer(modifier = Modifier.width(3.dp))
+
+                    // 점수 (old: score, "/ 점수점")
+                    val scoreText = remember(item.score) {
+                        val scoreCount = NumberFormat.getNumberInstance().format(item.score)
+                            .replace(",", "")
+                        "/ ${scoreCount}점"
+                    }
+                    Text(
+                        text = scoreText,
+                        style = ExoTypo.title15.copy(
+                            fontSize = 16.sp,
+                            color = ColorPalette.mainLight,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
+
+            // 급상승 표시 (우측 상단, old: iv_icon_up + tv_increase_step)
+            if (item.suddenIncrease) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(end = 60.dp, top = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.icon_up),
+                        contentDescription = "급상승",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(width = 35.dp, height = 28.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.label_rising, item.difference),
+                        style = ExoTypo.label10.copy(
+                            color = ColorPalette.mainLight,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
+        }
+
+        // 하단 Divider
+        HorizontalDivider(
+            thickness = 1.dp,
+            color = ColorPalette.gray200
+        )
+    }
+}
+
+/**
+ * HofAccumulativeRankingItem - 명예의 전당 누적 랭킹 아이템
+ *
+ * old 프로젝트의 aggregated_hof_item.xml 및 HallAggregatedAdapter.kt 기반
+ *
+ * 주요 기능:
+ * 1. 순위 아이콘 (1/2/3위 왕관)
+ * 2. 순위 변동 표시 (NEW, UP/DOWN)
+ * 3. 작은 원형 프로필 이미지
+ * 4. 점수 표시
+ * 5. 우측 화살표
+ * 6. 급상승 1위 하이라이트
+ *
+ * @param item 랭킹 아이템 데이터 (AggregateRankModel을 변환한 데이터)
+ * @param cdnUrl CDN 베이스 URL (PreferencesManager에서 가져온 값)
+ * @param onItemClick 아이템 클릭 이벤트
+ */
+@Composable
+fun HofAccumulativeRankingItem(
+    item: net.ib.mn.data.remote.dto.AggregateRankModel,
+    cdnUrl: String,
+    onItemClick: () -> Unit = {}
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // 급상승 여부에 따라 배경 설정 (old: bg_cumulative_best)
+        Box(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            // 급상승일 때 좌측 띠 배경 표시
+            if (item.suddenIncrease) {
+                Image(
+                    painter = painterResource(R.drawable.bg_cumulative_best),
+                    contentDescription = null,
+                    modifier = Modifier.matchParentSize(),
+                    contentScale = ContentScale.FillBounds
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onItemClick() }
+                    .background(if (item.suddenIncrease) Color.Transparent else ColorPalette.background100)
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+            // 순위 영역 (old: container_ranking, 45dp width)
+            Column(
+                modifier = Modifier.width(45.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterVertically)
+            ) {
+                // 1,2,3위 왕관 아이콘 (old: icon_ranking)
+                // scoreRank는 1부터 시작 (API 응답 기준)
+                when (item.scoreRank) {
+                    1 -> Icon(
+                        painter = painterResource(R.drawable.icon_rating_heart_voting_1st),
+                        contentDescription = "1st",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(width = 24.dp, height = 18.dp)
+                    )
+                    2 -> Icon(
+                        painter = painterResource(R.drawable.icon_rating_heart_voting_2nd),
+                        contentDescription = "2nd",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(width = 24.dp, height = 18.dp)
+                    )
+                    3 -> Icon(
+                        painter = painterResource(R.drawable.icon_rating_heart_voting_3rd),
+                        contentDescription = "3rd",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(width = 24.dp, height = 18.dp)
+                    )
+                }
+
+                // 순위 텍스트 (old: rank)
+                // 1,2,3등은 main 컬러, 그 외는 text_default 컬러
+                Text(
+                    text = stringResource(R.string.rank_count_format, item.scoreRank),
+                    style = ExoTypo.body11.copy(
+                        color = if (item.scoreRank <= 3) ColorPalette.main else ColorPalette.textDefault
+                    )
+                )
+
+                // 순위 변동 표시 (old: icon_new_ranking, ll_change_ranking)
+                when (item.status.lowercase()) {
+                    "new" -> {
+                        // NEW 아이콘
+                        Icon(
+                            painter = painterResource(R.drawable.icon_change_ranking_new),
+                            contentDescription = "NEW",
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(width = 15.dp, height = 8.dp)
+                        )
+                    }
+                    "increase", "decrease", "same" -> {
+                        // UP/DOWN/NO_CHANGE 아이콘 + 수치
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            val iconRes = when (item.status.lowercase()) {
+                                "increase" -> R.drawable.icon_change_ranking_up
+                                "decrease" -> R.drawable.icon_change_ranking_down
+                                else -> R.drawable.icon_change_ranking_no_change
+                            }
+                            Icon(
+                                painter = painterResource(iconRes),
+                                contentDescription = item.status,
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(8.dp)
+                            )
+                            if (item.difference != 0) {
+                                Text(
+                                    text = remember(item.difference) {
+                                        NumberFormat.getNumberInstance().format(item.difference)
+                                    },
+                                    style = ExoTypo.label9.copy(color = ColorPalette.textDefault)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 프로필 이미지 (old: photo, 41dp x 41dp, container_ranking 바로 옆)
+            // old: UtilK.trendImageUrl(context, trendId) → ${cdnUrl}/t/${id}.1_200x200.webp
+            val imageUrl = remember(item.trendId, cdnUrl) {
+                net.ib.mn.util.IdolImageUtil.getTrendImageUrl(
+                    cdnUrl = cdnUrl,
+                    trendId = item.trendId
+                )
+            }
+
+            ExoProfileImage(
+                imageUrl = imageUrl,
+                rank = item.scoreRank,
+                modifier = Modifier.size(41.dp),
+                contentDescription = "프로필 이미지"
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            // 이름 + 그룹 + 점수 영역 (old: cl_name)
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterVertically)
+            ) {
+                // 이름 + 그룹명 (old: name, group)
+                ExoNameWithGroup(
+                    fullName = item.name,
+                    nameFontSize = 14.sp,
+                    groupFontSize = 10.sp
+                )
+
+                Spacer(modifier = Modifier.height(2.dp))
+
+                // 점수 표시 (old: score)
+                val scoreText = remember(item.score) {
+                    val scoreCount = NumberFormat.getNumberInstance().format(item.score)
+                        .replace(",", "")
+                    "${scoreCount}점"
+                }
+                Text(
+                    text = scoreText,
+                    style = ExoTypo.body11.copy(color = ColorPalette.textGray)
+                )
+            }
+
+            // 급상승 표시 (old: iv_icon_up + tv_increase_step)
+            if (item.suddenIncrease) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.icon_up),
+                        contentDescription = "급상승",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(width = 30.dp, height = 23.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.label_rising, item.difference),
+                        style = ExoTypo.label10.copy(
+                            color = ColorPalette.mainLight,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+                Spacer(modifier = Modifier.width(7.dp))
+            }
+
+            // 우측 화살표 (old: iv_arrow_go, layout_marginEnd="20dp")
+            Icon(
+                painter = painterResource(R.drawable.btn_go),
+                contentDescription = "Go",
+                modifier = Modifier.size(12.dp),
+                tint = Color.Unspecified
+            )
+
+            // 우측 마진 (old: layout_marginEnd="20dp")
+            Spacer(modifier = Modifier.width(20.dp))
+            }  // Row 닫기
+        }  // Box 닫기
+
+        // 하단 Divider
+        HorizontalDivider(
+            thickness = 0.5.dp,
+            color = ColorPalette.gray200
+        )
+    }  // Column 닫기
 }
 
 /**

@@ -33,9 +33,9 @@ interface RankingRepository {
      * old 프로젝트와 동일한 방식
      * charts/ranks/ API를 사용하여 해당 차트의 누적 집계 결과 획득
      *
-     * 사용 탭: Miracle (기적), Rookie (루키), HeartPick (하트픽), OnePick (원픽), HallOfFame (명예전당)
+     * 사용 탭: Miracle (기적), Rookie (루키), HeartPick (하트픽), OnePick (원픽), HallOfFame (명예전당-30일 누적순위)
      *
-     * @param code 차트 코드 (예: "PR_G_M", "HEARTPICK", "ONEPICK", "HOF")
+     * @param code 차트 코드 (예: "PR_G_M", "HEARTPICK", "ONEPICK", "HOF_M")
      * @return Flow<ApiResult<List<AggregateRankModel>>> 누적 랭킹 리스트
      */
     fun getChartRanks(code: String): Flow<ApiResult<List<AggregateRankModel>>>

@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -15,6 +16,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ColorPalette
 
 /**
  * ExoNameWithGroup - 이름과 그룹명을 표시하는 공용 컴포넌트
@@ -83,6 +85,58 @@ fun ExoNameWithGroup(
                 color = colorResource(groupColor),
                 textAlign = textAlign,
                 modifier = Modifier.align(Alignment.Bottom)  // 그룹명은 Row의 bottom에 맞춤
+            )
+        }
+    }
+}
+
+/**
+ * ExoNameWithGroupColor - Color 타입을 받는 버전
+ *
+ * HofAccumulativeTop1RankingItem 등에서 ColorPalette.mainLight 같은 Color 타입을 직접 사용할 수 있습니다.
+ */
+@Composable
+fun ExoNameWithGroupColor(
+    fullName: String,
+    modifier: Modifier = Modifier,
+    nameFontSize: TextUnit = 14.sp,
+    groupFontSize: TextUnit = 10.sp,
+    nameColor: Color = ColorPalette.textDefault,
+    groupColor: Color = ColorPalette.textDimmed,
+    nameFontWeight: FontWeight = FontWeight.Bold,
+    spacing: androidx.compose.ui.unit.Dp = 5.dp,
+    textAlign: TextAlign = TextAlign.Start
+) {
+    // "_"로 분리
+    val parts = fullName.split("_", limit = 2)
+    val name = parts.getOrNull(0) ?: fullName
+    val groupName = parts.getOrNull(1)
+
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // 이름
+        Text(
+            text = name,
+            fontSize = nameFontSize,
+            lineHeight = nameFontSize,
+            fontWeight = nameFontWeight,
+            color = nameColor,
+            textAlign = textAlign
+        )
+
+        // 그룹명 (있는 경우만 표시)
+        if (!groupName.isNullOrEmpty()) {
+            Spacer(modifier = Modifier.width(spacing))
+            Text(
+                text = groupName,
+                fontSize = groupFontSize,
+                lineHeight = groupFontSize,
+                fontWeight = FontWeight.Bold,
+                color = groupColor,
+                textAlign = textAlign,
+                modifier = Modifier.align(Alignment.Bottom)
             )
         }
     }

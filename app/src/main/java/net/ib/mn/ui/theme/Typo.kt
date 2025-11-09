@@ -203,6 +203,24 @@ object ExoTypo {
         )
 
     /**
+     * 라벨 텍스트 스타일 (9.sp, TextDefault)
+     */
+    val label9
+        @Composable get() = TextStyle(
+            fontSize = 9.sp,
+            color = ColorPalette.textDefault
+        )
+
+    /**
+     * 라벨 텍스트 스타일 (10.sp, Bold)
+     */
+    val label10
+        @Composable get() = TextStyle(
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+    /**
      * 라벨 텍스트 스타일 (13.sp, Bold, MainLight)
      */
     val label13

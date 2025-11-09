@@ -7,8 +7,11 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.RankingRepository
@@ -22,7 +25,8 @@ import net.ib.mn.domain.repository.RankingRepository
 class HallOfFameRankingSecondSubAccumulativePageViewModel @AssistedInject constructor(
     @Assisted private val chartCode: String,
     @Assisted private val exoTabSwitchType: Int,
-    private val rankingRepository: RankingRepository
+    private val rankingRepository: RankingRepository,
+    private val preferencesManager: net.ib.mn.data.local.PreferencesManager
 ) : ViewModel() {
 
     @AssistedFactory
@@ -30,14 +34,23 @@ class HallOfFameRankingSecondSubAccumulativePageViewModel @AssistedInject constr
         fun create(chartCode: String, exoTabSwitchType: Int): HallOfFameRankingSecondSubAccumulativePageViewModel
     }
 
-    private val _jsonData = MutableStateFlow<String>("")
-    val jsonData: StateFlow<String> = _jsonData.asStateFlow()
+    private val _rankingData = MutableStateFlow<List<net.ib.mn.data.remote.dto.AggregateRankModel>>(emptyList())
+    val rankingData: StateFlow<List<net.ib.mn.data.remote.dto.AggregateRankModel>> = _rankingData.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
+
+    // CDN URL (PreferencesManager에서 가져옴, 기본값: https://cdn-v1.my-rank.com)
+    val cdnUrl: StateFlow<String> = preferencesManager.cdnUrl
+        .map { it ?: "https://cdn-v1.my-rank.com" }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = "https://cdn-v1.my-rank.com"
+        )
 
     init {
         android.util.Log.d("HoF_Accum_VM", "========================================")
@@ -67,11 +80,11 @@ class HallOfFameRankingSecondSubAccumulativePageViewModel @AssistedInject constr
                         _isLoading.value = false
                         _error.value = null
 
-                        // Convert to JSON string
-                        val jsonString = com.google.gson.Gson().toJson(result.data)
-                        _jsonData.value = jsonString
+                        // 급상승 표시 계산 (old 프로젝트 HallOfFameAggFragment 로직과 동일)
+                        val processedData = calculateSuddenIncrease(result.data)
+                        _rankingData.value = processedData
 
-                        android.util.Log.d("HoF_Accum_VM", "JSON length: ${jsonString.length}")
+                        android.util.Log.d("HoF_Accum_VM", "Ranking data count: ${result.data.size}")
                     }
                     is ApiResult.Error -> {
                         android.util.Log.e("HoF_Accum_VM", "❌ Error: ${result.message}")
@@ -79,6 +92,51 @@ class HallOfFameRankingSecondSubAccumulativePageViewModel @AssistedInject constr
                         _error.value = result.message ?: "Unknown error"
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * 급상승 표시 계산
+     *
+     * old 프로젝트 HallOfFameAggFragment의 로직과 동일:
+     * 1. difference 값으로 내림차순 정렬
+     * 2. status == "increase"인 아이템 중 가장 높은 difference 찾기
+     * 3. 최대 difference와 동일한 값을 가진 모든 아이템을 suddenIncrease = true로 설정
+     *
+     * @param data 원본 랭킹 데이터
+     * @return 급상승 표시가 설정된 랭킹 데이터
+     */
+    private fun calculateSuddenIncrease(
+        data: List<net.ib.mn.data.remote.dto.AggregateRankModel>
+    ): List<net.ib.mn.data.remote.dto.AggregateRankModel> {
+        if (data.isEmpty()) return data
+
+        // 1. difference로 내림차순 정렬
+        val sortedByDiff = data.sortedWith(
+            compareByDescending<net.ib.mn.data.remote.dto.AggregateRankModel> { it.difference }
+                .thenBy { it.scoreRank }
+        )
+
+        // 2. status == "increase"인 아이템 중 최대 difference 찾기
+        val maxDifference = sortedByDiff
+            .firstOrNull { it.status.equals("increase", ignoreCase = true) }
+            ?.difference
+
+        if (maxDifference == null || maxDifference <= 0) {
+            android.util.Log.d("HoF_Accum_VM", "No sudden increase items found")
+            return data
+        }
+
+        android.util.Log.d("HoF_Accum_VM", "Max difference for sudden increase: $maxDifference")
+
+        // 3. 최대 difference와 동일한 값을 가진 모든 "increase" 아이템을 suddenIncrease = true로 설정
+        return data.map { item ->
+            if (item.status.equals("increase", ignoreCase = true) && item.difference == maxDifference) {
+                android.util.Log.d("HoF_Accum_VM", "Marking ${item.name} as sudden increase (diff: ${item.difference})")
+                item.copy(suddenIncrease = true)
+            } else {
+                item
             }
         }
     }
