@@ -163,17 +163,37 @@ object IdolImageUtil {
      * ${cdnUrl}/t/${id}.1_${IMAGE_SIZE_LOWEST}.webp
      * IMAGE_SIZE_LOWEST = "200x200"
      *
-     * @param cdnUrl CDN 베이스 URL (기본값: https://cdn-v1.my-rank.com)
+     * @param cdnUrl CDN 베이스 URL
      * @param trendId Trend ID
      * @param imageSize 이미지 사이즈 (기본값: 200x200)
      * @return Trend 이미지 URL
      */
     fun getTrendImageUrl(
-        cdnUrl: String = "https://cdn-v1.my-rank.com",
+        cdnUrl: String,
         trendId: Int,
         imageSize: String = "200x200"
     ): String {
         return "$cdnUrl/t/$trendId.1_$imageSize.webp"
+    }
+
+    /**
+     * Hof (명예의 전당) 이미지 URL 생성
+     *
+     * old 프로젝트의 HallOfFameDayAdapter 로직:
+     * ${cdnUrl}/h/${resourceId}.1_${IMAGE_SIZE_LOWEST}.webp
+     * IMAGE_SIZE_LOWEST = "200x200"
+     *
+     * @param cdnUrl CDN 베이스 URL
+     * @param hofId Resource ID (resource_uri에서 추출)
+     * @param imageSize 이미지 사이즈 (기본값: 200x200)
+     * @return Hall 이미지 URL
+     */
+    fun getHofImageUrl(
+        cdnUrl: String,
+        hofId: Int,
+        imageSize: String = "200x200"
+    ): String {
+        return "$cdnUrl/h/$hofId.1_$imageSize.webp"
     }
 
     /**

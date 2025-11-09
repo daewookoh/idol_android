@@ -58,13 +58,13 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
-    // CDN URL (PreferencesManager에서 가져옴, 기본값: https://cdn-v1.my-rank.com)
+    // CDN URL (PreferencesManager에서 가져옴, 기본값: https://hswnpegrwdch3017979.gcdn.ntruss.com)
     val cdnUrl: StateFlow<String> = preferencesManager.cdnUrl
-        .map { it ?: "https://cdn-v1.my-rank.com" }
+        .map { it ?: "https://hswnpegrwdch3017979.gcdn.ntruss.com" }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = "https://cdn-v1.my-rank.com"
+            initialValue = "https://hswnpegrwdch3017979.gcdn.ntruss.com"
         )
 
     // History 관련 state
@@ -121,7 +121,10 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
 
                         // Parse ranking data from JSON
                         val rankingList = parseRankingData(result.data)
-                        _rankingData.value = rankingList
+
+                        // Calculate rank for top3 (old 프로젝트 HallOfFameViewModel 로직과 동일)
+                        val processedList = calculateRank(rankingList)
+                        _rankingData.value = processedList
 
                         // Parse history only when historyParam is null (initial load)
                         if (historyParam == null) {
@@ -255,6 +258,11 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
      */
     private fun parseRankingData(jsonString: String): List<net.ib.mn.data.remote.dto.DailyRankModel> {
         return try {
+            android.util.Log.d("HoF_Daily_VM", "========================================")
+            android.util.Log.d("HoF_Daily_VM", "📥 API Response JSON:")
+            android.util.Log.d("HoF_Daily_VM", jsonString)
+            android.util.Log.d("HoF_Daily_VM", "========================================")
+
             val jsonObject = JSONObject(jsonString)
 
             // old 프로젝트: response.getJSONArray("objects")
@@ -265,19 +273,47 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
                 return emptyList()
             }
 
+            android.util.Log.d("HoF_Daily_VM", "📊 Objects array length: ${objectsArray.length()}")
+
             val gson = Gson()
             val listType = object : TypeToken<List<net.ib.mn.data.remote.dto.DailyRankModel>>() {}.type
 
             val result: List<net.ib.mn.data.remote.dto.DailyRankModel>? =
                 gson.fromJson(objectsArray.toString(), listType)
 
-            android.util.Log.d("HoF_Daily_VM", "Parsed ${result?.size ?: 0} ranking items from 'objects' array")
+            android.util.Log.d("HoF_Daily_VM", "✅ Parsed ${result?.size ?: 0} ranking items from 'objects' array")
 
             // old 프로젝트: _dayHofList.postValue(presentDayHofList.reversed())
             result?.reversed() ?: emptyList()
         } catch (e: Exception) {
             android.util.Log.e("HoF_Daily_VM", "Error parsing ranking data: ${e.message}", e)
             emptyList()
+        }
+    }
+
+    /**
+     * 랭킹 계산 (old 프로젝트 HallOfFameViewModel과 동일)
+     *
+     * heart 기준 top3에만 rank를 0, 1, 2로 설정
+     */
+    private fun calculateRank(list: List<net.ib.mn.data.remote.dto.DailyRankModel>): List<net.ib.mn.data.remote.dto.DailyRankModel> {
+        if (list.isEmpty()) return list
+
+        // heart로 내림차순 정렬하여 top3 추출
+        val top3 = list.sortedByDescending { it.heart }.take(3)
+
+        // top3의 각 아이템에 index(0, 1, 2) 매핑
+        val rankMap = top3.mapIndexed { index, item -> item.id to index }.toMap()
+
+        android.util.Log.d("HoF_Daily_VM", "Top3 IDs for ranking: ${rankMap.keys.joinToString()}")
+
+        // 원본 리스트를 순회하면서 rankMap에 있는 아이템만 rank 설정
+        return list.map { item ->
+            rankMap[item.id]?.let { rank ->
+                // idol이 null이면 기본값으로 IdolInfo 생성
+                val updatedIdol = item.idol?.copy(rank = rank) ?: net.ib.mn.data.remote.dto.IdolInfo(rank = rank)
+                item.copy(idol = updatedIdol)
+            } ?: item
         }
     }
 

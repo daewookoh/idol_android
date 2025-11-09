@@ -1,5 +1,6 @@
 package net.ib.mn.ui.components
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -267,7 +268,9 @@ fun LazyListScope.exoRankingItems(
                                         .align(Alignment.BottomEnd)
                                         .background(
                                             color = ColorPalette.badgeMemorialDay,
-                                            shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp)
+                                            shape = androidx.compose.foundation.shape.RoundedCornerShape(
+                                                4.dp
+                                            )
                                         )
                                         .padding(horizontal = 5.dp, vertical = 2.dp)
                                 ) {
@@ -388,7 +391,9 @@ fun LazyListScope.exoRankingItems(
                                                 )
                                             )
                                         },
-                                        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                                        shape = androidx.compose.foundation.shape.RoundedCornerShape(
+                                            8.dp
+                                        )
                                     )
                             ) {
                                 // type에 따른 애니메이션 처리
@@ -446,7 +451,11 @@ fun LazyListScope.exoRankingItems(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .fillMaxHeight()
-                                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+                                            .clip(
+                                                androidx.compose.foundation.shape.RoundedCornerShape(
+                                                    8.dp
+                                                )
+                                            )
                                     ) {
                                         val canvasWidth = size.width
                                         val canvasHeight = size.height
@@ -709,19 +718,19 @@ private fun AggregatedRankingItem(
                         painter = painterResource(R.drawable.icon_rating_heart_voting_1st),
                         contentDescription = "1st",
                         tint = Color.Unspecified,
-                        modifier = Modifier.size(width = 24.dp, height = 18.dp)
+                        modifier = Modifier.size(width = 18.dp, height = 12.dp)
                     )
                     2 -> Icon(
                         painter = painterResource(R.drawable.icon_rating_heart_voting_2nd),
                         contentDescription = "2nd",
                         tint = Color.Unspecified,
-                        modifier = Modifier.size(width = 24.dp, height = 18.dp)
+                        modifier = Modifier.size(width = 18.dp, height = 12.dp)
                     )
                     3 -> Icon(
                         painter = painterResource(R.drawable.icon_rating_heart_voting_3rd),
                         contentDescription = "3rd",
                         tint = Color.Unspecified,
-                        modifier = Modifier.size(width = 24.dp, height = 18.dp)
+                        modifier = Modifier.size(width = 18.dp, height = 12.dp)
                     )
                 }
 
@@ -1110,19 +1119,19 @@ fun HofAccumulativeRankingItem(
                         painter = painterResource(R.drawable.icon_rating_heart_voting_1st),
                         contentDescription = "1st",
                         tint = Color.Unspecified,
-                        modifier = Modifier.size(width = 24.dp, height = 18.dp)
+                        modifier = Modifier.size(width = 18.dp, height = 12.dp)
                     )
                     2 -> Icon(
                         painter = painterResource(R.drawable.icon_rating_heart_voting_2nd),
                         contentDescription = "2nd",
                         tint = Color.Unspecified,
-                        modifier = Modifier.size(width = 24.dp, height = 18.dp)
+                        modifier = Modifier.size(width = 18.dp, height = 12.dp)
                     )
                     3 -> Icon(
                         painter = painterResource(R.drawable.icon_rating_heart_voting_3rd),
                         contentDescription = "3rd",
                         tint = Color.Unspecified,
-                        modifier = Modifier.size(width = 24.dp, height = 18.dp)
+                        modifier = Modifier.size(width = 18.dp, height = 12.dp)
                     )
                 }
 
@@ -1451,17 +1460,20 @@ fun HofDailyRankingItem(
                 contentAlignment = Alignment.Center
             ) {
                 // 프로필 이미지 (old: iv_photo, 40dp x 40dp, margin 15dp)
-                // Center 정렬이므로 자동으로 좌우 15dp margin 효과
-                val imageUrl = remember(item.trendId, cdnUrl) {
-                    net.ib.mn.util.IdolImageUtil.getTrendImageUrl(
+                // old: ${cdnUrl}/h/${resourceId}.1_200x200.webp
+                val hofId: Int = remember(item.id, item.resourceUri) {
+                    item.getHofId()
+                }
+                val imageUrl: String = remember(hofId, cdnUrl) {
+                    net.ib.mn.util.IdolImageUtil.getHofImageUrl(
                         cdnUrl = cdnUrl,
-                        trendId = item.trendId
+                        hofId = hofId
                     )
                 }
 
                 ExoProfileImage(
                     imageUrl = imageUrl,
-                    rank = item.rank,
+                    rank = 0,  // Daily ranking에서는 rank badge 표시 안 함
                     modifier = Modifier.size(40.dp),
                     contentDescription = "프로필 이미지"
                 )
@@ -1476,7 +1488,7 @@ fun HofDailyRankingItem(
                                 contentDescription = "생일",
                                 tint = Color.Unspecified,
                                 modifier = Modifier
-                                    .size(36.dp)
+                                    .size(44.dp)
                                     .align(Alignment.TopStart)
                                     .padding(top = 7.dp)
                             )
@@ -1486,7 +1498,7 @@ fun HofDailyRankingItem(
                                 contentDescription = "데뷔일",
                                 tint = Color.Unspecified,
                                 modifier = Modifier
-                                    .size(36.dp)
+                                    .size(44.dp)
                                     .align(Alignment.TopStart)
                                     .padding(top = 7.dp)
                             )
@@ -1498,9 +1510,8 @@ fun HofDailyRankingItem(
                             contentDescription = "데뷔일",
                             tint = Color.Unspecified,
                             modifier = Modifier
-                                .size(36.dp)
+                                .size(44.dp)
                                 .align(Alignment.TopStart)
-                                .padding(top = 7.dp)
                         )
                     }
                     "C" -> {  // ANNIVERSARY_COMEBACK (컴백일)
@@ -1522,7 +1533,9 @@ fun HofDailyRankingItem(
                                     .padding(end = 7.dp, bottom = 11.dp)
                                     .background(
                                         color = ColorPalette.main,
-                                        shape = androidx.compose.foundation.shape.RoundedCornerShape(2.dp)
+                                        shape = androidx.compose.foundation.shape.RoundedCornerShape(
+                                            10.dp
+                                        )
                                     )
                                     .padding(horizontal = 5.dp, vertical = 2.dp)
                             ) {
@@ -1548,35 +1561,36 @@ fun HofDailyRankingItem(
             ) {
                 // 이름 + 그룹명 + 순위 아이콘
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(end = 11.dp),
+                    modifier = Modifier.fillMaxWidth().padding(end=11.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // 이름 + 그룹명
                     ExoNameWithGroup(
-                        fullName = item.name,
-                        modifier = Modifier.weight(1f, fill = false),
+                        fullName = item.idol?.name ?: "",
+                        modifier = Modifier,  // weight 제거 - 컨텐츠 크기만큼만 차지
                         nameFontSize = 15.sp,
                         groupFontSize = 10.sp
                     )
 
-                    Spacer(modifier = Modifier.width(5.dp))
+                    // 왕관을 우측 끝으로 밀어주는 Spacer
+                    Spacer(modifier = Modifier.weight(1f))
 
                     // 순위 아이콘 (1,2,3위 왕관, old: iv_rank_icon)
-                    if (item.rank in 1..3) {
-                        val iconRes = when (item.rank) {
-                            1 -> R.drawable.icon_rating_heart_voting_1st
-                            2 -> R.drawable.icon_rating_heart_voting_2nd
-                            3 -> R.drawable.icon_rating_heart_voting_3rd
+                    // rank는 0부터 시작 (0 = 1위, 1 = 2위, 2 = 3위)
+                    val rank = item.idol?.rank ?: -1
+                    if (rank in 0..2) {
+                        val iconRes = when (rank) {
+                            0 -> R.drawable.icon_rating_heart_voting_1st
+                            1 -> R.drawable.icon_rating_heart_voting_2nd
+                            2 -> R.drawable.icon_rating_heart_voting_3rd
                             else -> null
                         }
                         iconRes?.let {
                             Icon(
                                 painter = painterResource(it),
-                                contentDescription = "${item.rank}위",
+                                contentDescription = "${rank + 1}위",
                                 tint = Color.Unspecified,
-                                modifier = Modifier.size(width = 24.dp, height = 18.dp)
+                                modifier = Modifier.size(width = 18.dp, height = 12.dp).offset(y=(5).dp)
                             )
                         }
                     }
@@ -1592,8 +1606,14 @@ fun HofDailyRankingItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // 투표수 (old: tv_count)
+                    val voteCountText = remember(item.heart) {
+                        val voteCountComma = java.text.NumberFormat.getNumberInstance(
+                            androidx.appcompat.app.AppCompatDelegate.getApplicationLocales()[0] ?: java.util.Locale.getDefault()
+                        ).format(item.heart)
+                        voteCountComma
+                    }
                     Text(
-                        text = stringResource(R.string.vote_count_format, item.heart),
+                        text = stringResource(R.string.vote_count_format, voteCountText),
                         style = ExoTypo.body13.copy(color = ColorPalette.gray580),
                         modifier = Modifier.weight(1f),
                         maxLines = 1,
@@ -1602,9 +1622,27 @@ fun HofDailyRankingItem(
 
                     Spacer(modifier = Modifier.width(5.dp))
 
-                    // 날짜 (old: tv_date)
+                    // 날짜 (old: tv_date - KST 타임존으로 표시)
+                    val dateText = remember(item.createdAt) {
+                        try {
+                            // ISO 8601 형식 파싱 (2025-11-02T23:40:00)
+                            val isoFormat = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault())
+                            isoFormat.timeZone = java.util.TimeZone.getTimeZone("UTC")
+                            val date = isoFormat.parse(item.createdAt)
+
+                            // 명예전당은 항상 KST로 표시 (old 프로젝트와 동일)
+                            val displayFormat = java.text.DateFormat.getDateInstance(
+                                java.text.DateFormat.MEDIUM,
+                                androidx.appcompat.app.AppCompatDelegate.getApplicationLocales()[0] ?: java.util.Locale.getDefault()
+                            )
+                            displayFormat.timeZone = java.util.TimeZone.getTimeZone("Asia/Seoul")
+                            date?.let { displayFormat.format(it) } ?: item.createdAt
+                        } catch (e: Exception) {
+                            item.createdAt
+                        }
+                    }
                     Text(
-                        text = item.createdAt,
+                        text = dateText,
                         style = ExoTypo.body12.copy(color = ColorPalette.gray580)
                     )
                 }

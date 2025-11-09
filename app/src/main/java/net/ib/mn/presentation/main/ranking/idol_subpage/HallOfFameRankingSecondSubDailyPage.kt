@@ -246,7 +246,7 @@ fun HallOfFameRankingSecondSubDailyPage(
                                 item = item,
                                 cdnUrl = cdnUrl,
                                 onItemClick = {
-                                    android.util.Log.d("HoF_Daily", "Clicked on ${item.name} (rank: ${item.rank})")
+                                    android.util.Log.d("HoF_Daily", "Clicked on ${item.idol?.name} (id: ${item.id})")
                                 }
                             )
                         }

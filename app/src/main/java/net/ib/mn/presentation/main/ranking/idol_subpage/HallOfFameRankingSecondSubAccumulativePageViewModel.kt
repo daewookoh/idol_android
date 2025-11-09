@@ -43,13 +43,13 @@ class HallOfFameRankingSecondSubAccumulativePageViewModel @AssistedInject constr
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
-    // CDN URL (PreferencesManager에서 가져옴, 기본값: https://cdn-v1.my-rank.com)
+    // CDN URL (PreferencesManager에서 가져옴, 기본값: https://hswnpegrwdch3017979.gcdn.ntruss.com)
     val cdnUrl: StateFlow<String> = preferencesManager.cdnUrl
-        .map { it ?: "https://cdn-v1.my-rank.com" }
+        .map { it ?: "https://hswnpegrwdch3017979.gcdn.ntruss.com" }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = "https://cdn-v1.my-rank.com"
+            initialValue = "https://hswnpegrwdch3017979.gcdn.ntruss.com"
         )
 
     init {

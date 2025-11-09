@@ -38,7 +38,7 @@ class RankingPageViewModel @Inject constructor(
 
     companion object {
         private const val KEY_SELECTED_TAB_INDEX = "selectedTabIndex"
-        private const val DEFAULT_TAB_INDEX = 7  // 기본 선택 탭 (하트픽)
+        private const val DEFAULT_TAB_INDEX = 1
     }
 
     /**
