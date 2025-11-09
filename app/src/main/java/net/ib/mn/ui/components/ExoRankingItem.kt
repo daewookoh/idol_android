@@ -1412,3 +1412,209 @@ fun HeartPickRankingItem(
         }
     }
 }
+
+/**
+ * HofDailyRankingItem - 명예의 전당 일일 랭킹 아이템
+ *
+ * old 프로젝트의 hall_item.xml 및 HallOfFameDayAdapter 기반
+ *
+ * 주요 기능:
+ * 1. 프로필 이미지 (40x40dp)
+ * 2. Anniversary badges (생일, 데뷔, 컴백, 기념일)
+ * 3. 이름 + 그룹명 + 순위 아이콘 (1/2/3위 왕관)
+ * 4. 투표수 + 날짜
+ *
+ * @param item 일일 랭킹 아이템 데이터
+ * @param cdnUrl CDN 베이스 URL
+ * @param onItemClick 아이템 클릭 이벤트
+ */
+@Composable
+fun HofDailyRankingItem(
+    item: net.ib.mn.data.remote.dto.DailyRankModel,
+    cdnUrl: String,
+    onItemClick: () -> Unit = {}
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(ColorPalette.background100)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onItemClick() },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 프로필 영역 (old: ConstraintLayout, 70dp width, height는 40dp + margin 15dp * 2)
+            Box(
+                modifier = Modifier.size(70.dp),  // 70dp x 70dp
+                contentAlignment = Alignment.Center
+            ) {
+                // 프로필 이미지 (old: iv_photo, 40dp x 40dp, margin 15dp)
+                // Center 정렬이므로 자동으로 좌우 15dp margin 효과
+                val imageUrl = remember(item.trendId, cdnUrl) {
+                    net.ib.mn.util.IdolImageUtil.getTrendImageUrl(
+                        cdnUrl = cdnUrl,
+                        trendId = item.trendId
+                    )
+                }
+
+                ExoProfileImage(
+                    imageUrl = imageUrl,
+                    rank = item.rank,
+                    modifier = Modifier.size(40.dp),
+                    contentDescription = "프로필 이미지"
+                )
+
+                // Anniversary badges (old 프로젝트 ConstraintLayout 기준)
+                when (item.idol?.anniversary) {
+                    "Y" -> {  // ANNIVERSARY_BIRTH (생일)
+                        // 솔로는 생일 배지, 그룹은 데뷔 배지
+                        if (item.idol?.type == "S") {
+                            Icon(
+                                painter = painterResource(R.drawable.icon_anniversary_birth_medium),
+                                contentDescription = "생일",
+                                tint = Color.Unspecified,
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .align(Alignment.TopStart)
+                                    .padding(top = 7.dp)
+                            )
+                        } else {
+                            Icon(
+                                painter = painterResource(R.drawable.icon_anniversary_debut_medium),
+                                contentDescription = "데뷔일",
+                                tint = Color.Unspecified,
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .align(Alignment.TopStart)
+                                    .padding(top = 7.dp)
+                            )
+                        }
+                    }
+                    "E" -> {  // ANNIVERSARY_DEBUT (데뷔일)
+                        Icon(
+                            painter = painterResource(R.drawable.icon_anniversary_debut_medium),
+                            contentDescription = "데뷔일",
+                            tint = Color.Unspecified,
+                            modifier = Modifier
+                                .size(36.dp)
+                                .align(Alignment.TopStart)
+                                .padding(top = 7.dp)
+                        )
+                    }
+                    "C" -> {  // ANNIVERSARY_COMEBACK (컴백일)
+                        Icon(
+                            painter = painterResource(R.drawable.icon_anniversary_comeback_medium),
+                            contentDescription = "컴백일",
+                            tint = Color.Unspecified,
+                            modifier = Modifier
+                                .size(width = 66.dp, height = 56.dp)
+                                .align(Alignment.TopStart)
+                                .padding(top = 12.dp)
+                        )
+                    }
+                    "D" -> {  // ANNIVERSARY_MEMORIAL_DAY (기념일)
+                        item.idol?.anniversaryDays?.let { days ->
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .padding(end = 7.dp, bottom = 11.dp)
+                                    .background(
+                                        color = ColorPalette.main,
+                                        shape = androidx.compose.foundation.shape.RoundedCornerShape(2.dp)
+                                    )
+                                    .padding(horizontal = 5.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = "${days}${stringResource(R.string.lable_day)}",
+                                    style = ExoTypo.body7.copy(
+                                        color = ColorPalette.textWhiteBlack,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 우측 정보 영역 (old: ll_container)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 15.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
+                // 이름 + 그룹명 + 순위 아이콘
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 11.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // 이름 + 그룹명
+                    ExoNameWithGroup(
+                        fullName = item.name,
+                        modifier = Modifier.weight(1f, fill = false),
+                        nameFontSize = 15.sp,
+                        groupFontSize = 10.sp
+                    )
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    // 순위 아이콘 (1,2,3위 왕관, old: iv_rank_icon)
+                    if (item.rank in 1..3) {
+                        val iconRes = when (item.rank) {
+                            1 -> R.drawable.icon_rating_heart_voting_1st
+                            2 -> R.drawable.icon_rating_heart_voting_2nd
+                            3 -> R.drawable.icon_rating_heart_voting_3rd
+                            else -> null
+                        }
+                        iconRes?.let {
+                            Icon(
+                                painter = painterResource(it),
+                                contentDescription = "${item.rank}위",
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(width = 24.dp, height = 18.dp)
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(3.dp))
+
+                // 투표수 + 날짜 (old: tv_count + tv_date)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // 투표수 (old: tv_count)
+                    Text(
+                        text = stringResource(R.string.vote_count_format, item.heart),
+                        style = ExoTypo.body13.copy(color = ColorPalette.gray580),
+                        modifier = Modifier.weight(1f),
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    )
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    // 날짜 (old: tv_date)
+                    Text(
+                        text = item.createdAt,
+                        style = ExoTypo.body12.copy(color = ColorPalette.gray580)
+                    )
+                }
+            }
+        }
+
+        // 하단 Divider
+        HorizontalDivider(
+            thickness = 0.5.dp,
+            color = ColorPalette.gray200
+        )
+    }
+}

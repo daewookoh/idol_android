@@ -7,9 +7,14 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.RankingRepository
@@ -31,6 +36,7 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
     @Assisted private val chartCode: String,
     @Assisted private val exoTabSwitchType: Int,
     private val rankingRepository: RankingRepository,
+    private val preferencesManager: net.ib.mn.data.local.PreferencesManager,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -43,14 +49,23 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
         private const val KEY_CURRENT_POSITION = "currentPosition"
     }
 
-    private val _jsonData = MutableStateFlow<String>("")
-    val jsonData: StateFlow<String> = _jsonData.asStateFlow()
+    private val _rankingData = MutableStateFlow<List<net.ib.mn.data.remote.dto.DailyRankModel>>(emptyList())
+    val rankingData: StateFlow<List<net.ib.mn.data.remote.dto.DailyRankModel>> = _rankingData.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
+
+    // CDN URL (PreferencesManager에서 가져옴, 기본값: https://cdn-v1.my-rank.com)
+    val cdnUrl: StateFlow<String> = preferencesManager.cdnUrl
+        .map { it ?: "https://cdn-v1.my-rank.com" }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = "https://cdn-v1.my-rank.com"
+        )
 
     // History 관련 state
     private val _historyYear = MutableStateFlow<String?>(null)
@@ -103,7 +118,10 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
                         android.util.Log.d("HoF_Daily_VM", "✅ Success: received JSON")
                         _isLoading.value = false
                         _error.value = null
-                        _jsonData.value = result.data
+
+                        // Parse ranking data from JSON
+                        val rankingList = parseRankingData(result.data)
+                        _rankingData.value = rankingList
 
                         // Parse history only when historyParam is null (initial load)
                         if (historyParam == null) {
@@ -121,7 +139,7 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
 
                         updatePrevNextVisibility()
 
-                        android.util.Log.d("HoF_Daily_VM", "JSON length: ${result.data.length}")
+                        android.util.Log.d("HoF_Daily_VM", "Ranking data count: ${rankingList.size}")
                     }
                     is ApiResult.Error -> {
                         android.util.Log.e("HoF_Daily_VM", "❌ Error: ${result.message}")
@@ -224,6 +242,42 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
                 null
             }
             loadData(currentChartCode, historyParam)
+        }
+    }
+
+    /**
+     * JSON 문자열을 DailyRankModel 리스트로 파싱
+     *
+     * old 프로젝트와 동일하게 "objects" 키를 사용하고 reversed() 처리
+     *
+     * @param jsonString hofs/ API 응답 JSON
+     * @return DailyRankModel 리스트 (역순)
+     */
+    private fun parseRankingData(jsonString: String): List<net.ib.mn.data.remote.dto.DailyRankModel> {
+        return try {
+            val jsonObject = JSONObject(jsonString)
+
+            // old 프로젝트: response.getJSONArray("objects")
+            val objectsArray = jsonObject.optJSONArray("objects")
+
+            if (objectsArray == null) {
+                android.util.Log.e("HoF_Daily_VM", "No 'objects' array in JSON response")
+                return emptyList()
+            }
+
+            val gson = Gson()
+            val listType = object : TypeToken<List<net.ib.mn.data.remote.dto.DailyRankModel>>() {}.type
+
+            val result: List<net.ib.mn.data.remote.dto.DailyRankModel>? =
+                gson.fromJson(objectsArray.toString(), listType)
+
+            android.util.Log.d("HoF_Daily_VM", "Parsed ${result?.size ?: 0} ranking items from 'objects' array")
+
+            // old 프로젝트: _dayHofList.postValue(presentDayHofList.reversed())
+            result?.reversed() ?: emptyList()
+        } catch (e: Exception) {
+            android.util.Log.e("HoF_Daily_VM", "Error parsing ranking data: ${e.message}", e)
+            emptyList()
         }
     }
 

@@ -4,13 +4,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -74,9 +77,10 @@ fun HallOfFameRankingSecondSubDailyPage(
             factory.create(currentChartCode, selectedSubTabIndex)
         }
 
-    val jsonData by dataViewModel.jsonData.collectAsState()
+    val rankingData by dataViewModel.rankingData.collectAsState()
     val isLoading by dataViewModel.isLoading.collectAsState()
     val error by dataViewModel.error.collectAsState()
+    val cdnUrl by dataViewModel.cdnUrl.collectAsState()
     val historyYear by dataViewModel.historyYear.collectAsState()
     val historyMonth by dataViewModel.historyMonth.collectAsState()
     val showPrevButton by dataViewModel.showPrevButton.collectAsState()
@@ -207,9 +211,7 @@ fun HallOfFameRankingSecondSubDailyPage(
 
         // 데이터 표시
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+            modifier = Modifier.fillMaxSize()
         ) {
             when {
                 isLoading -> {
@@ -223,33 +225,31 @@ fun HallOfFameRankingSecondSubDailyPage(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
+                rankingData.isEmpty() -> {
+                    Text(
+                        text = "데이터가 없습니다",
+                        fontSize = 14.sp,
+                        color = ColorPalette.textDimmed,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
                 else -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        Text(
-                            text = """
-                                일일 순위
-
-                                tabbarType: $tabbarType (일일)
-                                exoTabSwitchType: $selectedSubTabIndex
-                                hofChartCode: $chartCode
-
-                                JSON Data:
-                            """.trimIndent(),
-                            fontSize = 12.sp,
-                            color = ColorPalette.textDimmed
-                        )
-
-                        Text(
-                            text = jsonData,
-                            fontSize = 10.sp,
-                            fontFamily = FontFamily.Monospace,
-                            color = ColorPalette.textDefault,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
+                        items(
+                            items = rankingData,
+                            key = { item -> item.id }
+                        ) { item ->
+                            net.ib.mn.ui.components.HofDailyRankingItem(
+                                item = item,
+                                cdnUrl = cdnUrl,
+                                onItemClick = {
+                                    android.util.Log.d("HoF_Daily", "Clicked on ${item.name} (rank: ${item.rank})")
+                                }
+                            )
+                        }
                     }
                 }
             }

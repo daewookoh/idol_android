@@ -110,6 +110,17 @@ object ExoTypo {
 
     // ============ Body Styles ============
     /**
+     * 일반 텍스트 스타일 (7.sp, TextDefault)
+     * Memorial day badge용
+     */
+    val body7
+        @Composable get() = TextStyle(
+            fontSize = 7.sp,
+            lineHeight = 7.sp,
+            color = ColorPalette.textDefault
+        )
+
+    /**
      * 일반 텍스트 스타일 (11.sp, TextGray)
      */
     val body11
