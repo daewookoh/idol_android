@@ -191,6 +191,16 @@ fun RankingPage(
     // 메인 탭 선택 상태 (ViewModel에서 관리, 바텀 네비게이션 이동 시에도 유지)
     val savedMainTabIndex by viewModel.selectedTabIndex.collectAsState()
 
+    // 앱 첫 실행 시 defaultChartCode로부터 초기 탭 설정
+    LaunchedEffect(tabDataList) {
+        if (tabDataList.isNotEmpty()) {
+            viewModel.initializeTabFromDefaultChartCode(tabDataList) { tab ->
+                // TypeListModel에서 code 추출
+                (tab as? net.ib.mn.data.model.TypeListModel)?.code
+            }
+        }
+    }
+
     val subPagerState = rememberPagerState(
         initialPage = savedMainTabIndex, // 저장된 탭에서 시작
         pageCount = { tabDataList.size }
@@ -201,6 +211,14 @@ fun RankingPage(
     LaunchedEffect(subPagerState.currentPage, subPagerState.isScrollInProgress) {
         if (!subPagerState.isScrollInProgress) {
             viewModel.setSelectedTabIndex(subPagerState.currentPage)
+        }
+    }
+
+    // savedMainTabIndex가 변경되면 pager도 해당 페이지로 이동
+    LaunchedEffect(savedMainTabIndex) {
+        if (subPagerState.currentPage != savedMainTabIndex) {
+            android.util.Log.d("RankingPage", "📌 Moving pager to tab: $savedMainTabIndex")
+            subPagerState.animateScrollToPage(savedMainTabIndex)
         }
     }
 

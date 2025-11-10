@@ -583,6 +583,7 @@ class StartUpViewModel @Inject constructor(
 
                         android.util.Log.d("USER_INFO", "[StartUpViewModel] chartCodes from server: ${userData.most?.chartCodes}")
                         android.util.Log.d("USER_INFO", "[StartUpViewModel] Selected chartCode (filtered): $chartCode")
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel] Most idol category: $category")
 
                         preferencesManager.setMostIdol(
                             idolId = userData.most?.id,
@@ -592,6 +593,26 @@ class StartUpViewModel @Inject constructor(
                             category = category
                         )
                         android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Most idol saved: id=${userData.most?.id}, type=${userData.most?.type}, groupId=${userData.most?.groupId}, chartCode=$chartCode, category=$category")
+
+                        // mostCategory를 defaultCategory로 설정 (GLOBALS 탭 초기 필터링에 사용)
+                        // 앱 첫 진입 시 최애의 성별에 맞는 랭킹이 표시되도록 함
+                        if (category != null) {
+                            preferencesManager.setDefaultCategory(category)
+                            android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Default category set from mostCategory: $category")
+                            android.util.Log.d("USER_INFO", "[StartUpViewModel]   → GLOBALS 탭에서 이 성별의 랭킹이 표시됩니다")
+                        } else {
+                            android.util.Log.w("USER_INFO", "[StartUpViewModel] ⚠️ mostCategory is null, defaultCategory not set")
+                        }
+
+                        // mostChartCode를 defaultChartCode로 설정 (랭킹 탭 초기 선택에 사용)
+                        // 앱 첫 진입 시 최애의 차트에 해당하는 탭이 선택되도록 함
+                        if (chartCode != null) {
+                            preferencesManager.setDefaultChartCode(chartCode)
+                            android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Default chartCode set from mostChartCode: $chartCode")
+                            android.util.Log.d("USER_INFO", "[StartUpViewModel]   → 랭킹 탭에서 이 차트가 기본으로 선택됩니다")
+                        } else {
+                            android.util.Log.w("USER_INFO", "[StartUpViewModel] ⚠️ mostChartCode is null, defaultChartCode not set")
+                        }
 
                         // setUserInfo 완료 후 DataStore 업데이트가 완료되기를 보장하기 위해 약간의 지연
                         // DataStore는 비동기적으로 업데이트되므로, 업데이트가 반영되기까지 시간이 필요할 수 있음

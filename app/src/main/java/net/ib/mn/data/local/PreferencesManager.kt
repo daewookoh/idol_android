@@ -131,6 +131,7 @@ class PreferencesManager @Inject constructor(
 
         // Category
         val KEY_DEFAULT_CATEGORY = stringPreferencesKey(Constants.PREF_DEFAULT_CATEGORY)
+        val KEY_DEFAULT_CHART_CODE = stringPreferencesKey("default_chart_code")  // 기본 탭 선택용
 
         // Most Idol (최애)
         val KEY_MOST_IDOL_ID = intPreferencesKey("most_idol_id")
@@ -287,6 +288,11 @@ class PreferencesManager @Inject constructor(
     val defaultCategory: Flow<String> = context.dataStore.data
         .map { preferences ->
             preferences[KEY_DEFAULT_CATEGORY] ?: Constants.TYPE_MALE
+        }
+
+    val defaultChartCode: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_DEFAULT_CHART_CODE]
         }
 
     val mostIdolId: Flow<Int?> = context.dataStore.data
@@ -543,6 +549,12 @@ class PreferencesManager @Inject constructor(
     suspend fun setDefaultCategory(category: String) {
         context.dataStore.edit { preferences ->
             preferences[KEY_DEFAULT_CATEGORY] = category
+        }
+    }
+
+    suspend fun setDefaultChartCode(chartCode: String) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_DEFAULT_CHART_CODE] = chartCode
         }
     }
 

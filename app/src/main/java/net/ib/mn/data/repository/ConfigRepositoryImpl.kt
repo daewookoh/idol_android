@@ -329,6 +329,13 @@ class ConfigRepositoryImpl @Inject constructor(
     }
 
     /**
+     * 기본 차트 코드 가져오기 (앱 첫 실행 시 초기 탭 선택용)
+     */
+    override suspend fun getDefaultChartCode(): String? {
+        return preferencesManager.defaultChartCode.first()
+    }
+
+    /**
      * 모든 캐시 데이터 삭제 (서버 URL 변경 시 사용)
      * 메모리 캐시와 StateFlow를 모두 초기화
      */

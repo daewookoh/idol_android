@@ -38,7 +38,7 @@ class RankingPageViewModel @Inject constructor(
 
     companion object {
         private const val KEY_SELECTED_TAB_INDEX = "selectedTabIndex"
-        private const val DEFAULT_TAB_INDEX = 1
+        private const val DEFAULT_TAB_INDEX = 0
     }
 
     /**
@@ -65,8 +65,19 @@ class RankingPageViewModel @Inject constructor(
     /**
      * 랭킹 페이지 내 메인 탭 선택 인덱스
      * SavedStateHandle을 사용하여 바텀 네비게이션 이동 시에도 유지
+     *
+     * 초기값 설정 우선순위:
+     * 1. SavedStateHandle에 저장된 값 (이전에 선택한 탭)
+     * 2. defaultChartCode로부터 계산된 인덱스 (앱 첫 실행 시)
+     * 3. 0 (기본값)
      */
     val selectedTabIndex: StateFlow<Int> = savedStateHandle.getStateFlow(KEY_SELECTED_TAB_INDEX, DEFAULT_TAB_INDEX)
+
+    /**
+     * 앱 첫 실행 시 defaultChartCode를 읽어서 초기 탭 인덱스 설정
+     */
+    private val _shouldInitializeTab = MutableStateFlow(true)
+    val shouldInitializeTab: StateFlow<Boolean> = _shouldInitializeTab.asStateFlow()
 
     /**
      * 선택된 탭 인덱스 업데이트
@@ -74,6 +85,52 @@ class RankingPageViewModel @Inject constructor(
     fun setSelectedTabIndex(index: Int) {
         savedStateHandle[KEY_SELECTED_TAB_INDEX] = index
         android.util.Log.d("RankingViewModel", "📌 Selected tab index updated: $index")
+    }
+
+    /**
+     * defaultChartCode에 해당하는 탭 인덱스를 찾아서 설정
+     */
+    fun initializeTabFromDefaultChartCode(tabDataList: List<*>, getCodeFromTab: (Any) -> String?) {
+        if (!_shouldInitializeTab.value) {
+            android.util.Log.d("RankingViewModel", "⏭️ Tab already initialized, skipping")
+            return
+        }
+
+        // 이미 SavedStateHandle에 값이 있으면 (이전에 선택한 탭이 있으면) 초기화하지 않음
+        if (savedStateHandle.get<Int>(KEY_SELECTED_TAB_INDEX) != null && savedStateHandle.get<Int>(KEY_SELECTED_TAB_INDEX) != DEFAULT_TAB_INDEX) {
+            android.util.Log.d("RankingViewModel", "⏭️ SavedStateHandle has previous tab selection, skipping initialization")
+            _shouldInitializeTab.value = false
+            return
+        }
+
+        viewModelScope.launch {
+            val defaultChartCode = configRepository.getDefaultChartCode()
+            android.util.Log.d("RankingViewModel", "========================================")
+            android.util.Log.d("RankingViewModel", "[RankingViewModel] Initializing tab from defaultChartCode")
+            android.util.Log.d("RankingViewModel", "  - defaultChartCode: $defaultChartCode")
+            android.util.Log.d("RankingViewModel", "  - tabDataList size: ${tabDataList.size}")
+
+            if (defaultChartCode != null) {
+                // defaultChartCode에 해당하는 탭 찾기
+                val tabIndex = tabDataList.indexOfFirst { tab ->
+                    val code = tab?.let { getCodeFromTab(it) }
+                    android.util.Log.d("RankingViewModel", "  - Checking tab: code=$code")
+                    code == defaultChartCode
+                }
+
+                if (tabIndex >= 0) {
+                    android.util.Log.d("RankingViewModel", "✅ Found matching tab at index: $tabIndex")
+                    setSelectedTabIndex(tabIndex)
+                } else {
+                    android.util.Log.w("RankingViewModel", "⚠️ No matching tab found for chartCode: $defaultChartCode, using default index 0")
+                }
+            } else {
+                android.util.Log.d("RankingViewModel", "ℹ️ No defaultChartCode set, using default index 0")
+            }
+
+            android.util.Log.d("RankingViewModel", "========================================")
+            _shouldInitializeTab.value = false
+        }
     }
 
     init {
