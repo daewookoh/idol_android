@@ -527,6 +527,7 @@ class StartUpViewModel @Inject constructor(
                     android.util.Log.d("USER_INFO", "[StartUpViewModel] itemNo: ${data?.itemNo}")
                     android.util.Log.d("USER_INFO", "[StartUpViewModel] domain: ${data?.domain}")
                     android.util.Log.d("USER_INFO", "[StartUpViewModel] giveHeart: ${data?.giveHeart}")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] most: ${data?.most?.id} (${data?.most?.name})")
                     android.util.Log.d("USER_INFO", "========================================")
 
                     // 사용자 정보 DataStore 저장
@@ -570,6 +571,14 @@ class StartUpViewModel @Inject constructor(
                             giveHeart = userData.giveHeart
                         )
 
+                        // 최애 정보 저장 (old 프로젝트의 IdolAccount.getAccount(context)?.most와 동일)
+                        preferencesManager.setMostIdol(
+                            idolId = userData.most?.id,
+                            type = userData.most?.type,
+                            groupId = userData.most?.groupId
+                        )
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Most idol saved: id=${userData.most?.id}, type=${userData.most?.type}, groupId=${userData.most?.groupId}")
+
                         // setUserInfo 완료 후 DataStore 업데이트가 완료되기를 보장하기 위해 약간의 지연
                         // DataStore는 비동기적으로 업데이트되므로, 업데이트가 반영되기까지 시간이 필요할 수 있음
                         kotlinx.coroutines.delay(100)
@@ -592,6 +601,15 @@ class StartUpViewModel @Inject constructor(
                         android.util.Log.d("USER_INFO", "[StartUpViewModel] UserSelf cache valid (304 Not Modified)")
                         android.util.Log.d("USER_INFO", "[StartUpViewModel] Using cached user info from DataStore")
                         android.util.Log.d(TAG, "UserSelf cache valid (304 Not Modified)")
+
+                        // 304 응답이지만 most 정보가 없으면 ETag를 삭제하고 다시 호출
+                        val mostId = preferencesManager.mostIdolId.first()
+                        if (mostId == null) {
+                            android.util.Log.w("USER_INFO", "[StartUpViewModel] ⚠️ Most ID is null in cache, forcing API refresh")
+                            preferencesManager.setUserSelfETag("")
+                            loadUserSelf()
+                            return@collect
+                        }
                     } else if (result.code == 401) {
                         // 토큰이 유효하지 않음 - 토큰 삭제 및 로그인 페이지로 이동
                         android.util.Log.e("USER_INFO", "[StartUpViewModel] ❌ Token invalid (401 Unauthorized)")

@@ -1,5 +1,8 @@
 package net.ib.mn.util
 
+import android.content.Context
+import android.text.TextUtils
+import androidx.appcompat.app.AppCompatDelegate
 import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.data.local.entity.IdolEntity
 import net.ib.mn.ui.components.RankingItemData
@@ -13,10 +16,14 @@ import java.util.Locale
  * 1. 하트 수(heart) 내림차순 정렬
  * 2. 동점일 경우 이름(name) 오름차순 정렬 (Collator 사용)
  * 3. 동점자는 동일한 순위 부여
+ *
+ * 다국어 처리:
+ * - old 프로젝트의 IdolModel.getName(context) 로직과 동일
+ * - 현재 언어 설정에 따라 적절한 이름 필드 반환
  */
 
 /**
- * processRanksData 결과 데이터
+ * processIdolsData 결과 데이터
  */
 data class ProcessedRankData(
     val rankItems: List<RankingItemData>,
@@ -28,6 +35,51 @@ object RankingUtil {
     // 공통 Collator (이름 정렬용) - 불변 객체로 재사용
     private val nameCollator = Collator.getInstance(Locale.ROOT).apply {
         strength = Collator.PRIMARY
+    }
+
+    /**
+     * IdolEntity에서 현재 언어에 맞는 이름을 가져오기
+     * old 프로젝트의 IdolModel.getName(context) 로직과 동일
+     *
+     * @param idol IdolEntity 인스턴스
+     * @param context Context (언어 설정 확인용)
+     * @return 현재 언어에 맞는 이름
+     */
+    fun getLocalizedName(idol: IdolEntity, context: Context): String {
+        try {
+            // AppCompatDelegate에서 설정된 언어 가져오기
+            val locale = AppCompatDelegate.getApplicationLocales()[0] ?: Locale.getDefault()
+            val lang = locale.language.lowercase()
+
+            return when {
+                lang.startsWith("en") && !TextUtils.isEmpty(idol.nameEn) -> idol.nameEn
+                lang.startsWith("ko") -> idol.name
+                lang == "zh" && locale.country == "TW" && !TextUtils.isEmpty(idol.nameZhTw) -> idol.nameZhTw
+                lang.startsWith("zh") && !TextUtils.isEmpty(idol.nameZh) -> idol.nameZh
+                lang.startsWith("ja") && !TextUtils.isEmpty(idol.nameJp) -> idol.nameJp
+                !TextUtils.isEmpty(idol.nameEn) -> idol.nameEn
+                else -> idol.name
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return idol.nameEn.ifEmpty { idol.name }
+        }
+    }
+
+    /**
+     * 이름을 "_"로 분리 (이름_그룹명 형식)
+     * old 프로젝트의 Util.nameSplit(name) 로직과 동일
+     *
+     * @param fullName "이름_그룹명" 형식의 문자열
+     * @return Pair<이름, 그룹명>
+     */
+    fun splitName(fullName: String): Pair<String, String> {
+        return if (fullName.contains("_")) {
+            val parts = fullName.split("_", limit = 2)
+            Pair(parts[0], parts.getOrNull(1) ?: "")
+        } else {
+            Pair(fullName, "")
+        }
     }
 
     /**
@@ -137,74 +189,21 @@ object RankingUtil {
         }
     }
 
-    /**
-     * AggregateRankModel을 RankingItemData로 변환하고 1위 아이돌 정보 가져오기
-     *
-     * @param ranks AggregateRankModel 리스트
-     * @param idolDao IdolDao 인스턴스
-     * @param formatScore 점수 포맷팅 함수
-     * @return ProcessedRankData (rankItems, topIdol)
-     */
-    suspend fun processRanksData(
-        ranks: List<net.ib.mn.data.remote.dto.AggregateRankModel>,
-        idolDao: IdolDao,
-        formatScore: (Int) -> String
-    ): ProcessedRankData {
-        // 모든 idol ID 추출
-        val idolIds = ranks.map { it.idolId }
-
-        // DB에서 idol 정보 가져오기
-        val idols = idolDao.getIdolsByIds(idolIds)
-        val idolMap = idols.associateBy { it.id }
-
-        // AggregateRankModel을 RankingItemData로 변환
-        // Global(기적) 랭킹에서는 score는 기적 점수이고, 실제 투표수는 idol.heart 사용
-        val maxHeart = idols.maxOfOrNull { it.heart } ?: 0L
-        val minHeart = idols.minOfOrNull { it.heart } ?: 0L
-
-        val rankItems = ranks.map { rank ->
-            val idol = idolMap[rank.idolId]
-            val actualHeart = idol?.heart ?: 0L  // DB에서 실제 투표수 가져오기
-
-            RankingItemData(
-                rank = rank.scoreRank,
-                name = rank.name,  // "이름_그룹명" 형식 그대로 사용
-                voteCount = formatScore(actualHeart.toInt()),  // 실제 투표수 표시
-                photoUrl = idol?.imageUrl,
-                id = rank.idolId.toString(),
-                miracleCount = idol?.miracleCount ?: 0,
-                fairyCount = idol?.fairyCount ?: 0,
-                angelCount = idol?.angelCount ?: 0,
-                rookieCount = idol?.rookieCount ?: 0,
-                heartCount = actualHeart,  // 실제 투표수 사용
-                maxHeartCount = maxHeart,
-                minHeartCount = minHeart,
-                top3ImageUrls = idol?.let { IdolImageUtil.getTop3ImageUrls(it) } ?: listOf(null, null, null),
-                top3VideoUrls = idol?.let { IdolImageUtil.getTop3VideoUrls(it) } ?: listOf(null, null, null)
-            )
-        }
-
-        // 1위 아이돌 정보 가져오기 (ExoTop3용)
-        val topIdol = rankItems.firstOrNull()?.let { topRankItem ->
-            idolMap[topRankItem.id.toInt()]
-        }
-
-        return ProcessedRankData(
-            rankItems = rankItems,
-            topIdol = topIdol
-        )
-    }
 
     /**
      * IdolEntity를 RankingItemData로 변환하고 1위 아이돌 정보 가져오기
      * (Group, Solo 랭킹용 - 정렬은 UI에서 수행)
      *
      * @param idols IdolEntity 리스트
+     * @param context Context (다국어 이름 처리용)
+     * @param mostIdolId 최애 아이돌 ID (배경색 하이라이트용)
      * @param formatHeartCount 하트 수 포맷팅 함수
      * @return ProcessedRankData (rankItems, topIdol)
      */
     fun processIdolsData(
         idols: List<IdolEntity>,
+        context: Context,
+        mostIdolId: Int?,
         formatHeartCount: (Int) -> String
     ): ProcessedRankData {
         val idolMap = idols.associateBy { it.id }
@@ -212,9 +211,18 @@ object RankingUtil {
         // IdolEntity를 RankingItemData로 변환 (정렬은 MainRankingList에서 수행)
         // rank는 임시값 0, max/min도 임시값 0 (MainRankingList에서 재계산됨)
         val rankItems = idols.map { idol ->
+            // 다국어 이름 가져오기 (old 프로젝트와 동일)
+            val localizedName = getLocalizedName(idol, context)
+
+            // 최애 여부 판단 (old 프로젝트와 동일)
+            val isFavorite = mostIdolId != null && idol.id == mostIdolId
+            if (isFavorite) {
+                android.util.Log.d("RankingUtil", "💗 Found favorite idol: id=${idol.id}, name=${idol.name}")
+            }
+
             RankingItemData(
                 rank = 0,  // MainRankingList에서 계산
-                name = idol.name,  // "이름_그룹명" 형식 그대로 사용
+                name = localizedName,  // 다국어 처리된 이름 사용
                 voteCount = formatHeartCount(idol.heart.toInt()),
                 photoUrl = idol.imageUrl,
                 id = idol.id.toString(),
@@ -225,6 +233,7 @@ object RankingUtil {
                 heartCount = idol.heart,
                 maxHeartCount = 0L,  // MainRankingList에서 계산
                 minHeartCount = 0L,  // MainRankingList에서 계산
+                isFavorite = isFavorite,  // 최애 여부 설정
                 top3ImageUrls = IdolImageUtil.getTop3ImageUrls(idol),
                 top3VideoUrls = IdolImageUtil.getTop3VideoUrls(idol)
             )

@@ -76,6 +76,23 @@ class UserRepositoryImpl @Inject constructor(
                 // NOTE: UserSelfResponse 구조가 {objects: [...], ...} 형식이므로
                 // success 필드가 없음. objects 배열이 있으면 성공으로 판단
                 if (body.objects.isNotEmpty()) {
+                    // 응답 데이터 로그 출력
+                    val firstObject = body.objects.firstOrNull()
+                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ========================================")
+                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl] getUserSelf API Response:")
+                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - User ID: ${firstObject?.id}")
+
+                    if (firstObject?.most == null) {
+                        android.util.Log.w("USER_INFO", "[UserRepositoryImpl]   ⚠️ Most is NULL - User has no favorite idol set")
+                    } else {
+                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most: ${firstObject.most}")
+                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most ID: ${firstObject.most.id}")
+                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most Name: ${firstObject.most.name}")
+                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most Type: ${firstObject.most.type}")
+                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most GroupId: ${firstObject.most.groupId}")
+                    }
+                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ========================================")
+
                     // 새로운 ETag 저장
                     val newETag = response.headers()["ETag"]
                     newETag?.let {

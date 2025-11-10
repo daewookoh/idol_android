@@ -124,9 +124,45 @@ data class UserSelfData(
     val domain: String?,
 
     @SerializedName("give_heart")
-    val giveHeart: Int?
+    val giveHeart: Int?,
 
-    // NOTE: most, subscriptions, emoticon 등 복잡한 객체는 필요시 추가
+    @SerializedName("most")
+    val most: MostIdol?
+
+    // NOTE: subscriptions, emoticon 등 복잡한 객체는 필요시 추가
+)
+
+/**
+ * 사용자의 최애 아이돌 정보
+ * old 프로젝트의 UserModel.most와 동일한 구조
+ */
+data class MostIdol(
+    @SerializedName("id")
+    val id: Int,
+
+    @SerializedName("name")
+    val name: String?,
+
+    @SerializedName("name_en")
+    val nameEn: String?,
+
+    @SerializedName("name_jp")
+    val nameJp: String?,
+
+    @SerializedName("name_zh")
+    val nameZh: String?,
+
+    @SerializedName("name_zh_tw")
+    val nameZhTw: String?,
+
+    @SerializedName("type")
+    val type: String?,
+
+    @SerializedName("group_id")
+    val groupId: Int?,
+
+    @SerializedName("resource_uri")
+    val resourceUri: String?
 )
 
 // ============================================================

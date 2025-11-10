@@ -131,6 +131,11 @@ class PreferencesManager @Inject constructor(
 
         // Category
         val KEY_DEFAULT_CATEGORY = stringPreferencesKey(Constants.PREF_DEFAULT_CATEGORY)
+
+        // Most Idol (최애)
+        val KEY_MOST_IDOL_ID = intPreferencesKey("most_idol_id")
+        val KEY_MOST_IDOL_TYPE = stringPreferencesKey("most_idol_type")  // "S" or "G"
+        val KEY_MOST_IDOL_GROUP_ID = intPreferencesKey("most_idol_group_id")
     }
 
     // ============================================================
@@ -280,6 +285,21 @@ class PreferencesManager @Inject constructor(
     val defaultCategory: Flow<String> = context.dataStore.data
         .map { preferences ->
             preferences[KEY_DEFAULT_CATEGORY] ?: Constants.TYPE_MALE
+        }
+
+    val mostIdolId: Flow<Int?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_MOST_IDOL_ID]
+        }
+
+    val mostIdolType: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_MOST_IDOL_TYPE]
+        }
+
+    val mostIdolGroupId: Flow<Int?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_MOST_IDOL_GROUP_ID]
         }
 
     // ============================================================
@@ -512,6 +532,29 @@ class PreferencesManager @Inject constructor(
         context.dataStore.edit { preferences ->
             preferences[KEY_DEFAULT_CATEGORY] = category
         }
+    }
+
+    suspend fun setMostIdol(idolId: Int?, type: String?, groupId: Int?) {
+        context.dataStore.edit { preferences ->
+            if (idolId != null) {
+                preferences[KEY_MOST_IDOL_ID] = idolId
+            } else {
+                preferences.remove(KEY_MOST_IDOL_ID)
+            }
+
+            if (type != null) {
+                preferences[KEY_MOST_IDOL_TYPE] = type
+            } else {
+                preferences.remove(KEY_MOST_IDOL_TYPE)
+            }
+
+            if (groupId != null) {
+                preferences[KEY_MOST_IDOL_GROUP_ID] = groupId
+            } else {
+                preferences.remove(KEY_MOST_IDOL_GROUP_ID)
+            }
+        }
+        android.util.Log.d("PreferencesManager", "✅ Most idol saved: id=$idolId, type=$type, groupId=$groupId")
     }
 
     /**
