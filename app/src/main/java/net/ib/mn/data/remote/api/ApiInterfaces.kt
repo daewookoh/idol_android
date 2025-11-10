@@ -25,13 +25,15 @@ interface UserApi {
     /**
      * 사용자 프로필 조회 (ETag 캐싱 지원)
      *
-     * @param ts Timestamp (사용자 정보의 마지막 업데이트 시간)
+     * @param ts Timestamp (사용자 정보의 마지막 업데이트 시간, 캐시 무효화 시 현재 시간 전달)
      * @param etag ETag 값 (캐시 검증용)
+     * @param cacheControl Cache-Control 헤더 값 (캐시 제어용)
      */
     @GET("users/self/")
     suspend fun getUserSelf(
         @Query("ts") ts: Int = 0,
-        @Header("If-None-Match") etag: String? = null
+        @Header("If-None-Match") etag: String? = null,
+        @Header("Cache-Control") cacheControl: String? = null
     ): Response<UserSelfResponse>
 
     /**

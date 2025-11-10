@@ -36,25 +36,26 @@ class UserRepositoryImpl @Inject constructor(
     private val deviceUtil: DeviceUtil
 ) : UserRepository {
 
-    override fun getUserSelf(etag: String?): Flow<ApiResult<UserSelfResponse>> = flow {
+    override fun getUserSelf(etag: String?, cacheControl: String?, timestamp: Int?): Flow<ApiResult<UserSelfResponse>> = flow {
         emit(ApiResult.Loading)
 
         try {
-            // Get ts (timestamp) from DataStore's UserInfo
-            // NOTE: old 프로젝트와 동일하게 ts parameter 전달
+            // timestamp가 있으면 캐시 무효화를 위해 사용, 없으면 DataStore의 ts 사용
             val userInfo = preferencesManager.userInfo.first()
-            val ts = userInfo?.ts ?: 0
+            val ts = timestamp ?: (userInfo?.ts ?: 0)
 
             android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ========================================")
             android.util.Log.d("USER_INFO", "[UserRepositoryImpl] Calling getUserSelf API")
             android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - UserInfo exists: ${userInfo != null}")
             android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - TS from DataStore: ${userInfo?.ts}")
+            android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Timestamp parameter: $timestamp")
             android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - TS to send: $ts")
             android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - ETag: $etag")
+            android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Cache-Control: $cacheControl")
             android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ========================================")
 
             // AuthInterceptor가 자동으로 Authorization 헤더를 추가하므로 여기서는 제거
-            val response = userApi.getUserSelf(ts, etag)
+            val response = userApi.getUserSelf(ts, etag, cacheControl)
 
             // HTTP 304 Not Modified (캐시 유효)
             if (response.code() == 304) {
@@ -89,15 +90,21 @@ class UserRepositoryImpl @Inject constructor(
                         android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most ID: ${firstObject.most.id}")
                         android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most Name: ${firstObject.most.name}")
                         android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most Type: ${firstObject.most.type}")
+                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most ChartCode: ${firstObject.most.chartCodes?.firstOrNull()}")
+                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most Category: ${firstObject.most.category}")
                         android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most GroupId: ${firstObject.most.groupId}")
                     }
                     android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ========================================")
 
-                    // 새로운 ETag 저장
-                    val newETag = response.headers()["ETag"]
-                    newETag?.let {
-                        preferencesManager.setUserSelfETag(it)
-                        android.util.Log.d("UserRepositoryImpl", "✓ ETag saved: $it")
+                    // 새로운 ETag 저장 (cacheControl이 설정되지 않은 경우만, 즉 캐시를 사용하는 경우만)
+                    if (cacheControl == null && timestamp == null) {
+                        val newETag = response.headers()["ETag"]
+                        newETag?.let {
+                            preferencesManager.setUserSelfETag(it)
+                            android.util.Log.d("UserRepositoryImpl", "✓ ETag saved: $it")
+                        }
+                    } else {
+                        android.util.Log.d("UserRepositoryImpl", "⚠️ ETag not saved (cache disabled: cacheControl=$cacheControl, timestamp=$timestamp)")
                     }
 
                     emit(ApiResult.Success(body))

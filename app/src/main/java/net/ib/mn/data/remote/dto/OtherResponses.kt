@@ -158,11 +158,17 @@ data class MostIdol(
     @SerializedName("type")
     val type: String?,
 
+    @SerializedName("category")
+    val category: String?, // "M": male, "F": female
+
     @SerializedName("group_id")
     val groupId: Int?,
 
     @SerializedName("resource_uri")
-    val resourceUri: String?
+    val resourceUri: String?,
+
+    @SerializedName("chart_codes")
+    val chartCodes: List<String>?  // 예: ["PR_S_F", "GLOBALS", "MIRACLE"]
 )
 
 // ============================================================

@@ -15,9 +15,11 @@ interface UserRepository {
      * 사용자 프로필 조회 (ETag 캐싱 지원)
      *
      * @param etag 이전 ETag 값 (캐시 검증용)
+     * @param cacheControl Cache-Control 헤더 값 (캐시 제어용)
+     * @param timestamp 캐시 무효화용 타임스탬프 (null이 아니면 ts에 설정되어 캐시 무효화)
      * @return Flow<ApiResult<UserSelfResponse>>
      */
-    fun getUserSelf(etag: String? = null): Flow<ApiResult<UserSelfResponse>>
+    fun getUserSelf(etag: String? = null, cacheControl: String? = null, timestamp: Int? = null): Flow<ApiResult<UserSelfResponse>>
 
     /**
      * 사용자 상태 조회

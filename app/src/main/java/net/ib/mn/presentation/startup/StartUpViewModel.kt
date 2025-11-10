@@ -484,15 +484,16 @@ class StartUpViewModel @Inject constructor(
      */
     private suspend fun loadUserSelf() {
         try {
-            // DataStore에서 저장된 ETag 가져오기
-            val etag = preferencesManager.userSelfETag.first()
-
             android.util.Log.d("USER_INFO", "========================================")
-            android.util.Log.d("USER_INFO", "[StartUpViewModel] Loading user info from server")
-            android.util.Log.d("USER_INFO", "[StartUpViewModel] ETag: $etag")
+            android.util.Log.d("USER_INFO", "[StartUpViewModel] Loading user info from server (NO CACHE)")
             android.util.Log.d("USER_INFO", "========================================")
 
-            getUserSelfUseCase(etag).collect { result ->
+            // cacheControl을 전달하여 캐시 비활성화
+            getUserSelfUseCase(
+                etag = null,
+                cacheControl = "no-cache",
+                timestamp = (System.currentTimeMillis() / 1000).toInt()
+            ).collect { result ->
             when (result) {
                 is ApiResult.Loading -> {
                     android.util.Log.d("USER_INFO", "[StartUpViewModel] Loading user info...")
@@ -572,12 +573,25 @@ class StartUpViewModel @Inject constructor(
                         )
 
                         // 최애 정보 저장 (old 프로젝트의 IdolAccount.getAccount(context)?.most와 동일)
+                        // chartCodes에서 Award 코드(AW_로 시작)를 제외한 첫 번째 유효한 값을 저장
+                        // Award 코드는 특수 이벤트/시상식 관련이므로 일반 랭킹 탭에 매칭되지 않음
+                        val chartCode = userData.most?.chartCodes
+                            ?.firstOrNull { !it.startsWith("AW_") && !it.startsWith("DF_") }  // Award/DF 코드 제외
+                            ?: userData.most?.chartCodes?.firstOrNull()  // 모두 특수 코드면 첫 번째 사용
+
+                        val category = userData.most?.category
+
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel] chartCodes from server: ${userData.most?.chartCodes}")
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel] Selected chartCode (filtered): $chartCode")
+
                         preferencesManager.setMostIdol(
                             idolId = userData.most?.id,
                             type = userData.most?.type,
-                            groupId = userData.most?.groupId
+                            groupId = userData.most?.groupId,
+                            chartCode = chartCode,
+                            category = category
                         )
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Most idol saved: id=${userData.most?.id}, type=${userData.most?.type}, groupId=${userData.most?.groupId}")
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Most idol saved: id=${userData.most?.id}, type=${userData.most?.type}, groupId=${userData.most?.groupId}, chartCode=$chartCode, category=$category")
 
                         // setUserInfo 완료 후 DataStore 업데이트가 완료되기를 보장하기 위해 약간의 지연
                         // DataStore는 비동기적으로 업데이트되므로, 업데이트가 반영되기까지 시간이 필요할 수 있음
@@ -596,21 +610,7 @@ class StartUpViewModel @Inject constructor(
                     }
                 }
                 is ApiResult.Error -> {
-                    if (result.code == 304) {
-                        // 캐시 유효 - 로컬 데이터 사용
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel] UserSelf cache valid (304 Not Modified)")
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel] Using cached user info from DataStore")
-                        android.util.Log.d(TAG, "UserSelf cache valid (304 Not Modified)")
-
-                        // 304 응답이지만 most 정보가 없으면 ETag를 삭제하고 다시 호출
-                        val mostId = preferencesManager.mostIdolId.first()
-                        if (mostId == null) {
-                            android.util.Log.w("USER_INFO", "[StartUpViewModel] ⚠️ Most ID is null in cache, forcing API refresh")
-                            preferencesManager.setUserSelfETag("")
-                            loadUserSelf()
-                            return@collect
-                        }
-                    } else if (result.code == 401) {
+                    if (result.code == 401) {
                         // 토큰이 유효하지 않음 - 토큰 삭제 및 로그인 페이지로 이동
                         android.util.Log.e("USER_INFO", "[StartUpViewModel] ❌ Token invalid (401 Unauthorized)")
                         android.util.Log.e("USER_INFO", "[StartUpViewModel] Clearing auth credentials and navigating to Login")
