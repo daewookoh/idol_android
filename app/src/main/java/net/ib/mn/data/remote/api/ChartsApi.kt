@@ -65,13 +65,11 @@ interface ChartsApi {
      * old 프로젝트의 hofs/ API와 동일
      * 명예전당 일일 순위 데이터 조회
      *
-     * @param code 차트 코드 (예: "HOF_M", "HOF_F")
-     * @param historyParam 이전 기간 조회용 파라미터 (optional)
+     * @param params 쿼리 파라미터 맵 (code, created_at__gte, created_at__lt 등)
      * @return Response<ResponseBody> JSON 형식의 응답
      */
     @GET("hofs/")
     suspend fun getHofs(
-        @Query("code") code: String,
-        @Query("history_param") historyParam: String? = null
+        @retrofit2.http.QueryMap params: Map<String, String>
     ): Response<ResponseBody>
 }

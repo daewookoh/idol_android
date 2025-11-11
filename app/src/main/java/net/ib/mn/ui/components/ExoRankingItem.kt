@@ -70,6 +70,11 @@ import coil.request.ImageRequest
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ExoTypo
 import java.text.NumberFormat
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 /**
  * ExoRankingItem - 랭킹 아이템 리스트 렌더링 (로우레벨 구현)
@@ -1622,22 +1627,30 @@ fun HofDailyRankingItem(
 
                     Spacer(modifier = Modifier.width(5.dp))
 
-                    // 날짜 (old: tv_date - KST 타임존으로 표시)
                     val dateText = remember(item.createdAt) {
                         try {
-                            // ISO 8601 형식 파싱 (2025-11-02T23:40:00)
-                            val isoFormat = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault())
-                            isoFormat.timeZone = java.util.TimeZone.getTimeZone("UTC")
-                            val date = isoFormat.parse(item.createdAt)
+                            // 1. 원본 문자열 형식을 정의합니다. (T가 있으므로 'T'를 추가)
+                            val isoParser = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
 
-                            // 명예전당은 항상 KST로 표시 (old 프로젝트와 동일)
-                            val displayFormat = java.text.DateFormat.getDateInstance(
-                                java.text.DateFormat.MEDIUM,
-                                androidx.appcompat.app.AppCompatDelegate.getApplicationLocales()[0] ?: java.util.Locale.getDefault()
-                            )
-                            displayFormat.timeZone = java.util.TimeZone.getTimeZone("Asia/Seoul")
-                            date?.let { displayFormat.format(it) } ?: item.createdAt
+                            // 2. 문자열을 'LocalDateTime' (시간대 정보가 없는) 객체로 파싱합니다.
+                            val localDateTime = LocalDateTime.parse(item.createdAt, isoParser)
+
+                            // 3. 이 시간이 "Asia/Seoul" 시간대임을 명시적으로 지정합니다.
+                            val kstZoneId = ZoneId.of("Asia/Seoul")
+                            val zonedDateTime = localDateTime.atZone(kstZoneId)
+
+                            // 4. 사용자의 현재 로케일에 맞는 중간 길이(MEDIUM) 날짜 형식으로 포매터를 만듭니다.
+                            val userLocale = androidx.appcompat.app.AppCompatDelegate.getApplicationLocales()[0] ?: Locale.getDefault()
+                            val displayFormatter = DateTimeFormatter
+                                .ofLocalizedDate(FormatStyle.MEDIUM)
+                                .withLocale(userLocale)
+                                .withZone(kstZoneId) // 포매터에도 KST를 지정 (명확성을 위해)
+
+                            // 5. 포맷합니다.
+                            displayFormatter.format(zonedDateTime)
+
                         } catch (e: Exception) {
+                            // 파싱 실패 시 원본 문자열 반환
                             item.createdAt
                         }
                     }

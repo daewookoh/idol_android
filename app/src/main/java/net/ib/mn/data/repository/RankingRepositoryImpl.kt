@@ -1,5 +1,6 @@
 package net.ib.mn.data.repository
 
+import android.net.Uri
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import net.ib.mn.data.remote.api.ChartsApi
@@ -231,7 +232,28 @@ class RankingRepositoryImpl @Inject constructor(
             android.util.Log.d("RankingRepo", "  - historyParam: $historyParam")
             android.util.Log.d("RankingRepo", "========================================")
 
-            val response = chartsApi.getHofs(code, historyParam)
+            // Query parameter 맵 생성
+            val params = mutableMapOf<String, String>()
+            params["code"] = code
+
+            // historyParam을 URI로 파싱하여 개별 쿼리 파라미터로 분해
+            // OLD 프로젝트 HofsRepositoryImpl과 동일한 로직
+            historyParam?.let {
+                android.util.Log.d("RankingRepo", "🔍 Parsing historyParam: $it")
+                // 앞에 ? 가 있어야 parse 되므로 ?를 붙여서 parse
+                val uri = Uri.parse("?$it")
+                uri.queryParameterNames.forEach { key ->
+                    val value = uri.getQueryParameter(key)
+                    if (value?.isNotEmpty() == true) {
+                        params[key] = value
+                        android.util.Log.d("RankingRepo", "  ✓ Added param: $key = $value")
+                    }
+                }
+            }
+
+            android.util.Log.d("RankingRepo", "📤 Final params: $params")
+
+            val response = chartsApi.getHofs(params)
 
             android.util.Log.d("RankingRepo", "📦 Response received:")
             android.util.Log.d("RankingRepo", "  - HTTP Code: ${response.code()}")

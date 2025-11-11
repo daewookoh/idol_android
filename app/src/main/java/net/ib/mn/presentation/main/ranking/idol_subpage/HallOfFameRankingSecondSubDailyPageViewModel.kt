@@ -9,6 +9,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -30,6 +31,10 @@ import java.util.Locale
  * SavedStateHandle을 사용하여 기간 선택 상태를 저장:
  * - 앱을 내렸다 올려도 유지 (바텀 네비게이션 이동 시에도 유지)
  * - 앱을 재시작하면 리셋 (프로세스 종료 후)
+ *
+ * OLD 프로젝트와의 주요 차이점:
+ * - 탭 변경 시 currentPosition과 historyParam을 유지
+ * - loadData 호출 시 newChartCode와 함께 현재 선택된 기간(historyParam)을 전달
  */
 @HiltViewModel(assistedFactory = HallOfFameRankingSecondSubDailyPageViewModel.Factory::class)
 class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
@@ -90,6 +95,9 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
             savedStateHandle[KEY_CURRENT_POSITION] = value
         }
 
+    // 현재 실행 중인 로드 작업 (중복 호출 방지)
+    private var currentLoadJob: Job? = null
+
     init {
         android.util.Log.d("HoF_Daily_VM", "========================================")
         android.util.Log.d("HoF_Daily_VM", "📦 ViewModel initialized")
@@ -98,16 +106,34 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
         android.util.Log.d("HoF_Daily_VM", "  - restored currentPosition: $currentPosition")
         android.util.Log.d("HoF_Daily_VM", "========================================")
 
-        loadData()
+        // 초기 로드는 Page의 LaunchedEffect에서 처리
     }
 
-    fun loadData(newChartCode: String? = null, historyParam: String? = null) {
+    /**
+     * 데이터 로드
+     *
+     * OLD 프로젝트의 getHofDayData와 동일한 로직:
+     * - newChartCode: 탭 변경 시 새로운 차트 코드 (null이면 초기 chartCode 사용)
+     * - explicitHistoryParam: 기간 버튼 클릭 시 명시적으로 전달된 historyParam
+     *
+     * @param newChartCode 새로운 차트 코드 (탭 변경 시)
+     * @param explicitHistoryParam 명시적으로 전달된 historyParam (기간 버튼 클릭 시)
+     */
+    fun loadData(newChartCode: String? = null, explicitHistoryParam: String? = null) {
         val codeToUse = newChartCode ?: chartCode
 
-        viewModelScope.launch {
-            android.util.Log.d("HoF_Daily_VM", "🔵 Loading 일일 data for chartCode=$codeToUse, historyParam=$historyParam")
+        // 이전 로드 작업 취소
+        currentLoadJob?.cancel()
 
-            rankingRepository.getHofs(codeToUse, historyParam).collect { result ->
+        currentLoadJob = viewModelScope.launch {
+            android.util.Log.d("HoF_Daily_VM", "========================================")
+            android.util.Log.d("HoF_Daily_VM", "🔵 Loading 일일 data")
+            android.util.Log.d("HoF_Daily_VM", "  - chartCode: $codeToUse")
+            android.util.Log.d("HoF_Daily_VM", "  - explicitHistoryParam: $explicitHistoryParam")
+            android.util.Log.d("HoF_Daily_VM", "  - currentPosition: $currentPosition")
+            android.util.Log.d("HoF_Daily_VM", "========================================")
+
+            rankingRepository.getHofs(codeToUse, explicitHistoryParam).collect { result ->
                 when (result) {
                     is ApiResult.Loading -> {
                         android.util.Log.d("HoF_Daily_VM", "⏳ Loading...")
@@ -121,28 +147,22 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
 
                         // Parse ranking data from JSON
                         val rankingList = parseRankingData(result.data)
+                        android.util.Log.d("HoF_Daily_VM", "📊 Parsed ${rankingList.size} items from JSON")
 
                         // Calculate rank for top3 (old 프로젝트 HallOfFameViewModel 로직과 동일)
                         val processedList = calculateRank(rankingList)
+                        android.util.Log.d("HoF_Daily_VM", "🔢 Setting _rankingData with ${processedList.size} items")
+
                         _rankingData.value = processedList
+                        android.util.Log.d("HoF_Daily_VM", "✅ _rankingData updated! Current size: ${_rankingData.value.size}")
 
-                        // Parse history only when historyParam is null (initial load)
-                        if (historyParam == null) {
+                        // Parse history only when explicitHistoryParam is null (initial load)
+                        // OLD 프로젝트: if (historyParam != null) return@get
+                        if (explicitHistoryParam == null) {
                             parseHistory(result.data)
-
-                            // 저장된 currentPosition이 있으면 해당 위치로 이동
-                            if (currentPosition > 0 && currentPosition <= historyList.size) {
-                                android.util.Log.d("HoF_Daily_VM", "📌 Restoring saved position: $currentPosition")
-                                val item = historyList[currentPosition - 1]
-                                val restoredHistoryParam = "${item.historyParam}&${item.nextHistoryParam}"
-                                loadData(codeToUse, restoredHistoryParam)
-                                return@collect // 복원된 데이터 로드 후 리턴
-                            }
                         }
 
                         updatePrevNextVisibility()
-
-                        android.util.Log.d("HoF_Daily_VM", "Ranking data count: ${rankingList.size}")
                     }
                     is ApiResult.Error -> {
                         android.util.Log.e("HoF_Daily_VM", "❌ Error: ${result.message}")
@@ -222,30 +242,67 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
         _showPrevButton.value = currentPosition < historyList.size
     }
 
+    /**
+     * 이전 기간 버튼 클릭
+     *
+     * OLD 프로젝트 HallOfFameDayFragment.onClick(ivPrev) 로직과 동일:
+     * - currentPosition += 1
+     * - historyParam = tagArrayList[currentPosition]
+     * - getHofDayData(chartCode, historyParam)
+     */
     fun onPrevClicked(currentChartCode: String) {
         if (currentPosition < historyList.size) {
             currentPosition += 1
-            val historyParam = if (currentPosition > 0 && currentPosition <= historyList.size) {
-                val item = historyList[currentPosition - 1]
-                "${item.historyParam}&${item.nextHistoryParam}"
-            } else {
-                null
-            }
+            val historyParam = buildHistoryParam()
+            android.util.Log.d("HoF_Daily_VM", "⬅️ Prev clicked: position=$currentPosition, historyParam=$historyParam")
             loadData(currentChartCode, historyParam)
         }
     }
 
+    /**
+     * 다음 기간 버튼 클릭
+     *
+     * OLD 프로젝트 HallOfFameDayFragment.onClick(ivNext) 로직과 동일:
+     * - currentPosition -= 1
+     * - historyParam = tagArrayList[currentPosition]
+     * - getHofDayData(chartCode, historyParam)
+     */
     fun onNextClicked(currentChartCode: String) {
         if (currentPosition != 0) {
             currentPosition -= 1
-            val historyParam = if (currentPosition > 0 && currentPosition <= historyList.size) {
-                val item = historyList[currentPosition - 1]
-                "${item.historyParam}&${item.nextHistoryParam}"
-            } else {
-                null
-            }
+            val historyParam = buildHistoryParam()
+            android.util.Log.d("HoF_Daily_VM", "➡️ Next clicked: position=$currentPosition, historyParam=$historyParam")
             loadData(currentChartCode, historyParam)
         }
+    }
+
+    /**
+     * currentPosition을 기반으로 historyParam 생성
+     *
+     * OLD 프로젝트:
+     * - currentPosition == 0 → historyParam = null (최신)
+     * - currentPosition > 0 → historyParam = "&{history_param}&{next_history_param}"
+     */
+    private fun buildHistoryParam(): String? {
+        return if (currentPosition > 0 && currentPosition <= historyList.size) {
+            val item = historyList[currentPosition - 1]
+            "&${item.historyParam}&${item.nextHistoryParam}"
+        } else {
+            null
+        }
+    }
+
+    /**
+     * 탭 변경 시 호출
+     *
+     * OLD 프로젝트의 segmentedButton.setOnClickListener 로직과 동일:
+     * - historyParam = tagArrayList[currentPosition] (현재 기간 유지)
+     * - getHofDayData(newChartCode, historyParam)
+     */
+    fun onTabChanged(newChartCode: String) {
+        val historyParam = buildHistoryParam()
+        android.util.Log.d("HoF_Daily_VM", "🔄 Tab changed to chartCode=$newChartCode, keeping position=$currentPosition, historyParam=$historyParam")
+        loadData(newChartCode, historyParam)
     }
 
     /**

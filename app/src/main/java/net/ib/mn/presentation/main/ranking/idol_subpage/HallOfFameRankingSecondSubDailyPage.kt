@@ -55,6 +55,10 @@ import net.ib.mn.ui.theme.ExoTypo
  * selectedSubTabIndex는 ViewModel의 SavedStateHandle로 저장되어:
  * - 앱을 내렸다 올려도 유지 (바텀 네비게이션 이동 시에도 유지)
  * - 앱을 재시작하면 리셋 (프로세스 종료 후)
+ *
+ * OLD 프로젝트와의 차이점:
+ * - ExoTabSwitch 선택 변경 시에만 onTabChanged() 호출 (기간 유지)
+ * - 기간 버튼은 현재 chartCode를 유지하며 기간만 변경
  */
 @Composable
 fun HallOfFameRankingSecondSubDailyPage(
@@ -68,14 +72,19 @@ fun HallOfFameRankingSecondSubDailyPage(
 ) {
     val selectedSubTabIndex by viewModel.dailySubTabIndex.collectAsState()
 
-    // ExoTabSwitch 선택에 따른 차트 코드 결정
-    val currentChartCode = topThreeChartCodes.getOrNull(selectedSubTabIndex) ?: chartCode
-
-    // 데이터 로딩용 ViewModel 생성
+    // 데이터 로딩용 ViewModel 생성 (초기 chartCode로만 생성, 이후 변경은 함수 호출로 처리)
     val dataViewModel: HallOfFameRankingSecondSubDailyPageViewModel =
         hiltViewModel<HallOfFameRankingSecondSubDailyPageViewModel, HallOfFameRankingSecondSubDailyPageViewModel.Factory> { factory ->
-            factory.create(currentChartCode, selectedSubTabIndex)
+            factory.create(chartCode, 0)  // 초기값으로만 생성
         }
+
+    // ExoTabSwitch 선택에 따른 차트 코드 결정
+    // remember를 사용하여 안정적으로 추적
+    val currentChartCode = remember(selectedSubTabIndex, topThreeChartCodes) {
+        topThreeChartCodes.getOrNull(selectedSubTabIndex) ?: chartCode
+    }
+
+    android.util.Log.d("HoF_Daily", "📌 currentChartCode calculated: $currentChartCode (index=$selectedSubTabIndex)")
 
     val rankingData by dataViewModel.rankingData.collectAsState()
     val isLoading by dataViewModel.isLoading.collectAsState()
@@ -86,19 +95,20 @@ fun HallOfFameRankingSecondSubDailyPage(
     val showPrevButton by dataViewModel.showPrevButton.collectAsState()
     val showNextButton by dataViewModel.showNextButton.collectAsState()
 
-    // ExoTabSwitch 선택이 바뀔 때 새로운 차트 코드로 데이터 로드
+    // ExoTabSwitch 선택이 바뀔 때만 새로운 차트 코드로 데이터 로드 (기간 유지)
+    // OLD 프로젝트: historyParam = tagArrayList[currentPosition]
     LaunchedEffect(selectedSubTabIndex) {
-        android.util.Log.d("HoF_Daily", "🔄 ExoTabSwitch changed to index $selectedSubTabIndex")
-        dataViewModel.loadData(currentChartCode)
+        android.util.Log.d("HoF_Daily", "🔄 ExoTabSwitch changed to index $selectedSubTabIndex, chartCode=$currentChartCode")
+        dataViewModel.onTabChanged(currentChartCode)
     }
 
     android.util.Log.d("HoF_Daily", "========================================")
-    android.util.Log.d("HoF_Daily", "🎨 Daily Page State")
+    android.util.Log.d("HoF_Daily", "🎨 Daily Page Recomposition")
     android.util.Log.d("HoF_Daily", "  - chartCode: $chartCode")
     android.util.Log.d("HoF_Daily", "  - currentChartCode: $currentChartCode")
     android.util.Log.d("HoF_Daily", "  - tabbarType: $tabbarType (0=30일누적, 1=일일)")
-    android.util.Log.d("HoF_Daily", "  - exoTabSwitchType: $selectedSubTabIndex (선택된 서브탭)")
-    android.util.Log.d("HoF_Daily", "  - topThreeTabs: $topThreeTabs")
+    android.util.Log.d("HoF_Daily", "  - selectedSubTabIndex: $selectedSubTabIndex")
+    android.util.Log.d("HoF_Daily", "  - rankingData.size: ${rankingData.size}")
     android.util.Log.d("HoF_Daily", "  - isVisible: $isVisible")
     android.util.Log.d("HoF_Daily", "========================================")
 
@@ -111,8 +121,8 @@ fun HallOfFameRankingSecondSubDailyPage(
                 tabs = topThreeTabs.take(3),
                 selectedIndex = selectedSubTabIndex,
                 onTabSelected = { index ->
+                    android.util.Log.d("HoF_Daily", "👆 User clicked tab index: $index")
                     viewModel.setDailySubTabIndex(index)
-                    android.util.Log.d("HoF_Daily", "Sub-tab selected: $index")
                 }
             )
         }
@@ -140,9 +150,6 @@ fun HallOfFameRankingSecondSubDailyPage(
                             val paddingEndPx = (18 * density).toInt()
                             val paddingBottomPx = (16 * density).toInt()
                             setPadding(paddingStartPx, paddingTopPx, paddingEndPx, paddingBottomPx)
-                            setOnClickListener {
-                                dataViewModel.onPrevClicked(currentChartCode)
-                            }
                         }
                     },
                     update = { imageView ->
@@ -150,6 +157,11 @@ fun HallOfFameRankingSecondSubDailyPage(
                             android.view.View.VISIBLE
                         } else {
                             android.view.View.GONE
+                        }
+                        // update에서 리스너를 설정하여 최신 currentChartCode를 캡처
+                        imageView.setOnClickListener {
+                            android.util.Log.d("HoF_Daily", "⬅️ Prev button clicked with currentChartCode=$currentChartCode")
+                            dataViewModel.onPrevClicked(currentChartCode)
                         }
                     },
                     modifier = Modifier.size(45.dp)
@@ -187,9 +199,6 @@ fun HallOfFameRankingSecondSubDailyPage(
                             val paddingEndPx = (18 * density).toInt()
                             val paddingBottomPx = (16 * density).toInt()
                             setPadding(paddingStartPx, paddingTopPx, paddingEndPx, paddingBottomPx)
-                            setOnClickListener {
-                                dataViewModel.onNextClicked(currentChartCode)
-                            }
                         }
                     },
                     update = { imageView ->
@@ -197,6 +206,11 @@ fun HallOfFameRankingSecondSubDailyPage(
                             android.view.View.VISIBLE
                         } else {
                             android.view.View.INVISIBLE // INVISIBLE로 공간 유지
+                        }
+                        // update에서 리스너를 설정하여 최신 currentChartCode를 캡처
+                        imageView.setOnClickListener {
+                            android.util.Log.d("HoF_Daily", "➡️ Next button clicked with currentChartCode=$currentChartCode")
+                            dataViewModel.onNextClicked(currentChartCode)
                         }
                     },
                     modifier = Modifier.size(45.dp)
@@ -215,7 +229,9 @@ fun HallOfFameRankingSecondSubDailyPage(
         ) {
             when {
                 isLoading -> {
-                    null
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
                 error != null -> {
                     Text(
