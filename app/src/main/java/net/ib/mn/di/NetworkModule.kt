@@ -116,4 +116,9 @@ object NetworkModule {
     @Singleton
     fun provideOnepickApi(retrofit: Retrofit): OnepickApi =
         retrofit.create(OnepickApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideFavoritesApi(retrofit: Retrofit): FavoritesApi =
+        retrofit.create(FavoritesApi::class.java)
 }

@@ -82,6 +82,49 @@ object IdolImageUtil {
     }
 
     /**
+     * FavoriteIdolDto에서 Top3 이미지 URL 리스트 가져오기
+     */
+    fun getTop3ImageUrls(idol: net.ib.mn.data.remote.dto.FavoriteIdolDto): List<String?> {
+        val top3Ids = idol.top3?.split(",")?.map { it.trim() } ?: emptyList()
+        val top3ImageVer = idol.top3ImageVer ?: ""
+        val urls = listOf(idol.imageUrl, idol.imageUrl2, idol.imageUrl3)
+
+        // 비밀의 방: top3ImageVer가 비어있거나 top3Ids가 모두 null/empty
+        if (top3ImageVer.isEmpty() || top3Ids.all { it.isEmpty() || it == "0" }) {
+            return urls  // Use default images
+        }
+
+        return top3Ids.take(3).mapIndexed { index, id ->
+            if (id.isNotEmpty() && id != "0") {
+                val ver = top3ImageVer.split(",").getOrNull(index)?.trim() ?: ""
+                val originalUrl = urls.getOrNull(index)
+                originalUrl?.updateQueryParameter("ver", ver)
+            } else {
+                urls.getOrNull(index)
+            }
+        }.let { list ->
+            // 3개 미만이면 나머지 기본 이미지로 채우기
+            list + urls.drop(list.size)
+        }.take(3)
+    }
+
+    /**
+     * FavoriteIdolDto에서 Top3 비디오 URL 리스트 가져오기
+     */
+    fun getTop3VideoUrls(idol: net.ib.mn.data.remote.dto.FavoriteIdolDto): List<String?> {
+        val imageUrls = getTop3ImageUrls(idol)
+
+        return imageUrls.map { url ->
+            when {
+                url == null -> null
+                url.contains(".mp4") -> url
+                url.contains("_s_mv.jpg") -> url.replace("_s_mv.jpg", "_m_mv.mp4")
+                else -> null
+            }
+        }
+    }
+
+    /**
      * HeartPick 배너 이미지 URL에 언어별 분기 적용
      *
      * 지원 언어: 한국어(ko), 영어(en), 일본어(ja), 중국어 간체(zh-CN), 중국어 번체(zh-TW), 스페인어(es)

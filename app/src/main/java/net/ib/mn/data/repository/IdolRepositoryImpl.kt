@@ -1,5 +1,7 @@
 package net.ib.mn.data.repository
 
+import net.ib.mn.data.local.dao.IdolDao
+import net.ib.mn.data.local.entity.IdolEntity
 import net.ib.mn.data.remote.api.IdolApi
 import net.ib.mn.data.remote.dto.IdolListResponse
 import net.ib.mn.data.remote.dto.UpdateInfoResponse
@@ -15,7 +17,8 @@ import javax.inject.Inject
  * Idol Repository 구현체
  */
 class IdolRepositoryImpl @Inject constructor(
-    private val idolApi: IdolApi
+    private val idolApi: IdolApi,
+    private val idolDao: IdolDao
 ) : IdolRepository {
 
     override fun getUpdateInfo(): Flow<ApiResult<UpdateInfoResponse>> = flow {
@@ -101,5 +104,13 @@ class IdolRepositoryImpl @Inject constructor(
                 message = "Unknown error: ${e.message}"
             ))
         }
+    }
+
+    override suspend fun getIdolById(id: Int): IdolEntity? {
+        return idolDao.getIdolById(id)
+    }
+
+    override suspend fun getIdolsByTypeAndCategory(type: String, category: String): List<IdolEntity> {
+        return idolDao.getIdolByTypeAndCategory(type, category)
     }
 }

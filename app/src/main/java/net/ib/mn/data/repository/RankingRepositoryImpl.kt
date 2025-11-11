@@ -296,4 +296,68 @@ class RankingRepositoryImpl @Inject constructor(
             ))
         }
     }
+
+    override fun getIdolChartCodes(): Flow<ApiResult<Map<String, List<String>>>> = flow {
+        emit(ApiResult.Loading)
+
+        try {
+            android.util.Log.d("RankingRepo", "========================================")
+            android.util.Log.d("RankingRepo", "🟡 Calling getIdolChartCodes API (charts/list_per_idol/)")
+            android.util.Log.d("RankingRepo", "========================================")
+
+            val response = chartsApi.getIdolChartCodes()
+
+            android.util.Log.d("RankingRepo", "📦 Response received:")
+            android.util.Log.d("RankingRepo", "  - HTTP Code: ${response.code()}")
+            android.util.Log.d("RankingRepo", "  - isSuccessful: ${response.isSuccessful}")
+
+            if (response.isSuccessful && response.body() != null) {
+                val jsonString = response.body()!!.string()
+
+                android.util.Log.d("RankingRepo", "📋 JSON Response:")
+                android.util.Log.d("RankingRepo", jsonString)
+
+                // JSON 파싱
+                val gson = com.google.gson.Gson()
+                val responseType = object : com.google.gson.reflect.TypeToken<Map<String, Any>>() {}.type
+                val responseMap: Map<String, Any> = gson.fromJson(jsonString, responseType)
+
+                // API 응답에서 object 필드 확인 (OLD 프로젝트와 동일)
+                @Suppress("UNCHECKED_CAST")
+                val objectMap = responseMap["object"] as? Map<String, List<String>> ?: emptyMap()
+
+                android.util.Log.d("RankingRepo", "✅ getIdolChartCodes SUCCESS")
+                android.util.Log.d("RankingRepo", "  - Idol count: ${objectMap.size}")
+                android.util.Log.d("RankingRepo", "  - Sample data: ${objectMap.entries.take(5).associate { it.key to it.value }}")
+
+                emit(ApiResult.Success(objectMap))
+            } else {
+                android.util.Log.e("RankingRepo", "❌ Response not successful or body null")
+                android.util.Log.e("RankingRepo", "  - Error body: ${response.errorBody()?.string()}")
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            android.util.Log.e("RankingRepo", "❌ HttpException: ${e.code()} - ${e.message()}", e)
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code(),
+                message = "HTTP ${e.code()}: ${e.message()}"
+            ))
+        } catch (e: IOException) {
+            android.util.Log.e("RankingRepo", "❌ IOException: ${e.message}", e)
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Network error: ${e.message}"
+            ))
+        } catch (e: Exception) {
+            android.util.Log.e("RankingRepo", "❌ Exception: ${e.message}", e)
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Unknown error: ${e.message}"
+            ))
+        }
+    }
 }

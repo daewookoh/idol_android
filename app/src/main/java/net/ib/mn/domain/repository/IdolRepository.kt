@@ -1,5 +1,6 @@
 package net.ib.mn.domain.repository
 
+import net.ib.mn.data.local.entity.IdolEntity
 import net.ib.mn.data.remote.dto.IdolListResponse
 import net.ib.mn.data.remote.dto.UpdateInfoResponse
 import net.ib.mn.domain.model.ApiResult
@@ -27,4 +28,21 @@ interface IdolRepository {
      * @return Flow<ApiResult<IdolListResponse>>
      */
     fun getIdols(type: Int? = null, category: String? = null): Flow<ApiResult<IdolListResponse>>
+
+    /**
+     * ID로 특정 Idol 조회 (로컬 DB)
+     *
+     * @param id Idol ID
+     * @return IdolEntity 또는 null
+     */
+    suspend fun getIdolById(id: Int): IdolEntity?
+
+    /**
+     * Type과 Category로 Idol 리스트 조회 (로컬 DB)
+     *
+     * @param type Idol type ("S" or "G")
+     * @param category Category ("M" or "F")
+     * @return List<IdolEntity>
+     */
+    suspend fun getIdolsByTypeAndCategory(type: String, category: String): List<IdolEntity>
 }

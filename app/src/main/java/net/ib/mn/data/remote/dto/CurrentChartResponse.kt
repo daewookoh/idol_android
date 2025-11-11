@@ -31,12 +31,14 @@ data class MainChartModel(
  * 차트 코드 정보
  *
  * old 프로젝트와 동일
- * code: 차트 코드 (예: "SOLO_M", "GROUP_F")
+ * code: 차트 코드 (예: "PR_S_M", "PR_G_F")
  * name: 차트 이름 (예: "개인", "그룹")
+ * fullName: 전체 이름 (예: "남자 개인", "여자 그룹")
  */
 data class ChartCodeInfo(
     @SerializedName("code") val code: String? = null,
-    @SerializedName("name") val name: String? = null
+    @SerializedName("name") val name: String? = null,
+    @SerializedName("full_name") val fullName: String? = null
 )
 
 /**

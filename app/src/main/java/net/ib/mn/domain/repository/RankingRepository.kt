@@ -63,4 +63,15 @@ interface RankingRepository {
      * @return Flow<ApiResult<String>> JSON 형식의 응답
      */
     fun getHofs(code: String, historyParam: String? = null): Flow<ApiResult<String>>
+
+    /**
+     * 아이돌이 속한 차트 코드별 아이돌 ID 리스트 조회
+     *
+     * old 프로젝트의 charts/list_per_idol/ API와 동일
+     * 각 차트 코드에 속한 아이돌 ID 리스트를 반환
+     * 최애 화면에서 순위 계산에 사용
+     *
+     * @return Flow<ApiResult<Map<String, List<String>>>> 차트 코드 -> 아이돌 ID 리스트 맵
+     */
+    fun getIdolChartCodes(): Flow<ApiResult<Map<String, List<String>>>>
 }

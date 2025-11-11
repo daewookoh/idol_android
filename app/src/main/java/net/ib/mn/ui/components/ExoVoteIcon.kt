@@ -1,8 +1,16 @@
 package net.ib.mn.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -11,7 +19,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.res.painterResource
@@ -49,6 +59,7 @@ import net.ib.mn.presentation.main.ranking.idol_subpage.VoteViewModel
 fun ExoVoteIcon(
     idolId: Int,
     fullName: String,
+    type: String = "DEFAULT",
     onVoteSuccess: ((Long) -> Unit)? = null,
     modifier: Modifier = Modifier,
     voteViewModel: VoteViewModel = hiltViewModel()
@@ -100,26 +111,42 @@ fun ExoVoteIcon(
         )
     }
 
-    // 하트 투표 버튼 (old: line 327-335)
-    // layout_width/height: 50dp, padding: 10dp, layout_margin: 5dp
-    Box(
-        modifier = modifier.padding(5.dp)
-    ) {
-        IconButton(
-            onClick = {
-                // 다이얼로그만 표시 (하트 정보는 다이얼로그에서 로드)
-                showVoteDialog = true
-            },
-            modifier = Modifier.size(50.dp)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.btn_ranking_vote_heart),
-                contentDescription = "투표",
-                tint = ColorPalette.main,
-                modifier = Modifier
-                    .size(50.dp)
-                    .padding(10.dp)
-            )
+    // 타입에 따른 아이콘 렌더링
+    when (type) {
+        "CIRCLE" -> {
+            Box(modifier=modifier){
+                Icon(
+                    painter = painterResource(R.drawable.btn_ranking_vote_heart),
+                    contentDescription = "투표",
+                    tint = ColorPalette.main,
+                    modifier = Modifier.size(32.dp).clip(CircleShape)
+                        .clickable() {
+                            showVoteDialog = true
+                        }.background(ColorPalette.background100, CircleShape)
+                )
+            }
+        }
+        else -> {
+            Box(
+                modifier = modifier.padding(5.dp)
+            ) {
+                IconButton(
+                    onClick = {
+                        // 다이얼로그만 표시 (하트 정보는 다이얼로그에서 로드)
+                        showVoteDialog = true
+                    },
+                    modifier = Modifier.size(60.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.btn_ranking_vote_heart),
+                        contentDescription = "투표",
+                        tint = ColorPalette.main,
+                        modifier = Modifier
+                            .size(60.dp)
+                            .padding(15.dp)
+                    )
+                }
+            }
         }
     }
 }
