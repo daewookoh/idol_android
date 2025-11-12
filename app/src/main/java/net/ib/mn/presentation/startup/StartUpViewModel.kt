@@ -228,12 +228,15 @@ class StartUpViewModel @Inject constructor(
             android.util.Log.e(TAG, "❌ ConfigStartup failed - aborting initialization")
             android.util.Log.w(TAG, "⚠️  This is likely because BASE_URL points to a non-existent server")
             android.util.Log.w(TAG, "⚠️  Check Constants.BASE_URL = \"${Constants.BASE_URL}\"")
-            android.util.Log.w(TAG, "⚠️  To continue development, you can:")
-            android.util.Log.w(TAG, "    1. Set up a mock API server")
-            android.util.Log.w(TAG, "    2. Update BASE_URL to a working server")
-            android.util.Log.w(TAG, "    3. Temporarily skip this check (development only)")
+            android.util.Log.w(TAG, "⚠️  Clearing all auth credentials and local data...")
 
-            handleError(Exception("ConfigStartup API failed - Server not available"))
+            // 모든 인증 정보 및 로컬 데이터 삭제
+            preferencesManager.clearAll()
+            android.util.Log.d(TAG, "✓ All auth credentials and local data cleared")
+
+            // 로그인 페이지로 이동
+            setState { copy(isLoading = false, progress = 0f, currentStep = "Login required") }
+            setEffect { StartUpContract.Effect.NavigateToLogin }
             return
         }
 
@@ -791,24 +794,6 @@ class StartUpViewModel @Inject constructor(
                     android.util.Log.d(TAG, "Meta - Limit: ${response.meta?.limit}")
                     android.util.Log.d(TAG, "Meta - Offset: ${response.meta?.offset}")
                     android.util.Log.d(TAG, "Total Idols count: ${data?.size ?: 0}")
-                    android.util.Log.d(TAG, "----------------------------------------")
-
-                    // 상위 10개만 로그 출력 (너무 많을 수 있음)
-                    data?.take(10)?.forEach { idol ->
-                        android.util.Log.d(TAG, "Idol: ${idol.name}")
-                        android.util.Log.d(TAG, "  - ID: ${idol.id}")
-                        android.util.Log.d(TAG, "  - Type: ${idol.type}")
-                        android.util.Log.d(TAG, "  - Category: ${idol.category}")
-                        android.util.Log.d(TAG, "  - Heart: ${idol.heart}")
-                        android.util.Log.d(TAG, "  - Group ID: ${idol.groupId}")
-                        android.util.Log.d(TAG, "  - Image: ${idol.imageUrl}")
-                        android.util.Log.d(TAG, "  - Debut Day: ${idol.debutDay}")
-                        android.util.Log.d(TAG, "----------------------------------------")
-                    }
-
-                    if ((data?.size ?: 0) > 10) {
-                        android.util.Log.d(TAG, "... and ${data!!.size - 10} more idols")
-                    }
                     android.util.Log.d(TAG, "========================================")
 
                     // Room Database에 저장
@@ -816,20 +801,6 @@ class StartUpViewModel @Inject constructor(
                         val entities = idolList.map { it.toEntity() }
                         idolDao.insert(entities)  // old 프로젝트와 동일한 메서드명
                         android.util.Log.d(TAG, "✓ ${entities.size} idols saved to Room Database")
-
-                        // DB에서 저장된 데이터 확인
-                        val savedIdolsCount = idolDao.getAll().size  // old 프로젝트와 동일
-                        android.util.Log.d(TAG, "========================================")
-                        android.util.Log.d(TAG, "📊 DB Verification")
-                        android.util.Log.d(TAG, "========================================")
-                        android.util.Log.d(TAG, "Total Idols in DB: $savedIdolsCount")
-
-                        // 상위 5개 출력
-                        val savedIdols = idolDao.getAll().take(5)  // old 프로젝트와 동일
-                        savedIdols.forEachIndexed { index, idol ->
-                            android.util.Log.d(TAG, "[$index] ID: ${idol.id}, Name: ${idol.name}, GroupId: ${idol.groupId}")
-                        }
-                        android.util.Log.d(TAG, "========================================")
                     }
                 }
                 is ApiResult.Error -> {

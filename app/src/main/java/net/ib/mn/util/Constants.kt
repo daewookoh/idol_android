@@ -191,4 +191,9 @@ object Constants {
     const val TYPE_MALE: String = "M"
     const val TYPE_FEMALE: String = "F"
     const val PREF_DEFAULT_CATEGORY: String = "default_category"
+
+    // ============================================================
+    // Special Idol IDs (old Const.kt)
+    // ============================================================
+    const val SECRET_ROOM_IDOL_ID: Int = 99980  // 비밀의 방 아이돌 ID
 }

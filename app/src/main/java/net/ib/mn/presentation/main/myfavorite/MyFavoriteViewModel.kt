@@ -269,10 +269,8 @@ class MyFavoriteViewModel @Inject constructor(
                             MyFavoriteContract.TopFavorite(
                                 idolId = dto.idol.id,
                                 name = dto.idol.name ?: "Unknown",
-                                groupName = dto.idol.groupName,
                                 top3ImageUrls = listOf(dto.idol.imageUrl, dto.idol.imageUrl2, dto.idol.imageUrl3),
                                 top3VideoUrls = emptyList(),
-                                league = dto.idol.league,
                                 rank = mostIdolRank,
                                 heart = dto.idol.heart
                             )

@@ -20,41 +20,81 @@ object IdolImageUtil {
      * - top3ImageVer가 있으면 버전 파라미터로 cache busting
      * - top3Ids가 비어있으면 기본 이미지 (imageUrl, imageUrl2, imageUrl3) 사용
      *
-     * @param idol IdolEntity
+     * @param imageUrl 첫 번째 이미지 URL
+     * @param imageUrl2 두 번째 이미지 URL
+     * @param imageUrl3 세 번째 이미지 URL
+     * @param top3 top3 ID 리스트 (쉼표로 구분된 문자열)
+     * @param top3ImageVer top3 이미지 버전 (쉼표로 구분된 문자열)
      * @return 3개 이미지 URL 리스트
      */
-    fun getTop3ImageUrls(idol: IdolEntity): List<String?> {
-        val top3Ids = idol.top3?.split(",")?.map { it.trim() } ?: emptyList()
-        val top3ImageVer = idol.top3ImageVer ?: ""
-        val urls = listOf(idol.imageUrl, idol.imageUrl2, idol.imageUrl3)
+    fun getTop3ImageUrls(
+        imageUrl: String?,
+        imageUrl2: String?,
+        imageUrl3: String?,
+        top3: String?,
+        top3ImageVer: String?
+    ): List<String?> {
+        val top3Ids = top3?.split(",")?.map { it.trim() } ?: emptyList()
+        val verString = top3ImageVer ?: ""
+        val urls = listOf(imageUrl, imageUrl2, imageUrl3)
 
         android.util.Log.d("IdolImageUtil", "========================================")
-        android.util.Log.d("IdolImageUtil", "getTop3ImageUrls for idol: ${idol.name} (ID: ${idol.id})")
-        android.util.Log.d("IdolImageUtil", "  - imageUrl: ${idol.imageUrl}")
-        android.util.Log.d("IdolImageUtil", "  - imageUrl2: ${idol.imageUrl2}")
-        android.util.Log.d("IdolImageUtil", "  - imageUrl3: ${idol.imageUrl3}")
-        android.util.Log.d("IdolImageUtil", "  - top3: ${idol.top3}")
-        android.util.Log.d("IdolImageUtil", "  - top3ImageVer: ${idol.top3ImageVer}")
+        android.util.Log.d("IdolImageUtil", "getTop3ImageUrls called")
+        android.util.Log.d("IdolImageUtil", "  - imageUrl: $imageUrl")
+        android.util.Log.d("IdolImageUtil", "  - imageUrl2: $imageUrl2")
+        android.util.Log.d("IdolImageUtil", "  - imageUrl3: $imageUrl3")
+        android.util.Log.d("IdolImageUtil", "  - top3: $top3")
+        android.util.Log.d("IdolImageUtil", "  - top3ImageVer: $top3ImageVer")
         android.util.Log.d("IdolImageUtil", "========================================")
 
         // top3ImageVer가 비어있거나 top3Ids가 모두 null/empty인 경우
-        if (top3ImageVer.isEmpty() || top3Ids.all { it.isEmpty() || it == "0" }) {
+        if (verString.isEmpty() || top3Ids.all { it.isEmpty() || it == "0" }) {
             android.util.Log.d("IdolImageUtil", "→ Using default URLs (no top3 data)")
             return urls
         }
 
-        return top3Ids.take(3).mapIndexed { index, id ->
+        // top3 ID와 실제 URL 매핑 디버깅
+        android.util.Log.d("IdolImageUtil", "🔍 top3Ids: $top3Ids")
+        android.util.Log.d("IdolImageUtil", "🔍 Mapping process:")
+
+        val result = top3Ids.take(3).mapIndexed { index, id ->
+            android.util.Log.d("IdolImageUtil", "  [$index] top3Id=$id")
             if (id.isNotEmpty() && id != "0") {
-                val ver = top3ImageVer.split(",").getOrNull(index)?.trim() ?: ""
+                val ver = verString.split(",").getOrNull(index)?.trim() ?: ""
                 val originalUrl = urls.getOrNull(index)
-                originalUrl?.updateQueryParameter("ver", ver)
+                val finalUrl = originalUrl?.updateQueryParameter("ver", ver)
+                android.util.Log.d("IdolImageUtil", "    → urls[$index] with ver=$ver")
+                android.util.Log.d("IdolImageUtil", "    → finalUrl: $finalUrl")
+                finalUrl
             } else {
-                urls.getOrNull(index)
+                val url = urls.getOrNull(index)
+                android.util.Log.d("IdolImageUtil", "    → Default urls[$index]: $url")
+                url
             }
         }.let { list ->
             // 3개 미만이면 나머지 기본 이미지로 채우기
             list + urls.drop(list.size)
         }.take(3)
+
+        android.util.Log.d("IdolImageUtil", "🎯 Final result URLs:")
+        result.forEachIndexed { index, url ->
+            android.util.Log.d("IdolImageUtil", "  [$index] $url")
+        }
+
+        return result
+    }
+
+    /**
+     * IdolEntity에서 Top3 이미지 URL 리스트 가져오기 (convenience method)
+     */
+    fun getTop3ImageUrls(idol: IdolEntity): List<String?> {
+        return getTop3ImageUrls(
+            imageUrl = idol.imageUrl,
+            imageUrl2 = idol.imageUrl2,
+            imageUrl3 = idol.imageUrl3,
+            top3 = idol.top3,
+            top3ImageVer = idol.top3ImageVer
+        )
     }
 
     /**
@@ -65,63 +105,43 @@ object IdolImageUtil {
      * - _s_mv.jpg 파일이면 _m_mv.mp4로 변환
      * - 그 외에는 null 반환
      *
-     * @param idol IdolEntity
+     * @param imageUrl 첫 번째 이미지 URL
+     * @param imageUrl2 두 번째 이미지 URL
+     * @param imageUrl3 세 번째 이미지 URL
+     * @param top3 top3 ID 리스트 (쉼표로 구분된 문자열)
+     * @param top3ImageVer top3 이미지 버전 (쉼표로 구분된 문자열)
      * @return 3개 동영상 URL 리스트 (없으면 null)
      */
+    fun getTop3VideoUrls(
+        imageUrl: String?,
+        imageUrl2: String?,
+        imageUrl3: String?,
+        top3: String?,
+        top3ImageVer: String?
+    ): List<String?> {
+        val imageUrls = getTop3ImageUrls(imageUrl, imageUrl2, imageUrl3, top3, top3ImageVer)
+
+        return imageUrls.map { url ->
+            when {
+                url == null -> null
+                url.contains(".mp4") -> url
+                url.contains("_s_mv.jpg") -> url.replace("_s_mv.jpg", "_m_mv.mp4")
+                else -> null
+            }
+        }
+    }
+
+    /**
+     * IdolEntity에서 Top3 비디오 URL 리스트 가져오기 (convenience method)
+     */
     fun getTop3VideoUrls(idol: IdolEntity): List<String?> {
-        val imageUrls = getTop3ImageUrls(idol)
-
-        return imageUrls.map { url ->
-            when {
-                url == null -> null
-                url.contains(".mp4") -> url
-                url.contains("_s_mv.jpg") -> url.replace("_s_mv.jpg", "_m_mv.mp4")
-                else -> null
-            }
-        }
-    }
-
-    /**
-     * FavoriteIdolDto에서 Top3 이미지 URL 리스트 가져오기
-     */
-    fun getTop3ImageUrls(idol: net.ib.mn.data.remote.dto.FavoriteIdolDto): List<String?> {
-        val top3Ids = idol.top3?.split(",")?.map { it.trim() } ?: emptyList()
-        val top3ImageVer = idol.top3ImageVer ?: ""
-        val urls = listOf(idol.imageUrl, idol.imageUrl2, idol.imageUrl3)
-
-        // 비밀의 방: top3ImageVer가 비어있거나 top3Ids가 모두 null/empty
-        if (top3ImageVer.isEmpty() || top3Ids.all { it.isEmpty() || it == "0" }) {
-            return urls  // Use default images
-        }
-
-        return top3Ids.take(3).mapIndexed { index, id ->
-            if (id.isNotEmpty() && id != "0") {
-                val ver = top3ImageVer.split(",").getOrNull(index)?.trim() ?: ""
-                val originalUrl = urls.getOrNull(index)
-                originalUrl?.updateQueryParameter("ver", ver)
-            } else {
-                urls.getOrNull(index)
-            }
-        }.let { list ->
-            // 3개 미만이면 나머지 기본 이미지로 채우기
-            list + urls.drop(list.size)
-        }.take(3)
-    }
-
-    /**
-     * FavoriteIdolDto에서 Top3 비디오 URL 리스트 가져오기
-     */
-    fun getTop3VideoUrls(idol: net.ib.mn.data.remote.dto.FavoriteIdolDto): List<String?> {
-        val imageUrls = getTop3ImageUrls(idol)
-
-        return imageUrls.map { url ->
-            when {
-                url == null -> null
-                url.contains(".mp4") -> url
-                url.contains("_s_mv.jpg") -> url.replace("_s_mv.jpg", "_m_mv.mp4")
-                else -> null
-            }
-        }
+        return getTop3VideoUrls(
+            imageUrl = idol.imageUrl,
+            imageUrl2 = idol.imageUrl2,
+            imageUrl3 = idol.imageUrl3,
+            top3 = idol.top3,
+            top3ImageVer = idol.top3ImageVer
+        )
     }
 
     /**

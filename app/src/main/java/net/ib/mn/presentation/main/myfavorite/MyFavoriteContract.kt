@@ -105,7 +105,9 @@ class MyFavoriteContract {
         val chartCode: String? = null,        // 차트 코드 (PR_S_F, PR_G_M 등)
         val isSection: Boolean = false,        // 섹션 헤더 여부
         val sectionName: String? = null,       // 섹션 이름 (예: "남자 그룹", "여자 개인")
-        val sectionMaxScore: Long? = null      // 섹션 내 최대 하트 수 (progress bar용)
+        val sectionMaxScore: Long? = null,     // 섹션 내 최대 하트 수 (progress bar용)
+        val top3ImageUrls: List<String?> = emptyList(),  // Top3 이미지 URL
+        val top3VideoUrls: List<String?> = emptyList()   // Top3 비디오 URL
     )
 
     /**
@@ -114,10 +116,8 @@ class MyFavoriteContract {
     data class TopFavorite(
         val idolId: Int,
         val name: String,
-        val groupName: String?,
         val top3ImageUrls: List<String?>,  // 3개의 이미지 URL
         val top3VideoUrls: List<String?>,  // 3개의 비디오 URL
-        val league: String?,               // 리그 (S, A, B, C)
         val rank: Int?,                    // 순위
         val heart: Long?                   // 하트 수
     )
