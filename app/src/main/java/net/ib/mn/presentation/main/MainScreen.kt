@@ -57,7 +57,7 @@ fun MainScreen(
     broadcastManager: IdolBroadcastManager = hiltViewModel<MainViewModel>().broadcastManager,
     onLogout: () -> Unit = {}
 ) {
-    var selectedTab by remember { mutableIntStateOf(1) }
+    var selectedTab by remember { mutableIntStateOf(0) }
     val userInfo by viewModel.userInfo.collectAsState()
     val logoutCompleted by viewModel.logoutCompleted.collectAsState()
     val timerText by topBarViewModel.timerText.collectAsState()
