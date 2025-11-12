@@ -64,6 +64,11 @@ class MyFavoriteContract {
          * 새로고침
          */
         data object RefreshFavorites : Intent()
+
+        /**
+         * 투표 성공 (즉시 데이터 업데이트)
+         */
+        data class OnVoteSuccess(val idolId: Int, val votedHeart: Long) : Intent()
     }
 
     /**

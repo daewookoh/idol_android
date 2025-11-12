@@ -47,6 +47,7 @@ import net.ib.mn.domain.ranking.IdolIdsRankingDataSource
 import net.ib.mn.domain.repository.RankingRepository
 import net.ib.mn.presentation.main.ranking.idol_subpage.rememberMyFavoriteRankingState
 import net.ib.mn.presentation.main.ranking.idol_subpage.myFavoriteRankingItems
+import net.ib.mn.presentation.main.ranking.idol_subpage.MyFavoriteRankingData
 import net.ib.mn.ui.components.ExoTop3
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
@@ -178,7 +179,9 @@ private fun MyFavoriteContent(
                                 mostFavoriteIdol = mostIdol,
                                 onIdolClick = {
                                     onIntent(MyFavoriteContract.Intent.OnIdolClick(mostIdol.idolId))
-                                }
+                                },
+                                onIntent = onIntent,
+                                sectionRankingDataList = sectionRankingDataList
                             )
                         }
                     }
@@ -229,7 +232,9 @@ private fun SectionHeader(sectionName: String) {
 @Composable
 private fun MostFavoriteIdolHeader(
     mostFavoriteIdol: MyFavoriteContract.MostFavoriteIdol,
-    onIdolClick: () -> Unit
+    onIdolClick: () -> Unit,
+    onIntent: (MyFavoriteContract.Intent) -> Unit,
+    sectionRankingDataList: List<Pair<MyFavoriteViewModel.ChartSection, MyFavoriteRankingData>>
 ) {
     Column(
         modifier = Modifier
@@ -248,7 +253,8 @@ private fun MostFavoriteIdolHeader(
         // Info Bar - 순위, 이름, 하트 수, 투표 버튼
         MostFavoriteInfoBar(
             mostFavoriteIdol = mostFavoriteIdol,
-            onVoteClick = { /* TODO: 투표 처리 */ }
+            onIntent = onIntent,
+            sectionRankingDataList = sectionRankingDataList
         )
     }
 }
@@ -261,7 +267,8 @@ private fun MostFavoriteIdolHeader(
 @Composable
 private fun MostFavoriteInfoBar(
     mostFavoriteIdol: MyFavoriteContract.MostFavoriteIdol,
-    onVoteClick: () -> Unit
+    onIntent: (MyFavoriteContract.Intent) -> Unit,
+    sectionRankingDataList: List<Pair<MyFavoriteViewModel.ChartSection, MyFavoriteRankingData>>
 ) {
     Log.d("MostFavoriteInfoBar", mostFavoriteIdol.toString())
     Box(
@@ -348,6 +355,27 @@ private fun MostFavoriteInfoBar(
                 idolId = mostFavoriteIdol.idolId,
                 fullName = mostFavoriteIdol.name,
                 type = "CIRCLE",
+                onVoteSuccess = { votedHeart ->
+                    // 1. MostFavoriteIdol 즉시 업데이트
+                    onIntent(MyFavoriteContract.Intent.OnVoteSuccess(mostFavoriteIdol.idolId, votedHeart))
+
+                    // 2. 비밀의 방이 아닌 경우, 해당 차트의 랭킹 리스트도 즉시 업데이트
+                    if (mostFavoriteIdol.idolId != net.ib.mn.util.Constants.SECRET_ROOM_IDOL_ID) {
+                        mostFavoriteIdol.chartCode?.let { chartCode ->
+                            // 해당 차트의 ViewModel 찾기
+                            sectionRankingDataList.find { (section, _) ->
+                                section.chartCode == chartCode
+                            }?.let { (_, rankingData) ->
+                                // Success 상태인 경우에만 ViewModel의 updateVote 호출
+                                if (rankingData is MyFavoriteRankingData.Success) {
+                                    rankingData.viewModel.updateVote(mostFavoriteIdol.idolId, votedHeart)
+                                    android.util.Log.d("MostFavoriteInfoBar",
+                                        "✅ Chart $chartCode ranking updated: idol=${mostFavoriteIdol.idolId}, votes=$votedHeart")
+                                }
+                            }
+                        }
+                    }
+                },
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
         }

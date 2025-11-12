@@ -67,6 +67,7 @@ class MyFavoriteViewModel @Inject constructor(
             is MyFavoriteContract.Intent.OnPageVisible -> onPageVisible()
             is MyFavoriteContract.Intent.OnScreenVisible -> {} // UnifiedRankingSubPage에서 처리
             is MyFavoriteContract.Intent.OnScreenHidden -> {} // UnifiedRankingSubPage에서 처리
+            is MyFavoriteContract.Intent.OnVoteSuccess -> onVoteSuccess(intent.idolId, intent.votedHeart)
         }
     }
 
@@ -334,23 +335,36 @@ class MyFavoriteViewModel @Inject constructor(
      * @param mostIdolId 최애 아이돌 ID
      */
     private suspend fun updateMostFavoriteIdolFromDb(mostIdolId: Int) {
-        // SECRET_ROOM_IDOL_ID는 실시간 업데이트 불필요
-        if (mostIdolId == net.ib.mn.util.Constants.SECRET_ROOM_IDOL_ID) {
-            return
-        }
-
-        val mostChartCode = preferencesManager.mostIdolChartCode.firstOrNull()
-        if (mostChartCode == null) {
-            android.util.Log.w(logTag, "⚠️ mostChartCode is null")
-            return
-        }
-
         android.util.Log.d(logTag, "🔄 Updating MostFavoriteIdol from DB: idolId=$mostIdolId")
 
         // localDB에서 아이돌 정보 가져오기 (UDP로 이미 업데이트된 최신 데이터)
         val idolEntity = idolDao.getIdolById(mostIdolId)
         if (idolEntity == null) {
             android.util.Log.e(logTag, "❌ mostIdolId=$mostIdolId not found in localDB")
+            return
+        }
+
+        // SECRET_ROOM_IDOL_ID는 순위 없이 투표 수만 업데이트
+        if (mostIdolId == net.ib.mn.util.Constants.SECRET_ROOM_IDOL_ID) {
+            android.util.Log.d(logTag, "🔒 SECRET_ROOM: updating vote count only (no rank)")
+            val updatedIdol = MyFavoriteContract.MostFavoriteIdol(
+                idolId = mostIdolId,
+                name = idolEntity.name,
+                top3ImageUrls = listOf(idolEntity.imageUrl, idolEntity.imageUrl2, idolEntity.imageUrl3),
+                top3VideoUrls = emptyList(),
+                rank = null,  // 비밀의방은 순위 없음
+                heart = idolEntity.heart,
+                chartCode = null,  // 비밀의방은 chartCode 없음
+                imageUrl = idolEntity.imageUrl
+            )
+            setState { copy(mostFavoriteIdol = updatedIdol) }
+            android.util.Log.d(logTag, "✅ SECRET_ROOM updated: heart=${idolEntity.heart}")
+            return
+        }
+
+        val mostChartCode = preferencesManager.mostIdolChartCode.firstOrNull()
+        if (mostChartCode == null) {
+            android.util.Log.w(logTag, "⚠️ mostChartCode is null")
             return
         }
 
@@ -400,5 +414,37 @@ class MyFavoriteViewModel @Inject constructor(
 
     private fun onSettingClick() {
         setEffect { MyFavoriteContract.Effect.NavigateToFavoriteSetting }
+    }
+
+    /**
+     * 투표 성공 시 즉시 데이터 업데이트
+     *
+     * localDB 업데이트 후 MostFavoriteIdol 즉시 갱신
+     */
+    private fun onVoteSuccess(idolId: Int, votedHeart: Long) {
+        viewModelScope.launch {
+            android.util.Log.d(logTag, "💗 Vote success for idol $idolId: +$votedHeart hearts")
+
+            // localDB의 투표 수 업데이트
+            try {
+                val idol = idolDao.getIdolById(idolId)
+                if (idol != null) {
+                    val newHeart = idol.heart + votedHeart
+                    idolDao.updateIdolHeart(idolId, newHeart)
+                    android.util.Log.d(logTag, "✅ DB updated: idol=$idolId, newHeart=$newHeart")
+                } else {
+                    android.util.Log.w(logTag, "⚠️ Idol not found in DB: idol=$idolId")
+                }
+            } catch (e: Exception) {
+                android.util.Log.e(logTag, "❌ Failed to update DB: ${e.message}", e)
+            }
+
+            // MostFavoriteIdol이 투표한 아이돌인 경우 즉시 갱신
+            val mostIdolId = preferencesManager.mostIdolId.firstOrNull()
+            if (mostIdolId == idolId) {
+                updateMostFavoriteIdolFromDb(idolId)
+                android.util.Log.d(logTag, "✅ MostFavoriteIdol updated immediately after vote")
+            }
+        }
     }
 }
