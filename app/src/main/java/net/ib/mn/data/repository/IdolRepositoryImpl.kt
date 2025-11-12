@@ -158,4 +158,8 @@ class IdolRepositoryImpl @Inject constructor(
     override suspend fun getIdolsByTypeAndCategory(type: String, category: String): List<IdolEntity> {
         return idolDao.getIdolByTypeAndCategory(type, category)
     }
+
+    override suspend fun getIdolsByIds(ids: List<Int>): List<IdolEntity> {
+        return idolDao.getIdolsByIds(ids)
+    }
 }

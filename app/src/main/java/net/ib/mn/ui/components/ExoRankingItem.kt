@@ -95,12 +95,14 @@ import java.util.Locale
  * @param items 랭킹 아이템 리스트
  * @param type 랭킹 타입 ("MAIN" = 큰 이미지, "DAILY" = 작은 이미지, "AGGREGATE" = 누적 랭킹 아이템, 기본값: "MAIN")
  * @param onItemClick 아이템 클릭 이벤트
+ * @param disableAnimation 애니메이션 비활성화 (기본값: false)
  */
 fun LazyListScope.exoRankingItems(
     items: List<RankingItemData>,
     type: String = "MAIN",
     onItemClick: (Int, RankingItemData) -> Unit = { _, _ -> },
-    onVoteSuccess: (idolId: Int, voteCount: Long) -> Unit = { _, _ -> }
+    onVoteSuccess: (idolId: Int, voteCount: Long) -> Unit = { _, _ -> },
+    disableAnimation: Boolean = false
 ) {
     // 랭킹 아이템 리스트
     // key를 사용하여 아이템이 변경될 때 올바른 리컴포지션 수행
@@ -145,8 +147,13 @@ fun LazyListScope.exoRankingItems(
         // 최애 여부에 따른 배경색
         val backgroundColor = if (item.isFavorite) ColorPalette.main100 else ColorPalette.background100
 
-        Column(
-            modifier = Modifier
+        // 애니메이션 적용 (disableAnimation이 false일 때만)
+        val itemModifier = if (disableAnimation) {
+            Modifier
+                .fillMaxWidth()
+                .background(backgroundColor)
+        } else {
+            Modifier
                 .animateItem(
                     fadeInSpec = null,
                     fadeOutSpec = null,
@@ -157,7 +164,9 @@ fun LazyListScope.exoRankingItems(
                 )
                 .fillMaxWidth()
                 .background(backgroundColor)
-        ) {
+        }
+
+        Column(modifier = itemModifier) {
             // 메인 랭킹 아이템 (old: line 16-337)
             Row(
                 modifier = Modifier

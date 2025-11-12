@@ -10,12 +10,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.local.UserInfo
+import net.ib.mn.data.remote.udp.IdolBroadcastManager
 import net.ib.mn.util.Constants
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    val preferencesManager: PreferencesManager
+    val preferencesManager: PreferencesManager,
+    val broadcastManager: IdolBroadcastManager
 ) : ViewModel() {
 
     companion object {

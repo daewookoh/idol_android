@@ -108,10 +108,13 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
         loadConfigInfo()
         loadChartInfo()
         loadRankingData()
+
+        // UDP updateEvent 구독 (MainScreen에서 heartbeat 관리)
+        subscribeToUpdates()
     }
 
     /**
-     * 화면이 보일 때 호출 - UDP 구독 시작 및 데이터 새로고침
+     * 화면이 보일 때 호출 - 데이터 새로고침
      */
     fun onScreenVisible() {
         android.util.Log.d(logTag, "👁️ Screen became visible")
@@ -125,31 +128,20 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
                 queryIdolsByIdsFromDb(cachedIds)
             }
         }
-
-        // UDP 구독 시작
-        startUdpSubscription()
     }
 
     /**
-     * 화면이 사라질 때 호출 - UDP 구독 중지
+     * 화면이 사라질 때 호출
      */
     fun onScreenHidden() {
         android.util.Log.d(logTag, "🙈 Screen hidden")
         isScreenVisible = false
-        stopUdpSubscription()
     }
 
     /**
-     * UDP 구독 시작
+     * UDP updateEvent 구독 (heartbeat는 MainScreen에서 관리)
      */
-    private fun startUdpSubscription() {
-        // 이미 구독 중이면 중복 방지
-        if (udpSubscriptionJob?.isActive == true) {
-            android.util.Log.d(logTag, "⚠️ UDP already subscribed, skipping")
-            return
-        }
-
-        android.util.Log.d(logTag, "📡 Starting UDP subscription")
+    private fun subscribeToUpdates() {
         udpSubscriptionJob = viewModelScope.launch {
             broadcastManager.updateEvent.collect { changedIds ->
                 // 화면이 보이지 않으면 무시
@@ -182,18 +174,9 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
         }
     }
 
-    /**
-     * UDP 구독 중지
-     */
-    private fun stopUdpSubscription() {
-        udpSubscriptionJob?.cancel()
-        udpSubscriptionJob = null
-        android.util.Log.d(logTag, "🛑 Stopped UDP subscription")
-    }
-
     override fun onCleared() {
         super.onCleared()
-        stopUdpSubscription()
+        udpSubscriptionJob?.cancel()
         android.util.Log.d(logTag, "♻️ ViewModel cleared")
     }
 

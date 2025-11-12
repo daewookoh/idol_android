@@ -132,6 +132,7 @@ data class RankingItemData(
  * @param listState LazyColumn의 스크롤 상태 (탭 전환 시에도 유지됨)
  * @param onItemClick 아이템 클릭 이벤트 (index, item)
  * @param onVoteSuccess 투표 성공 콜백 (ViewModel로 전달)
+ * @param disableAnimation 애니메이션 비활성화 여부 (기본값: false)
  */
 @Composable
 fun ExoRankingList(
@@ -141,7 +142,8 @@ fun ExoRankingList(
     itemType: String = "MAIN",
     listState: LazyListState = rememberLazyListState(),
     onItemClick: (Int, RankingItemData) -> Unit = { _, _ -> },
-    onVoteSuccess: (Int, Long) -> Unit = { _, _ -> }
+    onVoteSuccess: (Int, Long) -> Unit = { _, _ -> },
+    disableAnimation: Boolean = false
 ) {
     LazyColumn(
         state = listState,
@@ -165,7 +167,8 @@ fun ExoRankingList(
             items = items,
             type = itemType,
             onItemClick = onItemClick,
-            onVoteSuccess = onVoteSuccess
+            onVoteSuccess = onVoteSuccess,
+            disableAnimation = disableAnimation
         )
     }
 }

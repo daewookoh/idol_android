@@ -16,18 +16,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -42,19 +40,24 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
 import net.ib.mn.R
-import net.ib.mn.ui.components.ExoTop3
 import net.ib.mn.ui.components.ExoVoteIcon
-import net.ib.mn.ui.components.RankingItemData
-import net.ib.mn.ui.components.exoRankingItems
-import net.ib.mn.ui.theme.ColorPalette
-import net.ib.mn.ui.theme.ExoTypo
 import java.text.NumberFormat
 import java.util.Locale
+import net.ib.mn.domain.ranking.IdolIdsRankingDataSource
+import net.ib.mn.domain.repository.RankingRepository
+import net.ib.mn.presentation.main.ranking.idol_subpage.rememberMyFavoriteRankingState
+import net.ib.mn.presentation.main.ranking.idol_subpage.myFavoriteRankingItems
+import net.ib.mn.ui.components.ExoTop3
+import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
+import net.ib.mn.util.NumberFormatUtil
+import javax.inject.Inject
 
 /**
- * My Favorite Page
+ * My Favorite Page (UnifiedRankingSubPage 재사용 버전)
  *
- * OLD 프로젝트의 FavoriteIdolBaseFragment UI를 Compose로 재현
+ * 5개 차트별로 내 즐겨찾기 아이돌만 필터링하여 표시
+ * UnifiedRankingSubPage를 재사용하여 순위 로직 공유
  */
 @Composable
 fun MyFavoritePage(
@@ -63,35 +66,13 @@ fun MyFavoritePage(
     viewModel: MyFavoriteViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val chartSections by viewModel.chartSections.collectAsState()
+    val topFavorite by viewModel.topFavorite.collectAsState()
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
 
     // 페이지가 visible될 때마다 데이터 갱신
     LaunchedEffect(Unit) {
         viewModel.sendIntent(MyFavoriteContract.Intent.OnPageVisible)
-    }
-
-    // Lifecycle 이벤트 감지하여 UDP 구독 관리
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> {
-                    android.util.Log.d("MyFavoritePage", "👁️ Screen visible (ON_RESUME)")
-                    viewModel.sendIntent(MyFavoriteContract.Intent.OnScreenVisible)
-                }
-                Lifecycle.Event.ON_PAUSE -> {
-                    android.util.Log.d("MyFavoritePage", "🙈 Screen hidden (ON_PAUSE)")
-                    viewModel.sendIntent(MyFavoriteContract.Intent.OnScreenHidden)
-                }
-                else -> {}
-            }
-        }
-
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
     }
 
     LaunchedEffect(Unit) {
@@ -115,147 +96,117 @@ fun MyFavoritePage(
 
     MyFavoriteContent(
         state = state,
+        chartSections = chartSections,
+        topFavorite = topFavorite,
         onIntent = viewModel::sendIntent
     )
 }
 
 /**
- * My Favorite Content (Stateless)
- *
- * OLD fragment_favorit.xml 레이아웃을 Compose로 변환
- * ExoRankingItem의 DAILY 타입 사용
+ * My Favorite Content (UnifiedRankingSubPage 재사용)
  */
 @Composable
 private fun MyFavoriteContent(
     state: MyFavoriteContract.State,
-    onIntent: (MyFavoriteContract.Intent) -> Unit
+    chartSections: List<MyFavoriteViewModel.ChartSection>,
+    topFavorite: MyFavoriteContract.TopFavorite?,
+    onIntent: (MyFavoriteContract.Intent) -> Unit,
+    viewModel: MyFavoriteViewModel = hiltViewModel()
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(ColorPalette.background100)
     ) {
-            when {
-                state.isLoading && state.favoriteIdols.isEmpty() -> {
-                    // 로딩 중
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+        when {
+            state.isLoading && chartSections.isEmpty() -> {
+                // 로딩 중
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = ColorPalette.main
+                    )
+                }
+            }
+
+            chartSections.isEmpty() -> {
+                // 빈 화면 (empty_view)
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        CircularProgressIndicator(
-                            color = ColorPalette.main
-                        )
+                        // 최애가 있으면 Top3 표시, 없으면 비밀의 방
+                        if (topFavorite != null) {
+                            Text(
+                                text = "즐겨찾기한 아이돌이 랭킹에 없습니다.",
+                                style = ExoTypo.body15,
+                                color = ColorPalette.gray200,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        } else {
+                            EmptyFavoriteHeader(
+                                onSettingClick = {
+                                    onIntent(MyFavoriteContract.Intent.OnSettingClick)
+                                }
+                            )
+                        }
                     }
                 }
+            }
 
-                state.favoriteIdols.isEmpty() -> {
-                    // 빈 화면 (empty_view)
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.lable_get_info),
-                            style = ExoTypo.body15,
-                            color = ColorPalette.gray200,
-                            modifier = Modifier.padding(10.dp)
-                        )
-                    }
+            else -> {
+                // 각 섹션의 랭킹 데이터를 미리 가져오기
+                val sectionRankingDataList = chartSections.map { section ->
+                    section to rememberMyFavoriteRankingState(
+                        chartCode = section.chartCode,
+                        favoriteIds = section.favoriteIds,
+                        isVisible = true,
+                        rankingRepository = viewModel.rankingRepository
+                    )
                 }
 
-                else -> {
-                    // ExoRankingItem의 DAILY 타입 사용
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        // 헤더: 최애가 있으면 Top3 이미지, 없으면 비밀의 방
-                        item(key = "header") {
-                            if (state.topFavorite != null) {
-                                Column(modifier = Modifier.fillMaxWidth()) {
-                                    // Top3 이미지 표시
-                                    ExoTop3(
-                                        id = "favorite_top3_${state.topFavorite.idolId}",
-                                        imageUrls = state.topFavorite.top3ImageUrls,
-                                        videoUrls = state.topFavorite.top3VideoUrls,
-                                        isVisible = true,
-                                        onItemClick = { index ->
-                                            onIntent(MyFavoriteContract.Intent.OnIdolClick(state.topFavorite.idolId))
-                                        }
-                                    )
-
-                                    // Info Bar (리그, 순위, 이름, 하트 수)
-                                    FavoriteInfoBar(
-                                        topFavorite = state.topFavorite,
-                                        onVoteClick = {
-                                            // TODO: 하트 투표 처리
-                                            Log.d("MyFavorite", "Vote clicked for idol: ${state.topFavorite.idolId}")
-                                        }
-                                    )
+                // LazyColumn으로 전체 스크롤 가능하게 (wrapContent 형식)
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    // 헤더: 최애 Top3 (있을 경우만)
+                    topFavorite?.let { favorite ->
+                        item(key = "header_top3") {
+                            FavoriteTop3Header(
+                                topFavorite = favorite,
+                                onIdolClick = {
+                                    onIntent(MyFavoriteContract.Intent.OnIdolClick(favorite.idolId))
                                 }
-                            } else {
-                                // 최애가 없을 경우 - 비밀의 방
-                                EmptyFavoriteHeader(
-                                    onSettingClick = {
-                                        onIntent(MyFavoriteContract.Intent.OnSettingClick)
-                                    }
-                                )
-                            }
+                            )
+                        }
+                    }
+
+                    // 각 차트 섹션별로 아이템들 추가
+                    sectionRankingDataList.forEach { (section, rankingData) ->
+                        // 섹션 헤더
+                        item(key = "section_header_${section.chartCode}") {
+                            SectionHeader(sectionName = section.sectionName)
                         }
 
-                        // 최애 목록을 섹션별로 그루핑하여 표시
-                        val groupedIdols = state.favoriteIdols.groupBy { it.isSection }
-                        var currentSectionIndex = 0
-
-                        while (currentSectionIndex < state.favoriteIdols.size) {
-                            val currentItem = state.favoriteIdols[currentSectionIndex]
-
-                            if (currentItem.isSection) {
-                                // 섹션 헤더 표시
-                                item(key = "section_${currentItem.chartCode}_$currentSectionIndex") {
-                                    SectionHeader(sectionName = currentItem.sectionName ?: "")
-                                }
-                                currentSectionIndex++
-
-                                // 섹션에 속한 아이돌들 찾기
-                                val sectionIdols = mutableListOf<MyFavoriteContract.FavoriteIdol>()
-                                while (currentSectionIndex < state.favoriteIdols.size &&
-                                       !state.favoriteIdols[currentSectionIndex].isSection) {
-                                    sectionIdols.add(state.favoriteIdols[currentSectionIndex])
-                                    currentSectionIndex++
-                                }
-
-                                // exoRankingItems 사용하여 해당 섹션의 아이돌들 표시
-                                exoRankingItems(
-                                    items = sectionIdols.map { idol ->
-                                        RankingItemData(
-                                            id = idol.idolId.toString(),
-                                            rank = idol.rank ?: 0,
-                                            name = idol.name,
-                                            voteCount = NumberFormat.getInstance().format(idol.score) ?: "0",
-                                            photoUrl = idol.imageUrl,
-                                            heartCount = idol.score ?: 0L,
-                                            maxHeartCount = idol.sectionMaxScore ?: 0L,
-                                            isFavorite = false
-                                        )
-                                    },
-                                    onItemClick = { _, item ->
-                                        onIntent(MyFavoriteContract.Intent.OnIdolClick(item.id.toIntOrNull() ?: 0))
-                                    }
-                                )
-                            } else {
-                                currentSectionIndex++
-                            }
-                        }
+                        // 랭킹 아이템들을 wrapContent 형식으로 추가
+                        myFavoriteRankingItems(
+                            chartCode = section.chartCode,
+                            data = rankingData
+                        )
                     }
                 }
             }
         }
     }
+}
 
 /**
  * 섹션 헤더 (ChartCode별 그룹 표시)
- *
- * OLD 프로젝트의 section_rank_header.xml 레이아웃 참고
  */
 @Composable
 private fun SectionHeader(sectionName: String) {
@@ -271,6 +222,36 @@ private fun SectionHeader(sectionName: String) {
             text = sectionName,
             style = ExoTypo.body14.copy(fontWeight = FontWeight.Bold),
             color = ColorPalette.textDefault
+        )
+    }
+}
+
+/**
+ * 최애 Top3 헤더
+ */
+@Composable
+private fun FavoriteTop3Header(
+    topFavorite: MyFavoriteContract.TopFavorite,
+    onIdolClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(ColorPalette.background100)
+    ) {
+        // ExoTop3 - 상단 배너 (이미지/동영상)
+        ExoTop3(
+            id = "favorite_top3_${topFavorite.idolId}",
+            imageUrls = topFavorite.top3ImageUrls,
+            videoUrls = topFavorite.top3VideoUrls,
+            isVisible = true,
+            onItemClick = { onIdolClick() }
+        )
+
+        // Info Bar - 순위, 이름, 하트 수, 투표 버튼
+        FavoriteInfoBar(
+            topFavorite = topFavorite,
+            onVoteClick = { /* TODO: 투표 처리 */ }
         )
     }
 }
@@ -292,22 +273,20 @@ private fun FavoriteInfoBar(
             .height(50.dp)
             .background(ColorPalette.main)
     ) {
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .padding(start = 20.dp, end = 14.dp)
         ) {
-
             // 내용
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight().padding(vertical = 12.dp),
+                    .fillMaxHeight()
+                    .padding(vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 // 순위
                 topFavorite.rank?.let { rank ->
                     Text(
@@ -316,8 +295,7 @@ private fun FavoriteInfoBar(
                         lineHeight = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = ColorPalette.textLight,
-                        modifier = Modifier
-                            .align(Alignment.Bottom)
+                        modifier = Modifier.align(Alignment.Bottom)
                     )
                 }
 
@@ -355,7 +333,6 @@ private fun FavoriteInfoBar(
                     )
                 }
 
-
                 // 하트 수
                 topFavorite.heart?.let { heart ->
                     Text(
@@ -382,8 +359,6 @@ private fun FavoriteInfoBar(
 
 /**
  * 최애가 없을 때 표시되는 헤더 (비밀의 방)
- *
- * OLD 프로젝트의 empty_favorite_header 레이아웃 참고
  */
 @Composable
 private fun EmptyFavoriteHeader(

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -20,13 +21,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import kotlinx.coroutines.launch
 import net.ib.mn.R
+import net.ib.mn.data.remote.udp.IdolBroadcastManager
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.MainBottomNavigation
 import net.ib.mn.ui.components.MainTopBar
@@ -49,6 +54,7 @@ import java.util.Locale
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
     topBarViewModel: MainTopBarViewModel = hiltViewModel(),
+    broadcastManager: IdolBroadcastManager = hiltViewModel<MainViewModel>().broadcastManager,
     onLogout: () -> Unit = {}
 ) {
     var selectedTab by remember { mutableIntStateOf(1) }
@@ -59,10 +65,11 @@ fun MainScreen(
     // 즉시 반응하는 로컬 카테고리 상태 사용 (UI 반응성 개선)
     val currentCategory by viewModel.currentCategory.collectAsState()
     val defaultCategory = currentCategory ?: Constants.TYPE_MALE
-    
+
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     // 타이머 시작
     LaunchedEffect(Unit) {
@@ -73,6 +80,40 @@ fun MainScreen(
     LaunchedEffect(logoutCompleted) {
         if (logoutCompleted) {
             onLogout()
+        }
+    }
+
+    // UDP 구독 관리: 랭킹(0)과 나의최애(1) 탭일 때만 구독
+    DisposableEffect(selectedTab, lifecycleOwner) {
+        val shouldSubscribe = selectedTab == 0 || selectedTab == 1
+
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    if (shouldSubscribe) {
+                        android.util.Log.d("MainScreen", "📡 Starting UDP subscription (tab: $selectedTab)")
+                        broadcastManager.startHeartbeat()
+                    }
+                }
+                Lifecycle.Event.ON_PAUSE -> {
+                    if (shouldSubscribe) {
+                        android.util.Log.d("MainScreen", "🛑 Stopping UDP subscription (tab: $selectedTab)")
+                        broadcastManager.stopHeartbeat()
+                    }
+                }
+                else -> {}
+            }
+        }
+
+        if (shouldSubscribe) {
+            lifecycleOwner.lifecycle.addObserver(observer)
+        }
+
+        onDispose {
+            if (shouldSubscribe) {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+                android.util.Log.d("MainScreen", "♻️ UDP observer removed")
+            }
         }
     }
 

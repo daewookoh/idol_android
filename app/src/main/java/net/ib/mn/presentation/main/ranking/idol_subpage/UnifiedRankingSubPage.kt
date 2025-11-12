@@ -34,6 +34,7 @@ import net.ib.mn.ui.components.ExoRankingList
  * @param isVisible 화면 가시성 (UDP 리스닝 제어)
  * @param listState LazyList 스크롤 상태
  * @param modifier Modifier
+ * @param isForFavorite MyFavorite용 여부 (true일 경우 ExoTop3 숨김, 스크롤 핸들링 비활성화)
  */
 @Composable
 fun UnifiedRankingSubPage(
@@ -41,7 +42,8 @@ fun UnifiedRankingSubPage(
     dataSource: RankingDataSource,
     isVisible: Boolean = true,
     listState: LazyListState? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isForFavorite: Boolean = false
 ) {
     android.util.Log.d("UnifiedRankingSubPage", "🎨 [Composing] ${dataSource.type} for chartCode: $chartCode")
 
@@ -59,7 +61,12 @@ fun UnifiedRankingSubPage(
     android.util.Log.d("UnifiedRankingSubPage", "✅ ViewModel instance: ${viewModel.hashCode()}, type=${dataSource.type}")
 
     val uiState by viewModel.uiState.collectAsState()
-    val scrollState = listState ?: rememberLazyListState()
+    // isForFavorite이 true면 새로운 스크롤 상태 생성 (독립적인 스크롤)
+    val scrollState = if (isForFavorite) {
+        rememberLazyListState()
+    } else {
+        listState ?: rememberLazyListState()
+    }
 
     // 초기 로드 또는 chartCode 변경 시 처리
     LaunchedEffect(chartCode) {
@@ -130,7 +137,7 @@ fun UnifiedRankingSubPage(
             } else {
                 ExoRankingList(
                     items = success.items,
-                    topIdol = success.topIdol,
+                    topIdol = if (isForFavorite) null else success.topIdol, // Favorite용이면 ExoTop3 숨김
                     isVisible = isVisible,
                     listState = scrollState,
                     onItemClick = { rank, item ->
@@ -138,7 +145,8 @@ fun UnifiedRankingSubPage(
                     },
                     onVoteSuccess = { idolId, voteCount ->
                         viewModel.updateVote(idolId, voteCount)
-                    }
+                    },
+                    disableAnimation = true  // 애니메이션 딜레이 제거
                 )
             }
         }

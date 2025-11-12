@@ -57,4 +57,12 @@ interface IdolRepository {
      * @return List<IdolEntity>
      */
     suspend fun getIdolsByTypeAndCategory(type: String, category: String): List<IdolEntity>
+
+    /**
+     * ID 리스트로 Idol 조회 (로컬 DB)
+     *
+     * @param ids Idol ID 리스트
+     * @return List<IdolEntity>
+     */
+    suspend fun getIdolsByIds(ids: List<Int>): List<IdolEntity>
 }
