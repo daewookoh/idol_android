@@ -1,5 +1,6 @@
 package net.ib.mn.presentation.startup
 
+import android.content.Context
 import androidx.lifecycle.viewModelScope
 import net.ib.mn.base.BaseViewModel
 import net.ib.mn.data.remote.dto.toEntity
@@ -7,12 +8,15 @@ import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.usecase.*
 import net.ib.mn.util.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.util.Locale
 import javax.inject.Inject
 
 /**
@@ -51,6 +55,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class StartUpViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val getConfigStartupUseCase: GetConfigStartupUseCase,
     private val getConfigSelfUseCase: GetConfigSelfUseCase,
     private val getUpdateInfoUseCase: GetUpdateInfoUseCase,
@@ -64,10 +69,12 @@ class StartUpViewModel @Inject constructor(
     private val getBlocksUseCase: GetBlocksUseCase,
     private val getTypeListUseCase: GetTypeListUseCase,
     private val configRepository: net.ib.mn.domain.repository.ConfigRepository,
+    private val rankingRepository: net.ib.mn.domain.repository.RankingRepository,
     private val chartsApi: net.ib.mn.data.remote.api.ChartsApi,
     private val preferencesManager: net.ib.mn.data.local.PreferencesManager,
     private val authInterceptor: net.ib.mn.data.remote.interceptor.AuthInterceptor,
     private val idolDao: net.ib.mn.data.local.dao.IdolDao,
+    private val rankingCacheRepository: net.ib.mn.data.repository.RankingCacheRepository,
 ) : BaseViewModel<StartUpContract.State, StartUpContract.Intent, StartUpContract.Effect>() {
 
     companion object {
@@ -242,6 +249,8 @@ class StartUpViewModel @Inject constructor(
 
         android.util.Log.d(TAG, "Phase 3: Loading remaining APIs in parallel...")
 
+        loadIdols()
+
         // Phase 3: 나머지 APIs 병렬 호출
         coroutineScope {
             val tasks = mutableListOf(
@@ -251,7 +260,8 @@ class StartUpViewModel @Inject constructor(
                 async { loadAdTypeList() },
                 async { loadMessageCoupon() },
                 async { loadTimezone() },
-                async { loadIdols() }
+                async { loadChartsCurrent() },
+                async { cacheIdolsRanking() }
                 // 조건부: loadBlocks() - 첫 사용자만
             )
 
@@ -259,9 +269,6 @@ class StartUpViewModel @Inject constructor(
             if (net.ib.mn.BuildConfig.CELEB) {
                 tasks.add(async { loadTypeList() })
             }
-
-            // 모든 앱: ChartsCurrent API 호출
-            tasks.add(async { loadChartsCurrent() })
 
             awaitAll(*tasks.toTypedArray())
         }
@@ -990,6 +997,17 @@ class StartUpViewModel @Inject constructor(
     }
 
     /**
+     * 차트별 아이돌 ID 목록을 병렬로 미리 로드하여 SharedPreferences에 저장
+     *
+     * 퍼포먼스 최적화: MyFavorite 페이지에서 5개 차트의 데이터를 빠르게 표시하기 위해
+     * StartUp 시점에 미리 로드하여 캐싱
+     */
+    private suspend fun cacheIdolsRanking() {
+        // RankingCacheRepository의 공용 함수 사용
+        rankingCacheRepository.cacheIdolsRanking()
+    }
+
+    /**
      * 차트 코드에서 타입 추출
      *
      * 예: "SOLO_M" -> "SOLO", "GROUP_F" -> "GROUP"
@@ -1000,5 +1018,12 @@ class StartUpViewModel @Inject constructor(
             code.startsWith("GROUP") -> "GROUP"
             else -> code
         }
+    }
+
+    /**
+     * 하트 수를 포맷팅 (천 단위 콤마)
+     */
+    private fun formatHeartCount(count: Int): String {
+        return NumberFormat.getNumberInstance(Locale.US).format(count)
     }
 }

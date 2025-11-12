@@ -192,7 +192,7 @@ object RankingUtil {
 
     /**
      * IdolEntity를 RankingItemData로 변환하고 1위 아이돌 정보 가져오기
-     * (Group, Solo 랭킹용 - 정렬은 UI에서 수행)
+     * (Group, Solo 랭킹용 - 정렬 및 순위 계산 포함)
      *
      * @param idols IdolEntity 리스트
      * @param context Context (다국어 이름 처리용)
@@ -208,9 +208,8 @@ object RankingUtil {
     ): ProcessedRankData {
         val idolMap = idols.associateBy { it.id }
 
-        // IdolEntity를 RankingItemData로 변환 (정렬은 MainRankingList에서 수행)
-        // rank는 임시값 0, max/min도 임시값 0 (MainRankingList에서 재계산됨)
-        val rankItems = idols.map { idol ->
+        // IdolEntity를 RankingItemData로 변환 (임시 rank, max/min 값)
+        val tempItems = idols.map { idol ->
             // 다국어 이름 가져오기 (old 프로젝트와 동일)
             val localizedName = getLocalizedName(idol, context)
 
@@ -221,7 +220,7 @@ object RankingUtil {
             }
 
             RankingItemData(
-                rank = 0,  // MainRankingList에서 계산
+                rank = 0,  // sortAndRank에서 계산
                 name = localizedName,  // 다국어 처리된 이름 사용
                 voteCount = formatHeartCount(idol.heart.toInt()),
                 photoUrl = idol.imageUrl,
@@ -231,16 +230,31 @@ object RankingUtil {
                 angelCount = idol.angelCount,
                 rookieCount = idol.rookieCount,
                 heartCount = idol.heart,
-                maxHeartCount = 0L,  // MainRankingList에서 계산
-                minHeartCount = 0L,  // MainRankingList에서 계산
+                maxHeartCount = 0L,  // 아래에서 계산
+                minHeartCount = 0L,  // 아래에서 계산
                 isFavorite = isFavorite,  // 최애 여부 설정
                 top3ImageUrls = IdolImageUtil.getTop3ImageUrls(idol),
                 top3VideoUrls = IdolImageUtil.getTop3VideoUrls(idol)
             )
         }
 
+        // 정렬 및 순위 계산
+        val sortedItems = sortAndRank(tempItems)
+
+        // max/min 하트 수 계산
+        val maxHeart = sortedItems.maxOfOrNull { it.heartCount } ?: 0L
+        val minHeart = sortedItems.minOfOrNull { it.heartCount } ?: 0L
+
+        // 최종 rankItems (max/min 적용)
+        val rankItems = sortedItems.map { item ->
+            item.copy(
+                maxHeartCount = maxHeart,
+                minHeartCount = minHeart
+            )
+        }
+
         // 1위 아이돌 정보 가져오기 (ExoTop3용)
-        val topIdol = getTopRank(rankItems)?.let { topRankItem ->
+        val topIdol = rankItems.firstOrNull()?.let { topRankItem ->
             idolMap[topRankItem.id.toInt()]
         }
 

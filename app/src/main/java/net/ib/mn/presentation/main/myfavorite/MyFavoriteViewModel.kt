@@ -35,7 +35,8 @@ class MyFavoriteViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val configRepository: ConfigRepository,
     private val idolDao: net.ib.mn.data.local.dao.IdolDao,
-    private val broadcastManager: net.ib.mn.data.remote.udp.IdolBroadcastManager
+    private val broadcastManager: net.ib.mn.data.remote.udp.IdolBroadcastManager,
+    private val rankingCacheRepository: net.ib.mn.data.repository.RankingCacheRepository
 ) : BaseViewModel<MyFavoriteContract.State, MyFavoriteContract.Intent, MyFavoriteContract.Effect>() {
 
     private val logTag = "MyFavoriteVM"

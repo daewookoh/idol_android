@@ -43,7 +43,8 @@ import javax.inject.Singleton
 class IdolBroadcastManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val idolDao: IdolDao,
-    private val idolRepository: net.ib.mn.domain.repository.IdolRepository
+    private val idolRepository: net.ib.mn.domain.repository.IdolRepository,
+    private val rankingCacheRepository: net.ib.mn.data.repository.RankingCacheRepository
 ) {
     companion object {
         /**
@@ -670,6 +671,11 @@ class IdolBroadcastManager @Inject constructor(
                     }
                     Log.d(TAG, "   → ViewModel에서 해당 아이돌만 재계산")
                 }
+
+                // 랭킹 캐시 부분 업데이트 (전체 재생성이 아닌 해당 아이돌만)
+                Log.i(TAG, "🔄 Updating ranking cache for ${changedIdolIds.size} idols")
+                rankingCacheRepository.updateIdolsFromUdp(changedIdolIds)
+                Log.i(TAG, "✅ Ranking cache partially updated")
             } else {
                 if (VERBOSE_LOGGING) {
                     Log.d(TAG, "ℹ️ 변경사항 없음 - 이벤트 발행 안 함")
@@ -822,6 +828,10 @@ class IdolBroadcastManager @Inject constructor(
                                 // UI 갱신 이벤트 발행
                                 val updatedIdSet = entities.map { it.id }.toSet()
                                 _updateEvent.emit(updatedIdSet)
+
+                                // ⚠️ API 업데이트 시 cacheIdolsRanking() 호출하지 않음
+                                // 이유: 전체 캐시 재생성 시 사용자의 투표 업데이트가 덮어씌워질 수 있음
+                                // StateFlow 구독 방식으로 UI는 자동으로 업데이트됨
                             } else {
                                 Log.w(TAG, "⚠️ API returned empty data")
                             }
@@ -873,6 +883,10 @@ class IdolBroadcastManager @Inject constructor(
 
                                 // UI 전체 갱신 이벤트 발행 (empty set = 전체 갱신)
                                 _updateEvent.emit(emptySet())
+
+                                // ⚠️ 전체 갱신 시에도 cacheIdolsRanking() 호출하지 않음
+                                // 이유: 전체 캐시 재생성 시 사용자의 투표 업데이트가 덮어씌워질 수 있음
+                                // StateFlow 구독 방식으로 UI는 자동으로 업데이트됨
                             } else {
                                 Log.w(TAG, "⚠️ Full refresh: API returned empty data")
                             }
