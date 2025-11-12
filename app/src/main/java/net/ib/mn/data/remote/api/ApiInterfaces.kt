@@ -125,6 +125,21 @@ interface IdolApi {
     ): Response<IdolListResponse>
 
     /**
+     * ID 리스트로 아이돌 조회
+     * old 프로젝트와 동일: GET idols/idol_by_ids/
+     * UDP에서 info_ver 변경 감지 시 전체 필드 업데이트용
+     *
+     * @param ids 콤마로 구분된 아이돌 ID 리스트 (예: "1,2,3")
+     * @param fields 조회할 필드 (빈 문자열이면 모든 필드 반환)
+     * @return IdolListResponse
+     */
+    @GET("idols/idol_by_ids/")
+    suspend fun getIdolsByIds(
+        @Query("ids") ids: String,
+        @Query(value = "fields", encoded = true) fields: String? = null
+    ): Response<IdolListResponse>
+
+    /**
      * 아이돌에게 하트 투표
      * old 프로젝트와 동일: POST idols/give_heart/
      * @param body VoteRequest with idol_id and number

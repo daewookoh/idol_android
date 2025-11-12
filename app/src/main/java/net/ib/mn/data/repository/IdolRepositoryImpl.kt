@@ -106,6 +106,51 @@ class IdolRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getIdolsByIds(ids: List<Int>, fields: String?): Flow<ApiResult<IdolListResponse>> = flow {
+        emit(ApiResult.Loading)
+
+        try {
+            // ID 리스트를 콤마로 구분된 문자열로 변환
+            val idsString = ids.joinToString(",")
+
+            val response = idolApi.getIdolsByIds(idsString, fields)
+
+            if (response.isSuccessful && response.body() != null) {
+                val body = response.body()!!
+
+                if (body.data != null) {
+                    emit(ApiResult.Success(body))
+                } else {
+                    emit(ApiResult.Error(
+                        exception = Exception("API returned null data"),
+                        code = response.code()
+                    ))
+                }
+            } else {
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code(),
+                message = "HTTP ${e.code()}: ${e.message()}"
+            ))
+        } catch (e: IOException) {
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Network error: ${e.message}"
+            ))
+        } catch (e: Exception) {
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Unknown error: ${e.message}"
+            ))
+        }
+    }
+
     override suspend fun getIdolById(id: Int): IdolEntity? {
         return idolDao.getIdolById(id)
     }

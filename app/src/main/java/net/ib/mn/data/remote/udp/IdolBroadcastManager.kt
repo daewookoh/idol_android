@@ -20,6 +20,7 @@ import kotlinx.coroutines.sync.withLock
 import net.ib.mn.BuildConfig
 import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.data.local.entity.IdolEntity
+import net.ib.mn.data.remote.dto.toEntity
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
@@ -41,7 +42,8 @@ import javax.inject.Singleton
 @Singleton
 class IdolBroadcastManager @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val idolDao: IdolDao
+    private val idolDao: IdolDao,
+    private val idolRepository: net.ib.mn.domain.repository.IdolRepository
 ) {
     companion object {
         /**
@@ -674,13 +676,32 @@ class IdolBroadcastManager @Inject constructor(
                 }
             }
 
-            // TODO: notExistingIds, updatedInfoVerIds 처리 (API 호출)
-            if (notExistingIds.isNotEmpty()) {
-                Log.w(TAG, "=== ${notExistingIds.size} idols not found in DB")
+            // info_ver 변경된 아이돌 API 호출 (old 프로젝트 로직)
+            if (updatedInfoVerIds.isNotEmpty()) {
+                Log.i(TAG, "=== ${updatedInfoVerIds.size} idols need info update via API")
+
+                // 30개 이상이면 전체 갱신 (old 프로젝트 로직)
+                if (updatedInfoVerIds.size > 30) {
+                    Log.w(TAG, "⚠️ ${updatedInfoVerIds.size} idols changed (>30) - Starting full refresh")
+                    refreshAllIdols()
+                } else {
+                    // API 호출하여 전체 필드 업데이트
+                    updateIdolsByIds(updatedInfoVerIds.toList())
+                }
             }
 
-            if (updatedInfoVerIds.isNotEmpty()) {
-                Log.w(TAG, "=== ${updatedInfoVerIds.size} idols need API update")
+            // DB에 없는 아이돌 처리 (old 프로젝트 로직)
+            if (notExistingIds.isNotEmpty()) {
+                Log.w(TAG, "=== ${notExistingIds.size} idols not found in DB")
+
+                // 10개 이상이면 전체 갱신 (old 프로젝트 로직)
+                if (notExistingIds.size > 10) {
+                    Log.w(TAG, "⚠️ ${notExistingIds.size} missing idols (>10) - Starting full refresh")
+                    refreshAllIdols()
+                } else {
+                    // API 호출하여 누락된 아이돌 정보 가져오기
+                    updateIdolsByIds(notExistingIds.toList())
+                }
             }
 
         } catch (e: Exception) {
@@ -761,6 +782,113 @@ class IdolBroadcastManager @Inject constructor(
             hexChars[j * 2 + 1] = hexArray[(v and 0x0F.toUInt()).toInt()]
         }
         return String(hexChars)
+    }
+
+    /**
+     * ID 리스트로 아이돌 정보 업데이트 (API 호출)
+     *
+     * old 프로젝트의 IdolApiManager.updateIdols() 로직
+     * info_ver 변경 감지 시 전체 필드 업데이트용
+     *
+     * @param ids 업데이트할 아이돌 ID 리스트
+     */
+    private fun updateIdolsByIds(ids: List<Int>) {
+        scope.launch {
+            try {
+                Log.i(TAG, "🔄 Updating ${ids.size} idols via API: $ids")
+
+                // API 호출 (fields=null이면 모든 필드 반환)
+                idolRepository.getIdolsByIds(ids, fields = null).collect { result ->
+                    when (result) {
+                        is net.ib.mn.domain.model.ApiResult.Success -> {
+                            val idolDataList = result.data.data
+
+                            if (idolDataList != null && idolDataList.isNotEmpty()) {
+                                Log.i(TAG, "✅ API returned ${idolDataList.size} idols")
+
+                                // DB에 업데이트 (isViewable 포함 모든 필드)
+                                val entities = idolDataList.map { it.toEntity() }
+                                idolDao.upsertIdols(entities)
+
+                                Log.i(TAG, "✅ Updated ${entities.size} idols in DB (isViewable included)")
+
+                                // isViewable 값 로깅
+                                if (VERBOSE_LOGGING) {
+                                    entities.forEach { entity ->
+                                        Log.d(TAG, "  - ID:${entity.id} ${entity.name} isViewable=${entity.isViewable}")
+                                    }
+                                }
+
+                                // UI 갱신 이벤트 발행
+                                val updatedIdSet = entities.map { it.id }.toSet()
+                                _updateEvent.emit(updatedIdSet)
+                            } else {
+                                Log.w(TAG, "⚠️ API returned empty data")
+                            }
+                        }
+                        is net.ib.mn.domain.model.ApiResult.Error -> {
+                            Log.e(TAG, "❌ API error: ${result.message}")
+                        }
+                        is net.ib.mn.domain.model.ApiResult.Loading -> {
+                            // Loading state
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ updateIdolsByIds error", e)
+            }
+        }
+    }
+
+    /**
+     * 전체 아이돌 정보 갱신
+     * old 프로젝트의 전체 갱신 로직
+     *
+     * 30개 이상 info_ver 변경 또는 10개 이상 누락 시 호출
+     */
+    private fun refreshAllIdols() {
+        scope.launch {
+            try {
+                Log.i(TAG, "🔄 Starting full idol refresh via API")
+
+                // API 호출 (type=null, category=null이면 전체 조회)
+                idolRepository.getIdols(type = null, category = null).collect { result ->
+                    when (result) {
+                        is net.ib.mn.domain.model.ApiResult.Success -> {
+                            val idolDataList = result.data.data
+
+                            if (idolDataList != null && idolDataList.isNotEmpty()) {
+                                Log.i(TAG, "✅ Full refresh: API returned ${idolDataList.size} idols")
+
+                                // DB에 전체 업데이트
+                                val entities = idolDataList.map { it.toEntity() }
+                                idolDao.upsertIdols(entities)
+
+                                Log.i(TAG, "✅ Full refresh complete: ${entities.size} idols updated in DB")
+
+                                // isViewable 통계 로깅
+                                val viewableCount = entities.count { it.isViewable == "Y" }
+                                val hiddenCount = entities.count { it.isViewable == "N" }
+                                Log.i(TAG, "   Viewable: $viewableCount, Hidden: $hiddenCount")
+
+                                // UI 전체 갱신 이벤트 발행 (empty set = 전체 갱신)
+                                _updateEvent.emit(emptySet())
+                            } else {
+                                Log.w(TAG, "⚠️ Full refresh: API returned empty data")
+                            }
+                        }
+                        is net.ib.mn.domain.model.ApiResult.Error -> {
+                            Log.e(TAG, "❌ Full refresh error: ${result.message}")
+                        }
+                        is net.ib.mn.domain.model.ApiResult.Loading -> {
+                            // Loading state
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ refreshAllIdols error", e)
+            }
+        }
     }
 
     /**

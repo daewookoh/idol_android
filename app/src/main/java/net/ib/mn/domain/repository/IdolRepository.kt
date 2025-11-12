@@ -30,6 +30,18 @@ interface IdolRepository {
     fun getIdols(type: Int? = null, category: String? = null): Flow<ApiResult<IdolListResponse>>
 
     /**
+     * ID 리스트로 Idol 조회 (API)
+     *
+     * UDP에서 info_ver 변경 감지 시 전체 필드 업데이트용
+     * old 프로젝트의 idol_by_ids API와 동일
+     *
+     * @param ids 아이돌 ID 리스트
+     * @param fields 조회할 필드 (null이면 모든 필드)
+     * @return Flow<ApiResult<IdolListResponse>>
+     */
+    fun getIdolsByIds(ids: List<Int>, fields: String? = null): Flow<ApiResult<IdolListResponse>>
+
+    /**
      * ID로 특정 Idol 조회 (로컬 DB)
      *
      * @param id Idol ID
