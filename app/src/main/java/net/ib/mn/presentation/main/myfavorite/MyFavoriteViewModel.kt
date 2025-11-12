@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import net.ib.mn.base.BaseViewModel
 import net.ib.mn.data.local.PreferencesManager
+import net.ib.mn.data.remote.dto.AggregateRankModel
+import net.ib.mn.data.remote.dto.toEntity
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.FavoritesRepository
 import net.ib.mn.domain.repository.RankingRepository
@@ -31,7 +33,9 @@ class MyFavoriteViewModel @Inject constructor(
     val rankingRepository: RankingRepository,
     private val preferencesManager: PreferencesManager,
     private val userRepository: UserRepository,
-    private val configRepository: ConfigRepository
+    private val configRepository: ConfigRepository,
+    private val idolDao: net.ib.mn.data.local.dao.IdolDao,
+    private val broadcastManager: net.ib.mn.data.remote.udp.IdolBroadcastManager
 ) : BaseViewModel<MyFavoriteContract.State, MyFavoriteContract.Intent, MyFavoriteContract.Effect>() {
 
     private val logTag = "MyFavoriteVM"
@@ -46,8 +50,9 @@ class MyFavoriteViewModel @Inject constructor(
     private val _chartSections = MutableStateFlow<List<ChartSection>>(emptyList())
     val chartSections: StateFlow<List<ChartSection>> = _chartSections.asStateFlow()
 
-    private val _topFavorite = MutableStateFlow<MyFavoriteContract.TopFavorite?>(null)
-    val topFavorite: StateFlow<MyFavoriteContract.TopFavorite?> = _topFavorite.asStateFlow()
+    // MostFavoriteIdol 실시간 업데이트를 위한 Flow
+    private val _mostFavoriteIdolFlow = MutableStateFlow<MyFavoriteContract.MostFavoriteIdol?>(null)
+    val mostFavoriteIdolFlow: StateFlow<MyFavoriteContract.MostFavoriteIdol?> = _mostFavoriteIdolFlow.asStateFlow()
 
     override fun createInitialState(): MyFavoriteContract.State {
         return MyFavoriteContract.State()
@@ -67,6 +72,35 @@ class MyFavoriteViewModel @Inject constructor(
 
     init {
         // 초기 데이터는 onPageVisible에서 로드
+
+        // UDP updateEvent 구독하여 MostFavoriteIdol 실시간 업데이트
+        viewModelScope.launch {
+            broadcastManager.updateEvent.collect { changedIds ->
+                android.util.Log.d(logTag, "🔄 UDP update event received - ${changedIds.size} idols changed")
+
+                val mostIdolId = preferencesManager.mostIdolId.firstOrNull()
+
+                // 변경된 아이돌 중 mostIdolId가 있으면 업데이트
+                if (mostIdolId != null && changedIds.contains(mostIdolId)) {
+                    android.util.Log.d(logTag, "📊 MostIdol changed, updating...")
+                    updateMostFavoriteIdolFromDb(mostIdolId)
+                }
+            }
+        }
+
+        // chartSections가 변경되면 해당 차트의 랭킹에서 순위 업데이트
+        viewModelScope.launch {
+            _chartSections.collect { sections ->
+                val mostIdolId = preferencesManager.mostIdolId.firstOrNull()
+                val mostChartCode = preferencesManager.mostIdolChartCode.firstOrNull()
+
+                if (mostIdolId != null && mostChartCode != null && sections.isNotEmpty()) {
+                    // 차트 로딩이 완료되면 순위 업데이트
+                    android.util.Log.d(logTag, "📊 Chart sections loaded, updating rank for mostIdol")
+                    updateMostFavoriteIdolFromDb(mostIdolId)
+                }
+            }
+        }
     }
 
     /**
@@ -82,8 +116,22 @@ class MyFavoriteViewModel @Inject constructor(
                 when (result) {
                     is ApiResult.Success -> {
                         result.data.objects.firstOrNull()?.most?.let { most ->
-                            preferencesManager.setMostIdol(most.id, most.type, most.groupId)
-                            android.util.Log.d(logTag, "💾 Updated most idol: id=${most.id}")
+                            // chartCodes에서 Award/DF 코드 제외
+                            val chartCode = most.chartCodes
+                                ?.firstOrNull { !it.startsWith("AW_") && !it.startsWith("DF_") }
+                                ?: most.chartCodes?.firstOrNull()
+
+                            preferencesManager.setMostIdol(
+                                idolId = most.id,
+                                chartCode = chartCode,
+                                category = most.category
+                            )
+                            android.util.Log.d(logTag, "💾 Updated most idol: id=${most.id}, chartCode=$chartCode, category=${most.category}")
+
+                            // Most 아이돌 데이터를 로컬 DB에 upsert
+                            val idolEntity = most.toEntity()
+                            idolDao.upsert(idolEntity)
+                            android.util.Log.d(logTag, "💾 Most idol upserted to local DB: id=${most.id}, name=${most.name}")
                         }
                         loadFavorites()
                     }
@@ -172,8 +220,8 @@ class MyFavoriteViewModel @Inject constructor(
                             mainChartModel?.females?.forEach { info ->
                                 info.code?.let { put(it, info.fullName ?: info.name ?: it) }
                             }
-                            // GLOBALS는 직접 추가
-                            put("GLOBALS", "글로벌")
+                            // GLOBALS는 기존 다국어 문자열 사용 (overall = "Overall" / "종합")
+                            put("GLOBALS", context.getString(net.ib.mn.R.string.overall))
                         }
 
                         // Step 3 & 4: 각 차트에 내 즐겨찾기 아이돌이 있는지 확인하여 ChartSection 생성
@@ -200,27 +248,17 @@ class MyFavoriteViewModel @Inject constructor(
                         _chartSections.value = sections
                         android.util.Log.d(logTag, "✅ Visible chart sections: ${sections.size}")
 
-                        // Most Idol TopFavorite 생성
-                        val topFavoriteData = mostIdolId?.let { id ->
-                            favoriteDtos.find { it.idol.id == id }
-                        }?.let { dto ->
-                            MyFavoriteContract.TopFavorite(
-                                idolId = dto.idol.id,
-                                name = dto.idol.name ?: "Unknown",
-                                top3ImageUrls = listOf(dto.idol.imageUrl, dto.idol.imageUrl2, dto.idol.imageUrl3),
-                                top3VideoUrls = emptyList(),
-                                rank = null, // UnifiedRankingSubPage에서 계산
-                                heart = dto.idol.heart
-                            )
-                        }
-
-                        _topFavorite.value = topFavoriteData
+                        // MostFavoriteIdol 생성 - mostIdolId와 mostChartCode 기반
+                        val mostFavoriteIdol = createMostFavoriteIdol(
+                            mostIdolId = mostIdolId,
+                            chartIdolIdsMap = chartIdolIdsMap
+                        )
 
                         setState {
                             copy(
                                 isLoading = false,
                                 favoriteIdols = emptyList(), // 더 이상 사용 안 함
-                                topFavorite = topFavoriteData,
+                                mostFavoriteIdol = mostFavoriteIdol,
                                 error = null
                             )
                         }
@@ -240,6 +278,120 @@ class MyFavoriteViewModel @Inject constructor(
                 setState { copy(isLoading = false, error = e.message ?: "Unknown error") }
             }
         }
+    }
+
+    /**
+     * MostFavoriteIdol 생성 (초기 로딩용)
+     *
+     * localDB에서 이름과 투표수만 가져오고 순위는 null로 설정
+     * (순위는 UDP 업데이트 시 계산됨)
+     *
+     * @param mostIdolId SharedPreference의 mostIdolId
+     * @param chartIdolIdsMap 차트별 idol IDs 맵 (사용하지 않음, 호환성 유지)
+     * @return MostFavoriteIdol 또는 null
+     */
+    private suspend fun createMostFavoriteIdol(
+        mostIdolId: Int?,
+        chartIdolIdsMap: Map<String, List<Int>>
+    ): MyFavoriteContract.MostFavoriteIdol? {
+        if (mostIdolId == null) {
+            android.util.Log.w(logTag, "⚠️ mostIdolId is null, cannot create MostFavoriteIdol")
+            return null
+        }
+
+        // mostChartCode 가져오기
+        val mostChartCode = preferencesManager.mostIdolChartCode.firstOrNull()
+
+        android.util.Log.d(logTag, "🎯 Creating MostFavoriteIdol (initial): idolId=$mostIdolId, chartCode=$mostChartCode")
+
+        // localDB에서 아이돌 기본 정보만 가져오기
+        val idolEntity = idolDao.getIdolById(mostIdolId)
+        if (idolEntity == null) {
+            android.util.Log.e(logTag, "❌ mostIdolId=$mostIdolId not found in localDB")
+            return null
+        }
+
+        android.util.Log.d(logTag, "✅ MostFavoriteIdol created (initial): name=${idolEntity.name}, heart=${idolEntity.heart}, rank=null")
+
+        return MyFavoriteContract.MostFavoriteIdol(
+            idolId = mostIdolId,
+            name = idolEntity.name,
+            top3ImageUrls = listOf(idolEntity.imageUrl, idolEntity.imageUrl2, idolEntity.imageUrl3),
+            top3VideoUrls = emptyList(),
+            rank = null,  // 초기 로딩 시에는 순위 계산 안 함
+            heart = idolEntity.heart,
+            chartCode = mostChartCode,
+            imageUrl = idolEntity.imageUrl
+        )
+    }
+
+    /**
+     * MostFavoriteIdol을 localDB에서 업데이트
+     *
+     * UDP로 변경 이벤트를 받으면 localDB에서 최신 정보를 가져와 업데이트
+     * (UnifiedRankingSubPageViewModel의 queryIdolsByIdsFromDb와 동일한 방식)
+     *
+     * @param mostIdolId 최애 아이돌 ID
+     */
+    private suspend fun updateMostFavoriteIdolFromDb(mostIdolId: Int) {
+        // SECRET_ROOM_IDOL_ID는 실시간 업데이트 불필요
+        if (mostIdolId == net.ib.mn.util.Constants.SECRET_ROOM_IDOL_ID) {
+            return
+        }
+
+        val mostChartCode = preferencesManager.mostIdolChartCode.firstOrNull()
+        if (mostChartCode == null) {
+            android.util.Log.w(logTag, "⚠️ mostChartCode is null")
+            return
+        }
+
+        android.util.Log.d(logTag, "🔄 Updating MostFavoriteIdol from DB: idolId=$mostIdolId")
+
+        // localDB에서 아이돌 정보 가져오기 (UDP로 이미 업데이트된 최신 데이터)
+        val idolEntity = idolDao.getIdolById(mostIdolId)
+        if (idolEntity == null) {
+            android.util.Log.e(logTag, "❌ mostIdolId=$mostIdolId not found in localDB")
+            return
+        }
+
+        // 랭킹 계산을 위해 해당 차트의 모든 아이돌 가져오기
+        val allIdolsInChart = when (mostChartCode) {
+            "GLOBALS" -> {
+                // GLOBALS는 category로 필터링
+                val category = preferencesManager.mostIdolCategory.firstOrNull()
+                if (category != null) {
+                    idolDao.getByCategory(category)
+                } else {
+                    idolDao.getViewableIdols()
+                }
+            }
+            else -> {
+                // 특정 차트: type과 category로 필터링
+                val type = if (mostChartCode.contains("_S_")) "S" else "G"
+                val category = if (mostChartCode.contains("_M")) "M" else "F"
+                idolDao.getIdolByTypeAndCategory(type, category)
+            }
+        }
+
+        // heart 기준으로 정렬하여 순위 계산
+        val sortedIdols = allIdolsInChart.sortedByDescending { it.heart }
+        val rank = sortedIdols.indexOfFirst { it.id == mostIdolId } + 1
+
+        android.util.Log.d(logTag, "✅ MostFavoriteIdol updated from DB: rank=$rank, heart=${idolEntity.heart}")
+
+        val updatedIdol = MyFavoriteContract.MostFavoriteIdol(
+            idolId = mostIdolId,
+            name = idolEntity.name,
+            top3ImageUrls = listOf(idolEntity.imageUrl, idolEntity.imageUrl2, idolEntity.imageUrl3),
+            top3VideoUrls = emptyList(),
+            rank = if (rank > 0) rank else null,
+            heart = idolEntity.heart,
+            chartCode = mostChartCode,
+            imageUrl = idolEntity.imageUrl
+        )
+
+        // State 업데이트
+        setState { copy(mostFavoriteIdol = updatedIdol) }
     }
 
     private fun onIdolClick(idolId: Int) {

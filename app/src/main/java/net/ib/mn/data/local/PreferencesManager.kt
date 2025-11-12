@@ -135,8 +135,6 @@ class PreferencesManager @Inject constructor(
 
         // Most Idol (최애)
         val KEY_MOST_IDOL_ID = intPreferencesKey("most_idol_id")
-        val KEY_MOST_IDOL_TYPE = stringPreferencesKey("most_idol_type")  // "S" or "G"
-        val KEY_MOST_IDOL_GROUP_ID = intPreferencesKey("most_idol_group_id")
         val KEY_MOST_IDOL_CHART_CODE = stringPreferencesKey("most_idol_chart_code")
         val KEY_MOST_IDOL_CATEGORY = stringPreferencesKey("most_idol_category")  // "M" or "F"
     }
@@ -298,16 +296,6 @@ class PreferencesManager @Inject constructor(
     val mostIdolId: Flow<Int?> = context.dataStore.data
         .map { preferences ->
             preferences[KEY_MOST_IDOL_ID]
-        }
-
-    val mostIdolType: Flow<String?> = context.dataStore.data
-        .map { preferences ->
-            preferences[KEY_MOST_IDOL_TYPE]
-        }
-
-    val mostIdolGroupId: Flow<Int?> = context.dataStore.data
-        .map { preferences ->
-            preferences[KEY_MOST_IDOL_GROUP_ID]
         }
 
     val mostIdolChartCode: Flow<String?> = context.dataStore.data
@@ -558,24 +546,12 @@ class PreferencesManager @Inject constructor(
         }
     }
 
-    suspend fun setMostIdol(idolId: Int?, type: String?, groupId: Int?, chartCode: String? = null, category: String? = null) {
+    suspend fun setMostIdol(idolId: Int?, chartCode: String? = null, category: String? = null) {
         context.dataStore.edit { preferences ->
             if (idolId != null) {
                 preferences[KEY_MOST_IDOL_ID] = idolId
             } else {
                 preferences.remove(KEY_MOST_IDOL_ID)
-            }
-
-            if (type != null) {
-                preferences[KEY_MOST_IDOL_TYPE] = type
-            } else {
-                preferences.remove(KEY_MOST_IDOL_TYPE)
-            }
-
-            if (groupId != null) {
-                preferences[KEY_MOST_IDOL_GROUP_ID] = groupId
-            } else {
-                preferences.remove(KEY_MOST_IDOL_GROUP_ID)
             }
 
             if (chartCode != null) {
@@ -590,7 +566,7 @@ class PreferencesManager @Inject constructor(
                 preferences.remove(KEY_MOST_IDOL_CATEGORY)
             }
         }
-        android.util.Log.d("PreferencesManager", "✅ Most idol saved: id=$idolId, type=$type, groupId=$groupId, chartCode=$chartCode, category=$category")
+        android.util.Log.d("PreferencesManager", "✅ Most idol saved: id=$idolId, chartCode=$chartCode, category=$category")
     }
 
     /**

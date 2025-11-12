@@ -23,7 +23,7 @@ class MyFavoriteContract {
         val isLoading: Boolean = false,
         val favoriteIdols: List<FavoriteIdol> = emptyList(),
         val error: String? = null,
-        val topFavorite: TopFavorite? = null
+        val mostFavoriteIdol: MostFavoriteIdol? = null
     ) : UiState
 
     /**
@@ -111,14 +111,19 @@ class MyFavoriteContract {
     )
 
     /**
-     * Top3 이미지를 위한 최애 정보
+     * 최애 아이돌 정보 (실시간 랭킹 데이터 기반)
+     *
+     * SharedPreference의 mostIdolId와 mostChartCode를 기준으로
+     * 해당 차트의 실시간 랭킹 데이터에서 정보 추출
      */
-    data class TopFavorite(
+    data class MostFavoriteIdol(
         val idolId: Int,
         val name: String,
         val top3ImageUrls: List<String?>,  // 3개의 이미지 URL
         val top3VideoUrls: List<String?>,  // 3개의 비디오 URL
-        val rank: Int?,                    // 순위
-        val heart: Long?                   // 하트 수
+        val rank: Int?,                    // 해당 차트에서의 순위
+        val heart: Long?,                  // 해당 차트에서의 하트 수
+        val chartCode: String?,            // 기준 차트 코드
+        val imageUrl: String?              // 기본 이미지 URL
     )
 }

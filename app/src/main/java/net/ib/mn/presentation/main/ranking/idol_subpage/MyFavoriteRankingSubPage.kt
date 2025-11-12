@@ -3,6 +3,7 @@ package net.ib.mn.presentation.main.ranking.idol_subpage
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -127,10 +128,8 @@ fun LazyListScope.myFavoriteRankingItems(
         is MyFavoriteRankingData.Loading -> {
             item(key = "loading_${chartCode}") {
                 Box(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.height(60.dp),
                 ) {
-                    CircularProgressIndicator(color = ColorPalette.main)
                 }
             }
         }

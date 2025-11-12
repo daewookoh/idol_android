@@ -168,8 +168,68 @@ data class MostIdol(
     val resourceUri: String?,
 
     @SerializedName("chart_codes")
-    val chartCodes: List<String>?  // 예: ["PR_S_F", "GLOBALS", "MIRACLE"]
+    val chartCodes: List<String>?,  // 예: ["PR_S_F", "GLOBALS", "MIRACLE"]
+
+    @SerializedName("image_url")
+    val imageUrl: String?,
+
+    @SerializedName("image_url2")
+    val imageUrl2: String?,
+
+    @SerializedName("image_url3")
+    val imageUrl3: String?,
+
+    @SerializedName("heart")
+    val heart: Long?
 )
+
+/**
+ * Extension function to convert MostIdol to IdolEntity for Room Database.
+ * getUserSelf API로 받은 most 데이터를 로컬 DB에 upsert하기 위한 변환
+ */
+fun MostIdol.toEntity(): net.ib.mn.data.local.entity.IdolEntity {
+    return net.ib.mn.data.local.entity.IdolEntity(
+        id = id,
+        name = name ?: "",
+        nameEn = nameEn ?: "",
+        nameJp = nameJp ?: "",
+        nameZh = nameZh ?: "",
+        nameZhTw = nameZhTw ?: "",
+        type = type ?: "",
+        category = category ?: "",
+        groupId = groupId ?: 0,
+        resourceUri = resourceUri ?: "",
+        imageUrl = imageUrl,
+        imageUrl2 = imageUrl2,
+        imageUrl3 = imageUrl3,
+        heart = heart ?: 0L,
+        // 나머지 필드는 기본값 사용
+        miracleCount = 0,
+        angelCount = 0,
+        rookieCount = 0,
+        anniversary = "N",
+        anniversaryDays = null,
+        birthDay = null,
+        burningDay = null,
+        comebackDay = null,
+        debutDay = null,
+        description = "",
+        fairyCount = 0,
+        isViewable = "Y",
+        top3 = null,
+        top3Type = null,
+        top3Seq = -1,
+        top3ImageVer = "",
+        infoSeq = -1,
+        isLunarBirthday = null,
+        mostCount = 0,
+        mostCountDesc = null,
+        updateTs = (System.currentTimeMillis() / 1000).toInt(),
+        sourceApp = null,
+        fdName = null,
+        fdNameEn = null
+    )
+}
 
 // ============================================================
 // /users/status/ - 사용자 상태 (튜토리얼 등)

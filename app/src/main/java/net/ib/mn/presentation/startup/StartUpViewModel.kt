@@ -590,12 +590,17 @@ class StartUpViewModel @Inject constructor(
 
                         preferencesManager.setMostIdol(
                             idolId = userData.most?.id,
-                            type = userData.most?.type,
-                            groupId = userData.most?.groupId,
                             chartCode = chartCode,
                             category = category
                         )
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Most idol saved: id=${userData.most?.id}, type=${userData.most?.type}, groupId=${userData.most?.groupId}, chartCode=$chartCode, category=$category")
+                        android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Most idol saved: id=${userData.most?.id}, chartCode=$chartCode, category=$category")
+
+                        // Most 아이돌 데이터를 로컬 DB에 upsert
+                        userData.most?.let { most ->
+                            val idolEntity = most.toEntity()
+                            idolDao.upsert(idolEntity)
+                            android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Most idol upserted to local DB: id=${most.id}, name=${most.name}")
+                        }
 
                         // mostCategory를 defaultCategory로 설정 (GLOBALS 탭 초기 필터링에 사용)
                         // 앱 첫 진입 시 최애의 성별에 맞는 랭킹이 표시되도록 함

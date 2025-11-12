@@ -67,7 +67,6 @@ fun MyFavoritePage(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val chartSections by viewModel.chartSections.collectAsState()
-    val topFavorite by viewModel.topFavorite.collectAsState()
     val context = LocalContext.current
 
     // 페이지가 visible될 때마다 데이터 갱신
@@ -97,7 +96,6 @@ fun MyFavoritePage(
     MyFavoriteContent(
         state = state,
         chartSections = chartSections,
-        topFavorite = topFavorite,
         onIntent = viewModel::sendIntent
     )
 }
@@ -109,7 +107,6 @@ fun MyFavoritePage(
 private fun MyFavoriteContent(
     state: MyFavoriteContract.State,
     chartSections: List<MyFavoriteViewModel.ChartSection>,
-    topFavorite: MyFavoriteContract.TopFavorite?,
     onIntent: (MyFavoriteContract.Intent) -> Unit,
     viewModel: MyFavoriteViewModel = hiltViewModel()
 ) {
@@ -140,8 +137,8 @@ private fun MyFavoriteContent(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // 최애가 있으면 Top3 표시, 없으면 비밀의 방
-                        if (topFavorite != null) {
+                        // 최애가 있으면 메시지 표시, 없으면 비밀의 방
+                        if (state.mostFavoriteIdol != null) {
                             Text(
                                 text = "즐겨찾기한 아이돌이 랭킹에 없습니다.",
                                 style = ExoTypo.body15,
@@ -174,13 +171,13 @@ private fun MyFavoriteContent(
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    // 헤더: 최애 Top3 (있을 경우만)
-                    topFavorite?.let { favorite ->
-                        item(key = "header_top3") {
-                            FavoriteTop3Header(
-                                topFavorite = favorite,
+                    // 헤더: 최애 MostFavoriteIdol Top3 (있을 경우만)
+                    state.mostFavoriteIdol?.let { mostIdol ->
+                        item(key = "header_most_favorite") {
+                            MostFavoriteIdolHeader(
+                                mostFavoriteIdol = mostIdol,
                                 onIdolClick = {
-                                    onIntent(MyFavoriteContract.Intent.OnIdolClick(favorite.idolId))
+                                    onIntent(MyFavoriteContract.Intent.OnIdolClick(mostIdol.idolId))
                                 }
                             )
                         }
@@ -227,11 +224,11 @@ private fun SectionHeader(sectionName: String) {
 }
 
 /**
- * 최애 Top3 헤더
+ * 최애 아이돌 헤더 (MostFavoriteIdol)
  */
 @Composable
-private fun FavoriteTop3Header(
-    topFavorite: MyFavoriteContract.TopFavorite,
+private fun MostFavoriteIdolHeader(
+    mostFavoriteIdol: MyFavoriteContract.MostFavoriteIdol,
     onIdolClick: () -> Unit
 ) {
     Column(
@@ -241,32 +238,32 @@ private fun FavoriteTop3Header(
     ) {
         // ExoTop3 - 상단 배너 (이미지/동영상)
         ExoTop3(
-            id = "favorite_top3_${topFavorite.idolId}",
-            imageUrls = topFavorite.top3ImageUrls,
-            videoUrls = topFavorite.top3VideoUrls,
+            id = "most_favorite_${mostFavoriteIdol.idolId}",
+            imageUrls = mostFavoriteIdol.top3ImageUrls,
+            videoUrls = mostFavoriteIdol.top3VideoUrls,
             isVisible = true,
             onItemClick = { onIdolClick() }
         )
 
         // Info Bar - 순위, 이름, 하트 수, 투표 버튼
-        FavoriteInfoBar(
-            topFavorite = topFavorite,
+        MostFavoriteInfoBar(
+            mostFavoriteIdol = mostFavoriteIdol,
             onVoteClick = { /* TODO: 투표 처리 */ }
         )
     }
 }
 
 /**
- * 최애 정보 바 (리그, 순위, 이름, 하트 수)
+ * 최애 정보 바 (순위, 이름, 하트 수, 차트 코드)
  *
- * OLD 프로젝트의 favorite_header.xml rl_rank_name_score 영역 참고
+ * MostFavoriteIdol 데이터 기반 표시
  */
 @Composable
-private fun FavoriteInfoBar(
-    topFavorite: MyFavoriteContract.TopFavorite,
+private fun MostFavoriteInfoBar(
+    mostFavoriteIdol: MyFavoriteContract.MostFavoriteIdol,
     onVoteClick: () -> Unit
 ) {
-    Log.d("FavoriteInfoBar", topFavorite.toString())
+    Log.d("MostFavoriteInfoBar", mostFavoriteIdol.toString())
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -288,7 +285,7 @@ private fun FavoriteInfoBar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // 순위
-                topFavorite.rank?.let { rank ->
+                mostFavoriteIdol.rank?.let { rank ->
                     Text(
                         text = rank.toString(),
                         fontSize = 20.sp,
@@ -300,8 +297,8 @@ private fun FavoriteInfoBar(
                 }
 
                 // 이름과 그룹명 파싱
-                val nameParts = topFavorite.name.split("_")
-                val idolName = nameParts.getOrNull(0) ?: topFavorite.name
+                val nameParts = mostFavoriteIdol.name.split("_")
+                val idolName = nameParts.getOrNull(0) ?: mostFavoriteIdol.name
                 val groupName = nameParts.getOrNull(1)
 
                 // 이름
@@ -334,7 +331,7 @@ private fun FavoriteInfoBar(
                 }
 
                 // 하트 수
-                topFavorite.heart?.let { heart ->
+                mostFavoriteIdol.heart?.let { heart ->
                     Text(
                         text = "${NumberFormat.getInstance(Locale.getDefault()).format(heart)}",
                         fontSize = 10.sp,
@@ -348,8 +345,8 @@ private fun FavoriteInfoBar(
             }
 
             ExoVoteIcon(
-                idolId = topFavorite.idolId,
-                fullName = topFavorite.name,
+                idolId = mostFavoriteIdol.idolId,
+                fullName = mostFavoriteIdol.name,
                 type = "CIRCLE",
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
