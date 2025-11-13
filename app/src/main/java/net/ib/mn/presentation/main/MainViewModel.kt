@@ -10,14 +10,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.local.UserInfo
-import net.ib.mn.data.remote.udp.IdolBroadcastManager
-import net.ib.mn.util.Constants
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     val preferencesManager: PreferencesManager,
-    val broadcastManager: IdolBroadcastManager,
     private val rankingCacheRepository: net.ib.mn.data.repository.RankingCacheRepository
 ) : ViewModel() {
 
@@ -112,25 +109,11 @@ class MainViewModel @Inject constructor(
 
     /**
      * 앱이 백그라운드에서 포그라운드로 돌아올 때 호출
-     *
-     * 무조건 랭킹 캐시를 완전히 새로고침:
-     * 1. 백그라운드에서 재진입 시 항상 최신 데이터 보장
-     * 2. UDP 재연결 (MainScreen에서 처리)
      */
     fun onAppResume() {
         android.util.Log.d(TAG, "[MainViewModel] ========================================")
         android.util.Log.d(TAG, "[MainViewModel] 👁️ App resumed - refreshing all ranking caches")
         android.util.Log.d(TAG, "[MainViewModel] ========================================")
-
-        // 백그라운드에서 모든 차트 캐시 새로고침 (시간 제한 없이 무조건 실행)
-        viewModelScope.launch {
-            try {
-                rankingCacheRepository.cacheIdolsRanking()
-                android.util.Log.d(TAG, "[MainViewModel] ✅ All ranking caches refreshed")
-            } catch (e: Exception) {
-                android.util.Log.e(TAG, "[MainViewModel] ❌ Failed to refresh caches: ${e.message}", e)
-            }
-        }
     }
 
     /**

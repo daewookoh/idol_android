@@ -4,6 +4,9 @@ import android.app.Application
 import android.content.pm.PackageManager
 import android.util.Base64
 import android.util.Log
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
@@ -19,6 +22,7 @@ import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import net.ib.mn.data.local.PreferencesManager
+import net.ib.mn.data.remote.udp.IdolBroadcastManager
 import net.ib.mn.util.Constants
 import net.ib.mn.util.ServerUrl
 import java.security.MessageDigest
@@ -32,12 +36,21 @@ import javax.inject.Inject
  * 2. Facebook SDK: FacebookSdk.sdkInitialize()
  * 3. Line SDK: 별도 초기화 불필요 (사용 시 자동 초기화)
  * 4. Google Sign-In: 별도 초기화 불필요
+ *
+ * UDP 실시간 업데이트 관리:
+ * - 앱 전체 생명주기에 따라 UDP 브로드캐스트 관리
+ * - 포그라운드 진입 시 UDP 시작
+ * - 백그라운드 진입 시 UDP 중지
+ * - 앱 실행 중 상시 UDP 동작 보장
  */
 @HiltAndroidApp
-class IdolApplication : Application(), ImageLoaderFactory {
+class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObserver {
 
     @Inject
     lateinit var preferencesManager: PreferencesManager
+
+    @Inject
+    lateinit var broadcastManager: IdolBroadcastManager
 
     /**
      * Coil ImageLoader 설정 (메모리 최적화)
@@ -91,7 +104,7 @@ class IdolApplication : Application(), ImageLoaderFactory {
     }
 
     override fun onCreate() {
-        super.onCreate()
+        super<Application>.onCreate()
 
         // 저장된 서버 URL 로드 (old 프로젝트 방식)
         initializeServerUrl()
@@ -117,6 +130,36 @@ class IdolApplication : Application(), ImageLoaderFactory {
 
         // Line SDK: 별도 초기화 불필요 (사용 시 자동 초기화)
         // Google Sign-In: 별도 초기화 불필요
+
+        // 앱 전체 생명주기 옵저버 등록 (UDP 관리)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        Log.d("IdolApplication", "🔄 ProcessLifecycleOwner observer registered")
+    }
+
+    /**
+     * 앱이 포그라운드로 진입할 때 호출 (ProcessLifecycleOwner)
+     * UDP 브로드캐스트를 시작하여 실시간 업데이트를 받습니다.
+     */
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
+        Log.d("IdolApplication", "========================================")
+        Log.d("IdolApplication", "📱 App lifecycle: ON_START (Foreground)")
+        Log.d("IdolApplication", "========================================")
+        Log.d("IdolApplication", "📡 Starting UDP broadcast...")
+        broadcastManager.startHeartbeat()
+    }
+
+    /**
+     * 앱이 백그라운드로 진입할 때 호출 (ProcessLifecycleOwner)
+     * UDP 브로드캐스트를 중지하여 리소스를 절약합니다.
+     */
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        Log.d("IdolApplication", "========================================")
+        Log.d("IdolApplication", "📱 App lifecycle: ON_STOP (Background)")
+        Log.d("IdolApplication", "========================================")
+        Log.d("IdolApplication", "🛑 Stopping UDP broadcast...")
+        broadcastManager.stopHeartbeat()
     }
 
     /**
