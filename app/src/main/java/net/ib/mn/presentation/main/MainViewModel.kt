@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     val preferencesManager: PreferencesManager,
-    private val rankingCacheRepository: net.ib.mn.data.repository.RankingCacheRepository
+    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartDatabaseRepository
 ) : ViewModel() {
 
     companion object {
@@ -136,8 +136,8 @@ class MainViewModel @Inject constructor(
                 // DataStore의 모든 데이터 삭제
                 preferencesManager.clearAll()
 
-                // 랭킹 캐시 삭제
-                rankingCacheRepository.clearAll()
+                // Room DB의 모든 차트 데이터 삭제
+                chartDatabaseRepository.clearAll()
 
                 // 로그아웃 완료 플래그 설정
                 _logoutCompleted.value = true

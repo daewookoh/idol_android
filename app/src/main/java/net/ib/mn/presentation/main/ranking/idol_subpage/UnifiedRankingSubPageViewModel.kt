@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import net.ib.mn.domain.ranking.RankingDataSource
 import net.ib.mn.ui.components.RankingItemData
@@ -16,17 +17,17 @@ import net.ib.mn.ui.components.RankingItemData
 /**
  * 통합 랭킹 ViewModel (Global, Group, Solo 모두 지원)
  *
- * RankingCacheRepository를 구독하여 캐시된 데이터만 표시하는 간소화된 버전
+ * ChartDatabaseRepository를 구독하여 Room DB 데이터를 실시간으로 표시
  *
  * 주요 기능:
- * 1. RankingCacheRepository 구독 → 실시간 데이터 반영
+ * 1. ChartDatabaseRepository 구독 → Room DB Flow 기반 실시간 데이터 반영
  * 2. 차트 변경 (남녀 토글) 지원
  * 3. 캐시 데이터 즉시 표시 (빠른 로딩)
  *
  * 데이터 로딩은 StartUpViewModel에서 처리:
- * - StartUp 시점에 5개 차트 데이터를 미리 캐싱
+ * - StartUp 시점에 5개 차트 데이터를 미리 DB에 저장
  * - API 호출 및 데이터 가공은 StartUpViewModel이 담당
- * - 이 ViewModel은 캐시된 데이터를 구독하여 표시만 함
+ * - 이 ViewModel은 DB 데이터를 구독하여 표시만 함
  *
  * @param chartCode 초기 차트 코드
  * @param dataSource 랭킹 데이터 소스 (Global/Group/Solo)
@@ -35,7 +36,7 @@ import net.ib.mn.ui.components.RankingItemData
 class UnifiedRankingSubPageViewModel @AssistedInject constructor(
     @Assisted private val chartCode: String,
     @Assisted private val dataSource: RankingDataSource,
-    private val rankingCacheRepository: net.ib.mn.data.repository.RankingCacheRepository
+    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartDatabaseRepository
 ) : ViewModel() {
 
     sealed interface UiState {
@@ -51,83 +52,93 @@ class UnifiedRankingSubPageViewModel @AssistedInject constructor(
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     // 현재 사용 중인 차트 코드 (남녀 변경 시 업데이트됨)
-    private var currentChartCode: String = chartCode
+    private val _currentChartCode = MutableStateFlow(chartCode)
+    private val currentChartCode: StateFlow<String> = _currentChartCode.asStateFlow()
 
     private val logTag = "UnifiedRankingVM[${dataSource.type}]"
 
     init {
         android.util.Log.d(logTag, "🆕 ViewModel created for chartCode: $chartCode")
 
-        // 캐시 데이터를 구독하여 실시간 반영
+        // 현재 차트만 구독하여 실시간 반영
         subscribeToCacheData()
 
         // 캐시에서 즉시 데이터 로드
-        loadFromCache()
+        viewModelScope.launch {
+            loadFromCache()
+        }
     }
 
     /**
-     * RankingCacheRepository를 구독하여 캐시 변경 시 자동 업데이트
+     * ChartDatabaseRepository를 구독하여 DB 변경 시 자동 업데이트
+     *
+     * flatMapLatest를 사용하여 currentChartCode가 변경되면
+     * 자동으로 새로운 차트를 구독합니다.
      */
     private fun subscribeToCacheData() {
-        // 모든 차트 코드 변경을 감지하기 위해 각 차트별로 구독
-        listOf("PR_S_F", "PR_S_M", "PR_G_F", "PR_G_M", "GLOBALS").forEach { code ->
-            viewModelScope.launch {
-                android.util.Log.d(logTag, "👂 Starting subscription for chart: $code")
-                rankingCacheRepository.observeChartData(code).collect { processedData ->
-                    android.util.Log.d(logTag, "📥 Received update for chart $code: data=${processedData?.rankItems?.size} items, currentChartCode=$currentChartCode")
+        viewModelScope.launch {
+            _currentChartCode
+                .flatMapLatest { code ->
+                    android.util.Log.d(logTag, "👂 Subscribing to chart: $code")
+                    chartDatabaseRepository.observeChartData(code)
+                }
+                .collect { processedData ->
+                    val code = _currentChartCode.value
+                    android.util.Log.d(logTag, "📥 Received update for chart $code: data=${processedData?.rankItems?.size} items")
 
-                    // 현재 활성화된 차트 코드와 일치하는 경우에만 UI 업데이트
-                    if (code == currentChartCode && processedData != null) {
-                        android.util.Log.d(logTag, "🔄 Cache updated for $code: ${processedData.rankItems.size} items - UPDATING UI")
+                    if (processedData != null) {
+                        android.util.Log.d(logTag, "🔄 DB updated for $code: ${processedData.rankItems.size} items - UPDATING UI")
                         _uiState.value = UiState.Success(
                             items = processedData.rankItems,
                             topIdol = processedData.rankItems.firstOrNull()
                         )
                         android.util.Log.d(logTag, "✅ UI state updated successfully")
                     } else {
-                        android.util.Log.d(logTag, "⏭️ Skipping UI update: code mismatch or null data")
+                        android.util.Log.d(logTag, "⚠️ Received null data for $code")
                     }
                 }
-            }
         }
     }
 
     /**
-     * 캐시에서 데이터 로드 (즉시 표시)
+     * DB에서 데이터 로드 (즉시 표시)
      */
-    private fun loadFromCache() {
-        val cachedData = rankingCacheRepository.getChartData(currentChartCode)
+    private suspend fun loadFromCache() {
+        val code = _currentChartCode.value
+        val cachedData = chartDatabaseRepository.getChartData(code)
         if (cachedData != null) {
-            android.util.Log.d(logTag, "✅ Loaded from cache: ${cachedData.rankItems.size} items")
+            android.util.Log.d(logTag, "✅ Loaded from DB: ${cachedData.rankItems.size} items")
             _uiState.value = UiState.Success(
                 items = cachedData.rankItems,
                 topIdol = cachedData.rankItems.firstOrNull()
             )
         } else {
-            android.util.Log.d(logTag, "⚠️ No cache available for $currentChartCode - showing loading state")
+            android.util.Log.d(logTag, "⚠️ No data available in DB for $code - showing loading state")
             _uiState.value = UiState.Loading
         }
     }
 
     /**
      * 화면이 보일 때 호출
-     * 백그라운드에서 API 호출하여 캐시 갱신
+     * 백그라운드에서 API 호출하여 DB 갱신
      */
     fun onScreenVisible() {
-        android.util.Log.d(logTag, "👁️ Screen became visible for chartCode: $currentChartCode")
+        val code = _currentChartCode.value
+        android.util.Log.d(logTag, "👁️ Screen became visible for chartCode: $code")
 
-        // 백그라운드에서 API 호출하여 캐시 갱신
+        // 백그라운드에서 API 호출하여 DB 갱신
         viewModelScope.launch {
-            rankingCacheRepository.refreshChartData(currentChartCode)
+            chartDatabaseRepository.refreshChart(code)
         }
     }
 
     /**
      * 화면이 사라질 때 호출
-     * (캐시 구독 방식이므로 특별한 처리 불필요)
+     * (DB Flow 구독 방식이므로 특별한 처리 불필요)
      */
     fun onScreenHidden() {
-        android.util.Log.d(logTag, "🙈 Screen hidden for chartCode: $currentChartCode")
+        val code = _currentChartCode.value
+        android.util.Log.d(logTag, "🙈 Screen hidden for chartCode: $code")
         // Flow 구독은 viewModelScope에 의해 자동 관리됨
     }
 
@@ -137,10 +148,11 @@ class UnifiedRankingSubPageViewModel @AssistedInject constructor(
      * @param isMale true면 남자, false면 여자
      */
     fun changeGender(isMale: Boolean) {
+        val currentCode = _currentChartCode.value
         android.util.Log.d(logTag, "🔄 Changing gender to ${if (isMale) "Male" else "Female"}")
 
         // Global 랭킹은 변경 없음
-        if (currentChartCode == "GLOBALS") {
+        if (currentCode == "GLOBALS") {
             android.util.Log.d(logTag, "⚠️ Global ranking doesn't support gender change")
             return
         }
@@ -153,47 +165,45 @@ class UnifiedRankingSubPageViewModel @AssistedInject constructor(
 
         // 차트 코드 변환 (PR_S_F ↔ PR_S_M, PR_G_F ↔ PR_G_M)
         val newCode = when {
-            currentChartCode.startsWith("PR_S_") -> if (isMale) "PR_S_M" else "PR_S_F"
-            currentChartCode.startsWith("PR_G_") -> if (isMale) "PR_G_M" else "PR_G_F"
+            currentCode.startsWith("PR_S_") -> if (isMale) "PR_S_M" else "PR_S_F"
+            currentCode.startsWith("PR_G_") -> if (isMale) "PR_G_M" else "PR_G_F"
             else -> {
-                android.util.Log.e(logTag, "❌ Unknown chart code pattern: $currentChartCode")
+                android.util.Log.e(logTag, "❌ Unknown chart code pattern: $currentCode")
                 return
             }
         }
 
         // 같은 코드면 무시
-        if (newCode == currentChartCode) {
+        if (newCode == currentCode) {
             android.util.Log.d(logTag, "⚠️ Same code, ignoring: $newCode")
             return
         }
 
-        android.util.Log.d(logTag, "🔄 Changing chartCode: $currentChartCode → $newCode")
+        android.util.Log.d(logTag, "🔄 Changing chartCode: $currentCode → $newCode")
 
-        // 새로운 코드로 업데이트
-        currentChartCode = newCode
-
-        // 캐시에서 즉시 로드
-        loadFromCache()
+        // 새로운 코드로 업데이트 (flatMapLatest가 자동으로 새 차트 구독)
+        _currentChartCode.value = newCode
 
         // 백그라운드에서 API 호출하여 새 차트 데이터 갱신
         viewModelScope.launch {
-            rankingCacheRepository.refreshChartData(newCode)
+            chartDatabaseRepository.refreshChart(newCode)
         }
 
         android.util.Log.d(logTag, "✅ Gender changed to $newCode")
     }
 
     /**
-     * 투표 후 호출 - 캐시 업데이트 및 재랭킹
+     * 투표 후 호출 - DB 업데이트 및 재랭킹
      */
     fun updateVote(idolId: Int, votedHeart: Long) {
-        android.util.Log.d(logTag, "📊 Vote updated: idolId=$idolId, hearts=$votedHeart, chartCode=$currentChartCode")
+        val code = _currentChartCode.value
+        android.util.Log.d(logTag, "📊 Vote updated: idolId=$idolId, hearts=$votedHeart, chartCode=$code")
 
-        // 백그라운드에서 캐시 업데이트 및 재랭킹
+        // 백그라운드에서 DB 업데이트 및 재랭킹
         viewModelScope.launch {
             android.util.Log.d(logTag, "🚀 Starting updateVoteAndRefreshCache...")
-            rankingCacheRepository.updateVoteAndRefreshCache(
-                chartCode = currentChartCode,
+            chartDatabaseRepository.updateVoteAndRefreshCache(
+                chartCode = code,
                 idolId = idolId,
                 voteCount = votedHeart
             )
@@ -207,7 +217,9 @@ class UnifiedRankingSubPageViewModel @AssistedInject constructor(
     fun reloadIfNeeded() {
         android.util.Log.d(logTag, "🔄 Reload requested")
         // 캐시에서 다시 로드
-        loadFromCache()
+        viewModelScope.launch {
+            loadFromCache()
+        }
     }
 
     /**
@@ -215,9 +227,8 @@ class UnifiedRankingSubPageViewModel @AssistedInject constructor(
      */
     fun reloadWithNewCode(newChartCode: String) {
         android.util.Log.d(logTag, "🔄 Reload with new code: $newChartCode")
-        // 차트 코드 변경
-        currentChartCode = newChartCode
-        loadFromCache()
+        // 차트 코드 변경 (flatMapLatest가 자동으로 새 차트 구독)
+        _currentChartCode.value = newChartCode
     }
 
     @AssistedFactory

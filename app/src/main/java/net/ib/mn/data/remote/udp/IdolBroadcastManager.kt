@@ -44,7 +44,7 @@ class IdolBroadcastManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val idolDao: IdolDao,
     private val idolRepository: net.ib.mn.domain.repository.IdolRepository,
-    private val rankingCacheRepository: net.ib.mn.data.repository.RankingCacheRepository
+    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartDatabaseRepository
 ) {
     companion object {
         /**
@@ -672,10 +672,10 @@ class IdolBroadcastManager @Inject constructor(
                     Log.d(TAG, "   → ViewModel에서 해당 아이돌만 재계산")
                 }
 
-                // 랭킹 캐시 부분 업데이트 (전체 재생성이 아닌 해당 아이돌만)
-                Log.i(TAG, "🔄 Updating ranking cache for ${changedIdolIds.size} idols")
-                rankingCacheRepository.updateIdolsFromUdp(changedIdolIds)
-                Log.i(TAG, "✅ Ranking cache partially updated")
+                // Room DB 부분 업데이트 (전체 재생성이 아닌 해당 아이돌만)
+                Log.i(TAG, "🔄 Updating chart DB for ${changedIdolIds.size} idols")
+                chartDatabaseRepository.updateIdolsFromUdp(changedIdolIds)
+                Log.i(TAG, "✅ Chart DB partially updated")
             } else {
                 if (VERBOSE_LOGGING) {
                     Log.d(TAG, "ℹ️ 변경사항 없음 - 이벤트 발행 안 함")

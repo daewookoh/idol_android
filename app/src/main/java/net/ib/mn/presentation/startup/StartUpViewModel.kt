@@ -76,7 +76,7 @@ class StartUpViewModel @Inject constructor(
     private val preferencesManager: net.ib.mn.data.local.PreferencesManager,
     private val authInterceptor: net.ib.mn.data.remote.interceptor.AuthInterceptor,
     private val idolDao: net.ib.mn.data.local.dao.IdolDao,
-    private val rankingCacheRepository: net.ib.mn.data.repository.RankingCacheRepository,
+    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartDatabaseRepository,
 ) : BaseViewModel<StartUpContract.State, StartUpContract.Intent, StartUpContract.Effect>() {
 
     companion object {
@@ -843,14 +843,30 @@ class StartUpViewModel @Inject constructor(
     }
 
     /**
-     * 차트별 아이돌 ID 목록을 병렬로 미리 로드하여 SharedPreferences에 저장
+     * 차트별 아이돌 ID 목록을 Room DB에 미리 로드
      *
      * 퍼포먼스 최적화: MyFavorite 페이지에서 5개 차트의 데이터를 빠르게 표시하기 위해
-     * StartUp 시점에 미리 로드하여 캐싱
+     * StartUp 시점에 미리 Room DB에 저장
+     *
+     * 변경사항:
+     * - RankingCacheRepository (인메모리 캐시) 제거
+     * - ChartDatabaseRepository (Room DB) 사용 - Single Source of Truth
      */
     private suspend fun cacheIdolsRanking() {
-        // RankingCacheRepository의 공용 함수 사용
-        rankingCacheRepository.cacheIdolsRanking()
+        android.util.Log.d(TAG, "========================================")
+        android.util.Log.d(TAG, "📊 Caching chart rankings in database...")
+        android.util.Log.d(TAG, "========================================")
+
+        try {
+            chartDatabaseRepository.initializeChartsInDatabase()
+            android.util.Log.d(TAG, "✅ Database cache complete")
+
+            android.util.Log.d(TAG, "========================================")
+            android.util.Log.d(TAG, "✅ All chart rankings cached successfully")
+            android.util.Log.d(TAG, "========================================")
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "❌ Failed to cache rankings: ${e.message}", e)
+        }
     }
 
     /**

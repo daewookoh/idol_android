@@ -28,7 +28,7 @@ import javax.inject.Singleton
 class UserCacheRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val idolDao: net.ib.mn.data.local.dao.IdolDao,
-    private val rankingCacheRepository: RankingCacheRepository,
+    private val chartDatabaseRepository: ChartDatabaseRepository,
     private val userRepositoryProvider: javax.inject.Provider<net.ib.mn.domain.repository.UserRepository>,
     private val favoritesRepositoryProvider: javax.inject.Provider<net.ib.mn.domain.repository.FavoritesRepository>
 ) {
@@ -311,8 +311,8 @@ class UserCacheRepository @Inject constructor(
         }
 
         try {
-            // 1. 캐시에서 차트 데이터 가져오기
-            val chartData = chartCode?.let { rankingCacheRepository.getChartData(it) }
+            // 1. Room DB에서 차트 데이터 가져오기
+            val chartData = chartCode?.let { chartDatabaseRepository.getChartData(it) }
             val rankItem = chartData?.rankItems?.find { it.id == mostIdolId.toString() }
 
             if (rankItem != null) {

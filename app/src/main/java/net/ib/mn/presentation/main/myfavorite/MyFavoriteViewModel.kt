@@ -7,7 +7,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.ib.mn.base.BaseViewModel
-import net.ib.mn.data.repository.RankingCacheRepository
 import net.ib.mn.data.repository.UserCacheRepository
 import javax.inject.Inject
 
@@ -16,14 +15,14 @@ import javax.inject.Inject
  *
  * Flow 기반 반응형 아키텍처:
  * - UserCacheRepository.mostFavoriteIdol Flow 구독으로 실시간 업데이트
- * - RankingCacheRepository.observeChartData로 차트별 데이터 자동 반영
- * - 불필요한 API 호출 제거, 캐시 기반 동작
+ * - ChartDatabaseRepository.observeChartData로 차트별 데이터 자동 반영 (Room DB Flow)
+ * - 불필요한 API 호출 제거, DB 기반 동작
  */
 @HiltViewModel
 class MyFavoriteViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val userCacheRepository: UserCacheRepository,
-    private val rankingCacheRepository: RankingCacheRepository,
+    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartDatabaseRepository,
     val rankingRepository: net.ib.mn.domain.repository.RankingRepository
 ) : BaseViewModel<MyFavoriteContract.State, MyFavoriteContract.Intent, MyFavoriteContract.Effect>() {
 
@@ -96,13 +95,13 @@ class MyFavoriteViewModel @Inject constructor(
      * 백그라운드에서 최신 데이터 갱신
      * - UserSelf API 호출하여 최애 변경 확인
      * - 즐겨찾기 목록 갱신
-     * - 랭킹 캐시 갱신 (DB = Single Source of Truth)
+     * - 랭킹 DB 갱신 (Room DB = Single Source of Truth)
      *
      * ✅ 안전한 이유:
-     *   - updateVoteAndRefreshCache()가 DB를 먼저 업데이트한 후 캐시 재구성
-     *   - UDP도 DB를 먼저 업데이트한 후 캐시 갱신
-     *   - refreshChartData()는 항상 최신 DB 데이터를 기반으로 캐시 재구성
-     *   - DB = Single Source of Truth 원칙 준수
+     *   - updateVoteAndRefreshCache()가 DB를 먼저 업데이트
+     *   - UDP도 DB를 먼저 업데이트
+     *   - refreshChart()는 항상 최신 API 데이터를 기반으로 DB 재구성
+     *   - Room DB = Single Source of Truth 원칙 준수
      */
     private fun refreshDataInBackground() {
         viewModelScope.launch {
@@ -113,15 +112,15 @@ class MyFavoriteViewModel @Inject constructor(
                 // 2. 즐겨찾기 목록 최신화
                 userCacheRepository.refreshFavoriteIdols()
 
-                // 3. 랭킹 데이터 갱신 (DB 기반 캐시 재구성)
+                // 3. 랭킹 데이터 갱신 (Room DB 업데이트)
                 CHART_CODES.forEach { chartCode ->
-                    rankingCacheRepository.refreshChartData(chartCode)
+                    chartDatabaseRepository.refreshChart(chartCode)
                 }
 
                 android.util.Log.d(TAG, "✅ Background refresh completed")
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "❌ Background refresh failed: ${e.message}", e)
-                // 에러가 나도 캐시 데이터는 이미 보여주고 있으므로 사용자에게 에러 표시 안 함
+                // 에러가 나도 DB 데이터는 이미 보여주고 있으므로 사용자에게 에러 표시 안 함
             }
         }
     }
@@ -171,7 +170,7 @@ class MyFavoriteViewModel @Inject constructor(
     /**
      * 차트 섹션 업데이트
      */
-    private fun updateChartSections(favoriteIdolIds: Set<Int>) {
+    private suspend fun updateChartSections(favoriteIdolIds: Set<Int>) {
         if (favoriteIdolIds.isEmpty()) {
             _chartSections.value = emptyList()
             return
@@ -180,7 +179,7 @@ class MyFavoriteViewModel @Inject constructor(
         val sections = mutableListOf<ChartSection>()
 
         CHART_CODES.forEach { chartCode ->
-            val chartData = rankingCacheRepository.getChartData(chartCode) ?: return@forEach
+            val chartData = chartDatabaseRepository.getChartData(chartCode) ?: return@forEach
 
             // 해당 차트에서 즐겨찾기 아이돌만 필터링
             val favoriteIdsInChart = chartData.rankItems
@@ -221,11 +220,11 @@ class MyFavoriteViewModel @Inject constructor(
     }
 
     /**
-     * 투표 성공 시 캐시 업데이트
+     * 투표 성공 시 DB 업데이트
      *
-     * RankingCacheRepository.updateVoteAndRefreshCache()가 자동으로:
-     * 1. DB 업데이트
-     * 2. 캐시 업데이트
+     * ChartDatabaseRepository.updateVoteAndRefreshCache()가 자동으로:
+     * 1. IdolDao DB 업데이트
+     * 2. ChartRankingDao DB 업데이트
      * 3. UserCacheRepository.refreshMostFavoriteIdol() 호출
      *
      * mostFavoriteIdol Flow가 자동으로 UI 업데이트
@@ -236,7 +235,7 @@ class MyFavoriteViewModel @Inject constructor(
                 val chartCode = userCacheRepository.getMostIdolChartCode()
 
                 if (chartCode != null) {
-                    rankingCacheRepository.updateVoteAndRefreshCache(
+                    chartDatabaseRepository.updateVoteAndRefreshCache(
                         chartCode = chartCode,
                         idolId = idolId,
                         voteCount = votedHeart
@@ -249,7 +248,7 @@ class MyFavoriteViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                android.util.Log.e(TAG, "❌ Failed to update vote cache: ${e.message}", e)
+                android.util.Log.e(TAG, "❌ Failed to update vote in DB: ${e.message}", e)
             }
         }
     }
