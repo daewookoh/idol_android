@@ -104,8 +104,8 @@ class UnifiedRankingSubPageViewModel @AssistedInject constructor(
                 topIdol = cachedData.rankItems.firstOrNull()
             )
         } else {
-            android.util.Log.d(logTag, "⚠️ No cache available for $currentChartCode")
-            _uiState.value = UiState.Error("데이터를 불러오는 중입니다...")
+            android.util.Log.d(logTag, "⚠️ No cache available for $currentChartCode - showing loading state")
+            _uiState.value = UiState.Loading
         }
     }
 

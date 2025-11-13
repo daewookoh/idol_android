@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -83,19 +84,35 @@ fun MainScreen(
         }
     }
 
-    // UDP 구독 관리: 랭킹(0)과 나의최애(1) 탭일 때만 구독
-    DisposableEffect(selectedTab, lifecycleOwner) {
-        val shouldSubscribe = selectedTab == 0 || selectedTab == 1
-
+    // 앱 생명주기 관리: 백그라운드 복귀 시 캐시 새로고침
+    DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_RESUME -> {
+                    android.util.Log.d("MainScreen", "========================================")
+                    android.util.Log.d("MainScreen", "📱 App lifecycle: ON_RESUME")
+                    android.util.Log.d("MainScreen", "========================================")
+
+                    // 1. 앱 복귀 처리 (캐시 새로고침 포함)
+                    viewModel.onAppResume()
+
+                    // 2. UDP 구독 시작 (랭킹/나의최애 탭인 경우)
+                    val shouldSubscribe = selectedTab == 0 || selectedTab == 1
                     if (shouldSubscribe) {
                         android.util.Log.d("MainScreen", "📡 Starting UDP subscription (tab: $selectedTab)")
                         broadcastManager.startHeartbeat()
                     }
                 }
                 Lifecycle.Event.ON_PAUSE -> {
+                    android.util.Log.d("MainScreen", "========================================")
+                    android.util.Log.d("MainScreen", "📱 App lifecycle: ON_PAUSE")
+                    android.util.Log.d("MainScreen", "========================================")
+
+                    // 1. 앱 정지 처리
+                    viewModel.onAppPause()
+
+                    // 2. UDP 구독 중지 (랭킹/나의최애 탭인 경우)
+                    val shouldSubscribe = selectedTab == 0 || selectedTab == 1
                     if (shouldSubscribe) {
                         android.util.Log.d("MainScreen", "🛑 Stopping UDP subscription (tab: $selectedTab)")
                         broadcastManager.stopHeartbeat()
@@ -105,15 +122,11 @@ fun MainScreen(
             }
         }
 
-        if (shouldSubscribe) {
-            lifecycleOwner.lifecycle.addObserver(observer)
-        }
+        lifecycleOwner.lifecycle.addObserver(observer)
 
         onDispose {
-            if (shouldSubscribe) {
-                lifecycleOwner.lifecycle.removeObserver(observer)
-                android.util.Log.d("MainScreen", "♻️ UDP observer removed")
-            }
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            android.util.Log.d("MainScreen", "♻️ Lifecycle observer removed")
         }
     }
 
