@@ -497,7 +497,7 @@ class StartUpViewModel @Inject constructor(
      */
     private suspend fun loadAndSaveUserSelf() {
         try {
-            val loadResult = userRepository.loadAndSaveUserSelf("no-cache")
+            val loadResult = userRepository.loadAndSaveUserSelf()
 
             if (loadResult.isFailure) {
                 val exception = loadResult.exceptionOrNull()

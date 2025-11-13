@@ -28,7 +28,9 @@ import javax.inject.Singleton
 class UserCacheRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val idolDao: net.ib.mn.data.local.dao.IdolDao,
-    private val rankingCacheRepository: RankingCacheRepository
+    private val rankingCacheRepository: RankingCacheRepository,
+    private val userRepositoryProvider: javax.inject.Provider<net.ib.mn.domain.repository.UserRepository>,
+    private val favoritesRepositoryProvider: javax.inject.Provider<net.ib.mn.domain.repository.FavoritesRepository>
 ) {
 
     companion object {
@@ -387,5 +389,33 @@ class UserCacheRepository @Inject constructor(
         Log.d(TAG, "Favorite Idol Count: ${_favoriteIdolIds.value.size}")
         Log.d(TAG, "Heart Info: ${_heartInfo.value}")
         Log.d(TAG, "=========================================")
+    }
+
+    /**
+     * UserSelf 최신 데이터 가져오기 (백그라운드 갱신용)
+     */
+    suspend fun refreshUserData() {
+        try {
+            val result = userRepositoryProvider.get().loadAndSaveUserSelf("no-cache")
+            result.getOrThrow()
+            Log.d(TAG, "✅ UserSelf refreshed successfully")
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Failed to refresh UserSelf: ${e.message}", e)
+            throw e
+        }
+    }
+
+    /**
+     * 즐겨찾기 목록 최신화 (백그라운드 갱신용)
+     */
+    suspend fun refreshFavoriteIdols() {
+        try {
+            val result = favoritesRepositoryProvider.get().loadAndSaveFavoriteSelf()
+            result.getOrThrow()
+            Log.d(TAG, "✅ Favorites refreshed successfully")
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Failed to refresh Favorites: ${e.message}", e)
+            throw e
+        }
     }
 }

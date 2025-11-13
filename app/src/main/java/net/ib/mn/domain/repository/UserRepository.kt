@@ -120,5 +120,5 @@ interface UserRepository {
      * @param cacheControl Cache-Control 헤더 값
      * @return Result<Boolean> - 성공 시 true, 401 에러 시 Exception("Unauthorized")
      */
-    suspend fun loadAndSaveUserSelf(cacheControl: String? = null): Result<Boolean>
+    suspend fun loadAndSaveUserSelf(cacheControl: String? = "no-cache"): Result<Boolean>
 }

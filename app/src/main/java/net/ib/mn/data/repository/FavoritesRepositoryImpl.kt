@@ -185,25 +185,10 @@ class FavoritesRepositoryImpl @Inject constructor(
                         val favorites = result.data
 
                         // Extract idol IDs from favorites and cache them
+                        // ⚠️ IMPORTANT: Favorites API의 heart 값은 구버전일 수 있으므로
+                        // DB 업데이트는 하지 않고 ID만 캐싱합니다.
                         val idolIds = favorites.map { it.idol.id }
                         userCacheRepository.setFavoriteIdolIds(idolIds)
-
-                        // Save each favorite idol to local DB
-                        favorites.forEach { favorite ->
-                            val idol = favorite.idol
-                            val idolEntity = net.ib.mn.data.local.entity.IdolEntity(
-                                id = idol.id,
-                                name = idol.name ?: "",
-                                category = idol.category ?: "",
-                                type = idol.type ?: "",
-                                imageUrl = idol.imageUrl,
-                                imageUrl2 = idol.imageUrl2,
-                                imageUrl3 = idol.imageUrl3,
-                                groupId = idol.groupId ?: 0,
-                                heart = idol.heart ?: 0L
-                            )
-                            idolDao.upsert(idolEntity)
-                        }
 
                         success = true
                     }

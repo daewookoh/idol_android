@@ -209,6 +209,10 @@ class RankingCacheRepository @Inject constructor(
     /**
      * 투표 후 랭킹 업데이트 및 캐시 갱신
      *
+     * 🔑 핵심 원칙: DB를 먼저 업데이트하고, DB 데이터를 기반으로 캐시 재구성
+     * - DB = Single Source of Truth
+     * - 캐시는 DB에서 파생된 뷰
+     *
      * @param chartCode 업데이트할 차트 코드
      * @param idolId 투표한 아이돌 ID
      * @param voteCount 투표한 하트 수
@@ -221,9 +225,10 @@ class RankingCacheRepository @Inject constructor(
         Log.d(TAG, "📊 Vote: idol=$idolId, chart=$chartCode, +$voteCount")
 
         try {
-            // DB 업데이트 (항상 실행)
+            // 1️⃣ DB 먼저 업데이트 (Single Source of Truth)
             updateIdolHeartInDb(idolId, voteCount)
 
+            // 2️⃣ 캐시가 있는지 확인
             val cachedData = getChartData(chartCode)
             if (cachedData == null) {
                 Log.w(TAG, "⚠️ No cache for $chartCode")
@@ -236,44 +241,15 @@ class RankingCacheRepository @Inject constructor(
                 return
             }
 
-            // 캐시에서 해당 아이돌 하트 수 업데이트
-            val updatedItems = cachedData.rankItems.map { item ->
-                if (item.id == idolId.toString()) {
-                    val newHeart = item.heartCount + voteCount
-
-                    item.copy(
-                        voteCount = formatHeartCount(newHeart.toInt()),
-                        heartCount = newHeart
-                    )
-                } else {
-                    item
-                }
-            }
-
-            // 재랭킹 및 max/min 재계산
-            val sortedItems = RankingUtil.sortAndRank(updatedItems)
-            val maxHeart = sortedItems.maxOfOrNull { it.heartCount } ?: 0L
-            val minHeart = sortedItems.minOfOrNull { it.heartCount } ?: 0L
-
-            val finalItems = sortedItems.map { item ->
-                item.copy(maxHeartCount = maxHeart, minHeartCount = minHeart)
-            }
-
-            // topIdol 업데이트
-            val newTopIdol = finalItems.firstOrNull()?.id?.toIntOrNull()?.let {
-                idolDao.getIdolById(it)
-            } ?: cachedData.topIdol
-
-            // 캐시 업데이트
-            setChartData(
-                chartCode,
-                cachedData.copy(rankItems = finalItems, topIdol = newTopIdol)
-            )
-
-            Log.d(TAG, "✅ Vote updated: $chartCode")
-
-            // 최애 아이돌인 경우 UserCacheRepository의 mostFavoriteIdol도 업데이트
+            // 3️⃣ 업데이트된 DB 데이터를 기반으로 캐시 재구성
+            val chartIdolIds = cachedData.rankItems.map { it.id.toInt() }
             val mostIdolId = userCacheRepository.get().getMostIdolId()
+
+            rebuildChartCache(chartCode, chartIdolIds, mostIdolId)
+
+            Log.d(TAG, "✅ Vote updated: $chartCode (DB → Cache)")
+
+            // 4️⃣ 최애 아이돌인 경우 UserCacheRepository의 mostFavoriteIdol도 업데이트
             if (idolId == mostIdolId) {
                 userCacheRepository.get().refreshMostFavoriteIdol()
             }

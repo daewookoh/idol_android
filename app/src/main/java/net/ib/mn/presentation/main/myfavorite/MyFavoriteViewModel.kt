@@ -74,10 +74,55 @@ class MyFavoriteViewModel @Inject constructor(
             is MyFavoriteContract.Intent.RefreshFavorites -> loadFavoritesFromCache()
             is MyFavoriteContract.Intent.OnIdolClick -> onIdolClick(intent.idolId)
             is MyFavoriteContract.Intent.OnSettingClick -> onSettingClick()
-            is MyFavoriteContract.Intent.OnPageVisible -> loadFavoritesFromCache()
+            is MyFavoriteContract.Intent.OnPageVisible -> onPageVisible()
             is MyFavoriteContract.Intent.OnScreenVisible -> {}
             is MyFavoriteContract.Intent.OnScreenHidden -> {}
             is MyFavoriteContract.Intent.OnVoteSuccess -> onVoteSuccess(intent.idolId, intent.votedHeart)
+        }
+    }
+
+    /**
+     * 페이지 진입 시: 캐시 먼저 보여주고, 백그라운드에서 최신 데이터 로드
+     */
+    private fun onPageVisible() {
+        // 1. 캐시 먼저 로드 (빠른 응답)
+        loadFavoritesFromCache()
+
+        // 2. 백그라운드에서 최신 데이터 가져오기
+        refreshDataInBackground()
+    }
+
+    /**
+     * 백그라운드에서 최신 데이터 갱신
+     * - UserSelf API 호출하여 최애 변경 확인
+     * - 즐겨찾기 목록 갱신
+     * - 랭킹 캐시 갱신 (DB = Single Source of Truth)
+     *
+     * ✅ 안전한 이유:
+     *   - updateVoteAndRefreshCache()가 DB를 먼저 업데이트한 후 캐시 재구성
+     *   - UDP도 DB를 먼저 업데이트한 후 캐시 갱신
+     *   - refreshChartData()는 항상 최신 DB 데이터를 기반으로 캐시 재구성
+     *   - DB = Single Source of Truth 원칙 준수
+     */
+    private fun refreshDataInBackground() {
+        viewModelScope.launch {
+            try {
+                // 1. UserSelf 최신 데이터 가져오기 (최애 변경 확인)
+                userCacheRepository.refreshUserData()
+
+                // 2. 즐겨찾기 목록 최신화
+                userCacheRepository.refreshFavoriteIdols()
+
+                // 3. 랭킹 데이터 갱신 (DB 기반 캐시 재구성)
+                CHART_CODES.forEach { chartCode ->
+                    rankingCacheRepository.refreshChartData(chartCode)
+                }
+
+                android.util.Log.d(TAG, "✅ Background refresh completed")
+            } catch (e: Exception) {
+                android.util.Log.e(TAG, "❌ Background refresh failed: ${e.message}", e)
+                // 에러가 나도 캐시 데이터는 이미 보여주고 있으므로 사용자에게 에러 표시 안 함
+            }
         }
     }
 
