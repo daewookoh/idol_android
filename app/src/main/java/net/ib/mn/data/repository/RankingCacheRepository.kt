@@ -56,48 +56,29 @@ class RankingCacheRepository @Inject constructor(
     private val flows = ConcurrentHashMap<String, MutableStateFlow<ProcessedRankData?>>()
 
     /**
-     * 차트 데이터 저장
-     *
-     * @param chartCode 차트 코드 (예: "PR_S_F", "PR_G_M", "GLOBALS")
-     * @param data ProcessedRankData (rankItems + topIdol)
+     * 차트 데이터 저장 및 Flow 업데이트
      */
     fun setChartData(chartCode: String, data: ProcessedRankData) {
-        // LRU 방식으로 오래된 캐시 제거 (메모리 관리)
+        // LRU 캐시 관리
         if (cache.size >= MAX_CACHE_SIZE && !cache.containsKey(chartCode)) {
-            val oldestKey = cache.keys.firstOrNull()
-            if (oldestKey != null) {
+            cache.keys.firstOrNull()?.let { oldestKey ->
                 cache.remove(oldestKey)
                 flows.remove(oldestKey)
-                android.util.Log.d(TAG, "🗑️ Evicted oldest cache: $oldestKey")
+                Log.d(TAG, "🗑️ Evicted: $oldestKey")
             }
         }
 
         cache[chartCode] = data
+        flows.getOrPut(chartCode) { MutableStateFlow(null) }.value = data
 
-        // Flow 업데이트 - 새로운 값을 emit
-        val flow = flows.getOrPut(chartCode) { MutableStateFlow(null) }
-        flow.value = data
-
-        android.util.Log.d(
-            TAG,
-            "✅ Cached: $chartCode with ${data.rankItems.size} items, topIdol=${data.topIdol?.name}, flowHashCode=${flow.hashCode()}"
-        )
+        Log.d(TAG, "💾 $chartCode: ${data.rankItems.size} items")
     }
 
     /**
      * 차트 데이터 가져오기 (동기)
-     *
-     * @param chartCode 차트 코드
-     * @return ProcessedRankData 또는 null (캐시 미스)
      */
     fun getChartData(chartCode: String): ProcessedRankData? {
-        val data = cache[chartCode]
-        if (data != null) {
-            android.util.Log.d(TAG, "✅ Cache hit: $chartCode")
-        } else {
-            android.util.Log.d(TAG, "❌ Cache miss: $chartCode")
-        }
-        return data
+        return cache[chartCode]
     }
 
     /**
@@ -113,68 +94,42 @@ class RankingCacheRepository @Inject constructor(
     }
 
     /**
-     * 모든 캐시 클리어
-     * (로그아웃 시 사용)
+     * 모든 캐시 클리어 (로그아웃 시 사용)
      */
     fun clearAll() {
         val size = cache.size
         cache.clear()
         flows.values.forEach { it.value = null }
-        android.util.Log.d(TAG, "🗑️ Cleared all cache ($size items)")
+        Log.d(TAG, "🗑️ Cleared $size caches")
     }
 
     /**
      * 특정 차트 캐시 제거
-     *
-     * @param chartCode 차트 코드
      */
     fun clearChart(chartCode: String) {
         cache.remove(chartCode)
         flows[chartCode]?.value = null
-        android.util.Log.d(TAG, "🗑️ Cleared cache: $chartCode")
+        Log.d(TAG, "🗑️ Cleared: $chartCode")
     }
 
-    /**
-     * 캐시된 모든 차트 코드
-     *
-     * @return Set<String>
-     */
-    fun getCachedChartCodes(): Set<String> {
-        return cache.keys.toSet()
-    }
+    /** 캐시된 모든 차트 코드 */
+    fun getCachedChartCodes(): Set<String> = cache.keys.toSet()
 
-    /**
-     * 캐시 상태 확인
-     *
-     * @param chartCode 차트 코드
-     * @return Boolean (캐시 존재 여부)
-     */
-    fun hasCache(chartCode: String): Boolean {
-        return cache.containsKey(chartCode)
-    }
+    /** 캐시 존재 여부 */
+    fun hasCache(chartCode: String): Boolean = cache.containsKey(chartCode)
 
-    /**
-     * 캐시 크기
-     *
-     * @return Int
-     */
-    fun getCacheSize(): Int {
-        return cache.size
-    }
+    /** 캐시 크기 */
+    fun getCacheSize(): Int = cache.size
 
     /**
      * 캐시 상태 로깅 (디버깅용)
      */
     fun logCacheStatus() {
-        android.util.Log.d(TAG, "========================================")
-        android.util.Log.d(TAG, "Cache Status: ${cache.size} items")
-        cache.forEach { (chartCode, data) ->
-            android.util.Log.d(
-                TAG,
-                "  - $chartCode: ${data.rankItems.size} items, topIdol=${data.topIdol?.name}"
-            )
+        Log.d(TAG, "========== Cache Status: ${cache.size} ==========")
+        cache.forEach { (code, data) ->
+            Log.d(TAG, "  $code: ${data.rankItems.size} items")
         }
-        android.util.Log.d(TAG, "========================================")
+        Log.d(TAG, "===========================================")
     }
 
     /**
@@ -330,102 +285,78 @@ class RankingCacheRepository @Inject constructor(
     }
 
     /**
-     * UDP 업데이트 시 특정 아이돌의 하트 수만 업데이트 (캐시 부분 갱신)
+     * UDP 업데이트 시 특정 아이돌의 하트 수만 업데이트 (스마트 부분 갱신)
      *
-     * 전체 캐시를 재생성하지 않고, 해당 아이돌이 포함된 차트의 캐시만 업데이트
-     * 사용자가 방금 투표한 데이터와 충돌하지 않도록 처리:
-     * - 캐시의 하트 수가 DB보다 크면 사용자가 방금 투표한 것이므로 skip
-     * - DB의 하트 수가 크거나 같으면 서버에서 온 최신 데이터이므로 업데이트
+     * 전체 캐시 재생성 대신 해당 아이돌이 포함된 차트만 선택적으로 업데이트.
+     * 사용자 투표 데이터 보호: 캐시 하트 > DB 하트이면 skip (사용자가 방금 투표한 것)
      *
      * @param idolIds 업데이트할 아이돌 ID 리스트
      */
     suspend fun updateIdolsFromUdp(idolIds: Set<Int>) {
-        android.util.Log.d(TAG, "📡 UDP update for ${idolIds.size} idols")
+        Log.d(TAG, "📡 UDP: ${idolIds.size} idols")
 
         try {
-            // 업데이트된 아이돌들을 DB에서 가져오기
             val updatedIdols = idolDao.getIdolsByIds(idolIds.toList())
             if (updatedIdols.isEmpty()) {
-                android.util.Log.w(TAG, "⚠️ No idols found in DB for UDP update")
+                Log.w(TAG, "⚠️ No idols in DB")
                 return
             }
 
-            android.util.Log.d(TAG, "✅ Found ${updatedIdols.size} idols in DB")
             val updatedIdolMap = updatedIdols.associateBy { it.id }
-
-            // 각 차트의 캐시를 확인하고 해당 아이돌이 포함되어 있으면 업데이트
             val mostIdolId = preferencesManager.mostIdolId.first()
-            val chartCodes = listOf("PR_S_F", "PR_S_M", "PR_G_F", "PR_G_M", "GLOBALS")
 
-            chartCodes.forEach { chartCode ->
-                val cachedData = getChartData(chartCode)
-                if (cachedData == null) {
-                    android.util.Log.d(TAG, "⏭️ No cache for $chartCode, skipping")
-                    return@forEach
+            DEFAULT_CHART_CODES.forEach { chartCode ->
+                if (shouldUpdateChartFromUdp(chartCode, idolIds, updatedIdolMap)) {
+                    updateChartFromUdp(chartCode, mostIdolId)
                 }
-
-                // 업데이트할 아이돌이 이 차트에 포함되어 있는지 확인
-                val hasUpdatedIdol = cachedData.rankItems.any { item ->
-                    idolIds.contains(item.id.toIntOrNull())
-                }
-
-                if (!hasUpdatedIdol) {
-                    android.util.Log.d(TAG, "⏭️ $chartCode doesn't contain updated idols, skipping")
-                    return@forEach
-                }
-
-                android.util.Log.d(TAG, "🔄 Checking if $chartCode needs update...")
-
-                // 캐시와 DB의 하트 수 비교
-                var needsUpdate = false
-                for (cachedItem in cachedData.rankItems) {
-                    val idolId = cachedItem.id.toIntOrNull() ?: continue
-                    if (!idolIds.contains(idolId)) continue
-
-                    val dbIdol = updatedIdolMap[idolId] ?: continue
-                    val cachedHeart = cachedItem.heartCount
-                    val dbHeart = dbIdol.heart
-
-                    if (dbHeart > cachedHeart) {
-                        android.util.Log.d(TAG, "  Idol $idolId: cache=$cachedHeart < db=$dbHeart → needs update")
-                        needsUpdate = true
-                        break
-                    } else if (dbHeart < cachedHeart) {
-                        android.util.Log.d(TAG, "  Idol $idolId: cache=$cachedHeart > db=$dbHeart → skip (user just voted)")
-                    } else {
-                        android.util.Log.d(TAG, "  Idol $idolId: cache=$cachedHeart == db=$dbHeart → no change")
-                    }
-                }
-
-                if (!needsUpdate) {
-                    android.util.Log.d(TAG, "⏭️ $chartCode doesn't need update, skipping")
-                    return@forEach
-                }
-
-                android.util.Log.d(TAG, "🔄 Updating $chartCode cache...")
-
-                // DB에서 해당 차트의 모든 아이돌 정보 가져오기 (최신 하트 수 반영)
-                val chartIdolIds = cachedData.rankItems.map { it.id.toInt() }
-                val allIdols = idolDao.getIdolsByIds(chartIdolIds)
-
-                // 재정렬 및 재랭킹
-                val sortedIdols = allIdols.sortedByDescending { it.heart }
-                val processedData = net.ib.mn.util.RankingUtil.processIdolsData(
-                    idols = sortedIdols,
-                    context = context,
-                    mostIdolId = mostIdolId,
-                    formatHeartCount = ::formatHeartCount
-                )
-
-                // 캐시 업데이트
-                setChartData(chartCode, processedData)
-                android.util.Log.d(TAG, "✅ $chartCode cache updated via UDP")
             }
 
-            android.util.Log.d(TAG, "✅ UDP update complete")
+            Log.d(TAG, "✅ UDP update complete")
         } catch (e: Exception) {
-            android.util.Log.e(TAG, "❌ Failed to update from UDP: ${e.message}", e)
+            Log.e(TAG, "❌ UDP update failed: ${e.message}", e)
         }
+    }
+
+    /**
+     * UDP 업데이트가 필요한지 확인
+     */
+    private fun shouldUpdateChartFromUdp(
+        chartCode: String,
+        idolIds: Set<Int>,
+        updatedIdolMap: Map<Int, IdolEntity>
+    ): Boolean {
+        val cachedData = getChartData(chartCode) ?: return false
+
+        // 업데이트할 아이돌이 차트에 없으면 skip
+        val hasUpdatedIdol = cachedData.rankItems.any { item ->
+            idolIds.contains(item.id.toIntOrNull())
+        }
+        if (!hasUpdatedIdol) return false
+
+        // 캐시와 DB 비교: DB가 더 크면 업데이트 필요
+        for (cachedItem in cachedData.rankItems) {
+            val idolId = cachedItem.id.toIntOrNull() ?: continue
+            if (!idolIds.contains(idolId)) continue
+
+            val dbIdol = updatedIdolMap[idolId] ?: continue
+            if (dbIdol.heart > cachedItem.heartCount) {
+                Log.d(TAG, "  $chartCode: idol=$idolId needs update")
+                return true
+            }
+        }
+
+        return false
+    }
+
+    /**
+     * UDP 업데이트로 차트 캐시 갱신
+     */
+    private suspend fun updateChartFromUdp(chartCode: String, mostIdolId: Int?) {
+        val cachedData = getChartData(chartCode) ?: return
+        val chartIdolIds = cachedData.rankItems.map { it.id.toInt() }
+
+        rebuildChartCache(chartCode, chartIdolIds, mostIdolId)
+        Log.d(TAG, "✅ UDP: $chartCode updated")
     }
 
     // ==================== Private Helper Methods ====================
