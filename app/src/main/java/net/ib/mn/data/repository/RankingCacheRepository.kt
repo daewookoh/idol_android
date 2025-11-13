@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.first
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.data.local.entity.IdolEntity
+import net.ib.mn.util.Constants
 import net.ib.mn.util.ProcessedRankData
 import net.ib.mn.util.RankingUtil
 import java.text.NumberFormat
@@ -38,7 +39,8 @@ class RankingCacheRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val rankingRepository: net.ib.mn.domain.repository.RankingRepository,
     private val idolDao: IdolDao,
-    private val preferencesManager: PreferencesManager
+    private val preferencesManager: PreferencesManager,
+    private val userCacheRepository: dagger.Lazy<UserCacheRepository>
 ) {
 
     companion object {
@@ -158,7 +160,7 @@ class RankingCacheRepository @Inject constructor(
             }
 
             // Step 2: 각 차트별 rankingData 가공 및 캐싱 (병렬)
-            val mostIdolId = preferencesManager.mostIdolId.first()
+            val mostIdolId = userCacheRepository.get().getMostIdolId()
 
             coroutineScope {
                 chartIdolIdsMap.map { (chartCode, idolIds) ->
@@ -195,7 +197,7 @@ class RankingCacheRepository @Inject constructor(
                 return
             }
 
-            val mostIdolId = preferencesManager.mostIdolId.first()
+            val mostIdolId = userCacheRepository.get().getMostIdolId()
             rebuildChartCache(chartCode, idolIds, mostIdolId)
 
             Log.d(TAG, "✅ $chartCode refreshed")
@@ -219,18 +221,26 @@ class RankingCacheRepository @Inject constructor(
         Log.d(TAG, "📊 Vote: idol=$idolId, chart=$chartCode, +$voteCount")
 
         try {
-            val cachedData = getChartData(chartCode) ?: run {
+            // DB 업데이트 (항상 실행)
+            updateIdolHeartInDb(idolId, voteCount)
+
+            val cachedData = getChartData(chartCode)
+            if (cachedData == null) {
                 Log.w(TAG, "⚠️ No cache for $chartCode")
+
+                // 캐시가 없어도 최애 아이돌이면 업데이트
+                val mostIdolId = userCacheRepository.get().getMostIdolId()
+                if (idolId == mostIdolId) {
+                    userCacheRepository.get().updateMostFavoriteIdolHeart(voteCount)
+                }
                 return
             }
-
-            // DB 업데이트
-            updateIdolHeartInDb(idolId, voteCount)
 
             // 캐시에서 해당 아이돌 하트 수 업데이트
             val updatedItems = cachedData.rankItems.map { item ->
                 if (item.id == idolId.toString()) {
                     val newHeart = item.heartCount + voteCount
+
                     item.copy(
                         voteCount = formatHeartCount(newHeart.toInt()),
                         heartCount = newHeart
@@ -261,6 +271,12 @@ class RankingCacheRepository @Inject constructor(
             )
 
             Log.d(TAG, "✅ Vote updated: $chartCode")
+
+            // 최애 아이돌인 경우 UserCacheRepository의 mostFavoriteIdol도 업데이트
+            val mostIdolId = userCacheRepository.get().getMostIdolId()
+            if (idolId == mostIdolId) {
+                userCacheRepository.get().refreshMostFavoriteIdol()
+            }
         } catch (e: Exception) {
             Log.e(TAG, "❌ Vote update failed: ${e.message}", e)
         }
@@ -293,17 +309,14 @@ class RankingCacheRepository @Inject constructor(
      * @param idolIds 업데이트할 아이돌 ID 리스트
      */
     suspend fun updateIdolsFromUdp(idolIds: Set<Int>) {
-        Log.d(TAG, "📡 UDP: ${idolIds.size} idols")
-
         try {
             val updatedIdols = idolDao.getIdolsByIds(idolIds.toList())
             if (updatedIdols.isEmpty()) {
-                Log.w(TAG, "⚠️ No idols in DB")
                 return
             }
 
             val updatedIdolMap = updatedIdols.associateBy { it.id }
-            val mostIdolId = preferencesManager.mostIdolId.first()
+            val mostIdolId = userCacheRepository.get().getMostIdolId()
 
             DEFAULT_CHART_CODES.forEach { chartCode ->
                 if (shouldUpdateChartFromUdp(chartCode, idolIds, updatedIdolMap)) {
@@ -311,7 +324,10 @@ class RankingCacheRepository @Inject constructor(
                 }
             }
 
-            Log.d(TAG, "✅ UDP update complete")
+            // 최애 아이돌이 업데이트된 경우 UserCacheRepository도 갱신
+            if (mostIdolId != null && idolIds.contains(mostIdolId)) {
+                userCacheRepository.get().refreshMostFavoriteIdol()
+            }
         } catch (e: Exception) {
             Log.e(TAG, "❌ UDP update failed: ${e.message}", e)
         }

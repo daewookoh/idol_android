@@ -49,7 +49,8 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
     private val chartsApi: net.ib.mn.data.remote.api.ChartsApi,
     private val configsApi: net.ib.mn.data.remote.api.ConfigsApi,
     private val savedStateHandle: SavedStateHandle,
-    private val preferencesManager: net.ib.mn.data.local.PreferencesManager
+    private val preferencesManager: net.ib.mn.data.local.PreferencesManager,
+    private val userCacheRepository: net.ib.mn.data.repository.UserCacheRepository
 ) : ViewModel() {
 
     sealed interface UiState {
@@ -331,8 +332,7 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
             }
 
             // 최애 ID 가져오기
-            val mostIdolId = preferencesManager.mostIdolId.first()
-            android.util.Log.d(logTag, "💗 Most idol ID from PreferencesManager: $mostIdolId")
+            val mostIdolId = userCacheRepository.getMostIdolId()
 
             val result = net.ib.mn.util.RankingUtil.processIdolsData(
                 idols = idols,
@@ -340,13 +340,6 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
                 mostIdolId = mostIdolId,
                 formatHeartCount = ::formatHeartCount
             )
-
-            // isFavorite가 설정된 아이템 확인
-            val favoriteItems = result.rankItems.filter { it.isFavorite }
-            android.util.Log.d(logTag, "💗 Favorite items count: ${favoriteItems.size}")
-            favoriteItems.forEach { item ->
-                android.util.Log.d(logTag, "💗 Favorite item: id=${item.id}, name=${item.name}, rank=${item.rank}")
-            }
 
             // 정렬 및 순위 계산
             val sortedItems = net.ib.mn.util.RankingUtil.sortAndRank(result.rankItems)

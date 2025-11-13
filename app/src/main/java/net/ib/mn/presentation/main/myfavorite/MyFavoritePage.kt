@@ -242,9 +242,7 @@ private fun MyFavoriteContent(
                                     onIntent(MyFavoriteContract.Intent.OnIdolClick(mostFavoriteIdol.idolId))
                                 },
                                 onVoteSuccess = { idolId, votedHeart ->
-                                    // 투표 성공 시 처리 (필요한 경우 추가 로직)
-                                    android.util.Log.d("MyFavoritePage",
-                                        "Vote success callback: idol=$idolId, votes=$votedHeart")
+                                    onIntent(MyFavoriteContract.Intent.OnVoteSuccess(idolId, votedHeart))
                                 }
                             )
                         } else {

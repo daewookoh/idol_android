@@ -36,12 +36,12 @@ class MyFavoriteContract {
         data object OnPageVisible : Intent()
 
         /**
-         * 화면이 보일 때 (UDP 구독 시작)
+         * 화면이 보일 때
          */
         data object OnScreenVisible : Intent()
 
         /**
-         * 화면이 숨겨질 때 (UDP 구독 중지)
+         * 화면이 숨겨질 때
          */
         data object OnScreenHidden : Intent()
 

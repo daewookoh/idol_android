@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import net.ib.mn.data.remote.dto.UserSelfData
 import net.ib.mn.data.remote.dto.toEntity
+import net.ib.mn.presentation.main.myfavorite.MyFavoriteContract
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -26,7 +27,8 @@ import javax.inject.Singleton
 @Singleton
 class UserCacheRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val idolDao: net.ib.mn.data.local.dao.IdolDao
+    private val idolDao: net.ib.mn.data.local.dao.IdolDao,
+    private val rankingCacheRepository: RankingCacheRepository
 ) {
 
     companion object {
@@ -48,6 +50,10 @@ class UserCacheRepository @Inject constructor(
     // 최애 아이돌 차트 코드 캐시
     private val _mostIdolChartCode = MutableStateFlow<String?>(null)
     val mostIdolChartCode: Flow<String?> = _mostIdolChartCode.asStateFlow()
+
+    // 최애 아이돌 MostFavoriteIdol 캐시
+    private val _mostFavoriteIdol = MutableStateFlow<MyFavoriteContract.MostFavoriteIdol?>(null)
+    val mostFavoriteIdol: Flow<MyFavoriteContract.MostFavoriteIdol?> = _mostFavoriteIdol.asStateFlow()
 
     // 좋아하는 아이돌 ID 리스트 (추후 확장 가능)
     private val _favoriteIdolIds = MutableStateFlow<List<Int>>(emptyList())
@@ -148,6 +154,9 @@ class UserCacheRepository @Inject constructor(
         Log.d(TAG, "  - StrongHeart: $strongHeart")
         Log.d(TAG, "  - WeakHeart: $weakHeart")
         Log.d(TAG, "  - Hearts: $hearts")
+
+        // 최애 아이돌 RankingItemData 업데이트
+        updateMostFavoriteIdol()
     }
 
     /**
@@ -183,6 +192,13 @@ class UserCacheRepository @Inject constructor(
      */
     fun getHeartInfo(): HeartInfo? {
         return _heartInfo.value
+    }
+
+    /**
+     * 최애 아이돌 MostFavoriteIdol 가져오기 (동기)
+     */
+    fun getMostFavoriteIdol(): MyFavoriteContract.MostFavoriteIdol? {
+        return _mostFavoriteIdol.value
     }
 
     /**
@@ -256,6 +272,92 @@ class UserCacheRepository @Inject constructor(
     }
 
     /**
+     * 최애 아이돌 MostFavoriteIdol 강제 업데이트 (public)
+     *
+     * 외부에서 호출 가능 (예: 투표 후 즉시 업데이트)
+     */
+    suspend fun refreshMostFavoriteIdol() {
+        updateMostFavoriteIdol()
+    }
+
+    /**
+     * 최애 아이돌의 하트 수만 직접 업데이트 (비밀의 방 등 캐시가 없는 경우)
+     *
+     * @param voteCount 증가시킬 하트 수
+     */
+    fun updateMostFavoriteIdolHeart(voteCount: Long) {
+        val currentMostFavoriteIdol = _mostFavoriteIdol.value
+        if (currentMostFavoriteIdol != null) {
+            val newHeart = (currentMostFavoriteIdol.heart ?: 0L) + voteCount
+            _mostFavoriteIdol.value = currentMostFavoriteIdol.copy(heart = newHeart)
+        }
+    }
+
+    /**
+     * 최애 아이돌 MostFavoriteIdol 업데이트
+     *
+     * chartCode의 rankItems에서 mostIdolId를 찾아서 업데이트하거나,
+     * 없으면 DB에서 IdolEntity를 가져와서 가공
+     */
+    private suspend fun updateMostFavoriteIdol() {
+        val mostIdolId = _mostIdolId.value
+        val chartCode = _mostIdolChartCode.value
+
+        if (mostIdolId == null) {
+            _mostFavoriteIdol.value = null
+            return
+        }
+
+        try {
+            // 1. 캐시에서 차트 데이터 가져오기
+            val chartData = chartCode?.let { rankingCacheRepository.getChartData(it) }
+            val rankItem = chartData?.rankItems?.find { it.id == mostIdolId.toString() }
+
+            if (rankItem != null) {
+                // rankItem이 있는 경우: MostFavoriteIdol로 변환
+                _mostFavoriteIdol.value = MyFavoriteContract.MostFavoriteIdol(
+                    idolId = mostIdolId,
+                    name = rankItem.name,
+                    top3ImageUrls = rankItem.top3ImageUrls,
+                    top3VideoUrls = rankItem.top3VideoUrls,
+                    rank = rankItem.rank,
+                    heart = rankItem.heartCount,
+                    chartCode = chartCode,
+                    imageUrl = rankItem.photoUrl
+                )
+            } else {
+                // rankItem이 없는 경우: IdolDao에서 가져와서 가공
+                val idolEntity = idolDao.getIdolById(mostIdolId)
+
+                if (idolEntity != null) {
+                    _mostFavoriteIdol.value = MyFavoriteContract.MostFavoriteIdol(
+                        idolId = mostIdolId,
+                        name = idolEntity.name,
+                        top3ImageUrls = net.ib.mn.util.IdolImageUtil.getTop3ImageUrls(idolEntity),
+                        top3VideoUrls = net.ib.mn.util.IdolImageUtil.getTop3VideoUrls(idolEntity),
+                        rank = null,
+                        heart = idolEntity.heart,
+                        chartCode = chartCode,
+                        imageUrl = idolEntity.imageUrl
+                    )
+                } else {
+                    _mostFavoriteIdol.value = null
+                }
+            }
+        } catch (e: Exception) {
+            _mostFavoriteIdol.value = null
+            Log.e(TAG, "❌ Failed to update most favorite idol: ${e.message}", e)
+        }
+    }
+
+    /**
+     * 하트 수 포맷팅
+     */
+    private fun formatHeartCount(count: Int): String {
+        return java.text.NumberFormat.getNumberInstance(java.util.Locale.US).format(count)
+    }
+
+    /**
      * 모든 캐시 클리어 (로그아웃 시 사용)
      */
     fun clearAll() {
@@ -263,6 +365,7 @@ class UserCacheRepository @Inject constructor(
         _mostIdolId.value = null
         _mostIdolCategory.value = null
         _mostIdolChartCode.value = null
+        _mostFavoriteIdol.value = null
         _favoriteIdolIds.value = emptyList()
         _heartInfo.value = null
         _defaultCategory.value = null
@@ -280,6 +383,7 @@ class UserCacheRepository @Inject constructor(
         Log.d(TAG, "Most Idol ID: ${_mostIdolId.value}")
         Log.d(TAG, "Most Idol Category: ${_mostIdolCategory.value}")
         Log.d(TAG, "Most Idol ChartCode: ${_mostIdolChartCode.value}")
+        Log.d(TAG, "Most Favorite Idol: ${_mostFavoriteIdol.value?.name} (id=${_mostFavoriteIdol.value?.idolId})")
         Log.d(TAG, "Favorite Idol Count: ${_favoriteIdolIds.value.size}")
         Log.d(TAG, "Heart Info: ${_heartInfo.value}")
         Log.d(TAG, "=========================================")
