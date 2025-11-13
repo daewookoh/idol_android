@@ -40,4 +40,11 @@ interface FavoritesRepository {
      * @return Flow<ApiResult<Unit>>
      */
     fun deleteCache(): Flow<ApiResult<Unit>>
+
+    /**
+     * FavoritesSelf 데이터를 로드하고 Local DB에 저장
+     *
+     * @return Result<Boolean> - 성공 시 true, 실패 시 Exception
+     */
+    suspend fun loadAndSaveFavoriteSelf(): Result<Boolean>
 }

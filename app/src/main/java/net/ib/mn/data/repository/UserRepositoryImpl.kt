@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Base64
 import dagger.hilt.android.qualifiers.ApplicationContext
 import net.ib.mn.data.local.PreferencesManager
+import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.data.remote.api.UserApi
 import net.ib.mn.data.remote.dto.*
 import net.ib.mn.domain.model.ApiResult
@@ -33,7 +34,9 @@ class UserRepositoryImpl @Inject constructor(
     private val userApi: UserApi,
     private val preferencesManager: PreferencesManager,
     @ApplicationContext private val context: Context,
-    private val deviceUtil: DeviceUtil
+    private val deviceUtil: DeviceUtil,
+    private val idolDao: IdolDao,
+    private val userCacheRepository: UserCacheRepository
 ) : UserRepository {
 
     override fun getUserSelf(etag: String?, cacheControl: String?, timestamp: Int?): Flow<ApiResult<UserSelfResponse>> = flow {
@@ -683,5 +686,98 @@ class UserRepositoryImpl @Inject constructor(
             android.util.Log.e("SignUpAPI", "Signature write error", e)
         }
         return Base64.encodeToString(output.toByteArray(), Base64.NO_WRAP)
+    }
+
+    /**
+     * UserSelf 데이터를 로드하고 DataStore와 Local DB에 저장
+     * StartUpViewModel의 loadUserSelf 로직을 Repository로 이동
+     */
+    override suspend fun loadAndSaveUserSelf(cacheControl: String?): Result<Boolean> {
+        return try {
+            var shouldNavigateToLogin = false
+
+            getUserSelf(
+                etag = null,
+                cacheControl = cacheControl,
+                timestamp = (System.currentTimeMillis() / 1000).toInt()
+            ).collect { result ->
+                when (result) {
+                    is ApiResult.Loading -> {}
+                    is ApiResult.Success -> {
+                        val data = result.data.objects.firstOrNull()
+
+                        data?.let { userData ->
+                            val userDomain = userData.domain ?: preferencesManager.loginDomain.first()
+                            val savedLoginEmail = preferencesManager.loginEmail.first()
+                            val emailToSave = savedLoginEmail ?: userData.email
+
+                            preferencesManager.setUserInfo(
+                                id = userData.id,
+                                email = emailToSave,
+                                username = userData.username,
+                                nickname = userData.nickname,
+                                profileImage = userData.profileImage,
+                                hearts = userData.hearts,
+                                diamond = userData.diamond,
+                                strongHeart = userData.strongHeart,
+                                weakHeart = userData.weakHeart,
+                                level = userData.level,
+                                levelHeart = userData.levelHeart,
+                                power = userData.power,
+                                resourceUri = userData.resourceUri,
+                                pushKey = userData.pushKey,
+                                createdAt = userData.createdAt,
+                                pushFilter = userData.pushFilter,
+                                statusMessage = userData.statusMessage,
+                                ts = userData.ts,
+                                itemNo = userData.itemNo,
+                                domain = userDomain,
+                                giveHeart = userData.giveHeart
+                            )
+
+                            // Cache user data in memory for quick access
+                            userCacheRepository.setUserData(userData)
+
+                            val chartCode = userData.most?.chartCodes
+                                ?.firstOrNull { !it.startsWith("AW_") && !it.startsWith("DF_") }
+                                ?: userData.most?.chartCodes?.firstOrNull()
+
+                            val category = userData.most?.category
+
+                            userData.most?.let { most ->
+                                val idolEntity = most.toEntity()
+                                idolDao.upsert(idolEntity)
+                            }
+
+                            if (category != null) {
+                                preferencesManager.setDefaultCategory(category)
+                                userCacheRepository.setDefaultCategory(category)
+                            }
+
+                            if (chartCode != null) {
+                                preferencesManager.setDefaultChartCode(chartCode)
+                                userCacheRepository.setDefaultChartCode(chartCode)
+                            }
+
+                            kotlinx.coroutines.delay(100)
+                        }
+                    }
+                    is ApiResult.Error -> {
+                        if (result.code == 401) {
+                            preferencesManager.clearAll()
+                            shouldNavigateToLogin = true
+                        }
+                    }
+                }
+            }
+
+            if (shouldNavigateToLogin) {
+                Result.failure(Exception("Unauthorized"))
+            } else {
+                Result.success(true)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }

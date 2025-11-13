@@ -546,29 +546,6 @@ class PreferencesManager @Inject constructor(
         }
     }
 
-    suspend fun setMostIdol(idolId: Int?, chartCode: String? = null, category: String? = null) {
-        context.dataStore.edit { preferences ->
-            if (idolId != null) {
-                preferences[KEY_MOST_IDOL_ID] = idolId
-            } else {
-                preferences.remove(KEY_MOST_IDOL_ID)
-            }
-
-            if (chartCode != null) {
-                preferences[KEY_MOST_IDOL_CHART_CODE] = chartCode
-            } else {
-                preferences.remove(KEY_MOST_IDOL_CHART_CODE)
-            }
-
-            if (category != null) {
-                preferences[KEY_MOST_IDOL_CATEGORY] = category
-            } else {
-                preferences.remove(KEY_MOST_IDOL_CATEGORY)
-            }
-        }
-        android.util.Log.d("PreferencesManager", "✅ Most idol saved: id=$idolId, chartCode=$chartCode, category=$category")
-    }
-
     /**
      * 하트 값만 업데이트 (투표 후 사용)
      */

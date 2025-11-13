@@ -70,6 +70,8 @@ class StartUpViewModel @Inject constructor(
     private val getTypeListUseCase: GetTypeListUseCase,
     private val configRepository: net.ib.mn.domain.repository.ConfigRepository,
     private val rankingRepository: net.ib.mn.domain.repository.RankingRepository,
+    private val userRepository: net.ib.mn.domain.repository.UserRepository,
+    private val favoritesRepository: net.ib.mn.domain.repository.FavoritesRepository,
     private val chartsApi: net.ib.mn.data.remote.api.ChartsApi,
     private val preferencesManager: net.ib.mn.data.local.PreferencesManager,
     private val authInterceptor: net.ib.mn.data.remote.interceptor.AuthInterceptor,
@@ -255,7 +257,8 @@ class StartUpViewModel @Inject constructor(
         coroutineScope {
             val tasks = mutableListOf(
                 async { loadUpdateInfo() },
-                async { loadUserSelf() },
+                async { loadAndSaveUserSelf() },
+                async { loadAndSaveFavoriteSelf() },
                 async { loadUserStatus() },
                 async { loadAdTypeList() },
                 async { loadMessageCoupon() },
@@ -492,186 +495,29 @@ class StartUpViewModel @Inject constructor(
     /**
      * UserSelf API 호출 (사용자 프로필, ETag 지원)
      */
-    private suspend fun loadUserSelf() {
+    private suspend fun loadAndSaveUserSelf() {
         try {
-            android.util.Log.d("USER_INFO", "========================================")
-            android.util.Log.d("USER_INFO", "[StartUpViewModel] Loading user info from server (NO CACHE)")
-            android.util.Log.d("USER_INFO", "========================================")
+            val loadResult = userRepository.loadAndSaveUserSelf("no-cache")
 
-            // cacheControl을 전달하여 캐시 비활성화
-            getUserSelfUseCase(
-                etag = null,
-                cacheControl = "no-cache",
-                timestamp = (System.currentTimeMillis() / 1000).toInt()
-            ).collect { result ->
-            when (result) {
-                is ApiResult.Loading -> {
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Loading user info...")
-                }
-                is ApiResult.Success -> {
-                    // NOTE: UserSelfResponse 구조: {objects: [UserSelfData], ...}
-                    // 사용자 데이터는 objects 배열의 첫 번째 요소
-                    val data = result.data.objects.firstOrNull()
-
-                    android.util.Log.d("USER_INFO", "========================================")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ UserSelf API Response received")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Objects count: ${result.data.objects.size}")
-                    android.util.Log.d("USER_INFO", "========================================")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] id: ${data?.id}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] email: ${data?.email}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] username: ${data?.username}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] nickname: ${data?.nickname}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] profileImage: ${data?.profileImage}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] hearts: ${data?.hearts}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] diamond: ${data?.diamond}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] strongHeart: ${data?.strongHeart}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] weakHeart: ${data?.weakHeart}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] level: ${data?.level}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] levelHeart: ${data?.levelHeart}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] power: ${data?.power}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] resourceUri: ${data?.resourceUri}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] pushKey: ${data?.pushKey}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] createdAt: ${data?.createdAt}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] pushFilter: ${data?.pushFilter}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] statusMessage: ${data?.statusMessage}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] ts: ${data?.ts}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] itemNo: ${data?.itemNo}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] domain: ${data?.domain}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] giveHeart: ${data?.giveHeart}")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] most: ${data?.most?.id} (${data?.most?.name})")
-                    android.util.Log.d("USER_INFO", "========================================")
-
-                    // 사용자 정보 DataStore 저장
-                    data?.let { userData ->
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel] Saving user info to DataStore...")
-
-                        // domain이 null이면 저장된 loginDomain 사용 (old 프로젝트와 동일)
-                        val userDomain = userData.domain ?: preferencesManager.loginDomain.first()
-
-                        // 로그인 시 저장한 이메일 보존 (getUserSelf 응답의 이메일로 덮어쓰지 않음)
-                        val savedLoginEmail = preferencesManager.loginEmail.first()
-                        val emailToSave = savedLoginEmail ?: userData.email
-
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel] Email preservation:")
-                        android.util.Log.d("USER_INFO", "  - Login email (saved): $savedLoginEmail")
-                        android.util.Log.d("USER_INFO", "  - API response email: ${userData.email}")
-                        android.util.Log.d("USER_INFO", "  - Email to save: $emailToSave")
-
-                        // setUserInfo 호출 (suspend 함수이므로 완료될 때까지 기다림)
-                        preferencesManager.setUserInfo(
-                            id = userData.id,
-                            email = emailToSave,  // 로그인 시 저장한 이메일 사용
-                            username = userData.username,
-                            nickname = userData.nickname,
-                            profileImage = userData.profileImage,
-                            hearts = userData.hearts,
-                            diamond = userData.diamond,
-                            strongHeart = userData.strongHeart,
-                            weakHeart = userData.weakHeart,
-                            level = userData.level,
-                            levelHeart = userData.levelHeart,
-                            power = userData.power,
-                            resourceUri = userData.resourceUri,
-                            pushKey = userData.pushKey,
-                            createdAt = userData.createdAt,
-                            pushFilter = userData.pushFilter,
-                            statusMessage = userData.statusMessage,
-                            ts = userData.ts,
-                            itemNo = userData.itemNo,
-                            domain = userDomain,
-                            giveHeart = userData.giveHeart
-                        )
-
-                        // 최애 정보 저장 (old 프로젝트의 IdolAccount.getAccount(context)?.most와 동일)
-                        // chartCodes에서 Award 코드(AW_로 시작)를 제외한 첫 번째 유효한 값을 저장
-                        // Award 코드는 특수 이벤트/시상식 관련이므로 일반 랭킹 탭에 매칭되지 않음
-                        val chartCode = userData.most?.chartCodes
-                            ?.firstOrNull { !it.startsWith("AW_") && !it.startsWith("DF_") }  // Award/DF 코드 제외
-                            ?: userData.most?.chartCodes?.firstOrNull()  // 모두 특수 코드면 첫 번째 사용
-
-                        val category = userData.most?.category
-
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel] chartCodes from server: ${userData.most?.chartCodes}")
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel] Selected chartCode (filtered): $chartCode")
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel] Most idol category: $category")
-
-                        preferencesManager.setMostIdol(
-                            idolId = userData.most?.id,
-                            chartCode = chartCode,
-                            category = category
-                        )
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Most idol saved: id=${userData.most?.id}, chartCode=$chartCode, category=$category")
-
-                        // Most 아이돌 데이터를 로컬 DB에 upsert
-                        userData.most?.let { most ->
-                            val idolEntity = most.toEntity()
-                            idolDao.upsert(idolEntity)
-                            android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Most idol upserted to local DB: id=${most.id}, name=${most.name}")
-                        }
-
-                        // mostCategory를 defaultCategory로 설정 (GLOBALS 탭 초기 필터링에 사용)
-                        // 앱 첫 진입 시 최애의 성별에 맞는 랭킹이 표시되도록 함
-                        if (category != null) {
-                            preferencesManager.setDefaultCategory(category)
-                            android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Default category set from mostCategory: $category")
-                            android.util.Log.d("USER_INFO", "[StartUpViewModel]   → GLOBALS 탭에서 이 성별의 랭킹이 표시됩니다")
-                        } else {
-                            android.util.Log.w("USER_INFO", "[StartUpViewModel] ⚠️ mostCategory is null, defaultCategory not set")
-                        }
-
-                        // mostChartCode를 defaultChartCode로 설정 (랭킹 탭 초기 선택에 사용)
-                        // 앱 첫 진입 시 최애의 차트에 해당하는 탭이 선택되도록 함
-                        if (chartCode != null) {
-                            preferencesManager.setDefaultChartCode(chartCode)
-                            android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Default chartCode set from mostChartCode: $chartCode")
-                            android.util.Log.d("USER_INFO", "[StartUpViewModel]   → 랭킹 탭에서 이 차트가 기본으로 선택됩니다")
-                        } else {
-                            android.util.Log.w("USER_INFO", "[StartUpViewModel] ⚠️ mostChartCode is null, defaultChartCode not set")
-                        }
-
-                        // setUserInfo 완료 후 DataStore 업데이트가 완료되기를 보장하기 위해 약간의 지연
-                        // DataStore는 비동기적으로 업데이트되므로, 업데이트가 반영되기까지 시간이 필요할 수 있음
-                        kotlinx.coroutines.delay(100)
-
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Full user info saved to DataStore and update confirmed")
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - All fields saved: id, email, username, nickname, profileImage")
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - All fields saved: hearts, diamond, strongHeart, weakHeart")
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - All fields saved: level, levelHeart, power, resourceUri")
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - All fields saved: pushKey, createdAt, pushFilter, statusMessage")
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - All fields saved: ts, itemNo, domain, giveHeart")
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - DataStore will emit updated userInfo to subscribers")
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel]   - MainViewModel will receive the updated data")
-                    } ?: run {
-                        android.util.Log.w("USER_INFO", "[StartUpViewModel] ⚠️ UserSelf API returned null data")
-                    }
-                }
-                is ApiResult.Error -> {
-                    if (result.code == 401) {
-                        // 토큰이 유효하지 않음 - 토큰 삭제 및 로그인 페이지로 이동
-                        android.util.Log.e("USER_INFO", "[StartUpViewModel] ❌ Token invalid (401 Unauthorized)")
-                        android.util.Log.e("USER_INFO", "[StartUpViewModel] Clearing auth credentials and navigating to Login")
-
-                        // 토큰 및 로그인 정보 삭제
-                        preferencesManager.setAccessToken("")
-                        // loginEmail과 loginDomain도 삭제하기 위해 clearAll 호출 후 네비게이션
-                        preferencesManager.clearAll()
-
-                        android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Auth credentials cleared")
-
-                        // 로그인 페이지로 이동
-                        setEffect { StartUpContract.Effect.NavigateToLogin }
-
-                        // 초기화 중단
-                        return@collect
-                    } else {
-                        android.util.Log.e("USER_INFO", "[StartUpViewModel] ❌ UserSelf API error: ${result.message} (code: ${result.code})")
-                        android.util.Log.e(TAG, "UserSelf error: ${result.message}")
-                    }
+            if (loadResult.isFailure) {
+                val exception = loadResult.exceptionOrNull()
+                if (exception?.message == "Unauthorized") {
+                    setEffect { StartUpContract.Effect.NavigateToLogin }
                 }
             }
-        }
         } catch (e: Exception) {
             android.util.Log.e(TAG, "UserSelf exception: ${e.message}", e)
+        }
+    }
+
+    /**
+     * FavoritesSelf API 호출
+     */
+    private suspend fun loadAndSaveFavoriteSelf() {
+        try {
+            favoritesRepository.loadAndSaveFavoriteSelf()
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "FavoritesSelf exception: ${e.message}", e)
         }
     }
 

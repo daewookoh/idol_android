@@ -113,4 +113,12 @@ interface UserRepository {
      * @return Flow<ApiResult<CommonResponse>>
      */
     fun findPassword(email: String): Flow<ApiResult<CommonResponse>>
+
+    /**
+     * UserSelf 데이터를 로드하고 DataStore와 Local DB에 저장
+     *
+     * @param cacheControl Cache-Control 헤더 값
+     * @return Result<Boolean> - 성공 시 true, 401 에러 시 Exception("Unauthorized")
+     */
+    suspend fun loadAndSaveUserSelf(cacheControl: String? = "no-cache"): Result<Boolean>
 }

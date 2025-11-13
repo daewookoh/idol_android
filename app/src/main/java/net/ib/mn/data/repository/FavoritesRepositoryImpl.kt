@@ -20,7 +20,9 @@ import javax.inject.Singleton
 @Singleton
 class FavoritesRepositoryImpl @Inject constructor(
     private val favoritesApi: FavoritesApi,
-    private val gson: Gson
+    private val gson: Gson,
+    private val idolDao: net.ib.mn.data.local.dao.IdolDao,
+    private val userCacheRepository: net.ib.mn.data.repository.UserCacheRepository
 ) : FavoritesRepository {
 
     override fun getFavoritesSelf(): Flow<ApiResult<List<FavoriteDto>>> = flow {
@@ -169,6 +171,53 @@ class FavoritesRepositoryImpl @Inject constructor(
                 exception = e,
                 message = e.message
             ))
+        }
+    }
+
+    override suspend fun loadAndSaveFavoriteSelf(): Result<Boolean> {
+        return try {
+            var success = false
+
+            getFavoritesSelf().collect { result ->
+                when (result) {
+                    is ApiResult.Loading -> {}
+                    is ApiResult.Success -> {
+                        val favorites = result.data
+
+                        // Extract idol IDs from favorites and cache them
+                        val idolIds = favorites.map { it.idol.id }
+                        userCacheRepository.setFavoriteIdolIds(idolIds)
+
+                        // Save each favorite idol to local DB
+                        favorites.forEach { favorite ->
+                            val idol = favorite.idol
+                            val idolEntity = net.ib.mn.data.local.entity.IdolEntity(
+                                id = idol.id,
+                                name = idol.name ?: "",
+                                category = idol.category ?: "",
+                                type = idol.type ?: "",
+                                imageUrl = idol.imageUrl,
+                                imageUrl2 = idol.imageUrl2,
+                                imageUrl3 = idol.imageUrl3,
+                                groupId = idol.groupId ?: 0,
+                                heart = idol.heart ?: 0L
+                            )
+                            idolDao.upsert(idolEntity)
+                        }
+
+                        success = true
+                    }
+                    is ApiResult.Error -> {}
+                }
+            }
+
+            if (success) {
+                Result.success(true)
+            } else {
+                Result.failure(Exception("Failed to load favorites"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 }

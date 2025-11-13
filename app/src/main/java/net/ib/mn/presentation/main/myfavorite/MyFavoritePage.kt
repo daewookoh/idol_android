@@ -68,10 +68,68 @@ fun MyFavoritePage(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val chartSections by viewModel.chartSections.collectAsState()
+    val mostFavoriteIdol by viewModel.mostFavoriteIdol.collectAsState()
     val context = LocalContext.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
 
-    // 페이지가 visible될 때마다 데이터 갱신
+    // Lifecycle 이벤트 관찰 (모든 진입 상황 감지)
+    androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            when (event) {
+                androidx.lifecycle.Lifecycle.Event.ON_CREATE -> {
+                    android.util.Log.d("MyFavoritePage", "========================================")
+                    android.util.Log.d("MyFavoritePage", "📱 ON_CREATE - Page created")
+                    android.util.Log.d("MyFavoritePage", "========================================")
+                }
+                androidx.lifecycle.Lifecycle.Event.ON_START -> {
+                    android.util.Log.d("MyFavoritePage", "========================================")
+                    android.util.Log.d("MyFavoritePage", "▶️ ON_START - Page started (visible in background)")
+                    android.util.Log.d("MyFavoritePage", "========================================")
+                }
+                androidx.lifecycle.Lifecycle.Event.ON_RESUME -> {
+                    android.util.Log.d("MyFavoritePage", "========================================")
+                    android.util.Log.d("MyFavoritePage", "✅ ON_RESUME - Page fully visible and interactive")
+                    android.util.Log.d("MyFavoritePage", "   - From background: returning from other app")
+                    android.util.Log.d("MyFavoritePage", "   - From other tab: switched back to this tab")
+                    android.util.Log.d("MyFavoritePage", "   - From dialog: dialog was closed")
+                    android.util.Log.d("MyFavoritePage", "========================================")
+                    viewModel.sendIntent(MyFavoriteContract.Intent.OnPageVisible)
+                }
+                androidx.lifecycle.Lifecycle.Event.ON_PAUSE -> {
+                    android.util.Log.d("MyFavoritePage", "========================================")
+                    android.util.Log.d("MyFavoritePage", "⏸️ ON_PAUSE - Page paused (no longer interactive)")
+                    android.util.Log.d("MyFavoritePage", "   - To background: switching to other app")
+                    android.util.Log.d("MyFavoritePage", "   - To other tab: switching to another tab")
+                    android.util.Log.d("MyFavoritePage", "   - To dialog: dialog opened")
+                    android.util.Log.d("MyFavoritePage", "========================================")
+                }
+                androidx.lifecycle.Lifecycle.Event.ON_STOP -> {
+                    android.util.Log.d("MyFavoritePage", "========================================")
+                    android.util.Log.d("MyFavoritePage", "⏹️ ON_STOP - Page stopped (not visible)")
+                    android.util.Log.d("MyFavoritePage", "========================================")
+                }
+                androidx.lifecycle.Lifecycle.Event.ON_DESTROY -> {
+                    android.util.Log.d("MyFavoritePage", "========================================")
+                    android.util.Log.d("MyFavoritePage", "💀 ON_DESTROY - Page destroyed")
+                    android.util.Log.d("MyFavoritePage", "========================================")
+                }
+                else -> {}
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            android.util.Log.d("MyFavoritePage", "🗑️ DisposableEffect cleanup")
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    // 페이지 최초 진입 시
     LaunchedEffect(Unit) {
+        android.util.Log.d("MyFavoritePage", "========================================")
+        android.util.Log.d("MyFavoritePage", "🎬 LaunchedEffect - Initial composition")
+        android.util.Log.d("MyFavoritePage", "========================================")
         viewModel.sendIntent(MyFavoriteContract.Intent.OnPageVisible)
     }
 
@@ -97,6 +155,7 @@ fun MyFavoritePage(
     MyFavoriteContent(
         state = state,
         chartSections = chartSections,
+        mostFavoriteIdol = mostFavoriteIdol,
         onIntent = viewModel::sendIntent
     )
 }
@@ -108,6 +167,7 @@ fun MyFavoritePage(
 private fun MyFavoriteContent(
     state: MyFavoriteContract.State,
     chartSections: List<MyFavoriteViewModel.ChartSection>,
+    mostFavoriteIdol: MyFavoriteContract.MostFavoriteIdol?,
     onIntent: (MyFavoriteContract.Intent) -> Unit,
     viewModel: MyFavoriteViewModel = hiltViewModel()
 ) {
@@ -117,6 +177,7 @@ private fun MyFavoriteContent(
             .background(ColorPalette.background100)
     ) {
         when {
+            // 초기 로딩 중: mostFavoriteIdol 또는 chartSections가 아직 로드되지 않은 경우
             state.isLoading && chartSections.isEmpty() -> {
                 // 로딩 중
                 Box(
@@ -172,17 +233,23 @@ private fun MyFavoriteContent(
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    // 헤더: 최애 MostFavoriteIdol Top3 (있을 경우만)
-                    state.mostFavoriteIdol?.let { mostIdol ->
-                        item(key = "header_most_favorite") {
+                    // 헤더: 최애 MostFavoriteIdol Top3 (무조건 표시)
+                    item(key = "header_most_favorite") {
+                        if (mostFavoriteIdol != null) {
                             MostFavoriteIdolHeader(
-                                mostFavoriteIdol = mostIdol,
+                                mostFavoriteIdol = mostFavoriteIdol,
                                 onIdolClick = {
-                                    onIntent(MyFavoriteContract.Intent.OnIdolClick(mostIdol.idolId))
+                                    onIntent(MyFavoriteContract.Intent.OnIdolClick(mostFavoriteIdol.idolId))
                                 },
-                                onIntent = onIntent,
-                                sectionRankingDataList = sectionRankingDataList
+                                onVoteSuccess = { idolId, votedHeart ->
+                                    // 투표 성공 시 처리 (필요한 경우 추가 로직)
+                                    android.util.Log.d("MyFavoritePage",
+                                        "Vote success callback: idol=$idolId, votes=$votedHeart")
+                                }
                             )
+                        } else {
+                            // mostFavoriteIdol 로딩 중
+                            MostFavoriteIdolHeaderLoading()
                         }
                     }
 
@@ -228,13 +295,15 @@ private fun SectionHeader(sectionName: String) {
 
 /**
  * 최애 아이돌 헤더 (MostFavoriteIdol)
+ *
+ * UserCacheRepository와 RankingCacheRepository를 기반으로
+ * 실시간으로 업데이트되는 최애 아이돌 정보 표시
  */
 @Composable
 private fun MostFavoriteIdolHeader(
     mostFavoriteIdol: MyFavoriteContract.MostFavoriteIdol,
     onIdolClick: () -> Unit,
-    onIntent: (MyFavoriteContract.Intent) -> Unit,
-    sectionRankingDataList: List<Pair<MyFavoriteViewModel.ChartSection, MyFavoriteRankingData>>
+    onVoteSuccess: (idolId: Int, votedHeart: Long) -> Unit = { _, _ -> }
 ) {
     Column(
         modifier = Modifier
@@ -253,8 +322,7 @@ private fun MostFavoriteIdolHeader(
         // Info Bar - 순위, 이름, 하트 수, 투표 버튼
         MostFavoriteInfoBar(
             mostFavoriteIdol = mostFavoriteIdol,
-            onIntent = onIntent,
-            sectionRankingDataList = sectionRankingDataList
+            onVoteSuccess = onVoteSuccess
         )
     }
 }
@@ -262,15 +330,15 @@ private fun MostFavoriteIdolHeader(
 /**
  * 최애 정보 바 (순위, 이름, 하트 수, 차트 코드)
  *
- * MostFavoriteIdol 데이터 기반 표시
+ * RankingCacheRepository의 실시간 데이터를 기반으로
+ * 최애 아이돌의 현재 순위와 하트 수를 표시
  */
 @Composable
 private fun MostFavoriteInfoBar(
     mostFavoriteIdol: MyFavoriteContract.MostFavoriteIdol,
-    onIntent: (MyFavoriteContract.Intent) -> Unit,
-    sectionRankingDataList: List<Pair<MyFavoriteViewModel.ChartSection, MyFavoriteRankingData>>
+    onVoteSuccess: (idolId: Int, votedHeart: Long) -> Unit
 ) {
-    Log.d("MostFavoriteInfoBar", mostFavoriteIdol.toString())
+    android.util.Log.d("MostFavoriteInfoBar", "mostFavoriteIdol: $mostFavoriteIdol")
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -356,29 +424,48 @@ private fun MostFavoriteInfoBar(
                 fullName = mostFavoriteIdol.name,
                 type = "CIRCLE",
                 onVoteSuccess = { votedHeart ->
-                    // 1. MostFavoriteIdol 즉시 업데이트
-                    onIntent(MyFavoriteContract.Intent.OnVoteSuccess(mostFavoriteIdol.idolId, votedHeart))
-
-                    // 2. 비밀의 방이 아닌 경우, 해당 차트의 랭킹 리스트도 즉시 업데이트
-                    if (mostFavoriteIdol.idolId != net.ib.mn.util.Constants.SECRET_ROOM_IDOL_ID) {
-                        mostFavoriteIdol.chartCode?.let { chartCode ->
-                            // 해당 차트의 ViewModel 찾기
-                            sectionRankingDataList.find { (section, _) ->
-                                section.chartCode == chartCode
-                            }?.let { (_, rankingData) ->
-                                // Success 상태인 경우에만 ViewModel의 updateVote 호출
-                                if (rankingData is MyFavoriteRankingData.Success) {
-                                    rankingData.viewModel.updateVote(mostFavoriteIdol.idolId, votedHeart)
-                                    android.util.Log.d("MostFavoriteInfoBar",
-                                        "✅ Chart $chartCode ranking updated: idol=${mostFavoriteIdol.idolId}, votes=$votedHeart")
-                                }
-                            }
-                        }
-                    }
+                    // 콜백 호출 (RankingCacheRepository가 UDP를 통해 자동으로 업데이트됨)
+                    onVoteSuccess(mostFavoriteIdol.idolId, votedHeart)
+                    android.util.Log.d("MostFavoriteInfoBar",
+                        "✅ Vote success: idol=${mostFavoriteIdol.idolId}, votes=$votedHeart (auto-update via UDP)")
                 },
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
         }
+    }
+}
+
+/**
+ * 최애 아이돌 헤더 로딩 상태
+ */
+@Composable
+private fun MostFavoriteIdolHeaderLoading() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(ColorPalette.background100)
+    ) {
+        // ExoTop3 영역 높이만큼 스켈레톤
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(280.dp)
+                .background(ColorPalette.gray100),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                color = ColorPalette.main,
+                modifier = Modifier.size(40.dp)
+            )
+        }
+
+        // Info Bar 영역
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .background(ColorPalette.gray100)
+        )
     }
 }
 
