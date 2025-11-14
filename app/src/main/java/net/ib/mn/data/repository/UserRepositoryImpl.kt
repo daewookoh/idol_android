@@ -36,7 +36,9 @@ class UserRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val deviceUtil: DeviceUtil,
     private val idolDao: IdolDao,
-    private val userCacheRepository: UserCacheRepository
+    private val userCacheRepository: UserCacheRepository,
+    private val idolRepository: net.ib.mn.domain.repository.IdolRepository,
+    private val idolApi: net.ib.mn.data.remote.api.IdolApi
 ) : UserRepository {
 
     override fun getUserSelf(etag: String?, cacheControl: String?, timestamp: Int?): Flow<ApiResult<UserSelfResponse>> = flow {
@@ -83,19 +85,90 @@ class UserRepositoryImpl @Inject constructor(
                     // 응답 데이터 로그 출력
                     val firstObject = body.objects.firstOrNull()
                     android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ========================================")
-                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl] getUserSelf API Response:")
+                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl] getUserSelf API Full Response:")
+                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Raw Response Body: $body")
+                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - First Object: $firstObject")
+                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ========================================")
+                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl] getUserSelf API Response (Parsed):")
                     android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - User ID: ${firstObject?.id}")
+                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Email: ${firstObject?.email}")
+                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Username: ${firstObject?.username}")
+                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Nickname: ${firstObject?.nickname}")
+                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Hearts: ${firstObject?.hearts}")
 
                     if (firstObject?.most == null) {
                         android.util.Log.w("USER_INFO", "[UserRepositoryImpl]   ⚠️ Most is NULL - User has no favorite idol set")
+                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   🔍 Fetching SECRET_ROOM_IDOL (id=${Constants.SECRET_ROOM_IDOL_ID}) from API...")
+
+                        // most가 없으면 SECRET_ROOM_IDOL_ID로 조회 (API 직접 호출)
+                        try {
+                            val idsString = listOf(Constants.SECRET_ROOM_IDOL_ID).joinToString(",")
+                            val idolResponse = idolApi.getIdolsByIds(idsString, null)
+
+                            if (idolResponse.isSuccessful && idolResponse.body() != null) {
+                                val idolListResponse = idolResponse.body()!!
+                                android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   📦 Response data: ${idolListResponse.data?.size} idols")
+
+                                val secretIdol = idolListResponse.data?.firstOrNull()
+                                if (secretIdol != null) {
+                                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   ✓ SECRET_ROOM_IDOL fetched: ${secretIdol.name} (id=${secretIdol.id})")
+                                    try {
+                                        val idolEntity = secretIdol.toEntity()
+                                        idolDao.upsert(idolEntity)
+                                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   ✓ SECRET_ROOM_IDOL upserted to DB: ${secretIdol.name}")
+
+                                        // UserCacheRepository에도 mostIdolId 설정
+                                        val chartCode = secretIdol.resourceUri?.substringAfterLast("/")?.replace("/", "")
+                                        userCacheRepository.setMostIdolId(
+                                            idolId = secretIdol.id,
+                                            category = secretIdol.category,
+                                            chartCode = chartCode
+                                        )
+                                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   ✓ SECRET_ROOM_IDOL cached: id=${secretIdol.id}, category=${secretIdol.category}, chartCode=$chartCode")
+                                    } catch (e: Exception) {
+                                        android.util.Log.e("USER_INFO", "[UserRepositoryImpl]   ❌ Failed to upsert SECRET_ROOM_IDOL", e)
+                                    }
+                                } else {
+                                    android.util.Log.w("USER_INFO", "[UserRepositoryImpl]   ⚠️ SECRET_ROOM_IDOL not found in API response")
+                                }
+                            } else {
+                                android.util.Log.e("USER_INFO", "[UserRepositoryImpl]   ❌ Failed to fetch SECRET_ROOM_IDOL: HTTP ${idolResponse.code()}")
+                            }
+                        } catch (e: Exception) {
+                            android.util.Log.e("USER_INFO", "[UserRepositoryImpl]   ❌ Exception while fetching SECRET_ROOM_IDOL", e)
+                        }
                     } else {
-                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most: ${firstObject.most}")
+                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ========================================")
+                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl] Most Idol Data (Before DB Upsert):")
+                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Raw Most Object: ${firstObject.most}")
                         android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most ID: ${firstObject.most.id}")
                         android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most Name: ${firstObject.most.name}")
+                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most Name EN: ${firstObject.most.nameEn}")
                         android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most Type: ${firstObject.most.type}")
-                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most ChartCode: ${firstObject.most.chartCodes?.firstOrNull()}")
                         android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most Category: ${firstObject.most.category}")
                         android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most GroupId: ${firstObject.most.groupId}")
+                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most ChartCodes: ${firstObject.most.chartCodes}")
+                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most ImageUrl: ${firstObject.most.imageUrl}")
+                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most Heart: ${firstObject.most.heart}")
+
+                        // most 데이터를 idols DB에 upsert
+                        try {
+                            val idolEntity = firstObject.most.toEntity()
+                            android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Converted IdolEntity: $idolEntity")
+                            idolDao.upsert(idolEntity)
+                            android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   ✓ Most idol upserted to DB: ${firstObject.most.name} (id=${firstObject.most.id})")
+
+                            // UserCacheRepository에도 mostIdolId 설정
+                            val chartCode = firstObject.most.resourceUri?.substringAfterLast("/")?.replace("/", "")
+                            userCacheRepository.setMostIdolId(
+                                idolId = firstObject.most.id,
+                                category = firstObject.most.category,
+                                chartCode = chartCode
+                            )
+                            android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   ✓ Most idol cached: id=${firstObject.most.id}, category=${firstObject.most.category}, chartCode=$chartCode")
+                        } catch (e: Exception) {
+                            android.util.Log.e("USER_INFO", "[UserRepositoryImpl]   ❌ Failed to upsert most idol to DB", e)
+                        }
                     }
                     android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ========================================")
 

@@ -222,10 +222,15 @@ class UserCacheRepository @Inject constructor(
             Log.d(TAG, "  - Category: ${most.category}")
             Log.d(TAG, "  - ChartCode: $chartCode")
         } ?: run {
-            _mostIdolId.value = null
-            _mostIdolCategory.value = null
-            _mostIdolChartCode.value = null
-            Log.w(TAG, "⚠️ No most idol set")
+            // most가 null이지만 이미 mostIdolId가 설정되어 있으면 (예: SECRET_ROOM_IDOL) 유지
+            if (_mostIdolId.value == null) {
+                _mostIdolId.value = null
+                _mostIdolCategory.value = null
+                _mostIdolChartCode.value = null
+                Log.w(TAG, "⚠️ No most idol set")
+            } else {
+                Log.d(TAG, "✅ Keeping existing mostIdolId: ${_mostIdolId.value} (most is null in userData)")
+            }
         }
 
         // 하트 정보 업데이트
@@ -384,6 +389,29 @@ class UserCacheRepository @Inject constructor(
      */
     fun getDefaultCategory(): String? {
         return _defaultCategory.value
+    }
+
+    /**
+     * 최애 아이돌 ID 설정 (SECRET_ROOM_IDOL 등 수동 설정용)
+     *
+     * @param idolId 아이돌 ID
+     * @param category 아이돌 카테고리 (M/F)
+     * @param chartCode 아이돌 차트 코드
+     */
+    fun setMostIdolId(idolId: Int, category: String? = null, chartCode: String? = null) {
+        _mostIdolId.value = idolId
+        _mostIdolCategory.value = category
+        _mostIdolChartCode.value = chartCode
+        Log.d(TAG, "✅ Most idol ID manually set: id=$idolId, category=$category, chartCode=$chartCode")
+
+        // SharedPreference에 백업
+        ioScope.launch {
+            try {
+                preferencesManager.saveMostIdolInfo(idolId, category, chartCode)
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Failed to save most idol info to SharedPreference: ${e.message}", e)
+            }
+        }
     }
 
     /**
