@@ -3,6 +3,7 @@ package net.ib.mn.presentation.main.myfavorite
 import net.ib.mn.base.UiEffect
 import net.ib.mn.base.UiIntent
 import net.ib.mn.base.UiState
+import net.ib.mn.domain.model.MostPicksModel
 
 /**
  * My Favorite Contract
@@ -18,12 +19,14 @@ class MyFavoriteContract {
      * @property favoriteIdols 최애 아이돌 리스트
      * @property error 에러 메시지
      * @property topFavorite 1순위 최애 (top3 이미지 표시용)
+     * @property mostPicksModel 픽 참여 정보 (Support Bias Bar 표시용)
      */
     data class State(
         val isLoading: Boolean = false,
         val favoriteIdols: List<FavoriteIdol> = emptyList(),
         val error: String? = null,
-        val mostFavoriteIdol: MostFavoriteIdol? = null
+        val mostFavoriteIdol: MostFavoriteIdol? = null,
+        val mostPicksModel: MostPicksModel? = null
     ) : UiState
 
     /**
@@ -69,6 +72,11 @@ class MyFavoriteContract {
          * 투표 성공 (즉시 데이터 업데이트)
          */
         data class OnVoteSuccess(val idolId: Int, val votedHeart: Long) : Intent()
+
+        /**
+         * Support Bias Bar 클릭
+         */
+        data class OnSupportBiasBarClick(val id: Int, val kind: String) : Intent()
     }
 
     /**
@@ -94,6 +102,11 @@ class MyFavoriteContract {
          * 토스트 메시지 표시
          */
         data class ShowToast(val message: String) : Effect()
+
+        /**
+         * 웹 페이지로 이동 (Support Bias Bar 클릭)
+         */
+        data class NavigateToWebPage(val url: String) : Effect()
     }
 
     /**

@@ -89,6 +89,13 @@ class MyFavoriteViewModel @Inject constructor(
                 android.util.Log.e(TAG, "❌ Failed to load mostIdol chart in init: ${e.message}", e)
             }
         }
+
+        // mostPicksModel Flow를 State에 연결
+        viewModelScope.launch {
+            userCacheRepository.mostPicksModel.collect { model ->
+                setState { copy(mostPicksModel = model) }
+            }
+        }
     }
 
     override fun createInitialState(): MyFavoriteContract.State {
@@ -105,6 +112,7 @@ class MyFavoriteViewModel @Inject constructor(
             is MyFavoriteContract.Intent.OnScreenVisible -> {}
             is MyFavoriteContract.Intent.OnScreenHidden -> {}
             is MyFavoriteContract.Intent.OnVoteSuccess -> onVoteSuccess(intent.idolId, intent.votedHeart)
+            is MyFavoriteContract.Intent.OnSupportBiasBarClick -> onSupportBiasBarClick(intent.id, intent.kind)
         }
     }
 
@@ -255,6 +263,21 @@ class MyFavoriteViewModel @Inject constructor(
 
     private fun onSettingClick() {
         setEffect { MyFavoriteContract.Effect.NavigateToFavoriteSetting }
+    }
+
+    /**
+     * Support Bias Bar 클릭 시 웹페이지로 이동
+     */
+    private fun onSupportBiasBarClick(id: Int, kind: String) {
+        val locale = java.util.Locale.getDefault().language
+        val url = when (kind) {
+            "themepick" -> "https://starpass.app/themepick/$id?locale=$locale"
+            "heartpick" -> "https://starpass.app/heartpick/$id?locale=$locale"
+            "miracle" -> "https://starpass.app/miracle?locale=$locale"
+            "onepick" -> "https://starpass.app/onepick/$id?locale=$locale"
+            else -> return
+        }
+        setEffect { MyFavoriteContract.Effect.NavigateToWebPage(url) }
     }
 
     /**

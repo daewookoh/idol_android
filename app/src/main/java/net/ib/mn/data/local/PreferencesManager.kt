@@ -10,6 +10,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import net.ib.mn.domain.model.MostPicksModel
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -155,6 +156,7 @@ class PreferencesManager @Inject constructor(
         val KEY_MOST_IDOL_CATEGORY = stringPreferencesKey("most_idol_category")  // 최애 아이돌 카테고리 (M/F)
         val KEY_MOST_IDOL_CHART_CODE = stringPreferencesKey("most_idol_chart_code")  // 최애 아이돌 차트 코드
         val KEY_FAVORITE_IDOL_IDS = stringPreferencesKey("favorite_idol_ids_json")  // 즐겨찾기 아이돌 ID 리스트 JSON
+        val KEY_MOST_PICKS_MODEL = stringPreferencesKey("most_picks_model_json")  // 픽 참여 정보 JSON
     }
 
     // ============================================================
@@ -819,6 +821,38 @@ class PreferencesManager @Inject constructor(
             }
         } else {
             emptyList()
+        }
+    }
+
+    /**
+     * MostPicksModel 저장
+     */
+    suspend fun saveMostPicksModel(model: MostPicksModel?) {
+        context.dataStore.edit { preferences ->
+            if (model != null) {
+                val json = gson.toJson(model)
+                preferences[KEY_MOST_PICKS_MODEL] = json
+            } else {
+                preferences.remove(KEY_MOST_PICKS_MODEL)
+            }
+        }
+        android.util.Log.d("PreferencesManager", "✓ Saved most picks model: $model")
+    }
+
+    /**
+     * MostPicksModel 로드
+     */
+    suspend fun getMostPicksModel(): MostPicksModel? {
+        val json = context.dataStore.data.first()[KEY_MOST_PICKS_MODEL]
+        return if (json != null) {
+            try {
+                gson.fromJson(json, MostPicksModel::class.java)
+            } catch (e: Exception) {
+                android.util.Log.e("PreferencesManager", "Failed to parse MostPicksModel", e)
+                null
+            }
+        } else {
+            null
         }
     }
 

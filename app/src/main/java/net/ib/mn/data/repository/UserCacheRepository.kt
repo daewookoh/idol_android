@@ -10,8 +10,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import net.ib.mn.data.remote.dto.UserSelfData
 import net.ib.mn.data.remote.dto.toEntity
+import net.ib.mn.domain.model.MostPicksModel
 import net.ib.mn.presentation.main.myfavorite.MyFavoriteContract
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -81,6 +83,10 @@ class UserCacheRepository @Inject constructor(
     // 사용자 선택 차트 코드 (랭킹 탭 초기 선택용)
     private val _defaultChartCode = MutableStateFlow<String?>(null)
     val defaultChartCode: Flow<String?> = _defaultChartCode.asStateFlow()
+
+    // 픽 참여 정보 (Support Bias Bar용)
+    private val _mostPicksModel = MutableStateFlow<MostPicksModel?>(null)
+    val mostPicksModel: Flow<MostPicksModel?> = _mostPicksModel.asStateFlow()
 
     /**
      * 하트 정보 데이터 클래스
@@ -155,6 +161,13 @@ class UserCacheRepository @Inject constructor(
             if (defaultChartCode != null) {
                 _defaultChartCode.value = defaultChartCode
                 Log.d(TAG, "✓ Restored default chart code: $defaultChartCode")
+            }
+
+            // MostPicks 정보 복원
+            val mostPicksModel = preferencesManager.getMostPicksModel()
+            if (mostPicksModel != null) {
+                _mostPicksModel.value = mostPicksModel
+                Log.d(TAG, "✓ Restored most picks: $mostPicksModel")
             }
 
             Log.d(TAG, "✅ Cache restoration completed")
@@ -449,6 +462,15 @@ class UserCacheRepository @Inject constructor(
             Log.e(TAG, "❌ Failed to refresh UserSelf: ${e.message}", e)
             throw e
         }
+    }
+
+    /**
+     * MostPicksModel 설정
+     */
+    suspend fun setMostPicksModel(model: MostPicksModel?) {
+        _mostPicksModel.value = model
+        preferencesManager.saveMostPicksModel(model)
+        Log.d(TAG, "✓ MostPicksModel cached: $model")
     }
 
     /**

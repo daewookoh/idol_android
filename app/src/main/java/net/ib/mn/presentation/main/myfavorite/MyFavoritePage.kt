@@ -144,6 +144,10 @@ fun MyFavoritePage(
                 is MyFavoriteContract.Effect.ShowToast -> {
                     Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
                 }
+                is MyFavoriteContract.Effect.NavigateToWebPage -> {
+                    // TODO: WebView 또는 외부 브라우저로 열기
+                    android.util.Log.d("MyFavoritePage", "Navigate to: ${effect.url}")
+                }
             }
         }
     }
@@ -167,6 +171,7 @@ private fun MyFavoriteContent(
     onIntent: (MyFavoriteContract.Intent) -> Unit,
     viewModel: MyFavoriteViewModel = hiltViewModel()
 ) {
+    android.util.Log.d("MyFavoriteContent", "mostPicksModel: ${state.mostPicksModel}")
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -234,11 +239,15 @@ private fun MyFavoriteContent(
                         if (mostFavoriteIdol != null) {
                             MostFavoriteIdolHeader(
                                 mostFavoriteIdol = mostFavoriteIdol,
+                                mostPicksModel = state.mostPicksModel,
                                 onIdolClick = {
                                     onIntent(MyFavoriteContract.Intent.OnIdolClick(mostFavoriteIdol.idolId))
                                 },
                                 onVoteSuccess = { idolId, votedHeart ->
                                     onIntent(MyFavoriteContract.Intent.OnVoteSuccess(idolId, votedHeart))
+                                },
+                                onSupportBiasBarClick = { id, kind ->
+                                    onIntent(MyFavoriteContract.Intent.OnSupportBiasBarClick(id, kind))
                                 }
                             )
                         } else {
@@ -296,8 +305,10 @@ private fun SectionHeader(sectionName: String) {
 @Composable
 private fun MostFavoriteIdolHeader(
     mostFavoriteIdol: MyFavoriteContract.MostFavoriteIdol,
+    mostPicksModel: net.ib.mn.domain.model.MostPicksModel?,
     onIdolClick: () -> Unit,
-    onVoteSuccess: (idolId: Int, votedHeart: Long) -> Unit = { _, _ -> }
+    onVoteSuccess: (idolId: Int, votedHeart: Long) -> Unit = { _, _ -> },
+    onSupportBiasBarClick: (id: Int, kind: String) -> Unit = { _, _ -> }
 ) {
     Column(
         modifier = Modifier
@@ -318,6 +329,15 @@ private fun MostFavoriteIdolHeader(
             mostFavoriteIdol = mostFavoriteIdol,
             onVoteSuccess = onVoteSuccess
         )
+
+        // Support Bias Bar - 픽 참여 배너
+        if (mostPicksModel != null) {
+            SupportBiasBar(
+                idolId = mostFavoriteIdol.idolId,
+                mostPicksModel = mostPicksModel,
+                onClick = onSupportBiasBarClick
+            )
+        }
     }
 }
 
@@ -445,6 +465,125 @@ private fun MostFavoriteIdolHeaderLoading() {
                 .background(ColorPalette.gray100),
             contentAlignment = Alignment.Center
         ) { }
+    }
+}
+
+/**
+ * Support Bias Bar
+ * 최애가 픽에 참여하고 있을 때 표시되는 배너
+ */
+@Composable
+private fun SupportBiasBar(
+    idolId: Int,
+    mostPicksModel: net.ib.mn.domain.model.MostPicksModel,
+    onClick: (id: Int, kind: String) -> Unit
+) {
+    // 픽 참여 정보 결정 (old 로직과 동일)
+    val (bannerTitle, id, kind) = getBannerInfo(mostPicksModel)
+
+    if (kind.isEmpty()) return
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .clickable { onClick(id, kind) }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Heart Icon
+            Image(
+                painter = painterResource(R.drawable.img_popup_heart),
+                contentDescription = null,
+                modifier = Modifier.size(21.dp, 17.dp)
+            )
+
+            // Banner Text (Bold 처리된 bannerTitle)
+            val message = stringResource(R.string.most_in_picks_banner_msg, bannerTitle)
+            val start = message.indexOf(bannerTitle)
+            val end = start + bannerTitle.length
+
+            val annotatedString = androidx.compose.ui.text.buildAnnotatedString {
+                append(message)
+                if (start >= 0) {
+                    addStyle(
+                        style = androidx.compose.ui.text.SpanStyle(fontWeight = FontWeight.Bold),
+                        start = start,
+                        end = end
+                    )
+                }
+            }
+
+            Text(
+                text = annotatedString,
+                style = ExoTypo.body15,
+                color = ColorPalette.textDefault,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 9.dp)
+            )
+
+            // Arrow Icon
+            Image(
+                painter = painterResource(R.drawable.arrow_left_to_right),
+                contentDescription = null,
+                modifier = Modifier.size(8.dp, 12.dp)
+            )
+        }
+    }
+}
+
+/**
+ * 배너 정보 결정 (old 로직과 동일)
+ */
+private fun getBannerInfo(model: net.ib.mn.domain.model.MostPicksModel): Triple<String, Int, String> {
+    val themepick = "themepick"
+    val heartpick = "heartpick"
+    val miracle = "miracle"
+    val onepick = "onepick"
+
+    val theme: List<String> = listOf(themepick, heartpick, miracle)
+
+    return when {
+        model.heartpick?.isNotEmpty() == true && model.themepick?.isNotEmpty() == true && model.miracle == true -> {
+            val randomItem = theme.random()
+            when (randomItem) {
+                themepick -> Triple("테마픽", model.themepick.random(), themepick)
+                heartpick -> Triple("하트픽", model.heartpick.random(), heartpick)
+                miracle -> Triple("기적의 달", 0, miracle)
+                else -> Triple("", 0, "")
+            }
+        }
+        model.heartpick?.isNotEmpty() == true && model.themepick?.isNotEmpty() == true -> {
+            if (kotlin.random.Random.nextBoolean()) {
+                Triple("하트픽", model.heartpick.random(), heartpick)
+            } else {
+                Triple("테마픽", model.themepick.random(), themepick)
+            }
+        }
+        model.heartpick?.isNotEmpty() == true && model.miracle == true -> {
+            if (kotlin.random.Random.nextBoolean()) {
+                Triple("하트픽", model.heartpick.random(), heartpick)
+            } else {
+                Triple("기적의 달", 0, miracle)
+            }
+        }
+        model.themepick?.isNotEmpty() == true && model.miracle == true -> {
+            if (kotlin.random.Random.nextBoolean()) {
+                Triple("테마픽", model.themepick.random(), themepick)
+            } else {
+                Triple("기적의 달", 0, miracle)
+            }
+        }
+        model.heartpick?.isNotEmpty() == true -> Triple("하트픽", model.heartpick.random(), heartpick)
+        model.themepick?.isNotEmpty() == true -> Triple("테마픽", model.themepick.random(), themepick)
+        model.onepick?.isNotEmpty() == true -> Triple("이미지픽", model.onepick.random(), onepick)
+        model.miracle == true -> Triple("기적의 달", 0, miracle)
+        else -> Triple("", 0, "")
     }
 }
 
