@@ -365,6 +365,14 @@ class ChartRankingRepository @Inject constructor(
             val maxHeart = sortedIdols.firstOrNull()?.heart ?: 0L
             val minHeart = sortedIdols.lastOrNull()?.heart ?: 0L
 
+            // mostIdolId 가져오기 (isFavorite 설정용)
+            val mostIdolId = try {
+                userCacheRepository.get().getMostIdolId()
+            } catch (e: Exception) {
+                Log.w(TAG, "⚠️ Failed to get mostIdolId: ${e.message}")
+                null
+            }
+
             // RankingItem 리스트 생성 (같은 투표수면 같은 랭킹)
             var currentRank = 1
             var previousHeart: Long? = null
@@ -409,7 +417,8 @@ class ChartRankingRepository @Inject constructor(
                     anniversary = if (idol.anniversary == "Y") idol.anniversary else null,
                     anniversaryDays = idol.anniversaryDays ?: 0,
                     top3ImageUrls = imageUrls,
-                    top3VideoUrls = videoUrls
+                    top3VideoUrls = videoUrls,
+                    isFavorite = mostIdolId?.let { idol.id == it } ?: false
                 )
             }
 
@@ -469,7 +478,8 @@ class ChartRankingRepository @Inject constructor(
                             idolEntity.imageUrl2,
                             idolEntity.imageUrl3
                         ),
-                        top3VideoUrls = emptyList()
+                        top3VideoUrls = emptyList(),
+                        isFavorite = true  // 비밀의 방은 항상 최애
                     )
                     _mostFavoriteIdolRankingItem.value = specialItem
                     Log.d(TAG, "✅ Loaded special idol: ${specialItem.name}, heart=${specialItem.heartCount}")

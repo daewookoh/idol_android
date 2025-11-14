@@ -15,6 +15,7 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Scale
 import dagger.hilt.android.UnstableApi
@@ -171,7 +172,7 @@ private fun ExoTop3Internal(
 
                     var isVideoReady by remember { mutableStateOf(false) }
 
-                    // 스틸 이미지 (최적화: 정확한 크기로 리사이징)
+                    // 스틸 이미지 (최적화: 정확한 크기로 리사이징 + 백그라운드 복귀 시 캐시 유지)
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(stillImageUrl)
@@ -179,6 +180,10 @@ private fun ExoTop3Internal(
                             .scale(Scale.FILL)
                             .crossfade(true)
                             .crossfade(200)
+                            // 백그라운드 복귀 시 캐시 유지
+                            .memoryCachePolicy(CachePolicy.ENABLED)
+                            .diskCachePolicy(CachePolicy.ENABLED)
+                            .networkCachePolicy(CachePolicy.ENABLED)
                             .build(),
                         contentDescription = "Top ${index + 1} 이미지",
                         modifier = Modifier.fillMaxSize(),
@@ -200,7 +205,7 @@ private fun ExoTop3Internal(
 
                         if (actualVideoUrl != null) {
                             val exoPlayer = remember(actualVideoUrl) {
-                                ExoPlayer.Builder(context)
+                                val builder = ExoPlayer.Builder(context)
                                     // 메모리 최적화: 작은 버퍼 사이즈 사용
                                     .setLoadControl(
                                         androidx.media3.exoplayer.DefaultLoadControl.Builder()
@@ -212,21 +217,29 @@ private fun ExoTop3Internal(
                                             )
                                             .build()
                                     )
-                                    .build().apply {
-                                        repeatMode = Player.REPEAT_MODE_ALL
-                                        // 비디오만 재생 (오디오 트랙 비활성화로 메모리 절약)
-                                        volume = 0f
-                                        setMediaItem(MediaItem.fromUri(actualVideoUrl))
-                                        prepare()
 
-                                        addListener(object : Player.Listener {
-                                            override fun onPlaybackStateChanged(playbackState: Int) {
-                                                if (playbackState == Player.STATE_READY) {
-                                                    isVideoReady = true
-                                                }
+                                // 캐시 DataSource Factory가 있으면 사용 (백그라운드 복귀 시 캐시 유지)
+                                manager.cacheDataSourceFactory?.let { cacheFactory ->
+                                    builder.setMediaSourceFactory(
+                                        androidx.media3.exoplayer.source.DefaultMediaSourceFactory(cacheFactory)
+                                    )
+                                }
+
+                                builder.build().apply {
+                                    repeatMode = Player.REPEAT_MODE_ALL
+                                    // 비디오만 재생 (오디오 트랙 비활성화로 메모리 절약)
+                                    volume = 0f
+                                    setMediaItem(MediaItem.fromUri(actualVideoUrl))
+                                    prepare()
+
+                                    addListener(object : Player.Listener {
+                                        override fun onPlaybackStateChanged(playbackState: Int) {
+                                            if (playbackState == Player.STATE_READY) {
+                                                isVideoReady = true
                                             }
-                                        })
-                                    }
+                                        }
+                                    })
+                                }
                             }
 
                             // isActive 상태에 따라 재생/정지 제어

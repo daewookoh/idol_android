@@ -58,6 +58,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var configRepository: net.ib.mn.domain.repository.ConfigRepository
 
+    @Inject
+    lateinit var cacheDataSourceFactory: androidx.media3.datasource.cache.CacheDataSource.Factory
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
 
@@ -99,8 +102,14 @@ class MainActivity : AppCompatActivity() {
             }
 
             ExodusTheme(darkTheme = darkTheme) {
-                val navController = rememberNavController()
-                NavGraph(navController = navController)
+                // ExoTop3Manager에 비디오 캐시 제공
+                androidx.compose.runtime.CompositionLocalProvider(
+                    net.ib.mn.ui.components.LocalExoTop3Manager provides
+                        net.ib.mn.ui.components.ExoTop3Manager(cacheDataSourceFactory)
+                ) {
+                    val navController = rememberNavController()
+                    NavGraph(navController = navController)
+                }
             }
         }
     }

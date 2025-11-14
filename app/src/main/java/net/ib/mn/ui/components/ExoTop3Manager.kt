@@ -1,9 +1,11 @@
 package net.ib.mn.ui.components
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.media3.datasource.cache.CacheDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +22,9 @@ import kotlinx.coroutines.flow.asStateFlow
  * 3. 활성화될 때 setActivePlayer(id) 호출
  * 4. 비활성화될 때 자동으로 정리
  */
-object ExoTop3Manager {
+class ExoTop3Manager(
+    val cacheDataSourceFactory: CacheDataSource.Factory? = null
+) {
     private val _activePlayerId = MutableStateFlow<String?>(null)
     val activePlayerId: StateFlow<String?> = _activePlayerId.asStateFlow()
 
@@ -51,7 +55,7 @@ object ExoTop3Manager {
 /**
  * CompositionLocal for ExoTop3Manager
  */
-val LocalExoTop3Manager = staticCompositionLocalOf { ExoTop3Manager }
+val LocalExoTop3Manager = staticCompositionLocalOf { ExoTop3Manager() }
 
 /**
  * ExoTop3 활성화 관리를 위한 Composable 유틸리티
