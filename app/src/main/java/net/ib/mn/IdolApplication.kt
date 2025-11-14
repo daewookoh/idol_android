@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
@@ -20,6 +21,7 @@ import com.facebook.FacebookSdk
 import com.kakao.sdk.common.KakaoSdk
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.remote.udp.IdolBroadcastManager
@@ -145,8 +147,39 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
         Log.d("IdolApplication", "========================================")
         Log.d("IdolApplication", "📱 App lifecycle: ON_START (Foreground)")
         Log.d("IdolApplication", "========================================")
-        Log.d("IdolApplication", "📡 Starting UDP broadcast...")
-        broadcastManager.startHeartbeat()
+
+        // UDP 설정 및 연결
+        owner.lifecycleScope.launch {
+            try {
+                val udpBroadcastUrl = preferencesManager.udpBroadcastUrl.first()
+                val udpStage = preferencesManager.udpStage.first()
+                val userInfo = preferencesManager.userInfo.first()
+                val userId = userInfo?.id ?: 0
+
+                Log.d("IdolApplication", "========================================")
+                Log.d("IdolApplication", "📡 UDP Configuration:")
+                Log.d("IdolApplication", "  - UDP Broadcast URL: $udpBroadcastUrl")
+                Log.d("IdolApplication", "  - UDP Stage: $udpStage")
+                Log.d("IdolApplication", "  - User ID: $userId")
+                Log.d("IdolApplication", "========================================")
+
+                // UDP Stage가 0보다 클 때만 연결 (old 프로젝트와 동일)
+                if (udpStage > 0 && !udpBroadcastUrl.isNullOrEmpty()) {
+                    Log.d("IdolApplication", "✓ UDP enabled - Starting connection...")
+                    broadcastManager.setupConnection(udpBroadcastUrl, userId)
+                } else {
+                    if (udpStage <= 0) {
+                        Log.w("IdolApplication", "⚠️ UDP disabled (stage=$udpStage)")
+                    }
+                    if (udpBroadcastUrl.isNullOrEmpty()) {
+                        Log.w("IdolApplication", "⚠️ UDP URL not configured")
+                    }
+                    Log.w("IdolApplication", "Skipping UDP connection")
+                }
+            } catch (e: Exception) {
+                Log.e("IdolApplication", "❌ Failed to setup UDP connection", e)
+            }
+        }
     }
 
     /**
@@ -159,7 +192,16 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
         Log.d("IdolApplication", "📱 App lifecycle: ON_STOP (Background)")
         Log.d("IdolApplication", "========================================")
         Log.d("IdolApplication", "🛑 Stopping UDP broadcast...")
-        broadcastManager.stopHeartbeat()
+
+        // UDP 연결 완전히 해제
+        owner.lifecycleScope.launch {
+            try {
+                broadcastManager.disconnect()
+                Log.d("IdolApplication", "✓ UDP disconnected")
+            } catch (e: Exception) {
+                Log.e("IdolApplication", "❌ Failed to disconnect UDP", e)
+            }
+        }
     }
 
     /**
