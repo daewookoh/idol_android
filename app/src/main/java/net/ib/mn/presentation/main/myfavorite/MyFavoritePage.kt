@@ -43,16 +43,11 @@ import net.ib.mn.R
 import net.ib.mn.ui.components.ExoVoteIcon
 import java.text.NumberFormat
 import java.util.Locale
-import net.ib.mn.domain.ranking.IdolIdsRankingDataSource
-import net.ib.mn.domain.repository.RankingRepository
 import net.ib.mn.presentation.main.ranking.idol_subpage.rememberMyFavoriteRankingState
 import net.ib.mn.presentation.main.ranking.idol_subpage.myFavoriteRankingItems
-import net.ib.mn.presentation.main.ranking.idol_subpage.MyFavoriteRankingData
 import net.ib.mn.ui.components.ExoTop3
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
-import net.ib.mn.util.NumberFormatUtil
-import javax.inject.Inject
 
 /**
  * My Favorite Page (UnifiedRankingSubPage 재사용 버전)
@@ -360,7 +355,7 @@ private fun MostFavoriteInfoBar(
                 // 순위
                 mostFavoriteIdol.rank?.let { rank ->
                     Text(
-                        text = rank.toString(),
+                        text = if(rank == 0) "-" else rank.toString(),
                         fontSize = 20.sp,
                         lineHeight = 20.sp,
                         fontWeight = FontWeight.Bold,
@@ -443,27 +438,13 @@ private fun MostFavoriteIdolHeaderLoading() {
             .fillMaxWidth()
             .background(ColorPalette.background100)
     ) {
-        // ExoTop3 영역 높이만큼 스켈레톤
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(280.dp)
+                .height(200.dp)
                 .background(ColorPalette.gray100),
             contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(
-                color = ColorPalette.main,
-                modifier = Modifier.size(40.dp)
-            )
-        }
-
-        // Info Bar 영역
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .background(ColorPalette.gray100)
-        )
+        ) { }
     }
 }
 

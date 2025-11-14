@@ -76,6 +76,19 @@ class MyFavoriteViewModel @Inject constructor(
     init {
         // 즐겨찾기 ID 변경 감지하여 자동으로 섹션 업데이트
         observeFavoriteChanges()
+
+        // ✅ 앱 시작 시 mostIdol 차트를 즉시 로드하여 빠른 응답
+        viewModelScope.launch {
+            try {
+                val mostIdolChartCode = userCacheRepository.getMostIdolChartCode()
+                if (mostIdolChartCode != null) {
+                    android.util.Log.d(TAG, "🚀 Init: Loading mostIdol chart: $mostIdolChartCode")
+                    chartDatabaseRepository.refreshChart(mostIdolChartCode)
+                }
+            } catch (e: Exception) {
+                android.util.Log.e(TAG, "❌ Failed to load mostIdol chart in init: ${e.message}", e)
+            }
+        }
     }
 
     override fun createInitialState(): MyFavoriteContract.State {
@@ -128,8 +141,18 @@ class MyFavoriteViewModel @Inject constructor(
                 userCacheRepository.refreshFavoriteIdols()
 
                 // 3. 랭킹 데이터 갱신 (Room DB 업데이트)
+                // ✅ mostIdol의 차트를 먼저 갱신하여 빠른 응답
+                val mostIdolChartCode = userCacheRepository.getMostIdolChartCode()
+                if (mostIdolChartCode != null && mostIdolChartCode in CHART_CODES) {
+                    android.util.Log.d(TAG, "🔄 Refreshing mostIdol chart first: $mostIdolChartCode")
+                    chartDatabaseRepository.refreshChart(mostIdolChartCode)
+                }
+
+                // 나머지 차트 갱신
                 CHART_CODES.forEach { chartCode ->
-                    chartDatabaseRepository.refreshChart(chartCode)
+                    if (chartCode != mostIdolChartCode) {
+                        chartDatabaseRepository.refreshChart(chartCode)
+                    }
                 }
 
                 android.util.Log.d(TAG, "✅ Background refresh completed")
@@ -248,18 +271,11 @@ class MyFavoriteViewModel @Inject constructor(
             try {
                 val chartCode = userCacheRepository.getMostIdolChartCode()
 
-                if (chartCode != null) {
-                    chartDatabaseRepository.updateVoteAndRerank(
-                        idolId = idolId,
-                        votedHeartCount = votedHeart,
-                        chartCode = chartCode
-                    )
-                } else {
-                    // chartCode가 null인 경우 (비밀의 방 등) - 아무것도 안 함
-                    // ChartRankingRepository가 mostFavoriteIdolRankingItem을 관리하므로
-                    // 직접 업데이트할 필요 없음
-                    android.util.Log.d(TAG, "⚠️ chartCode is null - skipping vote update")
-                }
+                chartDatabaseRepository.updateVoteAndRerank(
+                    idolId = idolId,
+                    votedHeartCount = votedHeart,
+                    chartCode = chartCode
+                )
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "❌ Failed to update vote in DB: ${e.message}", e)
             }

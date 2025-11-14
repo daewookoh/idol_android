@@ -265,8 +265,10 @@ class IdolBroadcastManager @Inject constructor(
      * Heartbeat 전송 시작 (30초마다)
      */
     fun startHeartbeat() {
+        Log.i(TAG, "=== startHeartbeat called")
         heartbeatJob?.cancel()
         heartbeatJob = scope.launch {
+            Log.i(TAG, "=== heartbeat coroutine started")
             while (isActive) {
                 delay(30000) // 30초
                 Log.i(TAG, "=== 30 sec timer fired. Send request.")
@@ -378,6 +380,8 @@ class IdolBroadcastManager @Inject constructor(
                         scope.launch {
                             disconnect()
                             connect()
+                            // ✅ re-route 후 heartbeat 재시작 (old 프로젝트 패턴)
+                            startHeartbeat()
                         }
                         return
                     }
@@ -390,6 +394,8 @@ class IdolBroadcastManager @Inject constructor(
                         scope.launch {
                             disconnect()
                             connect()
+                            // ✅ re-route 후 heartbeat 재시작 (old 프로젝트 패턴)
+                            startHeartbeat()
                         }
                         return
                     }
@@ -539,8 +545,12 @@ class IdolBroadcastManager @Inject constructor(
                     Log.d(TAG, "✅ 파싱 완료: $idolCount 명의 아이돌 데이터")
                 }
 
-                // DB 업데이트
-                updateDatabase(ts)
+                // DB 업데이트를 별도 코루틴에서 실행 (old 프로젝트 로직)
+                // 이렇게 하면 mutex를 빠르게 해제하고 다음 UDP 패킷을 처리할 수 있음
+                val idolsSnapshot = HashMap(idols)  // idols 맵 복사
+                scope.launch(Dispatchers.IO) {
+                    updateDatabase(ts, idolsSnapshot)
+                }
 
             } catch (e: Exception) {
                 Log.e(TAG, "=== parse error", e)
@@ -550,10 +560,12 @@ class IdolBroadcastManager @Inject constructor(
 
     /**
      * DB 업데이트
+     * @param ts timestamp
+     * @param idolsMap UDP로 수신한 아이돌 데이터 맵 (별도 코루틴에서 실행하기 위해 스냅샷 전달)
      */
-    private suspend fun updateDatabase(ts: Int) {
+    private suspend fun updateDatabase(ts: Int, idolsMap: Map<Int, IdolUpdateData>) {
         try {
-            val keyList = idols.keys.toList()
+            val keyList = idolsMap.keys.toList()
             if (keyList.isEmpty()) return
 
             if (VERBOSE_LOGGING) {
@@ -573,7 +585,7 @@ class IdolBroadcastManager @Inject constructor(
             val updatedIdols = ArrayList<IdolEntity>()
             val updatedInfoVerIds = ArrayList<Int>()
 
-            for ((id, incomingData) in idols.entries) {
+            for ((id, incomingData) in idolsMap.entries) {
                 val idol = idolMap[id]
 
                 if (idol == null) {
@@ -582,25 +594,25 @@ class IdolBroadcastManager @Inject constructor(
                     continue
                 }
 
-                // info_ver 변경 (API 호출 필요하지만 heart는 업데이트)
+                // info_ver 변경 (API로 전체 필드 업데이트 필요)
                 if (idol.infoSeq != incomingData.infoSeq) {
                     Log.i(TAG, "=== info_ver updated id=$id ${idol.infoSeq} → ${incomingData.infoSeq}")
                     updatedInfoVerIds.add(id)
-                    // continue 제거: heart 값은 여전히 업데이트해야 함
+                    continue  // ✅ API로 전체 필드 업데이트할 것이므로 여기서 종료
                 }
 
-                // top3_ver 변경 (API 호출 필요하지만 heart는 업데이트)
+                // top3_ver 변경 (API로 전체 필드 업데이트 필요)
                 if (idol.top3Seq != incomingData.top3Seq) {
                     Log.i(TAG, "=== top3_ver updated id=$id ${idol.top3Seq} → ${incomingData.top3Seq}")
                     updatedInfoVerIds.add(id)
-                    // continue 제거: heart 값은 여전히 업데이트해야 함
+                    continue  // ✅ API로 전체 필드 업데이트할 것이므로 여기서 종료
                 }
 
-                // top3_image_ver 변경 (API 호출 필요하지만 heart는 업데이트)
+                // top3_image_ver 변경 (API로 전체 필드 업데이트 필요)
                 if (idol.top3ImageVer != incomingData.top3ImageVer && incomingData.top3ImageVer != null) {
                     Log.i(TAG, "=== top3_image_ver updated id=$id")
                     updatedInfoVerIds.add(id)
-                    // continue 제거: heart 값은 여전히 업데이트해야 함
+                    continue  // ✅ API로 전체 필드 업데이트할 것이므로 여기서 종료
                 }
 
                 // heart, top3 변경
@@ -682,32 +694,31 @@ class IdolBroadcastManager @Inject constructor(
                 }
             }
 
-            // info_ver 변경된 아이돌 API 호출 (old 프로젝트 로직)
-            if (updatedInfoVerIds.isNotEmpty()) {
-                Log.i(TAG, "=== ${updatedInfoVerIds.size} idols need info update via API")
+            // 전체 갱신이 필요한지 먼저 확인 (old 프로젝트 로직과 동일)
+            val needFullRefresh = (updatedInfoVerIds.size > 30) || (notExistingIds.size > 10)
 
-                // 30개 이상이면 전체 갱신 (old 프로젝트 로직)
-                if (updatedInfoVerIds.size > 30) {
-                    Log.w(TAG, "⚠️ ${updatedInfoVerIds.size} idols changed (>30) - Starting full refresh")
-                    refreshAllIdols()
-                } else {
-                    // API 호출하여 전체 필드 업데이트
-                    updateIdolsByIds(updatedInfoVerIds.toList())
+            if (needFullRefresh) {
+                // 중복 호출 방지
+                if (updatingAll) {
+                    Log.w(TAG, "⚠️ Already updating all, skipping")
+                    return
                 }
+                updatingAll = true
+                Log.w(TAG, "⚠️ Full refresh needed: ${updatedInfoVerIds.size} info changes, ${notExistingIds.size} missing")
+                refreshAllIdols()
+                return  // ✅ 전체 갱신 후 종료
             }
 
-            // DB에 없는 아이돌 처리 (old 프로젝트 로직)
+            // 부분 업데이트: info_ver 변경된 아이돌 API 호출
+            if (updatedInfoVerIds.isNotEmpty()) {
+                Log.i(TAG, "=== ${updatedInfoVerIds.size} idols need info update via API")
+                updateIdolsByIds(updatedInfoVerIds.toList())
+            }
+
+            // 부분 업데이트: DB에 없는 아이돌 API 호출
             if (notExistingIds.isNotEmpty()) {
                 Log.w(TAG, "=== ${notExistingIds.size} idols not found in DB")
-
-                // 10개 이상이면 전체 갱신 (old 프로젝트 로직)
-                if (notExistingIds.size > 10) {
-                    Log.w(TAG, "⚠️ ${notExistingIds.size} missing idols (>10) - Starting full refresh")
-                    refreshAllIdols()
-                } else {
-                    // API 호출하여 누락된 아이돌 정보 가져오기
-                    updateIdolsByIds(notExistingIds.toList())
-                }
+                updateIdolsByIds(notExistingIds.toList())
             }
 
         } catch (e: Exception) {
@@ -890,9 +901,14 @@ class IdolBroadcastManager @Inject constructor(
                             } else {
                                 Log.w(TAG, "⚠️ Full refresh: API returned empty data")
                             }
+
+                            // ✅ 완료 후 updatingAll 플래그 리셋 (old 프로젝트 로직)
+                            updatingAll = false
                         }
                         is net.ib.mn.domain.model.ApiResult.Error -> {
                             Log.e(TAG, "❌ Full refresh error: ${result.message}")
+                            // ✅ 에러 시에도 updatingAll 플래그 리셋
+                            updatingAll = false
                         }
                         is net.ib.mn.domain.model.ApiResult.Loading -> {
                             // Loading state
@@ -901,6 +917,8 @@ class IdolBroadcastManager @Inject constructor(
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "❌ refreshAllIdols error", e)
+                // ✅ 예외 발생 시에도 updatingAll 플래그 리셋
+                updatingAll = false
             }
         }
     }

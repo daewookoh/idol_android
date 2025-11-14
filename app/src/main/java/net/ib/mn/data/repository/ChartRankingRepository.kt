@@ -20,6 +20,7 @@ import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.ui.components.RankingItem
+import net.ib.mn.util.Constants
 import net.ib.mn.util.IdolImageUtil
 import net.ib.mn.util.ProcessedRankData
 import net.ib.mn.util.RankingUtil
@@ -173,12 +174,28 @@ class ChartRankingRepository @Inject constructor(
             idolDao.updateIdolHeart(idolId, newTotalHeart)
             Log.d(TAG, "✅ Updated idol DB: idol=$idolId, hearts=$newTotalHeart")
 
-            // 2. 업데이트된 DB 데이터를 기반으로 차트 재정렬
+            // 3. 투표한 아이돌이 최애돌인 경우 mostFavoriteIdolRankingItem도 즉시 업데이트
+            val mostIdolId = userCacheRepository.get().mostIdolId.first()
+            if (mostIdolId == idolId) {
+                Log.d(TAG, "💖 Voted idol is mostFavorite - updating mostFavoriteIdolRankingItem")
+                val currentMostIdol = _mostFavoriteIdolRankingItem.value
+                if (currentMostIdol != null) {
+                    // 기존 mostFavoriteIdol의 heartCount와 voteCount만 업데이트
+                    val updatedMostIdol = currentMostIdol.copy(
+                        heartCount = newTotalHeart,
+                        voteCount = NumberFormat.getNumberInstance(Locale.US).format(newTotalHeart)
+                    )
+                    _mostFavoriteIdolRankingItem.value = updatedMostIdol
+                    Log.d(TAG, "✅ Updated mostFavoriteIdol: hearts=$newTotalHeart")
+                }
+            }
+
+            // 4. 업데이트된 DB 데이터를 기반으로 차트 재정렬
             if (chartCode != null) {
                 // 특정 차트만 리프레시
                 refreshChart(chartCode)
                 Log.d(TAG, "✅ Refreshed chart: $chartCode")
-            } else {
+            } else if(idolId != Constants.SECRET_ROOM_IDOL_ID){
                 // 모든 차트 리프레시
                 coroutineScope {
                     DEFAULT_CHART_CODES.map { code ->
@@ -348,22 +365,36 @@ class ChartRankingRepository @Inject constructor(
             val maxHeart = sortedIdols.firstOrNull()?.heart ?: 0L
             val minHeart = sortedIdols.lastOrNull()?.heart ?: 0L
 
-            // RankingItem 리스트 생성
+            // RankingItem 리스트 생성 (같은 투표수면 같은 랭킹)
+            var currentRank = 1
+            var previousHeart: Long? = null
+
             val rankings = sortedIdols.mapIndexed { index, idol ->
+                // 투표수가 이전 아이돌과 다르면 현재 index + 1을 랭킹으로 사용
+                // 투표수가 같으면 이전 랭킹 유지
+                val rank = if (previousHeart != null && previousHeart == idol.heart) {
+                    currentRank  // 같은 투표수면 같은 랭킹
+                } else {
+                    index + 1  // 다른 투표수면 현재 순서를 랭킹으로
+                }
+
+                currentRank = rank
+                previousHeart = idol.heart
+
                 // IdolImageUtil을 사용하여 top3 이미지/비디오 URL 가져오기
                 val imageUrls = IdolImageUtil.getTop3ImageUrls(idol).filterNotNull()
                 val videoUrls = IdolImageUtil.getTop3VideoUrls(idol).filterNotNull()
 
                 // Top3 파싱 결과 로깅 (디버깅용 - 상위 3명만)
                 if (index < 3) {
-                    Log.d(TAG, "🖼️ [$chartCode] Rank ${index+1} (${idol.name}): images=${imageUrls.size}, videos=${videoUrls.size}")
+                    Log.d(TAG, "🖼️ [$chartCode] Rank $rank (${idol.name}): hearts=${idol.heart}, images=${imageUrls.size}, videos=${videoUrls.size}")
                     imageUrls.forEachIndexed { i, url -> Log.d(TAG, "    Image[$i]: $url") }
                     videoUrls.forEachIndexed { i, url -> Log.d(TAG, "    Video[$i]: $url") }
                 }
 
                 RankingItem(
                     id = idol.id.toString(),
-                    rank = index + 1,
+                    rank = rank,
                     heartCount = idol.heart,
                     voteCount = NumberFormat.getNumberInstance(Locale.US).format(idol.heart),
                     maxHeartCount = maxHeart,
@@ -403,6 +434,7 @@ class ChartRankingRepository @Inject constructor(
      * - 최애 아이돌의 차트 코드와 현재 차트 코드가 일치할 때만 업데이트
      * - rankings에서 찾으면: 해당 아이템을 그대로 설정
      * - rankings에 없으면: 업데이트하지 않음 (다른 차트일 가능성)
+     * - 비밀의 방(chartCodes=[]) 특수 처리: idol DB에서 직접 가져오기
      */
     private suspend fun updateMostFavoriteIdolRankingItem(
         chartCode: String,
@@ -419,8 +451,37 @@ class ChartRankingRepository @Inject constructor(
                 return
             }
 
+            // ✅ 비밀의 방 (chartCodes=[] 인 경우) 특수 처리
+            // mostIdolChartCode가 null이면 차트에 속하지 않는 특수 아이돌 (비밀의 방)
+            if (mostIdolChartCode == null) {
+                Log.d(TAG, "🔐 Special idol (비밀의 방) detected - loading from DB")
+                val idolEntity = idolDao.getIdolById(mostIdolId)
+                if (idolEntity != null) {
+                    val specialItem = RankingItem(
+                        rank = 0,  // 비밀의 방은 순위 없음
+                        name = idolEntity.name,
+                        voteCount = NumberFormat.getNumberInstance(Locale.US).format(idolEntity.heart),
+                        photoUrl = idolEntity.imageUrl,
+                        id = idolEntity.id.toString(),
+                        heartCount = idolEntity.heart,
+                        top3ImageUrls = listOfNotNull(
+                            idolEntity.imageUrl,
+                            idolEntity.imageUrl2,
+                            idolEntity.imageUrl3
+                        ),
+                        top3VideoUrls = emptyList()
+                    )
+                    _mostFavoriteIdolRankingItem.value = specialItem
+                    Log.d(TAG, "✅ Loaded special idol: ${specialItem.name}, heart=${specialItem.heartCount}")
+                } else {
+                    Log.w(TAG, "⚠️ Special idol not found in DB: id=$mostIdolId")
+                    _mostFavoriteIdolRankingItem.value = null
+                }
+                return
+            }
+
             // 최애 아이돌의 차트 코드와 현재 차트 코드가 일치하지 않으면 스킵
-            if (mostIdolChartCode != null && mostIdolChartCode != chartCode) {
+            if (mostIdolChartCode != chartCode) {
                 Log.d(TAG, "⏭️ Skipping chart $chartCode (mostIdol chart is $mostIdolChartCode)")
                 return
             }
