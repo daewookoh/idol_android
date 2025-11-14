@@ -59,6 +59,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var configRepository: net.ib.mn.domain.repository.ConfigRepository
 
     @Inject
+    lateinit var chartDatabaseRepository: net.ib.mn.data.repository.ChartRankingRepository
+
+    @Inject
     lateinit var cacheDataSourceFactory: androidx.media3.datasource.cache.CacheDataSource.Factory
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,14 +76,8 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // 저장된 서버 URL이 있으면 적용 (IdolApplication에서 이미 처리하지만, 재확인)
-        // old 프로젝트는 동기적으로 처리하므로 동기 처리로 변경
-        runBlocking {
-            val savedServerUrl = preferencesManager.serverUrl.first()
-            if (!savedServerUrl.isNullOrEmpty()) {
-                ServerUrl.setHost(savedServerUrl)
-            }
-        }
+        // 서버 URL은 IdolApplication.onCreate()에서 이미 설정되었으므로 여기서는 로깅만
+        android.util.Log.d("MainActivity", "Current server URL: ${ServerUrl.HOST}")
 
         enableEdgeToEdge()
 
@@ -150,33 +147,66 @@ class MainActivity : AppCompatActivity() {
             android.util.Log.d("MainActivity", "  - New Server: $fullHost")
             android.util.Log.d("MainActivity", "========================================")
 
-            // 서버 변경 시 데이터 리셋 (로그인 정보는 유지)
+            // 서버 변경 시 모든 데이터 리셋 (인증 정보 포함)
             runBlocking {
-                android.util.Log.d("MainActivity", "🗑️ Clearing local data (keeping auth credentials)...")
+                android.util.Log.d("MainActivity", "========================================")
+                android.util.Log.d("MainActivity", "🗑️ SERVER URL CHANGED - Clearing ALL data...")
+                android.util.Log.d("MainActivity", "  - Old URL: ${ServerUrl.HOST}")
+                android.util.Log.d("MainActivity", "  - New URL: $fullHost")
+                android.util.Log.d("MainActivity", "========================================")
 
-                // 1. 로그인 정보(토큰, 이메일, 도메인)를 제외한 모든 로컬 데이터 삭제
-                preferencesManager.clearAllExceptAuth()
-                android.util.Log.d("MainActivity", "✅ Local data cleared (auth credentials preserved)")
-
-                // 2. Room DB 데이터 삭제 (Idol 데이터 등)
+                // 1. 차트 랭킹 데이터 삭제 (메모리 캐시 포함)
                 try {
-                    idolDao.deleteAll()
-                    android.util.Log.d("MainActivity", "✅ Room DB data cleared")
+                    chartDatabaseRepository.clearAll()
+                    android.util.Log.d("MainActivity", "✅ Chart Rankings cleared (including memory cache)")
                 } catch (e: Exception) {
-                    android.util.Log.e("MainActivity", "❌ Failed to clear Room DB: ${e.message}", e)
+                    android.util.Log.e("MainActivity", "❌ Failed to clear Chart DB: ${e.message}", e)
                 }
 
-                // 3. ConfigRepository 메모리 캐시 삭제
+                // 2. 모든 Room DB 데이터 삭제
+                try {
+                    idolDao.deleteAll()
+                    android.util.Log.d("MainActivity", "✅ Room DB (Idol) cleared")
+                } catch (e: Exception) {
+                    android.util.Log.e("MainActivity", "❌ Failed to clear Idol DB: ${e.message}", e)
+                }
+
+                // 3. 인증 정보를 제외한 모든 DataStore 데이터 삭제 (유저 정보, 캐시 등 삭제)
+                try {
+                    preferencesManager.clearAllExceptAuth()
+                    android.util.Log.d("MainActivity", "✅ DataStore cleared except auth (user info, cache)")
+                } catch (e: Exception) {
+                    android.util.Log.e("MainActivity", "❌ Failed to clear DataStore: ${e.message}", e)
+                }
+
+                // 4. ConfigRepository 메모리 캐시 삭제
                 configRepository.clearAllCache()
                 android.util.Log.d("MainActivity", "✅ ConfigRepository cache cleared")
 
-                // 4. 새 서버 URL 저장
+                // 5. 새 서버 URL 저장 (clearAll 후에 저장해야 함)
+                // DataStore와 SharedPreferences 양쪽에 저장 (IdolApplication이 SharedPreferences를 읽음)
                 preferencesManager.setServerUrl(fullHost)
-                android.util.Log.d("MainActivity", "✅ New server URL saved: $fullHost")
-            }
 
-            // ServerUrl 변경 (Retrofit 인스턴스 재생성에 필요)
-            ServerUrl.setHost(fullHost)
+                // SharedPreferences에도 저장 (IdolApplication.onCreate()가 먼저 읽음)
+                // ⚠️ CRITICAL: commit()을 사용하여 동기적으로 저장 (프로세스 종료 전에 디스크에 flush)
+                val serverPrefs = getSharedPreferences("idol_server_config", android.content.Context.MODE_PRIVATE)
+                serverPrefs.edit().putString("server_url", fullHost).commit()  // commit() = 동기, apply() = 비동기
+
+                android.util.Log.d("MainActivity", "💾 Saving new server URL: $fullHost")
+
+                // 6. 저장 확인
+                val savedUrlSharedPrefs = serverPrefs.getString("server_url", null)
+                val savedUrlDataStore = preferencesManager.serverUrl.first()
+                android.util.Log.d("MainActivity", "✅ Server URL saved:")
+                android.util.Log.d("MainActivity", "  - SharedPreferences: $savedUrlSharedPrefs")
+                android.util.Log.d("MainActivity", "  - DataStore: $savedUrlDataStore")
+
+                android.util.Log.d("MainActivity", "========================================")
+                android.util.Log.d("MainActivity", "✅ All data cleared - App will restart")
+                android.util.Log.d("MainActivity", "  - Old Server: ${ServerUrl.HOST}")
+                android.util.Log.d("MainActivity", "  - New Server: $fullHost")
+                android.util.Log.d("MainActivity", "========================================")
+            }
 
             // 이미지 캐시 삭제
             try {
@@ -186,7 +216,7 @@ class MainActivity : AppCompatActivity() {
                 android.util.Log.e("MainActivity", "⚠️ Failed to clear image cache: ${e.message}", e)
             }
 
-            android.util.Log.d("MainActivity", "🔄 Killing process to fully restart app...")
+            android.util.Log.d("MainActivity", "🔄 Restarting app with new server URL...")
             android.util.Log.d("MainActivity", "========================================")
 
             // 프로세스 완전 종료 및 재시작 (모든 메모리, ViewModel, 싱글톤 등 완전 초기화)

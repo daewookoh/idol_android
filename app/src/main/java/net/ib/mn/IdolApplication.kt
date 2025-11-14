@@ -1,6 +1,7 @@
 package net.ib.mn
 
 import android.app.Application
+import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Base64
 import android.util.Log
@@ -106,10 +107,11 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
     }
 
     override fun onCreate() {
-        super<Application>.onCreate()
+        // ⚠️ CRITICAL: 저장된 서버 URL을 super.onCreate() 전에 로드해야 함!
+        // Hilt가 NetworkModule에서 Retrofit 싱글톤을 생성하기 전에 ServerUrl을 설정해야 함
+        initializeServerUrlBeforeDI()
 
-        // 저장된 서버 URL 로드 (old 프로젝트 방식)
-        initializeServerUrl()
+        super<Application>.onCreate()
 
         // Kakao SDK 초기화 (old 프로젝트와 동일)
         // China flavor에서는 Kakao를 사용하지 않으므로 제외
@@ -206,18 +208,36 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
 
     /**
      * 저장된 서버 URL을 로드하여 ServerUrl.HOST를 설정합니다.
-     * old 프로젝트의 BaseApplication.onCreate()와 동일한 로직
+     * ⚠️ CRITICAL: super.onCreate() 전에 호출되어야 하므로 SharedPreferences를 사용합니다.
+     * Hilt DI가 초기화되기 전이므로 preferencesManager를 사용할 수 없습니다.
+     *
+     * SharedPreferences는 DataStore와 별개의 저장소이므로, 서버 URL만 별도로 저장합니다.
      */
-    private fun initializeServerUrl() {
-        runBlocking {
-            val savedUrl = preferencesManager.serverUrl.first()
+    private fun initializeServerUrlBeforeDI() {
+        Log.d("ServerUrl", "========================================")
+        Log.d("ServerUrl", "🔧 Initializing server URL (BEFORE DI)...")
+        Log.d("ServerUrl", "  - Default URL: ${ServerUrl.HOST}")
+
+        try {
+            // SharedPreferences를 사용하여 서버 URL 로드
+            val prefs = getSharedPreferences("idol_server_config", Context.MODE_PRIVATE)
+            val savedUrl = prefs.getString("server_url", null)
+
             if (!savedUrl.isNullOrEmpty()) {
                 ServerUrl.setHost(savedUrl)
-                Log.d("ServerUrl", "Loaded saved server URL: $savedUrl")
+                Log.d("ServerUrl", "  - Saved URL found: $savedUrl")
+                Log.d("ServerUrl", "✅ Using saved server URL: ${ServerUrl.HOST}")
             } else {
-                Log.d("ServerUrl", "Using default server URL: ${ServerUrl.HOST}")
+                Log.d("ServerUrl", "  - No saved URL found")
+                Log.d("ServerUrl", "✅ Using default server URL: ${ServerUrl.HOST}")
             }
+        } catch (e: Exception) {
+            Log.e("ServerUrl", "  - Failed to load saved URL: ${e.message}", e)
+            Log.d("ServerUrl", "✅ Using default server URL: ${ServerUrl.HOST}")
         }
+
+        Log.d("ServerUrl", "  - Final BASE_URL: ${ServerUrl.BASE_URL}")
+        Log.d("ServerUrl", "========================================")
     }
 
     /**
