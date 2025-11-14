@@ -7,7 +7,6 @@ import android.content.ContextWrapper
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
-import net.ib.mn.util.ToastUtil
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -609,7 +608,7 @@ fun LoginScreen(
                                 )
                             } ?: run {
                                 android.util.Log.e("LoginScreen", "Activity not found for Facebook login")
-                                ToastUtil.show(context, R.string.msg_error_ok)
+                                showErrorDialog = context.getString(R.string.msg_error_ok)
                             }
                         }
                         LoginContract.LoginType.EMAIL -> {
@@ -622,7 +621,8 @@ fun LoginScreen(
                     showErrorDialog = effect.message
                 }
                 is LoginContract.Effect.ShowToast -> {
-                    ToastUtil.show(context, effect.message)
+                    // Toast도 다이얼로그로 표시
+                    showErrorDialog = effect.message
                 }
             }
         }

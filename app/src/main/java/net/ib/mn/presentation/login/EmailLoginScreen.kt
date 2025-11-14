@@ -1,7 +1,6 @@
 package net.ib.mn.presentation.login
 
 import android.content.res.Configuration
-import net.ib.mn.util.ToastUtil
 import net.ib.mn.util.KeyboardUtil
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,6 +44,7 @@ import net.ib.mn.R
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.LoadingOverlay
 import net.ib.mn.ui.components.ExoTitleDialog
+import net.ib.mn.ui.components.ExoDialog
 import net.ib.mn.ui.theme.ExodusTheme
 
 /**
@@ -66,6 +66,7 @@ fun EmailLoginScreen(
 
     var showFindIdDialog by remember { mutableStateOf(false) }
     var findIdEmail by remember { mutableStateOf<String?>(null) }
+    var showErrorDialog by remember { mutableStateOf<String?>(null) }
 
     // Effect 처리
     LaunchedEffect(Unit) {
@@ -78,10 +79,10 @@ fun EmailLoginScreen(
                 is EmailLoginContract.Effect.NavigateToForgotPassword -> onNavigateToForgotPassword()
                 is EmailLoginContract.Effect.NavigateBack -> onNavigateBack()
                 is EmailLoginContract.Effect.ShowError -> {
-                    ToastUtil.show(context, effect.message)
+                    showErrorDialog = effect.message
                 }
                 is EmailLoginContract.Effect.ShowToast -> {
-                    ToastUtil.show(context, effect.message)
+                    showErrorDialog = effect.message
                 }
                 is EmailLoginContract.Effect.ShowFindIdDialog -> {
                     findIdEmail = effect.email
@@ -96,7 +97,9 @@ fun EmailLoginScreen(
         onIntent = viewModel::sendIntent,
         showFindIdDialog = showFindIdDialog,
         findIdEmail = findIdEmail,
-        onDismissFindIdDialog = { showFindIdDialog = false }
+        onDismissFindIdDialog = { showFindIdDialog = false },
+        showErrorDialog = showErrorDialog,
+        onDismissErrorDialog = { showErrorDialog = null }
     )
 }
 
@@ -110,7 +113,9 @@ private fun EmailLoginContent(
     onIntent: (EmailLoginContract.Intent) -> Unit,
     showFindIdDialog: Boolean = false,
     findIdEmail: String? = null,
-    onDismissFindIdDialog: () -> Unit = {}
+    onDismissFindIdDialog: () -> Unit = {},
+    showErrorDialog: String? = null,
+    onDismissErrorDialog: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val hideKeyboard = {
@@ -299,6 +304,15 @@ private fun EmailLoginContent(
                 onDismiss = onDismissFindIdDialog,
                 dismissOnBackPress = false,
                 dismissOnClickOutside = false
+            )
+        }
+
+        // 에러 다이얼로그
+        showErrorDialog?.let { errorMessage ->
+            ExoDialog(
+                message = errorMessage,
+                onDismiss = onDismissErrorDialog,
+                onConfirm = onDismissErrorDialog
             )
         }
     } // ExoScaffold
