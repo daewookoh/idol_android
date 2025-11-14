@@ -1,6 +1,7 @@
 package net.ib.mn.di
 
 import android.content.Context
+import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.remote.api.*
 import net.ib.mn.data.remote.interceptor.AuthInterceptor
 import net.ib.mn.util.Constants
@@ -29,8 +30,9 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideAuthInterceptor(
-        @ApplicationContext context: Context
-    ): AuthInterceptor = AuthInterceptor(context)
+        @ApplicationContext context: Context,
+        preferencesManager: PreferencesManager
+    ): AuthInterceptor = AuthInterceptor(context, preferencesManager)
 
     @Provides
     @Singleton

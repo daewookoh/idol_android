@@ -3,7 +3,10 @@ package net.ib.mn.data.remote.interceptor
 import android.content.Context
 import android.util.Base64
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import net.ib.mn.BuildConfig
+import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.util.Constants
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -17,9 +20,11 @@ import javax.inject.Inject
  * NOTE: old 프로젝트와 동일하게 "email:domain:token" 형식의 Basic 인증 사용
  * - 로그인 성공 시: setAuthCredentials()로 email, domain, token 설정
  * - 앱 시작 시: StartUpViewModel에서 로드하여 setAuthCredentials() 호출
+ * - 프로세스 재시작 시: init 블록에서 DataStore로부터 자동 복원
  */
 class AuthInterceptor @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val preferencesManager: PreferencesManager
 ) : Interceptor {
 
     @Volatile
@@ -30,6 +35,27 @@ class AuthInterceptor @Inject constructor(
 
     @Volatile
     private var token: String? = null
+
+    init {
+        // 프로세스 재시작 시 DataStore에서 인증 정보 자동 복원
+        // 이렇게 하면 앱이 백그라운드에서 종료된 후 재실행될 때도 인증 정보가 유지됨
+        runBlocking {
+            val savedEmail = preferencesManager.loginEmail.first()
+            val savedDomain = preferencesManager.loginDomain.first()
+            val savedToken = preferencesManager.accessToken.first()
+
+            if (savedEmail != null && savedDomain != null && savedToken != null) {
+                android.util.Log.d("USER_INFO", "[AuthInterceptor] init: Restoring credentials from DataStore")
+                android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Email: $savedEmail")
+                android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Domain: $savedDomain")
+                android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Token: ${savedToken.take(20)}...")
+
+                setAuthCredentials(savedEmail, savedDomain, savedToken)
+            } else {
+                android.util.Log.d("USER_INFO", "[AuthInterceptor] init: No saved credentials found in DataStore")
+            }
+        }
+    }
 
     /**
      * old 프로젝트와 동일: email, domain, token을 설정
