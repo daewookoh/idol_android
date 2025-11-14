@@ -253,16 +253,15 @@ private fun ExoTop3Internal(
                                 }
                             }
 
-                            // PlayerView
+                            // TextureView를 직접 사용 (PlayerView UI 오버레이 완전 제거)
                             AndroidView(
                                 factory = { ctx ->
-                                    PlayerView(ctx).apply {
-                                        player = exoPlayer
-                                        useController = false
+                                    android.view.TextureView(ctx).apply {
                                         layoutParams = ViewGroup.LayoutParams(
                                             ViewGroup.LayoutParams.MATCH_PARENT,
                                             ViewGroup.LayoutParams.MATCH_PARENT
                                         )
+                                        exoPlayer.setVideoTextureView(this)
                                     }
                                 },
                                 modifier = Modifier.fillMaxSize()
