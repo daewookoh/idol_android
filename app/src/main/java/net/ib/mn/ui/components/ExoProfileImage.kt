@@ -78,6 +78,6 @@ fun ExoProfileImage(
         modifier = finalModifier,
         contentScale = contentScale,
         error = painterResource(defaultImageRes),
-        placeholder = painterResource(defaultImageRes)
+//        placeholder = painterResource(defaultImageRes)
     )
 }

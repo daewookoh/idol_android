@@ -146,7 +146,7 @@ private fun ExoTop3Internal(
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
-            .background(ColorPalette.gray100)
+            .background(ColorPalette.fixTop3Bg)
     ) {
         val screenWidth = with(LocalDensity.current) { maxWidth.toPx() }
         val itemWidth = screenWidth / 3
@@ -183,8 +183,8 @@ private fun ExoTop3Internal(
                         contentDescription = "Top ${index + 1} 이미지",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        error = androidx.compose.ui.res.painterResource(getDefaultImageRes(index)),
-                        placeholder = androidx.compose.ui.res.painterResource(getDefaultImageRes(index))
+                        error = androidx.compose.ui.res.painterResource(getDefaultImageRes(2)),
+//                        placeholder = androidx.compose.ui.res.painterResource(getDefaultImageRes(index))
                     )
 
                     // Layer2: 동영상 (있는 경우만)

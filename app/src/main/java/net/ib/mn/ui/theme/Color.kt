@@ -194,6 +194,7 @@ private val NoticeBackgroundDark = Color(0xFF1d1a19)
 
 // ==================== Fixed Colors (테마 변경 없음) ====================
 // 고정 색상 (라이트/다크 모드에서 변하지 않음)
+private val FixTop3Bg = Color(0xFFf2f2f2)
 private val FixGray1000 = Color(0xFF000000)
 private val FixGray900 = Color(0xFF222222)
 private val FixWhite = Color(0xFFFFFFFF)
@@ -505,6 +506,8 @@ object ColorPalette {
     val buttonOn: Color get() = ButtonOn
 
     // ==================== fix colors ====================
+    val fixTop3Bg: Color get() = FixTop3Bg
+
     val fixGray1000: Color get() = FixGray1000
     val fixGray900: Color get() = FixGray900
     val fixWhite: Color get() = FixWhite
