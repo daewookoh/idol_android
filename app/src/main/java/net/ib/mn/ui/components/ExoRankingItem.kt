@@ -1,13 +1,8 @@
 package net.ib.mn.ui.components
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -24,14 +19,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -55,19 +48,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import java.text.NumberFormat
 import java.time.LocalDateTime
@@ -525,8 +513,8 @@ fun LazyListScope.exoRankingItems(
                                         },
                                     contentAlignment = Alignment.CenterStart
                                 ) {
-                                    Text(
-                                        text = item.voteCount,
+                                    ExoHeartCounter(
+                                        count = item.heartCount,
                                         style = ExoTypo.stat11.copy(
                                             fontWeight = FontWeight.Normal,
                                             lineHeight = 17.sp
@@ -794,10 +782,18 @@ private fun AggregatedRankingItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // 점수 (TODO: score 필드 추가 필요, 현재는 voteCount 사용)
-                    Text(
-                        text = "${item.voteCount}점",
-                        style = ExoTypo.body11
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ExoHeartCounter(
+                            count = item.heartCount,
+                            style = ExoTypo.body11
+                        )
+                        Text(
+                            text = "점",
+                            style = ExoTypo.body11
+                        )
+                    }
 
                     // 날짜 (TODO: date 필드 추가 필요)
                     // Text(
@@ -1410,8 +1406,8 @@ fun HeartPickRankingItem(
                             .fillMaxHeight(),
                         contentAlignment = Alignment.CenterEnd
                     ) {
-                        Text(
-                            text = item.voteCount,
+                        ExoHeartCounter(
+                            count = item.heartCount,
                             style = ExoTypo.stat10.copy(lineHeight = 20.sp),
                             modifier = Modifier.padding(end = 4.dp)
                         )

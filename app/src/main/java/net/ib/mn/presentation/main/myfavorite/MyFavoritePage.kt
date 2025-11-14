@@ -40,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
 import net.ib.mn.R
+import net.ib.mn.ui.components.ExoHeartCounter
 import net.ib.mn.ui.components.ExoVoteIcon
 import java.text.NumberFormat
 import java.util.Locale
@@ -400,10 +401,9 @@ private fun MostFavoriteInfoBar(
 
                 // 하트 수
                 mostFavoriteIdol.heart?.let { heart ->
-                    Text(
-                        text = "${NumberFormat.getInstance(Locale.getDefault()).format(heart)}",
-                        fontSize = 10.sp,
-                        lineHeight = 18.sp,
+                    ExoHeartCounter(
+                        count = heart,
+                        style = ExoTypo.stat10.copy(lineHeight = 18.sp),
                         color = ColorPalette.textLight,
                         modifier = Modifier
                             .padding(start = 8.dp)

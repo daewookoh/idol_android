@@ -29,16 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 
 /**
@@ -385,8 +382,8 @@ private fun StatItem(
             tint = tintColor ?: Color.Unspecified
         )
         Spacer(modifier = Modifier.width(3.dp))
-        Text(
-            text = count.toString(),
+        ExoHeartCounter(
+            count = count.toLong(),
             style = ExoTypo.stat13
         )
     }
