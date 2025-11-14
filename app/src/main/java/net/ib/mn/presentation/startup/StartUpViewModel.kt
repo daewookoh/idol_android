@@ -76,7 +76,7 @@ class StartUpViewModel @Inject constructor(
     private val preferencesManager: net.ib.mn.data.local.PreferencesManager,
     private val authInterceptor: net.ib.mn.data.remote.interceptor.AuthInterceptor,
     private val idolDao: net.ib.mn.data.local.dao.IdolDao,
-    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartDatabaseRepository,
+    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartRankingRepository,
 ) : BaseViewModel<StartUpContract.State, StartUpContract.Intent, StartUpContract.Effect>() {
 
     companion object {
@@ -277,6 +277,11 @@ class StartUpViewModel @Inject constructor(
         }
 
         android.util.Log.d(TAG, "✓ All APIs completed successfully")
+
+        // Phase 4: Initialize chart rankings in SharedPreference
+        android.util.Log.d(TAG, "Phase 4: Initializing chart rankings...")
+        chartDatabaseRepository.initializeChartsInDatabase()
+        android.util.Log.d(TAG, "✓ Chart rankings initialized")
     }
 
     /**
@@ -656,9 +661,19 @@ class StartUpViewModel @Inject constructor(
 
                     // Room Database에 저장
                     data?.let { idolList ->
+                        // Top3 데이터 로깅 (디버깅용 - 첫 5개만)
+                        idolList.take(5).forEach { idol ->
+                            android.util.Log.d(TAG, "🖼️ API Data - Idol ${idol.id} (${idol.name}): top3=${idol.top3}, top3Type=${idol.top3Type}, top3ImageVer=${idol.top3ImageVer}")
+                        }
+
                         val entities = idolList.map { it.toEntity() }
                         idolDao.insert(entities)  // old 프로젝트와 동일한 메서드명
                         android.util.Log.d(TAG, "✓ ${entities.size} idols saved to Room Database")
+
+                        // 저장된 데이터 검증 (디버깅용 - 첫 5개만)
+                        entities.take(5).forEach { entity ->
+                            android.util.Log.d(TAG, "🖼️ Saved to DB - Idol ${entity.id} (${entity.name}): top3=${entity.top3}, top3Type=${entity.top3Type}")
+                        }
                     }
                 }
                 is ApiResult.Error -> {
@@ -850,7 +865,7 @@ class StartUpViewModel @Inject constructor(
      *
      * 변경사항:
      * - RankingCacheRepository (인메모리 캐시) 제거
-     * - ChartDatabaseRepository (Room DB) 사용 - Single Source of Truth
+     * - ChartRankingRepository (Room DB) 사용 - Single Source of Truth
      */
     /**
      * 5개 차트의 아이돌 ID 리스트를 가져와서 SharedPreference에 저장

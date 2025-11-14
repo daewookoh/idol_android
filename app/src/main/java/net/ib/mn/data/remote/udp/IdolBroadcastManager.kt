@@ -44,7 +44,7 @@ class IdolBroadcastManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val idolDao: IdolDao,
     private val idolRepository: net.ib.mn.domain.repository.IdolRepository,
-    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartDatabaseRepository
+    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartRankingRepository
 ) {
     companion object {
         /**

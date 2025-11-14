@@ -28,7 +28,7 @@ import javax.inject.Singleton
 class UserCacheRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val idolDao: net.ib.mn.data.local.dao.IdolDao,
-    private val chartDatabaseRepository: ChartDatabaseRepository,
+    private val chartDatabaseRepository: ChartRankingRepository,
     private val userRepositoryProvider: javax.inject.Provider<net.ib.mn.domain.repository.UserRepository>,
     private val favoritesRepositoryProvider: javax.inject.Provider<net.ib.mn.domain.repository.FavoritesRepository>
 ) {

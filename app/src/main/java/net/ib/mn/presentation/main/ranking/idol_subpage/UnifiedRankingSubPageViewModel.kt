@@ -17,10 +17,10 @@ import net.ib.mn.ui.components.RankingItemData
 /**
  * 통합 랭킹 ViewModel (Global, Group, Solo 모두 지원)
  *
- * ChartDatabaseRepository를 구독하여 Room DB 데이터를 실시간으로 표시
+ * ChartRankingRepository를 구독하여 Room DB 데이터를 실시간으로 표시
  *
  * 주요 기능:
- * 1. ChartDatabaseRepository 구독 → Room DB Flow 기반 실시간 데이터 반영
+ * 1. ChartRankingRepository 구독 → Room DB Flow 기반 실시간 데이터 반영
  * 2. 차트 변경 (남녀 토글) 지원
  * 3. 캐시 데이터 즉시 표시 (빠른 로딩)
  *
@@ -36,7 +36,7 @@ import net.ib.mn.ui.components.RankingItemData
 class UnifiedRankingSubPageViewModel @AssistedInject constructor(
     @Assisted private val chartCode: String,
     @Assisted private val dataSource: RankingDataSource,
-    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartDatabaseRepository
+    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartRankingRepository
 ) : ViewModel() {
 
     sealed interface UiState {
@@ -70,7 +70,7 @@ class UnifiedRankingSubPageViewModel @AssistedInject constructor(
     }
 
     /**
-     * ChartDatabaseRepository를 구독하여 DB 변경 시 자동 업데이트
+     * ChartRankingRepository를 구독하여 DB 변경 시 자동 업데이트
      *
      * flatMapLatest를 사용하여 currentChartCode가 변경되면
      * 자동으로 새로운 차트를 구독합니다.
@@ -201,13 +201,13 @@ class UnifiedRankingSubPageViewModel @AssistedInject constructor(
 
         // 백그라운드에서 DB 업데이트 및 재랭킹
         viewModelScope.launch {
-            android.util.Log.d(logTag, "🚀 Starting updateVoteAndRefreshCache...")
-            chartDatabaseRepository.updateVoteAndRefreshCache(
-                chartCode = code,
+            android.util.Log.d(logTag, "🚀 Starting updateVoteAndRerank...")
+            chartDatabaseRepository.updateVoteAndRerank(
                 idolId = idolId,
-                voteCount = votedHeart
+                newHeartCount = votedHeart,
+                chartCode = code
             )
-            android.util.Log.d(logTag, "✅ updateVoteAndRefreshCache completed")
+            android.util.Log.d(logTag, "✅ updateVoteAndRerank completed")
         }
     }
 

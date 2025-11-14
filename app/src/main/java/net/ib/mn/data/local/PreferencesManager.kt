@@ -41,6 +41,33 @@ data class UserInfo(
 )
 
 /**
+ * 차트 랭킹 아이템 데이터 클래스 (SharedPreference용)
+ * ChartRankingEntity를 대체하는 경량 데이터 클래스
+ */
+data class ChartRankingItem(
+    val idolId: Int,                 // 아이돌 ID
+    val rank: Int,                   // 순위
+    val heartCount: Long,            // 하트 수
+    val voteCount: String,           // 포맷된 하트 수
+    val maxHeartCount: Long,         // 차트 내 최대 하트 수
+    val minHeartCount: Long,         // 차트 내 최소 하트 수
+    val name: String,                // 아이돌 이름
+    val photoUrl: String?,           // 프로필 이미지 URL
+    val miracleCount: Int = 0,
+    val fairyCount: Int = 0,
+    val angelCount: Int = 0,
+    val rookieCount: Int = 0,
+    val anniversary: String? = null,
+    val anniversaryDays: Int = 0,
+    val top3Image1: String? = null,
+    val top3Image2: String? = null,
+    val top3Image3: String? = null,
+    val top3Video1: String? = null,
+    val top3Video2: String? = null,
+    val top3Video3: String? = null
+)
+
+/**
  * DataStore를 사용한 Preferences 관리
  *
  * SharedPreferences의 현대적인 대체품
@@ -140,6 +167,13 @@ class PreferencesManager @Inject constructor(
         val KEY_CHART_GROUP_M_IDS = stringPreferencesKey("chart_group_m_ids")  // GROUP 남성
         val KEY_CHART_GROUP_F_IDS = stringPreferencesKey("chart_group_f_ids")  // GROUP 여성
         val KEY_CHART_GLOBAL_IDS = stringPreferencesKey("chart_global_ids")  // GLOBAL
+
+        // Chart Rankings (5개 차트의 랭킹 데이터 - JSON 형식)
+        val KEY_CHART_SOLO_M_RANKING = stringPreferencesKey("chart_solo_m_ranking")  // SOLO_M 랭킹 JSON
+        val KEY_CHART_SOLO_F_RANKING = stringPreferencesKey("chart_solo_f_ranking")  // SOLO_F 랭킹 JSON
+        val KEY_CHART_GROUP_M_RANKING = stringPreferencesKey("chart_group_m_ranking")  // GROUP_M 랭킹 JSON
+        val KEY_CHART_GROUP_F_RANKING = stringPreferencesKey("chart_group_f_ranking")  // GROUP_F 랭킹 JSON
+        val KEY_CHART_GLOBAL_RANKING = stringPreferencesKey("chart_global_ranking")  // GLOBAL 랭킹 JSON
     }
 
     // ============================================================
@@ -650,5 +684,67 @@ class PreferencesManager @Inject constructor(
                 emptyList()
             }
         }.first()
+    }
+
+    // ============================================================
+    // Chart Rankings (JSON 기반 - DB 대체)
+    // ============================================================
+
+    /**
+     * 차트별 랭킹 데이터 저장
+     * @param chartCode 차트 코드 (예: "SOLO_M", "GROUP_F", "GLOBAL")
+     * @param rankings 랭킹 아이템 리스트
+     */
+    suspend fun saveChartRanking(chartCode: String, rankings: List<ChartRankingItem>) {
+        val rankingsJson = gson.toJson(rankings)
+        context.dataStore.edit { preferences ->
+            when (chartCode) {
+                "SOLO_M", "PR_S_M" -> preferences[KEY_CHART_SOLO_M_RANKING] = rankingsJson
+                "SOLO_F", "PR_S_F" -> preferences[KEY_CHART_SOLO_F_RANKING] = rankingsJson
+                "GROUP_M", "PR_G_M" -> preferences[KEY_CHART_GROUP_M_RANKING] = rankingsJson
+                "GROUP_F", "PR_G_F" -> preferences[KEY_CHART_GROUP_F_RANKING] = rankingsJson
+                "GLOBAL", "GLOBALS" -> preferences[KEY_CHART_GLOBAL_RANKING] = rankingsJson
+            }
+        }
+        android.util.Log.d("PreferencesManager", "✓ Saved ${rankings.size} ranking items for chart: $chartCode")
+    }
+
+    /**
+     * 차트별 랭킹 데이터 실시간 리스닝 (Flow)
+     * @param chartCode 차트 코드
+     * @return Flow<List<ChartRankingItem>> - 실시간 업데이트되는 랭킹 리스트
+     */
+    fun observeChartRanking(chartCode: String): Flow<List<ChartRankingItem>> {
+        val key = when (chartCode) {
+            "SOLO_M", "PR_S_M" -> KEY_CHART_SOLO_M_RANKING
+            "SOLO_F", "PR_S_F" -> KEY_CHART_SOLO_F_RANKING
+            "GROUP_M", "PR_G_M" -> KEY_CHART_GROUP_M_RANKING
+            "GROUP_F", "PR_G_F" -> KEY_CHART_GROUP_F_RANKING
+            "GLOBAL", "GLOBALS" -> KEY_CHART_GLOBAL_RANKING
+            else -> return kotlinx.coroutines.flow.flowOf(emptyList())
+        }
+
+        return context.dataStore.data.map { preferences ->
+            val rankingsJson = preferences[key]
+            if (rankingsJson != null) {
+                try {
+                    gson.fromJson(rankingsJson, Array<ChartRankingItem>::class.java).toList()
+                } catch (e: Exception) {
+                    android.util.Log.e("PreferencesManager", "Failed to parse rankings for $chartCode", e)
+                    emptyList()
+                }
+            } else {
+                emptyList()
+            }
+        }
+    }
+
+    /**
+     * 차트별 랭킹 데이터 일회성 읽기
+     * @param chartCode 차트 코드
+     * @return 랭킹 아이템 리스트 (없으면 빈 리스트)
+     */
+    suspend fun getChartRanking(chartCode: String): List<ChartRankingItem> {
+        return observeChartRanking(chartCode).first()
     }
 }

@@ -163,6 +163,7 @@ private fun ExoTop3Internal(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
+
                 ) {
                     // Layer1: 스틸 이미지
                     val stillImageUrl = images[index]

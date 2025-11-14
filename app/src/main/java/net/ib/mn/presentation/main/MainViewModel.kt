@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     val preferencesManager: PreferencesManager,
-    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartDatabaseRepository
+    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartRankingRepository
 ) : ViewModel() {
 
     companion object {

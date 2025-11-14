@@ -15,14 +15,14 @@ import javax.inject.Inject
  *
  * Flow 기반 반응형 아키텍처:
  * - UserCacheRepository.mostFavoriteIdol Flow 구독으로 실시간 업데이트
- * - ChartDatabaseRepository.observeChartData로 차트별 데이터 자동 반영 (Room DB Flow)
+ * - ChartRankingRepository.observeChartData로 차트별 데이터 자동 반영 (Room DB Flow)
  * - 불필요한 API 호출 제거, DB 기반 동작
  */
 @HiltViewModel
 class MyFavoriteViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val userCacheRepository: UserCacheRepository,
-    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartDatabaseRepository,
+    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartRankingRepository,
     val rankingRepository: net.ib.mn.domain.repository.RankingRepository
 ) : BaseViewModel<MyFavoriteContract.State, MyFavoriteContract.Intent, MyFavoriteContract.Effect>() {
 
@@ -98,7 +98,7 @@ class MyFavoriteViewModel @Inject constructor(
      * - 랭킹 DB 갱신 (Room DB = Single Source of Truth)
      *
      * ✅ 안전한 이유:
-     *   - updateVoteAndRefreshCache()가 DB를 먼저 업데이트
+     *   - updateVoteAndRerank()가 DB를 먼저 업데이트
      *   - UDP도 DB를 먼저 업데이트
      *   - refreshChart()는 항상 최신 API 데이터를 기반으로 DB 재구성
      *   - Room DB = Single Source of Truth 원칙 준수
@@ -220,12 +220,11 @@ class MyFavoriteViewModel @Inject constructor(
     }
 
     /**
-     * 투표 성공 시 DB 업데이트
+     * 투표 성공 시 차트 재정렬
      *
-     * ChartDatabaseRepository.updateVoteAndRefreshCache()가 자동으로:
-     * 1. IdolDao DB 업데이트
-     * 2. ChartRankingDao DB 업데이트
-     * 3. UserCacheRepository.refreshMostFavoriteIdol() 호출
+     * ChartRankingRepository.updateVoteAndRerank()가 자동으로:
+     * 1. SharedPreference의 차트 랭킹 업데이트
+     * 2. UserCacheRepository.refreshMostFavoriteIdol() 호출
      *
      * mostFavoriteIdol Flow가 자동으로 UI 업데이트
      */
@@ -235,10 +234,10 @@ class MyFavoriteViewModel @Inject constructor(
                 val chartCode = userCacheRepository.getMostIdolChartCode()
 
                 if (chartCode != null) {
-                    chartDatabaseRepository.updateVoteAndRefreshCache(
-                        chartCode = chartCode,
+                    chartDatabaseRepository.updateVoteAndRerank(
                         idolId = idolId,
-                        voteCount = votedHeart
+                        newHeartCount = votedHeart,
+                        chartCode = chartCode
                     )
                 } else {
                     // chartCode가 null인 경우 (비밀의 방 등)

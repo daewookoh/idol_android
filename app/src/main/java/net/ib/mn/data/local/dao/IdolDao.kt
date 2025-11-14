@@ -83,7 +83,7 @@ interface IdolDao {
      * idol 테이블의 전체 heart 합계를 관찰 (DB 변경 감지용)
      *
      * heart 값이 변경될 때마다 Flow가 새로운 값을 emit합니다.
-     * ChartDatabaseRepository에서 이를 구독하여 chart_rankings를 자동 업데이트합니다.
+     * ChartRankingRepository에서 이를 구독하여 chart_rankings를 자동 업데이트합니다.
      */
     @Query("SELECT SUM(heart) FROM idols")
     fun observeTotalHearts(): Flow<Long?>
