@@ -264,7 +264,7 @@ class StartUpViewModel @Inject constructor(
                 async { loadMessageCoupon() },
                 async { loadTimezone() },
                 async { loadChartsCurrent() },
-                async { cacheIdolsRanking() }
+                async { fetchChartIdols() }
                 // 조건부: loadBlocks() - 첫 사용자만
             )
 
@@ -852,20 +852,56 @@ class StartUpViewModel @Inject constructor(
      * - RankingCacheRepository (인메모리 캐시) 제거
      * - ChartDatabaseRepository (Room DB) 사용 - Single Source of Truth
      */
-    private suspend fun cacheIdolsRanking() {
+    /**
+     * 5개 차트의 아이돌 ID 리스트를 가져와서 SharedPreference에 저장
+     *
+     * 저장되는 차트:
+     * 1. SOLO_M - 개인 남성
+     * 2. SOLO_F - 개인 여성
+     * 3. GROUP_M - 그룹 남성
+     * 4. GROUP_F - 그룹 여성
+     * 5. GLOBAL - 글로벌
+     */
+    private suspend fun fetchChartIdols() {
         android.util.Log.d(TAG, "========================================")
-        android.util.Log.d(TAG, "📊 Caching chart rankings in database...")
+        android.util.Log.d(TAG, "📊 Fetching chart idol IDs...")
         android.util.Log.d(TAG, "========================================")
 
         try {
-            chartDatabaseRepository.initializeChartsInDatabase()
-            android.util.Log.d(TAG, "✅ Database cache complete")
+            // 5개 차트 코드 정의
+            val chartCodes = listOf("SOLO_M", "SOLO_F", "GROUP_M", "GROUP_F", "GLOBAL")
+
+            coroutineScope {
+                chartCodes.map { code ->
+                    async {
+                        try {
+                            android.util.Log.d(TAG, "🔄 Fetching idol IDs for chart: $code")
+                            val response = chartsApi.getChartIdolIds(code)
+
+                            if (response.isSuccessful && response.body() != null) {
+                                val body = response.body()!!
+                                if (body.success && body.data != null) {
+                                    // SharedPreference에 저장
+                                    preferencesManager.saveChartIdolIds(code, body.data)
+                                    android.util.Log.d(TAG, "✅ Saved ${body.data.size} idol IDs for $code")
+                                } else {
+                                    android.util.Log.w(TAG, "⚠️ No data for chart: $code")
+                                }
+                            } else {
+                                android.util.Log.e(TAG, "❌ Failed to fetch chart $code: ${response.code()}")
+                            }
+                        } catch (e: Exception) {
+                            android.util.Log.e(TAG, "❌ Error fetching chart $code: ${e.message}", e)
+                        }
+                    }
+                }.awaitAll()
+            }
 
             android.util.Log.d(TAG, "========================================")
-            android.util.Log.d(TAG, "✅ All chart rankings cached successfully")
+            android.util.Log.d(TAG, "✅ All chart idol IDs fetched and saved")
             android.util.Log.d(TAG, "========================================")
         } catch (e: Exception) {
-            android.util.Log.e(TAG, "❌ Failed to cache rankings: ${e.message}", e)
+            android.util.Log.e(TAG, "❌ Failed to fetch chart idols: ${e.message}", e)
         }
     }
 

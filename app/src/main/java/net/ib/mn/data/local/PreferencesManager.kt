@@ -8,6 +8,7 @@ import net.ib.mn.util.Constants
 import com.google.gson.Gson
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -132,6 +133,13 @@ class PreferencesManager @Inject constructor(
         // Category
         val KEY_DEFAULT_CATEGORY = stringPreferencesKey(Constants.PREF_DEFAULT_CATEGORY)
         val KEY_DEFAULT_CHART_CODE = stringPreferencesKey("default_chart_code")  // 기본 탭 선택용
+
+        // Chart Idol IDs (5개 차트의 아이돌 ID 리스트)
+        val KEY_CHART_SOLO_M_IDS = stringPreferencesKey("chart_solo_m_ids")  // SOLO 남성
+        val KEY_CHART_SOLO_F_IDS = stringPreferencesKey("chart_solo_f_ids")  // SOLO 여성
+        val KEY_CHART_GROUP_M_IDS = stringPreferencesKey("chart_group_m_ids")  // GROUP 남성
+        val KEY_CHART_GROUP_F_IDS = stringPreferencesKey("chart_group_f_ids")  // GROUP 여성
+        val KEY_CHART_GLOBAL_IDS = stringPreferencesKey("chart_global_ids")  // GLOBAL
     }
 
     // ============================================================
@@ -589,5 +597,58 @@ class PreferencesManager @Inject constructor(
 
             android.util.Log.d("PreferencesManager", "✅ All data cleared except auth credentials")
         }
+    }
+
+    // ============================================================
+    // Chart Idol IDs
+    // ============================================================
+
+    /**
+     * 차트별 아이돌 ID 리스트 저장
+     * @param chartCode 차트 코드 (예: "SOLO_M", "GROUP_F", "GLOBAL")
+     * @param idolIds 아이돌 ID 리스트
+     */
+    suspend fun saveChartIdolIds(chartCode: String, idolIds: List<Int>) {
+        val idsJson = gson.toJson(idolIds)
+        context.dataStore.edit { preferences ->
+            when (chartCode) {
+                "SOLO_M" -> preferences[KEY_CHART_SOLO_M_IDS] = idsJson
+                "SOLO_F" -> preferences[KEY_CHART_SOLO_F_IDS] = idsJson
+                "GROUP_M" -> preferences[KEY_CHART_GROUP_M_IDS] = idsJson
+                "GROUP_F" -> preferences[KEY_CHART_GROUP_F_IDS] = idsJson
+                "GLOBAL" -> preferences[KEY_CHART_GLOBAL_IDS] = idsJson
+            }
+        }
+        android.util.Log.d("PreferencesManager", "✓ Saved ${idolIds.size} idol IDs for chart: $chartCode")
+    }
+
+    /**
+     * 차트별 아이돌 ID 리스트 읽기
+     * @param chartCode 차트 코드
+     * @return 아이돌 ID 리스트 (없으면 빈 리스트)
+     */
+    suspend fun getChartIdolIds(chartCode: String): List<Int> {
+        val key = when (chartCode) {
+            "SOLO_M" -> KEY_CHART_SOLO_M_IDS
+            "SOLO_F" -> KEY_CHART_SOLO_F_IDS
+            "GROUP_M" -> KEY_CHART_GROUP_M_IDS
+            "GROUP_F" -> KEY_CHART_GROUP_F_IDS
+            "GLOBAL" -> KEY_CHART_GLOBAL_IDS
+            else -> return emptyList()
+        }
+
+        return context.dataStore.data.map { preferences ->
+            val idsJson = preferences[key]
+            if (idsJson != null) {
+                try {
+                    gson.fromJson(idsJson, Array<Int>::class.java).toList()
+                } catch (e: Exception) {
+                    android.util.Log.e("PreferencesManager", "Failed to parse idol IDs for $chartCode", e)
+                    emptyList()
+                }
+            } else {
+                emptyList()
+            }
+        }.first()
     }
 }
