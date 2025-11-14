@@ -4,24 +4,20 @@ import android.content.Context
 import android.util.Patterns
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import net.ib.mn.base.BaseViewModel
 import net.ib.mn.BuildConfig
+import net.ib.mn.base.BaseViewModel
 import net.ib.mn.data.local.PreferencesManager
-import net.ib.mn.data.remote.dto.CommonResponse
-import net.ib.mn.data.remote.interceptor.AuthInterceptor
+import net.ib.mn.data.repository.AuthRepository
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.usecase.SignInUseCase
 import net.ib.mn.domain.usecase.SignUpUseCase
 import net.ib.mn.domain.usecase.ValidateUserUseCase
 import net.ib.mn.util.Constants
 import net.ib.mn.util.DeviceUtil
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
-import net.ib.mn.data.remote.dto.SignInResponse
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -38,7 +34,7 @@ class SignUpViewModel @Inject constructor(
     private val signUpUseCase: SignUpUseCase,
     private val signInUseCase: SignInUseCase,
     private val preferencesManager: PreferencesManager,
-    private val authInterceptor: AuthInterceptor,
+    private val authRepository: AuthRepository,
     private val deviceUtil: DeviceUtil
 ) : BaseViewModel<SignUpContract.State, SignUpContract.Intent, SignUpContract.Effect>() {
 
@@ -1092,16 +1088,12 @@ class SignUpViewModel @Inject constructor(
                                     val userData = response.data
                                     val token = userData.token
                                     
-                                    // 1. AuthInterceptor에 인증 정보 설정
-                                    authInterceptor.setAuthCredentials(
+                                    // 1. AuthRepository에 인증 정보 설정 (메모리 캐시 + DataStore)
+                                    authRepository.login(
                                         email = userData.email,
                                         domain = domain,
                                         token = token
                                     )
-                                    
-                                    // 2. DataStore에 로그인 정보 저장 (StartUpScreen에서 확인용)
-                                    preferencesManager.setAccessToken(token)
-                                    preferencesManager.setLoginDomain(domain)
                                     
                                     // 3. 사용자 정보 저장
                                     preferencesManager.setUserInfo(
@@ -1127,16 +1119,12 @@ class SignUpViewModel @Inject constructor(
                                     android.util.Log.d(signUpTag, "  domain: $domain")
                                     android.util.Log.d(signUpTag, "========================================")
                                     
-                                    // 1. AuthInterceptor에 기본 정보 저장
-                                    authInterceptor.setAuthCredentials(
+                                    // 1. AuthRepository에 기본 정보 저장 (메모리 캐시 + DataStore)
+                                    authRepository.login(
                                         email = email,
                                         domain = domain,
                                         token = password
                                     )
-                                    
-                                    // 2. DataStore에 로그인 정보 저장 (StartUpScreen에서 확인용)
-                                    preferencesManager.setAccessToken(password)
-                                    preferencesManager.setLoginDomain(domain)
                                     
                                     // 3. 최소한의 사용자 정보 저장 (id는 임시로 0 사용, StartUpScreen에서 업데이트됨)
                                     // Old 프로젝트: createAccount에서 사용자 정보를 가져와서 저장

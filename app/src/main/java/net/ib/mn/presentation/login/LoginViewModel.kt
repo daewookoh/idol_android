@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kakao.sdk.user.UserApiClient
 import net.ib.mn.base.BaseViewModel
 import net.ib.mn.data.local.PreferencesManager
-import net.ib.mn.data.remote.interceptor.AuthInterceptor
+import net.ib.mn.data.repository.AuthRepository
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.usecase.SignInUseCase
 import net.ib.mn.domain.usecase.ValidateUserUseCase
@@ -41,7 +41,7 @@ class LoginViewModel @Inject constructor(
     private val validateUserUseCase: ValidateUserUseCase,
     private val signInUseCase: SignInUseCase,
     private val preferencesManager: PreferencesManager,
-    private val authInterceptor: AuthInterceptor,
+    private val authRepository: AuthRepository,
     private val deviceUtil: DeviceUtil
 ) : BaseViewModel<LoginContract.State, LoginContract.Intent, LoginContract.Effect>() {
 
@@ -490,18 +490,14 @@ class LoginViewModel @Inject constructor(
                             android.util.Log.d(loginTag, "  token: ${userData.token.take(20)}...")
                             android.util.Log.d(loginTag, "========================================")
 
-                            // 1. 인증 정보 저장 (AuthInterceptor에 설정)
+                            // 1. 인증 정보 저장 (AuthRepository에 저장 - 자동으로 DataStore 및 메모리 캐시)
                             // Old 프로젝트: IdolAccount.createAccount(this, email, hashToken, domain)
-                            authInterceptor.setAuthCredentials(
+                            authRepository.login(
                                 email = userData.email,
                                 domain = domain,
                                 token = userData.token
                             )
-                            android.util.Log.d(loginTag, "Auth credentials saved")
-
-                            // 2. DataStore에 로그인 정보 저장
-                            preferencesManager.setAccessToken(userData.token)
-                            preferencesManager.setLoginDomain(domain)
+                            android.util.Log.d(loginTag, "Auth credentials saved to AuthRepository (memory + DataStore)")
                             
                             // 3. 디바이스 ID 저장 (아이디 찾기용)
                             // old 프로젝트: 로그인 시 서버에 deviceId가 전달되지만, 로컬에도 저장하여 재설치 시에도 사용 가능하도록 함
@@ -549,16 +545,12 @@ class LoginViewModel @Inject constructor(
                                 password
                             }
                             
-                            // 1. AuthInterceptor에 기본 정보 저장 (토큰은 나중에 업데이트될 수 있음)
-                            authInterceptor.setAuthCredentials(
+                            // 1. AuthRepository에 기본 정보 저장 (토큰은 나중에 업데이트될 수 있음)
+                            authRepository.login(
                                 email = email,
                                 domain = domain,
                                 token = hashToken
                             )
-                            
-                            // 2. DataStore에 로그인 정보 저장 (StartUpScreen에서 확인용)
-                            preferencesManager.setAccessToken(hashToken)
-                            preferencesManager.setLoginDomain(domain)
                             
                             // 3. 디바이스 ID 저장 (아이디 찾기용)
                             // old 프로젝트: 로그인 시 서버에 deviceId가 전달되지만, 로컬에도 저장하여 재설치 시에도 사용 가능하도록 함
@@ -634,16 +626,12 @@ class LoginViewModel @Inject constructor(
                                 password // SNS 로그인의 경우 access token 그대로 사용
                             }
                             
-                            // 1. AuthInterceptor에 기본 정보 저장
-                            authInterceptor.setAuthCredentials(
+                            // 1. AuthRepository에 기본 정보 저장
+                            authRepository.login(
                                 email = email,
                                 domain = domain,
                                 token = hashToken
                             )
-                            
-                            // 2. DataStore에 로그인 정보 저장
-                            preferencesManager.setAccessToken(hashToken)
-                            preferencesManager.setLoginDomain(domain)
                             
                             // 3. 디바이스 ID 저장 (아이디 찾기용)
                             // old 프로젝트: 로그인 시 서버에 deviceId가 전달되지만, 로컬에도 저장하여 재설치 시에도 사용 가능하도록 함

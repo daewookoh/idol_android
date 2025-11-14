@@ -484,6 +484,12 @@ class PreferencesManager @Inject constructor(
         }
     }
 
+    suspend fun setLoginEmail(email: String) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_USER_EMAIL] = email
+        }
+    }
+
     suspend fun setLanguage(language: String) {
         context.dataStore.edit { preferences ->
             preferences[KEY_LANGUAGE] = language

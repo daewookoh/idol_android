@@ -3,10 +3,8 @@ package net.ib.mn.data.remote.interceptor
 import android.content.Context
 import android.util.Base64
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import net.ib.mn.BuildConfig
-import net.ib.mn.data.local.PreferencesManager
+import net.ib.mn.data.repository.AuthRepository
 import net.ib.mn.util.Constants
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -14,69 +12,41 @@ import java.util.Locale
 import javax.inject.Inject
 
 /**
- * 인증 Interceptor
+ * 인증 Interceptor (리팩토링 버전)
  *
  * Authorization 헤더를 자동으로 추가 (Basic 인증)
  * NOTE: old 프로젝트와 동일하게 "email:domain:token" 형식의 Basic 인증 사용
- * - 로그인 성공 시: setAuthCredentials()로 email, domain, token 설정
- * - 앱 시작 시: StartUpViewModel에서 로드하여 setAuthCredentials() 호출
- * - 프로세스 재시작 시: init 블록에서 DataStore로부터 자동 복원
+ *
+ * 변경사항:
+ * - AuthRepository로 책임 분리: 인증 데이터 관리는 AuthRepository가 담당
+ * - init 블록 제거: ANR 위험 제거 (AuthRepository가 필요 시 DataStore 로드)
+ * - @Volatile 변수 제거: AuthRepository의 인메모리 캐시 사용
+ * - setAuthCredentials() 제거: AuthRepository.login() 사용
+ *
+ * 로그인 시 호출 방법:
+ * - authRepository.login(email, domain, token) 호출 (ViewModel에서)
+ *
+ * 프로세스 재시작 시:
+ * - AuthRepository.getXXX()가 자동으로 DataStore에서 복원 (lazy loading)
  */
 class AuthInterceptor @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val preferencesManager: PreferencesManager
+    private val authRepository: AuthRepository
 ) : Interceptor {
 
-    @Volatile
-    private var email: String? = null
-
-    @Volatile
-    private var domain: String? = null
-
-    @Volatile
-    private var token: String? = null
-
-    init {
-        // 프로세스 재시작 시 DataStore에서 인증 정보 자동 복원
-        // 이렇게 하면 앱이 백그라운드에서 종료된 후 재실행될 때도 인증 정보가 유지됨
-        runBlocking {
-            val savedEmail = preferencesManager.loginEmail.first()
-            val savedDomain = preferencesManager.loginDomain.first()
-            val savedToken = preferencesManager.accessToken.first()
-
-            if (savedEmail != null && savedDomain != null && savedToken != null) {
-                android.util.Log.d("USER_INFO", "[AuthInterceptor] init: Restoring credentials from DataStore")
-                android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Email: $savedEmail")
-                android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Domain: $savedDomain")
-                android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Token: ${savedToken.take(20)}...")
-
-                setAuthCredentials(savedEmail, savedDomain, savedToken)
-            } else {
-                android.util.Log.d("USER_INFO", "[AuthInterceptor] init: No saved credentials found in DataStore")
-            }
-        }
-    }
-
-    /**
-     * old 프로젝트와 동일: email, domain, token을 설정
-     */
-    fun setAuthCredentials(email: String?, domain: String?, token: String?) {
-        android.util.Log.d("USER_INFO", "[AuthInterceptor] setAuthCredentials() called")
-        android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Email: $email")
-        android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Domain: $domain")
-        android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Token: ${if (token != null) "${token.take(20)}..." else "null"}")
-
-        this.email = email
-        this.domain = domain
-        this.token = token
-
-        android.util.Log.d("USER_INFO", "[AuthInterceptor] ✓ Auth credentials updated")
-    }
+    // init 블록, @Volatile 변수, setAuthCredentials() 메서드 모두 제거됨
+    // AuthRepository가 모든 인증 데이터 관리를 담당
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
         val url = originalRequest.url.toString()
         val method = originalRequest.method
+
+        // AuthRepository에서 현재 인증 정보 가져오기
+        // 캐시가 있으면 즉시 반환, 없으면 DataStore에서 lazy loading
+        val email = authRepository.getEmail()
+        val domain = authRepository.getDomain()
+        val token = authRepository.getAccessToken()
 
         // 디버깅: 모든 요청 로깅
         android.util.Log.d("AuthInterceptor", "========================================")
@@ -125,7 +95,7 @@ class AuthInterceptor @Inject constructor(
                 android.util.Log.d("USER_INFO", "[AuthInterceptor] Adding Authorization header to request")
                 android.util.Log.d("USER_INFO", "[AuthInterceptor]   - URL: $url")
                 android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Auth type: Basic")
-                android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Credential: $email:$domain:${token?.take(10)}...")
+                android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Credential: $email:$domain:${token.take(10)}...")
 
                 requestBuilder.header("Authorization", authHeader)
             } else {
@@ -147,7 +117,7 @@ class AuthInterceptor @Inject constructor(
             android.util.Log.e("USER_INFO", "[AuthInterceptor]   - URL: $url")
             android.util.Log.e("USER_INFO", "[AuthInterceptor]   - Email was: $email")
             android.util.Log.e("USER_INFO", "[AuthInterceptor]   - Domain was: $domain")
-            android.util.Log.e("USER_INFO", "[AuthInterceptor]   - Token was: ${if (token != null) "${token?.take(20)}..." else "null"}")
+            android.util.Log.e("USER_INFO", "[AuthInterceptor]   - Token was: ${if (token != null) "${token.take(20)}..." else "null"}")
         }
 
         return response

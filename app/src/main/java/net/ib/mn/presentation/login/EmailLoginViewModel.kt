@@ -5,7 +5,7 @@ import android.util.Patterns
 import androidx.lifecycle.viewModelScope
 import net.ib.mn.base.BaseViewModel
 import net.ib.mn.data.local.PreferencesManager
-import net.ib.mn.data.remote.interceptor.AuthInterceptor
+import net.ib.mn.data.repository.AuthRepository
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.UserRepository
 import net.ib.mn.domain.usecase.SignInUseCase
@@ -26,7 +26,7 @@ class EmailLoginViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val signInUseCase: SignInUseCase,
     private val preferencesManager: PreferencesManager,
-    private val authInterceptor: AuthInterceptor,
+    private val authRepository: AuthRepository,
     private val deviceUtil: DeviceUtil,
     private val userRepository: UserRepository
 ) : BaseViewModel<EmailLoginContract.State, EmailLoginContract.Intent, EmailLoginContract.Effect>() {
@@ -223,8 +223,11 @@ class EmailLoginViewModel @Inject constructor(
         // old: IdolAccount.createAccount(context, email, token, domain)
         // old 프로젝트는 afterSignin에서 createAccount 호출 후 StartupActivity로 이동
         // StartupActivity에서 getUserSelf API를 호출하여 전체 사용자 정보를 가져옴
-        preferencesManager.setAccessToken(tokenToSave)
-        preferencesManager.setLoginDomain(Constants.DOMAIN_EMAIL)
+        authRepository.login(
+            email = email,
+            domain = Constants.DOMAIN_EMAIL,
+            token = tokenToSave
+        )
         
         // old 프로젝트와 동일: email을 별도로 저장 (StartUpViewModel에서 loginEmail로 확인)
         // setUserInfo를 최소한의 정보로 호출하여 email 저장 (id는 0으로 설정, 나머지는 StartUpScreen에서 업데이트)
@@ -264,12 +267,10 @@ class EmailLoginViewModel @Inject constructor(
         preferencesManager.setDeviceId(deviceId)
         android.util.Log.d(TAG, "✓ Device ID saved: $deviceId")
 
-        // 6. AuthInterceptor에 인증 정보 설정 (API 호출용)
+        // 6. AuthRepository는 이미 위에서 login() 호출 완료 (메모리 캐시 + DataStore 저장)
         // old: IdolAccount.createAccount()는 sAccount 메모리 객체도 생성
-        android.util.Log.d("USER_INFO", "[EmailLoginViewModel] Setting auth credentials in AuthInterceptor...")
-        authInterceptor.setAuthCredentials(email, Constants.DOMAIN_EMAIL, tokenToSave)
-        android.util.Log.d("USER_INFO", "[EmailLoginViewModel] ✓ AuthInterceptor credentials set for immediate API calls")
-        android.util.Log.d(TAG, "✓ AuthInterceptor credentials set")
+        android.util.Log.d("USER_INFO", "[EmailLoginViewModel] ✓ AuthRepository credentials already set (memory + DataStore)")
+        android.util.Log.d(TAG, "✓ Auth credentials saved via AuthRepository")
 
         android.util.Log.d(TAG, "========================================")
         android.util.Log.d(TAG, "All login data saved successfully!")

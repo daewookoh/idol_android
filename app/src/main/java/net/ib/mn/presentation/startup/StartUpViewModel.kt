@@ -2,19 +2,29 @@ package net.ib.mn.presentation.startup
 
 import android.content.Context
 import androidx.lifecycle.viewModelScope
-import net.ib.mn.base.BaseViewModel
-import net.ib.mn.data.remote.dto.toEntity
-import net.ib.mn.domain.model.ApiResult
-import net.ib.mn.domain.usecase.*
-import net.ib.mn.util.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import net.ib.mn.base.BaseViewModel
+import net.ib.mn.data.remote.dto.toEntity
+import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.domain.usecase.GetAdTypeListUseCase
+import net.ib.mn.domain.usecase.GetBlocksUseCase
+import net.ib.mn.domain.usecase.GetConfigSelfUseCase
+import net.ib.mn.domain.usecase.GetConfigStartupUseCase
+import net.ib.mn.domain.usecase.GetIabKeyUseCase
+import net.ib.mn.domain.usecase.GetIdolsUseCase
+import net.ib.mn.domain.usecase.GetMessageCouponUseCase
+import net.ib.mn.domain.usecase.GetTypeListUseCase
+import net.ib.mn.domain.usecase.GetUpdateInfoUseCase
+import net.ib.mn.domain.usecase.GetUserSelfUseCase
+import net.ib.mn.domain.usecase.GetUserStatusUseCase
+import net.ib.mn.domain.usecase.UpdateTimezoneUseCase
+import net.ib.mn.util.Constants
 import java.text.NumberFormat
 import java.util.Locale
 import javax.inject.Inject
@@ -74,7 +84,7 @@ class StartUpViewModel @Inject constructor(
     private val favoritesRepository: net.ib.mn.domain.repository.FavoritesRepository,
     private val chartsApi: net.ib.mn.data.remote.api.ChartsApi,
     private val preferencesManager: net.ib.mn.data.local.PreferencesManager,
-    private val authInterceptor: net.ib.mn.data.remote.interceptor.AuthInterceptor,
+    private val authRepository: net.ib.mn.data.repository.AuthRepository,
     private val idolDao: net.ib.mn.data.local.dao.IdolDao,
     private val chartDatabaseRepository: net.ib.mn.data.repository.ChartRankingRepository,
 ) : BaseViewModel<StartUpContract.State, StartUpContract.Intent, StartUpContract.Effect>() {
@@ -111,36 +121,23 @@ class StartUpViewModel @Inject constructor(
             try {
                 setState { copy(isLoading = true, progress = 0f, error = null) }
 
-                // Step 0: 저장된 인증 정보 로드 (old 프로젝트의 IdolAccount.getAccount() 역할)
-                // old 프로젝트와 동일: email, domain, token을 모두 로드
+                // Step 0: 저장된 인증 정보 확인 (old 프로젝트의 IdolAccount.getAccount() 역할)
+                // AuthRepository를 통해 인증 정보 유효성 확인
                 android.util.Log.d("USER_INFO", "========================================")
-                android.util.Log.d("USER_INFO", "[StartUpViewModel] Loading auth credentials from DataStore...")
+                android.util.Log.d("USER_INFO", "[StartUpViewModel] Checking auth credentials via AuthRepository...")
 
-                val savedEmail = preferencesManager.loginEmail.first()
-                val savedDomain = preferencesManager.loginDomain.first()
-                val savedToken = preferencesManager.accessToken.first()
+                val hasValidCredentials = authRepository.hasValidCredentialsAsync()
 
-                if (savedEmail != null && savedDomain != null && savedToken != null) {
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Auth credentials found in DataStore")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel]   - Email: $savedEmail")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel]   - Domain: $savedDomain")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel]   - Token: ${savedToken.take(20)}...")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Setting credentials in AuthInterceptor...")
-
-                    // old 프로젝트와 동일: email, domain, token을 AuthInterceptor에 설정
-                    authInterceptor.setAuthCredentials(savedEmail, savedDomain, savedToken)
-
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ AuthInterceptor credentials set successfully")
+                if (hasValidCredentials) {
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Valid auth credentials found")
+                    android.util.Log.d("USER_INFO", "[StartUpViewModel] AuthRepository will automatically provide credentials to AuthInterceptor")
                     android.util.Log.d("USER_INFO", "[StartUpViewModel] Ready to make authenticated API calls")
                     android.util.Log.d("USER_INFO", "========================================")
 
-                    android.util.Log.d(TAG, "✓ Auth credentials loaded from DataStore")
+                    android.util.Log.d(TAG, "✓ Auth credentials validated via AuthRepository")
                 } else {
                     android.util.Log.w("USER_INFO", "========================================")
-                    android.util.Log.w("USER_INFO", "[StartUpViewModel] ⚠️ Auth credentials incomplete")
-                    android.util.Log.w("USER_INFO", "[StartUpViewModel]   - Email: $savedEmail")
-                    android.util.Log.w("USER_INFO", "[StartUpViewModel]   - Domain: $savedDomain")
-                    android.util.Log.w("USER_INFO", "[StartUpViewModel]   - Token: ${if (savedToken != null) "present" else "null"}")
+                    android.util.Log.w("USER_INFO", "[StartUpViewModel] ⚠️ Auth credentials incomplete or missing")
                     android.util.Log.w("USER_INFO", "[StartUpViewModel] User not logged in - navigating to Login screen")
                     android.util.Log.w("USER_INFO", "========================================")
 
