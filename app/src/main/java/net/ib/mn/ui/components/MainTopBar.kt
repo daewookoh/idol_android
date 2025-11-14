@@ -134,28 +134,27 @@ private fun MainToolbarMenu(
     // 검색 버튼 (old: marginEnd="12dp")
     Box(
         modifier = Modifier
-            .padding(end = 12.dp)
             .clickable { onSearchClick?.invoke() }
-            .padding(4.dp) // old: FrameLayout padding="4dp"
+            .padding(5.dp)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.btn_navigation_search),
             contentDescription = "검색",
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(22.dp)
         )
     }
-    
+
     // 친구 버튼 (old: marginEnd="16dp")
     Box(
         modifier = Modifier
-            .padding(end = 16.dp)
             .clickable { onFriendsClick?.invoke() }
-            .padding(4.dp) // old: FrameLayout padding="4dp"
+            .padding(5.dp)
+            .padding(end = 12.dp)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.btn_navigation_friend),
             contentDescription = "친구",
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(22.dp)
         )
     }
 }
@@ -174,44 +173,42 @@ private fun MyInfoToolbarMenu(
     onSettingClick: (() -> Unit)? = null
 ) {
     // 출석 체크 버튼 (기본적으로 숨김, old: marginEnd="12dp")
-    Box(
-        modifier = Modifier
-            .padding(end = 12.dp)
-            .clickable { onAttendanceClick?.invoke() }
-            .padding(4.dp) // old: FrameLayout padding="4dp"
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.btn_navigation_attendance),
-            contentDescription = "출석체크",
-            modifier = Modifier.size(24.dp)
-        )
-    }
-    
+//    Box(
+//        modifier = Modifier
+//            .clickable { onAttendanceClick?.invoke() }
+//            .padding(5.dp)
+//    ) {
+//        Icon(
+//            painter = painterResource(id = R.drawable.btn_navigation_attendance),
+//            contentDescription = "출석체크",
+//            modifier = Modifier.size(22.dp)
+//        )
+//    }
+
     // 알림 버튼 (old: marginEnd="12dp")
     Box(
         modifier = Modifier
-            .padding(end = 12.dp)
             .clickable { onNotificationClick?.invoke() }
-            .padding(4.dp) // old: FrameLayout padding="4dp"
+            .padding(5.dp)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.btn_navigation_bell),
             contentDescription = "알림",
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(22.dp)
         )
     }
-    
+
     // 설정 버튼 (old: marginEnd="16dp")
     Box(
         modifier = Modifier
-            .padding(end = 16.dp)
             .clickable { onSettingClick?.invoke() }
-            .padding(4.dp) // old: FrameLayout padding="4dp"
+            .padding(5.dp)
+            .padding(end = 12.dp)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.btn_navigation_setting),
             contentDescription = "설정",
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(22.dp)
         )
     }
 }
