@@ -98,9 +98,9 @@ import java.util.Locale
  * @param disableAnimation 애니메이션 비활성화 (기본값: false)
  */
 fun LazyListScope.exoRankingItems(
-    items: List<RankingItemData>,
+    items: List<RankingItem>,
     type: String = "MAIN",
-    onItemClick: (Int, RankingItemData) -> Unit = { _, _ -> },
+    onItemClick: (Int, RankingItem) -> Unit = { _, _ -> },
     onVoteSuccess: (idolId: Int, voteCount: Long) -> Unit = { _, _ -> },
     disableAnimation: Boolean = false
 ) {
@@ -331,7 +331,7 @@ fun LazyListScope.exoRankingItems(
                     ) {
                         // 순위 (세로 중앙 정렬)
                         Text(
-                            text = stringResource(R.string.rank_count_format, item.rank),
+                            text = if(item.rank == 0) "-"  else stringResource(R.string.rank_count_format,  item.rank),
                             style = ExoTypo.title15
                         )
 
@@ -704,9 +704,9 @@ fun LazyListScope.exoRankingItems(
 @Composable
 private fun AggregatedRankingItem(
     index: Int,
-    item: RankingItemData,
+    item: RankingItem,
     totalItems: Int,
-    onItemClick: (Int, RankingItemData) -> Unit
+    onItemClick: (Int, RankingItem) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -1293,7 +1293,7 @@ fun HofAccumulativeRankingItem(
  */
 @Composable
 fun HeartPickRankingItem(
-    item: RankingItemData,
+    item: RankingItem,
 ) {
     // HeartPick용 고정 사이즈
     val imageSize = 50.dp

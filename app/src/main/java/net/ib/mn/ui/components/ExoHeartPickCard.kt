@@ -567,7 +567,7 @@ private fun ActiveHeartPickCard(
                                 )
                             )
                     ) {
-                        // RankingItemData 리스트 생성
+                        // RankingItem 리스트 생성
                         val rankingItems = remember(otherIdols, firstPlaceIdol) {
                             val firstPlaceVotes = firstPlaceIdol?.voteCount?.replace(",", "")?.toLongOrNull() ?: 0L
                             android.util.Log.d("HeartPickCard", "firstPlaceIdol voteCount: ${firstPlaceIdol?.voteCount}, parsed: $firstPlaceVotes")
@@ -576,7 +576,7 @@ private fun ActiveHeartPickCard(
                                 val idolVotes = idol.voteCount.replace(",", "").toLongOrNull() ?: 0L
                                 android.util.Log.d("HeartPickCard", "Rank ${index + 2}: ${idol.name}, votes=${idol.voteCount}, parsed=$idolVotes, maxHeartCount=$firstPlaceVotes")
 
-                                RankingItemData(
+                                RankingItem(
                                     rank = index + 2,
                                     name = "${idol.name}_${idol.groupName}",
                                     voteCount = idol.voteCount,

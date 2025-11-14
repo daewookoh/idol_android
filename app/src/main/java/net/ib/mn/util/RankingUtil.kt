@@ -5,7 +5,7 @@ import android.text.TextUtils
 import androidx.appcompat.app.AppCompatDelegate
 import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.data.local.entity.IdolEntity
-import net.ib.mn.ui.components.RankingItemData
+import net.ib.mn.ui.components.RankingItem
 import java.text.Collator
 import java.util.Locale
 
@@ -26,7 +26,7 @@ import java.util.Locale
  * processIdolsData 결과 데이터
  */
 data class ProcessedRankData(
-    val rankItems: List<RankingItemData>,
+    val rankItems: List<RankingItem>,
     val topIdol: IdolEntity?
 )
 
@@ -83,23 +83,23 @@ object RankingUtil {
     }
 
     /**
-     * RankingItemData 정렬 및 순위 계산
+     * RankingItem 정렬 및 순위 계산
      *
-     * @param items 정렬할 RankingItemData 리스트
-     * @return 정렬되고 순위가 계산된 RankingItemData 리스트
+     * @param items 정렬할 RankingItem 리스트
+     * @return 정렬되고 순위가 계산된 RankingItem 리스트
      */
-    fun sortAndRank(items: List<RankingItemData>): List<RankingItemData> {
+    fun sortAndRank(items: List<RankingItem>): List<RankingItem> {
         if (items.isEmpty()) return emptyList()
 
         // 1. 정렬: 하트 수 내림차순 -> 이름 오름차순
         val sorted = items.sortedWith(
-            compareByDescending<RankingItemData> { it.heartCount }
+            compareByDescending<RankingItem> { it.heartCount }
                 .thenComparator { a, b -> nameCollator.compare(a.name, b.name) }
         )
 
         // 2. 랭킹 계산 (동점자 처리)
         // 동점자는 이전 결과 아이템과 같은 순위를 받음
-        val result = mutableListOf<RankingItemData>()
+        val result = mutableListOf<RankingItem>()
         sorted.forEachIndexed { index, item ->
             val rank = if (index > 0 && sorted[index - 1].heartCount == item.heartCount) {
                 // 동점: 이전 결과 아이템의 순위 사용
@@ -115,12 +115,12 @@ object RankingUtil {
     }
 
     /**
-     * 1위 RankingItemData 가져오기 (하트 수 기준)
+     * 1위 RankingItem 가져오기 (하트 수 기준)
      *
-     * @param items RankingItemData 리스트
-     * @return 하트 수가 가장 많은 RankingItemData (없으면 null)
+     * @param items RankingItem 리스트
+     * @return 하트 수가 가장 많은 RankingItem (없으면 null)
      */
-    private fun getTopRank(items: List<RankingItemData>): RankingItemData? {
+    private fun getTopRank(items: List<RankingItem>): RankingItem? {
         return items.maxByOrNull { it.heartCount }
     }
 
@@ -140,12 +140,12 @@ object RankingUtil {
      * @return 업데이트되고 정렬된 랭킹 아이템 리스트
      */
     suspend fun updateVoteAndRerank(
-        items: List<RankingItemData>,
+        items: List<RankingItem>,
         idolId: Int,
         voteCount: Long,
         idolDao: IdolDao,
         formatHeartCount: (Long) -> String
-    ): List<RankingItemData> {
+    ): List<RankingItem> {
         // 1. 로컬 DB의 투표 수 업데이트
         try {
             val idol = idolDao.getIdolById(idolId)
@@ -191,7 +191,7 @@ object RankingUtil {
 
 
     /**
-     * IdolEntity를 RankingItemData로 변환하고 1위 아이돌 정보 가져오기
+     * IdolEntity를 RankingItem로 변환하고 1위 아이돌 정보 가져오기
      * (Group, Solo 랭킹용 - 정렬 및 순위 계산 포함)
      *
      * @param idols IdolEntity 리스트
@@ -208,7 +208,7 @@ object RankingUtil {
     ): ProcessedRankData {
         val idolMap = idols.associateBy { it.id }
 
-        // IdolEntity를 RankingItemData로 변환 (임시 rank, max/min 값)
+        // IdolEntity를 RankingItem로 변환 (임시 rank, max/min 값)
         val tempItems = idols.map { idol ->
             // 다국어 이름 가져오기 (old 프로젝트와 동일)
             val localizedName = getLocalizedName(idol, context)
@@ -219,7 +219,7 @@ object RankingUtil {
                 android.util.Log.d("RankingUtil", "💗 Found favorite idol: id=${idol.id}, name=${idol.name}")
             }
 
-            RankingItemData(
+            RankingItem(
                 rank = 0,  // sortAndRank에서 계산
                 name = localizedName,  // 다국어 처리된 이름 사용
                 voteCount = formatHeartCount(idol.heart.toInt()),

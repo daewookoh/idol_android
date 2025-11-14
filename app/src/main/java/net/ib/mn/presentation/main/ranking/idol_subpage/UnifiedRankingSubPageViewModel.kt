@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import net.ib.mn.domain.ranking.RankingDataSource
-import net.ib.mn.ui.components.RankingItemData
+import net.ib.mn.ui.components.RankingItem
 
 /**
  * 통합 랭킹 ViewModel (Global, Group, Solo 모두 지원)
@@ -42,8 +42,8 @@ class UnifiedRankingSubPageViewModel @AssistedInject constructor(
     sealed interface UiState {
         data object Loading : UiState
         data class Success(
-            val items: List<RankingItemData>,
-            val topIdol: RankingItemData? = null
+            val items: List<RankingItem>,
+            val topIdol: RankingItem? = null
         ) : UiState
         data class Error(val message: String) : UiState
     }
@@ -204,7 +204,7 @@ class UnifiedRankingSubPageViewModel @AssistedInject constructor(
             android.util.Log.d(logTag, "🚀 Starting updateVoteAndRerank...")
             chartDatabaseRepository.updateVoteAndRerank(
                 idolId = idolId,
-                newHeartCount = votedHeart,
+                votedHeartCount = votedHeart,
                 chartCode = code
             )
             android.util.Log.d(logTag, "✅ updateVoteAndRerank completed")

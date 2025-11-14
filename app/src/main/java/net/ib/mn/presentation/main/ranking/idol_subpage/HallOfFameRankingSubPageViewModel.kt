@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import net.ib.mn.data.local.entity.IdolEntity
-import net.ib.mn.ui.components.RankingItemData
+import net.ib.mn.ui.components.RankingItem
 
 /**
  * HallOfFame (명예전당) 랭킹 ViewModel
@@ -31,7 +31,7 @@ class HallOfFameRankingSubPageViewModel @AssistedInject constructor(
     sealed interface UiState {
         data object Loading : UiState
         data class Success(
-            val items: List<RankingItemData>,
+            val items: List<RankingItem>,
             val topIdol: IdolEntity? = null
         ) : UiState
         data class Error(val message: String) : UiState

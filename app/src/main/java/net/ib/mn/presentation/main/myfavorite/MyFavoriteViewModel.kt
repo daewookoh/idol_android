@@ -31,10 +31,10 @@ class MyFavoriteViewModel @Inject constructor(
 
         // 차트 코드 정의
         private val CHART_CODES = listOf(
-            "PR_S_F",  // 여자 개인
             "PR_S_M",  // 남자 개인
-            "PR_G_F",  // 여자 그룹
+            "PR_S_F",  // 여자 개인
             "PR_G_M",  // 남자 그룹
+            "PR_G_F",  // 여자 그룹
             "GLOBALS"  // 종합
         )
     }
@@ -49,14 +49,29 @@ class MyFavoriteViewModel @Inject constructor(
     private val _chartSections = MutableStateFlow<List<ChartSection>>(emptyList())
     val chartSections: StateFlow<List<ChartSection>> = _chartSections.asStateFlow()
 
-    // 최애 아이돌 정보 (UserCacheRepository Flow 직접 구독)
+    // 최애 아이돌 정보 (ChartRankingRepository Flow 직접 구독하여 MostFavoriteIdol로 변환)
     val mostFavoriteIdol: StateFlow<MyFavoriteContract.MostFavoriteIdol?> =
-        userCacheRepository.mostFavoriteIdol
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = null
-            )
+        combine(
+            chartDatabaseRepository.mostFavoriteIdolRankingItem,
+            userCacheRepository.mostIdolChartCode
+        ) { rankingItem: net.ib.mn.ui.components.RankingItem?, chartCode: String? ->
+            rankingItem?.let {
+                MyFavoriteContract.MostFavoriteIdol(
+                    idolId = it.id.toIntOrNull() ?: 0,
+                    name = it.name,
+                    top3ImageUrls = it.top3ImageUrls,
+                    top3VideoUrls = it.top3VideoUrls,
+                    rank = it.rank,
+                    heart = it.heartCount,
+                    chartCode = chartCode,
+                    imageUrl = it.photoUrl
+                )
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
     init {
         // 즐겨찾기 ID 변경 감지하여 자동으로 섹션 업데이트
@@ -224,9 +239,9 @@ class MyFavoriteViewModel @Inject constructor(
      *
      * ChartRankingRepository.updateVoteAndRerank()가 자동으로:
      * 1. SharedPreference의 차트 랭킹 업데이트
-     * 2. UserCacheRepository.refreshMostFavoriteIdol() 호출
+     * 2. mostFavoriteIdolRankingItem Flow 업데이트
      *
-     * mostFavoriteIdol Flow가 자동으로 UI 업데이트
+     * mostFavoriteIdolRankingItem Flow가 자동으로 UI 업데이트
      */
     private fun onVoteSuccess(idolId: Int, votedHeart: Long) {
         viewModelScope.launch {
@@ -236,15 +251,14 @@ class MyFavoriteViewModel @Inject constructor(
                 if (chartCode != null) {
                     chartDatabaseRepository.updateVoteAndRerank(
                         idolId = idolId,
-                        newHeartCount = votedHeart,
+                        votedHeartCount = votedHeart,
                         chartCode = chartCode
                     )
                 } else {
-                    // chartCode가 null인 경우 (비밀의 방 등)
-                    val mostIdolId = userCacheRepository.getMostIdolId()
-                    if (idolId == mostIdolId) {
-                        userCacheRepository.updateMostFavoriteIdolHeart(votedHeart)
-                    }
+                    // chartCode가 null인 경우 (비밀의 방 등) - 아무것도 안 함
+                    // ChartRankingRepository가 mostFavoriteIdolRankingItem을 관리하므로
+                    // 직접 업데이트할 필요 없음
+                    android.util.Log.d(TAG, "⚠️ chartCode is null - skipping vote update")
                 }
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "❌ Failed to update vote in DB: ${e.message}", e)

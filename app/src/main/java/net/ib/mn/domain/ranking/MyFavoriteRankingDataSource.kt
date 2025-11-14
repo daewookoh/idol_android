@@ -8,7 +8,7 @@ import net.ib.mn.domain.repository.RankingRepository
  * My Favorite 랭킹 데이터 소스
  *
  * charts/idol_ids/ API를 호출하여 FULL 리스트를 반환
- * (필터링은 ViewModel에서 RankingItemData 생성 후 처리)
+ * (필터링은 ViewModel에서 RankingItem 생성 후 처리)
  *
  * 중요: 순위는 전체 목록에서 계산되며, 노출만 favoriteIds로 필터링
  *

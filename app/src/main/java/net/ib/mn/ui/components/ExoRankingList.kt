@@ -33,8 +33,8 @@ import java.util.Locale
  * - 순위, 이름, 투표수, 배지 수 등 핵심 필드만 비교
  */
 @Immutable
-data class RankingItemData(
-    val rank: Int,
+data class RankingItem(
+    val rank: Int ,
     val name: String,  // "이름_그룹명" 형식 (예: "디오_EXO")
     val voteCount: String,
     val photoUrl: String? = null,
@@ -61,7 +61,7 @@ data class RankingItemData(
     // equals 최적화: UI에 영향을 미치는 필드만 비교
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is RankingItemData) return false
+        if (other !is RankingItem) return false
 
         // 1. ID가 다르면 다른 아이템
         if (id != other.id) return false
@@ -103,7 +103,7 @@ data class RankingItemData(
     // equals를 override하면 hashCode도 override 필요
     override fun hashCode(): Int {
         var result = id.hashCode()
-        result = 31 * result + rank
+        result = 31 * result + (rank ?: 0)
         result = 31 * result + heartCount.hashCode()
         result = 31 * result + voteCount.hashCode()
         result = 31 * result + miracleCount
@@ -127,7 +127,7 @@ data class RankingItemData(
  * - 정렬, 순위 계산, max/min 계산 등의 비즈니스 로직은 ViewModel에서 처리
  *
  * @param items 완전히 정렬되고 가공된 랭킹 아이템 리스트
- * @param topIdol 1위 아이돌 RankingItemData (ExoTop3 표시용, nullable)
+ * @param topIdol 1위 아이돌 RankingItem (ExoTop3 표시용, nullable)
  * @param isVisible 화면 가시성 (ExoTop3 동영상 재생 제어)
  * @param listState LazyColumn의 스크롤 상태 (탭 전환 시에도 유지됨)
  * @param onItemClick 아이템 클릭 이벤트 (index, item)
@@ -136,12 +136,12 @@ data class RankingItemData(
  */
 @Composable
 fun ExoRankingList(
-    items: List<RankingItemData>,
-    topIdol: RankingItemData? = null,
+    items: List<RankingItem>,
+    topIdol: RankingItem? = null,
     isVisible: Boolean = true,
     itemType: String = "MAIN",
     listState: LazyListState = rememberLazyListState(),
-    onItemClick: (Int, RankingItemData) -> Unit = { _, _ -> },
+    onItemClick: (Int, RankingItem) -> Unit = { _, _ -> },
     onVoteSuccess: (Int, Long) -> Unit = { _, _ -> },
     disableAnimation: Boolean = false
 ) {

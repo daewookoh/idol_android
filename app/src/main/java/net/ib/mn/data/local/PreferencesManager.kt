@@ -40,32 +40,6 @@ data class UserInfo(
     val giveHeart: Int?
 )
 
-/**
- * 차트 랭킹 아이템 데이터 클래스 (SharedPreference용)
- * ChartRankingEntity를 대체하는 경량 데이터 클래스
- */
-data class ChartRankingItem(
-    val idolId: Int,                 // 아이돌 ID
-    val rank: Int,                   // 순위
-    val heartCount: Long,            // 하트 수
-    val voteCount: String,           // 포맷된 하트 수
-    val maxHeartCount: Long,         // 차트 내 최대 하트 수
-    val minHeartCount: Long,         // 차트 내 최소 하트 수
-    val name: String,                // 아이돌 이름
-    val photoUrl: String?,           // 프로필 이미지 URL
-    val miracleCount: Int = 0,
-    val fairyCount: Int = 0,
-    val angelCount: Int = 0,
-    val rookieCount: Int = 0,
-    val anniversary: String? = null,
-    val anniversaryDays: Int = 0,
-    val top3Image1: String? = null,
-    val top3Image2: String? = null,
-    val top3Image3: String? = null,
-    val top3Video1: String? = null,
-    val top3Video2: String? = null,
-    val top3Video3: String? = null
-)
 
 /**
  * DataStore를 사용한 Preferences 관리
@@ -174,6 +148,13 @@ class PreferencesManager @Inject constructor(
         val KEY_CHART_GROUP_M_RANKING = stringPreferencesKey("chart_group_m_ranking")  // GROUP_M 랭킹 JSON
         val KEY_CHART_GROUP_F_RANKING = stringPreferencesKey("chart_group_f_ranking")  // GROUP_F 랭킹 JSON
         val KEY_CHART_GLOBAL_RANKING = stringPreferencesKey("chart_global_ranking")  // GLOBAL 랭킹 JSON
+
+        // User Cache Data (UserCacheRepository 백업용)
+        val KEY_USER_SELF_DATA = stringPreferencesKey("user_self_data_json")  // UserSelfData JSON
+        val KEY_MOST_IDOL_ID = intPreferencesKey("most_idol_id")  // 최애 아이돌 ID
+        val KEY_MOST_IDOL_CATEGORY = stringPreferencesKey("most_idol_category")  // 최애 아이돌 카테고리 (M/F)
+        val KEY_MOST_IDOL_CHART_CODE = stringPreferencesKey("most_idol_chart_code")  // 최애 아이돌 차트 코드
+        val KEY_FAVORITE_IDOL_IDS = stringPreferencesKey("favorite_idol_ids_json")  // 즐겨찾기 아이돌 ID 리스트 JSON
     }
 
     // ============================================================
@@ -695,7 +676,7 @@ class PreferencesManager @Inject constructor(
      * @param chartCode 차트 코드 (예: "SOLO_M", "GROUP_F", "GLOBAL")
      * @param rankings 랭킹 아이템 리스트
      */
-    suspend fun saveChartRanking(chartCode: String, rankings: List<ChartRankingItem>) {
+    suspend fun saveChartRanking(chartCode: String, rankings: List<net.ib.mn.ui.components.RankingItem>) {
         val rankingsJson = gson.toJson(rankings)
         context.dataStore.edit { preferences ->
             when (chartCode) {
@@ -712,9 +693,9 @@ class PreferencesManager @Inject constructor(
     /**
      * 차트별 랭킹 데이터 실시간 리스닝 (Flow)
      * @param chartCode 차트 코드
-     * @return Flow<List<ChartRankingItem>> - 실시간 업데이트되는 랭킹 리스트
+     * @return Flow<List<RankingItem>> - 실시간 업데이트되는 랭킹 리스트
      */
-    fun observeChartRanking(chartCode: String): Flow<List<ChartRankingItem>> {
+    fun observeChartRanking(chartCode: String): Flow<List<net.ib.mn.ui.components.RankingItem>> {
         val key = when (chartCode) {
             "SOLO_M", "PR_S_M" -> KEY_CHART_SOLO_M_RANKING
             "SOLO_F", "PR_S_F" -> KEY_CHART_SOLO_F_RANKING
@@ -728,7 +709,7 @@ class PreferencesManager @Inject constructor(
             val rankingsJson = preferences[key]
             if (rankingsJson != null) {
                 try {
-                    gson.fromJson(rankingsJson, Array<ChartRankingItem>::class.java).toList()
+                    gson.fromJson(rankingsJson, Array<net.ib.mn.ui.components.RankingItem>::class.java).toList()
                 } catch (e: Exception) {
                     android.util.Log.e("PreferencesManager", "Failed to parse rankings for $chartCode", e)
                     emptyList()
@@ -744,7 +725,144 @@ class PreferencesManager @Inject constructor(
      * @param chartCode 차트 코드
      * @return 랭킹 아이템 리스트 (없으면 빈 리스트)
      */
-    suspend fun getChartRanking(chartCode: String): List<ChartRankingItem> {
+    suspend fun getChartRanking(chartCode: String): List<net.ib.mn.ui.components.RankingItem> {
         return observeChartRanking(chartCode).first()
+    }
+
+    // ============================================================
+    // User Cache Data (UserCacheRepository 백업용)
+    // ============================================================
+
+    /**
+     * UserSelfData 저장
+     */
+    suspend fun saveUserSelfData(userSelfData: net.ib.mn.data.remote.dto.UserSelfData) {
+        val json = gson.toJson(userSelfData)
+        context.dataStore.edit { preferences ->
+            preferences[KEY_USER_SELF_DATA] = json
+        }
+        android.util.Log.d("PreferencesManager", "✓ Saved UserSelfData to SharedPreference")
+    }
+
+    /**
+     * UserSelfData 로드
+     */
+    suspend fun getUserSelfData(): net.ib.mn.data.remote.dto.UserSelfData? {
+        val json = context.dataStore.data.first()[KEY_USER_SELF_DATA]
+        return if (json != null) {
+            try {
+                gson.fromJson(json, net.ib.mn.data.remote.dto.UserSelfData::class.java)
+            } catch (e: Exception) {
+                android.util.Log.e("PreferencesManager", "Failed to parse UserSelfData", e)
+                null
+            }
+        } else {
+            null
+        }
+    }
+
+    /**
+     * 최애 아이돌 정보 저장
+     */
+    suspend fun saveMostIdolInfo(idolId: Int?, category: String?, chartCode: String?) {
+        context.dataStore.edit { preferences ->
+            if (idolId != null) preferences[KEY_MOST_IDOL_ID] = idolId else preferences.remove(KEY_MOST_IDOL_ID)
+            if (category != null) preferences[KEY_MOST_IDOL_CATEGORY] = category else preferences.remove(KEY_MOST_IDOL_CATEGORY)
+            if (chartCode != null) preferences[KEY_MOST_IDOL_CHART_CODE] = chartCode else preferences.remove(KEY_MOST_IDOL_CHART_CODE)
+        }
+        android.util.Log.d("PreferencesManager", "✓ Saved most idol info: id=$idolId, category=$category, chartCode=$chartCode")
+    }
+
+    /**
+     * 최애 아이돌 ID 로드
+     */
+    suspend fun getMostIdolId(): Int? {
+        return context.dataStore.data.first()[KEY_MOST_IDOL_ID]
+    }
+
+    /**
+     * 최애 아이돌 카테고리 로드
+     */
+    suspend fun getMostIdolCategory(): String? {
+        return context.dataStore.data.first()[KEY_MOST_IDOL_CATEGORY]
+    }
+
+    /**
+     * 최애 아이돌 차트 코드 로드
+     */
+    suspend fun getMostIdolChartCode(): String? {
+        return context.dataStore.data.first()[KEY_MOST_IDOL_CHART_CODE]
+    }
+
+    /**
+     * 즐겨찾기 아이돌 ID 리스트 저장
+     */
+    suspend fun saveFavoriteIdolIds(idolIds: List<Int>) {
+        val json = gson.toJson(idolIds)
+        context.dataStore.edit { preferences ->
+            preferences[KEY_FAVORITE_IDOL_IDS] = json
+        }
+        android.util.Log.d("PreferencesManager", "✓ Saved ${idolIds.size} favorite idol IDs")
+    }
+
+    /**
+     * 즐겨찾기 아이돌 ID 리스트 로드
+     */
+    suspend fun getFavoriteIdolIds(): List<Int> {
+        val json = context.dataStore.data.first()[KEY_FAVORITE_IDOL_IDS]
+        return if (json != null) {
+            try {
+                gson.fromJson(json, Array<Int>::class.java).toList()
+            } catch (e: Exception) {
+                android.util.Log.e("PreferencesManager", "Failed to parse favorite idol IDs", e)
+                emptyList()
+            }
+        } else {
+            emptyList()
+        }
+    }
+
+    /**
+     * 하트 정보 저장 (strongHeart, weakHeart, hearts)
+     */
+    suspend fun saveHeartInfo(strongHeart: Long, weakHeart: Long, hearts: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_USER_STRONG_HEART] = strongHeart
+            preferences[KEY_USER_WEAK_HEART] = weakHeart
+            preferences[KEY_USER_HEARTS] = hearts
+        }
+        android.util.Log.d("PreferencesManager", "✓ Saved heart info: strong=$strongHeart, weak=$weakHeart, hearts=$hearts")
+    }
+
+    /**
+     * 하트 정보 로드
+     */
+    suspend fun getHeartInfo(): Triple<Long, Long, Int>? {
+        val prefs = context.dataStore.data.first()
+        val strongHeart = prefs[KEY_USER_STRONG_HEART]
+        val weakHeart = prefs[KEY_USER_WEAK_HEART]
+        val hearts = prefs[KEY_USER_HEARTS]
+
+        return if (strongHeart != null && weakHeart != null && hearts != null) {
+            Triple(strongHeart, weakHeart, hearts)
+        } else {
+            null
+        }
+    }
+
+    /**
+     * 기본 카테고리 가져오기 (UserCacheRepository용)
+     */
+    suspend fun getDefaultCategory(): String? {
+        val prefs = context.dataStore.data.first()
+        return prefs[KEY_DEFAULT_CATEGORY]
+    }
+
+    /**
+     * 기본 차트 코드 가져오기 (UserCacheRepository용)
+     */
+    suspend fun getDefaultChartCode(): String? {
+        val prefs = context.dataStore.data.first()
+        return prefs[KEY_DEFAULT_CHART_CODE]
     }
 }

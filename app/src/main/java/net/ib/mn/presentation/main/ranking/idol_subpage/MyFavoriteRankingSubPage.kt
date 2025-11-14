@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import net.ib.mn.domain.ranking.MyFavoriteRankingDataSource
 import net.ib.mn.domain.repository.RankingRepository
 import net.ib.mn.ui.components.exoRankingItems
-import net.ib.mn.ui.components.RankingItemData
+import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.theme.ColorPalette
 import androidx.hilt.navigation.compose.hiltViewModel
 
@@ -76,7 +76,7 @@ fun rememberMyFavoriteRankingState(
             // ✨ 중요: 순위는 전체 목록에서 이미 계산됨
             // 여기서는 favoriteIds로 노출만 필터링
             val favoriteIdSet: Set<Int> = favoriteIds
-            val filteredItems = success.items.filter { item: RankingItemData ->
+            val filteredItems = success.items.filter { item: RankingItem ->
                 val itemIdInt = item.id.toIntOrNull()
                 itemIdInt != null && favoriteIdSet.contains(itemIdInt)
             }
@@ -97,7 +97,7 @@ sealed class MyFavoriteRankingData {
     data object Loading : MyFavoriteRankingData()
     data class Error(val message: String) : MyFavoriteRankingData()
     data class Success(
-        val items: List<RankingItemData>,
+        val items: List<RankingItem>,
         val viewModel: UnifiedRankingSubPageViewModel
     ) : MyFavoriteRankingData()
 }

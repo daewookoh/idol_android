@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.ranking.RankingDataSource
-import net.ib.mn.ui.components.RankingItemData
+import net.ib.mn.ui.components.RankingItem
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -56,7 +56,7 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
     sealed interface UiState {
         data object Loading : UiState
         data class Success(
-            val items: List<RankingItemData>,
+            val items: List<RankingItem>,
             val bannerUrl: String? = null,
             val accumulatedChartCode: String? = null,
             val accumulatedBannerUrl: String? = null,

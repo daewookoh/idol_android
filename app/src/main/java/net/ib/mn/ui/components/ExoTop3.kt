@@ -44,7 +44,7 @@ fun ExoTop3(
 }
 
 /**
- * ExoTop3 - RankingItemData 버전
+ * ExoTop3 - RankingItem 버전
  *
  * @param rankingItemData 랭킹 아이템 데이터
  * @param isVisible 현재 화면에 표시 여부
@@ -53,7 +53,7 @@ fun ExoTop3(
 @androidx.annotation.OptIn(UnstableApi::class)
 @Composable
 fun ExoTop3(
-    rankingItemData: net.ib.mn.ui.components.RankingItemData,
+    rankingItemData: net.ib.mn.ui.components.RankingItem,
     isVisible: Boolean = true,
     onItemClick: (Int) -> Unit = {}
 ) {

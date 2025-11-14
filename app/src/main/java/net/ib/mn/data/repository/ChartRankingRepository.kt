@@ -10,13 +10,16 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import net.ib.mn.data.local.ChartRankingItem
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.domain.model.ApiResult
-import net.ib.mn.ui.components.RankingItemData
+import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.util.IdolImageUtil
 import net.ib.mn.util.ProcessedRankData
 import net.ib.mn.util.RankingUtil
@@ -66,6 +69,10 @@ class ChartRankingRepository @Inject constructor(
     // Coroutine Scope for background operations
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    // mostFavoriteIdolRankingItem Flow
+    private val _mostFavoriteIdolRankingItem = MutableStateFlow<RankingItem?>(null)
+    val mostFavoriteIdolRankingItem: StateFlow<RankingItem?> = _mostFavoriteIdolRankingItem.asStateFlow()
+
     // ==================== Public API (UI Layer) ====================
 
     /**
@@ -82,7 +89,10 @@ class ChartRankingRepository @Inject constructor(
                 Log.d(TAG, "⚠️ No data in SharedPreference for chart: $chartCode")
                 null
             } else {
-                convertToProcessedRankData(chartCode, items)
+                ProcessedRankData(
+                    rankItems = items,
+                    topIdol = null
+                )
             }
         }
     }
@@ -99,7 +109,10 @@ class ChartRankingRepository @Inject constructor(
             Log.d(TAG, "⚠️ No data in SharedPreference for chart: $chartCode")
             null
         } else {
-            convertToProcessedRankData(chartCode, items)
+            ProcessedRankData(
+                rankItems = items,
+                topIdol = null
+            )
         }
     }
 
@@ -120,7 +133,7 @@ class ChartRankingRepository @Inject constructor(
                 return
             }
 
-            val idolIds = existingRankings.map { it.idolId }
+            val idolIds = existingRankings.map { it.id.toIntOrNull() ?: 0 }
             Log.d(TAG, "🔄 [$chartCode] Refreshing with ${idolIds.size} idols from idol DB")
 
             // 2. idol DB의 최신 데이터로 랭킹 재생성
@@ -138,20 +151,27 @@ class ChartRankingRepository @Inject constructor(
      * 투표 후 차트 재정렬 (즉시 반영)
      *
      * 동작 순서:
-     * 1. idol DB 하트 수 업데이트 (Single Source of Truth)
+     * 1. idol DB 하트 수 업데이트 (기존 하트 수 + 투표 수)
      * 2. 업데이트된 DB 데이터를 기반으로 차트 재정렬
      *
      * @param idolId 투표한 아이돌 ID
-     * @param newHeartCount 새로운 하트 수
+     * @param votedHeartCount 투표한 하트 수 (기존 하트에 더해질 값)
      * @param chartCode 차트 코드 (nullable)
      */
-    suspend fun updateVoteAndRerank(idolId: Int, newHeartCount: Long, chartCode: String?) {
+    suspend fun updateVoteAndRerank(idolId: Int, votedHeartCount: Long, chartCode: String?) {
         try {
-            Log.d(TAG, "💝 Updating vote: idol=$idolId, hearts=$newHeartCount, chart=$chartCode")
+            Log.d(TAG, "💝 Updating vote: idol=$idolId, votedHearts=$votedHeartCount, chart=$chartCode")
 
-            // 1. 먼저 idol DB 업데이트 (Single Source of Truth)
-            idolDao.updateIdolHeart(idolId, newHeartCount)
-            Log.d(TAG, "✅ Updated idol DB: idol=$idolId, hearts=$newHeartCount")
+            // 1. 기존 하트 수 가져오기
+            val currentIdol = idolDao.getIdolById(idolId)
+            val currentHeart = currentIdol?.heart ?: 0L
+            val newTotalHeart = currentHeart + votedHeartCount
+
+            Log.d(TAG, "📊 Heart calculation: current=$currentHeart + voted=$votedHeartCount = total=$newTotalHeart")
+
+            // 2. idol DB 업데이트 (기존 하트 + 투표 하트)
+            idolDao.updateIdolHeart(idolId, newTotalHeart)
+            Log.d(TAG, "✅ Updated idol DB: idol=$idolId, hearts=$newTotalHeart")
 
             // 2. 업데이트된 DB 데이터를 기반으로 차트 재정렬
             if (chartCode != null) {
@@ -328,7 +348,7 @@ class ChartRankingRepository @Inject constructor(
             val maxHeart = sortedIdols.firstOrNull()?.heart ?: 0L
             val minHeart = sortedIdols.lastOrNull()?.heart ?: 0L
 
-            // ChartRankingItem 리스트 생성
+            // RankingItem 리스트 생성
             val rankings = sortedIdols.mapIndexed { index, idol ->
                 // IdolImageUtil을 사용하여 top3 이미지/비디오 URL 가져오기
                 val imageUrls = IdolImageUtil.getTop3ImageUrls(idol).filterNotNull()
@@ -341,27 +361,24 @@ class ChartRankingRepository @Inject constructor(
                     videoUrls.forEachIndexed { i, url -> Log.d(TAG, "    Video[$i]: $url") }
                 }
 
-                ChartRankingItem(
-                    idolId = idol.id,
+                RankingItem(
+                    id = idol.id.toString(),
                     rank = index + 1,
                     heartCount = idol.heart,
                     voteCount = NumberFormat.getNumberInstance(Locale.US).format(idol.heart),
                     maxHeartCount = maxHeart,
                     minHeartCount = minHeart,
                     name = idol.name,
-                    photoUrl = idol.imageUrl,
+                    photoUrl = idol.imageUrl ?: "",
                     miracleCount = idol.miracleCount,
                     fairyCount = idol.fairyCount,
                     angelCount = idol.angelCount,
                     rookieCount = idol.rookieCount,
-                    anniversary = idol.anniversary,
+                    superRookieCount = 0,
+                    anniversary = if (idol.anniversary == "Y") idol.anniversary else null,
                     anniversaryDays = idol.anniversaryDays ?: 0,
-                    top3Image1 = imageUrls.getOrNull(0),
-                    top3Image2 = imageUrls.getOrNull(1),
-                    top3Image3 = imageUrls.getOrNull(2),
-                    top3Video1 = videoUrls.getOrNull(0),
-                    top3Video2 = videoUrls.getOrNull(1),
-                    top3Video3 = videoUrls.getOrNull(2)
+                    top3ImageUrls = imageUrls,
+                    top3VideoUrls = videoUrls
                 )
             }
 
@@ -370,45 +387,61 @@ class ChartRankingRepository @Inject constructor(
 
             Log.d(TAG, "✅ [$chartCode] Saved ${rankings.size} rankings to SharedPreference")
 
+            // mostFavoriteIdolRankingItem 업데이트 (해당하는 아이돌이 있으면)
+            updateMostFavoriteIdolRankingItem(chartCode, rankings)
+
         } catch (e: Exception) {
             Log.e(TAG, "❌ [$chartCode] Failed to build rankings: ${e.message}", e)
         }
     }
 
-    /**
-     * ChartRankingItem 리스트를 ProcessedRankData로 변환
-     */
-    private fun convertToProcessedRankData(
-        chartCode: String,
-        items: List<ChartRankingItem>
-    ): ProcessedRankData {
-        val rankingItems = items.map { item ->
-            RankingItemData(
-                id = item.idolId.toString(),  // String으로 변환
-                rank = item.rank,
-                name = item.name,
-                photoUrl = item.photoUrl,
-                voteCount = item.voteCount,
-                heartCount = item.heartCount,
-                maxHeartCount = item.maxHeartCount,
-                minHeartCount = item.minHeartCount,
-                top3ImageUrls = listOfNotNull(item.top3Image1, item.top3Image2, item.top3Image3),
-                top3VideoUrls = listOfNotNull(item.top3Video1, item.top3Video2, item.top3Video3),
-                miracleCount = item.miracleCount,
-                fairyCount = item.fairyCount,
-                angelCount = item.angelCount,
-                rookieCount = item.rookieCount,
-                superRookieCount = 0,  // ChartRankingItem에 없는 필드
-                anniversary = item.anniversary,
-                anniversaryDays = item.anniversaryDays
-            )
-        }
 
-        // topIdol은 1등 아이돌의 IdolEntity를 가져와야 하지만, 여기서는 null로 설정
-        // 필요하다면 idolDao.getIdolById()를 사용하여 가져올 수 있음
-        return ProcessedRankData(
-            rankItems = rankingItems,
-            topIdol = null
-        )
+    /**
+     * mostFavoriteIdolRankingItem 업데이트
+     *
+     * refreshChart 시 호출되어 mostIdolId에 해당하는 아이돌의 RankingItem를 설정
+     * - 최애 아이돌의 차트 코드와 현재 차트 코드가 일치할 때만 업데이트
+     * - rankings에서 찾으면: 해당 아이템을 그대로 설정
+     * - rankings에 없으면: 업데이트하지 않음 (다른 차트일 가능성)
+     */
+    private suspend fun updateMostFavoriteIdolRankingItem(
+        chartCode: String,
+        rankings: List<RankingItem>
+    ) {
+        try {
+            // UserCacheRepository에서 mostIdolId와 mostIdolChartCode 가져오기
+            val mostIdolId: Int? = userCacheRepository.get().mostIdolId.first()
+            val mostIdolChartCode: String? = userCacheRepository.get().getMostIdolChartCode()
+
+            if (mostIdolId == null) {
+                Log.d(TAG, "⚠️ No mostIdolId set - clearing mostFavoriteIdolRankingItem")
+                _mostFavoriteIdolRankingItem.value = null
+                return
+            }
+
+            // 최애 아이돌의 차트 코드와 현재 차트 코드가 일치하지 않으면 스킵
+            if (mostIdolChartCode != null && mostIdolChartCode != chartCode) {
+                Log.d(TAG, "⏭️ Skipping chart $chartCode (mostIdol chart is $mostIdolChartCode)")
+                return
+            }
+
+            Log.d(TAG, "🔍 Looking for mostIdolId=$mostIdolId in chart $chartCode rankings")
+
+            // rankings에서 해당 아이돌 찾기
+            val foundItem = rankings.find { it.id.toIntOrNull() == mostIdolId }
+
+            if (foundItem != null) {
+                // rankings에 있으면 그대로 설정
+                Log.d(TAG, "✅ Found mostIdol in rankings: ${foundItem.name}, rank=${foundItem.rank}")
+
+                _mostFavoriteIdolRankingItem.value = foundItem
+            } else {
+                // rankings에 없으면 로그만 남기고 업데이트하지 않음
+                // (다른 차트이거나 순위권 밖일 수 있음)
+                Log.d(TAG, "⚠️ mostIdol not found in rankings for chart $chartCode")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Failed to update mostFavoriteIdolRankingItem: ${e.message}", e)
+        }
     }
 }

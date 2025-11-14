@@ -3,9 +3,13 @@ package net.ib.mn.data.repository
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import android.content.Context
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import net.ib.mn.data.remote.dto.UserSelfData
 import net.ib.mn.data.remote.dto.toEntity
 import net.ib.mn.presentation.main.myfavorite.MyFavoriteContract
@@ -13,7 +17,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * 사용자 정보 인메모리 캐시 Repository
+ * 사용자 정보 인메모리 캐시 Repository (SharedPreference 백업 지원)
  *
  * getUserSelf API 호출 시점에 로드된 UserSelfData를 메모리에 캐싱하여
  * 앱 전역에서 빠르게 접근할 수 있도록 함.
@@ -22,20 +26,29 @@ import javax.inject.Singleton
  * 1. UserSelfData 캐싱 (Thread-safe)
  * 2. Flow를 통한 반응형 데이터 제공
  * 3. 사용자 기본 정보, 하트 보유 정보, 최애 아이돌 정보 캐싱
- * 4. favoriteIdolIds 리스트 캐싱 (추후 확장 가능)
+ * 4. favoriteIdolIds 리스트 캐싱
+ * 5. **SharedPreference에 자동 백업 및 복원** (앱 재시작 시 데이터 유지)
+ *
+ * 아키텍처:
+ * - UserCacheRepository = Single Source of Truth (메모리 캐시 + Flow 반응형)
+ * - PreferencesManager = Persistent Storage (디스크 백업)
+ * - 모든 데이터 변경 시 SharedPreference에 자동 동기화
+ * - 앱 시작/캐시 손실 시 SharedPreference에서 복원
  */
 @Singleton
 class UserCacheRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val idolDao: net.ib.mn.data.local.dao.IdolDao,
-    private val chartDatabaseRepository: ChartRankingRepository,
     private val userRepositoryProvider: javax.inject.Provider<net.ib.mn.domain.repository.UserRepository>,
-    private val favoritesRepositoryProvider: javax.inject.Provider<net.ib.mn.domain.repository.FavoritesRepository>
+    private val favoritesRepositoryProvider: javax.inject.Provider<net.ib.mn.domain.repository.FavoritesRepository>,
+    private val preferencesManager: net.ib.mn.data.local.PreferencesManager
 ) {
 
     companion object {
         private const val TAG = "UserCacheRepository"
     }
+
+    // IO 작업용 CoroutineScope
+    private val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     // 사용자 정보 캐시
     private val _userData = MutableStateFlow<UserSelfData?>(null)
@@ -52,10 +65,6 @@ class UserCacheRepository @Inject constructor(
     // 최애 아이돌 차트 코드 캐시
     private val _mostIdolChartCode = MutableStateFlow<String?>(null)
     val mostIdolChartCode: Flow<String?> = _mostIdolChartCode.asStateFlow()
-
-    // 최애 아이돌 MostFavoriteIdol 캐시
-    private val _mostFavoriteIdol = MutableStateFlow<MyFavoriteContract.MostFavoriteIdol?>(null)
-    val mostFavoriteIdol: Flow<MyFavoriteContract.MostFavoriteIdol?> = _mostFavoriteIdol.asStateFlow()
 
     // 좋아하는 아이돌 ID 리스트 (추후 확장 가능)
     private val _favoriteIdolIds = MutableStateFlow<List<Int>>(emptyList())
@@ -82,6 +91,79 @@ class UserCacheRepository @Inject constructor(
         val hearts: Int
     )
 
+    init {
+        // 앱 시작 시 SharedPreference에서 데이터 복원
+        ioScope.launch {
+            restoreFromPreferences()
+        }
+    }
+
+    /**
+     * SharedPreference에서 모든 캐시 데이터 복원
+     */
+    private suspend fun restoreFromPreferences() {
+        try {
+            Log.d(TAG, "========================================")
+            Log.d(TAG, "🔄 Restoring cache from SharedPreference...")
+
+            // UserSelfData 복원
+            val userData = preferencesManager.getUserSelfData()
+            if (userData != null) {
+                _userData.value = userData
+                Log.d(TAG, "✓ Restored UserSelfData: ${userData.email}")
+            }
+
+            // 최애 아이돌 정보 복원
+            val mostIdolId = preferencesManager.getMostIdolId()
+            val mostIdolCategory = preferencesManager.getMostIdolCategory()
+            val mostIdolChartCode = preferencesManager.getMostIdolChartCode()
+
+            if (mostIdolId != null) {
+                _mostIdolId.value = mostIdolId
+                _mostIdolCategory.value = mostIdolCategory
+                _mostIdolChartCode.value = mostIdolChartCode
+                Log.d(TAG, "✓ Restored most idol: id=$mostIdolId, category=$mostIdolCategory, chartCode=$mostIdolChartCode")
+            }
+
+            // 즐겨찾기 아이돌 ID 리스트 복원
+            val favoriteIds = preferencesManager.getFavoriteIdolIds()
+            if (favoriteIds.isNotEmpty()) {
+                _favoriteIdolIds.value = favoriteIds
+                Log.d(TAG, "✓ Restored ${favoriteIds.size} favorite idol IDs")
+            }
+
+            // 하트 정보 복원
+            val heartInfo = preferencesManager.getHeartInfo()
+            if (heartInfo != null) {
+                _heartInfo.value = HeartInfo(
+                    strongHeart = heartInfo.first,
+                    weakHeart = heartInfo.second,
+                    hearts = heartInfo.third
+                )
+                Log.d(TAG, "✓ Restored heart info")
+            }
+
+            // 기본 카테고리 복원
+            val defaultCategory = preferencesManager.getDefaultCategory()
+            if (defaultCategory != null) {
+                _defaultCategory.value = defaultCategory
+                Log.d(TAG, "✓ Restored default category: $defaultCategory")
+            }
+
+            // 기본 차트 코드 복원
+            val defaultChartCode = preferencesManager.getDefaultChartCode()
+            if (defaultChartCode != null) {
+                _defaultChartCode.value = defaultChartCode
+                Log.d(TAG, "✓ Restored default chart code: $defaultChartCode")
+            }
+
+            Log.d(TAG, "✅ Cache restoration completed")
+            Log.d(TAG, "========================================")
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Failed to restore cache from SharedPreference: ${e.message}", e)
+        }
+    }
+
     /**
      * getUserSelf 호출 시 사용자 데이터 저장
      *
@@ -89,7 +171,8 @@ class UserCacheRepository @Inject constructor(
      * 1. 사용자 데이터 캐싱
      * 2. 최애 아이돌 정보 캐싱
      * 3. 하트 정보 캐싱
-     * 4. 최애 아이돌을 로컬 DB에 upsert (StartUpViewModel에서 이동됨)
+     * 4. 최애 아이돌을 로컬 DB에 upsert
+     * 5. **SharedPreference에 자동 백업**
      *
      * @param userData UserSelfData
      */
@@ -125,15 +208,6 @@ class UserCacheRepository @Inject constructor(
             Log.d(TAG, "  - Name: ${most.name}")
             Log.d(TAG, "  - Category: ${most.category}")
             Log.d(TAG, "  - ChartCode: $chartCode")
-
-            // 최애 아이돌을 로컬 DB에 upsert (StartUpViewModel에서 이동됨)
-            try {
-                val idolEntity = most.toEntity()
-                idolDao.upsert(idolEntity)
-                Log.d(TAG, "✅ Most idol upserted to local DB: id=${most.id}, name=${most.name}")
-            } catch (e: Exception) {
-                Log.e(TAG, "❌ Failed to upsert most idol to DB: ${e.message}", e)
-            }
         } ?: run {
             _mostIdolId.value = null
             _mostIdolCategory.value = null
@@ -157,8 +231,31 @@ class UserCacheRepository @Inject constructor(
         Log.d(TAG, "  - WeakHeart: $weakHeart")
         Log.d(TAG, "  - Hearts: $hearts")
 
-        // 최애 아이돌 RankingItemData 업데이트
-        updateMostFavoriteIdol()
+        // **SharedPreference에 자동 백업**
+        saveToPreferences(userData, strongHeart, weakHeart, hearts)
+    }
+
+    /**
+     * SharedPreference에 모든 캐시 데이터 백업
+     */
+    private suspend fun saveToPreferences(userData: UserSelfData, strongHeart: Long, weakHeart: Long, hearts: Int) {
+        try {
+            // UserSelfData 저장
+            preferencesManager.saveUserSelfData(userData)
+
+            // 최애 아이돌 정보 저장
+            val mostIdolId = _mostIdolId.value
+            val mostIdolCategory = _mostIdolCategory.value
+            val mostIdolChartCode = _mostIdolChartCode.value
+            preferencesManager.saveMostIdolInfo(mostIdolId, mostIdolCategory, mostIdolChartCode)
+
+            // 하트 정보 저장
+            preferencesManager.saveHeartInfo(strongHeart, weakHeart, hearts)
+
+            Log.d(TAG, "💾 Backed up to SharedPreference")
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Failed to backup to SharedPreference: ${e.message}", e)
+        }
     }
 
     /**
@@ -197,20 +294,22 @@ class UserCacheRepository @Inject constructor(
     }
 
     /**
-     * 최애 아이돌 MostFavoriteIdol 가져오기 (동기)
-     */
-    fun getMostFavoriteIdol(): MyFavoriteContract.MostFavoriteIdol? {
-        return _mostFavoriteIdol.value
-    }
-
-    /**
-     * 좋아하는 아이돌 ID 리스트 설정 (추후 확장)
+     * 좋아하는 아이돌 ID 리스트 설정
      *
      * @param idolIds 좋아하는 아이돌 ID 리스트
      */
     fun setFavoriteIdolIds(idolIds: List<Int>) {
         _favoriteIdolIds.value = idolIds
         Log.d(TAG, "✅ Favorite idol IDs cached: ${idolIds.size} idols")
+
+        // SharedPreference에 백업
+        ioScope.launch {
+            try {
+                preferencesManager.saveFavoriteIdolIds(idolIds)
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Failed to save favorite IDs to SharedPreference: ${e.message}", e)
+            }
+        }
     }
 
     /**
@@ -237,6 +336,15 @@ class UserCacheRepository @Inject constructor(
         Log.d(TAG, "💗 Heart info updated:")
         Log.d(TAG, "  - StrongHeart: $strongHeart")
         Log.d(TAG, "  - WeakHeart: $weakHeart")
+
+        // SharedPreference에 백업
+        ioScope.launch {
+            try {
+                preferencesManager.saveHeartInfo(strongHeart, weakHeart, currentHearts)
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Failed to save heart info to SharedPreference: ${e.message}", e)
+            }
+        }
     }
 
     /**
@@ -247,6 +355,15 @@ class UserCacheRepository @Inject constructor(
     fun setDefaultCategory(category: String) {
         _defaultCategory.value = category
         Log.d(TAG, "✅ Default category set: $category")
+
+        // SharedPreference에 백업
+        ioScope.launch {
+            try {
+                preferencesManager.setDefaultCategory(category)
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Failed to save default category to SharedPreference: ${e.message}", e)
+            }
+        }
     }
 
     /**
@@ -264,6 +381,15 @@ class UserCacheRepository @Inject constructor(
     fun setDefaultChartCode(chartCode: String) {
         _defaultChartCode.value = chartCode
         Log.d(TAG, "✅ Default chart code set: $chartCode")
+
+        // SharedPreference에 백업
+        ioScope.launch {
+            try {
+                preferencesManager.setDefaultChartCode(chartCode)
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Failed to save default chart code to SharedPreference: ${e.message}", e)
+            }
+        }
     }
 
     /**
@@ -273,84 +399,6 @@ class UserCacheRepository @Inject constructor(
         return _defaultChartCode.value
     }
 
-    /**
-     * 최애 아이돌 MostFavoriteIdol 강제 업데이트 (public)
-     *
-     * 외부에서 호출 가능 (예: 투표 후 즉시 업데이트)
-     */
-    suspend fun refreshMostFavoriteIdol() {
-        updateMostFavoriteIdol()
-    }
-
-    /**
-     * 최애 아이돌의 하트 수만 직접 업데이트 (비밀의 방 등 캐시가 없는 경우)
-     *
-     * @param voteCount 증가시킬 하트 수
-     */
-    fun updateMostFavoriteIdolHeart(voteCount: Long) {
-        val currentMostFavoriteIdol = _mostFavoriteIdol.value
-        if (currentMostFavoriteIdol != null) {
-            val newHeart = (currentMostFavoriteIdol.heart ?: 0L) + voteCount
-            _mostFavoriteIdol.value = currentMostFavoriteIdol.copy(heart = newHeart)
-        }
-    }
-
-    /**
-     * 최애 아이돌 MostFavoriteIdol 업데이트
-     *
-     * chartCode의 rankItems에서 mostIdolId를 찾아서 업데이트하거나,
-     * 없으면 DB에서 IdolEntity를 가져와서 가공
-     */
-    private suspend fun updateMostFavoriteIdol() {
-        val mostIdolId = _mostIdolId.value
-        val chartCode = _mostIdolChartCode.value
-
-        if (mostIdolId == null) {
-            _mostFavoriteIdol.value = null
-            return
-        }
-
-        try {
-            // 1. Room DB에서 차트 데이터 가져오기
-            val chartData = chartCode?.let { chartDatabaseRepository.getChartData(it) }
-            val rankItem = chartData?.rankItems?.find { it.id == mostIdolId.toString() }
-
-            if (rankItem != null) {
-                // rankItem이 있는 경우: MostFavoriteIdol로 변환
-                _mostFavoriteIdol.value = MyFavoriteContract.MostFavoriteIdol(
-                    idolId = mostIdolId,
-                    name = rankItem.name,
-                    top3ImageUrls = rankItem.top3ImageUrls,
-                    top3VideoUrls = rankItem.top3VideoUrls,
-                    rank = rankItem.rank,
-                    heart = rankItem.heartCount,
-                    chartCode = chartCode,
-                    imageUrl = rankItem.photoUrl
-                )
-            } else {
-                // rankItem이 없는 경우: IdolDao에서 가져와서 가공
-                val idolEntity = idolDao.getIdolById(mostIdolId)
-
-                if (idolEntity != null) {
-                    _mostFavoriteIdol.value = MyFavoriteContract.MostFavoriteIdol(
-                        idolId = mostIdolId,
-                        name = idolEntity.name,
-                        top3ImageUrls = net.ib.mn.util.IdolImageUtil.getTop3ImageUrls(idolEntity),
-                        top3VideoUrls = net.ib.mn.util.IdolImageUtil.getTop3VideoUrls(idolEntity),
-                        rank = null,
-                        heart = idolEntity.heart,
-                        chartCode = chartCode,
-                        imageUrl = idolEntity.imageUrl
-                    )
-                } else {
-                    _mostFavoriteIdol.value = null
-                }
-            }
-        } catch (e: Exception) {
-            _mostFavoriteIdol.value = null
-            Log.e(TAG, "❌ Failed to update most favorite idol: ${e.message}", e)
-        }
-    }
 
     /**
      * 하트 수 포맷팅
@@ -367,7 +415,6 @@ class UserCacheRepository @Inject constructor(
         _mostIdolId.value = null
         _mostIdolCategory.value = null
         _mostIdolChartCode.value = null
-        _mostFavoriteIdol.value = null
         _favoriteIdolIds.value = emptyList()
         _heartInfo.value = null
         _defaultCategory.value = null
@@ -385,7 +432,6 @@ class UserCacheRepository @Inject constructor(
         Log.d(TAG, "Most Idol ID: ${_mostIdolId.value}")
         Log.d(TAG, "Most Idol Category: ${_mostIdolCategory.value}")
         Log.d(TAG, "Most Idol ChartCode: ${_mostIdolChartCode.value}")
-        Log.d(TAG, "Most Favorite Idol: ${_mostFavoriteIdol.value?.name} (id=${_mostFavoriteIdol.value?.idolId})")
         Log.d(TAG, "Favorite Idol Count: ${_favoriteIdolIds.value.size}")
         Log.d(TAG, "Heart Info: ${_heartInfo.value}")
         Log.d(TAG, "=========================================")

@@ -120,7 +120,7 @@ E/Recomposition: 🔴 Item 456 (제니) recomposed 15 times - Optimization neede
 ```
 ⚠️ 같은 아이템이 5회 이상 리컴포지션
 🔴 같은 아이템이 10회 이상 리컴포지션
-→ RankingItemData의 equals 로직 검토 필요
+→ RankingItem의 equals 로직 검토 필요
 → remember 키 확인 필요
 ```
 
@@ -197,12 +197,12 @@ E/Recomposition: 🔴 Item 456 (제니) recomposed 15 times - Optimization neede
 4. Mapping이 느림 → 변환 로직 간소화
 
 ### 메모리가 많이 증가하는 경우:
-1. RankingItemData 크기 확인
+1. RankingItem 크기 확인
 2. 이미지 URL 리스트 최적화
 3. 불필요한 데이터 제거
 
 ### 리컴포지션이 많은 경우:
-1. RankingItemData.equals() 검토
+1. RankingItem.equals() 검토
 2. remember 키 확인
 3. 불필요한 상태 업데이트 제거
 
