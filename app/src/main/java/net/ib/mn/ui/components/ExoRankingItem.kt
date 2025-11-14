@@ -594,20 +594,30 @@ fun LazyListScope.exoRankingItems(
                         }
 
                         // Rookie 배지 (old: line 299-312)
+                        // rookieCount가 3 이상이면 Super Rookie로 표시
                         if (item.rookieCount > 0) {
+                            val isSuper = item.rookieCount >= 3
                             Box(
                                 modifier = Modifier.size(13.dp, 16.dp),
                                 contentAlignment = Alignment.TopCenter
                             ) {
                                 Icon(
-                                    painter = painterResource(R.drawable.charity_rookie_badge),
+                                    painter = painterResource(
+                                        if (isSuper) R.drawable.charity_super_rookie_badge
+                                        else R.drawable.charity_rookie_badge
+                                    ),
                                     contentDescription = null,
                                     modifier = Modifier.size(13.dp, 16.dp),
                                     tint = Color.Unspecified
                                 )
                                 Text(
-                                    text = remember(item.rookieCount) { item.rookieCount.toString() },
-                                    style = ExoTypo.label7.copy(color = ColorPalette.textRookie),
+                                    text = remember(item.rookieCount, isSuper) {
+                                        if (isSuper) "S" else item.rookieCount.toString()
+                                    },
+                                    style = ExoTypo.label7.copy(
+                                        color = if (isSuper) ColorPalette.textSuperRookie
+                                                else ColorPalette.textRookie
+                                    ),
                                     modifier = Modifier.offset(y = 5.dp)
                                 )
                             }
