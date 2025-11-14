@@ -691,8 +691,10 @@ class UserRepositoryImpl @Inject constructor(
     /**
      * UserSelf 데이터를 로드하고 DataStore와 Local DB에 저장
      * StartUpViewModel의 loadUserSelf 로직을 Repository로 이동
+     *
+     * @param isInitialLoad 최초 로드 여부 (true일 때만 최애 성별로 defaultCategory 덮어쓰기)
      */
-    override suspend fun loadAndSaveUserSelf(cacheControl: String?): Result<Boolean> {
+    override suspend fun loadAndSaveUserSelf(cacheControl: String?, isInitialLoad: Boolean): Result<Boolean> {
         return try {
             var shouldNavigateToLogin = false
 
@@ -749,9 +751,13 @@ class UserRepositoryImpl @Inject constructor(
                                 idolDao.upsert(idolEntity)
                             }
 
-                            if (category != null) {
-                                preferencesManager.setDefaultCategory(category)
+                            // 최초 로드 시에만 최애의 성별로 defaultCategory 설정
+                            // 이후 로드에서는 사용자가 수동으로 선택한 성별을 존중
+                            if (isInitialLoad && category != null) {
                                 userCacheRepository.setDefaultCategory(category)
+                                android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ✓ Initial load: Setting defaultCategory to $category (favorite idol gender)")
+                            } else if (!isInitialLoad && category != null) {
+                                android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ⚠️ Not initial load: Skipping defaultCategory update (user preference preserved)")
                             }
 
                             if (chartCode != null) {

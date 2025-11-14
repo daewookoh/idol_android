@@ -499,10 +499,11 @@ class StartUpViewModel @Inject constructor(
 
     /**
      * UserSelf API 호출 (사용자 프로필, ETag 지원)
+     * 최초 로드이므로 isInitialLoad = true로 호출하여 최애 성별로 defaultCategory 설정
      */
     private suspend fun loadAndSaveUserSelf() {
         try {
-            val loadResult = userRepository.loadAndSaveUserSelf()
+            val loadResult = userRepository.loadAndSaveUserSelf(isInitialLoad = true)
 
             if (loadResult.isFailure) {
                 val exception = loadResult.exceptionOrNull()

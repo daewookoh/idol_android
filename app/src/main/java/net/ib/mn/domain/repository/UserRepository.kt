@@ -118,7 +118,8 @@ interface UserRepository {
      * UserSelf 데이터를 로드하고 DataStore와 Local DB에 저장
      *
      * @param cacheControl Cache-Control 헤더 값
+     * @param isInitialLoad 최초 로드 여부 (true일 때만 최애 성별로 defaultCategory 덮어쓰기)
      * @return Result<Boolean> - 성공 시 true, 401 에러 시 Exception("Unauthorized")
      */
-    suspend fun loadAndSaveUserSelf(cacheControl: String? = "no-cache"): Result<Boolean>
+    suspend fun loadAndSaveUserSelf(cacheControl: String? = "no-cache", isInitialLoad: Boolean = false): Result<Boolean>
 }

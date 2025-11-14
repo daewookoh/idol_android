@@ -33,13 +33,6 @@ class MainViewModel @Inject constructor(
     val currentCategory: StateFlow<String?> = _currentCategory.asStateFlow()
 
     init {
-        // 프로세스 복원 시 즉시 카테고리 로드 (블로킹)
-        viewModelScope.launch {
-            val savedCategory = preferencesManager.defaultCategory.first()
-            _currentCategory.value = savedCategory
-            android.util.Log.d(TAG, "[MainViewModel] ✓ Category restored from DataStore: $savedCategory")
-        }
-
         viewModelScope.launch {
             android.util.Log.d(TAG, "========================================")
             android.util.Log.d(TAG, "[MainViewModel] Subscribing to DataStore userInfo")
@@ -83,13 +76,11 @@ class MainViewModel @Inject constructor(
             }
         }
 
-        // DataStore의 카테고리를 구독하여 실시간 업데이트
+        // DataStore의 카테고리를 구독
         viewModelScope.launch {
             preferencesManager.defaultCategory.collect { category ->
-                if (category != null && category != _currentCategory.value) {
-                    _currentCategory.value = category
-                    android.util.Log.d(TAG, "[MainViewModel] ✓ Category updated from DataStore: $category")
-                }
+                _currentCategory.value = category
+                android.util.Log.d(TAG, "[MainViewModel] ✓ Category updated: $category")
             }
         }
     }
