@@ -76,9 +76,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // 서버 URL은 IdolApplication.onCreate()에서 이미 설정되었으므로 여기서는 로깅만
-        android.util.Log.d("MainActivity", "Current server URL: ${ServerUrl.HOST}")
-
         enableEdgeToEdge()
 
         // UDP 연결은 IdolApplication에서 앱 전체 생명주기에 맞춰 관리됨
@@ -137,51 +134,38 @@ class MainActivity : AppCompatActivity() {
         val host = uri.getQueryParameter("host")
         if (!host.isNullOrEmpty()) {
             val fullHost = if (!host.startsWith("http")) {
-                "http://$host"
+                "https://$host"  // HTTPS 사용 (Android 9+는 기본적으로 HTTP 차단)
             } else {
                 host
             }
 
-            android.util.Log.d("MainActivity", "========================================")
-            android.util.Log.d("MainActivity", "🔄 URL Scheme: Server Change Detected")
-            android.util.Log.d("MainActivity", "  - New Server: $fullHost")
-            android.util.Log.d("MainActivity", "========================================")
+            android.util.Log.d("MainActivity", "URL Scheme: Changing server to $fullHost")
 
-            // 서버 변경 시 모든 데이터 리셋 (인증 정보 포함)
+            // 서버 변경 시 모든 데이터 리셋 (인증 정보 제외)
             runBlocking {
-                android.util.Log.d("MainActivity", "========================================")
-                android.util.Log.d("MainActivity", "🗑️ SERVER URL CHANGED - Clearing ALL data...")
-                android.util.Log.d("MainActivity", "  - Old URL: ${ServerUrl.HOST}")
-                android.util.Log.d("MainActivity", "  - New URL: $fullHost")
-                android.util.Log.d("MainActivity", "========================================")
-
                 // 1. 차트 랭킹 데이터 삭제 (메모리 캐시 포함)
                 try {
                     chartDatabaseRepository.clearAll()
-                    android.util.Log.d("MainActivity", "✅ Chart Rankings cleared (including memory cache)")
                 } catch (e: Exception) {
-                    android.util.Log.e("MainActivity", "❌ Failed to clear Chart DB: ${e.message}", e)
+                    android.util.Log.e("MainActivity", "Failed to clear Chart DB: ${e.message}", e)
                 }
 
                 // 2. 모든 Room DB 데이터 삭제
                 try {
                     idolDao.deleteAll()
-                    android.util.Log.d("MainActivity", "✅ Room DB (Idol) cleared")
                 } catch (e: Exception) {
-                    android.util.Log.e("MainActivity", "❌ Failed to clear Idol DB: ${e.message}", e)
+                    android.util.Log.e("MainActivity", "Failed to clear Idol DB: ${e.message}", e)
                 }
 
                 // 3. 인증 정보를 제외한 모든 DataStore 데이터 삭제 (유저 정보, 캐시 등 삭제)
                 try {
                     preferencesManager.clearAllExceptAuth()
-                    android.util.Log.d("MainActivity", "✅ DataStore cleared except auth (user info, cache)")
                 } catch (e: Exception) {
-                    android.util.Log.e("MainActivity", "❌ Failed to clear DataStore: ${e.message}", e)
+                    android.util.Log.e("MainActivity", "Failed to clear DataStore: ${e.message}", e)
                 }
 
                 // 4. ConfigRepository 메모리 캐시 삭제
                 configRepository.clearAllCache()
-                android.util.Log.d("MainActivity", "✅ ConfigRepository cache cleared")
 
                 // 5. 새 서버 URL 저장 (clearAll 후에 저장해야 함)
                 // DataStore와 SharedPreferences 양쪽에 저장 (IdolApplication이 SharedPreferences를 읽음)
@@ -191,33 +175,14 @@ class MainActivity : AppCompatActivity() {
                 // ⚠️ CRITICAL: commit()을 사용하여 동기적으로 저장 (프로세스 종료 전에 디스크에 flush)
                 val serverPrefs = getSharedPreferences("idol_server_config", android.content.Context.MODE_PRIVATE)
                 serverPrefs.edit().putString("server_url", fullHost).commit()  // commit() = 동기, apply() = 비동기
-
-                android.util.Log.d("MainActivity", "💾 Saving new server URL: $fullHost")
-
-                // 6. 저장 확인
-                val savedUrlSharedPrefs = serverPrefs.getString("server_url", null)
-                val savedUrlDataStore = preferencesManager.serverUrl.first()
-                android.util.Log.d("MainActivity", "✅ Server URL saved:")
-                android.util.Log.d("MainActivity", "  - SharedPreferences: $savedUrlSharedPrefs")
-                android.util.Log.d("MainActivity", "  - DataStore: $savedUrlDataStore")
-
-                android.util.Log.d("MainActivity", "========================================")
-                android.util.Log.d("MainActivity", "✅ All data cleared - App will restart")
-                android.util.Log.d("MainActivity", "  - Old Server: ${ServerUrl.HOST}")
-                android.util.Log.d("MainActivity", "  - New Server: $fullHost")
-                android.util.Log.d("MainActivity", "========================================")
             }
 
             // 이미지 캐시 삭제
             try {
                 cacheDir.deleteRecursively()
-                android.util.Log.d("MainActivity", "✅ Image cache cleared")
             } catch (e: Exception) {
-                android.util.Log.e("MainActivity", "⚠️ Failed to clear image cache: ${e.message}", e)
+                android.util.Log.e("MainActivity", "Failed to clear image cache: ${e.message}", e)
             }
-
-            android.util.Log.d("MainActivity", "🔄 Restarting app with new server URL...")
-            android.util.Log.d("MainActivity", "========================================")
 
             // 프로세스 완전 종료 및 재시작 (모든 메모리, ViewModel, 싱글톤 등 완전 초기화)
             val restartIntent = Intent(this@MainActivity, MainActivity::class.java)

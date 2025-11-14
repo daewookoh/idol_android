@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- 기본 설정: HTTPS만 허용 (보안 강화) -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- DEBUG 빌드: 사용자 인증서 신뢰 (개발용 프록시 도구 사용 가능) -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="user" />
+            <certificates src="system" />
+        </trust-anchors>
+    </debug-overrides>
+
+    <!-- 테스트 서버: HTTP 허용 (개발/테스트 환경) -->
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- 로컬 서버 -->
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
+
+        <!-- 테스트 서버 도메인 -->
+        <domain includeSubdomains="true">test.myloveidol.com</domain>
+        <domain includeSubdomains="true">dev.myloveidol.com</domain>
+        <domain includeSubdomains="true">staging.myloveidol.com</domain>
+    </domain-config>
+</network-security-config>

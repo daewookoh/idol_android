@@ -266,8 +266,6 @@ class ChartRankingRepository @Inject constructor(
      */
     suspend fun clearAll() {
         try {
-            Log.d(TAG, "🗑️ Clearing all chart rankings...")
-
             // 1. SharedPreference의 모든 차트 데이터 삭제
             DEFAULT_CHART_CODES.forEach { chartCode ->
                 preferencesManager.saveChartRanking(chartCode, emptyList())
@@ -276,10 +274,8 @@ class ChartRankingRepository @Inject constructor(
             // 2. 메모리 캐시 초기화
             _mostFavoriteIdolRankingItem.value = null
 
-            Log.d(TAG, "✅ All chart rankings cleared (including memory cache)")
-
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Failed to clear rankings: ${e.message}", e)
+            Log.e(TAG, "Failed to clear rankings: ${e.message}", e)
         }
     }
 

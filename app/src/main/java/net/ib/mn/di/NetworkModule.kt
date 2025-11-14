@@ -62,15 +62,8 @@ object NetworkModule {
     ): Retrofit {
         // ServerUrl.BASE_URL을 사용하여 동적으로 변경 가능하도록 수정
         // old 프로젝트처럼 런타임에 서버 URL 변경 지원
-        val baseUrl = net.ib.mn.util.ServerUrl.BASE_URL
-        android.util.Log.d("NetworkModule", "========================================")
-        android.util.Log.d("NetworkModule", "🌐 Creating Retrofit singleton instance")
-        android.util.Log.d("NetworkModule", "  - BASE_URL: $baseUrl")
-        android.util.Log.d("NetworkModule", "  - ServerUrl.HOST: ${net.ib.mn.util.ServerUrl.HOST}")
-        android.util.Log.d("NetworkModule", "========================================")
-
         return Retrofit.Builder()
-            .baseUrl(baseUrl)
+            .baseUrl(net.ib.mn.util.ServerUrl.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()

@@ -214,10 +214,6 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
      * SharedPreferences는 DataStore와 별개의 저장소이므로, 서버 URL만 별도로 저장합니다.
      */
     private fun initializeServerUrlBeforeDI() {
-        Log.d("ServerUrl", "========================================")
-        Log.d("ServerUrl", "🔧 Initializing server URL (BEFORE DI)...")
-        Log.d("ServerUrl", "  - Default URL: ${ServerUrl.HOST}")
-
         try {
             // SharedPreferences를 사용하여 서버 URL 로드
             val prefs = getSharedPreferences("idol_server_config", Context.MODE_PRIVATE)
@@ -225,19 +221,13 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
 
             if (!savedUrl.isNullOrEmpty()) {
                 ServerUrl.setHost(savedUrl)
-                Log.d("ServerUrl", "  - Saved URL found: $savedUrl")
-                Log.d("ServerUrl", "✅ Using saved server URL: ${ServerUrl.HOST}")
+                Log.d("ServerUrl", "Loaded saved server URL: $savedUrl")
             } else {
-                Log.d("ServerUrl", "  - No saved URL found")
-                Log.d("ServerUrl", "✅ Using default server URL: ${ServerUrl.HOST}")
+                Log.d("ServerUrl", "Using default server URL: ${ServerUrl.HOST}")
             }
         } catch (e: Exception) {
-            Log.e("ServerUrl", "  - Failed to load saved URL: ${e.message}", e)
-            Log.d("ServerUrl", "✅ Using default server URL: ${ServerUrl.HOST}")
+            Log.e("ServerUrl", "Failed to load saved URL: ${e.message}", e)
         }
-
-        Log.d("ServerUrl", "  - Final BASE_URL: ${ServerUrl.BASE_URL}")
-        Log.d("ServerUrl", "========================================")
     }
 
     /**
