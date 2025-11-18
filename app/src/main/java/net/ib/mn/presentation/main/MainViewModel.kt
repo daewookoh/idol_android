@@ -51,7 +51,7 @@ class MainViewModel @Inject constructor(
                     android.util.Log.d(TAG, "[MainViewModel]   - Username: ${info.username}")
                     android.util.Log.d(TAG, "[MainViewModel]   - Nickname: ${info.nickname}")
                     android.util.Log.d(TAG, "[MainViewModel]   - ProfileImage: ${info.profileImage}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - Hearts: ${info.hearts}")
+                    android.util.Log.d(TAG, "[MainViewModel]   - Hearts: ${info.heart}")
                     android.util.Log.d(TAG, "[MainViewModel]   - Diamond: ${info.diamond}")
                     android.util.Log.d(TAG, "[MainViewModel]   - StrongHeart: ${info.strongHeart}")
                     android.util.Log.d(TAG, "[MainViewModel]   - WeakHeart: ${info.weakHeart}")

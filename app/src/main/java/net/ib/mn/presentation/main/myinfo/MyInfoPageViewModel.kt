@@ -102,6 +102,18 @@ class MyInfoPageViewModel @Inject constructor(
     private val _hasNewFeed = MutableStateFlow(false)
     val hasNewFeed: StateFlow<Boolean> = _hasNewFeed.asStateFlow()
 
+    private val _heartCount = MutableStateFlow("0")
+    val heartCount: StateFlow<String> = _heartCount.asStateFlow()
+
+    private val _strongHeart = MutableStateFlow("0")
+    val strongHeart: StateFlow<String> = _strongHeart.asStateFlow()
+
+    private val _weakHeart = MutableStateFlow("0")
+    val weakHeart: StateFlow<String> = _weakHeart.asStateFlow()
+
+    private val _diaCount = MutableStateFlow("0")
+    val diaCount: StateFlow<String> = _diaCount.asStateFlow()
+
     init {
         // UserCacheRepository의 userData를 구독
         viewModelScope.launch {
@@ -135,6 +147,16 @@ class MyInfoPageViewModel @Inject constructor(
                     _totalExp.value = NumberFormat.getNumberInstance(Locale.getDefault()).format(levelHeart)
                     _subscriptionName.value = null // TODO: subscriptions 필드 추가 시 구현
                     _hasNewFeed.value = false // TODO: 피드 새 알림 로직 추가 시 구현
+
+                    // 하트/다이아 정보 업데이트
+                    val strongHeartValue = userData.strongHeart ?: 0L
+                    val weakHeartValue = userData.weakHeart ?: 0L
+                    val totalHeart = strongHeartValue + weakHeartValue
+
+                    _heartCount.value = NumberFormat.getNumberInstance(Locale.getDefault()).format(totalHeart)
+                    _strongHeart.value = NumberFormat.getNumberInstance(Locale.getDefault()).format(strongHeartValue)
+                    _weakHeart.value = NumberFormat.getNumberInstance(Locale.getDefault()).format(weakHeartValue)
+                    _diaCount.value = NumberFormat.getNumberInstance(Locale.getDefault()).format(userData.diamond ?: 0)
 
                     android.util.Log.d(TAG, "✅ UI state updated:")
                     android.util.Log.d(TAG, "  - Nickname: ${userData.nickname}")

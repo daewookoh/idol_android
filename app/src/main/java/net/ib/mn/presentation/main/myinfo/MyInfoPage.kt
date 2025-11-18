@@ -10,8 +10,9 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
-import net.ib.mn.presentation.main.myinfo.components.MyInfoAccountSection
-import net.ib.mn.presentation.main.myinfo.components.MyInfoLevelProgressBar
+import net.ib.mn.presentation.main.myinfo.components.MyInfoAccount
+import net.ib.mn.presentation.main.myinfo.components.MyInfoLevel
+import net.ib.mn.presentation.main.myinfo.components.MyInfoHeart
 
 /**
  * MyInfo 페이지
@@ -34,6 +35,10 @@ fun MyInfoPage(
     val totalExp by viewModel.totalExp.collectAsState()
     val subscriptionName by viewModel.subscriptionName.collectAsState()
     val hasNewFeed by viewModel.hasNewFeed.collectAsState()
+    val heartCount by viewModel.heartCount.collectAsState()
+    val strongHeart by viewModel.strongHeart.collectAsState()
+    val weakHeart by viewModel.weakHeart.collectAsState()
+    val diaCount by viewModel.diaCount.collectAsState()
 
     Column(
         modifier = modifier
@@ -44,7 +49,7 @@ fun MyInfoPage(
             .padding(bottom = 9.dp)
     ) {
         // MyInfo Account Section
-        MyInfoAccountSection(
+        MyInfoAccount(
             userName = userName,
             profileImageUrl = profileImageUrl,
             level = level,
@@ -59,11 +64,23 @@ fun MyInfoPage(
         Spacer(modifier = Modifier.height(10.dp))
 
         // Level Progress Bar
-        MyInfoLevelProgressBar(
+        MyInfoLevel(
             level = level,
             progress = levelProgress,
             levelUpText = levelUpText,
             totalExp = totalExp
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Heart & Diamond Info
+        MyInfoHeart(
+            heartCount = heartCount,
+            strongHeart = strongHeart,
+            weakHeart = weakHeart,
+            diaCount = diaCount,
+            onInfoClick = { /* TODO: Show currency info */ },
+            onHistoryClick = { /* TODO: Navigate to history */ }
         )
 
         Spacer(modifier = Modifier.height(30.dp))

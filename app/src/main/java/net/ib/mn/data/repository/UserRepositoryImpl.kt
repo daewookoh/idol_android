@@ -719,7 +719,7 @@ class UserRepositoryImpl @Inject constructor(
                                 username = userData.username,
                                 nickname = userData.nickname,
                                 profileImage = userData.profileImage,
-                                hearts = userData.hearts,
+                                heart = userData.heart,
                                 diamond = userData.diamond,
                                 strongHeart = userData.strongHeart,
                                 weakHeart = userData.weakHeart,

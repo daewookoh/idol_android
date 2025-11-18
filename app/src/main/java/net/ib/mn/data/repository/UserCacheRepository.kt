@@ -72,10 +72,6 @@ class UserCacheRepository @Inject constructor(
     private val _favoriteIdolIds = MutableStateFlow<List<Int>>(emptyList())
     val favoriteIdolIds: Flow<List<Int>> = _favoriteIdolIds.asStateFlow()
 
-    // 하트 정보 (strongHeart, weakHeart)
-    private val _heartInfo = MutableStateFlow<HeartInfo?>(null)
-    val heartInfo: Flow<HeartInfo?> = _heartInfo.asStateFlow()
-
     // 사용자 선택 카테고리 (GLOBALS 탭 필터링용)
     private val _defaultCategory = MutableStateFlow<String?>(null)
     val defaultCategory: Flow<String?> = _defaultCategory.asStateFlow()
@@ -87,15 +83,6 @@ class UserCacheRepository @Inject constructor(
     // 픽 참여 정보 (Support Bias Bar용)
     private val _mostPicksModel = MutableStateFlow<MostPicksModel?>(null)
     val mostPicksModel: Flow<MostPicksModel?> = _mostPicksModel.asStateFlow()
-
-    /**
-     * 하트 정보 데이터 클래스
-     */
-    data class HeartInfo(
-        val strongHeart: Long,
-        val weakHeart: Long,
-        val hearts: Int
-    )
 
     init {
         // 앱 시작 시 SharedPreference에서 데이터 복원
@@ -136,17 +123,6 @@ class UserCacheRepository @Inject constructor(
             if (favoriteIds.isNotEmpty()) {
                 _favoriteIdolIds.value = favoriteIds
                 Log.d(TAG, "✓ Restored ${favoriteIds.size} favorite idol IDs")
-            }
-
-            // 하트 정보 복원
-            val heartInfo = preferencesManager.getHeartInfo()
-            if (heartInfo != null) {
-                _heartInfo.value = HeartInfo(
-                    strongHeart = heartInfo.first,
-                    weakHeart = heartInfo.second,
-                    hearts = heartInfo.third
-                )
-                Log.d(TAG, "✓ Restored heart info")
             }
 
             // 기본 카테고리 복원
@@ -198,7 +174,6 @@ class UserCacheRepository @Inject constructor(
         Log.d(TAG, "  - Nickname: ${userData.nickname}")
         Log.d(TAG, "  - StrongHeart: ${userData.strongHeart}")
         Log.d(TAG, "  - WeakHeart: ${userData.weakHeart}")
-        Log.d(TAG, "  - Hearts: ${userData.hearts}")
         Log.d(TAG, "  - Most: ${userData.most?.name} (id=${userData.most?.id})")
         Log.d(TAG, "========================================")
 
@@ -228,32 +203,16 @@ class UserCacheRepository @Inject constructor(
             Log.w(TAG, "⚠️ No most idol set")
         }
 
-        // 하트 정보 업데이트
-        val strongHeart = userData.strongHeart ?: 0L
-        val weakHeart = userData.weakHeart ?: 0L
-        val hearts = userData.hearts ?: 0
-
-        _heartInfo.value = HeartInfo(
-            strongHeart = strongHeart,
-            weakHeart = weakHeart,
-            hearts = hearts
-        )
-
-        Log.d(TAG, "✅ Heart info cached:")
-        Log.d(TAG, "  - StrongHeart: $strongHeart")
-        Log.d(TAG, "  - WeakHeart: $weakHeart")
-        Log.d(TAG, "  - Hearts: $hearts")
-
         // **SharedPreference에 자동 백업**
-        saveToPreferences(userData, strongHeart, weakHeart, hearts)
+        saveToPreferences(userData)
     }
 
     /**
      * SharedPreference에 모든 캐시 데이터 백업
      */
-    private suspend fun saveToPreferences(userData: UserSelfData, strongHeart: Long, weakHeart: Long, hearts: Int) {
+    private suspend fun saveToPreferences(userData: UserSelfData) {
         try {
-            // UserSelfData 저장
+            // UserSelfData 저장 (하트 정보 포함)
             preferencesManager.saveUserSelfData(userData)
 
             // 최애 아이돌 정보 저장
@@ -261,9 +220,6 @@ class UserCacheRepository @Inject constructor(
             val mostIdolCategory = _mostIdolCategory.value
             val mostIdolChartCode = _mostIdolChartCode.value
             preferencesManager.saveMostIdolInfo(mostIdolId, mostIdolCategory, mostIdolChartCode)
-
-            // 하트 정보 저장
-            preferencesManager.saveHeartInfo(strongHeart, weakHeart, hearts)
 
             Log.d(TAG, "💾 Backed up to SharedPreference")
         } catch (e: Exception) {
@@ -300,10 +256,17 @@ class UserCacheRepository @Inject constructor(
     }
 
     /**
-     * 하트 정보 가져오기 (동기)
+     * StrongHeart 가져오기 (동기)
      */
-    fun getHeartInfo(): HeartInfo? {
-        return _heartInfo.value
+    fun getStrongHeart(): Long {
+        return _userData.value?.strongHeart ?: 0L
+    }
+
+    /**
+     * WeakHeart 가져오기 (동기)
+     */
+    fun getWeakHeart(): Long {
+        return _userData.value?.weakHeart ?: 0L
     }
 
     /**
@@ -339,12 +302,14 @@ class UserCacheRepository @Inject constructor(
      * @param weakHeart 업데이트된 weakHeart
      */
     fun updateHeartInfo(strongHeart: Long, weakHeart: Long) {
-        val currentHearts = _heartInfo.value?.hearts ?: 0
-        _heartInfo.value = HeartInfo(
+        val currentUserData = _userData.value ?: return
+
+        // UserSelfData 업데이트
+        val updatedUserData = currentUserData.copy(
             strongHeart = strongHeart,
-            weakHeart = weakHeart,
-            hearts = currentHearts
+            weakHeart = weakHeart
         )
+        _userData.value = updatedUserData
 
         Log.d(TAG, "💗 Heart info updated:")
         Log.d(TAG, "  - StrongHeart: $strongHeart")
@@ -353,9 +318,9 @@ class UserCacheRepository @Inject constructor(
         // SharedPreference에 백업
         ioScope.launch {
             try {
-                preferencesManager.saveHeartInfo(strongHeart, weakHeart, currentHearts)
+                preferencesManager.saveUserSelfData(updatedUserData)
             } catch (e: Exception) {
-                Log.e(TAG, "❌ Failed to save heart info to SharedPreference: ${e.message}", e)
+                Log.e(TAG, "❌ Failed to save user data to SharedPreference: ${e.message}", e)
             }
         }
     }
@@ -429,7 +394,6 @@ class UserCacheRepository @Inject constructor(
         _mostIdolCategory.value = null
         _mostIdolChartCode.value = null
         _favoriteIdolIds.value = emptyList()
-        _heartInfo.value = null
         _defaultCategory.value = null
         _defaultChartCode.value = null
         Log.d(TAG, "🗑️ All user cache cleared")
@@ -442,11 +406,12 @@ class UserCacheRepository @Inject constructor(
         Log.d(TAG, "========== User Cache Status ==========")
         Log.d(TAG, "User ID: ${_userData.value?.id}")
         Log.d(TAG, "Email: ${_userData.value?.email}")
+        Log.d(TAG, "StrongHeart: ${_userData.value?.strongHeart}")
+        Log.d(TAG, "WeakHeart: ${_userData.value?.weakHeart}")
         Log.d(TAG, "Most Idol ID: ${_mostIdolId.value}")
         Log.d(TAG, "Most Idol Category: ${_mostIdolCategory.value}")
         Log.d(TAG, "Most Idol ChartCode: ${_mostIdolChartCode.value}")
         Log.d(TAG, "Favorite Idol Count: ${_favoriteIdolIds.value.size}")
-        Log.d(TAG, "Heart Info: ${_heartInfo.value}")
         Log.d(TAG, "=========================================")
     }
 

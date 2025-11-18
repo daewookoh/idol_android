@@ -23,7 +23,7 @@ data class UserInfo(
     val username: String,
     val nickname: String?,
     val profileImage: String?,
-    val hearts: Int?,
+    val heart: Int?,
     val diamond: Int?,
     val strongHeart: Long?,
     val weakHeart: Long?,
@@ -69,7 +69,7 @@ class PreferencesManager @Inject constructor(
         val KEY_USER_USERNAME = stringPreferencesKey("user_username")
         val KEY_USER_NICKNAME = stringPreferencesKey("user_nickname")
         val KEY_USER_PROFILE_IMAGE = stringPreferencesKey("user_profile_image")
-        val KEY_USER_HEARTS = intPreferencesKey("user_hearts")
+        val KEY_USER_HEART = intPreferencesKey("user_heart")
         val KEY_ACCESS_TOKEN = stringPreferencesKey(Constants.KEY_ACCESS_TOKEN)
 
         // User Extended
@@ -218,7 +218,7 @@ class PreferencesManager @Inject constructor(
                     username = preferences[KEY_USER_USERNAME] ?: "",
                     nickname = preferences[KEY_USER_NICKNAME],
                     profileImage = preferences[KEY_USER_PROFILE_IMAGE],
-                    hearts = preferences[KEY_USER_HEARTS],
+                    heart = preferences[KEY_USER_HEART],
                     diamond = preferences[KEY_USER_DIAMOND],
                     strongHeart = preferences[KEY_USER_STRONG_HEART],
                     weakHeart = preferences[KEY_USER_WEAK_HEART],
@@ -241,7 +241,7 @@ class PreferencesManager @Inject constructor(
                 android.util.Log.d("USER_INFO", "[PreferencesManager]   - Username: ${info.username}")
                 android.util.Log.d("USER_INFO", "[PreferencesManager]   - Nickname: ${info.nickname}")
                 android.util.Log.d("USER_INFO", "[PreferencesManager]   - ProfileImage: ${info.profileImage}")
-                android.util.Log.d("USER_INFO", "[PreferencesManager]   - Hearts: ${info.hearts}")
+                android.util.Log.d("USER_INFO", "[PreferencesManager]   - Hearts: ${info.heart}")
                 android.util.Log.d("USER_INFO", "[PreferencesManager]   - Diamond: ${info.diamond}")
                 android.util.Log.d("USER_INFO", "[PreferencesManager]   - StrongHeart: ${info.strongHeart}")
                 android.util.Log.d("USER_INFO", "[PreferencesManager]   - WeakHeart: ${info.weakHeart}")
@@ -364,7 +364,7 @@ class PreferencesManager @Inject constructor(
         username: String,
         nickname: String?,
         profileImage: String?,
-        hearts: Int?,
+        heart: Int?,
         diamond: Int? = null,
         strongHeart: Long? = null,
         weakHeart: Long? = null,
@@ -388,7 +388,7 @@ class PreferencesManager @Inject constructor(
         android.util.Log.d("USER_INFO", "[PreferencesManager]   - Username: $username")
         android.util.Log.d("USER_INFO", "[PreferencesManager]   - Nickname: $nickname")
         android.util.Log.d("USER_INFO", "[PreferencesManager]   - ProfileImage: $profileImage")
-        android.util.Log.d("USER_INFO", "[PreferencesManager]   - Hearts: $hearts")
+        android.util.Log.d("USER_INFO", "[PreferencesManager]   - Heart: $heart")
         android.util.Log.d("USER_INFO", "[PreferencesManager]   - Diamond: $diamond")
         android.util.Log.d("USER_INFO", "[PreferencesManager]   - StrongHeart: $strongHeart")
         android.util.Log.d("USER_INFO", "[PreferencesManager]   - WeakHeart: $weakHeart")
@@ -414,7 +414,7 @@ class PreferencesManager @Inject constructor(
             // Nullable 필드는 null이면 키 삭제, 아니면 저장
             if (nickname != null) preferences[KEY_USER_NICKNAME] = nickname else preferences.remove(KEY_USER_NICKNAME)
             if (profileImage != null) preferences[KEY_USER_PROFILE_IMAGE] = profileImage else preferences.remove(KEY_USER_PROFILE_IMAGE)
-            if (hearts != null) preferences[KEY_USER_HEARTS] = hearts else preferences.remove(KEY_USER_HEARTS)
+            if (heart != null) preferences[KEY_USER_HEART] = heart else preferences.remove(KEY_USER_HEART)
             if (diamond != null) preferences[KEY_USER_DIAMOND] = diamond else preferences.remove(KEY_USER_DIAMOND)
             if (strongHeart != null) preferences[KEY_USER_STRONG_HEART] = strongHeart else preferences.remove(KEY_USER_STRONG_HEART)
             if (weakHeart != null) preferences[KEY_USER_WEAK_HEART] = weakHeart else preferences.remove(KEY_USER_WEAK_HEART)
@@ -857,34 +857,6 @@ class PreferencesManager @Inject constructor(
                 android.util.Log.e("PreferencesManager", "Failed to parse MostPicksModel", e)
                 null
             }
-        } else {
-            null
-        }
-    }
-
-    /**
-     * 하트 정보 저장 (strongHeart, weakHeart, hearts)
-     */
-    suspend fun saveHeartInfo(strongHeart: Long, weakHeart: Long, hearts: Int) {
-        context.dataStore.edit { preferences ->
-            preferences[KEY_USER_STRONG_HEART] = strongHeart
-            preferences[KEY_USER_WEAK_HEART] = weakHeart
-            preferences[KEY_USER_HEARTS] = hearts
-        }
-        android.util.Log.d("PreferencesManager", "✓ Saved heart info: strong=$strongHeart, weak=$weakHeart, hearts=$hearts")
-    }
-
-    /**
-     * 하트 정보 로드
-     */
-    suspend fun getHeartInfo(): Triple<Long, Long, Int>? {
-        val prefs = context.dataStore.data.first()
-        val strongHeart = prefs[KEY_USER_STRONG_HEART]
-        val weakHeart = prefs[KEY_USER_WEAK_HEART]
-        val hearts = prefs[KEY_USER_HEARTS]
-
-        return if (strongHeart != null && weakHeart != null && hearts != null) {
-            Triple(strongHeart, weakHeart, hearts)
         } else {
             null
         }

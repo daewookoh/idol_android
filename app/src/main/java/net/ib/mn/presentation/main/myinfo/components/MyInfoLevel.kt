@@ -26,7 +26,7 @@ import java.util.Locale
  * fragment_my_heart_info.xml의 layout_level과 동일
  */
 @Composable
-fun MyInfoLevelProgressBar(
+fun MyInfoLevel(
     level: Int,
     progress: Int,
     levelUpText: String,

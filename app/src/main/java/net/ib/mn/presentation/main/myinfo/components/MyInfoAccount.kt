@@ -24,7 +24,7 @@ import net.ib.mn.ui.components.ExoProfileImage
  * fragment_myinfo.xml의 layout_account 영역과 동일
  */
 @Composable
-fun MyInfoAccountSection(
+fun MyInfoAccount(
     modifier: Modifier = Modifier,
     userName: String = "",
     profileImageUrl: String = "",

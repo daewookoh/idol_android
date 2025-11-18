@@ -78,8 +78,8 @@ data class UserSelfData(
     @SerializedName("profile_image")
     val profileImage: String?,
 
-    @SerializedName("hearts")
-    val hearts: Int?,
+    @SerializedName("heart")
+    val heart: Int?,
 
     @SerializedName("diamond")
     val diamond: Int?,

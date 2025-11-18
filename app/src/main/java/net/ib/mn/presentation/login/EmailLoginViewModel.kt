@@ -237,7 +237,7 @@ class EmailLoginViewModel @Inject constructor(
             username = "",
             nickname = null,
             profileImage = null,
-            hearts = null,
+            heart = null,
             domain = Constants.DOMAIN_EMAIL
         )
         

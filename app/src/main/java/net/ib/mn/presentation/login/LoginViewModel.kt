@@ -513,7 +513,7 @@ class LoginViewModel @Inject constructor(
                                 username = "",
                                 nickname = null,
                                 profileImage = null,
-                                hearts = null,
+                                heart = null,
                                 domain = domain
                             )
                             android.util.Log.d(loginTag, "✓ Auth credentials saved (email, domain, token)")
@@ -566,7 +566,7 @@ class LoginViewModel @Inject constructor(
                                 username = "",
                                 nickname = null,
                                 profileImage = null,
-                                hearts = null,
+                                heart = null,
                                 domain = domain
                             )
                             android.util.Log.d(loginTag, "✓ Auth credentials saved (email, domain, token)")
@@ -647,7 +647,7 @@ class LoginViewModel @Inject constructor(
                                 username = "",
                                 nickname = null,
                                 profileImage = null,
-                                hearts = null,
+                                heart = null,
                                 domain = domain
                             )
                             android.util.Log.d(loginTag, "✓ Auth credentials saved (email, domain, token)")

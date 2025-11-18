@@ -1102,7 +1102,7 @@ class SignUpViewModel @Inject constructor(
                                         username = userData.username,
                                         nickname = userData.nickname,
                                         profileImage = userData.profileImage,
-                                        hearts = null,
+                                        heart = null,
                                         domain = domain
                                     )
                                     
@@ -1135,7 +1135,7 @@ class SignUpViewModel @Inject constructor(
                                         username = "", // StartUpScreen에서 업데이트됨
                                         nickname = null,
                                         profileImage = null,
-                                        hearts = null,
+                                        heart = null,
                                         domain = domain
                                     )
                                     
