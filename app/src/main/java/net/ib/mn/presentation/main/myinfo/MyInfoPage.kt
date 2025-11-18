@@ -13,6 +13,7 @@ import net.ib.mn.R
 import net.ib.mn.presentation.main.myinfo.components.MyInfoAccount
 import net.ib.mn.presentation.main.myinfo.components.MyInfoLevel
 import net.ib.mn.presentation.main.myinfo.components.MyInfoHeart
+import net.ib.mn.presentation.main.myinfo.components.MyInfoLinks
 
 /**
  * MyInfo 페이지
@@ -83,9 +84,15 @@ fun MyInfoPage(
             onHistoryClick = { /* TODO: Navigate to history */ }
         )
 
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
-        // Menu Section will be added here
+        // Bottom Links Section (비디오광고, 상점, 무료충전소)
+        MyInfoLinks(
+            videoAdHeartCount = 400, // TODO: Get from ViewModel
+            onVideoAdClick = { /* TODO: Navigate to video ad */ },
+            onStoreClick = { /* TODO: Navigate to store */ },
+            onFreeChargeClick = { /* TODO: Navigate to free charge */ }
+        )
     }
 }
 
