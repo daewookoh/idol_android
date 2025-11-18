@@ -26,18 +26,49 @@ class MyInfoPageViewModel @Inject constructor(
 
         // 레벨별 필요 하트 (old 프로젝트의 Const.LEVEL_HEARTS와 동일)
         private val LEVEL_HEARTS = intArrayOf(
-            0,      // Level 0
-            1000,   // Level 1
-            5000,   // Level 2
-            10000,  // Level 3
-            30000,  // Level 4
-            70000,  // Level 5
-            150000, // Level 6
-            300000, // Level 7
-            500000, // Level 8
-            1000000 // Level 9
+            0,          // Level 0
+            100,        // Level 1
+            1000,       // Level 2
+            2000,       // Level 3
+            3000,       // Level 4
+            5000,       // Level 5
+            7000,       // Level 6
+            10000,      // Level 7
+            20000,      // Level 8
+            35000,      // Level 9
+            50000,      // Level 10
+            65000,      // Level 11
+            80000,      // Level 12
+            100000,     // Level 13
+            120000,     // Level 14
+            150000,     // Level 15
+            190000,     // Level 16
+            240000,     // Level 17
+            300000,     // Level 18
+            400000,     // Level 19
+            500000,     // Level 20
+            650000,     // Level 21
+            800000,     // Level 22
+            1000000,    // Level 23
+            1500000,    // Level 24
+            2000000,    // Level 25
+            2500000,    // Level 26
+            3000000,    // Level 27
+            3500000,    // Level 28
+            4000000,    // Level 29
+            5000000,    // Level 30
+            7000000,    // Level 31
+            10000000,   // Level 32
+            13000000,   // Level 33
+            16000000,   // Level 34
+            20000000,   // Level 35
+            25000000,   // Level 36
+            30000000,   // Level 37
+            40000000,   // Level 38
+            50000000,   // Level 39
+            100000000   // Level 40
         )
-        private const val MAX_LEVEL = 9
+        private const val MAX_LEVEL = 40
     }
 
     // UI 상태
@@ -61,6 +92,9 @@ class MyInfoPageViewModel @Inject constructor(
 
     private val _levelUpText = MutableStateFlow("")
     val levelUpText: StateFlow<String> = _levelUpText.asStateFlow()
+
+    private val _totalExp = MutableStateFlow("")
+    val totalExp: StateFlow<String> = _totalExp.asStateFlow()
 
     private val _subscriptionName = MutableStateFlow<String?>(null)
     val subscriptionName: StateFlow<String?> = _subscriptionName.asStateFlow()
@@ -98,6 +132,7 @@ class MyInfoPageViewModel @Inject constructor(
                     _favoriteIdolSubName.value = favoriteIdolSubName
                     _levelProgress.value = progress
                     _levelUpText.value = levelUpText
+                    _totalExp.value = NumberFormat.getNumberInstance(Locale.getDefault()).format(levelHeart)
                     _subscriptionName.value = null // TODO: subscriptions 필드 추가 시 구현
                     _hasNewFeed.value = false // TODO: 피드 새 알림 로직 추가 시 구현
 
@@ -105,6 +140,7 @@ class MyInfoPageViewModel @Inject constructor(
                     android.util.Log.d(TAG, "  - Nickname: ${userData.nickname}")
                     android.util.Log.d(TAG, "  - Progress: $progress%")
                     android.util.Log.d(TAG, "  - LevelUpText: $levelUpText")
+                    android.util.Log.d(TAG, "  - TotalExp: ${_totalExp.value}")
                 } else {
                     // userData가 null일 때는 기본값 유지
                     android.util.Log.d(TAG, "⚠️ UserData is null, keeping default state")

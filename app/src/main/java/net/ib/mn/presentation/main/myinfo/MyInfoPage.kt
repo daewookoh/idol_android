@@ -31,6 +31,7 @@ fun MyInfoPage(
     val favoriteIdolSubName by viewModel.favoriteIdolSubName.collectAsState()
     val levelProgress by viewModel.levelProgress.collectAsState()
     val levelUpText by viewModel.levelUpText.collectAsState()
+    val totalExp by viewModel.totalExp.collectAsState()
     val subscriptionName by viewModel.subscriptionName.collectAsState()
     val hasNewFeed by viewModel.hasNewFeed.collectAsState()
 
@@ -55,14 +56,14 @@ fun MyInfoPage(
             onSubscriptionBadgeClick = { /* TODO: Navigate to subscription */ }
         )
 
+        Spacer(modifier = Modifier.height(10.dp))
+
         // Level Progress Bar
         MyInfoLevelProgressBar(
             level = level,
             progress = levelProgress,
             levelUpText = levelUpText,
-            modifier = Modifier
-                .widthIn(max = 160.dp)
-                .padding(start = 90.dp) // 10dp(outer) + 60dp(profile) + 20dp(spacer)
+            totalExp = totalExp
         )
 
         Spacer(modifier = Modifier.height(30.dp))
