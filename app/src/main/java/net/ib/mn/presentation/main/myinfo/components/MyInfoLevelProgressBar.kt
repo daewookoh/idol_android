@@ -101,15 +101,20 @@ fun MyInfoLevelProgressBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(15.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(colorResource(id = R.color.background_100))
+                    .background(
+                        color = colorResource(id = R.color.background_100),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .clip(RoundedCornerShape(8.dp))
             ) {
                 Box(
                     modifier = Modifier
                         .height(15.dp)
                         .fillMaxWidth(fraction = animatedProgress.coerceIn(0f, 1f))
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(color = colorResource(id = R.color.main))
+                        .background(
+                            color = colorResource(id = R.color.main),
+                            shape = RoundedCornerShape(8.dp)
+                        )
                 )
             }
 
