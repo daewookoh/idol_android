@@ -57,9 +57,9 @@ fun ExoProfileImage(
 
     // 디폴트 이미지 선택 (ExoTop3 방식)
     val defaultImageRes = if (rank % 2 == 0) {
-        R.drawable.menu_profile_2
-    } else {
         R.drawable.menu_profile_1
+    } else {
+        R.drawable.menu_profile_2
     }
 
     // Modifier 구성

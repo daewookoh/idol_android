@@ -39,7 +39,7 @@ import net.ib.mn.util.Constants
 import net.ib.mn.presentation.main.freeboard.FreeBoardPage
 import net.ib.mn.presentation.main.menu.MenuPage
 import net.ib.mn.presentation.main.myfavorite.MyFavoritePage
-import net.ib.mn.presentation.main.profile.ProfilePage
+import net.ib.mn.presentation.main.myinfo.MyInfoPage
 import net.ib.mn.presentation.main.ranking.RankingPage
 import java.util.Locale
 
@@ -54,7 +54,7 @@ fun MainScreen(
     topBarViewModel: MainTopBarViewModel = hiltViewModel(),
     onLogout: () -> Unit = {}
 ) {
-    var selectedTab by remember { mutableIntStateOf(0) }
+    var selectedTab by remember { mutableIntStateOf(2) }
     val userInfo by viewModel.userInfo.collectAsState()
     val logoutCompleted by viewModel.logoutCompleted.collectAsState()
     val timerText by topBarViewModel.timerText.collectAsState()
@@ -218,7 +218,7 @@ fun MainScreen(
                 when (tab) {
                     0 -> RankingPage()
                     1 -> MyFavoritePage()
-                    2 -> ProfilePage()
+                    2 -> MyInfoPage()
                     3 -> FreeBoardPage()
                     4 -> MenuPage()
                 }
