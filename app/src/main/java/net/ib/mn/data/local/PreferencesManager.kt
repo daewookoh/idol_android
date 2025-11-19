@@ -131,6 +131,7 @@ class PreferencesManager @Inject constructor(
         val KEY_UDP_BROADCAST_URL = stringPreferencesKey("udp_broadcast_url")
         val KEY_UDP_STAGE = intPreferencesKey("udp_stage")
         val KEY_CDN_URL = stringPreferencesKey("cdn_url")
+        val KEY_VIDEO_HEART = intPreferencesKey("video_heart")  // 비디오 광고 하트 보상
 
         // Category
         val KEY_DEFAULT_CATEGORY = stringPreferencesKey(Constants.PREF_DEFAULT_CATEGORY)
@@ -301,6 +302,11 @@ class PreferencesManager @Inject constructor(
     val cdnUrl: Flow<String?> = context.dataStore.data
         .map { preferences ->
             preferences[KEY_CDN_URL]
+        }
+
+    val videoHeart: Flow<Int> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_VIDEO_HEART] ?: 0
         }
 
     val defaultCategory: Flow<String> = context.dataStore.data
@@ -542,6 +548,12 @@ class PreferencesManager @Inject constructor(
     suspend fun setCdnUrl(url: String) {
         context.dataStore.edit { preferences ->
             preferences[KEY_CDN_URL] = url
+        }
+    }
+
+    suspend fun setVideoHeart(videoHeart: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_VIDEO_HEART] = videoHeart
         }
     }
 

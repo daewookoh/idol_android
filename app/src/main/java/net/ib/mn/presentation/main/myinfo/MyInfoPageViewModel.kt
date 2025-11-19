@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.repository.UserCacheRepository
 import java.text.NumberFormat
 import java.util.Locale
@@ -18,7 +19,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class MyInfoPageViewModel @Inject constructor(
-    private val userCacheRepository: UserCacheRepository
+    private val userCacheRepository: UserCacheRepository,
+    private val preferencesManager: PreferencesManager
 ) : ViewModel() {
 
     companion object {
@@ -114,7 +116,18 @@ class MyInfoPageViewModel @Inject constructor(
     private val _diaCount = MutableStateFlow("0")
     val diaCount: StateFlow<String> = _diaCount.asStateFlow()
 
+    private val _videoAdHeartCount = MutableStateFlow(0)
+    val videoAdHeartCount: StateFlow<Int> = _videoAdHeartCount.asStateFlow()
+
     init {
+        // PreferencesManager의 videoHeart를 구독
+        viewModelScope.launch {
+            preferencesManager.videoHeart.collect { videoHeart ->
+                _videoAdHeartCount.value = videoHeart
+                android.util.Log.d(TAG, "Video Ad Heart Count updated: $videoHeart")
+            }
+        }
+
         // UserCacheRepository의 userData를 구독
         viewModelScope.launch {
             userCacheRepository.userData.collect { userData ->

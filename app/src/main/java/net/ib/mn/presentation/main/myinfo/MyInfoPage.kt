@@ -40,6 +40,7 @@ fun MyInfoPage(
     val strongHeart by viewModel.strongHeart.collectAsState()
     val weakHeart by viewModel.weakHeart.collectAsState()
     val diaCount by viewModel.diaCount.collectAsState()
+    val videoAdHeartCount by viewModel.videoAdHeartCount.collectAsState()
 
     Column(
         modifier = modifier
@@ -88,11 +89,10 @@ fun MyInfoPage(
 
         // Bottom Links Section (비디오광고, 상점, 무료충전소)
         MyInfoLinks(
-            videoAdHeartCount = 400, // TODO: Get from ViewModel
+            videoAdHeartCount = videoAdHeartCount,
             onVideoAdClick = { /* TODO: Navigate to video ad */ },
             onStoreClick = { /* TODO: Navigate to store */ },
             onFreeChargeClick = { /* TODO: Navigate to free charge */ }
         )
     }
 }
-

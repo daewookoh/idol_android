@@ -399,6 +399,7 @@ class StartUpViewModel @Inject constructor(
                     android.util.Log.d(TAG, "UDP Broadcast URL: ${data.udpBroadcastUrl}")
                     android.util.Log.d(TAG, "UDP Stage: ${data.udpStage}")
                     android.util.Log.d(TAG, "CDN URL: ${data.cdnUrl}")
+                    android.util.Log.d(TAG, "Video Heart: ${data.videoHeart}")
                     android.util.Log.d(TAG, "----------------------------------------")
                     android.util.Log.d(TAG, "Daily Idol Update: ${data.dailyIdolUpdate}")
                     android.util.Log.d(TAG, "All Idol Update: ${data.allIdolUpdate}")
@@ -420,6 +421,10 @@ class StartUpViewModel @Inject constructor(
                         preferencesManager.setCdnUrl(it)
                         android.util.Log.d(TAG, "✓ CDN URL saved: $it")
                     }
+
+                    // Video Heart 저장
+                    preferencesManager.setVideoHeart(data.videoHeart)
+                    android.util.Log.d(TAG, "✓ Video Heart saved: ${data.videoHeart}")
 
                     android.util.Log.d(TAG, "✓ ConfigSelf data saved to DataStore")
                 }
