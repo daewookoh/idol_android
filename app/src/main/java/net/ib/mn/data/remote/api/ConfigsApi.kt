@@ -3,6 +3,7 @@ package net.ib.mn.data.remote.api
 import net.ib.mn.data.remote.dto.ConfigSelfResponse
 import net.ib.mn.data.remote.dto.ConfigStartupResponse
 import net.ib.mn.data.remote.dto.TypeListResponse
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
 
@@ -30,4 +31,11 @@ interface ConfigsApi {
      */
     @GET("configs/typelist/")
     suspend fun getTypeList(): Response<TypeListResponse>
+
+    /**
+     * In-app 배너 조회
+     * old 프로젝트와 동일하게 ResponseBody로 받아서 직접 파싱
+     */
+    @GET("idol_supports/inapp_banner/")
+    suspend fun getInAppBanner(): Response<ResponseBody>
 }

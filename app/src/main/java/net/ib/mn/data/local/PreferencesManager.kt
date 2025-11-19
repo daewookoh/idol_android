@@ -133,6 +133,15 @@ class PreferencesManager @Inject constructor(
         val KEY_CDN_URL = stringPreferencesKey("cdn_url")
         val KEY_VIDEO_HEART = intPreferencesKey("video_heart")  // 비디오 광고 하트 보상
 
+        // Menu Config (from /configs/self/ API)
+        val KEY_MENU_NOTICE_MAIN = stringPreferencesKey("menu_notice_main")
+        val KEY_MENU_STORE_MAIN = stringPreferencesKey("menu_store_main")
+        val KEY_MENU_FREE_BOARD_MAIN = stringPreferencesKey("menu_free_board_main")
+        val KEY_SHOW_STORE_EVENT_MARKER = stringPreferencesKey("show_store_event_marker")
+        val KEY_SHOW_FREE_CHARGE_MARKER = stringPreferencesKey("show_free_charge_marker")
+        val KEY_SHOW_LIVE_STREAMING_TAB = booleanPreferencesKey("show_live_streaming_tab")
+        val KEY_IN_APP_BANNER_MENU = stringPreferencesKey("in_app_banner_menu")  // JSON 문자열
+
         // Category
         val KEY_DEFAULT_CATEGORY = stringPreferencesKey(Constants.PREF_DEFAULT_CATEGORY)
         val KEY_DEFAULT_CHART_CODE = stringPreferencesKey("default_chart_code")  // 기본 탭 선택용
@@ -307,6 +316,41 @@ class PreferencesManager @Inject constructor(
     val videoHeart: Flow<Int> = context.dataStore.data
         .map { preferences ->
             preferences[KEY_VIDEO_HEART] ?: 0
+        }
+
+    val menuNoticeMain: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_MENU_NOTICE_MAIN]
+        }
+
+    val menuStoreMain: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_MENU_STORE_MAIN]
+        }
+
+    val menuFreeBoardMain: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_MENU_FREE_BOARD_MAIN]
+        }
+
+    val showStoreEventMarker: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_SHOW_STORE_EVENT_MARKER]
+        }
+
+    val showFreeChargeMarker: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_SHOW_FREE_CHARGE_MARKER]
+        }
+
+    val showLiveStreamingTab: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_SHOW_LIVE_STREAMING_TAB] ?: false
+        }
+
+    val inAppBannerMenu: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_IN_APP_BANNER_MENU]
         }
 
     val defaultCategory: Flow<String> = context.dataStore.data
@@ -554,6 +598,73 @@ class PreferencesManager @Inject constructor(
     suspend fun setVideoHeart(videoHeart: Int) {
         context.dataStore.edit { preferences ->
             preferences[KEY_VIDEO_HEART] = videoHeart
+        }
+    }
+
+    // Menu Config setters
+    suspend fun setMenuNoticeMain(value: String?) {
+        context.dataStore.edit { preferences ->
+            if (value != null) {
+                preferences[KEY_MENU_NOTICE_MAIN] = value
+            } else {
+                preferences.remove(KEY_MENU_NOTICE_MAIN)
+            }
+        }
+    }
+
+    suspend fun setMenuStoreMain(value: String?) {
+        context.dataStore.edit { preferences ->
+            if (value != null) {
+                preferences[KEY_MENU_STORE_MAIN] = value
+            } else {
+                preferences.remove(KEY_MENU_STORE_MAIN)
+            }
+        }
+    }
+
+    suspend fun setMenuFreeBoardMain(value: String?) {
+        context.dataStore.edit { preferences ->
+            if (value != null) {
+                preferences[KEY_MENU_FREE_BOARD_MAIN] = value
+            } else {
+                preferences.remove(KEY_MENU_FREE_BOARD_MAIN)
+            }
+        }
+    }
+
+    suspend fun setShowStoreEventMarker(value: String?) {
+        context.dataStore.edit { preferences ->
+            if (value != null) {
+                preferences[KEY_SHOW_STORE_EVENT_MARKER] = value
+            } else {
+                preferences.remove(KEY_SHOW_STORE_EVENT_MARKER)
+            }
+        }
+    }
+
+    suspend fun setShowFreeChargeMarker(value: String?) {
+        context.dataStore.edit { preferences ->
+            if (value != null) {
+                preferences[KEY_SHOW_FREE_CHARGE_MARKER] = value
+            } else {
+                preferences.remove(KEY_SHOW_FREE_CHARGE_MARKER)
+            }
+        }
+    }
+
+    suspend fun setShowLiveStreamingTab(value: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_SHOW_LIVE_STREAMING_TAB] = value
+        }
+    }
+
+    suspend fun setInAppBannerMenu(bannerListJson: String?) {
+        context.dataStore.edit { preferences ->
+            if (bannerListJson != null) {
+                preferences[KEY_IN_APP_BANNER_MENU] = bannerListJson
+            } else {
+                preferences.remove(KEY_IN_APP_BANNER_MENU)
+            }
         }
     }
 

@@ -2,6 +2,7 @@ package net.ib.mn.presentation.startup
 
 import android.content.Context
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.async
@@ -83,6 +84,7 @@ class StartUpViewModel @Inject constructor(
     private val userRepository: net.ib.mn.domain.repository.UserRepository,
     private val favoritesRepository: net.ib.mn.domain.repository.FavoritesRepository,
     private val chartsApi: net.ib.mn.data.remote.api.ChartsApi,
+    private val configsApi: net.ib.mn.data.remote.api.ConfigsApi,
     private val preferencesManager: net.ib.mn.data.local.PreferencesManager,
     private val authRepository: net.ib.mn.data.repository.AuthRepository,
     private val idolDao: net.ib.mn.data.local.dao.IdolDao,
@@ -224,6 +226,10 @@ class StartUpViewModel @Inject constructor(
         // old 코드: async { getConfigSelf(context) }.await()
         android.util.Log.d(TAG, "Phase 1: Loading ConfigSelf (prerequisite)...")
         loadConfigSelf()
+
+        // Phase 1-1: InAppBanner 로드
+        android.util.Log.d(TAG, "Phase 1-1: Loading InAppBanner...")
+        loadInAppBanner()
 
         // Phase 2: ConfigStartup (critical path - 실패 시 중단)
         // old 코드: val isStartupSuccess = async { getConfigStartup(context) }.await()
@@ -426,6 +432,14 @@ class StartUpViewModel @Inject constructor(
                     preferencesManager.setVideoHeart(data.videoHeart)
                     android.util.Log.d(TAG, "✓ Video Heart saved: ${data.videoHeart}")
 
+                    // Menu Config 저장
+                    preferencesManager.setMenuNoticeMain(data.menuNoticeMain)
+                    preferencesManager.setMenuStoreMain(data.menuStoreMain)
+                    preferencesManager.setMenuFreeBoardMain(data.menuFreeBoardMain)
+                    preferencesManager.setShowStoreEventMarker(data.showStoreEventMarker)
+                    preferencesManager.setShowFreeChargeMarker(data.showFreeChargeMarker)
+                    preferencesManager.setShowLiveStreamingTab(data.showLiveStreamingTab)
+
                     android.util.Log.d(TAG, "✓ ConfigSelf data saved to DataStore")
                 }
                     is ApiResult.Error -> {
@@ -435,6 +449,79 @@ class StartUpViewModel @Inject constructor(
             }
         } catch (e: Exception) {
             android.util.Log.e(TAG, "ConfigSelf exception: ${e.message}", e)
+        }
+    }
+
+    /**
+     * InAppBanner API 호출
+     */
+    private suspend fun loadInAppBanner() {
+        try {
+            android.util.Log.d(TAG, "Calling InAppBanner API...")
+            val response = configsApi.getInAppBanner()
+
+            if (response.isSuccessful && response.body() != null) {
+                val responseBody = response.body()!!.string()
+                android.util.Log.d(TAG, "InAppBanner response: $responseBody")
+
+                // JSON 파싱
+                val jsonObject = org.json.JSONObject(responseBody)
+                val success = jsonObject.optBoolean("success", false)
+
+                if (success) {
+                    val objectsArray = jsonObject.optJSONArray("objects")
+
+                    if (objectsArray != null && objectsArray.length() > 0) {
+                        val bannerList = mutableListOf<net.ib.mn.data.remote.dto.InAppBannerDto>()
+
+                        for (i in 0 until objectsArray.length()) {
+                            val bannerObj = objectsArray.getJSONObject(i)
+                            bannerList.add(
+                                net.ib.mn.data.remote.dto.InAppBannerDto(
+                                    id = bannerObj.getInt("id"),
+                                    imageUrl = bannerObj.getString("image_url"),
+                                    link = if (bannerObj.has("link")) bannerObj.getString("link") else null,
+                                    section = if (bannerObj.has("section")) bannerObj.getString("section") else "M"
+                                )
+                            )
+                        }
+
+                        android.util.Log.d(TAG, "✓ InAppBanner API success (${bannerList.size} banners)")
+
+                        // section별로 그룹화
+                        val bannersBySection = bannerList.groupBy { it.section }
+
+                        // 메뉴 섹션 배너만 추출
+                        val menuBanners = bannersBySection["M"] ?: emptyList()
+
+                        // JSON으로 변환하여 저장
+                        if (menuBanners.isNotEmpty()) {
+                            val menuBannersJson = Gson().toJson(menuBanners.map { dto ->
+                                net.ib.mn.domain.model.InAppBanner(
+                                    id = dto.id,
+                                    imageUrl = dto.imageUrl,
+                                    link = dto.link,
+                                    section = dto.section
+                                )
+                            })
+                            preferencesManager.setInAppBannerMenu(menuBannersJson)
+                            android.util.Log.d(TAG, "✓ Menu banners saved (${menuBanners.size} banners)")
+                        } else {
+                            preferencesManager.setInAppBannerMenu(null)
+                            android.util.Log.d(TAG, "✓ No menu banners found")
+                        }
+                    } else {
+                        preferencesManager.setInAppBannerMenu(null)
+                        android.util.Log.d(TAG, "✓ No banners in response")
+                    }
+                } else {
+                    android.util.Log.e(TAG, "InAppBanner API success=false")
+                }
+            } else {
+                android.util.Log.e(TAG, "InAppBanner API error: ${response.code()}")
+            }
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "InAppBanner exception: ${e.message}", e)
         }
     }
 

@@ -98,5 +98,22 @@ data class ConfigSelfResponse(
     val showRookieInfo: Int = 0,
 
     @SerializedName("show_miracle_info")
-    val showMiracleInfo: Int = 0
+    val showMiracleInfo: Int = 0,
+
+    // 메뉴 설정 (Menu configuration)
+    @SerializedName("menu_notice_main")
+    val menuNoticeMain: String? = null,  // "Y" = 아이콘 메뉴에 표시, "N" = 텍스트 메뉴에 표시
+
+    @SerializedName("menu_store_main")
+    val menuStoreMain: String? = null,  // "Y" = 아이콘 메뉴에 표시, "N" = 텍스트 메뉴에 표시
+
+    @SerializedName("menu_board_main")
+    val menuFreeBoardMain: String? = null,  // "Y" = 아이콘 메뉴에 표시, "N" = 텍스트 메뉴에 표시
+
+    // 메뉴 뱃지 마커 (Menu badge markers)
+    @SerializedName("show_store_event_marker")
+    val showStoreEventMarker: String? = null,  // "Y" = 상점 이벤트 뱃지 표시
+
+    @SerializedName("show_free_charge_event_marker")
+    val showFreeChargeMarker: String? = null  // "Y" = 무료충전소 뱃지 표시
 )

@@ -54,7 +54,7 @@ fun MainScreen(
     topBarViewModel: MainTopBarViewModel = hiltViewModel(),
     onLogout: () -> Unit = {}
 ) {
-    var selectedTab by remember { mutableIntStateOf(2) }
+    var selectedTab by remember { mutableIntStateOf(4) }
     val userInfo by viewModel.userInfo.collectAsState()
     val logoutCompleted by viewModel.logoutCompleted.collectAsState()
     val timerText by topBarViewModel.timerText.collectAsState()
