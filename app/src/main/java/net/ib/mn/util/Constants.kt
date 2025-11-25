@@ -196,4 +196,5 @@ object Constants {
     // Special Idol IDs (old Const.kt)
     // ============================================================
     const val SECRET_ROOM_IDOL_ID: Int = 99980  // 비밀의 방 아이돌 ID
+    const val FREE_BOARD_IDOL_ID: Int = 99990   // 자유게시판 아이돌 ID
 }

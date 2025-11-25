@@ -13,11 +13,13 @@ class FreeBoardContract {
 
     data class State(
         val isLoading: Boolean = false,
+        val isLoadingMore: Boolean = false,
         val isRefreshing: Boolean = false,
         val tags: List<TagModel> = emptyList(),
         val selectedTagId: Int = TAG_ID_HOT,
         val articles: List<ArticleModel> = emptyList(),
         val totalCount: Int = 0,
+        val hasMore: Boolean = true,
         val orderBy: String = FILTER_DATE_ORDER,
         val searchKeyword: String? = null,
         val selectedLanguage: String? = null,

@@ -1,7 +1,6 @@
 package net.ib.mn.domain.model
 
 import com.google.gson.annotations.SerializedName
-import java.util.Date
 
 /**
  * 게시글 모델
@@ -38,7 +37,7 @@ data class ArticleModel(
     val reportCount: Int = 0,
 
     @SerializedName("created_at")
-    val createdAt: Date = Date(),
+    val createdAt: String? = null,
 
     @SerializedName("resource_uri")
     val resourceUri: String = "",

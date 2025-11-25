@@ -167,6 +167,9 @@ class PreferencesManager @Inject constructor(
         val KEY_MOST_IDOL_CHART_CODE = stringPreferencesKey("most_idol_chart_code")  // 최애 아이돌 차트 코드
         val KEY_FAVORITE_IDOL_IDS = stringPreferencesKey("favorite_idol_ids_json")  // 즐겨찾기 아이돌 ID 리스트 JSON
         val KEY_MOST_PICKS_MODEL = stringPreferencesKey("most_picks_model_json")  // 픽 참여 정보 JSON
+
+        // Free Board 선택 탭 저장
+        val KEY_FREE_BOARD_SELECTED_TAG_ID = intPreferencesKey("free_board_selected_tag_id")
     }
 
     // ============================================================
@@ -1004,5 +1007,27 @@ class PreferencesManager @Inject constructor(
     suspend fun getDefaultChartCode(): String? {
         val prefs = context.dataStore.data.first()
         return prefs[KEY_DEFAULT_CHART_CODE]
+    }
+
+    // ============================================================
+    // Free Board Tab Selection
+    // ============================================================
+
+    /**
+     * Free Board 선택된 탭 ID 저장
+     * 첫 진입시 HOT(0)이 기본, 이후 마지막 선택 탭 유지
+     */
+    suspend fun setFreeBoardSelectedTagId(tagId: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_FREE_BOARD_SELECTED_TAG_ID] = tagId
+        }
+    }
+
+    /**
+     * Free Board 선택된 탭 ID 가져오기
+     * @return 저장된 탭 ID (없으면 null - 첫 진입시 HOT 선택)
+     */
+    suspend fun getFreeBoardSelectedTagId(): Int? {
+        return context.dataStore.data.first()[KEY_FREE_BOARD_SELECTED_TAG_ID]
     }
 }

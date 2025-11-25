@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -30,6 +31,7 @@ import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.ArticleUser
 import net.ib.mn.domain.model.TagModel
 import net.ib.mn.ui.components.ExoBoardItem
+import net.ib.mn.ui.components.ExoBoardItemType
 import net.ib.mn.ui.components.ExoSearchBox
 import net.ib.mn.ui.theme.ColorPalette
 
@@ -177,28 +179,39 @@ private fun FreeBoardContent(
                         EmptyView(hasSearchKeyword = !state.searchKeyword.isNullOrEmpty())
                     }
                     else -> {
+                        val listState = rememberLazyListState()
+
+                        // 무한 스크롤 감지
+                        val shouldLoadMore = remember {
+                            derivedStateOf {
+                                val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+                                    ?: return@derivedStateOf false
+                                lastVisibleItem.index >= state.articles.size - 3
+                            }
+                        }
+
+                        LaunchedEffect(shouldLoadMore.value) {
+                            if (shouldLoadMore.value && !state.isLoading && !state.isLoadingMore && state.hasMore) {
+                                onIntent(FreeBoardContract.Intent.LoadMore)
+                            }
+                        }
+
                         LazyColumn(
+                            state = listState,
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(ColorPalette.gray80)
+                                .background(ColorPalette.background100)
                         ) {
                             items(
                                 count = state.articles.size,
                                 key = { index -> state.articles[index].id }
                             ) { index ->
                                 val article = state.articles[index]
-                                val tagName = state.tags.find { it.id == article.tagId }?.name
 
                                 ExoBoardItem(
                                     article = article,
                                     onItemClick = { /* Navigate to detail */ },
-                                    onUserClick = { /* Navigate to user profile */ },
-                                    onLikeClick = { /* Toggle like */ },
-                                    onCommentClick = { /* Navigate to comments */ },
-                                    onMoreClick = { /* Show more options */ },
-                                    showTag = state.selectedTagId == FreeBoardContract.State.TAG_ID_HOT ||
-                                            state.selectedTagId == FreeBoardContract.State.TAG_ID_ALL,
-                                    tagName = tagName,
+                                    itemType = ExoBoardItemType.MINI,
                                     showPopularIcon = state.selectedTagId == FreeBoardContract.State.TAG_ID_HOT
                                 )
                             }
@@ -249,8 +262,8 @@ private fun TagTabRow(
             modifier = Modifier
                 .fillMaxSize()
                 .horizontalScroll(scrollState)
-                .padding(horizontal = 20.dp, vertical = 7.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                .padding(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             tags.forEach { tag ->
@@ -308,7 +321,7 @@ private fun TagChip(
                     }
                 )
                 .clickable(onClick = onClick)
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = 10.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(

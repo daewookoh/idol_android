@@ -1,6 +1,7 @@
 package net.ib.mn.di
 
 import net.ib.mn.data.repository.AdRepositoryImpl
+import net.ib.mn.data.repository.ArticlesRepositoryImpl
 import net.ib.mn.data.repository.ConfigRepositoryImpl
 import net.ib.mn.data.repository.FavoritesRepositoryImpl
 import net.ib.mn.data.repository.HeartpickRepositoryImpl
@@ -11,6 +12,7 @@ import net.ib.mn.data.repository.ThemepickRepositoryImpl
 import net.ib.mn.data.repository.UserRepositoryImpl
 import net.ib.mn.data.repository.UtilityRepositoryImpl
 import net.ib.mn.domain.repository.AdRepository
+import net.ib.mn.domain.repository.ArticlesRepository
 import net.ib.mn.domain.repository.ConfigRepository
 import net.ib.mn.domain.repository.FavoritesRepository
 import net.ib.mn.domain.repository.HeartpickRepository
@@ -94,4 +96,10 @@ abstract class RepositoryModule {
     abstract fun bindFavoritesRepository(
         impl: FavoritesRepositoryImpl
     ): FavoritesRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindArticlesRepository(
+        impl: ArticlesRepositoryImpl
+    ): ArticlesRepository
 }

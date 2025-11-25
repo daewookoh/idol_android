@@ -30,6 +30,14 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
+ * 게시글 아이템 타입
+ */
+enum class ExoBoardItemType {
+    NORMAL,  // 전체 표시 (프로필, 제목, 내용, 이미지, 통계, 액션 버튼)
+    MINI     // 간단 표시 (제목, 내용 한줄, 작성자-작성시간, 좋아요/댓글/조회수)
+}
+
+/**
  * 게시글 아이템 컴포넌트
  *
  * old 프로젝트의 community_item.xml 레이아웃을 Compose로 구현
@@ -41,6 +49,7 @@ import java.util.*
  * @param onCommentClick 댓글 클릭 콜백
  * @param onMoreClick 더보기 클릭 콜백
  * @param modifier Modifier
+ * @param itemType 아이템 타입 (NORMAL, MINI)
  * @param showTag 태그 표시 여부
  * @param tagName 태그 이름
  * @param showPopularIcon 인기글 아이콘 표시 여부
@@ -54,9 +63,52 @@ fun ExoBoardItem(
     onCommentClick: () -> Unit = {},
     onMoreClick: () -> Unit = {},
     modifier: Modifier = Modifier,
+    itemType: ExoBoardItemType = ExoBoardItemType.NORMAL,
     showTag: Boolean = false,
     tagName: String? = null,
     showPopularIcon: Boolean = false
+) {
+    when (itemType) {
+        ExoBoardItemType.NORMAL -> {
+            ExoBoardItemNormal(
+                article = article,
+                onItemClick = onItemClick,
+                onUserClick = onUserClick,
+                onLikeClick = onLikeClick,
+                onCommentClick = onCommentClick,
+                onMoreClick = onMoreClick,
+                modifier = modifier,
+                showTag = showTag,
+                tagName = tagName,
+                showPopularIcon = showPopularIcon
+            )
+        }
+        ExoBoardItemType.MINI -> {
+            ExoBoardItemMini(
+                article = article,
+                onItemClick = onItemClick,
+                modifier = modifier,
+                showPopularIcon = showPopularIcon
+            )
+        }
+    }
+}
+
+/**
+ * NORMAL 타입 게시글 아이템
+ */
+@Composable
+private fun ExoBoardItemNormal(
+    article: ArticleModel,
+    onItemClick: () -> Unit,
+    onUserClick: () -> Unit,
+    onLikeClick: () -> Unit,
+    onCommentClick: () -> Unit,
+    onMoreClick: () -> Unit,
+    modifier: Modifier,
+    showTag: Boolean,
+    tagName: String?,
+    showPopularIcon: Boolean
 ) {
     Column(
         modifier = modifier
@@ -123,12 +175,217 @@ fun ExoBoardItem(
 }
 
 /**
+ * MINI 타입 게시글 아이템
+ * 제목, 내용 한줄, 작성자-작성시간, 좋아요/댓글/조회수, 썸네일(있을 경우)
+ * old 프로젝트의 item_small_talk.xml 참고
+ */
+@Composable
+private fun ExoBoardItemMini(
+    article: ArticleModel,
+    onItemClick: () -> Unit,
+    modifier: Modifier,
+    showPopularIcon: Boolean
+) {
+    // 이미지 파일 찾기 (files 배열 또는 직접 imageUrl/thumbnailUrl 필드)
+    val imageFiles = article.files.filter { it.fileType == "image" || it.fileUrl?.contains("image") == true }
+    val thumbnailUrl = when {
+        // 1. ArticleModel의 직접 thumbnailUrl 필드 확인
+        !article.thumbnailUrl.isNullOrEmpty() -> article.thumbnailUrl
+        // 2. ArticleModel의 직접 imageUrl 필드 확인
+        !article.imageUrl.isNullOrEmpty() -> article.imageUrl
+        // 3. files 배열에서 찾기
+        else -> imageFiles.firstOrNull()?.let { it.thumbnailUrl ?: it.fileUrl }
+    }
+    val imageCount = if (imageFiles.isNotEmpty()) imageFiles.size else if (thumbnailUrl != null) 1 else 0
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(ColorPalette.background100)
+    ) {
+        // 상단 구분선
+        HorizontalDivider(
+            thickness = 0.3.dp,
+            color = ColorPalette.gray110
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onItemClick)
+                .padding(horizontal = 20.dp, vertical = 17.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 왼쪽 컨텐츠 영역
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .then(
+                        if (thumbnailUrl != null) Modifier.padding(end = 12.dp) else Modifier
+                    )
+            ) {
+                // 제목 (인기글 아이콘 포함)
+                if (!article.title.isNullOrEmpty()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 0.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // 인기글 아이콘 (HOT일 경우 이미지 사용)
+                        if (showPopularIcon && article.isPopular) {
+                            Icon(
+                                painter = painterResource(R.drawable.icon_popularpost_title),
+                                contentDescription = "Popular",
+                                modifier = Modifier.padding(end = 5.dp),
+                                tint = androidx.compose.ui.graphics.Color.Unspecified
+                            )
+                        }
+
+                        Text(
+                            text = article.title,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorPalette.textDefault,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+
+                // 본문 내용 (한 줄)
+                if (!article.content.isNullOrEmpty()) {
+                    Text(
+                        text = article.content,
+                        fontSize = 13.sp,
+                        color = ColorPalette.textGray,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .offset(y = (-3).dp)
+                    )
+                }
+
+                // 작성자, 작성시간
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 0.dp)
+                ) {
+                    // 작성자
+                    Text(
+                        text = article.user?.nickname ?: "",
+                        fontSize = 11.sp,
+                        color = ColorPalette.textDimmed,
+                        maxLines = 1
+                    )
+
+                    // 구분점
+                    Text(
+                        text = " · ",
+                        fontSize = 11.sp,
+                        color = ColorPalette.textDimmed
+                    )
+
+                    // 작성시간
+                    Text(
+                        text = formatDateShort(article.createdAt),
+                        fontSize = 11.sp,
+                        color = ColorPalette.textDimmed
+                    )
+                }
+
+                // 좋아요, 댓글, 조회수
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 0.dp)
+                ) {
+                    // 좋아요
+                    Icon(
+                        painter = painterResource(
+                            if (article.isUserLike) R.drawable.icon_board_like_active else R.drawable.icon_board_like
+                        ),
+                        contentDescription = "Like",
+                        modifier = Modifier.size(14.dp),
+                        tint = if (article.isUserLike) ColorPalette.main else ColorPalette.textGray
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(
+                        text = article.likeCount.toString(),
+                        fontSize = 12.sp,
+                        color = ColorPalette.textGray
+                    )
+
+                    Spacer(modifier = Modifier.width(14.dp))
+
+                    // 댓글
+                    Icon(
+                        painter = painterResource(R.drawable.icon_board_comment),
+                        contentDescription = "Comment",
+                        modifier = Modifier.size(14.dp),
+                        tint = ColorPalette.textGray
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(
+                        text = article.commentCount.toString(),
+                        fontSize = 12.sp,
+                        color = ColorPalette.textGray
+                    )
+
+                    Spacer(modifier = Modifier.width(14.dp))
+
+                    // 조회수
+                    Icon(
+                        painter = painterResource(R.drawable.icon_board_hits),
+                        contentDescription = "Views",
+                        modifier = Modifier.size(14.dp),
+                        tint = ColorPalette.textGray
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(
+                        text = article.viewCount.toString(),
+                        fontSize = 12.sp,
+                        color = ColorPalette.textGray
+                    )
+                }
+            }
+
+            // 오른쪽 썸네일 (이미지가 있을 경우)
+            if (thumbnailUrl != null) {
+                Box {
+                    AsyncImage(
+                        model = thumbnailUrl,
+                        contentDescription = "Thumbnail",
+                        modifier = Modifier
+                            .size(70.dp)
+                            .clip(RoundedCornerShape(10.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    // 이미지 개수 표시 (2개 이상일 경우)
+                    if (imageCount > 1) {
+                        Text(
+                            text = "+${imageCount - 1}",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorPalette.textLight,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(top = 3.dp, end = 5.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
  * 게시글 헤더 (프로필, 닉네임, 날짜, 더보기)
  */
 @Composable
 private fun ArticleHeader(
     user: ArticleUser?,
-    createdAt: Date,
+    createdAt: String?,
     isMostOnly: Boolean,
     onUserClick: () -> Unit,
     onMoreClick: () -> Unit
@@ -329,7 +586,7 @@ private fun ArticleImages(
                         .padding(top = 29.dp, end = 16.dp)
                         .background(
                             color = ColorPalette.textDefault.copy(alpha = 0.7f),
-                            shape = RoundedCornerShape(13.dp)
+                            shape = RoundedCornerShape(10.dp)
                         )
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
@@ -519,16 +776,59 @@ private fun getLevelIconRes(level: Int): Int {
 }
 
 /**
- * 날짜 포맷팅
+ * 날짜 포맷팅 (전체)
+ * 서버에서 받은 ISO 형식 날짜 문자열을 표시 형식으로 변환
  */
-private fun formatDate(date: Date): String {
-    val sdf = SimpleDateFormat("yyyy.M.d a h:mm", Locale.getDefault())
-    return sdf.format(date)
+private fun formatDate(dateString: String?): String {
+    if (dateString.isNullOrEmpty()) return ""
+
+    return try {
+        // 서버 날짜 형식: "2025-11-23T03:43:40"
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("yyyy.M.d a h:mm", Locale.getDefault())
+        val date = inputFormat.parse(dateString)
+        if (date != null) outputFormat.format(date) else dateString
+    } catch (e: Exception) {
+        dateString
+    }
+}
+
+/**
+ * 날짜 포맷팅 (간략)
+ * MINI 타입에서 사용
+ * 오늘: 시간 표시 (오후 2:20)
+ * 그 외: 날짜 표시 (2023.03.17)
+ */
+private fun formatDateShort(dateString: String?): String {
+    if (dateString.isNullOrEmpty()) return ""
+
+    return try {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        val date = inputFormat.parse(dateString) ?: return dateString
+
+        val now = Calendar.getInstance()
+        val dateCalendar = Calendar.getInstance().apply { time = date }
+
+        val isToday = now.get(Calendar.YEAR) == dateCalendar.get(Calendar.YEAR) &&
+                now.get(Calendar.DAY_OF_YEAR) == dateCalendar.get(Calendar.DAY_OF_YEAR)
+
+        if (isToday) {
+            // 오늘이면 시간만 표시
+            val timeFormat = SimpleDateFormat("a h:mm", Locale.getDefault())
+            timeFormat.format(date)
+        } else {
+            // 그 외 날짜 표시
+            val dateFormat = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
+            dateFormat.format(date)
+        }
+    } catch (e: Exception) {
+        dateString
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ExoBoardItemPreview() {
+fun ExoBoardItemNormalPreview() {
     ExoBoardItem(
         article = ArticleModel(
             id = "1",
@@ -545,8 +845,34 @@ fun ExoBoardItemPreview() {
             )
         ),
         onItemClick = {},
+        itemType = ExoBoardItemType.NORMAL,
         showTag = true,
         tagName = "자유",
+        showPopularIcon = true
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ExoBoardItemMiniPreview() {
+    ExoBoardItem(
+        article = ArticleModel(
+            id = "1",
+            title = "같이 콘서트 갈사람 있나요!!",
+            content = "내용 자리 입니다. 테스트 내용을 적어봅니다. 조금 더 긴 내용을 테스트해봅니다.",
+            likeCount = 123,
+            commentCount = 45,
+            viewCount = 1000,
+            isPopular = true,
+            createdAt = "2025-11-25T10:30:00",
+            user = ArticleUser(
+                id = 1,
+                nickname = "닉네임",
+                level = 5
+            )
+        ),
+        onItemClick = {},
+        itemType = ExoBoardItemType.MINI,
         showPopularIcon = true
     )
 }
