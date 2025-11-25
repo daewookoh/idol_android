@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt.android)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)  // kapt 대신 ksp 사용
 
     // Firebase (old 프로젝트와 동일)
     alias(libs.plugins.google.services)
@@ -400,7 +400,7 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.androidx.compose.material3)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)  // kapt → ksp
     implementation(libs.hilt.navigation.compose)
 
     // Retrofit
@@ -431,7 +431,7 @@ dependencies {
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)  // kapt → ksp
 
     // Splash Screen
     implementation(libs.androidx.core.splashscreen)

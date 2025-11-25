@@ -353,6 +353,11 @@ class PreferencesManager @Inject constructor(
             preferences[KEY_IN_APP_BANNER_MENU]
         }
 
+    val boardTags: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_BOARD_TAGS]
+        }
+
     val defaultCategory: Flow<String> = context.dataStore.data
         .map { preferences ->
             preferences[KEY_DEFAULT_CATEGORY] ?: Constants.TYPE_MALE
