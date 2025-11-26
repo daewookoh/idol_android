@@ -180,6 +180,9 @@ class PreferencesManager @Inject constructor(
         val KEY_EVENT_LIST_IDS = stringPreferencesKey("event_list_ids")  // 서버 이벤트 ID 목록 (콤마 구분)
         val KEY_NOTICE_READ_IDS = stringPreferencesKey("notice_read_ids")  // 읽은 공지사항 ID 목록 (콤마 구분)
         val KEY_NOTICE_LIST_IDS = stringPreferencesKey("notice_list_ids")  // 서버 공지사항 ID 목록 (콤마 구분)
+
+        // Ranking - 최애 이동 토스트
+        val KEY_HAS_SHOWN_MY_FAV_TOAST = booleanPreferencesKey("has_shown_my_fav_toast")  // 최애 이동 토스트 표시 여부
     }
 
     // ============================================================
@@ -1147,5 +1150,43 @@ class PreferencesManager @Inject constructor(
      */
     suspend fun isEventRead(eventId: String): Boolean {
         return getReadEventIds().contains(eventId)
+    }
+
+    // ============================================================
+    // Ranking - 최애 이동 토스트
+    // ============================================================
+
+    /**
+     * 최애 이동 토스트 표시 여부 Flow
+     */
+    val hasShownMyFavToast: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_HAS_SHOWN_MY_FAV_TOAST] ?: false
+        }
+
+    /**
+     * 최애 이동 토스트 표시 완료 처리
+     */
+    suspend fun setHasShownMyFavToast(hasShown: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_HAS_SHOWN_MY_FAV_TOAST] = hasShown
+        }
+    }
+
+    /**
+     * 최애 이동 토스트 표시 여부 가져오기 (일회성)
+     */
+    suspend fun getHasShownMyFavToast(): Boolean {
+        return context.dataStore.data.first()[KEY_HAS_SHOWN_MY_FAV_TOAST] ?: false
+    }
+
+    /**
+     * 최애 이동 토스트 초기화 (앱 시작 시 호출)
+     * old 프로젝트의 StartupActivity에서 호출하던 로직
+     */
+    suspend fun resetMyFavToast() {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_HAS_SHOWN_MY_FAV_TOAST] = false
+        }
     }
 }

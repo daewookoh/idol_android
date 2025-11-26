@@ -257,7 +257,7 @@ class IdolApiManager @Inject constructor(
             val ids = idols.map { it.id }.joinToString(",")
             idolsRepository.getIdolsByIds(
                 ids = ids,
-                fields = "heart,top3,top3_type,image_url,image_url2,image_url3,top3_image_ver",
+                fields = "heart,top3",
                 onServerTime = {
                     GlobalVariable.ServerTs = it
                 },

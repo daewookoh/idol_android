@@ -1,20 +1,33 @@
 package net.ib.mn.presentation.main.ranking
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryScrollableTabRow
@@ -33,9 +46,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
@@ -74,6 +91,13 @@ fun RankingPage(
     // WebView 상태 관리
     var webViewEventId by rememberSaveable { mutableStateOf<Int?>(null) }
     var webViewTitle by rememberSaveable { mutableStateOf("") }
+
+    // 최애 이동 토스트 상태
+    val showMyFavToast by viewModel.showMyFavToast.collectAsState()
+    val myFavIdolPosition by viewModel.myFavIdolPosition.collectAsState()
+
+    // 첫 번째 탭(개인)의 LazyListState (최애 이동 스크롤용)
+    val firstTabListState = rememberLazyListState()
 
     // RankingRepository EntryPoint를 통해 주입
     val context = LocalContext.current
@@ -401,102 +425,133 @@ fun RankingPage(
             }
         }
 
-        // 탭별 컨텐츠 - 완전히 독립적인 8개의 SubPage
-        // 각 페이지는 미리 생성되어 독립적으로 존재함
-        // HorizontalPager는 단순히 보여주기만 함
-        HorizontalPager(
-            state = subPagerState,
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
-            beyondViewportPageCount = 1,  // 양쪽 1페이지씩 미리 렌더링 (리소스 최적화)
-            key = { pageIndex ->
-                // 고유한 key로 각 페이지를 구분
-                subPages.getOrNull(pageIndex)?.first ?: "page_$pageIndex"
-            }
-        ) { pageIndex ->
-            val (pageKey, currentType) = subPages.getOrNull(pageIndex) ?: return@HorizontalPager
+        // 탭별 컨텐츠 + 최애 이동 토스트 오버레이
+        Box(modifier = Modifier.fillMaxSize()) {
+            // 탭별 컨텐츠 - 완전히 독립적인 8개의 SubPage
+            // 각 페이지는 미리 생성되어 독립적으로 존재함
+            // HorizontalPager는 단순히 보여주기만 함
+            HorizontalPager(
+                state = subPagerState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
+                beyondViewportPageCount = 1,  // 양쪽 1페이지씩 미리 렌더링 (리소스 최적화)
+                key = { pageIndex ->
+                    // 고유한 key로 각 페이지를 구분
+                    subPages.getOrNull(pageIndex)?.first ?: "page_$pageIndex"
+                }
+            ) { pageIndex ->
+                val (pageKey, currentType) = subPages.getOrNull(pageIndex) ?: return@HorizontalPager
 
-            // 각 페이지를 완전히 독립적으로 렌더링
-            // key()를 사용하여 Compose가 각 페이지를 별도의 인스턴스로 인식
-            // Hilt의 ViewModelStoreOwner를 유지하여 DI가 제대로 작동하도록 함
-            androidx.compose.runtime.key(pageKey) {
-                android.util.Log.d("RankingPage", "🎨 [Rendering] SubPage for pageIndex=$pageIndex, key=$pageKey")
+                // 각 페이지를 완전히 독립적으로 렌더링
+                // key()를 사용하여 Compose가 각 페이지를 별도의 인스턴스로 인식
+                // Hilt의 ViewModelStoreOwner를 유지하여 DI가 제대로 작동하도록 함
+                androidx.compose.runtime.key(pageKey) {
+                    android.util.Log.d("RankingPage", "🎨 [Rendering] SubPage for pageIndex=$pageIndex, key=$pageKey")
 
-                // 타입에 따라 적절한 SubPage 호출
-                when (currentType.type) {
-                    "SOLO" -> {
-                        android.util.Log.d("RankingPage", "🎯 Rendering SOLO with dataSource: ${soloDataSource.hashCode()}, type=${soloDataSource.type}")
-                        net.ib.mn.presentation.main.ranking.idol_subpage.UnifiedRankingSubPage(
+                    // 타입에 따라 적절한 SubPage 호출
+                    when (currentType.type) {
+                        "SOLO" -> {
+                            android.util.Log.d("RankingPage", "🎯 Rendering SOLO with dataSource: ${soloDataSource.hashCode()}, type=${soloDataSource.type}")
+                            net.ib.mn.presentation.main.ranking.idol_subpage.UnifiedRankingSubPage(
+                                chartCode = currentType.code ?: "",
+                                dataSource = soloDataSource,
+                                isVisible = subPagerState.currentPage == pageIndex,
+                                listState = if (pageIndex == 0) firstTabListState else null,
+                                onRankItemsLoaded = if (pageIndex == 0) { items ->
+                                    // 첫 번째 탭(개인)의 랭킹 데이터가 로드되면 최애 토스트 체크
+                                    viewModel.checkMyFavToast(items)
+                                } else null
+                            )
+                        }
+                        "GROUP" -> {
+                            android.util.Log.d("RankingPage", "🎯 Rendering GROUP with dataSource: ${groupDataSource.hashCode()}, type=${groupDataSource.type}")
+                            net.ib.mn.presentation.main.ranking.idol_subpage.UnifiedRankingSubPage(
+                                chartCode = currentType.code ?: "",
+                                dataSource = groupDataSource,
+                                isVisible = subPagerState.currentPage == pageIndex
+                            )
+                        }
+                        "MIRACLE" -> {
+                            android.util.Log.d("RankingPage", "🎯 Rendering MIRACLE with dataSource: ${miracleDataSource.hashCode()}, type=${miracleDataSource.type}, code=${currentType.code}")
+                            net.ib.mn.presentation.main.ranking.idol_subpage.MiracleRookieRankingSubPage(
+                                chartCode = currentType.code ?: "",
+                                dataSource = miracleDataSource,
+                                isVisible = subPagerState.currentPage == pageIndex,
+                                onInfoClick = { eventId ->
+                                    webViewEventId = eventId
+                                    webViewTitle = context.getString(R.string.title_miracle_month)
+                                }
+                            )
+                        }
+                        "ROOKIE" -> {
+                            android.util.Log.d("RankingPage", "🎯 Rendering ROOKIE with dataSource: ${rookieDataSource.hashCode()}, type=${rookieDataSource.type}, code=${currentType.code}")
+                            net.ib.mn.presentation.main.ranking.idol_subpage.MiracleRookieRankingSubPage(
+                                chartCode = currentType.code ?: "",
+                                dataSource = rookieDataSource,
+                                isVisible = subPagerState.currentPage == pageIndex,
+                                onInfoClick = { eventId ->
+                                    webViewEventId = eventId
+                                    webViewTitle = "Rookie"
+                                }
+                            )
+                        }
+                        "HEARTPICK" -> net.ib.mn.presentation.main.ranking.idol_subpage.HeartPickRankingSubPage(
                             chartCode = currentType.code ?: "",
-                            dataSource = soloDataSource,
                             isVisible = subPagerState.currentPage == pageIndex
                         )
-                    }
-                    "GROUP" -> {
-                        android.util.Log.d("RankingPage", "🎯 Rendering GROUP with dataSource: ${groupDataSource.hashCode()}, type=${groupDataSource.type}")
-                        net.ib.mn.presentation.main.ranking.idol_subpage.UnifiedRankingSubPage(
+                        "ONEPICK" -> net.ib.mn.presentation.main.ranking.idol_subpage.OnePickRankingSubPage(
                             chartCode = currentType.code ?: "",
-                            dataSource = groupDataSource,
                             isVisible = subPagerState.currentPage == pageIndex
                         )
-                    }
-                    "MIRACLE" -> {
-                        android.util.Log.d("RankingPage", "🎯 Rendering MIRACLE with dataSource: ${miracleDataSource.hashCode()}, type=${miracleDataSource.type}, code=${currentType.code}")
-                        net.ib.mn.presentation.main.ranking.idol_subpage.MiracleRookieRankingSubPage(
+                        "HOF" -> net.ib.mn.presentation.main.ranking.idol_subpage.HallOfFameRankingSubPage(
                             chartCode = currentType.code ?: "",
-                            dataSource = miracleDataSource,
                             isVisible = subPagerState.currentPage == pageIndex,
-                            onInfoClick = { eventId ->
-                                webViewEventId = eventId
-                                webViewTitle = context.getString(R.string.title_miracle_month)
+                            topThreeTabs = tabs.take(3),
+                            topThreeChartCodes = tabDataList.take(3).map { it.code ?: "" }
+                        )
+                        "GLOBALS" -> {
+                            android.util.Log.d("RankingPage", "🎯 Rendering GLOBALS with dataSource: ${globalDataSource.hashCode()}, type=${globalDataSource.type}")
+                            net.ib.mn.presentation.main.ranking.idol_subpage.UnifiedRankingSubPage(
+                                chartCode = currentType.code ?: "",
+                                dataSource = globalDataSource,
+                                isVisible = subPagerState.currentPage == pageIndex
+                            )
+                        }
+                        else -> {
+                            // 기본값 또는 에러 처리
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("Unsupported type: ${currentType.type}")
                             }
-                        )
-                    }
-                    "ROOKIE" -> {
-                        android.util.Log.d("RankingPage", "🎯 Rendering ROOKIE with dataSource: ${rookieDataSource.hashCode()}, type=${rookieDataSource.type}, code=${currentType.code}")
-                        net.ib.mn.presentation.main.ranking.idol_subpage.MiracleRookieRankingSubPage(
-                            chartCode = currentType.code ?: "",
-                            dataSource = rookieDataSource,
-                            isVisible = subPagerState.currentPage == pageIndex,
-                            onInfoClick = { eventId ->
-                                webViewEventId = eventId
-                                webViewTitle = "Rookie"
-                            }
-                        )
-                    }
-                    "HEARTPICK" -> net.ib.mn.presentation.main.ranking.idol_subpage.HeartPickRankingSubPage(
-                        chartCode = currentType.code ?: "",
-                        isVisible = subPagerState.currentPage == pageIndex
-                    )
-                    "ONEPICK" -> net.ib.mn.presentation.main.ranking.idol_subpage.OnePickRankingSubPage(
-                        chartCode = currentType.code ?: "",
-                        isVisible = subPagerState.currentPage == pageIndex
-                    )
-                    "HOF" -> net.ib.mn.presentation.main.ranking.idol_subpage.HallOfFameRankingSubPage(
-                        chartCode = currentType.code ?: "",
-                        isVisible = subPagerState.currentPage == pageIndex,
-                        topThreeTabs = tabs.take(3),
-                        topThreeChartCodes = tabDataList.take(3).map { it.code ?: "" }
-                    )
-                    "GLOBALS" -> {
-                        android.util.Log.d("RankingPage", "🎯 Rendering GLOBALS with dataSource: ${globalDataSource.hashCode()}, type=${globalDataSource.type}")
-                        net.ib.mn.presentation.main.ranking.idol_subpage.UnifiedRankingSubPage(
-                            chartCode = currentType.code ?: "",
-                            dataSource = globalDataSource,
-                            isVisible = subPagerState.currentPage == pageIndex
-                        )
-                    }
-                    else -> {
-                        // 기본값 또는 에러 처리
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("Unsupported type: ${currentType.type}")
                         }
                     }
                 }
+            }
+
+            // 최애 이동 토스트 (하단에 오버레이)
+            // 첫 번째 탭(개인)에서만 표시하고, 최애가 화면에 안 보일 때만 표시
+            androidx.compose.animation.AnimatedVisibility(
+                visible = showMyFavToast && subPagerState.currentPage == 0,
+                modifier = Modifier.align(Alignment.BottomCenter),
+                enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
+                exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
+            ) {
+                MyFavoriteToast(
+                    onClick = {
+                        // 최애 아이돌 위치로 스크롤 (3번째 위치에 보이도록)
+                        coroutineScope.launch {
+                            if (myFavIdolPosition >= 0) {
+                                // 최애가 3번째 아이템으로 보이도록 2칸 위로 스크롤
+                                val targetIndex = (myFavIdolPosition - 2).coerceAtLeast(0)
+                                firstTabListState.animateScrollToItem(targetIndex)
+                            }
+                            viewModel.onMyFavToastClick()
+                        }
+                    }
+                )
             }
         }
     }
@@ -642,5 +697,68 @@ private fun extractTypeFromCode(code: String): String {
         code.contains("_S_") -> "SOLO"   // PR_S_M, PR_S_F 등 처리
         code.contains("_G_") -> "GROUP"  // PR_G_M, PR_G_F 등 처리
         else -> code
+    }
+}
+
+/**
+ * 최애 이동 토스트 컴포넌트
+ * old 프로젝트의 MostToast.kt와 동일한 UI
+ */
+@Composable
+private fun MyFavoriteToast(
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+            .fillMaxWidth()
+            .background(
+                color = colorResource(id = R.color.main100),
+                shape = RoundedCornerShape(20.dp)
+            )
+            .border(
+                width = 1.dp,
+                color = colorResource(id = R.color.main300),
+                shape = RoundedCornerShape(20.dp)
+            )
+            .clickable { onClick() }
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.icon_toast_heart),
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = stringResource(id = R.string.banner_go_myidol_title),
+                    color = colorResource(id = R.color.text_default),
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                )
+            }
+            Text(
+                text = stringResource(id = R.string.banner_go_myidol_btn),
+                color = colorResource(id = R.color.main_light),
+                textDecoration = TextDecoration.Underline,
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                ),
+                maxLines = 1
+            )
+        }
     }
 }

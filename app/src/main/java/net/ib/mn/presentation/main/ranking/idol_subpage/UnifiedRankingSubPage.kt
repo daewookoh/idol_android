@@ -35,6 +35,7 @@ import net.ib.mn.ui.components.ExoRankingList
  * @param listState LazyList 스크롤 상태
  * @param modifier Modifier
  * @param isForFavorite MyFavorite용 여부 (true일 경우 ExoTop3 숨김, 스크롤 핸들링 비활성화)
+ * @param onRankItemsLoaded 랭킹 데이터 로드 완료 콜백 (최애 이동 토스트용)
  */
 @Composable
 fun UnifiedRankingSubPage(
@@ -43,7 +44,8 @@ fun UnifiedRankingSubPage(
     isVisible: Boolean = true,
     listState: LazyListState? = null,
     modifier: Modifier = Modifier,
-    isForFavorite: Boolean = false
+    isForFavorite: Boolean = false,
+    onRankItemsLoaded: ((List<net.ib.mn.ui.components.RankingItem>) -> Unit)? = null
 ) {
     android.util.Log.d("UnifiedRankingSubPage", "🎨 [Composing] ${dataSource.type} for chartCode: $chartCode")
 
@@ -120,6 +122,13 @@ fun UnifiedRankingSubPage(
 
         is UnifiedRankingSubPageViewModel.UiState.Success -> {
             val success = uiState as UnifiedRankingSubPageViewModel.UiState.Success
+
+            // 랭킹 데이터 로드 완료 콜백 (최초 1회만 호출)
+            LaunchedEffect(success.items) {
+                if (success.items.isNotEmpty()) {
+                    onRankItemsLoaded?.invoke(success.items)
+                }
+            }
 
             if (success.items.isEmpty()) {
                 Box(

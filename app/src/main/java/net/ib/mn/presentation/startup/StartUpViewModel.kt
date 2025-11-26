@@ -123,6 +123,10 @@ class StartUpViewModel @Inject constructor(
             try {
                 setState { copy(isLoading = true, progress = 0f, error = null) }
 
+                // 앱 시작 시 최애 이동 토스트 초기화 (old 프로젝트의 StartupActivity와 동일)
+                preferencesManager.resetMyFavToast()
+                android.util.Log.d(TAG, "✓ My favorite toast reset")
+
                 // Step 0: 저장된 인증 정보 확인 (old 프로젝트의 IdolAccount.getAccount() 역할)
                 // AuthRepository를 통해 인증 정보 유효성 확인
                 android.util.Log.d("USER_INFO", "========================================")

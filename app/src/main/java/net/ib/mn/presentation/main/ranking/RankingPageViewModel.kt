@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.ib.mn.BuildConfig
+import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.model.TypeListModel
 import net.ib.mn.data.remote.dto.MainChartModel
 import net.ib.mn.domain.repository.ConfigRepository
@@ -33,12 +34,14 @@ import javax.inject.Inject
 class RankingPageViewModel @Inject constructor(
     val configRepository: ConfigRepository, // public으로 변경 (RankingPage에서 접근)
     private val chartsApi: net.ib.mn.data.remote.api.ChartsApi,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val preferencesManager: PreferencesManager
 ) : ViewModel() {
 
     companion object {
         private const val KEY_SELECTED_TAB_INDEX = "selectedTabIndex"
         private const val DEFAULT_TAB_INDEX = 0
+        const val MY_FAV_TOAST_MIN_RANK_LIMIT = 6  // 최애가 6위 이상일 때만 토스트 표시
     }
 
     /**
@@ -61,6 +64,18 @@ class RankingPageViewModel @Inject constructor(
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
+
+    // 최애 이동 토스트 표시 상태
+    private val _showMyFavToast = MutableStateFlow(false)
+    val showMyFavToast: StateFlow<Boolean> = _showMyFavToast.asStateFlow()
+
+    // 최애 아이돌의 랭킹 리스트 내 위치 (스크롤 대상)
+    private val _myFavIdolPosition = MutableStateFlow(-1)
+    val myFavIdolPosition: StateFlow<Int> = _myFavIdolPosition.asStateFlow()
+
+    // 최애 아이돌 ID
+    private val _mostIdolId = MutableStateFlow<Int?>(null)
+    val mostIdolId: StateFlow<Int?> = _mostIdolId.asStateFlow()
 
     /**
      * 랭킹 페이지 내 메인 탭 선택 인덱스
@@ -145,6 +160,69 @@ class RankingPageViewModel @Inject constructor(
             android.util.Log.w("RankingViewModel", "⚠️ MainChartModel is null (process restored) - reloading data")
             reloadChartData()
         }
+    }
+
+    /**
+     * 최애 이동 토스트 표시 여부 체크
+     * old 프로젝트의 showRankingWithMyFavToast 로직
+     *
+     * @param rankItems 랭킹 아이템 리스트
+     */
+    fun checkMyFavToast(rankItems: List<net.ib.mn.ui.components.RankingItem>) {
+        viewModelScope.launch {
+            // 이미 토스트를 표시한 적 있으면 표시하지 않음
+            val hasShown = preferencesManager.getHasShownMyFavToast()
+            if (hasShown) {
+                _showMyFavToast.value = false
+                return@launch
+            }
+
+            // 최애 아이돌 ID 가져오기
+            val mostId = preferencesManager.getMostIdolId()
+            if (mostId == null) {
+                _showMyFavToast.value = false
+                return@launch
+            }
+            _mostIdolId.value = mostId
+
+            // 랭킹 리스트에서 최애 아이돌 찾기
+            val mostIdolIndex = rankItems.indexOfFirst { it.id.toIntOrNull() == mostId }
+            if (mostIdolIndex < 0) {
+                _showMyFavToast.value = false
+                return@launch
+            }
+
+            // 최애 아이돌의 랭킹 (1-indexed)
+            val mostIdolRank = rankItems.getOrNull(mostIdolIndex)?.rank ?: (mostIdolIndex + 1)
+
+            // 6위 이상일 때만 토스트 표시 (화면에 안 보이는 경우)
+            if (mostIdolRank < MY_FAV_TOAST_MIN_RANK_LIMIT) {
+                _showMyFavToast.value = false
+                return@launch
+            }
+
+            // 스크롤 위치 저장 (ExoTop3 고려하여 +1)
+            _myFavIdolPosition.value = mostIdolIndex + 1
+            _showMyFavToast.value = true
+        }
+    }
+
+    /**
+     * 최애 이동 토스트 클릭 처리
+     * 토스트 숨기고, 표시 완료 기록
+     */
+    fun onMyFavToastClick() {
+        viewModelScope.launch {
+            _showMyFavToast.value = false
+            preferencesManager.setHasShownMyFavToast(true)
+        }
+    }
+
+    /**
+     * 최애 이동 토스트 숨기기
+     */
+    fun hideMyFavToast() {
+        _showMyFavToast.value = false
     }
 
     /**
