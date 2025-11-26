@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.ArticleUser
@@ -36,6 +38,7 @@ import net.ib.mn.ui.components.ExoBoardItemType
 import net.ib.mn.ui.components.ExoBoardNoticeItem
 import net.ib.mn.ui.components.ExoSearchBox
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.util.BoardLanguage
 
 /**
  * Free Board 페이지 - 프리톡 메뉴 화면
@@ -84,8 +87,25 @@ private fun FreeBoardContent(
     state: FreeBoardContract.State,
     onIntent: (FreeBoardContract.Intent) -> Unit
 ) {
-    var searchText by remember { mutableStateOf("") }
+    // state.searchKeyword와 동기화되는 검색 텍스트
+    var searchText by remember { mutableStateOf(state.searchKeyword ?: "") }
+
+    // state.searchKeyword가 변경되면 (탭 변경 등) searchText도 업데이트
+    LaunchedEffect(state.searchKeyword) {
+        searchText = state.searchKeyword ?: ""
+    }
+
     val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+    val scope = rememberCoroutineScope()
+
+    // 정렬 필터 바텀시트 상태
+    val orderFilterSheetState = rememberModalBottomSheetState()
+    var showOrderFilterSheet by remember { mutableStateOf(false) }
+
+    // 언어 필터 바텀시트 상태 (skipPartiallyExpanded = true로 처음부터 확장)
+    val languageFilterSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showLanguageFilterSheet by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -125,6 +145,7 @@ private fun FreeBoardContent(
                         onValueChange = { searchText = it },
                         onSearch = {
                             keyboardController?.hide()
+                            focusManager.clearFocus()
                             onIntent(FreeBoardContract.Intent.OnSearchSubmit(searchText))
                         },
                         placeholder = stringResource(R.string.freeboard_search),
@@ -144,12 +165,12 @@ private fun FreeBoardContent(
                     ) {
                         // Language Filter
                         FilterButton(
-                            text = if (state.selectedLanguageId.isEmpty()) {
+                            text = if (state.selectedLanguageId.isEmpty() || state.selectedLanguageId == "all") {
                                 stringResource(R.string.filter_all_language)
                             } else {
                                 state.selectedLanguage ?: stringResource(R.string.filter_all_language)
                             },
-                            onClick = { onIntent(FreeBoardContract.Intent.OnLanguageFilterClick) }
+                            onClick = { showLanguageFilterSheet = true }
                         )
 
                         Spacer(modifier = Modifier.width(10.dp))
@@ -163,7 +184,7 @@ private fun FreeBoardContent(
                                 FreeBoardContract.State.FILTER_HITS_ORDER -> stringResource(R.string.order_hit)
                                 else -> stringResource(R.string.freeboard_order_newest)
                             },
-                            onClick = { /* Show filter bottom sheet */ }
+                            onClick = { showOrderFilterSheet = true }
                         )
                     }
                 }
@@ -276,6 +297,53 @@ private fun FreeBoardContent(
                     .size(53.dp)
                     .clickable { onIntent(FreeBoardContract.Intent.OnWriteClick) },
                 tint = androidx.compose.ui.graphics.Color.Unspecified
+            )
+        }
+    }
+
+    // 정렬 필터 바텀시트
+    if (showOrderFilterSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showOrderFilterSheet = false },
+            sheetState = orderFilterSheetState,
+            containerColor = ColorPalette.gray100
+        ) {
+            OrderFilterBottomSheetContent(
+                currentOrderBy = state.orderBy,
+                onFilterSelected = { orderBy ->
+                    when (orderBy) {
+                        FreeBoardContract.State.FILTER_DATE_ORDER -> onIntent(FreeBoardContract.Intent.OnFilterLatest)
+                        FreeBoardContract.State.FILTER_LIKE_ORDER -> onIntent(FreeBoardContract.Intent.OnFilterLike)
+                        FreeBoardContract.State.FILTER_COMMENT_ORDER -> onIntent(FreeBoardContract.Intent.OnFilterComments)
+                        FreeBoardContract.State.FILTER_HITS_ORDER -> onIntent(FreeBoardContract.Intent.OnFilterViewCount)
+                    }
+                    scope.launch {
+                        orderFilterSheetState.hide()
+                        showOrderFilterSheet = false
+                    }
+                }
+            )
+        }
+    }
+
+    // 언어 필터 바텀시트 (화면의 70% 높이 고정, 내부 스크롤)
+    if (showLanguageFilterSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showLanguageFilterSheet = false },
+            sheetState = languageFilterSheetState,
+            containerColor = ColorPalette.gray100,
+            sheetMaxWidth = BottomSheetDefaults.SheetMaxWidth
+        ) {
+            LanguageFilterBottomSheetContent(
+                currentLanguageId = state.selectedLanguageId,
+                onLanguageSelected = { language, languageName ->
+                    onIntent(FreeBoardContract.Intent.OnLanguageFilterSelected(languageName, language.code))
+                    scope.launch {
+                        languageFilterSheetState.hide()
+                        showLanguageFilterSheet = false
+                    }
+                },
+                modifier = Modifier.fillMaxHeight(0.7f)
             )
         }
     }
@@ -447,7 +515,6 @@ private fun NoMostIdolEmptyView() {
         modifier = Modifier
             .fillMaxSize()
             .background(ColorPalette.background100)
-            .padding(bottom = 107.dp)
             .padding(horizontal = 20.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -487,6 +554,111 @@ private fun NoMostIdolEmptyView() {
                 textAlign = TextAlign.Center
             )
         }
+    }
+}
+
+/**
+ * 정렬 필터 바텀시트 내용
+ * old 프로젝트의 bottom_sheet_board_filter.xml과 동일
+ */
+@Composable
+private fun OrderFilterBottomSheetContent(
+    currentOrderBy: String,
+    onFilterSelected: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 24.dp)
+    ) {
+        // 최신순
+        FilterOptionItem(
+            text = stringResource(R.string.freeboard_order_newest),
+            isSelected = currentOrderBy == FreeBoardContract.State.FILTER_DATE_ORDER,
+            onClick = { onFilterSelected(FreeBoardContract.State.FILTER_DATE_ORDER) }
+        )
+
+        // 공감순
+        FilterOptionItem(
+            text = stringResource(R.string.order_by_like),
+            isSelected = currentOrderBy == FreeBoardContract.State.FILTER_LIKE_ORDER,
+            onClick = { onFilterSelected(FreeBoardContract.State.FILTER_LIKE_ORDER) }
+        )
+
+        // 댓글순
+        FilterOptionItem(
+            text = stringResource(R.string.freeboard_order_comments),
+            isSelected = currentOrderBy == FreeBoardContract.State.FILTER_COMMENT_ORDER,
+            onClick = { onFilterSelected(FreeBoardContract.State.FILTER_COMMENT_ORDER) }
+        )
+
+        // 조회순
+        FilterOptionItem(
+            text = stringResource(R.string.order_hit),
+            isSelected = currentOrderBy == FreeBoardContract.State.FILTER_HITS_ORDER,
+            onClick = { onFilterSelected(FreeBoardContract.State.FILTER_HITS_ORDER) }
+        )
+    }
+}
+
+/**
+ * 언어 필터 바텀시트 내용
+ */
+@Composable
+private fun LanguageFilterBottomSheetContent(
+    currentLanguageId: String,
+    onLanguageSelected: (BoardLanguage, String?) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = 24.dp)
+    ) {
+        // 모든 언어 옵션들
+        items(
+            count = BoardLanguage.all().size,
+            key = { index -> BoardLanguage.all()[index].code }
+        ) { index ->
+            val language = BoardLanguage.all()[index]
+            val languageName = stringResource(language.labelResId)
+            FilterOptionItem(
+                text = languageName,
+                isSelected = currentLanguageId == language.code ||
+                    (currentLanguageId.isEmpty() && language == BoardLanguage.ALL),
+                onClick = {
+                    onLanguageSelected(
+                        language,
+                        if (language == BoardLanguage.ALL) null else languageName
+                    )
+                }
+            )
+        }
+    }
+}
+
+/**
+ * 필터 옵션 아이템
+ */
+@Composable
+private fun FilterOptionItem(
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            fontSize = 15.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+            color = if (isSelected) ColorPalette.main else ColorPalette.gray900
+        )
     }
 }
 

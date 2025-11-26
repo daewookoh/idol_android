@@ -81,4 +81,19 @@ interface ArticlesApi {
         @Query("image_only") imageOnly: String? = null,
         @Query("is_popular") isPopular: String? = null,
     ): Response<ResponseBody>
+
+    /**
+     * 덕질게시판 (최애 탭)
+     * 최애 아이돌 관련 게시글 조회
+     */
+    @GET("articles/inventory/")
+    suspend fun getSmallTalkInventory(
+        @Query("idol") idolId: Int,
+        @Query("is_most") isMost: String = "Y",
+        @Query("type") type: String = "M",
+        @Query("order_by") orderBy: String,
+        @Query("limit") limit: Int = 50,
+        @Query("keyword") keyword: String? = null,
+        @Query("locale") locale: String? = null,
+    ): Response<ResponseBody>
 }

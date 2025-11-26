@@ -71,6 +71,23 @@ interface ArticlesRepository {
      * @param nextUrl 다음 페이지 URL
      */
     fun getArticlesNext(nextUrl: String): Flow<ApiResult<ArticlesResponse>>
+
+    /**
+     * 덕질게시판 (최애 탭) 게시물 조회
+     *
+     * @param idolId 최애 아이돌 ID
+     * @param orderBy 정렬 기준
+     * @param keyword 검색어
+     * @param locale 언어 필터
+     * @param limit 한 번에 가져올 개수
+     */
+    fun getMyFavoriteArticles(
+        idolId: Int,
+        orderBy: String,
+        keyword: String? = null,
+        locale: String? = null,
+        limit: Int = 50
+    ): Flow<ApiResult<ArticlesResponse>>
 }
 
 /**

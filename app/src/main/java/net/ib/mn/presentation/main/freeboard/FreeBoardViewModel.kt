@@ -102,7 +102,8 @@ class FreeBoardViewModel @Inject constructor(
             val currentState = uiState.value
             val orderBy = currentState.orderBy
             val keyword = currentState.searchKeyword?.takeIf { it.isNotEmpty() }
-            val locale = currentState.selectedLanguageId.takeIf { it.isNotEmpty() }
+            // "all"이거나 빈 문자열이면 locale을 null로 보냄
+            val locale = currentState.selectedLanguageId.takeIf { it.isNotEmpty() && it != "all" }
             val selectedTagId = currentState.selectedTagId
 
             Log.d(TAG, "loadArticles: selectedTagId=$selectedTagId, orderBy=$orderBy, keyword=$keyword, locale=$locale")
@@ -133,6 +134,17 @@ class FreeBoardViewModel @Inject constructor(
                 FreeBoardContract.State.TAG_ID_ALL -> {
                     Log.d(TAG, "Calling getFreeBoardAll")
                     articlesRepository.getFreeBoardAll(
+                        orderBy = orderBy,
+                        keyword = keyword,
+                        locale = locale
+                    )
+                }
+                FreeBoardContract.State.TAG_ID_MY_FAVORITE -> {
+                    // 최애 탭: 최애 아이돌 ID로 덕질게시판 API 호출
+                    val mostIdolId = preferencesManager.getMostIdolId() ?: 0
+                    Log.d(TAG, "Calling getMyFavoriteArticles with mostIdolId=$mostIdolId")
+                    articlesRepository.getMyFavoriteArticles(
+                        idolId = mostIdolId,
                         orderBy = orderBy,
                         keyword = keyword,
                         locale = locale

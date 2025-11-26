@@ -204,6 +204,56 @@ class ArticlesRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getMyFavoriteArticles(
+        idolId: Int,
+        orderBy: String,
+        keyword: String?,
+        locale: String?,
+        limit: Int
+    ): Flow<ApiResult<ArticlesResponse>> = flow {
+        emit(ApiResult.Loading)
+
+        try {
+            Log.d(TAG, "getMyFavoriteArticles: idolId=$idolId, orderBy=$orderBy, keyword=$keyword, locale=$locale")
+            val response = articlesApi.getSmallTalkInventory(
+                idolId = idolId,
+                isMost = "Y",
+                type = "M",
+                orderBy = orderBy,
+                limit = limit,
+                keyword = keyword,
+                locale = locale
+            )
+
+            if (response.isSuccessful && response.body() != null) {
+                val bodyString = response.body()!!.string()
+                val articlesResponse = parseArticlesResponse(bodyString)
+                emit(ApiResult.Success(articlesResponse))
+            } else {
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code(),
+                message = "HTTP ${e.code()}: ${e.message()}"
+            ))
+        } catch (e: IOException) {
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Network error: ${e.message}"
+            ))
+        } catch (e: Exception) {
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Unknown error: ${e.message}"
+            ))
+        }
+    }
+
     /**
      * API 응답 JSON을 ArticlesResponse로 파싱
      */
