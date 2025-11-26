@@ -4,6 +4,7 @@ import net.ib.mn.base.UiEffect
 import net.ib.mn.base.UiIntent
 import net.ib.mn.base.UiState
 import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.domain.model.NoticeModel
 import net.ib.mn.domain.model.TagModel
 
 /**
@@ -17,6 +18,7 @@ class FreeBoardContract {
         val isRefreshing: Boolean = false,
         val tags: List<TagModel> = emptyList(),
         val selectedTagId: Int = TAG_ID_HOT,
+        val notices: List<NoticeModel> = emptyList(),  // 공지사항/고정글 리스트
         val articles: List<ArticleModel> = emptyList(),
         val totalCount: Int = 0,
         val hasMore: Boolean = true,

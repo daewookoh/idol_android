@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flow
 import net.ib.mn.data.remote.api.ArticlesApi
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.domain.model.NoticeModel
 import net.ib.mn.domain.repository.ArticlesRepository
 import net.ib.mn.domain.repository.ArticlesResponse
 import org.json.JSONObject
@@ -213,12 +214,40 @@ class ArticlesRepositoryImpl @Inject constructor(
         val jsonObject = JSONObject(bodyString)
         val meta = jsonObject.optJSONObject("meta")
         val objectsArray = jsonObject.optJSONArray("objects")
+        val topNoticesArray = jsonObject.optJSONArray("top_notices")
 
-        Log.d(TAG, "parseArticlesResponse: meta=$meta, objectsArray size=${objectsArray?.length()}")
+        Log.d(TAG, "parseArticlesResponse: meta=$meta, objectsArray size=${objectsArray?.length()}, topNotices size=${topNoticesArray?.length()}")
 
         val totalCount = meta?.optInt("total_count", 0) ?: 0
         val nextUrl = meta?.optString("next")?.takeIf { it.isNotEmpty() && it != "null" }
 
+        // 공지사항/고정글 파싱
+        val notices = if (topNoticesArray != null && topNoticesArray.length() > 0) {
+            try {
+                val noticeList = mutableListOf<NoticeModel>()
+                for (i in 0 until topNoticesArray.length()) {
+                    val noticeJson = topNoticesArray.getJSONObject(i)
+                    val notice = NoticeModel(
+                        id = noticeJson.optString("id", ""),
+                        title = noticeJson.optString("title", ""),
+                        content = noticeJson.optString("content", ""),
+                        contentHtml = noticeJson.optString("content_html", ""),
+                        createdAt = noticeJson.optLong("created_at", 0L),
+                        isOpen = noticeJson.optBoolean("is_open", false)
+                    )
+                    noticeList.add(notice)
+                }
+                Log.d(TAG, "parseArticlesResponse: parsed ${noticeList.size} notices")
+                noticeList
+            } catch (e: Exception) {
+                Log.e(TAG, "parseArticlesResponse: Failed to parse notices", e)
+                emptyList()
+            }
+        } else {
+            emptyList()
+        }
+
+        // 게시글 파싱
         val articles = if (objectsArray != null && objectsArray.length() > 0) {
             try {
                 val listType = object : TypeToken<List<ArticleModel>>() {}.type
@@ -235,6 +264,7 @@ class ArticlesRepositoryImpl @Inject constructor(
         }
 
         return ArticlesResponse(
+            notices = notices,
             articles = articles,
             totalCount = totalCount,
             nextUrl = nextUrl

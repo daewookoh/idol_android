@@ -158,7 +158,7 @@ class FreeBoardViewModel @Inject constructor(
                     }
                     is ApiResult.Success -> {
                         val response = result.data
-                        Log.d(TAG, "ApiResult.Success: articles=${response.articles.size}, totalCount=${response.totalCount}, nextUrl=${response.nextUrl}")
+                        Log.d(TAG, "ApiResult.Success: notices=${response.notices.size}, articles=${response.articles.size}, totalCount=${response.totalCount}, nextUrl=${response.nextUrl}")
                         nextUrl = response.nextUrl
 
                         val existingArticles = uiState.value.articles
@@ -168,17 +168,25 @@ class FreeBoardViewModel @Inject constructor(
                             response.articles
                         }
 
+                        // 공지사항은 첫 로드에만 설정 (loadMore 시에는 유지)
+                        val notices = if (isLoadMore) {
+                            uiState.value.notices
+                        } else {
+                            response.notices
+                        }
+
                         setState {
                             copy(
                                 isLoading = false,
                                 isRefreshing = false,
+                                notices = notices,
                                 articles = newArticles,
                                 totalCount = response.totalCount,
                                 hasMore = response.nextUrl != null,
-                                isEmpty = newArticles.isEmpty()
+                                isEmpty = newArticles.isEmpty() && notices.isEmpty()
                             )
                         }
-                        Log.d(TAG, "State updated: articles=${newArticles.size}, isEmpty=${newArticles.isEmpty()}")
+                        Log.d(TAG, "State updated: notices=${notices.size}, articles=${newArticles.size}, isEmpty=${newArticles.isEmpty() && notices.isEmpty()}")
                     }
                     is ApiResult.Error -> {
                         Log.e(TAG, "ApiResult.Error: ${result.message}", result.exception)

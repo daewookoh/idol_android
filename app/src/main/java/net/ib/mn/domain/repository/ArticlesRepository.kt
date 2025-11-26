@@ -3,6 +3,7 @@ package net.ib.mn.domain.repository
 import kotlinx.coroutines.flow.Flow
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.domain.model.NoticeModel
 
 /**
  * Articles Repository 인터페이스
@@ -76,6 +77,7 @@ interface ArticlesRepository {
  * 게시글 목록 응답 모델
  */
 data class ArticlesResponse(
+    val notices: List<NoticeModel> = emptyList(),  // 공지사항/고정글 (top_notices)
     val articles: List<ArticleModel>,
     val totalCount: Int,
     val nextUrl: String?

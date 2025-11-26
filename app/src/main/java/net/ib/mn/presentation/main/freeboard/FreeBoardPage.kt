@@ -29,9 +29,11 @@ import kotlinx.coroutines.flow.collectLatest
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.ArticleUser
+import net.ib.mn.domain.model.NoticeModel
 import net.ib.mn.domain.model.TagModel
 import net.ib.mn.ui.components.ExoBoardItem
 import net.ib.mn.ui.components.ExoBoardItemType
+import net.ib.mn.ui.components.ExoBoardNoticeItem
 import net.ib.mn.ui.components.ExoSearchBox
 import net.ib.mn.ui.theme.ColorPalette
 
@@ -220,15 +222,32 @@ private fun FreeBoardContent(
                                 .fillMaxSize()
                                 .background(ColorPalette.background100)
                         ) {
+                            // 공지사항/고정글 (상단에 표시)
+                            items(
+                                count = state.notices.size,
+                                key = { index -> "notice_${state.notices[index].id}" },
+                                contentType = { "notice" }
+                            ) { index ->
+                                val notice = state.notices[index]
+                                val isLastNotice = index == state.notices.size - 1
+
+                                key(notice.id) {
+                                    ExoBoardNoticeItem(
+                                        notice = notice,
+                                        onItemClick = { /* Navigate to notice detail (WebView) */ },
+                                        showDivider = !isLastNotice // 마지막 공지는 구분선 표시 안함
+                                    )
+                                }
+                            }
+
+                            // 게시글 목록
                             items(
                                 count = state.articles.size,
                                 key = { index -> state.articles[index].id },
-                                // 성능 최적화: contentType 지정으로 아이템 재사용 최적화
                                 contentType = { "article" }
                             ) { index ->
                                 val article = state.articles[index]
 
-                                // 성능 최적화: 개별 아이템을 key로 recomposition 최소화
                                 key(article.id) {
                                     ExoBoardItem(
                                         article = article,

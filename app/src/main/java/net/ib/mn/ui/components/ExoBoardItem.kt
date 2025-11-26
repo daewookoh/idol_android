@@ -25,6 +25,7 @@ import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleFile
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.ArticleUser
+import net.ib.mn.domain.model.NoticeModel
 import net.ib.mn.ui.theme.ColorPalette
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,7 +35,8 @@ import java.util.*
  */
 enum class ExoBoardItemType {
     NORMAL,  // 전체 표시 (프로필, 제목, 내용, 이미지, 통계, 액션 버튼)
-    MINI     // 간단 표시 (제목, 내용 한줄, 작성자-작성시간, 좋아요/댓글/조회수)
+    MINI,    // 간단 표시 (제목, 내용 한줄, 작성자-작성시간, 좋아요/댓글/조회수)
+    NOTICE   // 공지사항/고정글 (핀 아이콘 + 제목)
 }
 
 /**
@@ -89,6 +91,67 @@ fun ExoBoardItem(
                 onItemClick = onItemClick,
                 modifier = modifier,
                 showPopularIcon = showPopularIcon
+            )
+        }
+        ExoBoardItemType.NOTICE -> {
+            // NOTICE 타입은 ExoBoardNoticeItem을 직접 사용해야 함
+            // 이 케이스는 사용되지 않음 (ArticleModel이 아닌 NoticeModel 사용)
+        }
+    }
+}
+
+/**
+ * 공지사항/고정글 아이템 컴포넌트
+ * old 프로젝트의 item_board_notice.xml 레이아웃을 Compose로 구현
+ *
+ * @param notice 공지사항 모델
+ * @param onItemClick 아이템 클릭 콜백
+ * @param modifier Modifier
+ * @param showDivider 하단 구분선 표시 여부
+ */
+@Composable
+fun ExoBoardNoticeItem(
+    notice: NoticeModel,
+    onItemClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    showDivider: Boolean = true
+) {
+    Column(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(34.dp)
+                .background(ColorPalette.main100)
+                .clickable(onClick = onItemClick)
+                .padding(horizontal = 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 핀 아이콘
+            Icon(
+                painter = painterResource(R.drawable.icon_community_pin),
+                contentDescription = "Notice",
+                tint = androidx.compose.ui.graphics.Color.Unspecified
+            )
+
+            Spacer(modifier = Modifier.width(5.dp))
+
+            // 공지 제목
+            Text(
+                text = notice.title,
+                fontSize = 12.sp,
+                color = ColorPalette.mainLight,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        // 하단 구분선
+        if (showDivider) {
+            HorizontalDivider(
+                thickness = 0.3.dp,
+                color = ColorPalette.main300
             )
         }
     }
