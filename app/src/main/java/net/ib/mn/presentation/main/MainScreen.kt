@@ -74,6 +74,7 @@ fun MainScreen(
         topBarViewModel.startTimer()
         topBarViewModel.checkNewNotification()
         viewModel.checkEvent()  // 웰컴 미션 버튼 표시 여부 API 호출
+        viewModel.onTabSelected(selectedTab)  // 초기 탭 선택 상태 설정 (UDP 반응 활성화)
     }
 
     // 로그아웃 완료 시 네비게이션 처리
@@ -205,7 +206,10 @@ fun MainScreen(
                 defaultBackgroundColor = colorResource(id = R.color.background_200),
                 defaultBorderColor = colorResource(id = R.color.gray150),
                 defaultTextColor = colorResource(id = R.color.text_default),
-                onTabSelected = { selectedTab = it }
+                onTabSelected = {
+                    selectedTab = it
+                    viewModel.onTabSelected(it)  // UDP 반응 활성화/비활성화
+                }
             )
         }
     ) {

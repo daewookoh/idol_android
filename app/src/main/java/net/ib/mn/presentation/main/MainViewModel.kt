@@ -5,14 +5,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.ib.mn.R
+import net.ib.mn.util.Constants
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.local.UserInfo
+import net.ib.mn.data.remote.udp.IdolBroadcastManager
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.UserRepository
 import net.ib.mn.util.DeviceUtil
@@ -24,6 +29,8 @@ class MainViewModel @Inject constructor(
     private val chartDatabaseRepository: net.ib.mn.data.repository.ChartRankingRepository,
     private val userRepository: UserRepository,
     private val deviceUtil: DeviceUtil,
+    private val idolBroadcastManager: IdolBroadcastManager,
+    private val idolRepository: net.ib.mn.domain.repository.IdolRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -40,6 +47,9 @@ class MainViewModel @Inject constructor(
     // 즉시 반응하는 로컬 카테고리 상태 (UI 반응성 개선)
     private val _currentCategory = MutableStateFlow<String?>(null)
     val currentCategory: StateFlow<String?> = _currentCategory.asStateFlow()
+
+    // UDP 종료 지연 Job (다른 탭에 15초 이상 머물 때만 UDP 종료)
+    private var udpStopJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -92,6 +102,9 @@ class MainViewModel @Inject constructor(
                 android.util.Log.d(TAG, "[MainViewModel] ✓ Category updated: $category")
             }
         }
+
+        // 기존 콜백 제거 - 새 전략에서는 onTabSelected()에서 직접 API 호출 여부를 판단
+        // idolBroadcastManager.setOnReactionEnabledCallback { ... }
     }
 
     /**
@@ -109,11 +122,26 @@ class MainViewModel @Inject constructor(
 
     /**
      * 앱이 백그라운드에서 포그라운드로 돌아올 때 호출
+     * UDP 연결이 끊어진 경우에만 백그라운드 동안 놓친 데이터를 API로 복구
      */
     fun onAppResume() {
         android.util.Log.d(TAG, "[MainViewModel] ========================================")
-        android.util.Log.d(TAG, "[MainViewModel] 👁️ App resumed - refreshing all ranking caches")
+        android.util.Log.d(TAG, "[MainViewModel] 👁️ App resumed")
         android.util.Log.d(TAG, "[MainViewModel] ========================================")
+
+        // UDP 연결 상태 확인
+        val isUdpConnected = idolBroadcastManager.isConnected()
+        android.util.Log.d(TAG, "[MainViewModel] UDP connection status: ${if (isUdpConnected) "CONNECTED" else "DISCONNECTED"}")
+
+        // UDP 연결이 끊어진 경우에만 API로 데이터 복구
+        if (!isUdpConnected) {
+            android.util.Log.d(TAG, "[MainViewModel] 🔄 UDP disconnected - refreshing all charts from API")
+            viewModelScope.launch(Dispatchers.IO) {
+                chartDatabaseRepository.refreshAllChartsFromApi(idolRepository)
+            }
+        } else {
+            android.util.Log.d(TAG, "[MainViewModel] ✅ UDP connected - no API refresh needed")
+        }
     }
 
     /**
@@ -145,6 +173,67 @@ class MainViewModel @Inject constructor(
                 android.util.Log.d(TAG, "[MainViewModel] ✓ Logout completed successfully")
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "[MainViewModel] ❌ Logout failed: ${e.message}", e)
+            }
+        }
+    }
+
+    /**
+     * 바텀 네비게이션 탭 변경 시 호출
+     *
+     * 새 전략 (서버 비용 절감):
+     * - 랭킹(0)/나의최애(1) 탭: UDP 즉시 활성화 + 지연 종료 Job 취소 + UDP 상태 기반 API 호출
+     * - 다른 탭: 15초 후 UDP 종료 (15초 내 복귀 시 UDP 유지)
+     *
+     * API 호출 기준:
+     * - UDP가 살아있으면 → API 호출 불필요 (실시간 데이터 유지)
+     * - UDP가 죽어있으면 → API 호출 필요 (놓친 데이터 복구)
+     *
+     * @param tabIndex 선택된 탭 인덱스 (0: 랭킹, 1: 나의 최애, 2: 내정보, 3: 자유게시판, 4: 메뉴)
+     */
+    fun onTabSelected(tabIndex: Int) {
+        val tabName = when (tabIndex) {
+            0 -> "Ranking"
+            1 -> "MyFavorite"
+            2 -> "MyInfo"
+            3 -> "FreeBoard"
+            4 -> "Menu"
+            else -> "Unknown"
+        }
+
+        val isRankingOrFavoriteTab = tabIndex == 0 || tabIndex == 1
+
+        if (isRankingOrFavoriteTab) {
+            // 랭킹/나의최애 탭 진입: 지연 종료 취소 + UDP 상태 확인
+            udpStopJob?.cancel()
+            udpStopJob = null
+
+            val isUdpAlive = idolBroadcastManager.isReactionEnabled()
+
+            if (isUdpAlive) {
+                // UDP가 살아있음 → API 호출 불필요
+                android.util.Log.d(TAG, "[MainViewModel] 📌 Tab: $tabName - UDP alive, no API refresh needed")
+            } else {
+                // UDP가 죽어있음 → UDP 활성화 + API 호출
+                android.util.Log.d(TAG, "[MainViewModel] 📌 Tab: $tabName - UDP dead, enabling + API refresh")
+                idolBroadcastManager.setReactionEnabled(true, "MainViewModel.onTabSelected($tabName)")
+
+                viewModelScope.launch(Dispatchers.IO) {
+                    chartDatabaseRepository.refreshAllChartsFromApi(idolRepository)
+                }
+            }
+        } else {
+            // 다른 탭 진입: 15초 후 UDP 종료 (기존 Job이 있으면 유지)
+            if (udpStopJob == null) {
+                android.util.Log.d(TAG, "[MainViewModel] 📌 Tab: $tabName - scheduling UDP stop in ${Constants.UDP_STOP_DELAY_MS / 1000}s")
+
+                udpStopJob = viewModelScope.launch {
+                    delay(Constants.UDP_STOP_DELAY_MS)
+                    android.util.Log.d(TAG, "[MainViewModel] ⏰ ${Constants.UDP_STOP_DELAY_MS / 1000}s passed - stopping UDP reaction")
+                    idolBroadcastManager.setReactionEnabled(false, "MainViewModel.delayedStop($tabName)")
+                    udpStopJob = null
+                }
+            } else {
+                android.util.Log.d(TAG, "[MainViewModel] 📌 Tab: $tabName - UDP stop already scheduled")
             }
         }
     }

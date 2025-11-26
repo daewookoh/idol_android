@@ -95,6 +95,60 @@ class IdolBroadcastManager @Inject constructor(
     val updateEvent: SharedFlow<Set<Int>> = _updateEvent.asSharedFlow()
 
     /**
+     * 반응 활성화 상태
+     * true: UDP 수신 시 DB 업데이트 및 이벤트 발행
+     * false: UDP 수신만 하고 반응하지 않음 (리스닝만 유지)
+     *
+     * 랭킹 페이지나 나의 최애 페이지가 선택되었을 때만 true로 설정
+     */
+    @Volatile
+    private var isReactionEnabled = false
+
+    /**
+     * 반응 활성화 시 콜백 (데이터 새로고침용)
+     * UDP 비활성화 상태에서 활성화로 전환 시 호출되어 놓친 데이터를 API로 복구
+     */
+    private var onReactionEnabledCallback: (() -> Unit)? = null
+
+    /**
+     * 반응 활성화 시 콜백 설정
+     * @param callback 콜백 함수 (null이면 콜백 제거)
+     */
+    fun setOnReactionEnabledCallback(callback: (() -> Unit)?) {
+        onReactionEnabledCallback = callback
+    }
+
+    /**
+     * 반응 활성화/비활성화 설정
+     * @param enabled true: 반응 활성화, false: 반응 비활성화
+     * @param source 호출 소스 (로그용)
+     */
+    fun setReactionEnabled(enabled: Boolean, source: String = "Unknown") {
+        val wasEnabled = isReactionEnabled
+        isReactionEnabled = enabled
+        Log.i(TAG, "🔔 Reaction ${if (enabled) "ENABLED" else "DISABLED"} by $source (was: $wasEnabled)")
+
+        // 비활성화 → 활성화 전환 시 콜백 호출 (놓친 데이터 복구)
+        if (enabled && !wasEnabled) {
+            Log.i(TAG, "🔄 Triggering data refresh callback (recovering missed UDP data)")
+            onReactionEnabledCallback?.invoke()
+        }
+    }
+
+    /**
+     * 현재 반응 활성화 상태 조회
+     */
+    fun isReactionEnabled(): Boolean = isReactionEnabled
+
+    /**
+     * UDP 연결 상태 조회
+     * @return true: 연결됨, false: 연결 끊김
+     */
+    fun isConnected(): Boolean {
+        return socket?.isConnected == true && socket?.isClosed == false
+    }
+
+    /**
      * UDP 연결 설정
      */
     fun setupConnection(url: String, userId: Int) {
@@ -214,7 +268,14 @@ class IdolBroadcastManager @Inject constructor(
                             Log.d(TAG, "   hex: ${bytesToHex(data.copyOf(minOf(data.size, 64)))}")
                         }
 
+                        // 반응 활성화 상태 체크 (랭킹/나의최애 페이지 선택 시에만 반응)
+                        if (!isReactionEnabled) {
+                            Log.d(TAG, "⏸️ UDP received but reaction DISABLED - skipping parse (listening only)")
+                            continue
+                        }
+
                         if (!updatingAll) {
+                            Log.d(TAG, "▶️ UDP received and reaction ENABLED - processing parse")
                             launch {
                                 parse(ByteBuffer.wrap(data), data.size)
                             }

@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.local.dao.IdolDao
+import net.ib.mn.data.remote.dto.toEntity
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.util.Constants
@@ -258,6 +259,68 @@ class ChartRankingRepository @Inject constructor(
 
         } catch (e: Exception) {
             Log.e(TAG, "❌ Failed to update from UDP: ${e.message}", e)
+        }
+    }
+
+    /**
+     * API를 통해 모든 차트의 아이돌 데이터 새로고침
+     * UDP 비활성화 상태에서 활성화로 전환 시 호출하여 놓친 데이터를 복구
+     *
+     * old 프로젝트의 NewRankingViewModel.refreshData()와 동일한 패턴
+     *
+     * @param idolRepository IdolRepository (API 호출용)
+     */
+    suspend fun refreshAllChartsFromApi(idolRepository: net.ib.mn.domain.repository.IdolRepository) {
+        try {
+            val startTime = System.currentTimeMillis()
+
+            // 1. 모든 차트에서 아이돌 ID 수집
+            val allIdolIds = mutableSetOf<Int>()
+            DEFAULT_CHART_CODES.forEach { chartCode ->
+                preferencesManager.getChartRanking(chartCode).forEach { item ->
+                    item.id.toIntOrNull()?.let { allIdolIds.add(it) }
+                }
+            }
+
+            if (allIdolIds.isEmpty()) {
+                Log.d(TAG, "⚠️ refreshAllChartsFromApi: No idol IDs - charts may not be initialized yet")
+                return
+            }
+
+            // 2. HTTP 414 방지를 위해 100개씩 청크로 나누어 API 호출
+            val chunks = allIdolIds.toList().chunked(100)
+            var totalUpdatedIdols = 0
+            var apiSuccess = false
+
+            for (chunk in chunks) {
+                idolRepository.getIdolsByIds(chunk, fields = null).collect { result ->
+                    when (result) {
+                        is ApiResult.Success -> {
+                            result.data.data?.let { idolDataList ->
+                                if (idolDataList.isNotEmpty()) {
+                                    idolDao.upsertIdols(idolDataList.map { it.toEntity() })
+                                    totalUpdatedIdols += idolDataList.size
+                                    apiSuccess = true
+                                }
+                            }
+                        }
+                        is ApiResult.Error -> Log.e(TAG, "❌ refreshAllChartsFromApi error: ${result.message}")
+                        is ApiResult.Loading -> { }
+                    }
+                }
+            }
+
+            // 3. API 성공 시 모든 차트 새로고침 (정렬 재계산)
+            if (apiSuccess) {
+                coroutineScope {
+                    DEFAULT_CHART_CODES.map { chartCode ->
+                        async { refreshChart(chartCode) }
+                    }.awaitAll()
+                }
+                Log.d(TAG, "✅ refreshAllChartsFromApi: Updated $totalUpdatedIdols idols in ${System.currentTimeMillis() - startTime}ms")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ refreshAllChartsFromApi error", e)
         }
     }
 
