@@ -766,8 +766,14 @@ class UserRepositoryImpl @Inject constructor(
                             }
 
                             if (isInitialLoad) {
-                                preferencesManager.setFreeBoardSelectedTagId(net.ib.mn.util.Constants.MY_FAVORITE_TAG_ID)
-                                android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ✓ Initial load: Setting FreeBoardSelectedTagId to ${net.ib.mn.util.Constants.MY_FAVORITE_TAG_ID} (MY_FAVORITE_TAG)")
+                                // 실서버일 경우 최애(MY_FAVORITE)를, 테스트서버일 경우 HOT(0)을 기본 탭으로 설정
+                                val defaultTagId = if (net.ib.mn.util.ServerUrl.isTestServer()) {
+                                    net.ib.mn.presentation.main.freeboard.FreeBoardContract.State.TAG_ID_HOT
+                                } else {
+                                    net.ib.mn.util.Constants.MY_FAVORITE_TAG_ID
+                                }
+                                preferencesManager.setFreeBoardSelectedTagId(defaultTagId)
+                                android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ✓ Initial load: Setting FreeBoardSelectedTagId to $defaultTagId (${if (net.ib.mn.util.ServerUrl.isTestServer()) "HOT - TestServer" else "MY_FAVORITE - Production"})")
                             }
 
                             kotlinx.coroutines.delay(100)
