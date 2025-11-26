@@ -791,4 +791,82 @@ class UserRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override fun checkEvent(
+        version: String,
+        gmail: String,
+        isVM: Boolean,
+        isRooted: Boolean,
+        deviceId: String
+    ): Flow<ApiResult<CheckEventResponse>> = flow {
+        emit(ApiResult.Loading)
+
+        try {
+            // old 프로젝트와 동일한 is_vm 파라미터 변환
+            // T: VM이면서 루팅됨, R: 루팅됨, F: 정상
+            val paramVM = when {
+                isVM && isRooted -> "T"
+                isRooted -> "R"
+                else -> "F"
+            }
+
+            android.util.Log.d("CheckEventAPI", "========================================")
+            android.util.Log.d("CheckEventAPI", "API Request:")
+            android.util.Log.d("CheckEventAPI", "  - version: $version")
+            android.util.Log.d("CheckEventAPI", "  - gmail: $gmail")
+            android.util.Log.d("CheckEventAPI", "  - isVM: $paramVM")
+            android.util.Log.d("CheckEventAPI", "  - deviceId: $deviceId")
+            android.util.Log.d("CheckEventAPI", "========================================")
+
+            val response = userApi.checkEvent(version, gmail, paramVM, deviceId)
+
+            if (response.isSuccessful && response.body() != null) {
+                val body = response.body()!!
+
+                android.util.Log.d("CheckEventAPI", "========================================")
+                android.util.Log.d("CheckEventAPI", "API Response:")
+                android.util.Log.d("CheckEventAPI", "  - success: ${body.success}")
+                android.util.Log.d("CheckEventAPI", "  - showWelcomeMission: ${body.showWelcomeMission}")
+                android.util.Log.d("CheckEventAPI", "  - mostPicks: ${body.mostPicks}")
+                android.util.Log.d("CheckEventAPI", "  - guideUrl: ${body.guideUrl}")
+                android.util.Log.d("CheckEventAPI", "  - banners count: ${body.banners?.size ?: 0}")
+                android.util.Log.d("CheckEventAPI", "========================================")
+
+                if (body.success) {
+                    emit(ApiResult.Success(body))
+                } else {
+                    emit(ApiResult.Error(
+                        exception = Exception("API returned success=false"),
+                        code = response.code()
+                    ))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                android.util.Log.e("CheckEventAPI", "HTTP ${response.code()}: $errorBody")
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            android.util.Log.e("CheckEventAPI", "HttpException", e)
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code(),
+                message = "HTTP ${e.code()}: ${e.message()}"
+            ))
+        } catch (e: IOException) {
+            android.util.Log.e("CheckEventAPI", "IOException", e)
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Network error: ${e.message}"
+            ))
+        } catch (e: Exception) {
+            android.util.Log.e("CheckEventAPI", "Exception", e)
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Unknown error: ${e.message}"
+            ))
+        }
+    }
 }

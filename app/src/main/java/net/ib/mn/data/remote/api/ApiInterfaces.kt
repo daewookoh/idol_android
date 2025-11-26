@@ -97,6 +97,24 @@ interface UserApi {
         @Body body: FindPasswordRequest
     ): Response<CommonResponse>
 
+    /**
+     * 이벤트 체크 (웰컴 미션, 배너 등)
+     * old 프로젝트와 동일: GET users/check_event/
+     *
+     * @param version 앱 버전
+     * @param gmail 구글 이메일 (광고 ID 대용)
+     * @param isVM VM/루팅 여부 ("T", "R", "F")
+     * @param deviceId 디바이스 ID
+     * @return CheckEventResponse with show_welcome_mission, banners, etc.
+     */
+    @GET("users/check_event/")
+    suspend fun checkEvent(
+        @Query("version") version: String,
+        @Query("gmail") gmail: String,
+        @Query("is_vm") isVM: String,
+        @Query("device_id") deviceId: String
+    ): Response<CheckEventResponse>
+
     // NOTE: 추가 가능한 User 엔드포인트 (필요 시 구현)
     // - POST /users/iab_verify/ - IAB 검증
     // - POST /users/payments/google_item/ - Google Play 아이템 검증

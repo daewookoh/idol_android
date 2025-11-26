@@ -122,4 +122,23 @@ interface UserRepository {
      * @return Result<Boolean> - 성공 시 true, 401 에러 시 Exception("Unauthorized")
      */
     suspend fun loadAndSaveUserSelf(cacheControl: String? = "no-cache", isInitialLoad: Boolean = false): Result<Boolean>
+
+    /**
+     * 이벤트 체크 (웰컴 미션, 배너 등)
+     * old 프로젝트의 MainViewModel.requestEvent()와 동일
+     *
+     * @param version 앱 버전
+     * @param gmail 구글 이메일 (광고 ID 대용)
+     * @param isVM VM 여부
+     * @param isRooted 루팅 여부
+     * @param deviceId 디바이스 ID
+     * @return Flow<ApiResult<CheckEventResponse>>
+     */
+    fun checkEvent(
+        version: String,
+        gmail: String,
+        isVM: Boolean,
+        isRooted: Boolean,
+        deviceId: String
+    ): Flow<ApiResult<CheckEventResponse>>
 }

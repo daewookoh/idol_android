@@ -692,6 +692,76 @@ data class FindPasswordRequest(
  */
 
 // ============================================================
+// /users/check_event/ - 이벤트 체크 (웰컴 미션, 배너 등)
+// ============================================================
+/**
+ * checkEvent API Response
+ *
+ * old 프로젝트의 MainViewModel.requestEvent()에서 사용
+ * show_welcome_mission 필드로 웰컴 미션 버튼 표시 여부 결정
+ */
+data class CheckEventResponse(
+    @SerializedName("success")
+    val success: Boolean,
+
+    @SerializedName("show_welcome_mission")
+    val showWelcomeMission: Boolean?,
+
+    @SerializedName("most_picks")
+    val mostPicks: MostPicksData?,
+
+    @SerializedName("guide_url")
+    val guideUrl: String?,
+
+    @SerializedName("banners")
+    val banners: List<EventBanner>?,
+
+    @SerializedName("progress")
+    val progress: String?, // "Y" or "N" - 버닝타임 진행 여부
+
+    @SerializedName("burning_time")
+    val burningTime: Int?
+)
+
+/**
+ * 최애 픽 데이터
+ * API 응답: {"heartpick": [116], "miracle": false, "onepick": [678], "themepick": []}
+ */
+data class MostPicksData(
+    @SerializedName("heartpick")
+    val heartpick: List<Int>?,
+
+    @SerializedName("miracle")
+    val miracle: Boolean?,
+
+    @SerializedName("onepick")
+    val onepick: List<Int>?,
+
+    @SerializedName("themepick")
+    val themepick: List<Int>?
+)
+
+/**
+ * 이벤트 배너 정보
+ */
+data class EventBanner(
+    @SerializedName("id")
+    val id: Int?,
+
+    @SerializedName("title")
+    val title: String?,
+
+    @SerializedName("image_url")
+    val imageUrl: String?,
+
+    @SerializedName("link_url")
+    val linkUrl: String?,
+
+    @SerializedName("type")
+    val type: String?
+)
+
+// ============================================================
 // Common Response (범용)
 // ============================================================
 data class CommonResponse(

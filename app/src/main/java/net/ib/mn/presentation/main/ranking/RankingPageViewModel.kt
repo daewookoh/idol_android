@@ -77,6 +77,19 @@ class RankingPageViewModel @Inject constructor(
     private val _mostIdolId = MutableStateFlow<Int?>(null)
     val mostIdolId: StateFlow<Int?> = _mostIdolId.asStateFlow()
 
+    // 웰컴 미션 버튼 표시 상태
+    private val _showWelcomeMission = MutableStateFlow(false)
+    val showWelcomeMission: StateFlow<Boolean> = _showWelcomeMission.asStateFlow()
+
+    init {
+        // 웰컴 미션 버튼 표시 여부 구독
+        viewModelScope.launch {
+            preferencesManager.showWelcomeMission.collect { show ->
+                _showWelcomeMission.value = show
+            }
+        }
+    }
+
     /**
      * 랭킹 페이지 내 메인 탭 선택 인덱스
      * SavedStateHandle을 사용하여 바텀 네비게이션 이동 시에도 유지

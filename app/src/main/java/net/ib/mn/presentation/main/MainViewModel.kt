@@ -1,21 +1,30 @@
 package net.ib.mn.presentation.main
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import net.ib.mn.R
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.local.UserInfo
+import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.domain.repository.UserRepository
+import net.ib.mn.util.DeviceUtil
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     val preferencesManager: PreferencesManager,
-    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartRankingRepository
+    private val chartDatabaseRepository: net.ib.mn.data.repository.ChartRankingRepository,
+    private val userRepository: UserRepository,
+    private val deviceUtil: DeviceUtil,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     companion object {
@@ -136,6 +145,50 @@ class MainViewModel @Inject constructor(
                 android.util.Log.d(TAG, "[MainViewModel] ✓ Logout completed successfully")
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "[MainViewModel] ❌ Logout failed: ${e.message}", e)
+            }
+        }
+    }
+
+    /**
+     * 이벤트 체크 API 호출 (웰컴 미션, 배너 등)
+     * old 프로젝트의 MainViewModel.requestEvent()와 동일
+     *
+     * MainScreen 진입 시 호출하여 showWelcomeMission 값을 가져옴
+     */
+    fun checkEvent() {
+        viewModelScope.launch {
+            try {
+                val version = context.getString(R.string.app_version)
+                val gmail = deviceUtil.getGmail()
+                val deviceId = deviceUtil.getDeviceUUID()
+
+                android.util.Log.d(TAG, "[MainViewModel] 📡 Calling checkEvent API...")
+
+                userRepository.checkEvent(
+                    version = version,
+                    gmail = gmail,
+                    isVM = false,  // TODO: VM 감지 로직 추가 시 변경
+                    isRooted = false,  // TODO: 루팅 감지 로직 추가 시 변경
+                    deviceId = deviceId
+                ).collect { result ->
+                    when (result) {
+                        is ApiResult.Loading -> {
+                            android.util.Log.d(TAG, "[MainViewModel] checkEvent loading...")
+                        }
+                        is ApiResult.Success -> {
+                            val showWelcomeMission = result.data.showWelcomeMission ?: false
+                            android.util.Log.d(TAG, "[MainViewModel] ✓ checkEvent success: showWelcomeMission=$showWelcomeMission")
+
+                            // PreferencesManager에 저장
+                            preferencesManager.setShowWelcomeMission(showWelcomeMission)
+                        }
+                        is ApiResult.Error -> {
+                            android.util.Log.e(TAG, "[MainViewModel] ❌ checkEvent error: ${result.message}")
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e(TAG, "[MainViewModel] ❌ checkEvent exception: ${e.message}", e)
             }
         }
     }

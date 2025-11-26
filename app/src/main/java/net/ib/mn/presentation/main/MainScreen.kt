@@ -69,10 +69,11 @@ fun MainScreen(
     val coroutineScope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // 타이머 시작 및 알림 체크
+    // 타이머 시작, 알림 체크, 이벤트 체크 (웰컴 미션 버튼 등)
     LaunchedEffect(Unit) {
         topBarViewModel.startTimer()
         topBarViewModel.checkNewNotification()
+        viewModel.checkEvent()  // 웰컴 미션 버튼 표시 여부 API 호출
     }
 
     // 로그아웃 완료 시 네비게이션 처리

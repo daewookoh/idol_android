@@ -183,6 +183,9 @@ class PreferencesManager @Inject constructor(
 
         // Ranking - 최애 이동 토스트
         val KEY_HAS_SHOWN_MY_FAV_TOAST = booleanPreferencesKey("has_shown_my_fav_toast")  // 최애 이동 토스트 표시 여부
+
+        // Welcome Mission 버튼
+        val KEY_SHOW_WELCOME_MISSION = booleanPreferencesKey("show_welcome_mission")  // 웰컴 미션 버튼 표시 여부
     }
 
     // ============================================================
@@ -1188,5 +1191,33 @@ class PreferencesManager @Inject constructor(
         context.dataStore.edit { preferences ->
             preferences[KEY_HAS_SHOWN_MY_FAV_TOAST] = false
         }
+    }
+
+    // ============================================================
+    // Welcome Mission 버튼
+    // ============================================================
+
+    /**
+     * 웰컴 미션 버튼 표시 여부 Flow
+     */
+    val showWelcomeMission: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_SHOW_WELCOME_MISSION] ?: false
+        }
+
+    /**
+     * 웰컴 미션 버튼 표시 여부 설정
+     */
+    suspend fun setShowWelcomeMission(show: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_SHOW_WELCOME_MISSION] = show
+        }
+    }
+
+    /**
+     * 웰컴 미션 버튼 표시 여부 가져오기 (일회성)
+     */
+    suspend fun getShowWelcomeMission(): Boolean {
+        return context.dataStore.data.first()[KEY_SHOW_WELCOME_MISSION] ?: false
     }
 }

@@ -1,6 +1,7 @@
 package net.ib.mn.presentation.main.ranking
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -43,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -96,8 +98,23 @@ fun RankingPage(
     val showMyFavToast by viewModel.showMyFavToast.collectAsState()
     val myFavIdolPosition by viewModel.myFavIdolPosition.collectAsState()
 
+    // 웰컴 미션 버튼 상태
+    val showWelcomeMission by viewModel.showWelcomeMission.collectAsState()
+
     // 첫 번째 탭(개인)의 LazyListState (최애 이동 스크롤용)
     val firstTabListState = rememberLazyListState()
+
+    // 스크롤 시 최애 아이돌이 화면에 보이면 토스트 영구 숨김 (다시 나오지 않음)
+    LaunchedEffect(firstTabListState.firstVisibleItemIndex, firstTabListState.layoutInfo.visibleItemsInfo) {
+        if (showMyFavToast && myFavIdolPosition >= 0) {
+            val visibleItems = firstTabListState.layoutInfo.visibleItemsInfo
+            val isMyFavVisible = visibleItems.any { it.index == myFavIdolPosition }
+            if (isMyFavVisible) {
+                android.util.Log.d("RankingPage", "👀 My favorite idol is now visible at position $myFavIdolPosition - permanently hiding toast")
+                viewModel.onMyFavToastClick()  // 영구적으로 토스트 숨김 (PreferencesManager에 기록)
+            }
+        }
+    }
 
     // RankingRepository EntryPoint를 통해 주입
     val context = LocalContext.current
@@ -531,6 +548,32 @@ fun RankingPage(
                 }
             }
 
+            // 웰컴 미션 버튼 (우측 하단, 최애 토스트 위)
+            // old 프로젝트의 iv_mission과 동일한 위치
+            // ShowMyFavToast와 동일한 애니메이션 속도로 위아래 이동
+            val welcomeButtonBottomPadding by animateDpAsState(
+                targetValue = if (showMyFavToast && subPagerState.currentPage == 0) 72.dp else 4.dp,
+                animationSpec = tween(durationMillis = 300),  // slideInVertically 기본 속도와 동일
+                label = "welcomeButtonBottomPadding"
+            )
+            androidx.compose.animation.AnimatedVisibility(
+                visible = showWelcomeMission,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(
+                        end = 8.dp,
+                        bottom = welcomeButtonBottomPadding
+                    ),
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                WelcomeMissionButton(
+                    onClick = {
+                        // TODO: WelcomeMissionFragment로 이동
+                    }
+                )
+            }
+
             // 최애 이동 토스트 (하단에 오버레이)
             // 첫 번째 탭(개인)에서만 표시하고, 최애가 화면에 안 보일 때만 표시
             androidx.compose.animation.AnimatedVisibility(
@@ -539,7 +582,7 @@ fun RankingPage(
                 enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
                 exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
             ) {
-                MyFavoriteToast(
+                ShowMyFavToast(
                     onClick = {
                         // 최애 아이돌 위치로 스크롤 (3번째 위치에 보이도록)
                         coroutineScope.launch {
@@ -701,11 +744,32 @@ private fun extractTypeFromCode(code: String): String {
 }
 
 /**
+ * 웰컴 미션 버튼 컴포넌트
+ * old 프로젝트의 iv_mission (btn_welcome.xml)과 동일한 UI
+ */
+@Composable
+private fun WelcomeMissionButton(
+    onClick: () -> Unit
+) {
+    Image(
+        painter = painterResource(id = R.drawable.btn_welcome),
+        contentDescription = "Welcome Mission",
+        modifier = Modifier
+            .size(64.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            )
+    )
+}
+
+/**
  * 최애 이동 토스트 컴포넌트
  * old 프로젝트의 MostToast.kt와 동일한 UI
  */
 @Composable
-private fun MyFavoriteToast(
+private fun ShowMyFavToast(
     onClick: () -> Unit
 ) {
     Box(
