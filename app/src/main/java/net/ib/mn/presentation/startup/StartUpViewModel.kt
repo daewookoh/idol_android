@@ -364,6 +364,15 @@ class StartUpViewModel @Inject constructor(
                         configData.noticeList?.let { preferencesManager.setNotices(it) }
                         configData.eventList?.let { preferencesManager.setEvents(it) }
 
+                        // New Picks (하트픽, 원픽 NEW 뱃지)
+                        configData.newPicks?.let { newPicks ->
+                            preferencesManager.setNewPicks(
+                                heartpick = newPicks.heartpick,
+                                onepick = newPicks.onepick,
+                                themepick = newPicks.themepick
+                            )
+                        }
+
                         android.util.Log.d(TAG, "✓ ConfigStartup data saved to DataStore")
                     }
                     // NOTE: 메모리 캐싱이 필요한 경우 구현 방법:

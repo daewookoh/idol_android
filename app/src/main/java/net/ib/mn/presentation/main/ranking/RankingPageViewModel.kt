@@ -81,11 +81,32 @@ class RankingPageViewModel @Inject constructor(
     private val _showWelcomeMission = MutableStateFlow(false)
     val showWelcomeMission: StateFlow<Boolean> = _showWelcomeMission.asStateFlow()
 
+    // NEW 뱃지 표시 상태 (하트픽, 원픽)
+    private val _hasNewHeartPick = MutableStateFlow(false)
+    val hasNewHeartPick: StateFlow<Boolean> = _hasNewHeartPick.asStateFlow()
+
+    private val _hasNewOnePick = MutableStateFlow(false)
+    val hasNewOnePick: StateFlow<Boolean> = _hasNewOnePick.asStateFlow()
+
     init {
         // 웰컴 미션 버튼 표시 여부 구독
         viewModelScope.launch {
             preferencesManager.showWelcomeMission.collect { show ->
                 _showWelcomeMission.value = show
+            }
+        }
+
+        // NEW 뱃지 표시 여부 구독 (하트픽)
+        viewModelScope.launch {
+            preferencesManager.hasNewHeartPick.collect { hasNew ->
+                _hasNewHeartPick.value = hasNew
+            }
+        }
+
+        // NEW 뱃지 표시 여부 구독 (원픽)
+        viewModelScope.launch {
+            preferencesManager.hasNewOnePick.collect { hasNew ->
+                _hasNewOnePick.value = hasNew
             }
         }
     }

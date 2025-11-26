@@ -186,6 +186,10 @@ class PreferencesManager @Inject constructor(
 
         // Welcome Mission 버튼
         val KEY_SHOW_WELCOME_MISSION = booleanPreferencesKey("show_welcome_mission")  // 웰컴 미션 버튼 표시 여부
+
+        // New Picks (하트픽, 원픽 NEW 뱃지)
+        val KEY_HAS_NEW_HEART_PICK = booleanPreferencesKey("has_new_heart_pick")  // 하트픽 NEW 뱃지
+        val KEY_HAS_NEW_ONE_PICK = booleanPreferencesKey("has_new_one_pick")  // 원픽 NEW 뱃지
     }
 
     // ============================================================
@@ -1219,5 +1223,52 @@ class PreferencesManager @Inject constructor(
      */
     suspend fun getShowWelcomeMission(): Boolean {
         return context.dataStore.data.first()[KEY_SHOW_WELCOME_MISSION] ?: false
+    }
+
+    // ============================================================
+    // New Picks (하트픽, 원픽 NEW 뱃지)
+    // ============================================================
+
+    /**
+     * 하트픽 NEW 뱃지 표시 여부 Flow
+     */
+    val hasNewHeartPick: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_HAS_NEW_HEART_PICK] ?: false
+        }
+
+    /**
+     * 원픽 NEW 뱃지 표시 여부 Flow
+     */
+    val hasNewOnePick: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_HAS_NEW_ONE_PICK] ?: false
+        }
+
+    /**
+     * New Picks 설정 (하트픽, 원픽 NEW 뱃지)
+     * old 프로젝트의 setNewPicks와 동일
+     */
+    suspend fun setNewPicks(heartpick: Boolean, onepick: Boolean, themepick: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_HAS_NEW_HEART_PICK] = heartpick
+            // 원픽 또는 테마픽 중 하나라도 true면 원픽 NEW 뱃지 표시
+            preferences[KEY_HAS_NEW_ONE_PICK] = onepick || themepick
+        }
+        android.util.Log.d("PreferencesManager", "✓ Set new picks: heartpick=$heartpick, onepick=$onepick, themepick=$themepick")
+    }
+
+    /**
+     * 하트픽 NEW 뱃지 표시 여부 가져오기 (일회성)
+     */
+    suspend fun getHasNewHeartPick(): Boolean {
+        return context.dataStore.data.first()[KEY_HAS_NEW_HEART_PICK] ?: false
+    }
+
+    /**
+     * 원픽 NEW 뱃지 표시 여부 가져오기 (일회성)
+     */
+    suspend fun getHasNewOnePick(): Boolean {
+        return context.dataStore.data.first()[KEY_HAS_NEW_ONE_PICK] ?: false
     }
 }

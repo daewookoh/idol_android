@@ -101,6 +101,10 @@ fun RankingPage(
     // 웰컴 미션 버튼 상태
     val showWelcomeMission by viewModel.showWelcomeMission.collectAsState()
 
+    // NEW 뱃지 표시 상태 (하트픽, 원픽)
+    val hasNewHeartPick by viewModel.hasNewHeartPick.collectAsState()
+    val hasNewOnePick by viewModel.hasNewOnePick.collectAsState()
+
     // 첫 번째 탭(개인)의 LazyListState (최애 이동 스크롤용)
     val firstTabListState = rememberLazyListState()
 
@@ -387,6 +391,17 @@ fun RankingPage(
                 }
             ) {
                 tabs.forEachIndexed { index, tabName ->
+                    // 현재 탭의 타입 확인 (NEW 뱃지 표시용)
+                    val currentTabType = tabDataList.getOrNull(index)?.type
+
+                    // NEW 뱃지 표시 여부 (하트픽/원픽만)
+                    val showNewBadge = when (currentTabType) {
+                        "HEARTPICK" -> hasNewHeartPick
+                        "ONEPICK" -> hasNewOnePick
+                        else -> false
+                    }
+
+                    // Box로 감싸서 탭 이름은 중앙 고정, NEW 뱃지는 위에 배치
                     Box(
                         modifier = Modifier
                             .wrapContentWidth()
@@ -402,10 +417,27 @@ fun RankingPage(
                             .padding(horizontal = 12.dp),
                         contentAlignment = Alignment.Center
                     ) {
+                        // 탭 이름 (항상 중앙에 고정)
                         Text(
                             text = tabName,
                             style = ExoTypo.title14.copy(lineHeight = 14.sp, color=if (subPagerState.currentPage == index) mainColor else textDimmedColor)
                         )
+                        // NEW 뱃지 (탭 이름 위에 배치)
+                        if (showNewBadge) {
+                            val density = androidx.compose.ui.platform.LocalDensity.current
+                            val fontSizeInDp = with(density) { 8.dp.toSp() }  // dp를 sp로 변환 (스케일 안됨)
+                            Text(
+                                text = "NEW",
+                                style = TextStyle(
+                                    fontSize = fontSizeInDp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = mainColor
+                                ),
+                                modifier = Modifier
+                                    .align(Alignment.TopCenter)
+                                    .padding(top = 6.dp)
+                            )
+                        }
                     }
                 }
             }
