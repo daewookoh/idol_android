@@ -1,1 +1,0 @@
-../../../../../../app/java/net/ib/mn/activity/MainActivity.kt
