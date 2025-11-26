@@ -646,7 +646,8 @@ fun VoteCompleteBottomSheet(
                 Text(
                     text = displaySubtitle,
                     fontSize = 14.sp,
-                    lineHeight = 20.sp,  // 14sp 텍스트에 적절한 lineHeight
+                    lineHeight = 20.sp,
+                    letterSpacing = (-0.3).sp,  // 자간 줄이기
                     color = ColorPalette.textDimmed,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp)
