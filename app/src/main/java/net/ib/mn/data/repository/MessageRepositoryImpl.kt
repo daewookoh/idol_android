@@ -1,14 +1,18 @@
 package net.ib.mn.data.repository
 
+import android.util.Log
 import net.ib.mn.data.remote.api.MessageApi
 import net.ib.mn.data.remote.dto.MessageCouponResponse
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.MessageRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import org.json.JSONObject
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+
+private const val TAG = "MessageRepository"
 
 class MessageRepositoryImpl @Inject constructor(
     private val messageApi: MessageApi
@@ -54,6 +58,33 @@ class MessageRepositoryImpl @Inject constructor(
                 exception = e,
                 message = "Unknown error: ${e.message}"
             ))
+        }
+    }
+
+    override suspend fun checkNewNotification(afterDate: String?): Boolean {
+        return try {
+            val response = messageApi.getNotifications(type = "P", after = afterDate)
+
+            if (response.isSuccessful && response.body() != null) {
+                val bodyString = response.body()!!.string()
+                val jsonObject = JSONObject(bodyString)
+
+                if (jsonObject.optBoolean("success", false)) {
+                    val meta = jsonObject.optJSONObject("meta")
+                    val totalCount = meta?.optInt("total_count", 0) ?: 0
+                    Log.d(TAG, "checkNewNotification: totalCount=$totalCount")
+                    totalCount > 0
+                } else {
+                    Log.w(TAG, "checkNewNotification: API returned success=false")
+                    false
+                }
+            } else {
+                Log.w(TAG, "checkNewNotification: API call failed with code=${response.code()}")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "checkNewNotification: Error", e)
+            false
         }
     }
 }

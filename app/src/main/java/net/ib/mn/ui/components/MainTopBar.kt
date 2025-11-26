@@ -32,6 +32,7 @@ fun MainTopBar(
     showToggleButton: Boolean = false,
     showMainMenu: Boolean = true, // main_toolbar_menu (검색, 친구)
     showMyInfoMenu: Boolean = false, // myinfo_toolbar_menu (출석, 알림, 설정)
+    hasNewNotification: Boolean = false, // 알림 아이콘 빨간점 표시 여부
     onToggleClick: (() -> Unit)? = null,
     onSearchClick: (() -> Unit)? = null,
     onFriendsClick: (() -> Unit)? = null,
@@ -105,6 +106,7 @@ fun MainTopBar(
             if (showMyInfoMenu) {
                 // MyInfo 메뉴 (출석, 알림, 설정)
                 MyInfoToolbarMenu(
+                    hasNewNotification = hasNewNotification,
                     onAttendanceClick = onAttendanceClick,
                     onNotificationClick = onNotificationClick,
                     onSettingClick = onSettingClick
@@ -168,6 +170,7 @@ private fun MainToolbarMenu(
  */
 @Composable
 private fun MyInfoToolbarMenu(
+    hasNewNotification: Boolean = false,
     onAttendanceClick: (() -> Unit)? = null,
     onNotificationClick: (() -> Unit)? = null,
     onSettingClick: (() -> Unit)? = null
@@ -196,6 +199,17 @@ private fun MyInfoToolbarMenu(
             contentDescription = "알림",
             modifier = Modifier.size(22.dp)
         )
+
+        // 새 알림 빨간점 표시
+        if (hasNewNotification) {
+            Box(
+                modifier = Modifier
+                    .size(4.dp)
+                    .align(Alignment.TopEnd)
+                    .clip(CircleShape)
+                    .background(Color.Red)
+            )
+        }
     }
 
     // 설정 버튼 (old: marginEnd="16dp")

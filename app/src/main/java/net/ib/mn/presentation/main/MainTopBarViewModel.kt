@@ -2,26 +2,66 @@ package net.ib.mn.presentation.main
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import net.ib.mn.data.local.PreferencesManager
+import net.ib.mn.domain.repository.MessageRepository
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+
+private const val TAG = "MainTopBarViewModel"
 
 /**
  * 메인 TopBar의 타이머를 관리하는 ViewModel
  * old 프로젝트의 MainActivity.handleMessage()와 동일한 로직
  */
 @HiltViewModel
-class MainTopBarViewModel @Inject constructor() : ViewModel() {
-    
+class MainTopBarViewModel @Inject constructor(
+    private val messageRepository: MessageRepository,
+    private val preferencesManager: PreferencesManager
+) : ViewModel() {
+
     private val _timerText = MutableStateFlow("")
     val timerText: StateFlow<String> = _timerText.asStateFlow()
+
+    // 알림 아이콘의 new 뱃지 상태
+    private val _hasNewNotification = MutableStateFlow(false)
+    val hasNewNotification: StateFlow<Boolean> = _hasNewNotification.asStateFlow()
+
+    /**
+     * 새 알림이 있는지 여부 설정
+     */
+    fun setHasNewNotification(hasNew: Boolean) {
+        _hasNewNotification.value = hasNew
+    }
+
+    /**
+     * 새 알림 체크 API 호출
+     * old 프로젝트의 UtilK.checkNewNotification()과 동일
+     */
+    fun checkNewNotification() {
+        viewModelScope.launch {
+            try {
+                val afterDate = preferencesManager.getRecentNotificationDate()
+                Log.d(TAG, "checkNewNotification: afterDate=$afterDate")
+
+                val hasNew = messageRepository.checkNewNotification(afterDate)
+                Log.d(TAG, "checkNewNotification: hasNew=$hasNew")
+
+                _hasNewNotification.value = hasNew
+            } catch (e: Exception) {
+                Log.e(TAG, "checkNewNotification: Error", e)
+            }
+        }
+    }
     
     private val handler = Handler(Looper.getMainLooper())
     private var timerTask: Runnable? = null

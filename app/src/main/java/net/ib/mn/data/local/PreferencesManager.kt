@@ -170,6 +170,9 @@ class PreferencesManager @Inject constructor(
 
         // Free Board 선택 탭 저장
         val KEY_FREE_BOARD_SELECTED_TAG_ID = intPreferencesKey("free_board_selected_tag_id")
+
+        // Notification
+        val KEY_RECENT_NOTIFICATION_DATE = stringPreferencesKey("recent_notification_create_date")
     }
 
     // ============================================================
@@ -1029,5 +1032,27 @@ class PreferencesManager @Inject constructor(
      */
     suspend fun getFreeBoardSelectedTagId(): Int? {
         return context.dataStore.data.first()[KEY_FREE_BOARD_SELECTED_TAG_ID]
+    }
+
+    // ============================================================
+    // Notification
+    // ============================================================
+
+    /**
+     * 최근 알림 날짜 저장
+     * 알림 화면 진입시 저장하여, 이후 새 알림 체크에 사용
+     */
+    suspend fun setRecentNotificationDate(date: String) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_RECENT_NOTIFICATION_DATE] = date
+        }
+    }
+
+    /**
+     * 최근 알림 날짜 가져오기
+     * @return 저장된 날짜 (없으면 null - 전체 알림 조회)
+     */
+    suspend fun getRecentNotificationDate(): String? {
+        return context.dataStore.data.first()[KEY_RECENT_NOTIFICATION_DATE]
     }
 }

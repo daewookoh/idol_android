@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -39,6 +40,11 @@ fun MyInfoHeart(
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(12.dp),
+                clip = false
+            )
             .clip(RoundedCornerShape(12.dp))
             .background(colorResource(id = R.color.background_200))
             .padding(horizontal = 20.dp).padding(top=20.dp)

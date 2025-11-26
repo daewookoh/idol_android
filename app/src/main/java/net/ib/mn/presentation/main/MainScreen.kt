@@ -54,10 +54,11 @@ fun MainScreen(
     topBarViewModel: MainTopBarViewModel = hiltViewModel(),
     onLogout: () -> Unit = {}
 ) {
-    var selectedTab by remember { mutableIntStateOf(3) }
+    var selectedTab by remember { mutableIntStateOf(4) }
     val userInfo by viewModel.userInfo.collectAsState()
     val logoutCompleted by viewModel.logoutCompleted.collectAsState()
     val timerText by topBarViewModel.timerText.collectAsState()
+    val hasNewNotification by topBarViewModel.hasNewNotification.collectAsState()
 
     // 즉시 반응하는 로컬 카테고리 상태 사용 (UI 반응성 개선)
     val currentCategory by viewModel.currentCategory.collectAsState()
@@ -68,9 +69,10 @@ fun MainScreen(
     val coroutineScope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // 타이머 시작
+    // 타이머 시작 및 알림 체크
     LaunchedEffect(Unit) {
         topBarViewModel.startTimer()
+        topBarViewModel.checkNewNotification()
     }
 
     // 로그아웃 완료 시 네비게이션 처리
@@ -171,6 +173,7 @@ fun MainScreen(
                 showToggleButton = showToggleButton,
                 showMainMenu = showMainMenu,
                 showMyInfoMenu = showMyInfoMenu,
+                hasNewNotification = hasNewNotification,
                 toggleButton = {
                     SwitchToggleButton(
                         genderList = genderStrings,

@@ -179,6 +179,17 @@ interface MessageApi {
      */
     @GET("messages/coupons/")
     suspend fun getMessageCoupon(): Response<MessageCouponResponse>
+
+    /**
+     * 알림 메시지 조회
+     * type: P (Push 알림)
+     * after: 특정 시점 이후의 알림만 조회 (UTC date string)
+     */
+    @GET("messages/")
+    suspend fun getNotifications(
+        @Query("type") type: String? = "P",
+        @Query("after") after: String? = null
+    ): Response<ResponseBody>
 }
 
 // ============================================================
