@@ -12,16 +12,18 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.data.local.PreferencesManager
+import net.ib.mn.data.remote.api.MiscApi
+import net.ib.mn.data.remote.api.StampsApi
 import net.ib.mn.domain.model.IconMenuItem
 import net.ib.mn.domain.model.IconMenuType
 import net.ib.mn.domain.model.InAppBanner
 import net.ib.mn.domain.model.MenuConfig
-import net.ib.mn.domain.model.MenuItem
 import net.ib.mn.domain.model.TextMenuItem
 import net.ib.mn.domain.model.TextMenuType
-import net.ib.mn.domain.repository.ConfigRepository
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.SupportedLanguage
+import org.json.JSONArray
+import org.json.JSONObject
 import javax.inject.Inject
 
 /**
@@ -30,16 +32,10 @@ import javax.inject.Inject
 @HiltViewModel
 class MenuPageViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val configRepository: ConfigRepository,
-    private val preferencesManager: PreferencesManager
+    private val preferencesManager: PreferencesManager,
+    private val miscApi: MiscApi,
+    private val stampsApi: StampsApi
 ) : ViewModel() {
-
-    companion object {
-        private const val TAG = "MenuPageViewModel"
-    }
-
-    private val _menuConfig = MutableStateFlow(MenuConfig.default())
-    val menuConfig: StateFlow<MenuConfig> = _menuConfig.asStateFlow()
 
     private val _iconMenuItems = MutableStateFlow<List<IconMenuItem>>(emptyList())
     val iconMenuItems: StateFlow<List<IconMenuItem>> = _iconMenuItems.asStateFlow()
@@ -50,38 +46,29 @@ class MenuPageViewModel @Inject constructor(
     private val _bannerList = MutableStateFlow<List<InAppBanner>>(emptyList())
     val bannerList: StateFlow<List<InAppBanner>> = _bannerList.asStateFlow()
 
+    private val _hasUnreadNotice = MutableStateFlow(false)
+    private val _hasUnreadEvent = MutableStateFlow(false)
+    private val _isAttendanceAvailable = MutableStateFlow(false)
+
     init {
         observeMenuConfig()
         loadBanners()
+        checkBadgeStates()
     }
 
-    /**
-     * 배너 데이터 로드
-     */
     private fun loadBanners() {
         viewModelScope.launch {
             preferencesManager.inAppBannerMenu.collect { bannerJson ->
-                if (bannerJson != null) {
-                    try {
-                        // JSON 문자열을 InAppBanner 리스트로 변환
+                _bannerList.value = bannerJson?.let { json ->
+                    runCatching {
                         val type = object : com.google.gson.reflect.TypeToken<List<InAppBanner>>() {}.type
-                        val banners: List<InAppBanner> = com.google.gson.Gson().fromJson(bannerJson, type)
-                        _bannerList.value = banners
-                        android.util.Log.d(TAG, "Loaded ${banners.size} banners from PreferencesManager")
-                    } catch (e: Exception) {
-                        android.util.Log.e(TAG, "Failed to parse banner JSON: ${e.message}")
-                        _bannerList.value = emptyList()
-                    }
-                } else {
-                    _bannerList.value = emptyList()
-                }
+                        com.google.gson.Gson().fromJson<List<InAppBanner>>(json, type)
+                    }.getOrDefault(emptyList())
+                } ?: emptyList()
             }
         }
     }
 
-    /**
-     * 메뉴 설정 변경 구독
-     */
     private fun observeMenuConfig() {
         viewModelScope.launch {
             combine(
@@ -90,254 +77,225 @@ class MenuPageViewModel @Inject constructor(
                 preferencesManager.menuStoreMain,
                 preferencesManager.menuFreeBoardMain,
                 preferencesManager.showStoreEventMarker,
-                preferencesManager.showFreeChargeMarker
+                preferencesManager.showFreeChargeMarker,
+                _hasUnreadNotice,
+                _hasUnreadEvent,
+                _isAttendanceAvailable
             ) { flows: Array<Any?> ->
-                val showLiveStreamingTab = flows[0] as Boolean
-                val menuNoticeMain = flows[1] as? String
-                val menuStoreMain = flows[2] as? String
-                val menuFreeBoardMain = flows[3] as? String
-                val showStoreEventMarker = flows[4] as? String
-                val showFreeChargeMarker = flows[5] as? String
-
                 MenuConfig(
-                    menuNoticeMain = menuNoticeMain ?: "N",
-                    menuStoreMain = menuStoreMain ?: "N",
-                    menuFreeBoardMain = menuFreeBoardMain ?: "N",
-                    showStoreEventMarker = showStoreEventMarker ?: "N",
-                    showFreeChargeMarker = showFreeChargeMarker ?: "N",
-                    showLiveStreamingTab = showLiveStreamingTab,
-                    hasUnreadNotice = false,  // TODO: SharedAppState 연결
-                    hasUnreadEvent = false,   // TODO: SharedAppState 연결
-                    isAttendanceAvailable = false,  // TODO: SharedAppState 연결
-                    showGameMenu = false  // TODO: RemoteConfig 연결
+                    menuNoticeMain = (flows[1] as? String) ?: "N",
+                    menuStoreMain = (flows[2] as? String) ?: "N",
+                    menuFreeBoardMain = (flows[3] as? String) ?: "N",
+                    showStoreEventMarker = (flows[4] as? String) ?: "N",
+                    showFreeChargeMarker = (flows[5] as? String) ?: "N",
+                    showLiveStreamingTab = flows[0] as Boolean,
+                    hasUnreadNotice = flows[6] as Boolean,
+                    hasUnreadEvent = flows[7] as Boolean,
+                    isAttendanceAvailable = flows[8] as Boolean,
+                    showGameMenu = false
                 )
             }.collect { config ->
-                _menuConfig.value = config
-                updateMenuItems(config)
-                android.util.Log.d(TAG, "MenuConfig updated: $config")
+                _iconMenuItems.value = buildIconMenuItems(config)
+                _textMenuItems.value = buildTextMenuItems(config)
             }
         }
     }
 
-    /**
-     * 메뉴 아이템 업데이트 (필터링 포함)
-     */
-    private fun updateMenuItems(config: MenuConfig) {
-        _iconMenuItems.value = buildIconMenuItems(config)
-        _textMenuItems.value = buildTextMenuItems(config)
+    private fun checkBadgeStates() {
+        viewModelScope.launch { checkUnreadNotices() }
+        viewModelScope.launch { checkUnreadEvents() }
+        viewModelScope.launch { checkAttendanceAvailable() }
     }
 
-    /**
-     * 아이콘 메뉴 아이템 생성
-     */
-    private fun buildIconMenuItems(config: MenuConfig): List<IconMenuItem> {
-        val items = mutableListOf<IconMenuItem>()
+    private suspend fun checkUnreadNotices() {
+        runCatching {
+            val response = miscApi.getNotices()
+            if (response.isSuccessful) {
+                val json = JSONObject(response.body()?.string() ?: return)
+                if (json.optBoolean("success", false)) {
+                    val ids = extractIds(json.optJSONArray("objects"))
+                    val readIds = preferencesManager.getReadNoticeIds()
+                    _hasUnreadNotice.value = ids.any { it !in readIds }
+                }
+            }
+        }
+    }
 
-        // 1. 고객센터 (항상 표시)
-        items.add(
-            IconMenuItem(
-                id = "support",
-                labelResId = R.string.support,
-                iconResId = R.drawable.icon_menu_support_1,
-                type = IconMenuType.SUPPORT
-            )
-        )
+    private suspend fun checkUnreadEvents() {
+        runCatching {
+            val response = miscApi.getEvents()
+            if (response.isSuccessful) {
+                val json = JSONObject(response.body()?.string() ?: return)
+                if (json.optBoolean("success", false)) {
+                    val ids = extractIds(json.optJSONArray("objects"))
+                    val readIds = preferencesManager.getReadEventIds()
+                    _hasUnreadEvent.value = ids.any { it !in readIds }
+                }
+            }
+        }
+    }
 
-        // 2. 무료충전소 (항상 표시)
-        items.add(
-            IconMenuItem(
-                id = "free_charge",
-                labelResId = R.string.btn_free_heart_charge,
-                iconResId = R.drawable.icon_menu_freeshop,
-                type = IconMenuType.FREE_CHARGE,
-                hasBadge = config.showFreeChargeMarker == "Y",
-                badgeIconResId = if (config.showFreeChargeMarker == "Y") R.drawable.icon_menu_up else null
-            )
-        )
+    private suspend fun checkAttendanceAvailable() {
+        runCatching {
+            val response = stampsApi.getStampsCurrent()
+            if (response.isSuccessful) {
+                val json = JSONObject(response.body()?.string() ?: return)
+                if (json.optBoolean("success", false)) {
+                    val stamp = json.optJSONObject("stamp")
+                    // stamp 객체가 없거나 today 키가 없으면 출석 가능
+                    val todayStamped = stamp?.takeIf { it.has("today") }?.optBoolean("today", false) ?: false
+                    _isAttendanceAvailable.value = !todayStamped
+                }
+            }
+        }
+    }
 
-        // 3. 출석체크 (항상 표시)
-        items.add(
-            IconMenuItem(
-                id = "attendance",
-                labelResId = R.string.attendance_check,
-                iconResId = R.drawable.icon_menu_attendance,
-                type = IconMenuType.ATTENDANCE,
-                hasBadge = config.isAttendanceAvailable,
-                badgeIconResId = if (config.isAttendanceAvailable) R.drawable.icon_menu_new else null
-            )
-        )
+    private fun extractIds(array: JSONArray?): Set<String> {
+        if (array == null) return emptySet()
+        return (0 until array.length())
+            .mapNotNull { array.optJSONObject(it)?.optLong("id", 0)?.takeIf { id -> id > 0 }?.toString() }
+            .toSet()
+    }
 
-        // 4. 이벤트 (항상 표시)
-        items.add(
-            IconMenuItem(
-                id = "event",
-                labelResId = R.string.menu_menu00,
-                iconResId = R.drawable.icon_menu_event_1,
-                type = IconMenuType.EVENT,
-                hasBadge = config.hasUnreadEvent,
-                badgeIconResId = if (config.hasUnreadEvent) R.drawable.icon_menu_up else null
-            )
-        )
+    private fun buildIconMenuItems(config: MenuConfig): List<IconMenuItem> = buildList {
+        add(IconMenuItem(
+            id = "support",
+            labelResId = R.string.support,
+            iconResId = R.drawable.icon_menu_support_1,
+            type = IconMenuType.SUPPORT
+        ))
 
-        // 5. 상점 (menuStoreMain != "N"일 때 표시)
+        add(IconMenuItem(
+            id = "free_charge",
+            labelResId = R.string.btn_free_heart_charge,
+            iconResId = R.drawable.icon_menu_freeshop,
+            type = IconMenuType.FREE_CHARGE,
+            hasBadge = config.showFreeChargeMarker == "Y",
+            badgeIconResId = R.drawable.icon_menu_up.takeIf { config.showFreeChargeMarker == "Y" }
+        ))
+
+        add(IconMenuItem(
+            id = "attendance",
+            labelResId = R.string.attendance_check,
+            iconResId = R.drawable.icon_menu_attendance,
+            type = IconMenuType.ATTENDANCE,
+            hasBadge = config.isAttendanceAvailable,
+            badgeIconResId = R.drawable.icon_menu_new.takeIf { config.isAttendanceAvailable }
+        ))
+
+        add(IconMenuItem(
+            id = "event",
+            labelResId = R.string.menu_menu00,
+            iconResId = R.drawable.icon_menu_event_1,
+            type = IconMenuType.EVENT,
+            hasBadge = config.hasUnreadEvent,
+            badgeIconResId = R.drawable.icon_menu_up.takeIf { config.hasUnreadEvent }
+        ))
+
         if (config.menuStoreMain != "N") {
-            items.add(
-                IconMenuItem(
-                    id = "store",
-                    labelResId = R.string.label_store,
-                    iconResId = R.drawable.icon_menu_shop,
-                    type = IconMenuType.STORE,
-                    hasBadge = config.showStoreEventMarker == "Y",
-                    badgeIconResId = if (config.showStoreEventMarker == "Y") R.drawable.icon_menu_up else null
-                )
-            )
+            add(IconMenuItem(
+                id = "store",
+                labelResId = R.string.label_store,
+                iconResId = R.drawable.icon_menu_shop,
+                type = IconMenuType.STORE,
+                hasBadge = config.showStoreEventMarker == "Y",
+                badgeIconResId = R.drawable.icon_menu_up.takeIf { config.showStoreEventMarker == "Y" }
+            ))
         }
 
-        // 6. 공지사항 (menuNoticeMain != "N"일 때 표시)
         if (config.menuNoticeMain != "N") {
-            items.add(
-                IconMenuItem(
-                    id = "notice",
-                    labelResId = R.string.setting_menu01,
-                    iconResId = R.drawable.icon_menu_notice,
-                    type = IconMenuType.NOTICE,
-                    hasBadge = config.hasUnreadNotice,
-                    badgeIconResId = if (config.hasUnreadNotice) R.drawable.icon_menu_new else null
-                )
-            )
+            add(IconMenuItem(
+                id = "notice",
+                labelResId = R.string.setting_menu01,
+                iconResId = R.drawable.icon_menu_notice,
+                type = IconMenuType.NOTICE,
+                hasBadge = config.hasUnreadNotice,
+                badgeIconResId = R.drawable.icon_menu_new.takeIf { config.hasUnreadNotice }
+            ))
         }
 
-        // 7. 자유게시판 (menuFreeBoardMain != "N" AND showLiveStreamingTab일 때 표시)
         if (config.menuFreeBoardMain != "N" && config.showLiveStreamingTab) {
-            items.add(
-                IconMenuItem(
-                    id = "free_board",
-                    labelResId = R.string.hometab_title_freeboard,
-                    iconResId = R.drawable.icon_menu_board,
-                    type = IconMenuType.FREE_BOARD
-                )
-            )
+            add(IconMenuItem(
+                id = "free_board",
+                labelResId = R.string.hometab_title_freeboard,
+                iconResId = R.drawable.icon_menu_board,
+                type = IconMenuType.FREE_BOARD
+            ))
         }
-
-        return items
     }
 
-    /**
-     * 텍스트 메뉴 아이템 생성
-     */
-    private fun buildTextMenuItems(config: MenuConfig): List<TextMenuItem> {
-        val items = mutableListOf<TextMenuItem>()
+    private fun buildTextMenuItems(config: MenuConfig): List<TextMenuItem> = buildList {
+        add(TextMenuItem(
+            id = "vote_certificate",
+            labelResId = R.string.certificate_title,
+            iconResId = R.drawable.icon_sidemenu_votingcertificate,
+            type = TextMenuType.VOTE_CERTIFICATE
+        ))
 
-        // 1. 투표 인증서 (항상 표시)
-        items.add(
-            TextMenuItem(
-                id = "vote_certificate",
-                labelResId = R.string.certificate_title,
-                iconResId = R.drawable.icon_sidemenu_votingcertificate,
-                type = TextMenuType.VOTE_CERTIFICATE
-            )
-        )
-
-        // 2. 자유게시판 (menuFreeBoardMain != "Y" AND showLiveStreamingTab일 때 표시)
         if (config.menuFreeBoardMain != "Y" && config.showLiveStreamingTab) {
-            items.add(
-                TextMenuItem(
-                    id = "free_board_text",
-                    labelResId = R.string.hometab_title_freeboard,
-                    iconResId = R.drawable.icon_sidemenu_board,
-                    type = TextMenuType.FREE_BOARD
-                )
-            )
+            add(TextMenuItem(
+                id = "free_board_text",
+                labelResId = R.string.hometab_title_freeboard,
+                iconResId = R.drawable.icon_sidemenu_board,
+                type = TextMenuType.FREE_BOARD
+            ))
         }
 
-        // 3. 상점 (menuStoreMain != "Y"일 때 표시)
         if (config.menuStoreMain != "Y") {
-            items.add(
-                TextMenuItem(
-                    id = "store_text",
-                    labelResId = R.string.label_store,
-                    iconResId = R.drawable.icon_sidemenu_shop,
-                    type = TextMenuType.STORE,
-                    hasBadge = config.showStoreEventMarker == "Y"
-                )
-            )
+            add(TextMenuItem(
+                id = "store_text",
+                labelResId = R.string.label_store,
+                iconResId = R.drawable.icon_sidemenu_shop,
+                type = TextMenuType.STORE,
+                hasBadge = config.showStoreEventMarker == "Y"
+            ))
         }
 
-        // 4. 공지사항 (menuNoticeMain != "Y"일 때 표시)
         if (config.menuNoticeMain != "Y") {
-            items.add(
-                TextMenuItem(
-                    id = "notice_text",
-                    labelResId = R.string.setting_menu01,
-                    iconResId = R.drawable.icon_sidemenu_notice,
-                    type = TextMenuType.NOTICE,
-                    hasBadge = config.hasUnreadNotice
-                )
-            )
+            add(TextMenuItem(
+                id = "notice_text",
+                labelResId = R.string.setting_menu01,
+                iconResId = R.drawable.icon_sidemenu_notice,
+                type = TextMenuType.NOTICE,
+                hasBadge = config.hasUnreadNotice
+            ))
         }
 
-        // 5. 친구 초대 (항상 표시)
-        items.add(
-            TextMenuItem(
-                id = "invite_friend",
-                labelResId = R.string.menu_invite_friend,
-                iconResId = R.drawable.icon_sidemenu_invite_friend,
-                type = TextMenuType.INVITE_FRIEND
-            )
-        )
+        add(TextMenuItem(
+            id = "invite_friend",
+            labelResId = R.string.menu_invite_friend,
+            iconResId = R.drawable.icon_sidemenu_invite_friend,
+            type = TextMenuType.INVITE_FRIEND
+        ))
 
-        // 6. 기록실 (항상 표시)
-        items.add(
-            TextMenuItem(
-                id = "history",
-                labelResId = R.string.menu_stats,
-                iconResId = R.drawable.icon_sidemenu_record,
-                type = TextMenuType.HISTORY
-            )
-        )
+        add(TextMenuItem(
+            id = "history",
+            labelResId = R.string.menu_stats,
+            iconResId = R.drawable.icon_sidemenu_record,
+            type = TextMenuType.HISTORY
+        ))
 
-        // 7. 미니게임 (showGameMenu일 때 표시)
-        if (config.showGameMenu) {
-            items.add(
-                TextMenuItem(
-                    id = "game",
-                    labelResId = R.string.menu_minigame,
-                    iconResId = R.drawable.icon_sidemenu_game,
-                    type = TextMenuType.GAME
-                )
-            )
-        }
+        add(TextMenuItem(
+            id = "game",
+            labelResId = R.string.menu_minigame,
+            iconResId = R.drawable.icon_sidemenu_game,
+            type = TextMenuType.GAME
+        ))
 
-        // 8. 퀴즈 (현재 로케일이 지원 로케일에 포함될 때 표시)
         if (LocaleUtil.isExistCurrentLocale(context, SupportedLanguage.BOARD_KIN_QUIZZES_TOP100_LOCALES)) {
-            items.add(
-                TextMenuItem(
-                    id = "quiz",
-                    labelResId = R.string.menu_quiz,
-                    iconResId = R.drawable.icon_sidemenu_quiz,
-                    type = TextMenuType.QUIZ
-                )
-            )
+            add(TextMenuItem(
+                id = "quiz",
+                labelResId = R.string.menu_quiz,
+                iconResId = R.drawable.icon_sidemenu_quiz,
+                type = TextMenuType.QUIZ
+            ))
         }
 
-        // 9. 닮은꼴 (항상 표시)
-        items.add(
-            TextMenuItem(
-                id = "face",
-                labelResId = R.string.menu_face,
-                iconResId = R.drawable.icon_sidemenu_similar,
-                type = TextMenuType.FACE
-            )
-        )
-
-        return items
-    }
-
-    /**
-     * 메뉴 아이템 클릭 처리
-     */
-    fun onMenuItemClick(item: MenuItem) {
-        android.util.Log.d(TAG, "Menu item clicked: ${item.id}")
-        // TODO: Navigation 처리는 MenuPage에서 콜백으로 처리
+        add(TextMenuItem(
+            id = "face",
+            labelResId = R.string.menu_face,
+            iconResId = R.drawable.icon_sidemenu_similar,
+            type = TextMenuType.FACE
+        ))
     }
 }

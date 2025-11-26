@@ -173,6 +173,13 @@ class PreferencesManager @Inject constructor(
 
         // Notification
         val KEY_RECENT_NOTIFICATION_DATE = stringPreferencesKey("recent_notification_create_date")
+
+        // Menu Badge (출석체크, 이벤트, 공지사항)
+        val KEY_IS_ATTENDANCE_AVAILABLE = booleanPreferencesKey("is_attendance_available")
+        val KEY_EVENT_READ_IDS = stringPreferencesKey("event_read_ids")  // 읽은 이벤트 ID 목록 (콤마 구분)
+        val KEY_EVENT_LIST_IDS = stringPreferencesKey("event_list_ids")  // 서버 이벤트 ID 목록 (콤마 구분)
+        val KEY_NOTICE_READ_IDS = stringPreferencesKey("notice_read_ids")  // 읽은 공지사항 ID 목록 (콤마 구분)
+        val KEY_NOTICE_LIST_IDS = stringPreferencesKey("notice_list_ids")  // 서버 공지사항 ID 목록 (콤마 구분)
     }
 
     // ============================================================
@@ -1054,5 +1061,91 @@ class PreferencesManager @Inject constructor(
      */
     suspend fun getRecentNotificationDate(): String? {
         return context.dataStore.data.first()[KEY_RECENT_NOTIFICATION_DATE]
+    }
+
+    // ============================================================
+    // Notice Badge (읽지 않은 공지사항)
+    // ============================================================
+
+    /**
+     * 읽은 공지사항 ID 리스트 Flow
+     */
+    val readNoticeIds: Flow<Set<String>> = context.dataStore.data
+        .map { preferences ->
+            val idsString = preferences[KEY_NOTICE_READ_IDS]
+            if (idsString.isNullOrEmpty()) emptySet()
+            else idsString.split(",").toSet()
+        }
+
+    /**
+     * 공지사항을 읽음 처리
+     */
+    suspend fun markNoticeAsRead(noticeId: String) {
+        context.dataStore.edit { preferences ->
+            val currentIds = preferences[KEY_NOTICE_READ_IDS]
+            val idsSet = if (currentIds.isNullOrEmpty()) mutableSetOf()
+            else currentIds.split(",").toMutableSet()
+            idsSet.add(noticeId)
+            preferences[KEY_NOTICE_READ_IDS] = idsSet.joinToString(",")
+        }
+    }
+
+    /**
+     * 읽은 공지사항 ID 리스트 가져오기 (일회성)
+     */
+    suspend fun getReadNoticeIds(): Set<String> {
+        val idsString = context.dataStore.data.first()[KEY_NOTICE_READ_IDS]
+        return if (idsString.isNullOrEmpty()) emptySet()
+        else idsString.split(",").toSet()
+    }
+
+    /**
+     * 특정 공지사항이 읽혔는지 확인
+     */
+    suspend fun isNoticeRead(noticeId: String): Boolean {
+        return getReadNoticeIds().contains(noticeId)
+    }
+
+    // ============================================================
+    // Event Badge (읽지 않은 이벤트)
+    // ============================================================
+
+    /**
+     * 읽은 이벤트 ID 리스트 Flow
+     */
+    val readEventIds: Flow<Set<String>> = context.dataStore.data
+        .map { preferences ->
+            val idsString = preferences[KEY_EVENT_READ_IDS]
+            if (idsString.isNullOrEmpty()) emptySet()
+            else idsString.split(",").toSet()
+        }
+
+    /**
+     * 이벤트를 읽음 처리
+     */
+    suspend fun markEventAsRead(eventId: String) {
+        context.dataStore.edit { preferences ->
+            val currentIds = preferences[KEY_EVENT_READ_IDS]
+            val idsSet = if (currentIds.isNullOrEmpty()) mutableSetOf()
+            else currentIds.split(",").toMutableSet()
+            idsSet.add(eventId)
+            preferences[KEY_EVENT_READ_IDS] = idsSet.joinToString(",")
+        }
+    }
+
+    /**
+     * 읽은 이벤트 ID 리스트 가져오기 (일회성)
+     */
+    suspend fun getReadEventIds(): Set<String> {
+        val idsString = context.dataStore.data.first()[KEY_EVENT_READ_IDS]
+        return if (idsString.isNullOrEmpty()) emptySet()
+        else idsString.split(",").toSet()
+    }
+
+    /**
+     * 특정 이벤트가 읽혔는지 확인
+     */
+    suspend fun isEventRead(eventId: String): Boolean {
+        return getReadEventIds().contains(eventId)
     }
 }

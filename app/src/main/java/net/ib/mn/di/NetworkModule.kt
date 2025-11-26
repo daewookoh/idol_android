@@ -128,4 +128,14 @@ object NetworkModule {
     @Singleton
     fun provideArticlesApi(retrofit: Retrofit): ArticlesApi =
         retrofit.create(ArticlesApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideMiscApi(retrofit: Retrofit): MiscApi =
+        retrofit.create(MiscApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideStampsApi(retrofit: Retrofit): StampsApi =
+        retrofit.create(StampsApi::class.java)
 }

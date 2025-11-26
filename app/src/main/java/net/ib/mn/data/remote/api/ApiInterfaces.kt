@@ -206,6 +206,43 @@ interface UtilityApi {
     ): Response<TimezoneUpdateResponse>
 }
 
+// ============================================================
+// Misc API
+// ============================================================
+interface MiscApi {
+
+    /**
+     * 공지사항 조회
+     */
+    @GET("notices/")
+    suspend fun getNotices(): Response<ResponseBody>
+
+    /**
+     * 이벤트 조회
+     */
+    @GET("event_list/")
+    suspend fun getEvents(): Response<ResponseBody>
+}
+
+// ============================================================
+// Stamps API (출석체크)
+// ============================================================
+interface StampsApi {
+
+    /**
+     * 현재 출석 정보 조회
+     * stamp.today == false 이면 오늘 출석 가능
+     */
+    @GET("stamps/current/")
+    suspend fun getStampsCurrent(): Response<ResponseBody>
+
+    /**
+     * 출석 도장 찍기
+     */
+    @POST("stamps/")
+    suspend fun postStamp(): Response<ResponseBody>
+}
+
 /*
  * ============================================================
  * API 구현 가이드

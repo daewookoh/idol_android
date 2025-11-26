@@ -1,6 +1,5 @@
 package net.ib.mn.presentation.main.menu
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +15,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,7 +44,6 @@ fun MenuPage(
     val iconMenuItems by viewModel.iconMenuItems.collectAsStateWithLifecycle()
     val textMenuItems by viewModel.textMenuItems.collectAsStateWithLifecycle()
     val bannerList by viewModel.bannerList.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     MenuContent(
         modifier = modifier,
@@ -55,8 +52,6 @@ fun MenuPage(
         textMenuItems = textMenuItems,
         onBannerClick = onBannerClick,
         onMenuItemClick = { item ->
-            // TODO: 실제 네비게이션 처리
-            Toast.makeText(context, "Clicked: ${item.id}", Toast.LENGTH_SHORT).show()
             onMenuItemClick(item.id)
         }
     )
