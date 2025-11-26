@@ -117,8 +117,8 @@ fun ExoVoteDialog(
             bonusHeart = voteResult?.bonusHeart ?: 0,
             title = voteRankingTitle,
             subtitle = voteResult?.msg ?: "",
-            idolName = fullName,
-            currentVoteCount = idolHeart + votedHeart,  // 기존 투표 수 + 방금 투표한 수
+            idolName = fullName.substringBefore("_"),
+            currentVoteCount = idolHeart - votedHeart,  // 내 투표수를 더하기 전 값
             onConfirm = { onNavigateToCertificate(idolId) },
             onDismiss = {
                 showVoteCompleteSheet = false
