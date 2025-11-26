@@ -80,8 +80,8 @@
     <string name="actor_title_review">Написать отзыв о CHOEAEDOL Celeb в Google</string>
     <string name="title_show_option">Настройки приватности</string>
     <string name="title_signup">Регистрация</string>
-    <string name="title_level_heart">Что такое накопленный рейтинг?</string>
-    <string name="actor_title_level_heart">Что такое накопленный рейтинг?</string>
+    <string name="title_level_heart">Накопленный рейтинг?</string>
+    <string name="actor_title_level_heart">Накопленный рейтинг?</string>
     <string name="heart_count_format" formatted="false">%s</string>
     <string name="vote_count_format" formatted="false">%s</string>
     <string name="rank_count_format" formatted="false">%s</string>
@@ -111,7 +111,7 @@
     <string name="btn_signup_finish">Зарегистрироваться</string>
     <string name="btn_signup_finish_1">Регистрация завершена</string>
     <string name="my_action">Мои действия</string>
-    <string name="my_vote">Накопленные голоса</string>
+    <string name="my_vote">Мои накопленные голоса</string>
     <string name="menu_menu00">События</string>
     <string name="menu_menu01">Мой айдол - Настройки</string>
     <string name="actor_menu_menu01">Мой селебрити - Настройки</string>
@@ -368,13 +368,13 @@
     <string name="error_8003">Вы уже друзья.</string>
     <string name="error_9997">Вы можете отправить через 10 минут.</string>
     <string name="error_9998">Вы можете отправлять до 3 сердец каждому из друзей ежедневно.</string>
-    <string name="voting_guide_title1">Что такое мои накопленные голоса?</string>
-    <string name="voting_guide_title2">Условия получения уровня</string>
-    <string name="voting_guide_desc1">- Это количество сердечек, которые вы отдали за своего кумира.\n- Ваша оценка и накопленные голоса будут сброшены, если вы не войдете в систему в течение определенного периода времени.\n(Все вернется, когда вы войдете в систему и проголосуете снова.)\n- Вы будете получать 100 сердечек ежедневно за запуск приложения. , а также сердечки бонусного уровня в зависимости от вашего уровня!</string>
-    <string name="actor_voting_guide_desc1">- Это количество сердечек, которые вы отдали за свою знаменитость.\n- Ваш уровень и накопленные голоса будут сброшены, если вы не войдете в систему в течение определенного периода времени.\n(Все вернется, когда вы войдете в систему и проголосуете снова.)\n- Вы будете получать 100 сердечек ежедневно за запуск приложения. , а также бонусные сердечки в зависимости от вашего уровня!</string>
+    <string name="voting_guide_title1">Что такое «Мои накопленные голоса»?</string>
+    <string name="voting_guide_title2">Руководство по уровням</string>
+    <string name="voting_guide_desc1">- Это количество сердечек, которые вы отдали за своего кумира.\n- Ваш уровень и накопленные голоса будут сброшены, если вы не войдёте в систему в течение определённого времени.\n(Все вернется, когда вы войдете в систему и проголосуете снова.)\n- Вы будете получать 100 сердечек ежедневно за запуск приложения. , а также сердечки бонусного уровня в зависимости от вашего уровня!</string>
+    <string name="actor_voting_guide_desc1">- Это количество сердечек, которые вы отдали за свою знаменитость.\n- Ваш уровень и накопленные голоса будут сброшены, если вы не войдёте в систему в течение определённого времени.\n(Все вернется, когда вы войдете в систему и проголосуете снова.)\n- Вы будете получать 100 сердечек ежедневно за запуск приложения. , а также бонусные сердечки в зависимости от вашего уровня!</string>
     <string name="level_heart_format" formatted="false">Накопленные голоса: %s</string>
-    <string name="level_heart_guide_title1">Занявший 1 место по накопленному баллу становится Ангел милосердия👼</string>
-    <string name="actor_level_heart_guide_title1">Занявший 1 место по накопленному баллу становится Ангел милосердия👼</string>
+    <string name="level_heart_guide_title1">Первое место в накопленном рейтинге становится Ангелом Благотворительности👼</string>
+    <string name="actor_level_heart_guide_title1">Первое место в накопленном рейтинге становится Ангелом Благотворительности👼</string>
     <string name="level_heart_guide_title2">Баллы по рейтингу</string>
     <string name="level_heart_guide_title3">Зал славы — совокупный рейтинг</string>
     <string name="level_heart_guide_title4">Уведомление</string>
@@ -536,7 +536,7 @@
     <string name="setting_menu_cache">Удалить кэш</string>
     <string name="are_you_sure">Вы уверены?</string>
     <string name="setting_menu_push_hearts">Сердца</string>
-    <string name="setting_menu_push_comments">Комментарий</string>
+    <string name="setting_menu_push_comments">Комментарии</string>
     <string name="menu_menu_kin">Idol Q &amp; A</string>
     <string name="actor_menu_menu_kin">Q &amp; A</string>
     <string name="hint_search">Введите текст для поиска</string>
@@ -558,16 +558,16 @@
     <string name="message_send_heart">Отправить с сердцами</string>
     <string name="message_empty">Сообщений нет.</string>
     <!-- permissoin (korean only) -->
-    <string name="permission_required">[Требуемые разрешения]</string>
-    <string name="permission_optional">[Необязательные разрешения]</string>
-    <string name="permission_contact">Контакты: Требуется для бесплатной станции пополнения сердец. Необходимо для входа через Google.</string>
-    <string name="permission_phone">Телефон: Требуется для бесплатной станции пополнения сердец</string>
-    <string name="permission_storage">Память: требуется для загрузки и сохранения фотографий.</string>
-    <string name="permission_desc"></string>
-    <string name="actor_permission_desc"></string>
+    <string name="permission_required">[Требуется разрешение(я)]</string>
+    <string name="permission_optional">[Необязательное разрешение(я)]</string>
+    <string name="permission_contact">Контакты: Требуются для зоны Бесплатные Сердца. Требуются для входа через Google.</string>
+    <string name="permission_phone">Телефон: необходим для бесплатной станции заправки сердца</string>
+    <string name="permission_storage">Хранилище: требуется для загрузки и сохранения фотографий.</string>
+    <string name="permission_desc">Вам не нужно предоставлять разрешения на доступ для использования CHOEAEDOL.\n\nCHOEAEDOL не собирает никакую личную информацию.</string>
+    <string name="actor_permission_desc">Вам не нужно предоставлять разрешения на доступ для использования CHOEAEDOL Celeb.\n\nCHOEAEDOL Celeb не собирает никакую личную информацию.</string>
     <string name="allow">Разрешить</string>
     <string name="deny">Запретить</string>
-    <string name="label_see_video_for_heartbox">Еще одна видеореклама, еще один шанс</string>
+    <string name="label_see_video_for_heartbox">Посмотри видеорекламу и открой больше коробок с сердцами!</string>
     <!-- bj app -->
     <string name="profile_additional_info">Доп. информация</string>
     <string name="profile_birth">Дата рождения</string>
@@ -625,7 +625,7 @@
     <string name="gaon_final_guide">Период голосования завершен.</string>
     <string name="gaon_final_title">%1$s ~ %2$s Итоговый результат</string>
     <string name="menu_freeboard">Доска объявлений</string>
-    <string name="myheart_today_earn">Навсегда сердце заработанное сегодня</string>
+    <string name="myheart_today_earn">Сердечки, полученные сегодня</string>
     <string name="myheart_today_earn_help">Если вы соберете %1$s сердец, \nизображение профиля идола первого места будет изменено с профилем моего кумира. \nИзмененное изображение профиля будет сброшено завтра.</string>
     <string name="actor_myheart_today_earn_help">Если вы заработаете %1$s «сердец», изображения профиля первого места будут изменены на профиль «Мой актер». Измененные изображения профиля будут сброшены завтра.</string>
     <string name="label_image_option">Соотношение сторон фото</string>
@@ -922,7 +922,7 @@
     <string name="title_notifications">Уведомление</string>
     <string name="label_no_notifications">Нет уведомлений.</string>
     <string name="label_delete_all_notifications">Очистить все?</string>
-    <string name="actor_level_heart_guide_desc1">Рейтинги основаны на накопленных баллах, которые объединяются и суммируются за последние 30 дней от каждого фэндома в Зале славы. Отображаются только топ100.\nЕсли вы нажмете на каждый фандом, будет показано соответствующее изменение рейтинга.\nПожертвования будут осуществляться от имени знаменитостей на основе накопленного рейтинга за последние 30 дней!\n\n✔ Критерии достижения\n- Условие 1: в среднем 3 000 000 голосов или более за последние 30 дней\n- Условие 2: занимать 1-е или 2-е место в каждой категории за последние 6 дней в Зале славы\n- Оба условия должны быть выполнены, чтобы быть выбранным в качестве Ангела-благотворителя.\n\n✅ Награда\n – 1-е место в категории\n(1) Пожертвование в размере 500 000 вон в фонд Miral Welfare Foundation\n(2) Реклама в метро на входной станции Хондэ\n(3) Баннер на всю страницу\n(4) Скользящее меню по меню\n   2-е место в категории\n(1) Пожертвование в размере 500 000 вон в фонд Miral Фонд благосостояния\n(2)Реклама в метро на входной станции Хондэ\n(3)Баннер на всю страницу</string>
+    <string name="actor_level_heart_guide_desc1">Рейтинги основаны на накопленных баллах, которые объединяются и суммируются за последние 30 дней от каждого фэндома в Зале славы. Отображаются только топ100.\nЕсли вы нажмете на каждый фандом, будет показано соответствующее изменение рейтинга.\nПожертвования будут осуществляться от имени знаменитостей на основе накопленного рейтинга за последние 30 дней!\n\n✔ Критерии достижения\n- Условие 1: в среднем 3 000 000 голосов или более за последние 30 дней\n- Условие 2: занимать 1-е или 2-е место в соответствующей категории в Зале славы по состоянию на 6-е число каждого месяца\n- Оба условия должны быть выполнены, чтобы быть выбранным в качестве Ангела-благотворителя.\n\n✅ Награда\n – 1-е место в категории\n(1) Пожертвование в размере 500 000 вон в фонд Miral Welfare Foundation\n(2) Реклама в метро на входной станции Хондэ\n(3) Баннер на всю страницу\n(4) Скользящее меню по меню\n   2-е место в категории\n(1) Пожертвование в размере 500 000 вон в фонд Miral Фонд благосостояния\n(2)Реклама в метро на входной станции Хондэ\n(3)Баннер на всю страницу</string>
     <string name="AAA">AAA</string>
     <string name="award_guide">Информация</string>
     <string name="award_example">Расстановка</string>
@@ -1753,6 +1753,7 @@
     <string name="video_image_picker_not_found">Выбор видео и изображений не поддерживается.</string>
     <string name="push_setting_guide_head">Время проведения Дукджиля</string>
     <string name="push_setting_guide_body">Включите уведомления и никогда не пропустите любимые новости!</string>
+    <string name="setting_menu_push_comments_only">Комментарий</string>
     <string name="setting_menu_push_likes">Нравится</string>
     <string name="setting_menu_push_hotposts">Горячие посты</string>
     <string name="levelheart_bonus_yes">🎬 Смотреть рекламу</string>
@@ -1810,4 +1811,6 @@
     <string name="reward_invite_mission_completion">Награда за завершение миссии «Приглашение друга»</string>
     <string name="signup_desc2_noreward">Введите код приглашения от вашего друга, чтобы обменяться сердечками.</string>
     <string name="signup_toast_auto_fill_recommender">Скопированный код приглашения был введен автоматически.</string>
+    <string name="vote_ranking">Проголосовано</string>
+    <string name="heart_arcade_description1">Играйте в мини-игры🕹️ и получайте сердечки🩷</string>
 </resources>

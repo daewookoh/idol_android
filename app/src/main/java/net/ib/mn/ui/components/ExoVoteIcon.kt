@@ -46,12 +46,14 @@ import net.ib.mn.presentation.main.ranking.idol_subpage.VoteViewModel
  * ```
  * ExoVoteIcon(
  *     idolId = idol.id,
- *     fullName = "슬기_레드벨벳"
+ *     fullName = "슬기_레드벨벳",
+ *     idolHeart = idol.heart
  * )
  * ```
  *
  * @param idolId 아이돌 ID
  * @param fullName "이름_그룹명" 형식의 전체 이름
+ * @param idolHeart 아이돌의 현재 총 투표 수 (투표 완료 메시지에 표시)
  * @param onVoteSuccess 투표 성공 시 콜백 (옵션, 투표한 하트 개수)
  * @param modifier Modifier
  */
@@ -59,6 +61,7 @@ import net.ib.mn.presentation.main.ranking.idol_subpage.VoteViewModel
 fun ExoVoteIcon(
     idolId: Int,
     fullName: String,
+    idolHeart: Long = 0L,
     type: String = "DEFAULT",
     onVoteSuccess: ((Long) -> Unit)? = null,
     modifier: Modifier = Modifier,
@@ -69,43 +72,22 @@ fun ExoVoteIcon(
 
     var showVoteDialog by remember { mutableStateOf(false) }
 
-    // 투표 다이얼로그 (다이얼로그 내부에서 하트 정보 로드)
+    // 투표 다이얼로그 (다이얼로그 내부에서 투표 처리 및 완료 바텀시트 표시)
     if (showVoteDialog) {
         ExoVoteDialog(
+            idolId = idolId,
             fullName = fullName,
+            idolHeart = idolHeart,
             onVote = { heart: Long ->
-                scope.launch {
-                    voteViewModel.voteIdol(
-                        idolId = idolId,
-                        heart = heart,
-                        onSuccess = { response ->
-                            showVoteDialog = false
-                            onVoteSuccess?.invoke(heart)
-
-                            // 투표 성공 메시지 (서버 응답 메시지 사용)
-                            response.msg?.let {
-                                android.widget.Toast.makeText(
-                                    context,
-                                    it,
-                                    android.widget.Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        },
-                        onError = { errorMessage ->
-                            showVoteDialog = false
-
-                            // 에러 메시지
-                            android.widget.Toast.makeText(
-                                context,
-                                errorMessage,
-                                android.widget.Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    )
-                }
+                // 투표 완료 후 콜백 (바텀시트는 ExoVoteDialog 내부에서 처리)
+                onVoteSuccess?.invoke(heart)
             },
             onDismiss = {
                 showVoteDialog = false
+            },
+            onNavigateToCertificate = { certIdolId ->
+                // TODO: 투표 인증서 화면 이동 처리
+                android.util.Log.d("ExoVoteIcon", "Navigate to certificate for idol: $certIdolId")
             },
             voteViewModel = voteViewModel
         )

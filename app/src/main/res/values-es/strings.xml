@@ -80,8 +80,8 @@
     <string name="actor_title_review">Escribe una reseña en Google para CHOEAEDOL Celeb</string>
     <string name="title_show_option">Configuración de Privacidad</string>
     <string name="title_signup">Registro</string>
-    <string name="title_level_heart">¿Qué es el ranking acumulado?</string>
-    <string name="actor_title_level_heart">¿Qué es el ranking acumulado?</string>
+    <string name="title_level_heart">¿Ranking Acumulado?</string>
+    <string name="actor_title_level_heart">¿Ranking Acumulado?</string>
     <string name="heart_count_format" formatted="false">%s</string>
     <string name="vote_count_format" formatted="false">%s</string>
     <string name="rank_count_format" formatted="false">%s</string>
@@ -111,7 +111,7 @@
     <string name="btn_signup_finish">Registrarse</string>
     <string name="btn_signup_finish_1">Registro completado</string>
     <string name="my_action">Mis actividades</string>
-    <string name="my_vote">Mis votos acumulados</string>
+    <string name="my_vote">Mis Votos Acumulados</string>
     <string name="menu_menu00">Eventos</string>
     <string name="menu_menu01">Configuración de Mi Idol</string>
     <string name="actor_menu_menu01">Configuración de Mi Celebridad</string>
@@ -368,13 +368,13 @@
     <string name="error_8003">Ya son amigos</string>
     <string name="error_9997">Podrás enviar después de 10 minutos.</string>
     <string name="error_9998">Puedes enviar hasta 3 corazones por amigo cada día.</string>
-    <string name="voting_guide_title1">¿Qué son Mis votos acumulados?</string>
-    <string name="voting_guide_title2">Condiciones para subir de nivel</string>
-    <string name="voting_guide_desc1">Este es el número de corazones que has votado por tu Idol. \n- Tu nivel y los votos acumulados se restablecerán si no inicias sesión durante un cierto período de tiempo. \n- (Todo se restaurará cuando vuelvas a iniciar sesión y votar).\n- ¡Recibirás 100 corazones diarios por abrir la app, además de corazones de recompensa extra según tu nivel actual!</string>
-    <string name="actor_voting_guide_desc1">Este es el número de corazones que has votado por tu Celebridad. \n- Tu nivel y los votos acumulados se restablecerán si no inicias sesión durante un cierto período de tiempo. \n- (Todo se restaurará cuando vuelvas a iniciar sesión y votar).\n- ¡Recibirás 100 corazones diarios por abrir la app, además de corazones de recompensa extra según tu nivel actual!</string>
+    <string name="voting_guide_title1">¿Qué son “Mis Votos Acumulados”?</string>
+    <string name="voting_guide_title2">Guía de Niveles</string>
+    <string name="voting_guide_desc1">Este es el número de corazones que has votado por tu Idol. \n- Tu nivel y tus votos acumulados se restablecerán si no inicias sesión durante un período de tiempo determinado. \n- (Todo se restaurará cuando vuelvas a iniciar sesión y votar).\n- ¡Recibirás 100 corazones diarios por abrir la app, además de corazones de recompensa extra según tu nivel actual!</string>
+    <string name="actor_voting_guide_desc1">Este es el número de corazones que has votado por tu Celebridad. \n- Tu nivel y tus votos acumulados se restablecerán si no inicias sesión durante un período de tiempo determinado. \n- (Todo se restaurará cuando vuelvas a iniciar sesión y votar).\n- ¡Recibirás 100 corazones diarios por abrir la app, además de corazones de recompensa extra según tu nivel actual!</string>
     <string name="level_heart_format" formatted="false">Votos acumulados: %s</string>
-    <string name="level_heart_guide_title1">El primer lugar en la puntuación acumulada se convierte en Ángel de la Caridad👼</string>
-    <string name="actor_level_heart_guide_title1">El primer lugar en la puntuación acumulada se convierte en Ángel de la Caridad👼</string>
+    <string name="level_heart_guide_title1">El primer lugar en la Puntuación Acumulada se convierte en el Ángel de Caridad👼</string>
+    <string name="actor_level_heart_guide_title1">El primer lugar en la Puntuación Acumulada se convierte en el Ángel de Caridad👼</string>
     <string name="level_heart_guide_title2">Puntos por clasificación</string>
     <string name="level_heart_guide_title3">Salón de la Fama - Ranking Acumulado</string>
     <string name="level_heart_guide_title4">Aviso</string>
@@ -526,7 +526,7 @@
     <string name="setting_menu_cache">Eliminar caché</string>
     <string name="are_you_sure">¿Estás seguro?</string>
     <string name="setting_menu_push_hearts">Corazones</string>
-    <string name="setting_menu_push_comments">Comentarios</string>
+    <string name="setting_menu_push_comments">Comentarios y Solicitudes de Amistad</string>
     <string name="menu_menu_kin">Q &amp; A Idol</string>
     <string name="actor_menu_menu_kin">Q &amp; Aa</string>
     <string name="hint_search"></string>
@@ -556,6 +556,7 @@
     <string name="permission_desc"></string>
     <string name="actor_permission_desc"></string>
     <string name="allow">Permitir</string>
+    <string name="deny">Negar</string>
     <string name="label_see_video_for_heartbox">Ver anuncio para recibir más Cajas de Corazones</string>
     <!-- bj app -->
     <string name="profile_additional_info">Información Adicional</string>
@@ -693,7 +694,7 @@
     <string name="use_coupon">Usar</string>
     <string name="expire_coupon">Validez</string>
     <string name="my_info">Perfil</string>
-    <string name="my_info_vote">Votos acumulados</string>
+    <string name="my_info_vote">Votos Acumulados</string>
     <string name="my_info_reg_date">Se unió</string>
     <string name="used_coupon">Usado</string>
     <string name="set_all_in_day">Establecer día All-in</string>
@@ -1665,7 +1666,7 @@
     <string name="purchase_loading_title">Pago en proceso</string>
     <string name="purchase_loading_msg">Si abandonas la página, su compra podria ser duplicada</string>
     <string name="filter_actor">Actor</string>
-    <string name="setting_haptic">vibración táctil</string>
+    <string name="setting_haptic">Vibración táctil</string>
     <string name="date_deadline">Fecha límite</string>
     <string name="adtype_korean">🇰🇷Anuncios en Corea</string>
     <string name="adtype_global">🌎Anuncios globales</string>
@@ -1763,6 +1764,7 @@
     <string name="video_image_picker_not_found">La selección de videos e imágenes no está habilitada.</string>
     <string name="push_setting_guide_head">¿Quieres apoyar a tu Idol? ¡Apresúrate!</string>
     <string name="push_setting_guide_body">¡Activa las notificaciones y no te pierdas las novedades de tu idol!</string>
+    <string name="setting_menu_push_comments_only">Comentarios</string>
     <string name="setting_menu_push_likes">Me gusta</string>
     <string name="setting_menu_push_hotposts">Posts en tendencia</string>
     <string name="levelheart_bonus_yes">🎬 Ver anuncio</string>
@@ -1819,4 +1821,6 @@
     <string name="reward_invite_mission_completion">Recompensa por completar la misión de invitación de amistad</string>
     <string name="signup_desc2_noreward">Ingresa el código de invitación de tu referente para intercambiar Corazones como amigos.</string>
     <string name="signup_toast_auto_fill_recommender">El código de invitación copiado se ha introducido automáticamente.</string>
+    <string name="vote_ranking">VOTADO</string>
+    <string name="heart_arcade_description1">Play mini-games🕹️ and earn hearts🩷</string>
 </resources>

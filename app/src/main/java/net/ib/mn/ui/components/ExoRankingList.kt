@@ -35,7 +35,8 @@ import java.util.Locale
 @Immutable
 data class RankingItem(
     val rank: Int ,
-    val name: String,  // "이름_그룹명" 형식 (예: "디오_EXO")
+    val name: String,  // "이름_그룹명" 형식 (예: "디오_EXO") - 한국어 기본
+    val nameEn: String? = null,  // "이름_그룹명" 형식 영어 (예: "D.O_EXO")
     val voteCount: String,
     val photoUrl: String? = null,
     val id: String = "",  // 고유 ID로 사용 (변경 추적에 중요)
@@ -55,6 +56,20 @@ data class RankingItem(
     val top3ImageUrls: List<String?> = listOf(null, null, null),  // 펼치기 이미지 3개
     val top3VideoUrls: List<String?> = listOf(null, null, null),  // 펼치기 동영상 3개
 ) {
+    /**
+     * 현재 로케일에 맞는 이름 반환
+     * old 프로젝트의 IdolModel.getName(context)와 동일한 로직
+     */
+    fun getLocalizedName(languageCode: String): String {
+        return when {
+            languageCode.startsWith("ko") -> name
+            languageCode.startsWith("en") && !nameEn.isNullOrEmpty() -> nameEn
+            // 다른 언어는 영어 이름, 없으면 한국어
+            !nameEn.isNullOrEmpty() -> nameEn
+            else -> name
+        }
+    }
+
     // LazyColumn의 key로 사용할 고유 식별자
     fun itemKey(): String = id.ifEmpty { "$rank-$name" }
 

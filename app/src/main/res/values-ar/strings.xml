@@ -80,8 +80,8 @@
     <string name="actor_title_review">اكتب تقييماً عن CHOEAEDOL Celeb</string>
     <string name="title_show_option">إعدادات الخصوصية</string>
     <string name="title_signup">تسجيل العضوية</string>
-    <string name="title_level_heart">ماذا يُقصد بالترتيب التراكمي؟</string>
-    <string name="actor_title_level_heart">ماذا يُقصد بالترتيب التراكمي؟</string>
+    <string name="title_level_heart">الترتيب التراكمي؟</string>
+    <string name="actor_title_level_heart">الترتيب التراكمي؟</string>
     <string name="heart_count_format" formatted="false">%s</string>
     <string name="vote_count_format" formatted="false">%s</string>
     <string name="rank_count_format" formatted="false">%s</string>
@@ -111,7 +111,7 @@
     <string name="btn_signup_finish">اشتراك</string>
     <string name="btn_signup_finish_1">اكتمل التسجيل</string>
     <string name="my_action">الأنشطة</string>
-    <string name="my_vote">الأصوات المتراكمة</string>
+    <string name="my_vote">أصواتي التراكمية</string>
     <string name="menu_menu00">الأحداث</string>
     <string name="menu_menu01">إعدادات فنان بلدي</string>
     <string name="actor_menu_menu01">إعدادات مشهورتي</string>
@@ -368,13 +368,13 @@
     <string name="error_8003">أنتما بالفعل أصدقاء.</string>
     <string name="error_9997">يمكنك الإرسال بعد 10 دقائق.</string>
     <string name="error_9998">يمكنك فقط إرسال ما يصل إلى 3 قلوب لكل صديق كل يوم.</string>
-    <string name="voting_guide_title1">ما هي أصواتي المتراكمة؟</string>
-    <string name="voting_guide_title2">شروط الترتيب</string>
+    <string name="voting_guide_title1">ما معنى «أصواتي التراكمية»؟</string>
+    <string name="voting_guide_title2">دليل المستويات</string>
     <string name="voting_guide_desc1">- هذا هو عدد القلوب التي صوتت لها لصالح نجمك.\n- ستتم إعادة تعيين درجتك والأصوات المتراكمة إذا لم تقم بتسجيل الدخول لفترة زمنية معينة.\n(سيعود كل شيء عند تسجيل الدخول والتصويت مرة أخرى.)\n- ستتلقى 100 قلب يوميًا لبدء تشغيل التطبيق ، بالإضافة إلى قلوب مكافأة المستوى الإضافي بناءً على حالة مستواك!</string>
     <string name="actor_voting_guide_desc1">- هذا هو عدد القلوب التي صوتت لها لمشاهيرك.\n- سيتم إعادة ضبط مستواك والأصوات المتراكمة إذا لم تقم بتسجيل الدخول لفترة معينة من الوقت.\n(سيعود كل شيء عند تسجيل الدخول والتصويت مرة أخرى.)\n- ستتلقى 100 قلب يوميًا لبدء تشغيل التطبيق ، بالإضافة إلى قلوب مكافأة المستوى الإضافي بناءً على حالة مستواك!</string>
     <string name="level_heart_format" formatted="false">الأصوات المتراكمة: %s</string>
-    <string name="level_heart_guide_title1">يصبح صاحب المركز الأول في الترتيب التراكمي هو الخيرية الملاك.👼</string>
-    <string name="actor_level_heart_guide_title1">يصبح صاحب المركز الأول في الترتيب التراكمي هو الخيرية الملاك.👼</string>
+    <string name="level_heart_guide_title1">صاحب المركز الأول في النقاط التراكمية يصبح ملاك الخير👼</string>
+    <string name="actor_level_heart_guide_title1">صاحب المركز الأول في النقاط التراكمية يصبح ملاك الخير👼</string>
     <string name="level_heart_guide_title2">النقاط حسب الترتيب</string>
     <string name="level_heart_guide_title3">قاعة الشهرة - الترتيب التراكمي</string>
     <string name="level_heart_guide_title4">يلاحظ</string>
@@ -536,7 +536,7 @@
     <string name="setting_menu_cache">حذف ذاكرة التخزين المؤقت</string>
     <string name="are_you_sure">هل أنت متأكد؟</string>
     <string name="setting_menu_push_hearts">قلوب</string>
-    <string name="setting_menu_push_comments">تعليق</string>
+    <string name="setting_menu_push_comments">تعليقات</string>
     <string name="menu_menu_kin">سؤال وجواب</string>
     <string name="actor_menu_menu_kin">سؤال وجواب</string>
     <string name="hint_search">أدخل نص البحث</string>
@@ -558,16 +558,16 @@
     <string name="message_send_heart">إرسال بالقلوب</string>
     <string name="message_empty">لا توجد رسائل</string>
     <!-- permissoin (korean only) -->
-    <string name="permission_required">[الإذن (الأذونات) المطلوب]</string>
-    <string name="permission_optional">[إذن(أذونات) اختياري]</string>
-    <string name="permission_contact">جهات الاتصال : مطلوبة لمركز إعادة تعبئة القلوب المجاني. مطلوب لتسجيل الدخول إلى جوجل.</string>
-    <string name="permission_phone">الهاتف: مطلوب لمركز إعادة تعبئة القلوب المجاني</string>
+    <string name="permission_required">[الأذونات المطلوبة]</string>
+    <string name="permission_optional">[الأذونات الاختيارية]</string>
+    <string name="permission_contact">جهات الاتصال: مطلوبة لمنطقة القلب المجاني. مطلوبة لتسجيل الدخول عبر Google.</string>
+    <string name="permission_phone">الهاتف: مطلوب لمحطة إعادة تعبئة القلب المجانية</string>
     <string name="permission_storage">التخزين: مطلوب لتحميل الصور وحفظها.</string>
-    <string name="permission_desc">لا تحتاج إلى السماح لأذونات الوصول لاستخدام CHOEAEDOL. \n\nلا يجمع CHOEAEDOL أي معلومات شخصية.</string>
-    <string name="actor_permission_desc">لا تحتاج للسماح لأذونات الوصول لاستخدام CHOEAEDOL Celeb. \n\nلا يجمع CHOEAEDOL Celeb أي معلومات شخصية.</string>
+    <string name="permission_desc">لا تحتاج إلى السماح بأذونات الوصول لاستخدام CHOEAEDOL.\n\nCHOEAEDOL لا يجمع أي معلومات شخصية.</string>
+    <string name="actor_permission_desc">لا تحتاج إلى السماح بأذونات الوصول لاستخدام CHOEAEDOL Celeb.\n\nCHOEAEDOL Celeb لا يجمع أي معلومات شخصية.</string>
     <string name="allow">السماح</string>
     <string name="deny">رفض</string>
-    <string name="label_see_video_for_heartbox">شاهد إعلان الفيديو واحصل على المزيد من صندوق القلب</string>
+    <string name="label_see_video_for_heartbox">شاهد إعلانًا بالفيديو وافتح المزيد من صناديق القلوب!</string>
     <!-- bj app -->
     <string name="profile_additional_info">معلومات إضافية</string>
     <string name="profile_birth">تاريخ الميلاد</string>
@@ -633,7 +633,7 @@
     <string name="confirm_change_account">أنت مشترك بالفعل في نفس البريد الإلكتروني. هل ترغب في تغيير هذا الحساب إلى طريقة تسجيل الدخول التي حددتها؟</string>
     <string name="facebook_no_email">لا يمكن الحصول على معلومات البريد الإلكتروني من فيسبوك.</string>
     <string name="menu_freeboard">لوحة</string>
-    <string name="myheart_today_earn">تم جمع قلب Ever اليوم</string>
+    <string name="myheart_today_earn">القلوب التي جُمعت اليوم</string>
     <string name="myheart_today_earn_help">إذا جمعت %1$s قلوب ever في أي وقت،\nسيتم تغيير أول صورة للملف الشخصي لـ idol باستخدام الملف الشخصي لـ idol. \nسيتم إعادة تعيين صورة الملف الشخصي التي تم تغييرها غداً.</string>
     <string name="actor_myheart_today_earn_help">إذا ربحت %1$s قلوب ever، سيتم تغيير صور الملف الشخصي لملف My actor الشخصي. \nسيتم إعادة تعيين صور الملف الشخصي التي تم تغييرها غداً.</string>
     <string name="label_image_option">نسبة أبعاد الصورة</string>
@@ -1021,7 +1021,7 @@
     <string name="title_notifications">إشعار</string>
     <string name="label_no_notifications">لا توجد إشعارات.</string>
     <string name="label_delete_all_notifications">مسح الكل؟</string>
-    <string name="actor_level_heart_guide_desc1">تعتمد التصنيفات على النتائج المتراكمة التي تم جمعها وتجميعها على مدار الثلاثين يومًا الماضية من كل قاعدة جماهيرية في قاعة المشاهير. يتم عرض أعلى 100 فقط.\nإذا نقرت على كل قاعدة جماهيرية، فسيتم عرض التغيير المقابل في التصنيف.\nسيتم التبرعات بأسماء المشاهير بناءً على التصنيف المتراكم خلال الثلاثين يومًا الماضية!\n\n✅ معايير الإنجاز\n- الشرط 1: متوسط ​​3,000,000 صوت أو أكثر خلال الثلاثين يومًا الماضية\n- الشرط 2: الحصول على المرتبة الأولى أو الثانية في كل فئة خلال الأيام الستة الماضية في قاعة المشاهير\n- يجب استيفاء كلا الشرطين ليتم اختيارك كملاك خيري.\n\n✅ المكافأة\n- المركز الأول في الفئة\n(1) التبرع بمبلغ 500,000 وون كوري لمؤسسة ميرال للرعاية الاجتماعية\n(2) إعلان مترو الأنفاق في محطة مدخل هونغداي\n(3) إعلان بانر على صفحة كاملة\n(4) إعلان قائمة منزلق\n- المركز الثاني من الفئة\n(1) التبرع بمبلغ 500,000 وون كوري إلى ميرال مؤسسة الرعاية الاجتماعية\n(2)إعلان لمترو الأنفاق في محطة مدخل هونغداي\n(3)إعلان بانر على صفحة كاملة</string>
+    <string name="actor_level_heart_guide_desc1">تعتمد التصنيفات على النتائج المتراكمة التي تم جمعها وتجميعها على مدار الثلاثين يومًا الماضية من كل قاعدة جماهيرية في قاعة المشاهير. يتم عرض أعلى 100 فقط.\nإذا نقرت على كل قاعدة جماهيرية، فسيتم عرض التغيير المقابل في التصنيف.\nسيتم التبرعات بأسماء المشاهير بناءً على التصنيف المتراكم خلال الثلاثين يومًا الماضية!\n\n✅ معايير الإنجاز\n- الشرط 1: متوسط ​​3,000,000 صوت أو أكثر خلال الثلاثين يومًا الماضية\n- الشرط الشرط 2: الحصول على المركز الأول أو الثاني في الفئة المقابلة في قاعة المشاهير في اليوم السادس من كل شهر\n- يجب استيفاء كلا الشرطين ليتم اختيارك كملاك خيري.\n\n✅ المكافأة\n- المركز الأول في الفئة\n(1) التبرع بمبلغ 500,000 وون كوري لمؤسسة ميرال للرعاية الاجتماعية\n(2) إعلان مترو الأنفاق في محطة مدخل هونغداي\n(3) إعلان بانر على صفحة كاملة\n(4) إعلان قائمة منزلق\n- المركز الثاني من الفئة\n(1) التبرع بمبلغ 500,000 وون كوري إلى ميرال مؤسسة الرعاية الاجتماعية\n(2)إعلان لمترو الأنفاق في محطة مدخل هونغداي\n(3)إعلان بانر على صفحة كاملة</string>
     <string name="AAA">AAA</string>
     <string name="award_guide">معلومات</string>
     <string name="award_example">اصطفوا</string>
@@ -1846,6 +1846,7 @@
     <string name="video_image_picker_not_found">لا يتم دعم اختيار الفيديو والصور</string>
     <string name="push_setting_guide_head">توقيت دقجيل</string>
     <string name="push_setting_guide_body">قم بتشغيل الإشعارات ولا تفوت أخبارك المفضلة أبدًا!</string>
+    <string name="setting_menu_push_comments_only">تعليق</string>
     <string name="setting_menu_push_likes">يحب</string>
     <string name="setting_menu_push_hotposts">المشاركات الساخنة</string>
     <string name="levelheart_bonus_yes">🎬 شاهد م</string>
@@ -1903,4 +1904,6 @@
     <string name="reward_invite_mission_completion">مكافأة إكمال مهمة دعوة صديق</string>
     <string name="signup_desc2_noreward">أدخل رمز دعوة الشخص الذي أوصى بك لتبادل القلوب كأصدقاء.</string>
     <string name="signup_toast_auto_fill_recommender">تم إدخال رمز الدعوة المنسوخ تلقائيًا.</string>
+    <string name="vote_ranking">تم التصويت</string>
+    <string name="heart_arcade_description1">العب الميني-جيمز🕹️ واربح قلوبًا🩷</string>
 </resources>

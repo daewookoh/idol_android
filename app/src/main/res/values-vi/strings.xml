@@ -80,8 +80,8 @@
     <string name="actor_title_review">Để lại lời đánh giá trên Goole về CHOEAEDOL Celeb</string>
     <string name="title_show_option">Cài đặt quyền riêng tư</string>
     <string name="title_signup">Đăng ký thành viên</string>
-    <string name="title_level_heart">xếp hạng thành tích là gì?</string>
-    <string name="actor_title_level_heart">xếp hạng thành tích là gì?</string>
+    <string name="title_level_heart">Xếp hạng tích lũy?</string>
+    <string name="actor_title_level_heart">Xếp hạng tích lũy?</string>
     <string name="heart_count_format" formatted="false">%s</string>
     <string name="vote_count_format" formatted="false">%s</string>
     <string name="rank_count_format" formatted="false">%s</string>
@@ -111,7 +111,7 @@
     <string name="btn_signup_finish">Đăng ký</string>
     <string name="btn_signup_finish_1">Hoàn thành đăng ký</string>
     <string name="my_action">Hoạt động của tôi</string>
-    <string name="my_vote">Bình chọn tích lũy của tôi</string>
+    <string name="my_vote">Lượt bình chọn tích lũy của tôi</string>
     <string name="menu_menu00">Sự kiện</string>
     <string name="menu_menu01">Cài đặt Thần tượng của tôi</string>
     <string name="actor_menu_menu01">Cài đặt người nổi tiếng của tôi</string>
@@ -368,13 +368,13 @@
     <string name="error_8003">Đã trở thành bạn bè.</string>
     <string name="error_9997">Bạn có thể gửi lại sau 10 phút.</string>
     <string name="error_9998">Bạn có thể gửi tối đa 3 trái tim trong một ngày cho một người bạn.</string>
-    <string name="voting_guide_title1">Phiếu bầu tích lũy của tôi là?</string>
-    <string name="voting_guide_title2">Điều kiện cấp độ</string>
-    <string name="voting_guide_desc1">- Đây là số tim mà bạn bình chọn cho Idol của mình.\n- Điểm và phiếu bầu tích lũy của bạn sẽ bị đặt lại nếu bạn không đăng nhập trong một khoảng thời gian nhất định.\n(Mọi thứ sẽ trở lại khi bạn đăng nhập và bỏ phiếu lại.)\n- Bạn sẽ nhận được 100 trái tim mỗi ngày khi khởi chạy ứng dụng , cũng như trái tim thưởng theo cấp độ dựa trên trạng thái cấp độ của bạn!</string>
-    <string name="actor_voting_guide_desc1">- Đây là số trái tim bạn đã bình chọn cho Celeb của mình.\n- Cấp độ và phiếu bầu tích lũy của bạn sẽ được đặt lại nếu bạn không đăng nhập trong một khoảng thời gian nhất định.\n(Mọi thứ sẽ trở lại khi bạn đăng nhập và bỏ phiếu lại.)\n- Bạn sẽ nhận được 100 trái tim mỗi ngày khi khởi chạy ứng dụng , cũng như trái tim thưởng theo cấp độ dựa trên trạng thái cấp độ của bạn!</string>
+    <string name="voting_guide_title1">“Lượt bình chọn tích lũy của tôi” là gì?</string>
+    <string name="voting_guide_title2">Hướng dẫn cấp độ</string>
+    <string name="voting_guide_desc1">- Đây là số tim mà bạn bình chọn cho Idol của mình.\n- Cấp độ và số phiếu tích lũy của bạn sẽ bị đặt lại nếu bạn không đăng nhập trong một khoảng thời gian nhất định.\n(Mọi thứ sẽ trở lại khi bạn đăng nhập và bỏ phiếu lại.)\n- Bạn sẽ nhận được 100 trái tim mỗi ngày khi khởi chạy ứng dụng , cũng như trái tim thưởng theo cấp độ dựa trên trạng thái cấp độ của bạn!</string>
+    <string name="actor_voting_guide_desc1">- Đây là số trái tim bạn đã bình chọn cho Celeb của mình.\n- Cấp độ và số phiếu tích lũy của bạn sẽ bị đặt lại nếu bạn không đăng nhập trong một khoảng thời gian nhất định.\n(Mọi thứ sẽ trở lại khi bạn đăng nhập và bỏ phiếu lại.)\n- Bạn sẽ nhận được 100 trái tim mỗi ngày khi khởi chạy ứng dụng , cũng như trái tim thưởng theo cấp độ dựa trên trạng thái cấp độ của bạn!</string>
     <string name="level_heart_format" formatted="false">Bình chọn tích lũy: %s</string>
-    <string name="level_heart_guide_title1">Vị trí số 1 về số điểm tích lũy sẽ trở thành Thiên thần quyên góp👼</string>
-    <string name="actor_level_heart_guide_title1">Vị trí số 1 về số điểm tích lũy sẽ trở thành Thiên thần quyên góp👼</string>
+    <string name="level_heart_guide_title1">Hạng nhất trong Điểm Tích Lũy sẽ trở thành Thiên Thần Từ Thiện👼</string>
+    <string name="actor_level_heart_guide_title1">Hạng nhất trong Điểm Tích Lũy sẽ trở thành Thiên Thần Từ Thiện👼</string>
     <string name="level_heart_guide_title2">Điểm theo thứ hạng</string>
     <string name="level_heart_guide_title3">Hall of Fame - Xếp hạng tích lũy</string>
     <string name="level_heart_guide_title4">Để ý</string>
@@ -567,7 +567,7 @@
     <string name="actor_permission_desc">Ngay cả khi bạn không đồng ý với các quyền truy cập tùy chọn, không có vấn đề gì khi sử dụng các chức năng cơ bản của CHOEAEDOL Celeb. \n\nCHOEAEDOL Celeb không thu thập bất kỳ thông tin cá nhân nào.</string>
     <string name="allow">Cho phép</string>
     <string name="deny">Không cho phép</string>
-    <string name="label_see_video_for_heartbox">Xem quảng cáo có thể nhận thêm được nhiều hộp trái tim~!</string>
+    <string name="label_see_video_for_heartbox">Xem quảng cáo video để mở thêm Hộp Trái Tim!</string>
     <!-- bj app -->
     <string name="profile_additional_info">Thông tin bổ sung</string>
     <string name="profile_birth">Ngày sinh</string>
@@ -633,7 +633,7 @@
     <string name="confirm_change_account">Bạn đang dùng cùng một email để đăng nhập. Bạn có muốn thay đổi phương pháp đăng nhập?</string>
     <string name="facebook_no_email">Không thể xác minh thông tin email từ tài khoản facebook.</string>
     <string name="menu_freeboard">Bảng</string>
-    <string name="myheart_today_earn">Điểm thu thập trái tim vĩnh cửu ngày hôm nay</string>
+    <string name="myheart_today_earn">Số tim nhận hôm nay</string>
     <string name="myheart_today_earn_help">Khi bạn thu thập đủ %1$s trái tim vĩnh cửu, hình đại diện của một cá nhân hay nhóm đang xếp vị trí top1 sẽ được thay thế bằng thần tượng của tôi.\nẢnh thay đổi sẽ được cài đặt lại tại thời điểm đếm.</string>
     <string name="actor_myheart_today_earn_help">Khi bạn thu thập đủ %1$s trái tim vĩnh cửu, hình đại diện của một nam diễn viên hay nữ diễn viên đang xếp vị trí top1 sẽ được thay thế bằng diễn viên yêu thích của tôi.\nẢnh thay đổi sẽ được cài đặt lại tại thời điểm đếm.</string>
     <string name="label_image_option">Tỉ lệ khung ảnh</string>
@@ -770,7 +770,7 @@
     <string name="use_coupon">Sử dụng</string>
     <string name="expire_coupon">Thời hạn sử dụng</string>
     <string name="my_info">Thông tin của tôi</string>
-    <string name="my_info_vote">Bình chọn tích lũy</string>
+    <string name="my_info_vote">Lượt bình chọn tích lũy</string>
     <string name="my_info_reg_date">Ngày đăng ký</string>
     <string name="used_coupon">Đã sử dụng</string>
     <string name="set_all_in_day">Đặt All-in day</string>
@@ -1020,7 +1020,8 @@
     <string name="title_notifications">Thông báo</string>
     <string name="label_no_notifications">Không có thông báo.</string>
     <string name="label_delete_all_notifications">Bạn có muốn xoá tất cả thông báo không?</string>
-    <string name="actor_level_heart_guide_desc1">Bảng xếp hạng dựa trên điểm số tích lũy được tổng hợp trong 30 ngày qua từ mỗi fandom trên Hall of Fame. Chỉ top100 được hiển thị.\nNếu bạn nhấp vào từng fandom, sự thay đổi thứ hạng tương ứng sẽ được hiển thị.\nViệc quyên góp sẽ được thực hiện dưới tên của những người nổi tiếng dựa trên thứ hạng tích lũy trong 30 ngày qua!\n\n✅ Tiêu chí thành tích\n- Điều kiện1 : trung bình 3.000.000 phiếu bầu trở lên trong 30 ngày qua\n- Điều kiện2 : xếp thứ 1 hoặc thứ 2 trong mỗi hạng mục trong 6 ngày qua trên Hall of Fame\n- Cả hai điều kiện phải được đáp ứng để được chọn làm Thiên thần từ thiện.\n\n✅ Phần thưởng\n- Hạng nhất\n(1)Quyên góp 500.000KRW cho Quỹ phúc lợi Miral\n(2)Quảng cáo tàu điện ngầm tại ga vào Hongdae\n(3)Quảng cáo biểu ngữ toàn trang\n(4)Quảng cáo trượt menu\n- Vị trí thứ 2 hạng mục\n(1)Quyên góp 500.000KRW cho Quỹ phúc lợi Miral\n(2)Quảng cáo tàu điện ngầm tại ga vào Hongdae\n(3)Quảng cáo biểu ngữ toàn trang</string>
+    <string name="actor_level_heart_guide_desc1">Bảng xếp hạng dựa trên điểm số tích lũy được tổng hợp trong 30 ngày qua từ mỗi fandom trên Hall of Fame. Chỉ top100 được hiển thị.\nNếu bạn nhấp vào từng fandom, sự thay đổi thứ hạng tương ứng sẽ được hiển thị.\nViệc quyên góp sẽ được thực hiện dưới tên của những người nổi tiếng dựa trên thứ hạng tích lũy trong 30 ngày qua!\n\n✅ Tiêu chí thành tích\n- Điều kiện1 : trung bình 3.000.000 phiếu bầu trở lên trong 30 ngày qua\n-Điều kiện2 : xếp hạng 1 hoặc 2 trong hạng mục tương ứng trên Hall of Fame vào ngày 6 hàng tháng
+\n- Cả hai điều kiện phải được đáp ứng để được chọn làm Thiên thần từ thiện.\n\n✅ Phần thưởng\n- Hạng nhất\n(1)Quyên góp 500.000KRW cho Quỹ phúc lợi Miral\n(2)Quảng cáo tàu điện ngầm tại ga vào Hongdae\n(3)Quảng cáo biểu ngữ toàn trang\n(4)Quảng cáo trượt menu\n- Vị trí thứ 2 hạng mục\n(1)Quyên góp 500.000KRW cho Quỹ phúc lợi Miral\n(2)Quảng cáo tàu điện ngầm tại ga vào Hongdae\n(3)Quảng cáo biểu ngữ toàn trang</string>
     <string name="AAA">AAA</string>
     <string name="award_guide">Hướng dẫn</string>
     <string name="award_example">Đội hình</string>
@@ -1837,6 +1838,7 @@ Tặng một món quà đặc biệt cho thần tượng của tôi trên CHOEAE
     <string name="video_image_picker_not_found">Lựa chọn video và hình ảnh không được hỗ trợ</string>
     <string name="push_setting_guide_head">Thời điểm của Dukjil</string>
     <string name="push_setting_guide_body">Bật thông báo và không bao giờ bỏ lỡ tin tức yêu thích của bạn!</string>
+    <string name="setting_menu_push_comments_only">Bình luận</string>
     <string name="setting_menu_push_likes">Lượt thích</string>
     <string name="setting_menu_push_hotposts">Bài viết nóng</string>
     <string name="levelheart_bonus_yes">🎬 Xem quảng cáo</string>
@@ -1893,4 +1895,6 @@ Tặng một món quà đặc biệt cho thần tượng của tôi trên CHOEAE
     <string name="reward_invite_mission_completion">Phần thưởng hoàn thành nhiệm vụ mời bạn bè</string>
     <string name="signup_desc2_noreward">Nhập mã mời của người giới thiệu để trao đổi Trái tim với tư cách là bạn bè.</string>
     <string name="signup_toast_auto_fill_recommender">Mã mời đã sao chép đã được nhập tự động.</string>
+    <string name="vote_ranking">Đã bình chọn</string>
+    <string name="heart_arcade_description1">玩小游戏🕹️，还能赚爱心🩷</string>
 </resources>

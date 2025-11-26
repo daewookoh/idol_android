@@ -1,5 +1,6 @@
 package net.ib.mn.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,12 +17,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,7 +52,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.launch
 import net.ib.mn.R
+import net.ib.mn.data.remote.dto.VoteResponse
 import net.ib.mn.presentation.main.ranking.idol_subpage.VoteViewModel
 import java.text.NumberFormat
 import java.util.Locale
@@ -61,17 +70,23 @@ import java.util.Locale
  * 3. 직접 입력 (EditText)
  * 4. 투표 확인 및 취소
  * 5. 다이얼로그 표시 시 자동으로 사용자 하트 정보 로드
+ * 6. 투표 완료 후 바텀시트 표시 (100개 미만/이상 차이)
  *
+ * @param idolId 아이돌 ID (투표 API 호출에 필요)
  * @param fullName "이름_그룹명" 형식의 전체 이름 (예: "슬기_레드벨벳")
  * @param onVote 투표 시 콜백 (투표 하트 개수)
  * @param onDismiss 다이얼로그 닫기 콜백
+ * @param onNavigateToCertificate 투표 인증서 화면 이동 콜백 (100개 이상 투표 시)
  * @param voteViewModel 투표 ViewModel (하트 정보 로드 및 투표 처리)
  */
 @Composable
 fun ExoVoteDialog(
+    idolId: Int,
     fullName: String,
+    idolHeart: Long = 0L,  // 아이돌의 현재 총 투표 수
     onVote: (Long) -> Unit,
     onDismiss: () -> Unit,
+    onNavigateToCertificate: (Int) -> Unit = {},
     voteViewModel: VoteViewModel = hiltViewModel()
 ) {
     // 다이얼로그 표시 시 사용자 하트 정보 로드
@@ -86,10 +101,35 @@ fun ExoVoteDialog(
     val strongHeart = totalHeart - freeHeart
 
     var heartInput by remember { mutableStateOf("") }
+    var showVoteCompleteSheet by remember { mutableStateOf(false) }
+    var voteResult by remember { mutableStateOf<VoteResponse?>(null) }
+    var votedHeart by remember { mutableLongStateOf(0L) }
+
+    val coroutineScope = rememberCoroutineScope()
+    val voteRankingTitle = stringResource(R.string.vote_ranking)
 
     android.util.Log.d("ExoVoteDialog", "💰 Current hearts - total: $totalHeart, free: $freeHeart, strong: $strongHeart")
 
-    Dialog(onDismissRequest = onDismiss) {
+    // 투표 완료 바텀시트
+    if (showVoteCompleteSheet && voteResult != null) {
+        VoteCompleteBottomSheet(
+            voteCount = votedHeart,
+            bonusHeart = voteResult?.bonusHeart ?: 0,
+            title = voteRankingTitle,
+            subtitle = voteResult?.msg ?: "",
+            idolName = fullName,
+            currentVoteCount = idolHeart + votedHeart,  // 기존 투표 수 + 방금 투표한 수
+            onConfirm = { onNavigateToCertificate(idolId) },
+            onDismiss = {
+                showVoteCompleteSheet = false
+                onDismiss()
+            }
+        )
+    }
+
+    // 기존 투표 다이얼로그 (showVoteCompleteSheet가 false일 때만)
+    if (!showVoteCompleteSheet) {
+        Dialog(onDismissRequest = onDismiss) {
         // old: line 10-15 - LinearLayoutCompat with bg_popup
         Box(
             modifier = Modifier
@@ -359,7 +399,22 @@ fun ExoVoteDialog(
                         onClick = {
                             val voteHeart = heartInput.toLongOrNull() ?: 0
                             if (voteHeart > 0 && voteHeart <= totalHeart) {
-                                onVote(voteHeart)
+                                votedHeart = voteHeart
+                                coroutineScope.launch {
+                                    voteViewModel.voteIdol(
+                                        idolId = idolId,
+                                        heart = voteHeart,
+                                        onSuccess = { response ->
+                                            voteResult = response
+                                            showVoteCompleteSheet = true
+                                            onVote(voteHeart)
+                                        },
+                                        onError = { errorMsg ->
+                                            android.util.Log.e("ExoVoteDialog", "❌ Vote failed: $errorMsg")
+                                            // TODO: 에러 토스트 표시
+                                        }
+                                    )
+                                }
                             }
                         },
                         modifier = Modifier
@@ -397,6 +452,7 @@ fun ExoVoteDialog(
                 }
             }
         }
+    }
     }
 }
 
@@ -472,6 +528,188 @@ private fun HeartAllButton(
                 fontSize = 11.sp,
                 color = ColorPalette.textDefault
             )
+        }
+    }
+}
+
+/**
+ * 투표 완료 바텀시트
+ *
+ * old 프로젝트의 VoteBottomSheetFragment와 동일
+ * old: bottom_sheet_vote.xml
+ *
+ * 100개 미만 vs 100개 이상 차이:
+ * - 100개 미만: 보너스 하트 표시 없음, 버튼 텍스트 "확인"
+ * - 100개 이상: 보너스 하트 표시 (+N ❤️), 버튼 텍스트 "투표 인증서 확인", 클릭 시 인증서 화면 이동
+ *
+ * @param voteCount 투표한 하트 개수
+ * @param bonusHeart 보너스 하트 (0이면 100개 미만 투표)
+ * @param title 타이틀 (예: "순위 투표", "게시물 투표")
+ * @param subtitle 서브타이틀 (API에서 받은 메시지 - 빈 문자열이면 기본 메시지 생성)
+ * @param idolName 아이돌 이름 (기본 메시지 생성에 사용)
+ * @param currentVoteCount 현재 총 투표 수 (기본 메시지 생성에 사용)
+ * @param onConfirm 확인 버튼 클릭 (100개 이상일 때 인증서 화면 이동)
+ * @param onDismiss 닫기 콜백
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun VoteCompleteBottomSheet(
+    voteCount: Long,
+    bonusHeart: Int,
+    title: String,
+    subtitle: String,
+    idolName: String = "",
+    currentVoteCount: Long = 0L,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val hasBonusHeart = bonusHeart > 0
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // subtitle이 비어있으면 기본 메시지 생성 (old 프로젝트와 동일)
+    val displaySubtitle = if (subtitle.isEmpty()) {
+        stringResource(
+            R.string.response_v1_articles_give_heart,
+            NumberFormat.getNumberInstance(Locale.US).format(voteCount),
+            idolName,
+            NumberFormat.getNumberInstance(Locale.US).format(currentVoteCount),
+            NumberFormat.getNumberInstance(Locale.US).format(voteCount)
+        )
+    } else {
+        subtitle
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = Color.Transparent,
+        dragHandle = null
+    ) {
+        // old: cl_reward_root - paddingTop 10dp, transparent background
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp)
+        ) {
+            // 콘텐츠 영역 (배경 포함)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 84.dp)  // 이미지 중앙 (168dp/2)
+                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                    .background(ColorPalette.textWhiteBlack),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // 이미지 나머지 절반 + 18dp margin
+                Spacer(modifier = Modifier.height(84.dp + 18.dp))
+
+                // old: tv_title - 22sp bold
+                Text(
+                    text = title,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = ColorPalette.textChat,
+                    textAlign = TextAlign.Center
+                )
+
+                // old: cl_heart - 보너스 하트 (100개 이상일 때만)
+                if (hasBonusHeart) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(top = 8.dp)
+                    ) {
+                        // old: tv_plus
+                        Text(
+                            text = "+",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorPalette.main
+                        )
+                        // old: tv_heart
+                        Text(
+                            text = bonusHeart.toString(),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorPalette.main
+                        )
+                        // old: iv_heart - 21x17dp, marginStart 2dp
+                        Spacer(modifier = Modifier.width(2.dp))
+                        Image(
+                            painter = painterResource(R.drawable.img_popup_heart),
+                            contentDescription = null,
+                            modifier = Modifier.size(21.dp, 17.dp)
+                        )
+                    }
+                }
+
+                // old: tv_subtitle - 14sp, marginTop 12dp, marginHorizontal 24dp
+                Text(
+                    text = displaySubtitle,
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,  // 14sp 텍스트에 적절한 lineHeight
+                    color = ColorPalette.textDimmed,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp)
+                )
+
+                // old: tv_confirm - 55dp height, marginTop 26dp, marginHorizontal 24dp, radius 28dp
+                Button(
+                    onClick = {
+                        if (hasBonusHeart) {
+                            onConfirm()  // 인증서 화면 이동
+                        }
+                        onDismiss()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 24.dp, end = 24.dp, top = 26.dp)
+                        .height(55.dp),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ColorPalette.main
+                    )
+                ) {
+                    Text(
+                        text = if (hasBonusHeart)
+                            stringResource(R.string.vote_certificate_popup_button)
+                        else
+                            stringResource(R.string.btn_confirm),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+
+                // old: bottom view - 30dp height
+                Spacer(modifier = Modifier.height(30.dp))
+            }
+
+            // old: img_review - width=0dp(match_parent), height=168dp
+            Image(
+                painter = painterResource(R.drawable.img_popup_vote),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(168.dp)
+                    .align(Alignment.TopCenter)
+            )
+
+            // old: btn_close - 62dp, padding 25dp (icon ~12dp), marginTop 10dp from bg top, marginEnd 10dp
+            // bg top = 84dp, so absolute top = 84dp + 10dp = 94dp
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 94.dp, end = 10.dp)
+                    .size(62.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.btn_popup_close),
+                    contentDescription = "Close",
+                    modifier = Modifier.padding(25.dp),
+                    tint = Color.Unspecified
+                )
+            }
         }
     }
 }

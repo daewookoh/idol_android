@@ -80,8 +80,8 @@
     <string name="actor_title_review">Écrire un avis sur Google pour CHOEAEDOL Celeb</string>
     <string name="title_show_option">Paramètres de confidentialité</string>
     <string name="title_signup">Inscription</string>
-    <string name="title_level_heart">Rang accumulé?</string>
-    <string name="actor_title_level_heart">Rang accumulé?</string>
+    <string name="title_level_heart">Classement Cumulé ?</string>
+    <string name="actor_title_level_heart">Classement Cumulé ?</string>
     <string name="heart_count_format" formatted="false">%s</string>
     <string name="vote_count_format" formatted="false">%s</string>
     <string name="rank_count_format" formatted="false">%s</string>
@@ -111,7 +111,7 @@
     <string name="btn_signup_finish">Inscription</string>
     <string name="btn_signup_finish_1">Inscription terminée</string>
     <string name="my_action">Mes activités</string>
-    <string name="my_vote">Mes votes accumulés</string>
+    <string name="my_vote">Mes Votes Cumulés</string>
     <string name="menu_menu00">Événements</string>
     <string name="menu_menu01">Réglages de mon Idole</string>
     <string name="actor_menu_menu01">Mes paramètres de célébrités</string>
@@ -368,17 +368,17 @@
     <string name="error_8003">Vous êtes déjà amis.</string>
     <string name="error_9997">Vous pouvez envoyer 10 minutes après.</string>
     <string name="error_9998">Vous pouvez envoyer à jusqu\'à 3 cœurs par ami par jour.</string>
-    <string name="voting_guide_title1">Qu\'est-ce que mes "votes accumulés"?</string>
-    <string name="voting_guide_title2">Conditions pour le grade</string>
-    <string name="voting_guide_desc1">- C\'est le nombre de cœurs que vous avez voté pour votre idole.\n- Votre note et les votes accumulés seront réinitialisés si vous ne vous connectez pas pendant un certain temps.\n(Tout reviendra lorsque vous vous connecterez et voterez à nouveau.)\n- Vous recevrez 100 cœurs par jour pour le lancement de l\'application. , ainsi que des cœurs de récompense de niveau bonus en fonction de votre statut !</string>
-    <string name="actor_voting_guide_desc1">- C\'est le nombre de cœurs que vous avez voté pour votre célébrité.\n- Votre niveau et les votes accumulés seront réinitialisés si vous ne vous connectez pas pendant un certain temps.\n(Tout reviendra lorsque vous vous connecterez et voterez à nouveau.)\n- Vous recevrez 100 cœurs par jour pour lancer l\'application , ainsi que des cœurs de récompense de niveau bonus en fonction de votre statut !</string>
+    <string name="voting_guide_title1">Qu’est-ce que « Mes Votes Cumulés » ?</string>
+    <string name="voting_guide_title2">Guide des niveaux</string>
+    <string name="voting_guide_desc1">- C\'est le nombre de cœurs que vous avez voté pour votre idole.\n- Votre niveau et vos votes cumulés seront réinitialisés si vous ne vous connectez pas pendant un certain temps.\n(Tout reviendra lorsque vous vous connecterez et voterez à nouveau.)\n- Vous recevrez 100 cœurs par jour pour le lancement de l\'application. , ainsi que des cœurs de récompense de niveau bonus en fonction de votre statut !</string>
+    <string name="actor_voting_guide_desc1">- C\'est le nombre de cœurs que vous avez voté pour votre célébrité.\n- Votre niveau et vos votes cumulés seront réinitialisés si vous ne vous connectez pas pendant un certain temps.\n(Tout reviendra lorsque vous vous connecterez et voterez à nouveau.)\n- Vous recevrez 100 cœurs par jour pour lancer l\'application , ainsi que des cœurs de récompense de niveau bonus en fonction de votre statut !</string>
     <string name="level_heart_format" formatted="false">Votes accumulés: %s</string>
-    <string name="level_heart_guide_title1">La 1ère place du score cumulé devient le Ange de la charité👼</string>
-    <string name="actor_level_heart_guide_title1">La 1ère place du score cumulé devient le Ange de la charité👼</string>
+    <string name="level_heart_guide_title1">La 1ère place au Score Cumulé devient l’Ange de Charité👼</string>
+    <string name="actor_level_heart_guide_title1">La 1ère place au Score Cumulé devient l’Ange de Charité👼</string>
     <string name="level_heart_guide_title2">Points par rang</string>
     <string name="level_heart_guide_title3">Hall of Fame - Classements cumulatifs</string>
     <string name="level_heart_guide_title4">Avis</string>
-    <string name="level_heart_guide_desc1">Il s\'agit du total des scores obtenus lors des classements de vote quotidiens au cours des 30 derniers jours. Il expose le top 100.\nSi vous cliquez sur le nom de chaque individu et groupe, vous pouvez voir le graphique de changement de classement.\nNous faisons des dons à des lieux significatifs au nom d\'une idole et de son fandom, qui a été classé premier numéro un cumulé dans le classement sur 30 jours !\n\n✅ Méthode d\'agrégation\n- Membre : #1 score cumulé sur les 30 jours précédents, dont le 10 de chaque mois (annoncé le 11)\n- Groupe : #1 score cumulé sur les 30 jours précédents, dont le 15 de chaque mois (annoncé le 16)\n- Autres catégories : notifiées séparément lors de la procédure\n\n✅ Récompense\n- Don de 500 000 won aux organisations de protection sociale au nom de l\'artiste et du Fandom.\n- Publication d\'une annonce sur un tableau électronique dans le métro de Séoul</string>
+    <string name="level_heart_guide_desc1">Il s\'agit du total des scores obtenus lors des classements de vote quotidiens au cours des 30 derniers jours. Il affiche le top 100\nSi vous cliquez sur le nom de chaque individu et groupe, vous pouvez voir le graphique de changement de classement.\nNous faisons des dons à des lieux significatifs au nom d\'une idole et de son fandom, qui a été classé premier numéro un cumulé dans le classement sur 30 jours !\n\n✅ Méthode d\'agrégation\n- Membre : #1 score cumulé sur les 30 jours précédents, dont le 10 de chaque mois (annoncé le 11)\n- Groupe : #1 score cumulé sur les 30 jours précédents, dont le 15 de chaque mois (annoncé le 16)\n- Autres catégories : notifiées séparément lors de la procédure\n\n✅ Récompense\n- Don de 500 000 won aux organisations de protection sociale au nom de l\'artiste et du Fandom.\n- Publication d\'une annonce sur un tableau électronique dans le métro de Séoul</string>
     <string name="level_heart_guide_desc3">Les membres de chaque ligue sont déterminés selon les critères de changement de ligue le 11 (Individuel) et le 16 (Groupe).\nSi la ligue est modifiée, le score de classement cumulatif du Temple de la renommée commence par 0 point.</string>
     <string name="level_heart_guide_desc4">-La ligue des individus et des groupes est séparée. (Même si le groupe est en Ligue S, les individus peuvent être en Ligue A.)\n- En cas d\'égalité, toutes les égalités seront attribuées selon les règles d\'attribution de la ligue et seront réattribuées au nombre existant d\'équipes ou d\'individus le mois suivant .\nex.) Si 3 équipes obtiennent le même score en Ligue A, 3 équipes passeront en Ligue S (Changement du quota de la Ligue S à 13). Trois équipes de rang inférieur seront déplacées en Ligue A le mois suivant pour garder 12 équipes en Ligue S.\n- Les idoles nouvellement ajoutées commencent en Ligue A.\n- L\'historique des classements avant l\'introduction du système de ligue dans le Temple de la renommée est marqué comme \'ALL\'.</string>
     <string name="title_heart_vote_ranking__format" formatted="false">%s Top 100 des votes</string>
@@ -524,7 +524,7 @@
     <string name="setting_menu_cache">Supprimer le cache</string>
     <string name="are_you_sure">Êtes-vous sûr?</string>
     <string name="setting_menu_push_hearts">Cœur</string>
-    <string name="setting_menu_push_comments">Commentaire</string>
+    <string name="setting_menu_push_comments">Commentaires</string>
     <string name="menu_menu_kin">Q&amp;R Idole</string>
     <string name="actor_menu_menu_kin">Questions et réponses</string>
     <string name="hint_search"></string>
@@ -540,9 +540,16 @@
     <string name="purchased">Votre achat est terminé.</string>
     <string name="newbie_info"></string>
     <!-- permissoin (korean only) -->
-    <string name="permission_storage">Stockage : requis pour télécharger et enregistrer des photos.</string>
-    <string name="permission_desc"></string>
-    <string name="actor_permission_desc"></string>
+    <string name="permission_required">[Autorisations requises]</string>
+    <string name="permission_optional">[Autorisation(s) facultative(s)]</string>
+    <string name="permission_contact">Contacts : Requis pour la zone Cœur Gratuit. Requis pour la connexion Google.</string>
+    <string name="permission_phone">Téléphone : requis pour la station de remplissage de cœur gratuite</string>
+    <string name="permission_storage">Espace de stockage : nécessaire pour le chargement et l\'enregistrement des photos.</string>
+    <string name="permission_desc">Vous n\'avez pas besoin d\'autoriser l\'accès pour utiliser CHOEAEDOL.\n\nCHOEAEDOL ne collecte aucune information personnelle.</string>
+    <string name="actor_permission_desc">Vous n\'avez pas besoin d\'autoriser l\'accès pour utiliser CHOEAEDOL Celeb.\n\nCHOEAEDOL Celeb ne collecte aucune information personnelle.</string>
+    <string name="allow">Permettre</string>
+    <string name="deny">Refuser</string>
+    <string name="label_see_video_for_heartbox">Regarde une publicité et ouvre plus de boîtes de cœurs !</string>
     <!-- bj app -->
     <string name="format_reg_date" formatted="false">Inscrit en %s</string>
     <string name="laboratory">Laboratoire</string>
@@ -588,7 +595,7 @@
     <string name="gaon_final_guide">La période de vote est terminée.</string>
     <string name="gaon_final_title">Résultat final du %1$s ~ %2$s</string>
     <string name="menu_freeboard">Tableau</string>
-    <string name="myheart_today_earn">Le coeur éternel d\'aujourd\'hui</string>
+    <string name="myheart_today_earn">Cœurs gagnés aujourd’hui</string>
     <string name="myheart_today_earn_help">Si vous collectionnez %1$s coeurs, la première image de profil d\'idole sera changée avec le profil de mon idole. \nL\'image de profil modifiée sera réinitialisée demain.</string>
     <string name="actor_myheart_today_earn_help">Si vous gagnez %1$s «coeurs permanents», les images de profil de la première place seront remplacées par le profil de Mon acteur. Les images de profil modifiées seront réinitialisées demain.</string>
     <string name="label_image_option">Format d\'image</string>
@@ -651,7 +658,7 @@
     <string name="use_coupon">Utilisation</string>
     <string name="expire_coupon">Validité</string>
     <string name="my_info">Mon profil</string>
-    <string name="my_info_vote">Votes accumulés</string>
+    <string name="my_info_vote">Votes Cumulés</string>
     <string name="my_info_reg_date">Inscrit en</string>
     <string name="used_coupon">Utilisé</string>
     <string name="set_all_in_day">Set tout-en-un jour</string>
@@ -886,7 +893,7 @@
     <string name="title_notifications">Notification</string>
     <string name="label_no_notifications">Aucune notification.</string>
     <string name="label_delete_all_notifications">Tout effacer?</string>
-    <string name="actor_level_heart_guide_desc1">Les classements sont basés sur les scores accumulés qui sont combinés et agrégés au cours des 30 derniers jours pour chaque fandom du Temple de la renommée. Seuls les 100 premiers sont affichés.\nSi vous cliquez sur chaque fandom, le changement de classement correspondant sera affiché.\nLes dons seront faits au nom de célébrités en fonction des classements accumulés au cours des 30 derniers jours !\n\n✅ Critères de réussite\n- Condition1 : une moyenne de 3 000 000 de votes ou plus au cours des 30 derniers jours\n- Condition2 : classé 1er ou 2ème dans chaque catégorie au cours des 6 derniers jours au Hall of Fame\n- Les deux conditions doivent être remplies pour être sélectionné comme Charity Angel.\n\n✅ Récompense\n- Catégorie 1ère place\n(1)Don de 500 000 KRW à la Miral Welfare Foundation\n(2)Publicité du métro à la station d\'entrée de Hongdae\n(3)Bannière publicitaire pleine page\n(4)Annonce coulissante du menu\n- Catégorie 2ème place\n(1)Don de 500 000 KRW à la Miral Welfare Foundation\n(2)Publicité du métro au poste d\'entrée de Hongdae\n(3)Bannière publicitaire pleine page</string>
+    <string name="actor_level_heart_guide_desc1">Les classements sont basés sur les scores accumulés qui sont combinés et agrégés au cours des 30 derniers jours pour chaque fandom du Temple de la renommée. Seuls les 100 premiers sont affichés.\nSi vous cliquez sur chaque fandom, le changement de classement correspondant sera affiché.\nLes dons seront faits au nom de célébrités en fonction des classements accumulés au cours des 30 derniers jours !\n\n✅ Critères de réussite\n- Condition1 : une moyenne de 3 000 000 de votes ou plus au cours des 30 derniers jours\n- Condition2 : classé 1er ou 2ᵉ dans la catégorie correspondante au Hall of Fame le 6 de chaque mois\n- Les deux conditions doivent être remplies pour être sélectionné comme Charity Angel.\n\n✅ Récompense\n- Catégorie 1ère place\n(1)Don de 500 000 KRW à la Miral Welfare Foundation\n(2)Publicité du métro à la station d\'entrée de Hongdae\n(3)Bannière publicitaire pleine page\n(4)Annonce coulissante du menu\n- Catégorie 2ème place\n(1)Don de 500 000 KRW à la Miral Welfare Foundation\n(2)Publicité du métro au poste d\'entrée de Hongdae\n(3)Bannière publicitaire pleine page</string>
     <string name="AAA">AAA</string>
     <string name="award_guide">Info</string>
     <string name="award_example">S\'aligner</string>
@@ -1717,6 +1724,7 @@ Offrez un cadeau spécial à mon idole sur CHOEAEDOL !💖</string>
     <string name="video_image_picker_not_found">La sélection de vidéos et d\'images n\'est pas prise en charge</string>
     <string name="push_setting_guide_head">Moment de Dukjil</string>
     <string name="push_setting_guide_body">Activez les notifications et ne manquez jamais votre actualité préférée !</string>
+    <string name="setting_menu_push_comments_only">Commentaire</string>
     <string name="setting_menu_push_likes">Goûts</string>
     <string name="setting_menu_push_hotposts">Messages chauds</string>
     <string name="levelheart_bonus_yes">🎬 Regarder la publicité</string>
@@ -1774,4 +1782,6 @@ Veuillez changer de pays ou de région et réessayer.</string>
     <string name="reward_invite_mission_completion">Récompense d\'achèvement de mission d\'invitation d\'ami</string>
     <string name="signup_desc2_noreward">Saisissez le code d’invitation de votre parrain pour échanger des cœurs entre amis.</string>
     <string name="signup_toast_auto_fill_recommender">Le code d\'invitation copié a été saisi automatiquement.</string>
+    <string name="vote_ranking">Vote effectué</string>
+    <string name="heart_arcade_description1">Jouez aux mini-jeux🕹️ et gagnez des cœurs🩷</string>
 </resources>

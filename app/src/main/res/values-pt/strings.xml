@@ -80,8 +80,8 @@
     <string name="actor_title_review">Escrever um comentário no Google para o CHOEAEDOL Celeb</string>
     <string name="title_show_option">Configurações de privacidade</string>
     <string name="title_signup">Registro de membro</string>
-    <string name="title_level_heart">O que significa grupo, indivíduo acumulado?</string>
-    <string name="actor_title_level_heart">O que significa grupo, indivíduo acumulado?</string>
+    <string name="title_level_heart">Ranking Acumulado?</string>
+    <string name="actor_title_level_heart">Ranking Acumulado?</string>
     <string name="heart_count_format" formatted="false">%s</string>
     <string name="vote_count_format" formatted="false">%s</string>
     <string name="rank_count_format" formatted="false">%s</string>
@@ -111,7 +111,7 @@
     <string name="btn_signup_finish">Registro</string>
     <string name="btn_signup_finish_1">Registro completo</string>
     <string name="my_action">Minhas atividades</string>
-    <string name="my_vote">Meus votos acumulados</string>
+    <string name="my_vote">Meus Votos Acumulados</string>
     <string name="menu_menu00">Eventos</string>
     <string name="menu_menu01">Configurações dos meus ídolos</string>
     <string name="actor_menu_menu01">Configurações dos meus celeb</string>
@@ -368,13 +368,13 @@
     <string name="error_8003">Vocês já são amigos.</string>
     <string name="error_9997">Você poderá enviar em 10 minutos.</string>
     <string name="error_9998">Só é permitido enviar até 3 corações por amigo por dia.</string>
-    <string name="voting_guide_title1">Quanto votos acumulados eu tenho?</string>
-    <string name="voting_guide_title2">Condições para Pontuar</string>
-    <string name="voting_guide_desc1">- Este é o número de corações que você votou no seu Ídolo.\n- Sua nota e votos acumulados serão zerados se você não fizer login por um determinado período de tempo.\n(Tudo retornará quando você fizer login e votar novamente.)\n- Você receberá 100 corações diariamente ao iniciar o aplicativo , bem como corações de recompensa de nível de bônus com base no status do seu nível!</string>
-    <string name="actor_voting_guide_desc1">- Este é o número de corações que você votou na sua celebridade.\n- Seu nível e votos acumulados serão zerados se você não fizer login por um determinado período de tempo.\n(Tudo retornará quando você fizer login e votar novamente.)\n- Você receberá 100 corações diariamente ao iniciar o aplicativo , bem como corações de recompensa de nível de bônus com base no status do seu nível!</string>
+    <string name="voting_guide_title1">O que são “Meus Votos Cumulados”?</string>
+    <string name="voting_guide_title2">Guia de Níveis</string>
+    <string name="voting_guide_desc1">- Este é o número de corações que você votou no seu Ídolo.\n- Seu nível e seus votos acumulados serão redefinidos se você não fizer login por um determinado período de tempo.\n(Tudo retornará quando você fizer login e votar novamente.)\n- Você receberá 100 corações diariamente ao iniciar o aplicativo , bem como corações de recompensa de nível de bônus com base no status do seu nível!</string>
+    <string name="actor_voting_guide_desc1">- Este é o número de corações que você votou na sua celebridade.\n- Seu nível e seus votos acumulados serão redefinidos se você não fizer login por um determinado período de tempo.\n(Tudo retornará quando você fizer login e votar novamente.)\n- Você receberá 100 corações diariamente ao iniciar o aplicativo , bem como corações de recompensa de nível de bônus com base no status do seu nível!</string>
     <string name="level_heart_format" formatted="false">Votos acumulados: %s</string>
-    <string name="level_heart_guide_title1">O 1º colocado na pontuação acumulada passa a ser o Anjo da caridade👼</string>
-    <string name="actor_level_heart_guide_title1">O 1º colocado na pontuação acumulada passa a ser o Anjo da caridade👼</string>
+    <string name="level_heart_guide_title1">O 1º lugar na Pontuação Cumulativa se torna o Anjo da Caridade👼</string>
+    <string name="actor_level_heart_guide_title1">O 1º lugar na Pontuação Cumulativa se torna o Anjo da Caridade👼</string>
     <string name="level_heart_guide_title2">Pontos por classificação</string>
     <string name="level_heart_guide_title3">Hall of Fame - Classificações cumulativas</string>
     <string name="level_heart_guide_title4">Perceber</string>
@@ -536,7 +536,7 @@
     <string name="setting_menu_cache">Limpar memória cache</string>
     <string name="are_you_sure">Tem certeza?</string>
     <string name="setting_menu_push_hearts">Corações</string>
-    <string name="setting_menu_push_comments">Comentário</string>
+    <string name="setting_menu_push_comments">Comentários</string>
     <string name="menu_menu_kin">İdol Dúvidas</string>
     <string name="actor_menu_menu_kin">Dúvidas</string>
     <string name="hint_search">Digite o texto para pesquisa</string>
@@ -559,15 +559,15 @@
     <string name="message_empty">Sem mensagens.</string>
     <!-- permissoin (korean only) -->
     <string name="permission_required">[Permissões necessárias]</string>
-    <string name="permission_optional">[Permissões opcionais]</string>
-    <string name="permission_contact">Contatos: Obrigatórios para a estação de recarga gratuita de corações. Necessário para acessar via Google.</string>
-    <string name="permission_phone">Celular: Necessário para a estação de recarga gratuita de corações</string>
-    <string name="permission_storage">Armazenamento: necessário para enviar e salvar fotos.</string>
-    <string name="permission_desc"></string>
-    <string name="actor_permission_desc"></string>
+    <string name="permission_optional">[Permissão(ões) opcional(is)]</string>
+    <string name="permission_contact">Contatos: Necessário para a área Coração Grátis. Necessário para login do Google.</string>
+    <string name="permission_phone">Telefone: Necessário para o posto de recarga cardíaca gratuita</string>
+    <string name="permission_storage">Armazenamento: Necessário para carregar e salvar fotos.</string>
+    <string name="permission_desc">Você não precisa conceder permissões de acesso para usar o CHOEAEDOL.\n\nCHOEAEDOL não coleta nenhuma informação pessoal.</string>
+    <string name="actor_permission_desc">Você não precisa conceder permissões de acesso para usar o CHOEAEDOL Celeb.\n\nCHOEAEDOL Celeb não coleta nenhuma informação pessoal.</string>
     <string name="allow">Permitir</string>
     <string name="deny">Negar</string>
-    <string name="label_see_video_for_heartbox">Um anúncio em vídeo. Mais uma chance</string>
+    <string name="label_see_video_for_heartbox">Assista a um anúncio e abra mais Caixas de Corações!</string>
     <!-- bj app -->
     <string name="profile_additional_info">Informações adicionais</string>
     <string name="profile_birth">Data de nascimento</string>
@@ -625,7 +625,7 @@
     <string name="gaon_final_guide">O período de votação se encerrou.</string>
     <string name="gaon_final_title">%1$s ~ %2$s</string>
     <string name="menu_freeboard">Painel</string>
-    <string name="myheart_today_earn">Coração permanente coletado hoje</string>
+    <string name="myheart_today_earn">Corações ganhos hoje</string>
     <string name="myheart_today_earn_help">Se você coletar %1$s corações, \na primeira imagem de perfil do ídolo será alterada com o perfil do meu ídolo. \nA imagem alterada do perfil será redefinida amanhã.</string>
     <string name="actor_myheart_today_earn_help">Se você ganhar %1$s "Coração permanente", as imagens do primeiro perfil serão alteradas para o perfil do My actor. As imagens de perfil alteradas serão repostas amanhã.</string>
     <string name="label_image_option">Proporção de foto</string>
@@ -922,7 +922,7 @@
     <string name="title_notifications">Notificação</string>
     <string name="label_no_notifications">Nenhuma notificação.</string>
     <string name="label_delete_all_notifications">Limpar tudo?</string>
-    <string name="actor_level_heart_guide_desc1">As classificações são baseadas em pontuações acumuladas que são combinadas e agregadas nos últimos 30 dias de cada fandom no Hall da Fama. Apenas os 100 primeiros são exibidos.\nSe você clicar em cada fandom, será mostrada a mudança de classificação correspondente.\nAs doações serão feitas em nomes de celebridades com base nos rankings acumulados nos últimos 30 dias!\n\n✅ Critérios de desempenho\n- Condição1: média de 3.000.000 votos ou mais nos últimos 30 dias\n- Condição2: classificação em 1º ou 2º lugar em cada categoria nos últimos 6 dias no Hall da Fama\n- Ambas as condições devem ser atendidas para ser selecionado como Charity Angel.\n\n✅ Recompensa\n- Categoria 1º lugar\n(1)Doação de 500.000KRW para Miral Welfare Foundation\n(2)Anúncio do metrô na estação de entrada de Hongdae\n(3)Anúncio em banner de página inteira\n(4)Anúncio deslizante de menu\n- Categoria 2º lugar\n(1)Doação de 500.000KRW para Miral Welfare Foundation\n(2)Anúncio de metrô na estação de entrada de Hongdae\n(3)Anúncio em banner de página inteira</string>
+    <string name="actor_level_heart_guide_desc1">As classificações são baseadas em pontuações acumuladas que são combinadas e agregadas nos últimos 30 dias de cada fandom no Hall da Fama. Apenas os 100 primeiros são exibidos.\nSe você clicar em cada fandom, será mostrada a mudança de classificação correspondente.\nAs doações serão feitas em nomes de celebridades com base nos rankings acumulados nos últimos 30 dias!\n\n✅ Critérios de desempenho\n- Condição1: média de 3.000.000 votos ou mais nos últimos 30 dias\n- Condição2 : ficar em 1º ou 2º lugar na categoria correspondente no Hall da Fama no dia 6 de cada mês\n- Ambas as condições devem ser atendidas para ser selecionado como Charity Angel.\n\n✅ Recompensa\n- Categoria 1º lugar\n(1)Doação de 500.000KRW para Miral Welfare Foundation\n(2)Anúncio do metrô na estação de entrada de Hongdae\n(3)Anúncio em banner de página inteira\n(4)Anúncio deslizante de menu\n- Categoria 2º lugar\n(1)Doação de 500.000KRW para Miral Welfare Foundation\n(2)Anúncio de metrô na estação de entrada de Hongdae\n(3)Anúncio em banner de página inteira</string>
     <string name="AAA">AAA</string>
     <string name="award_guide">Informações</string>
     <string name="award_example">Alinhar</string>
@@ -1754,6 +1754,7 @@ Dê um presente especial ao meu ídolo no CHOEAEDOL!💖</string>
     <string name="video_image_picker_not_found">A seleção de vídeo e imagem não é suportada</string>
     <string name="push_setting_guide_head">Momento de Dukjil</string>
     <string name="push_setting_guide_body">Ative as notificações e nunca perca suas novidades favoritas!</string>
+    <string name="setting_menu_push_comments_only">Comentário</string>
     <string name="setting_menu_push_likes">Curtidas</string>
     <string name="setting_menu_push_hotposts">Postagens interessantes</string>
     <string name="levelheart_bonus_yes">🎬 Assistir anúncio</string>
@@ -1811,4 +1812,6 @@ Mude para outro país ou região e tente novamente.</string>
     <string name="reward_invite_mission_completion">Recompensa por conclusão da missão de convite de amigo</string>
     <string name="signup_desc2_noreward">Digite o código de convite do seu referente para trocar Corações com amigos.</string>
     <string name="signup_toast_auto_fill_recommender">O código de convite copiado foi inserido automaticamente.</string>
+    <string name="vote_ranking">Votado</string>
+    <string name="heart_arcade_description1">Jogue minijogos🕹️ e ganhe corações🩷</string>
 </resources>

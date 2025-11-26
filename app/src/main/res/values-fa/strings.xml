@@ -80,8 +80,8 @@
     <string name="actor_title_review">برای CHOEAEDOL Celeb یک نظر بنویسید</string>
     <string name="title_show_option">تنظیمات حریم خصوصی</string>
     <string name="title_signup">ثبت نام عضویت</string>
-    <string name="title_level_heart">رتبه انباشته به چه معنی است؟</string>
-    <string name="actor_title_level_heart">رتبه انباشته به چه معنی است؟</string>
+    <string name="title_level_heart">رتبه‌بندی تجمعی؟</string>
+    <string name="actor_title_level_heart">رتبه‌بندی تجمعی؟</string>
     <string name="heart_count_format" formatted="false">%s</string>
     <string name="vote_count_format" formatted="false">%s</string>
     <string name="rank_count_format" formatted="false">%s</string>
@@ -111,7 +111,7 @@
     <string name="btn_signup_finish">ثبت نام</string>
     <string name="btn_signup_finish_1">ثبت نام کامل شد</string>
     <string name="my_action">فعالیت ها</string>
-    <string name="my_vote">آراء جمع شده</string>
+    <string name="my_vote">آرای تجمعی من</string>
     <string name="menu_menu00">رویداد</string>
     <string name="menu_menu01">تنظیمات بت من</string>
     <string name="actor_menu_menu01">تنظیمات مشهورتي</string>
@@ -368,17 +368,17 @@
     <string name="error_8003">شما قبلاً دوست هستید.</string>
     <string name="error_9997">بعد از 10 دقیقه می توانید ارسال کنید.</string>
     <string name="error_9998">شما فقط می توانید هر روز حداکثر 3 قلب برای هر دوست بفرستید.</string>
-    <string name="voting_guide_title1">آرای جمع شده من چیست؟</string>
-    <string name="voting_guide_title2">شرایط برای درجه</string>
+    <string name="voting_guide_title1">«آرای تجمیعی من» چیست؟</string>
+    <string name="voting_guide_title2">راهنمای سطح</string>
     <string name="voting_guide_desc1">- این تعداد قلب هایی است که به بت خود رای داده اید.\n- اگر برای مدت معینی وارد سیستم نشوید، نمره و آرای جمع شده شما بازنشانی می شود.\n(هنگامی که وارد سیستم شوید و دوباره رای دهید همه چیز برمی گردد.)\n- روزانه 100 قلب برای راه اندازی برنامه دریافت خواهید کرد. ، و همچنین قلب های پاداش سطح جایزه بر اساس وضعیت سطح شما!</string>
     <string name="actor_voting_guide_desc1">- این تعداد قلب هایی است که به Celeb خود رای داده اید.\n- اگر برای مدت معینی وارد سیستم نشوید، سطح و آرای جمع شده شما بازنشانی می شود.\n(هنگامی که وارد سیستم شوید و دوباره رای دهید همه چیز برمی گردد.)\n- روزانه 100 قلب برای راه اندازی برنامه دریافت خواهید کرد. ، و همچنین قلب های پاداش سطح جایزه بر اساس وضعیت سطح شما!</string>
     <string name="level_heart_format" formatted="false">آرا جمع شده: %s</string>
-    <string name="level_heart_guide_title1">رتبه اول در رتبه بندی انباشته فرشته خیریه می شود.👼</string>
-    <string name="actor_level_heart_guide_title1">رتبه اول در رتبه بندی انباشته فرشته خیریه می شود.👼</string>
+    <string name="level_heart_guide_title1">نفر اول در امتیاز تجمعی به فرشتهٔ نیکوکاری تبدیل می‌شود👼</string>
+    <string name="actor_level_heart_guide_title1">نفر اول در امتیاز تجمعی به فرشتهٔ نیکوکاری تبدیل می‌شود👼</string>
     <string name="level_heart_guide_title2">امتیازات براساس رتبه</string>
     <string name="level_heart_guide_title3">تالار مشاهیر - رتبه بندی تجمعی</string>
     <string name="level_heart_guide_title4">اطلاع</string>
-    <string name="level_heart_guide_desc1">این مجموع امتیازات کسب شده از رتبه بندی روزانه رای گیری در 30 روز گذشته است. 100 مورد برتر را نشان می دهد.\nاگر روی نام هر فرد و گروه کلیک کنید، می توانید نمودار تغییر رتبه را مشاهده کنید.\nما به مکان های معنی دار به نام یک بت و هوادار آن که در رتبه بندی 30 روزه رتبه اول انباشته شده رتبه یک را داشت، کمک مالی می کنیم!\n\n✅ روش تجمیع\n- عضو: شماره 1 امتیاز انباشته برای 30 روز قبل، شامل روز دهم هر ماه (اعلام شده در یازدهم)\n- گروه: نمره انباشته شماره 1 برای 30 روز قبل، شامل پانزدهم هر ماه ماه (اعلام شده در شانزدهم)\n- سایر دسته ها: هنگام ادامه به طور جداگانه اطلاع داده می شود\n\n✅ جایزه\n- اهدای 500000 وون به سازمان بهزیستی به نام هنرمند و فن.\n- ارسال آگهی برد الکترونیکی در متروی سئول</string>
+    <string name="level_heart_guide_desc1">این مجموع امتیازاتی است که از رتبه‌بندی‌های رأی‌گیری روزانه در ۳۰ روز گذشته به‌دست آمده است. ۱۰۰ رتبه برتر نمایش داده می‌شود.\nبا کلیک روی نام هر فرد یا گروه، می‌توانید نمودار تغییر رتبه آنها را مشاهده کنید.\nما به نام آیدل و فندومی که در رتبه‌بندی تجمعی ۳۰ روزه رتبه اول را کسب کرده‌اند، به مکان‌های معنادار کمک مالی می‌کنیم!!\n\n✅ روش تجمیع\n- فردی: رتبه ۱ امتیاز تجمعی در ۳۰ روز گذشته، شامل روز دهم هر ماه (اعلام در روز یازدهم)\n- گروه: رتبه ۱ امتیاز تجمعی در ۳۰ روز گذشته، شامل روز پانزدهم هر ماه (اعلام در روز شانزدهم)\n- سایر دسته‌ها: هنگام اجرا به‌طور جداگانه اطلاع‌رسانی می‌شود\n\n✅ پاداش\n- اهدای ۵۰۰٬۰۰۰ وون به سازمان‌های رفاهی به نام هنرمند و فندوم\n- نمایش تبلیغ تابلوی الکترونیکی در متروی سئول</string>
     <string name="level_heart_guide_desc3">اعضای هر لیگ بر اساس معیارهای تغییر لیگ در روزهای یازدهم (انفرادی) و شانزدهم (گروه) تعیین می‌شوند.» اگر لیگ تغییر کند، امتیاز رده‌بندی تجمعی تالار مشاهیر با 0 امتیاز شروع می‌شود.</string>
     <string name="level_heart_guide_desc4">-لیگ انفرادی و گروهی جداست. (حتی اگر گروه در لیگ S باشد، افراد می توانند در لیگ A حضور داشته باشند.)\n- در صورت تساوی، همه تساوی ها طبق قوانین تخصیص لیگ تعیین می شود و در ماه بعد به تعداد تیم ها یا افراد موجود تخصیص داده می شود. .\nبه عنوان مثال) اگر 3 تیم در لیگ A امتیاز یکسانی کسب کنند، 3 تیم به لیگ S می روند (تغییر سهمیه لیگ S به 13). سه تیم با رده پایین ماه بعد به لیگ A منتقل خواهند شد تا 12 تیم در لیگ S باقی بمانند.\n- بت های جدید اضافه شده در لیگ A شروع می شوند.\n- تاریخچه رتبه بندی قبل از معرفی سیستم لیگ در تالار مشاهیر به عنوان "ALL" مشخص شده است.</string>
     <string name="title_heart_vote_ranking__format" formatted="false">%s100 رای برتر</string>
@@ -536,7 +536,7 @@
     <string name="setting_menu_cache">حافظه نهان را پاک کنید</string>
     <string name="are_you_sure">مطمئنی؟</string>
     <string name="setting_menu_push_hearts">قلب</string>
-    <string name="setting_menu_push_comments">نظر دهید</string>
+    <string name="setting_menu_push_comments">نظرات</string>
     <string name="menu_menu_kin">سوال و جواب آیدل</string>
     <string name="actor_menu_menu_kin">پرسش و پاسخ</string>
     <string name="hint_search">متن جستجو را وارد کنید</string>
@@ -558,16 +558,16 @@
     <string name="message_send_heart">ارسال با قلب</string>
     <string name="message_empty">هیچ پیامی وجود ندارد.</string>
     <!-- permissoin (korean only) -->
-    <string name="permission_required">[مجوزهای لازم]</string>
-    <string name="permission_optional">[مجوز(های اختیاری)]</string>
-    <string name="permission_contact">مخاطبین : مورد نیاز ایستگاه پر کردن مجدد قلب است. برای ورود به سیستم گوگل لازم است.</string>
-    <string name="permission_phone">تلفن : برای ایستگاه پر کردن مجدد قلب مورد نیاز است</string>
-    <string name="permission_storage">فضای ذخیره سازی: برای آپلود و ذخیره عکس ها مورد نیاز است.</string>
-    <string name="permission_desc">نیازی به مجوزهای دسترسی برای استفاده از CHOEAEDOL نیست. \n\nCHOEAEDOL اطلاعات شخصی را جمع آوری نمی کند.</string>
-    <string name="actor_permission_desc">نیازی به مجوز دسترسی برای استفاده از CHOEAEDOL Celeb نیست. \n\nCHOEAEDOL Celeb اطلاعات شخصی را جمع آوری نمی کند.</string>
+    <string name="permission_required">[مجوز(های) مورد نیاز]</string>
+    <string name="permission_optional">[مجوز(های) اختیاری]</string>
+    <string name="permission_contact">اطلاعات تماس: لازم برای بخش قلب رایگان. لازم برای ورود با گوگل.</string>
+    <string name="permission_phone">تلفن: برای استفاده از پمپ بنزین رایگان قلب الزامی است</string>
+    <string name="permission_storage">فضای ذخیره‌سازی: برای آپلود و ذخیره عکس‌ها مورد نیاز است.</string>
+    <string name="permission_desc">برای استفاده از CHOEAEDOL نیازی به دادن مجوز دسترسی ندارید.\n\nCHOEAEDOL هیچ اطلاعات شخصی جمع‌آوری نمی‌کند.</string>
+    <string name="actor_permission_desc">برای استفاده از CHOEAEDOL Celeb نیازی به دادن مجوز دسترسی ندارید.\n\nCHOEAEDOL Celeb هیچ اطلاعات شخصی جمع‌آوری نمی‌کند.</string>
     <string name="allow">اجازه</string>
     <string name="deny">انکار</string>
-    <string name="label_see_video_for_heartbox">تبلیغات ویدیویی را تماشا کنید ، جعبه قلب بیشتری کسب کنید</string>
+    <string name="label_see_video_for_heartbox">یک ویدیو تماشا کن و جعبه‌های قلب بیشتری باز کن!</string>
     <!-- bj app -->
     <string name="profile_additional_info">اطلاعات اضافی</string>
     <string name="profile_birth">تاریخ تولد</string>
@@ -633,7 +633,7 @@
     <string name="confirm_change_account">شما قبلاً در همان ایمیل مشترک شده اید. آیا می خواهید این حساب را به روشی که انتخاب کرده اید تغییر دهید؟</string>
     <string name="facebook_no_email">اطلاعات ایمیل ازفیس بوک دریافت نشد.</string>
     <string name="menu_freeboard">صفحه</string>
-    <string name="myheart_today_earn">تا به امروز قلب جمع آوری شده است</string>
+    <string name="myheart_today_earn">قلب‌های امروز جمع‌شده</string>
     <string name="myheart_today_earn_help">اگر جمع کنید %1$s قلبهای همیشه ، تصویر نمایه بت اول با نمایه بت من تغییر خواهد کرد. \nتصویر نمایه تغییر یافته فردا بازنشانی می شود.</string>
     <string name="actor_myheart_today_earn_help">اگر درآمد کسب کنید %1$s قلب همیشه ، تصاویر پروفایل مکان اول به پروفایل بازیگر من تغییر خواهند کرد. \nتصاویر نمایه تغییر یافته فردا بازنشانی می شوند.</string>
     <string name="label_image_option">نسبت ابعاد عکس</string>
@@ -1846,6 +1846,7 @@
     <string name="video_image_picker_not_found">انتخاب ویدیو و تصویر پشتیبانی نمی شود</string>
     <string name="push_setting_guide_head">زمان دوکجیل</string>
     <string name="push_setting_guide_body">اعلان ها را روشن کنید و هرگز اخبار مورد علاقه خود را از دست ندهید!</string>
+    <string name="setting_menu_push_comments_only">نظر دهید</string>
     <string name="setting_menu_push_likes">دوست دارد</string>
     <string name="setting_menu_push_hotposts">پست های داغ</string>
     <string name="levelheart_bonus_yes">🎬 AD را تماشا کنید</string>
@@ -1903,4 +1904,6 @@
     <string name="reward_invite_mission_completion">پاداش تکمیل ماموریت دعوت دوست</string>
     <string name="signup_desc2_noreward">برای تبادل قلب‌ها به عنوان دوست، کد دعوت معرف خود را وارد کنید.</string>
     <string name="signup_toast_auto_fill_recommender">کد دعوت کپی شده به صورت خودکار وارد شده است.</string>
+    <string name="vote_ranking">رأی داده شد</string>
+    <string name="heart_arcade_description1">Jogue minijogos🕹️ e ganhe corações🩷</string>
 </resources>

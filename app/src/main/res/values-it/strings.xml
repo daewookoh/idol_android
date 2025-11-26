@@ -80,8 +80,8 @@
     <string name="actor_title_review">Scrivi una recensione per CHOEAEDOL Celeb</string>
     <string name="title_show_option">Impostazioni della privacy</string>
     <string name="title_signup">Registrazione soci</string>
-    <string name="title_level_heart">Cosa significa rango accumulato?</string>
-    <string name="actor_title_level_heart">Cosa significa rango accumulato?</string>
+    <string name="title_level_heart">Classifica Cumulativa?</string>
+    <string name="actor_title_level_heart">Classifica Cumulativa?</string>
     <string name="heart_count_format" formatted="false">%s</string>
     <string name="vote_count_format" formatted="false">%s</string>
     <string name="rank_count_format" formatted="false">%s</string>
@@ -111,7 +111,7 @@
     <string name="btn_signup_finish">Iscriviti</string>
     <string name="btn_signup_finish_1">Iscrizione completata</string>
     <string name="my_action">Attività</string>
-    <string name="my_vote">Voti accumulati</string>
+    <string name="my_vote">I miei voti cumulativi</string>
     <string name="menu_menu00">Eventi</string>
     <string name="menu_menu01">Le impostazioni del Mio Idolo</string>
     <string name="actor_menu_menu01">Le impostazioni delle Mie Celebrità</string>
@@ -368,13 +368,13 @@
     <string name="error_8003">Siete già amici</string>
     <string name="error_9997">Puoi inviare dopo 10 minuti.</string>
     <string name="error_9998">Puoi inviare fino a 3 cuori per amico solo ogni giorno.</string>
-    <string name="voting_guide_title1">Quali sono i miei voti accumulati?</string>
-    <string name="voting_guide_title2">Condizioni per il rango</string>
-    <string name="voting_guide_desc1">- Questo è il numero di cuori che hai votato per il tuo Idolo.\n- Il tuo voto e i voti accumulati verranno ripristinati se non accedi per un certo periodo di tempo.\n(Tutto tornerà quando accedi e voterai di nuovo.)\n- Riceverai 100 cuori al giorno per l\'avvio dell\'app , così come i cuori premio di livello bonus in base al tuo stato di livello!</string>
-    <string name="actor_voting_guide_desc1">- Questo è il numero di cuori che hai votato per la tua celebrità.\n- Il tuo livello e i voti accumulati verranno ripristinati se non accedi per un certo periodo di tempo.\n(Tutto tornerà quando accedi e voterai di nuovo.)\n- Riceverai 100 cuori al giorno per l\'avvio dell\'app , così come i cuori premio di livello bonus in base al tuo stato di livello!</string>
+    <string name="voting_guide_title1">Che cos’è “I miei voti cumulativi”?</string>
+    <string name="voting_guide_title2">Guida ai livelli</string>
+    <string name="voting_guide_desc1">- Questo è il numero di cuori che hai votato per il tuo Idolo.\n- Il tuo livello e i tuoi voti cumulativi verranno reimpostati se non accedi per un determinato periodo di tempo.\n(Tutto tornerà quando accedi e voterai di nuovo.)\n- Riceverai 100 cuori al giorno per l\'avvio dell\'app , così come i cuori premio di livello bonus in base al tuo stato di livello!</string>
+    <string name="actor_voting_guide_desc1">- Questo è il numero di cuori che hai votato per la tua celebrità.\n- Il tuo livello e i tuoi voti cumulativi verranno reimpostati se non accedi per un determinato periodo di tempo.\n(Tutto tornerà quando accedi e voterai di nuovo.)\n- Riceverai 100 cuori al giorno per l\'avvio dell\'app , così come i cuori premio di livello bonus in base al tuo stato di livello!</string>
     <string name="level_heart_format" formatted="false">Voti accumulati: %s</string>
-    <string name="level_heart_guide_title1">Il 1° posto nel punteggio accumulato diventa l\'Angelo della carità👼</string>
-    <string name="actor_level_heart_guide_title1">Il 1° posto nel punteggio accumulato diventa l\'Angelo della carità👼</string>
+    <string name="level_heart_guide_title1">Il primo posto nel Punteggio Cumulativo diventa l’Angelo della Carità👼</string>
+    <string name="actor_level_heart_guide_title1">Il primo posto nel Punteggio Cumulativo diventa l’Angelo della Carità👼</string>
     <string name="level_heart_guide_title2">Punti per rango</string>
     <string name="level_heart_guide_title3">Hall of Fame - Classifiche cumulative</string>
     <string name="level_heart_guide_title4">Avviso</string>
@@ -536,7 +536,7 @@
     <string name="setting_menu_cache">Elimina cache</string>
     <string name="are_you_sure">Sei sicuro?</string>
     <string name="setting_menu_push_hearts">Cuori</string>
-    <string name="setting_menu_push_comments">Commento</string>
+    <string name="setting_menu_push_comments">Commenti</string>
     <string name="menu_menu_kin">Q&amp;A Idol</string>
     <string name="actor_menu_menu_kin">Domande e risposte</string>
     <string name="hint_search">Inserisci il testo di ricerca</string>
@@ -558,16 +558,16 @@
     <string name="message_send_heart">Invia con i Cuori</string>
     <string name="message_empty">Nessun messaggio</string>
     <!-- permissoin (korean only) -->
-    <string name="permission_required">[Autorizzazione/i richiesta/e]</string>
-    <string name="permission_optional">[Autorizzazione/i facoltativa/e]</string>
-    <string name="permission_contact">Contatti : richiesti per la stazione di ricarica cardiaca libera. Richiesto per l\'accesso a Google.</string>
-    <string name="permission_phone">Telefono : richiesti per la stazione di ricarica cardiaca gratuita</string>
-    <string name="permission_storage">Spazio di archiviazione: necessario per caricare e salvare foto.</string>
-    <string name="permission_desc">Non è necessario consentire le autorizzazioni all\'accesso per utilizzare CHOEAEDOL. \n\nCHOEAEDOL non raccoglie alcuna informazione personale.</string>
-    <string name="actor_permission_desc">Non è necessario consentire le autorizzazioni all\'accesso per utilizzare CHOEAEDOL Celeb. \n\nCHOEAEDOL Celeb non raccoglie alcuna informazione personale.</string>
+    <string name="permission_required">[Permesso/i richiesto/i]</string>
+    <string name="permission_optional">[Autorizzazione(i) facoltativa(e)]</string>
+    <string name="permission_contact">Contatti: Necessari per l’area Cuore Gratuito. Necessari per l’accesso Google.</string>
+    <string name="permission_phone">Telefono: necessario per la stazione di ricarica cardiaca gratuita</string>
+    <string name="permission_storage">Archiviazione: necessaria per caricare e salvare le foto.</string>
+    <string name="permission_desc">Non è necessario concedere autorizzazioni di accesso per utilizzare CHOEAEDOL.\n\nCHOEAEDOL non raccoglie alcuna informazione personale.</string>
+    <string name="actor_permission_desc">Non è necessario concedere autorizzazioni di accesso per utilizzare CHOEAEDOL Celeb.\n\nCHOEAEDOL Celeb non raccoglie alcuna informazione personale.</string>
     <string name="allow">Consenti</string>
-    <string name="deny">Nega</string>
-    <string name="label_see_video_for_heartbox">Guarda l\'annuncio video, ottieni altre Scatole di cuori</string>
+    <string name="deny">Permitir</string>
+    <string name="label_see_video_for_heartbox">Guarda un video e apri più Heart Box!</string>
     <!-- bj app -->
     <string name="profile_additional_info">Informazioni addizionali</string>
     <string name="profile_birth">Data di nascita</string>
@@ -633,7 +633,7 @@
     <string name="confirm_change_account">Sei già iscritto con la stessa email. Desideri modificare questo account con il metodo di accesso selezionato?</string>
     <string name="facebook_no_email">Impossibile ottenere informazioni sull\'email da Facebook.</string>
     <string name="menu_freeboard">Consiglio</string>
-    <string name="myheart_today_earn">Cuore Sempre raccolto oggi</string>
+    <string name="myheart_today_earn">Cuori raccolti oggi</string>
     <string name="myheart_today_earn_help">Se raccogli %1$s Cuori Sempre, \nl\'immagine del profilo dell\'idolo al primo posto verrà modificata con il profilo del mio idolo. \nL\'immagine del profilo modificata verrà ripristinata domani.</string>
     <string name="actor_myheart_today_earn_help">Se guadagni %1$s Cuori Sempre, \nle immagini del profilo al primo posto verranno cambiate nel profilo del mio attore. \nLe immagini del profilo modificate verranno ripristinate domani.</string>
     <string name="label_image_option">Proporzioni foto</string>
@@ -769,7 +769,7 @@
     <string name="use_coupon">Uso</string>
     <string name="expire_coupon">Validità</string>
     <string name="my_info">Profilo</string>
-    <string name="my_info_vote">Voti accumulati</string>
+    <string name="my_info_vote">Voti Cumulativi</string>
     <string name="my_info_reg_date">Iscritto</string>
     <string name="used_coupon">Usato</string>
     <string name="set_all_in_day">Imposta il giorno All-in</string>
@@ -1846,6 +1846,7 @@ Fai un regalo speciale al mio idolo su CHOEAEDOL!💖</string>
     <string name="video_image_picker_not_found">La selezione di video e immagini non è supportata</string>
     <string name="push_setting_guide_head">Tempi di Dukjil</string>
     <string name="push_setting_guide_body">Attiva le notifiche e non perdere mai le tue notizie preferite!</string>
+    <string name="setting_menu_push_comments_only">Commento</string>
     <string name="setting_menu_push_likes">Mi piace</string>
     <string name="setting_menu_push_hotposts">Post caldi</string>
     <string name="levelheart_bonus_yes">🎬 Guarda AD</string>
@@ -1903,4 +1904,6 @@ Passa a un altro Paese o a un\'altra regione e riprova.</string>
     <string name="reward_invite_mission_completion">Ricompensa per il completamento della missione di invito di un amico</string>
     <string name="signup_desc2_noreward">Inserisci il codice di invito del tuo referente per scambiare Cuori come amici.</string>
     <string name="signup_toast_auto_fill_recommender">Il codice di invito copiato è stato inserito automaticamente.</string>
+    <string name="vote_ranking">VOTATO</string>
+    <string name="heart_arcade_description1">Gioca ai minigiochi🕹️ e guadagna cuori🩷</string>
 </resources>

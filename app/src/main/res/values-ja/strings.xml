@@ -526,7 +526,7 @@
     <string name="setting_menu_cache">キャッシュを削除する</string>
     <string name="are_you_sure">本気ですか？</string>
     <string name="setting_menu_push_hearts">ハート</string>
-    <string name="setting_menu_push_comments">コメント</string>
+    <string name="setting_menu_push_comments">コメント、友達リクエスト</string>
     <string name="menu_menu_kin">Idol Q &amp; A</string>
     <string name="actor_menu_menu_kin">Q &amp; A</string>
     <string name="hint_search"></string>
@@ -543,8 +543,12 @@
     <string name="newbie_info"></string>
     <string name="report_done">問題が通告されました。</string>
     <!-- permissoin (korean only) -->
+    <string name="permission_required">【必須アクセス権限：権限情報のご案内】</string>
+    <string name="permission_optional">【任意アクセス権限：権限情報のご案内】</string>
+    <string name="permission_contact">連絡先：無料チャージ利用時の重複広告防止、またGoogleログイン試行時にGoogle情報を取得するために使用します。</string>
+    <string name="permission_phone">電話：無料チャージ利用時の重複広告防止のために使用します。</string>
     <string name="permission_storage">ストレージ：写真を投稿したり保存するために必要です。</string>
-    <string name="permission_desc"></string>
+    <string name="permission_desc">任意アクセス権限は、同意しなくても最愛ドルの基本機能のご利用に問題はありません。\n\n最愛ドルは、いかなる個人情報も収集いたしません。</string>
     <string name="actor_permission_desc">アクセス権限に同意をしていなくても、最愛ドルスターの基本的な機能の使用には問題ありません。\n\n最愛ドルスターはどんな個人情報も収集いたしません。</string>
     <string name="allow">承認</string>
     <string name="deny">承認しない</string>
@@ -600,7 +604,7 @@
     <string name="confirm_change_account">すでに同じメールアドレスで登録されています。該当のアカウントを選択したログイン方法に変更いたしますか？</string>
     <string name="facebook_no_email">Facebookからメール情報を確認するこができませんでした。</string>
     <string name="menu_freeboard">掲示板</string>
-    <string name="myheart_today_earn">今日貯めたエバーハート</string>
+    <string name="myheart_today_earn">今日集めたハート</string>
     <string name="myheart_today_earn_help">%1$s個のエバーハートを集めると、現在1位の\n個人またはグループのプロフィール画像が自分の推しの画像に変更されます。\n変更された画像は集計時間にリセットされます。</string>
     <string name="actor_myheart_today_earn_help">%1$sの "エバーハート"を獲得した場合、最初の場所のプロフィール画像は私のスターのプロフィールに変更されます。 \n変更されたプロフィール画像は明日にリセットされます。</string>
     <string name="label_image_option">写真の縦横比</string>
@@ -1800,6 +1804,7 @@ Google Playストアの環境を確認した後、もう一度お試しくださ
     <string name="video_image_picker_not_found">ビデオもしくはイメージ選択を支援するアプリがありません。</string>
     <string name="push_setting_guide_head">推し活もタイミング</string>
     <string name="push_setting_guide_body">通知をオンにして、推しの最新情報を見逃さないでくださいね！</string>
+    <string name="setting_menu_push_comments_only">コメント</string>
     <string name="setting_menu_push_likes">いいね</string>
     <string name="setting_menu_push_hotposts">注目の投稿</string>
     <string name="levelheart_bonus_yes">🎬 広告を見る</string>
@@ -1856,4 +1861,6 @@ Google Playストアの環境を確認した後、もう一度お試しくださ
     <string name="reward_invite_mission_completion">友達招待ミッションクリアボーナス</string>
     <string name="signup_desc2_noreward">推薦者の招待コードを入力すると、友達としてハートを交換できます。</string>
     <string name="signup_toast_auto_fill_recommender">コピーした招待コードを自動入力しました。</string>
+    <string name="vote_ranking">投票済み</string>
+    <string name="heart_arcade_description1">ミニゲーム🕹️でハート🩷をゲットしよう！</string>
 </resources>

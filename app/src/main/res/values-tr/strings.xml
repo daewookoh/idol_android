@@ -80,8 +80,8 @@
     <string name="actor_title_review">CHOEAEDOL Celeb için Google\'a bir değerlendirme yazın</string>
     <string name="title_show_option">Gizlilik Ayarları</string>
     <string name="title_signup">Üyelik Kaydı</string>
-    <string name="title_level_heart">Birikmiş grup ortalaması, bireysel ortalama ne demek?</string>
-    <string name="actor_title_level_heart">Birikmiş grup ortalaması, bireysel ortalama ne demek?</string>
+    <string name="title_level_heart">Kümülatif Sıralama?</string>
+    <string name="actor_title_level_heart">Kümülatif Sıralama?</string>
     <string name="heart_count_format" formatted="false">%s</string>
     <string name="vote_count_format" formatted="false">%s</string>
     <string name="rank_count_format" formatted="false">%s</string>
@@ -111,7 +111,7 @@
     <string name="btn_signup_finish">Kaydol</string>
     <string name="btn_signup_finish_1">Kayıt tamamlandı</string>
     <string name="my_action">Aktivitelerim</string>
-    <string name="my_vote">Birikmiş Oylarım</string>
+    <string name="my_vote">Kümülatif Oylarım</string>
     <string name="menu_menu00">Etkinlikler</string>
     <string name="menu_menu01">İdol Ayarlarım</string>
     <string name="actor_menu_menu01">Ünlü ayarlarım</string>
@@ -368,13 +368,13 @@
     <string name="error_8003">Zaten arkadaşsınız.</string>
     <string name="error_9997">10 dakika sonra gönderebilirsiniz.</string>
     <string name="error_9998">Bir arkadaşa günde en fazla 3 kalp gönderebilirsiniz.</string>
-    <string name="voting_guide_title1">Birikmiş oylarım nedir?</string>
-    <string name="voting_guide_title2">Derece için Koşullar</string>
-    <string name="voting_guide_desc1">- Bu, idolünüz için oy verdiğiniz kalplerin sayısıdır.\n- Belirli bir süre giriş yapmazsanız notunuz ve birikmiş oylarınız sıfırlanacaktır.\n(Tekrar giriş yapıp oy verdiğinizde her şey geri gelecektir.)\n- Uygulamayı başlattığınızda günlük 100 kalp alacaksınız. , ayrıca seviye durumunuza göre bonus seviye ödül kalpleri!</string>
-    <string name="actor_voting_guide_desc1">- Bu, Celeb\'ınız için oy verdiğiniz kalplerin sayısıdır.\n- Belirli bir süre giriş yapmazsanız seviyeniz ve birikmiş oylarınız sıfırlanacaktır.\n(Tekrar giriş yapıp oy verdiğinizde her şey geri gelecektir.)\n- Uygulamayı başlattığınızda günlük 100 kalp alacaksınız. , ayrıca seviye durumunuza göre bonus seviye ödül kalpleri!</string>
+    <string name="voting_guide_title1">‘Kümülatif Oylarım’ nedir?</string>
+    <string name="voting_guide_title2">Seviye Rehberi</string>
+    <string name="voting_guide_desc1">- Bu, idolünüz için oy verdiğiniz kalplerin sayısıdır.\n- Belirli bir süre giriş yapmazsanız, seviyeniz ve kümülatif oylarınız sıfırlanacaktır.\n(Tekrar giriş yapıp oy verdiğinizde her şey geri gelecektir.)\n- Uygulamayı başlattığınızda günlük 100 kalp alacaksınız. , ayrıca seviye durumunuza göre bonus seviye ödül kalpleri!</string>
+    <string name="actor_voting_guide_desc1">- Bu, Celeb\'ınız için oy verdiğiniz kalplerin sayısıdır.\n- Belirli bir süre giriş yapmazsanız, seviyeniz ve kümülatif oylarınız sıfırlanacaktır.\n(Tekrar giriş yapıp oy verdiğinizde her şey geri gelecektir.)\n- Uygulamayı başlattığınızda günlük 100 kalp alacaksınız. , ayrıca seviye durumunuza göre bonus seviye ödül kalpleri!</string>
     <string name="level_heart_format" formatted="false">Birikmiş oy: %s</string>
-    <string name="level_heart_guide_title1">Toplam puan sıralamasında 1. olana İyilik Meleği deniyor👼</string>
-    <string name="actor_level_heart_guide_title1">Toplam puan sıralamasında 1. olana İyilik Meleği deniyor👼</string>
+    <string name="level_heart_guide_title1">Kümülatif Skorda 1. sırayı alan kişi Hayır Meleği olur👼</string>
+    <string name="actor_level_heart_guide_title1">Kümülatif Skorda 1. sırayı alan kişi Hayır Meleği olur👼</string>
     <string name="level_heart_guide_title2">Sıralamaya göre puanlar</string>
     <string name="level_heart_guide_title3">Onur Listesi - Kümülatif Sıralamalar</string>
     <string name="level_heart_guide_title4">Fark etme</string>
@@ -536,7 +536,7 @@
     <string name="setting_menu_cache">Ön belleği sil</string>
     <string name="are_you_sure">Emin misiniz?</string>
     <string name="setting_menu_push_hearts">Kalpler</string>
-    <string name="setting_menu_push_comments">Yorum</string>
+    <string name="setting_menu_push_comments">Yorumlar</string>
     <string name="menu_menu_kin">İdol S ve C</string>
     <string name="actor_menu_menu_kin">S ve C</string>
     <string name="hint_search">Arama metnini girin</string>
@@ -560,14 +560,14 @@
     <!-- permissoin (korean only) -->
     <string name="permission_required">[Gerekli İzin(ler)]</string>
     <string name="permission_optional">[İsteğe Bağlı İzin(ler)]</string>
-    <string name="permission_contact">İletişim: Ücretsiz kalp doldurma istasyonu için gerekli. Google oturum açma işlemi için gerekli.</string>
-    <string name="permission_phone">Telefon: Ücretsiz kalp doldurma istasyonu için gerekli</string>
-    <string name="permission_storage">Depolama: Fotoğrafları yüklemek ve kaydetmek için gereklidir.</string>
-    <string name="permission_desc"></string>
-    <string name="actor_permission_desc"></string>
+    <string name="permission_contact">İletişim: Ücretsiz Kalp alanı için gerekli. Google girişi için gerekli.</string>
+    <string name="permission_phone">Telefon: Ücretsiz kalp dolum istasyonu için gereklidir</string>
+    <string name="permission_storage">Depolama: Fotoğrafların yüklenmesi ve kaydedilmesi için gereklidir.</string>
+    <string name="permission_desc">CHOEAEDOL\'u kullanmak için erişim izinlerini onaylamanız gerekmez.\n\nCHOEAEDOL hiçbir kişisel bilgi toplamaz.</string>
+    <string name="actor_permission_desc">CHOEAEDOL Celeb\'i kullanmak için erişim izinlerini onaylamanız gerekmez.\n\nCHOEAEDOL Celeb hiçbir kişisel bilgi toplamaz.</string>
     <string name="allow">İzin ver</string>
     <string name="deny">Reddet</string>
-    <string name="label_see_video_for_heartbox">Bir video reklamı, bir şans daha</string>
+    <string name="label_see_video_for_heartbox">Video reklam izleyerek daha fazla Kalp Kutusu aç!</string>
     <!-- bj app -->
     <string name="profile_additional_info">İlave bilgi</string>
     <string name="profile_birth">Doğum Tarihi</string>
@@ -625,7 +625,7 @@
     <string name="gaon_final_guide">Oylama dönemi sona ermiştir.</string>
     <string name="gaon_final_title">%1$s ~ %2$s Sonuç</string>
     <string name="menu_freeboard">Sohbet</string>
-    <string name="myheart_today_earn">Herhangi bir zaman kalp bugün</string>
+    <string name="myheart_today_earn">Bugün kazanılan kalpler</string>
     <string name="myheart_today_earn_help">Eğer hiç %1$s kalp atışını toplarsanız, \nilk idol profil görüntüsü idolüm profilim ile değiştirilecektir. \nDeğiştirilen profil resmi yarın sıfırlanacak.</string>
     <string name="actor_myheart_today_earn_help">%1$s "hiç kalp" kazanırsanız, ilk yer profili resimleri Aktörüm\'ün profiline dönüştürülür. Değiştirilen profil görüntüleri yarın sıfırlanacak.</string>
     <string name="label_image_option">Fotoğraf en boy oranı</string>
@@ -688,7 +688,7 @@
     <string name="use_coupon">Kullanım</string>
     <string name="expire_coupon">Geçerlik</string>
     <string name="my_info">Benim profilim</string>
-    <string name="my_info_vote">Birikmiş oy</string>
+    <string name="my_info_vote">Kümülatif Oylar</string>
     <string name="my_info_reg_date">tarihinde katıldı</string>
     <string name="used_coupon">Tamamlandı</string>
     <string name="set_all_in_day">Tümü gününü ayarla</string>
@@ -922,7 +922,7 @@
     <string name="title_notifications">Bildirim</string>
     <string name="label_no_notifications">Bildirim yok.</string>
     <string name="label_delete_all_notifications">Hepsini temizle?</string>
-    <string name="actor_level_heart_guide_desc1">Sıralamalar, Hall of Fame\'deki her fandomdan son 30 gün içinde birleştirilen ve bir araya getirilen birikmiş puanlara dayanmaktadır. Yalnızca ilk 100 görüntülenir.\nHer fandomun üzerine tıklarsanız, ilgili sıralama değişikliği gösterilecektir.\nSon 30 gün içindeki toplam sıralamaya göre ünlülerin adına bağış yapılacaktır!\n\n✅ Başarı kriterleri\n- Koşul 1 : son 30 gün içinde ortalama 3.000.000 oy veya daha fazla\n- Koşul 2 : Hall of Fame\'de son 6 gün içinde her kategoride 1. veya 2. sırada yer almak\n- Charity Angel olarak seçilebilmek için her iki koşulun da karşılanması gerekir.\n\n✅ Ödül\n- Kategori 1.si\n(1)Miral Refah Vakfı\'na 500.000 KRW bağış\n(2)Hongdae giriş istasyonunda metro reklamı\n(3)Tam sayfa banner reklam\n(4) Kayan menü reklamı\n- Kategori 2.si\n(1)Miral\'e 500.000 KRW bağış Refah Vakfı\n(2)Hongdae giriş istasyonundaki metro reklamı\n(3)Tam sayfa banner reklam</string>
+    <string name="actor_level_heart_guide_desc1">Sıralamalar, Hall of Fame\'deki her fandomdan son 30 gün içinde birleştirilen ve bir araya getirilen birikmiş puanlara dayanmaktadır. Yalnızca ilk 100 görüntülenir.\nHer fandomun üzerine tıklarsanız, ilgili sıralama değişikliği gösterilecektir.\nSon 30 gün içindeki toplam sıralamaya göre ünlülerin adına bağış yapılacaktır!\n\n✅ Başarı kriterleri\n- Koşul 1 : son 30 gün içinde ortalama 3.000.000 oy veya daha fazla\n- Koşul 2 : Hall of Fame’de her ayın 6’sı itibarıyla ilgili kategoride 1. veya 2. sırada yer almak\n- Charity Angel olarak seçilebilmek için her iki koşulun da karşılanması gerekir.\n\n✅ Ödül\n- Kategori 1.si\n(1)Miral Refah Vakfı\'na 500.000 KRW bağış\n(2)Hongdae giriş istasyonunda metro reklamı\n(3)Tam sayfa banner reklam\n(4) Kayan menü reklamı\n- Kategori 2.si\n(1)Miral\'e 500.000 KRW bağış Refah Vakfı\n(2)Hongdae giriş istasyonundaki metro reklamı\n(3)Tam sayfa banner reklam</string>
     <string name="AAA">AAA</string>
     <string name="award_guide">Bilgi</string>
     <string name="award_example">Sıralanmak</string>
@@ -1753,6 +1753,7 @@ CHOEAEDOL\'daki idolüme özel bir hediye ver!💖</string>
     <string name="video_image_picker_not_found">Video ve resim seçimi desteklenmiyor</string>
     <string name="push_setting_guide_head">Dukjil\'in Zamanlaması</string>
     <string name="push_setting_guide_body">Bildirimleri açın ve en sevdiğiniz haberleri asla kaçırmayın!</string>
+    <string name="setting_menu_push_comments_only">Yorum</string>
     <string name="setting_menu_push_likes">Beğeniler</string>
     <string name="setting_menu_push_hotposts">Sıcak gönderiler</string>
     <string name="levelheart_bonus_yes">🎬 REKLAM\'ı izle</string>
@@ -1809,4 +1810,6 @@ CHOEAEDOL\'daki idolüme özel bir hediye ver!💖</string>
     <string name="reward_invite_mission_completion">Arkadaş Daveti Görev Tamamlama Ödülü</string>
     <string name="signup_desc2_noreward">Arkadaş olarak Kalpleri paylaşmak için kod davetini girin.</string>
     <string name="signup_toast_auto_fill_recommender">Kopyalanan davet kodu otomatik olarak girilmiştir.</string>
+    <string name="vote_ranking">Oy verildi</string>
+    <string name="heart_arcade_description1">Mini oyunlar oynayın🕹️ ve kalpler kazanın🩷</string>
 </resources>

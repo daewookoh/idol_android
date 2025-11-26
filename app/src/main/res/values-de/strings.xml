@@ -80,8 +80,8 @@
     <string name="actor_title_review">Schreiben Sie eine Bewertung für CHOEAEDOL Celeb</string>
     <string name="title_show_option">Datenschutzeinstellungen</string>
     <string name="title_signup">Registrierung der Mitgliedschaft</string>
-    <string name="title_level_heart">Was bedeutet kumulierter Rang?</string>
-    <string name="actor_title_level_heart">Was bedeutet kumulierter Rang?</string>
+    <string name="title_level_heart">Kumuliertes Ranking?</string>
+    <string name="actor_title_level_heart">Kumuliertes Ranking?</string>
     <string name="heart_count_format" formatted="false">%s</string>
     <string name="vote_count_format" formatted="false">%s</string>
     <string name="rank_count_format" formatted="false">%s</string>
@@ -111,7 +111,7 @@
     <string name="btn_signup_finish">Registrieren</string>
     <string name="btn_signup_finish_1">Registrierung abgeschlossen</string>
     <string name="my_action">Aktivitäten</string>
-    <string name="my_vote">Kumulierte Abstimmung</string>
+    <string name="my_vote">Meine kumulativen Stimmen</string>
     <string name="menu_menu00">Ereignisse</string>
     <string name="menu_menu01">Meine Idol-Einstellungen</string>
     <string name="actor_menu_menu01">Meine Promi-Einstellungen</string>
@@ -368,17 +368,17 @@
     <string name="error_8003">Sie sind bereits Freunde.</string>
     <string name="error_9997">Sie können nach 10 Minuten senden.</string>
     <string name="error_9998">Sie können nur bis zu 3 Herzen pro Freund pro Tag senden.</string>
-    <string name="voting_guide_title1">Was sind meine kumulierten Stimmen?</string>
-    <string name="voting_guide_title2">Bedingungen für die Einstufung</string>
-    <string name="voting_guide_desc1">– Dies ist die Anzahl der Herzen, die Sie für Ihr Idol gestimmt haben.\n- Ihre Note und Ihre gesammelten Stimmen werden zurückgesetzt, wenn Sie sich für einen bestimmten Zeitraum nicht anmelden.\n(Alles wird wieder angezeigt, wenn Sie sich anmelden und erneut abstimmen.)\n- Sie erhalten täglich 100 Herzen für den Start der App sowie Bonus-Level-Belohnungsherzen basierend auf Ihrem Level-Status!</string>
-    <string name="actor_voting_guide_desc1">- Dies ist die Anzahl der Herzen, mit denen Sie für Ihren Promi gestimmt haben.\n- Ihr Level und Ihre gesammelten Stimmen werden zurückgesetzt, wenn Sie sich für einen bestimmten Zeitraum nicht anmelden.\n(Alles wird wieder angezeigt, wenn Sie sich anmelden und erneut abstimmen.)\n- Sie erhalten täglich 100 Herzen für den Start der App sowie Bonus-Level-Belohnungsherzen basierend auf Ihrem Level-Status!</string>
+    <string name="voting_guide_title1">Was bedeutet „Meine kumulativen Stimmen“?</string>
+    <string name="voting_guide_title2">Level-Leitfaden</string>
+    <string name="voting_guide_desc1">– Dies ist die Anzahl der Herzen, die Sie für Ihr Idol gestimmt haben.\n- Dein Level und deine kumulierten Stimmen werden zurückgesetzt, wenn du dich für einen bestimmten Zeitraum nicht anmeldest.\n(Alles wird wieder angezeigt, wenn Sie sich anmelden und erneut abstimmen.)\n- Sie erhalten täglich 100 Herzen für den Start der App sowie Bonus-Level-Belohnungsherzen basierend auf Ihrem Level-Status!</string>
+    <string name="actor_voting_guide_desc1">- Dies ist die Anzahl der Herzen, mit denen Sie für Ihren Promi gestimmt haben.\n- Dein Level und deine kumulierten Stimmen werden zurückgesetzt, wenn du dich für einen bestimmten Zeitraum nicht anmeldest.\n(Alles wird wieder angezeigt, wenn Sie sich anmelden und erneut abstimmen.)\n- Sie erhalten täglich 100 Herzen für den Start der App sowie Bonus-Level-Belohnungsherzen basierend auf Ihrem Level-Status!</string>
     <string name="level_heart_format" formatted="false">Kumulierte Stimmen: %s</string>
-    <string name="level_heart_guide_title1">Der 1. Platz in der Gesamtpunktzahl wird zum Wohltätigkeit Engel👼</string>
-    <string name="actor_level_heart_guide_title1">Der 1. Platz in der Gesamtpunktzahl wird zum Wohltätigkeit Engel👼</string>
+    <string name="level_heart_guide_title1">Der 1. Platz in der Kumulierten Punktzahl wird zum Wohltätigkeitsengel👼</string>
+    <string name="actor_level_heart_guide_title1">Der 1. Platz in der Kumulierten Punktzahl wird zum Wohltätigkeitsengel👼</string>
     <string name="level_heart_guide_title2">Punkte nach Rang</string>
     <string name="level_heart_guide_title3">Hall of Fame - Kumulative Rankings</string>
     <string name="level_heart_guide_title4">Notiz</string>
-    <string name="level_heart_guide_desc1">Dabei handelt es sich um die Gesamtpunktzahl der täglichen Abstimmungsrankings der letzten 30 Tage. Es zeigt die Top 100 an.\nWenn Sie auf die einzelnen Einzel- und Gruppennamen klicken, können Sie die Rangänderungsgrafik sehen.\nWir spenden an bedeutungsvolle Orte im Namen eines Idols und seines Fandoms, das in der 30-Tage-Rangliste als bester kumulierter Nummer eins eingestuft wurde!“\n\n✅ Aggregationsmethode\n- Mitglied: Nr. 1, akkumulierte Punktzahl für die letzten 30 Tage, einschließlich des 10. eines jeden Monats (bekannt gegeben am 11.)\n- Gruppe: Nr. 1, akkumulierte Punktzahl für die letzten 30 Tage, einschließlich des 15. von jedem Monat (angekündigt am 16.)\n- Andere Kategorien: Wird beim Fortfahren separat mitgeteilt\n\n✅ Belohnung\n- Spende von 500.000 Won an Wohlfahrtsorganisationen im Namen des Künstlers und des Fandoms.\n- Veröffentlichung einer elektronischen Anzeige in der Seouler U-Bahn</string>
+    <string name="level_heart_guide_desc1">Dabei handelt es sich um die Gesamtpunktzahl der täglichen Abstimmungsrankings der letzten 30 Tage. Es zeigt die Top 100 an.\nWenn Sie auf die einzelnen Einzel- und Gruppennamen klicken, können Sie die Rangänderungsgrafik sehen.\nWir spenden an bedeutungsvolle Orte im Namen eines Idols und seines Fandoms, das in der 30-Tage-Rangliste als primo nel ranking cumulativo dei 30 giorni eingestuft wurde!“\n\n✅ Aggregationsmethode\n- Mitglied: Nr. 1, akkumulierte Punktzahl für die letzten 30 Tage, einschließlich des 10. eines jeden Monats (bekannt gegeben am 11.)\n- Gruppe: Nr. 1, akkumulierte Punktzahl für die letzten 30 Tage, einschließlich des 15. von jedem Monat (angekündigt am 16.)\n- Andere Kategorien: Wird beim Fortfahren separat mitgeteilt\n\n✅ Belohnung\n- Spende von 500.000 Won an Wohlfahrtsorganisationen im Namen des Künstlers und des Fandoms.\n- Veröffentlichung einer elektronischen Anzeige in der Seouler U-Bahn</string>
     <string name="level_heart_guide_desc3">Die Mitglieder jeder Liga werden gemäß den Ligawechselkriterien am 11. (Einzelspieler) und 16. (Gruppe) bestimmt.\nWenn die Liga gewechselt wird, beginnt die kumulierte Ranglistenpunktzahl der Hall of Fame mit 0 Punkten.</string>
     <string name="level_heart_guide_desc4">-Die Liga von Einzelpersonen und Gruppen ist getrennt. (Auch wenn die Gruppe in Liga S ist, können Einzelpersonen in Liga A sein.)\n- Wenn es zu einem Unentschieden kommt, werden alle Unentschieden gemäß den Ligazuweisungsregeln zugewiesen und im folgenden Monat der bestehenden Anzahl von Teams oder Einzelpersonen neu zugewiesen .\nzB) Wenn 3 Teams die gleiche Punktzahl in Liga A erzielen, wechseln 3 Teams in Liga S (Änderung der Quote von Liga S auf 13). Drei niederrangige Teams werden im folgenden Monat in Liga A versetzt, um 12 Teams in Liga S zu halten.\n- Die neu hinzugefügten Idole beginnen in Liga A.\n- Die Ranglistengeschichte vor der Einführung des Ligasystems in der Hall of Fame ist als „ALLE“ gekennzeichnet.</string>
     <string name="title_heart_vote_ranking__format" formatted="false">%s Top 100 Stimmen</string>
@@ -536,7 +536,7 @@
     <string name="setting_menu_cache">Zwischenspeicher löschen</string>
     <string name="are_you_sure">Sind Sie sicher?</string>
     <string name="setting_menu_push_hearts">Herzen</string>
-    <string name="setting_menu_push_comments">Kommentar</string>
+    <string name="setting_menu_push_comments">Kommentare</string>
     <string name="menu_menu_kin">Idol Q&amp;A</string>
     <string name="actor_menu_menu_kin">Q&amp;A</string>
     <string name="hint_search">Suchtext eingeben</string>
@@ -558,16 +558,16 @@
     <string name="message_send_heart">Senden Sie mit Herzen</string>
     <string name="message_empty">Keine Nachrichten.</string>
     <!-- permissoin (korean only) -->
-    <string name="permission_required">[Erforderliche Berechtigung(en)]</string>
-    <string name="permission_optional">[Optionale Berechtigung(en)]</string>
-    <string name="permission_contact">Kontakte: Erforderlich für die kostenlose Herz-Ladestation. Erforderlich für die Google-Anmeldung.</string>
-    <string name="permission_phone">Telefon: Erforderlich für die kostenlose Herz-Ladestation</string>
-    <string name="permission_storage">Speicher: Erforderlich zum Hochladen und Speichern von Fotos.</string>
-    <string name="permission_desc">Sie müssen keine Zugriffsberechtigungen erteilen, um CHOEAEDOL verwenden zu können. \n\nCHOEAEDOL sammelt keine persönlichen Daten.</string>
-    <string name="actor_permission_desc">Sie müssen keine Zugriffsberechtigungen erteilen, um CHOEAEDOL Celeb verwenden zu können. \n\nCHOEAEDOL Celeb sammelt keine persönlichen Daten.</string>
+    <string name="permission_required">[Erforderliche Berechtigungen]</string>
+    <string name="permission_optional">[Optionale Berechtigungen]</string>
+    <string name="permission_contact">Kontakte: Erforderlich für den Bereich Kostenloses Herz. Erforderlich für die Google-Anmeldung.</string>
+    <string name="permission_phone">Telefon: Erforderlich für die kostenlose Herzinfusionsstation</string>
+    <string name="permission_storage">Speicherplatz: Wird zum Hochladen und Speichern von Fotos benötigt.</string>
+    <string name="permission_desc">Sie müssen keine Zugriffsrechte erteilen, um CHOEAEDOL zu nutzen.\n\nCHOEAEDOL erhebt keine personenbezogenen Daten.</string>
+    <string name="actor_permission_desc">Sie müssen keine Zugriffsrechte erteilen, um CHOEAEDOL Celeb zu nutzen.\n\nCHOEAEDOL Celeb sammelt keine personenbezogenen Daten.</string>
     <string name="allow">Erlauben</string>
     <string name="deny">Ablehnen</string>
-    <string name="label_see_video_for_heartbox">Videoanzeige ansehen, mehr Herzbox erhalten</string>
+    <string name="label_see_video_for_heartbox">Sieh dir eine Videoanzeige an und öffne mehr Herzboxen!</string>
     <!-- bj app -->
     <string name="profile_additional_info">Zusätzliche Information</string>
     <string name="profile_birth">Geburtsdatum</string>
@@ -633,7 +633,7 @@
     <string name="confirm_change_account">Sie haben diese E-Mail bereits abonniert. Möchten Sie für dieses Konto die von Ihnen ausgewählte Anmeldemethode übernehmen?</string>
     <string name="facebook_no_email">E-Mail-Informationen von Facebook konnten nicht abgerufen werden.</string>
     <string name="menu_freeboard">Board</string>
-    <string name="myheart_today_earn">Ever Herz heute gesammelt</string>
+    <string name="myheart_today_earn">Heute gesammelte Herzen</string>
     <string name="myheart_today_earn_help">Wenn Sie Ever %1$s Herzen sammeln,\nwird das erste Idol-Profilbild mit dem Profil meines Idols geändert. \nDas geänderte Profilbild wird morgen zurückgesetzt.</string>
     <string name="actor_myheart_today_earn_help">Wenn Sie Ever %1$s Herzen verdienen, werden die Profilbilder an erster Stelle in das Profil meines Schauspielers geändert. \nDie geänderten Profilbilder werden morgen zurückgesetzt.</string>
     <string name="label_image_option">Foto-Seitenverhältnis</string>
@@ -769,7 +769,7 @@
     <string name="use_coupon">Verwenden</string>
     <string name="expire_coupon">Gültigkeit</string>
     <string name="my_info">Profil</string>
-    <string name="my_info_vote">Kumulierte Stimmen</string>
+    <string name="my_info_vote">Kumulative Stimmen</string>
     <string name="my_info_reg_date">Ist beigetreten</string>
     <string name="used_coupon">Verwendet</string>
     <string name="set_all_in_day">All-in-Day einstellen</string>
@@ -1021,7 +1021,7 @@
     <string name="title_notifications">Benachrichtigung</string>
     <string name="label_no_notifications">Keine Benachrichtigungen.</string>
     <string name="label_delete_all_notifications">Alles löschen?</string>
-    <string name="actor_level_heart_guide_desc1">Die Rangliste basiert auf den gesammelten Punktzahlen, die in den letzten 30 Tagen von jedem Fandom in der Hall of Fame kombiniert und aggregiert wurden. Es werden nur Top100 angezeigt.\nWenn Sie auf jedes Fandom klicken, wird die entsprechende Änderung der Rangfolge angezeigt.\nSpenden erfolgen im Namen von Prominenten basierend auf den gesammelten Platzierungen der letzten 30 Tage!\n\n✅ Leistungskriterien\n- Bedingung 1: durchschnittlich 3.000.000 oder mehr Stimmen in den letzten 30 Tagen\n- Bedingung 2: Platz 1 oder 2 in jeder Kategorie in den letzten 6 Tagen in der Hall of Fame\n- Beide Bedingungen müssen erfüllt sein, um als Charity Angel ausgewählt zu werden.\n\n✅ Belohnung\n- Kategorie 1. Platz\n(1) Spende von 500.000 KRW an die Miral Welfare Foundation\n(2) U-Bahn-Werbung an der Eingangsstation Hongdae\n(3) Ganzseitige Bannerwerbung\n(4)Menü-Slide-Werbung\n- Kategorie 2. Platz\n(1) Spende von 500.000 KRW an die Miral Welfare Foundation\n(2)U-Bahn-Werbung an der Eingangsstation Hongdae\n(3)Ganzseitige Bannerwerbung</string>
+    <string name="actor_level_heart_guide_desc1">Die Rangliste basiert auf den gesammelten Punktzahlen, die in den letzten 30 Tagen von jedem Fandom in der Hall of Fame kombiniert und aggregiert wurden. Es werden nur Top100 angezeigt.\nWenn Sie auf jedes Fandom klicken, wird die entsprechende Änderung der Rangfolge angezeigt.\nSpenden erfolgen im Namen von Prominenten basierend auf den gesammelten Platzierungen der letzten 30 Tage!\n\n✅ Leistungskriterien\n- Bedingung 1: durchschnittlich 3.000.000 oder mehr Stimmen in den letzten 30 Tagen\n- am 6. jedes Monats in der jeweiligen Kategorie in der Hall of Fame auf Platz 1 oder 2 liegen\n- Beide Bedingungen müssen erfüllt sein, um als Charity Angel ausgewählt zu werden.\n\n✅ Belohnung\n- Kategorie 1. Platz\n(1) Spende von 500.000 KRW an die Miral Welfare Foundation\n(2) U-Bahn-Werbung an der Eingangsstation Hongdae\n(3) Ganzseitige Bannerwerbung\n(4)Menü-Slide-Werbung\n- Kategorie 2. Platz\n(1) Spende von 500.000 KRW an die Miral Welfare Foundation\n(2)U-Bahn-Werbung an der Eingangsstation Hongdae\n(3)Ganzseitige Bannerwerbung</string>
     <string name="AAA">AAA</string>
     <string name="award_guide">Info</string>
     <string name="award_example">Ausrichten</string>
@@ -1846,6 +1846,7 @@ Schenken Sie meinem Idol auf CHOEAEDOL ein besonderes Geschenk!💖</string>
     <string name="video_image_picker_not_found">Die Video- und Bildauswahl wird nicht unterstützt</string>
     <string name="push_setting_guide_head">Zeitpunkt von Dukjil</string>
     <string name="push_setting_guide_body">Aktivieren Sie Benachrichtigungen und verpassen Sie nie Ihre Lieblingsnachrichten!</string>
+    <string name="setting_menu_push_comments_only">Kommentar</string>
     <string name="setting_menu_push_likes">Gefällt mir</string>
     <string name="setting_menu_push_hotposts">Heiße Beiträge</string>
     <string name="levelheart_bonus_yes">🎬 AD ansehen</string>
@@ -1903,4 +1904,6 @@ Bitte wechseln Sie zu einem anderen Land oder einer anderen Region und versuchen
     <string name="reward_invite_mission_completion">Belohnung für den Abschluss einer Freundeseinladungsmission</string>
     <string name="signup_desc2_noreward">Geben Sie den Einladungscode Ihres Freundes ein, um Herzen auszutauschen.</string>
     <string name="signup_toast_auto_fill_recommender">Der kopierte Einladungscode wurde automatisch eingetragen.</string>
+    <string name="vote_ranking">ABGESTIMMT</string>
+    <string name="heart_arcade_description1">Spiel Minispiele🕹️ und sammle Herzen🩷</string>
 </resources>

@@ -80,8 +80,8 @@
     <string name="actor_title_review">เขียนบทวิจารณ์สำหรับ CHOEAEDOL Celeb</string>
     <string name="title_show_option">ติดตั้งขอบเขตการเปิดเผยข้อมูลส่วนตัว</string>
     <string name="title_signup">ลงทะเบียนสมาชิก</string>
-    <string name="title_level_heart">ยศสะสม?</string>
-    <string name="actor_title_level_heart">ยศสะสม?</string>
+    <string name="title_level_heart">อันดับสะสม?</string>
+    <string name="actor_title_level_heart">อันดับสะสม?</string>
     <string name="heart_count_format" formatted="false">%s อัน</string>
     <string name="vote_count_format" formatted="false">%s</string>
     <string name="rank_count_format" formatted="false">%s</string>
@@ -111,7 +111,7 @@
     <string name="btn_signup_finish">ลงทะเบียน</string>
     <string name="btn_signup_finish_1">การลงทะเบียนสำเร็จ</string>
     <string name="my_action">กิจกรรมของฉัน</string>
-    <string name="my_vote">การโหวตรวมของฉัน</string>
+    <string name="my_vote">คะแนนโหวตสะสมของฉัน</string>
     <string name="menu_menu00">อีเวนต์</string>
     <string name="menu_menu01">การติดตั้งไอดอลของฉัน</string>
     <string name="actor_menu_menu01">การตั้งค่าคนดังของฉัน</string>
@@ -368,10 +368,10 @@
     <string name="error_8003">คุณได้เป็นเพื่อนกันเรียบร้อยแล้ว</string>
     <string name="error_9997">คุณสามารถส่งได้หลังจาก 10 นาทีหลังจากนี้</string>
     <string name="error_9998">คุณสามารถส่งหัวใจให้เพื่อนของคุณเต็มที่ 1 ท่านต่อหัวใจ 3ดวง .</string>
-    <string name="voting_guide_title1">อะไรคือการโหวตรวมของฉัน?</string>
-    <string name="voting_guide_title2">เงื่อนไขสำหรับแต่ละระดับ</string>
-    <string name="voting_guide_desc1">- นี่คือจำนวนหัวใจที่คุณโหวตให้ไอดอลของคุณ\n- เกรดและคะแนนโหวตสะสมของคุณจะถูกรีเซ็ตหากคุณไม่ได้เข้าสู่ระบบในช่วงระยะเวลาหนึ่ง\n(ทุกอย่างจะกลับมาเมื่อคุณเข้าสู่ระบบและโหวตอีกครั้ง)\n- คุณจะได้รับ 100 หัวใจทุกวันสำหรับการเปิดแอป เช่นเดียวกับหัวใจรางวัลระดับโบนัสตามสถานะระดับของคุณ!</string>
-    <string name="actor_voting_guide_desc1">- นี่คือจำนวนหัวใจที่คุณโหวตให้กับเซเลบของคุณ\n- ระดับและคะแนนโหวตสะสมของคุณจะถูกรีเซ็ตหากคุณไม่ได้เข้าสู่ระบบในช่วงระยะเวลาหนึ่ง\n(ทุกอย่างจะกลับมาเมื่อคุณเข้าสู่ระบบและโหวตอีกครั้ง)\n- คุณจะได้รับ 100 หัวใจทุกวันสำหรับการเปิดแอป เช่นเดียวกับหัวใจรางวัลระดับโบนัสตามสถานะระดับของคุณ!</string>
+    <string name="voting_guide_title1">‘คะแนนโหวตสะสมของฉัน’ คืออะไร?</string>
+    <string name="voting_guide_title2">คู่มือระดับ</string>
+    <string name="voting_guide_desc1">- นี่คือจำนวนหัวใจที่คุณโหวตให้ไอดอลของคุณ\n- เลเวลและคะแนนโหวตสะสมของคุณจะถูกรีเซ็ตหากคุณไม่เข้าสู่ระบบเป็นระยะเวลาหนึ่ง\n(ทุกอย่างจะกลับมาเมื่อคุณเข้าสู่ระบบและโหวตอีกครั้ง)\n- คุณจะได้รับ 100 หัวใจทุกวันสำหรับการเปิดแอป เช่นเดียวกับหัวใจรางวัลระดับโบนัสตามสถานะระดับของคุณ!</string>
+    <string name="actor_voting_guide_desc1">- นี่คือจำนวนหัวใจที่คุณโหวตให้กับเซเลบของคุณ\n- เลเวลและคะแนนโหวตสะสมของคุณจะถูกรีเซ็ตหากคุณไม่เข้าสู่ระบบเป็นระยะเวลาหนึ่ง\n(ทุกอย่างจะกลับมาเมื่อคุณเข้าสู่ระบบและโหวตอีกครั้ง)\n- คุณจะได้รับ 100 หัวใจทุกวันสำหรับการเปิดแอป เช่นเดียวกับหัวใจรางวัลระดับโบนัสตามสถานะระดับของคุณ!</string>
     <string name="level_heart_format" formatted="false">การโหวตรวม: %s</string>
     <string name="level_heart_guide_title1">อันดับที่ 1 ของคะแนนสะสมจะเป็น Angel การกุศล👼</string>
     <string name="actor_level_heart_guide_title1">อันดับที่ 1 ของคะแนนสะสมจะเป็น Angel การกุศล👼</string>
@@ -524,7 +524,7 @@
     <string name="setting_menu_cache">ลบแคช</string>
     <string name="are_you_sure">คุณแน่ใจไหม?</string>
     <string name="setting_menu_push_hearts">หัวใจ</string>
-    <string name="setting_menu_push_comments">ความคิดเห็น</string>
+    <string name="setting_menu_push_comments">คอมเมนต์</string>
     <string name="menu_menu_kin">ถาม - ตอบ</string>
     <string name="actor_menu_menu_kin">ถาม - ตอบ</string>
     <string name="hint_search"></string>
@@ -540,9 +540,16 @@
     <string name="purchased">การสั่งซื้อของคุณเสร็จสมบูรณ์แล้ว</string>
     <string name="newbie_info"></string>
     <!-- permissoin (korean only) -->
-    <string name="permission_storage">พื้นที่เก็บข้อมูล: จำเป็นสำหรับการอัปโหลดและบันทึกรูปภาพ</string>
-    <string name="permission_desc"></string>
-    <string name="actor_permission_desc"></string>
+    <string name="permission_required">[การอนุญาตที่จำเป็น]</string>
+    <string name="permission_optional">[สิทธิ์อนุญาตเพิ่มเติม]</string>
+    <string name="permission_contact">ผู้ติดต่อ: จำเป็นสำหรับพื้นที่ หัวใจฟรี. จำเป็นสำหรับการเข้าสู่ระบบ Google.</string>
+    <string name="permission_phone">โทรศัพท์: จำเป็นสำหรับสถานีเติมหัวใจฟรี</string>
+    <string name="permission_storage">พื้นที่เก็บข้อมูล: จำเป็นสำหรับการอัพโหลดและบันทึกรูปภาพ</string>
+    <string name="permission_desc">คุณไม่จำเป็นต้องอนุญาตสิทธิ์การเข้าถึงเพื่อใช้ CHOEAEDOL\n\nCHOEAEDOL ไม่รวบรวมข้อมูลส่วนบุคคลใดๆ</string>
+    <string name="actor_permission_desc">คุณไม่จำเป็นต้องอนุญาตสิทธิ์การเข้าถึงเพื่อใช้ CHOEAEDOL Celeb\n\nCHOEAEDOL Celeb ไม่รวบรวมข้อมูลส่วนบุคคลใดๆ</string>
+    <string name="allow">อนุญาต</string>
+    <string name="deny">ปฏิเสธ</string>
+    <string name="label_see_video_for_heartbox">ดูโฆษณาวิดีโอ เพื่อเปิดกล่องหัวใจเพิ่ม!</string>
     <!-- bj app -->
     <string name="format_reg_date" formatted="false">เข้าร่วมเมื่อ %s</string>
     <string name="laboratory">ห้องปฏิบัติการ</string>
@@ -588,7 +595,7 @@
     <string name="gaon_final_guide">ระยะเวลาโหวตสิ้นสุดลงแล้ว</string>
     <string name="gaon_final_title">ผลโหวตสุดท้ายวันที่ %1$s ~ %2$s</string>
     <string name="menu_freeboard">บอร์ด</string>
-    <string name="myheart_today_earn">หัวใจนิรันดร์รวบรวมวันนี้</string>
+    <string name="myheart_today_earn">หัวใจที่ได้วันนี้</string>
     <string name="myheart_today_earn_help">ถ้าคุณรวบรวม %1$s หัวใจที่เคย \nรูปโปรไฟล์ไอดอลแรกจะเปลี่ยนไปตามโปรไฟล์ของไอดอลของฉัน \nรูปโปรไฟล์ที่มีการเปลี่ยนแปลงจะถูกรีเซ็ตในวันพรุ่งนี้</string>
     <string name="actor_myheart_today_earn_help">ถ้าคุณมีรายได้ %1$s "หัวใจที่เคย" ภาพโปรไฟล์สถานที่แรกจะเปลี่ยนเป็นโปรไฟล์ของนักแสดงของฉัน ภาพโปรไฟล์ที่เปลี่ยนแปลงจะถูกรีเซ็ตในวันพรุ่งนี้</string>
     <string name="label_image_option">อัตราส่วนภาพ</string>
@@ -651,7 +658,7 @@
     <string name="use_coupon">ใช้</string>
     <string name="expire_coupon">วันหมดอายุ</string>
     <string name="my_info">ประวัติของฉัน</string>
-    <string name="my_info_vote">การโหวตรวม</string>
+    <string name="my_info_vote">คะแนนโหวตสะสม</string>
     <string name="my_info_reg_date">เข้าร่วมเมื่อ</string>
     <string name="used_coupon">ใช้เสร็จแล้ว</string>
     <string name="set_all_in_day">ตั้งค่า All-in day</string>
@@ -886,7 +893,7 @@
     <string name="title_notifications">การแจ้งเตือน</string>
     <string name="label_no_notifications">ไม่มีการแจ้งเตือน</string>
     <string name="label_delete_all_notifications">ลบทั้งหมด?</string>
-    <string name="actor_level_heart_guide_desc1">การจัดอันดับจะขึ้นอยู่กับคะแนนสะสมที่นำมารวมกันในช่วง 30 วันที่ผ่านมาจากแฟนคลับแต่ละรายบนหอเกียรติยศ แสดงเฉพาะ 100 อันดับแรกเท่านั้น\nหากคุณคลิกที่แฟนคลับแต่ละกลุ่ม การเปลี่ยนแปลงอันดับที่เกี่ยวข้องจะปรากฏขึ้น\nการบริจาคจะดำเนินการในนามของคนดังตามอันดับสะสมในช่วง 30 วันที่ผ่านมา!\n\n✅ เกณฑ์ความสำเร็จ\n- เงื่อนไข 1 : ได้รับคะแนนโหวตเฉลี่ย 3,000,000 ครั้งขึ้นไปในช่วง 30 วันที่ผ่านมา\n- เงื่อนไข 2 : อันดับที่ 1 หรือ 2 ในแต่ละหมวดหมู่ในช่วง 6 วันที่ผ่านมาบนหอเกียรติยศ\n- ต้องปฏิบัติตามเงื่อนไขทั้งสองจึงจะได้รับเลือกให้เป็น Charity Angel\n\n✅ รางวัล\n- อันดับที่ 1\n(1)บริจาค 500,000KRW ให้กับมูลนิธิ Miral Welfare\n(2)โฆษณารถไฟใต้ดินที่สถานีทางเข้าฮงแด\n(3)โฆษณาแบนเนอร์แบบเต็มหน้า\n(4)โฆษณาแบบเลื่อนเมนู\n- อันดับที่ 2\n(1)บริจาค 500,000KRW ให้กับมูลนิธิ Miral Welfare\n(2)โฆษณารถไฟใต้ดินที่สถานีทางเข้าฮงแด\n(3)โฆษณาแบนเนอร์แบบเต็มหน้า</string>
+    <string name="actor_level_heart_guide_desc1">การจัดอันดับจะขึ้นอยู่กับคะแนนสะสมที่นำมารวมกันในช่วง 30 วันที่ผ่านมาจากแฟนคลับแต่ละรายบนหอเกียรติยศ แสดงเฉพาะ 100 อันดับแรกเท่านั้น\nหากคุณคลิกที่แฟนคลับแต่ละกลุ่ม การเปลี่ยนแปลงอันดับที่เกี่ยวข้องจะปรากฏขึ้น\nการบริจาคจะดำเนินการในนามของคนดังตามอันดับสะสมในช่วง 30 วันที่ผ่านมา!\n\n✅ เกณฑ์ความสำเร็จ\n- เงื่อนไข 1 : ได้รับคะแนนโหวตเฉลี่ย 3,000,000 ครั้งขึ้นไปในช่วง 30 วันที่ผ่านมา\n- เงื่อนไข 2 : อันดับที่ 1 หรือ 2 ในแต่ละหมวดหมู่บนหอเกียรติยศ ณ วันที่ 6 ของทุกเดือน\n- ต้องปฏิบัติตามเงื่อนไขทั้งสองจึงจะได้รับเลือกให้เป็น Charity Angel\n\n✅ รางวัล\n- อันดับที่ 1\n(1)บริจาค 500,000KRW ให้กับมูลนิธิ Miral Welfare\n(2)โฆษณารถไฟใต้ดินที่สถานีทางเข้าฮงแด\n(3)โฆษณาแบนเนอร์แบบเต็มหน้า\n(4)โฆษณาแบบเลื่อนเมนู\n- อันดับที่ 2\n(1)บริจาค 500,000KRW ให้กับมูลนิธิ Miral Welfare\n(2)โฆษณารถไฟใต้ดินที่สถานีทางเข้าฮงแด\n(3)โฆษณาแบนเนอร์แบบเต็มหน้า</string>
     <string name="AAA">AAA</string>
     <string name="award_guide">ข้อมูล</string>
     <string name="award_example">ผู้เล่นตัวจริง</string>
@@ -1715,6 +1722,7 @@
     <string name="video_image_picker_not_found">ไม่รองรับการเลือกวิดีโอและรูปภาพ</string>
     <string name="push_setting_guide_head">เวลาของดุ๊กจิล</string>
     <string name="push_setting_guide_body">เปิดการแจ้งเตือนและไม่พลาดข่าวสารที่คุณชื่นชอบ!</string>
+    <string name="setting_menu_push_comments_only">ความคิดเห็น</string>
     <string name="setting_menu_push_likes">ชอบ</string>
     <string name="setting_menu_push_hotposts">กระทู้ร้อนแรง</string>
     <string name="levelheart_bonus_yes">🎬 ดูโฆษณา</string>
@@ -1771,4 +1779,6 @@
     <string name="reward_invite_mission_completion">รางวัลความสำเร็จภารกิจคำเชิญเพื่อน</string>
     <string name="signup_desc2_noreward">กรอกรหัสเชิญจากผู้แนะนำของคุณเพื่อแลกหัวใจกับเพื่อน</string>
     <string name="signup_toast_auto_fill_recommender">รหัสเชิญที่คัดลอกได้ถูกป้อนโดยอัตโนมัติ</string>
+    <string name="vote_ranking">โหวตแล้ว</string>
+    <string name="heart_arcade_description1">เล่นมินิเกม🕹️ แล้วรับหัวใจ🩷</string>
 </resources>

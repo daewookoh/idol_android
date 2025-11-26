@@ -334,7 +334,7 @@
     <string name="response_v1_articles_ok">게시가 완료되었습니다.</string>
     <string name="response_v1_articles_ok_heart">게시가 완료되었습니다.\n하트 %1$s개가 지급되었습니다.</string>
     <string name="response_users_is_active_time_over">일일 투표 수 제한을 초과해서 투표할 수 없습니다.</string>
-    <string name="response_v1_articles_give_heart">하트 %1$s개가 투표되었습니다.\n[%2$s 현재 하트 수 : %3$s + %4$s]</string>
+    <string name="response_v1_articles_give_heart">하트 %1$s개가 투표되었습니다.\n[%2$s 현재 투표 수 : %3$s + %4$s]</string>
     <string name="error_nextapps_error1">광고를 불러오는데 실패하였습니다</string>
     <string name="error_nextapps_error2">캠페인에 참여할 수 없습니다.</string>
     <string name="error_nextapps_error3">종료된 캠페인입니다.</string>
@@ -369,9 +369,9 @@
     <string name="error_9997">10분 후에 보내실 수 있습니다.</string>
     <string name="error_9998">친구 한명에게 보낼 수 있는 하트는 하루 최대 3개입니다.</string>
     <string name="voting_guide_title1">나의 누적 투표란?</string>
-    <string name="voting_guide_title2">등급 조건</string>
-    <string name="voting_guide_desc1">- 나의 최애에게 투표한 총 하트 개수입니다.\n(동일 그룹, 동일 그룹의 멤버에게 투표한 하트 개수도 반영)\n- 로그인을 안 한지 일정 시간이 지나면 누적투표수와 등급이 초기화됩니다.\n(로그인 후 다시 투표하면 누적 투표수와 등급이 복구됩니다.) \n- 앱 접속 시 매일 100개의 하트가 지급되며, 등급 조건에 따라 보너스 레벨 보상 하트가 주어집니다!</string>
-    <string name="actor_voting_guide_desc1">- 나의 최애에게만 투표한 총 하트 개수입니다.\n- 로그인을 안 한지 일정 시간이 지나면 누적투표수와 등급이 초기화됩니다.\n(로그인 후 다시 투표하면 누적 투표수와 등급이 복구됩니다.) \n- 앱 접속 시 매일 100개의 하트가 지급되며, 등급 조건에 따라 보너스 레벨 보상 하트가 주어집니다!</string>
+    <string name="voting_guide_title2">레벨 안내</string>
+    <string name="voting_guide_desc1">- 나의 최애에게 투표한 총 하트 개수입니다.\n(동일 그룹, 동일 그룹의 멤버에게 투표한 하트 개수도 반영)\n- 로그인을 안 한지 일정 시간이 지나면 누적투표수와 레벨이 초기화됩니다.\n(로그인 후 다시 투표하면 누적 투표수와 레벨이 복구됩니다.) \n- 앱 접속 시 매일 100개의 하트가 지급되며, 레벨에 따라 보너스 레벨 보상 하트가 주어집니다!</string>
+    <string name="actor_voting_guide_desc1">- 나의 최애에게만 투표한 총 하트 개수입니다.\n- 로그인을 안 한지 일정 시간이 지나면 누적투표수와 레벨이 초기화됩니다.\n(로그인 후 다시 투표하면 누적 투표수와 레벨이 복구됩니다.) \n- 앱 접속 시 매일 100개의 하트가 지급되며, 레벨에 따라 보너스 레벨 보상 하트가 주어집니다!</string>
     <string name="level_heart_format" formatted="false">누적 투표: %s</string>
     <string name="level_heart_guide_title1">누적점수 1위는 기부천사👼</string>
     <string name="actor_level_heart_guide_title1">누적점수 1위는 기부천사👼</string>
@@ -536,7 +536,7 @@
     <string name="setting_menu_cache">캐시 비우기</string>
     <string name="are_you_sure">모든 하트를 올인하는 게 확실합니까?</string>
     <string name="setting_menu_push_hearts">하트</string>
-    <string name="setting_menu_push_comments">댓글</string>
+    <string name="setting_menu_push_comments">댓글, 친구 신청</string>
     <string name="menu_menu_kin">지식돌</string>
     <string name="actor_menu_menu_kin">지식돌</string>
     <string name="hint_search">검색어 입력</string>
@@ -567,7 +567,7 @@
     <string name="actor_permission_desc">선택적 접근권한은 동의하지 않으셔도, 최애돌 셀럽 기본기능사용에 문제가 없습니다. \n\n최애돌 셀럽은 어떠한 개인정보도 수집하지 않습니다.</string>
     <string name="allow">승인</string>
     <string name="deny">허용안함</string>
-    <string name="label_see_video_for_heartbox">비디오 광고를 보면 하트박스를 더 할 수 있어요~!</string>
+    <string name="label_see_video_for_heartbox">비디오 광고를 보면 하트박스를 더 열 수 있어요!</string>
     <!-- bj app -->
     <string name="profile_additional_info">추가정보</string>
     <string name="profile_birth">생년월일</string>
@@ -1022,7 +1022,7 @@
     <string name="title_notifications">알림</string>
     <string name="label_no_notifications">받은 알림이 없습니다.</string>
     <string name="label_delete_all_notifications">모든 알림을 삭제하시겠습니까?</string>
-    <string name="actor_level_heart_guide_desc1">최근 30일 간 각 팬덤 별 명예 전당 순위에서 얻은 점수를 합산하여 집계된 순위이며, 상위 100위 까지 보여집니다.\n각 팬덤을 클릭하면 해당 팬덤의 순위 변화 추이를 보실 수 있습니다.\n30일간의 누적 순위로 선정된 셀럽의 이름으로 뜻깊은 곳에 기부를 전합니다!\n\n✅ 달성 조건\n- 조건1 : 30일간 평균 투표수 300만표 이상\n- 조건2 : 매월 명예전당 6일을 기준으로 각 카테고리 1~2위\n- 두 가지 조건을 모두 달성해야 기부천사로 선정됩니다.\n\n✅ 보상\n- 카테고리 1위\n(1)밀알복지재단 50만원 기부\n(2)홍대입구역 지하철 광고\n(3)전면 배너 광고\n(4)메뉴 슬라이딩 배너 광고 \n- 카테고리 2위\n(1)밀알복지재단 50만원 기부\n(2)홍대 입구역 지하철 광고\n(3)전면 배너 광고</string>
+    <string name="actor_level_heart_guide_desc1">최근 30일 간 각 팬덤 별 명예 전당 순위에서 얻은 점수를 합산한 누적 순위이며, 상위 100위 까지 보여집니다.\n각 팬덤을 클릭하면 해당 팬덤의 순위 변화 추이를 보실 수 있습니다.\n30일간의 누적 순위로 선정된 셀럽의 이름으로 뜻깊은 곳에 기부를 전합니다!\n\n✅ 달성 조건\n- 조건1 : 30일간 평균 투표수 300만표 이상\n- 조건2 : 매월 6일 기준, 명예전당 각 카테고리 1~2위\n- 두 가지 조건을 모두 달성해야 기부천사로 선정됩니다.\n\n✅ 보상\n- 카테고리 1위\n(1)밀알복지재단 50만원 기부\n(2)홍대입구역 지하철 광고\n(3)전면 배너 광고\n(4)메뉴 슬라이딩 배너 광고 \n- 카테고리 2위\n(1)밀알복지재단 50만원 기부\n(2)홍대 입구역 지하철 광고\n(3)전면 배너 광고</string>
     <string name="AAA">AAA</string>
     <string name="award_guide">안내</string>
     <string name="award_example">라인업</string>
@@ -1776,7 +1776,7 @@
     <string name="welcome_mission_set_most_title">최애 설정하기</string>
     <string name="welcome_mission_set_most_desc">나의 최애를 설정해보세요</string>
     <string name="welcome_mission_vote_title">투표하기</string>
-    <string name="welcome_mission_vote_desc">최에에게 하트를 보내주세요</string>
+    <string name="welcome_mission_vote_desc">최애에게 하트를 보내주세요</string>
     <string name="welcome_mission_community_title">커뮤니티 글쓰기</string>
     <string name="welcome_mission_community_desc">같은 최애 친구들과 함께 소통해보세요</string>
     <string name="welcome_mission_video_ad_title">비디오광고 시청하기</string>
@@ -1849,6 +1849,7 @@
     <string name="video_image_picker_not_found">비디오 또는 이미지 선택을 지원하는 앱이 없습니다</string>
     <string name="push_setting_guide_head">덕질도 타이밍</string>
     <string name="push_setting_guide_body">알림 켜고 최애 소식 놓치지 마세요!</string>
+    <string name="setting_menu_push_comments_only">댓글</string>
     <string name="setting_menu_push_likes">좋아요</string>
     <string name="setting_menu_push_hotposts">인기글</string>
     <string name="levelheart_bonus_yes">🎬 광고 보기</string>
@@ -1905,4 +1906,6 @@
     <string name="reward_invite_mission_completion">친구 초대 미션 완료 보상</string>
     <string name="signup_desc2_noreward">추천인의 초대코드를 입력하면 친구가 되어 하트를 주고받을 수 있어요.</string>
     <string name="signup_toast_auto_fill_recommender">복사한 초대코드를 자동으로 입력했어요.</string>
+    <string name="vote_ranking">투표 완료</string>
+    <string name="heart_arcade_description1">미니게임 하고🕹️ 하트도 벌어요🩷</string>
 </resources>

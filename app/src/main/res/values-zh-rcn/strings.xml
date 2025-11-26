@@ -369,7 +369,7 @@
     <string name="error_9997">10分钟后可发送。</string>
     <string name="error_9998">每天向一位好友发送的爱心最多为3个。</string>
     <string name="voting_guide_title1">我的累计投票是什么？</string>
-    <string name="voting_guide_title2">等级条件</string>
+    <string name="voting_guide_title2">等级指南</string>
     <string name="voting_guide_desc1">- 这是您为偶像投票的心数。\n- 如果您在一段时间内没有登录，您的成绩和累积投票将被重置。\n（当您再次登录并投票时，一切都会恢复。）\n- 每天启动应用程序您将收到 100 颗心，以及基于您的等级状态的奖金等级奖励心！</string>
     <string name="actor_voting_guide_desc1">- 这是您为名人投票的红心数。\n- 如果您在一段时间内没有登录，您的等级和累积投票将被重置。\n（当您再次登录并投票时，一切都会恢复。）\n- 每天启动应用程序您将收到 100 颗心，以及基于您的等级状态的奖金等级奖励心！</string>
     <string name="level_heart_format" formatted="false">累计投票: %s</string>
@@ -526,7 +526,7 @@
     <string name="setting_menu_cache">刪除緩存</string>
     <string name="are_you_sure">您確定吗？</string>
     <string name="setting_menu_push_hearts">爱心</string>
-    <string name="setting_menu_push_comments">评论</string>
+    <string name="setting_menu_push_comments">评论丶好友申请</string>
     <string name="menu_menu_kin">偶像问答</string>
     <string name="actor_menu_menu_kin">问答</string>
     <string name="hint_search"></string>
@@ -543,7 +543,11 @@
     <string name="newbie_info"></string>
     <string name="report_done">已报案</string>
     <!-- permissoin (korean only) -->
-    <string name="permission_storage">存储：上传和保存照片所需。</string>
+    <string name="permission_required">[必需权限]</string>
+    <string name="permission_optional">[可选权限]</string>
+    <string name="permission_contact">联系人: 用于免费爱心加油站；用于谷歌登陆。</string>
+    <string name="permission_phone">电话: 用于免费爱心加油站。</string>
+    <string name="permission_storage">存储：用于上传和保存照片。</string>
     <string name="permission_desc"></string>
     <string name="actor_permission_desc"></string>
     <string name="allow">允许</string>
@@ -598,7 +602,7 @@
     <string name="confirm_change_account">您已经使用此电子邮件登录。您想将此帐户更改为您选择的登录方式吗？</string>
     <string name="facebook_no_email">无法从Facebook验证电子邮件信息。</string>
     <string name="menu_freeboard">论坛</string>
-    <string name="myheart_today_earn">今天收集的永久爱心</string>
+    <string name="myheart_today_earn">今天获得的爱心</string>
     <string name="myheart_today_earn_help">如果您收集了%1$s个永久爱心，\n排行榜第一位的爱豆图像将改变为您的最爱豆的图像。 \n改变后的图像将于明天重置。</string>
     <string name="actor_myheart_today_earn_help">如果您收集了%1$s个永久爱心，\n排行榜第一位的名人图像将改变为您的最爱名人的图像。 \n改变后的图像将于明天重置。</string>
     <string name="label_image_option">照片宽高比</string>
@@ -1810,6 +1814,7 @@
     <string name="video_image_picker_not_found">无法选择视频或者照片</string>
     <string name="push_setting_guide_head">追星拼的就是手速</string>
     <string name="push_setting_guide_body">打开消息推送，别错过你本命的最新消息！</string>
+    <string name="setting_menu_push_comments_only">评论</string>
     <string name="setting_menu_push_likes">点赞</string>
     <string name="setting_menu_push_hotposts">热帖</string>
     <string name="levelheart_bonus_yes">🎬 观看广告</string>
@@ -1866,4 +1871,6 @@
     <string name="reward_invite_mission_completion">好友邀请任务完成奖励</string>
     <string name="signup_desc2_noreward">输入推荐人的邀请码即可与好友互换爱心。</string>
     <string name="signup_toast_auto_fill_recommender">已自动填入复制的邀请码。</string>
+    <string name="vote_ranking">投票完成</string>
+    <string name="heart_arcade_description1">玩小游戏🕹️，还能赚爱心🩷</string>
 </resources>

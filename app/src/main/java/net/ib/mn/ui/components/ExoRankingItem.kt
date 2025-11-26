@@ -651,6 +651,7 @@ fun LazyListScope.exoRankingItems(
                 ExoVoteIcon(
                     idolId = item.id.toIntOrNull() ?: 0,
                     fullName = item.name,  // name은 이미 "이름_그룹명" 형식
+                    idolHeart = item.heartCount,  // 아이돌의 현재 총 투표 수
                     onVoteSuccess = { votedHeart ->
                         android.util.Log.d("ExoRankingItem", "💗 Voted $votedHeart hearts to ${item.name}")
                         // 부모 컴포넌트에 투표 성공 알림

@@ -463,6 +463,9 @@ class ChartRankingRepository @Inject constructor(
                     videoUrls.forEachIndexed { i, url -> Log.d(TAG, "    Video[$i]: $url") }
                 }
 
+                // 다국어 이름 가져오기 (old 프로젝트와 동일)
+                val localizedName = RankingUtil.getLocalizedName(idol, context)
+
                 RankingItem(
                     id = idol.id.toString(),
                     rank = rank,
@@ -470,7 +473,7 @@ class ChartRankingRepository @Inject constructor(
                     voteCount = NumberFormat.getNumberInstance(Locale.US).format(idol.heart),
                     maxHeartCount = maxHeart,
                     minHeartCount = minHeart,
-                    name = idol.name,
+                    name = localizedName,
                     photoUrl = idol.imageUrl ?: "",
                     miracleCount = idol.miracleCount,
                     fairyCount = idol.fairyCount,
@@ -529,9 +532,11 @@ class ChartRankingRepository @Inject constructor(
                 Log.d(TAG, "🔐 Special idol (비밀의 방) detected - loading from DB")
                 val idolEntity = idolDao.getIdolById(mostIdolId)
                 if (idolEntity != null) {
+                    // 다국어 이름 가져오기 (old 프로젝트와 동일)
+                    val localizedName = RankingUtil.getLocalizedName(idolEntity, context)
                     val specialItem = RankingItem(
                         rank = 0,  // 비밀의 방은 순위 없음
-                        name = idolEntity.name,
+                        name = localizedName,
                         voteCount = NumberFormat.getNumberInstance(Locale.US).format(idolEntity.heart),
                         photoUrl = idolEntity.imageUrl,
                         id = idolEntity.id.toString(),

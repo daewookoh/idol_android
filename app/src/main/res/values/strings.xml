@@ -110,8 +110,8 @@
     <string name="actor_title_review">Write a review for CHOEAEDOL Celeb</string>
     <string name="title_show_option">Privacy Settings</string>
     <string name="title_signup">Membership Registration</string>
-    <string name="title_level_heart">What does accumulated rank mean?</string>
-    <string name="actor_title_level_heart">What does accumulated rank mean?</string>
+    <string name="title_level_heart">Cumulative Rank?</string>
+    <string name="actor_title_level_heart">Cumulative Rank?</string>
     <string name="heart_count_format" formatted="false">%s</string>
     <string name="vote_count_format" formatted="false">%s</string>
     <string name="rank_count_format" formatted="false">%s</string>
@@ -141,7 +141,7 @@
     <string name="btn_signup_finish">Sign up</string>
     <string name="btn_signup_finish_1">Sign up complete</string>
     <string name="my_action">Activities</string>
-    <string name="my_vote">Accumulated Votes</string>
+    <string name="my_vote">My Cumulative Votes</string>
     <string name="menu_menu00">Events</string>
     <string name="menu_menu01">My Idol Settings</string>
     <string name="actor_menu_menu01">My Celeb Settings</string>
@@ -364,7 +364,7 @@
     <string name="response_v1_articles_ok">Post complete.</string>
     <string name="response_v1_articles_ok_heart">Post complete.\n%1$s hearts have been awarded.</string>
     <string name="response_users_is_active_time_over">You cannot cast votes beyond the daily limit.</string>
-    <string name="response_v1_articles_give_heart">%1$s hearts voted.\n%3$s + %4$s</string>
+    <string name="response_v1_articles_give_heart">%1$s hearts have been voted.\n[%2$s Current votes: %3$s + %4$s]</string>
     <string name="error_nextapps_error1">Failed to retrieve ad.</string>
     <string name="error_nextapps_error2">Cannot participate in the campaign.</string>
     <string name="error_nextapps_error3">This campaign has concluded.</string>
@@ -398,17 +398,17 @@
     <string name="error_8003">You are already friends.</string>
     <string name="error_9997">You can send it after 10 minutes.</string>
     <string name="error_9998">You can only send up to 3 hearts per friend each day.</string>
-    <string name="voting_guide_title1">What is \'My Accumulated Votes\'?</string>
-    <string name="voting_guide_title2">Conditions for Grades</string>
-    <string name="voting_guide_desc1">- This is the number of hearts you voted for your Idol. \n- Your grade and accumulated votes will be reset if you do not log in for a certain period of time.\n(Everything will return when you log in and vote again.)\n- You\'ll receive 100 hearts daily for launching the app, as well as bonus level reward hearts based on your level status!</string>
-    <string name="actor_voting_guide_desc1">- This is the number of hearts you voted for your Celeb. \n- Your level and accumulated votes will be reset if you do not log in for a certain period of time.\n(Everything will return when you log in and vote again.)\n- You\'ll receive 100 hearts daily for launching the app, as well as bonus level reward hearts based on your level status!</string>
+    <string name="voting_guide_title1">What is ‘My Cumulative Votes’?</string>
+    <string name="voting_guide_title2">Level Guide</string>
+    <string name="voting_guide_desc1">- This is the number of hearts you voted for your Idol. \n- Your level and cumulative votes will be reset if you do not log in for a certain period of time.\n(Everything will return when you log in and vote again.)\n- You\'ll receive 100 hearts daily for launching the app, as well as bonus level reward hearts based on your level status!</string>
+    <string name="actor_voting_guide_desc1">- This is the number of hearts you voted for your Celeb. \n- Your level and cumulative votes will be reset if you do not log in for a certain period of time.\n(Everything will return when you log in and vote again.)\n- You\'ll receive 100 hearts daily for launching the app, as well as bonus level reward hearts based on your level status!</string>
     <string name="level_heart_format" formatted="false">Accumulated votes: %s</string>
-    <string name="level_heart_guide_title1">The 1st place in the accumulated score becomes the Charity Angel👼</string>
-    <string name="actor_level_heart_guide_title1">The 1st place in the accumulated score becomes the Charity Angel👼</string>
+    <string name="level_heart_guide_title1">The 1st place in the Cumulative Score becomes the Charity Angel👼</string>
+    <string name="actor_level_heart_guide_title1">The 1st place in the Cumulative Score becomes the Charity Angel👼</string>
     <string name="level_heart_guide_title2">Points by rank</string>
     <string name="level_heart_guide_title3">Hall of Fame - Cumulative Rankings</string>
     <string name="level_heart_guide_title4">Notice</string>
-    <string name="level_heart_guide_desc1">This is the total of the scores obtained from the daily voting rankings in the last 30 days. It exposes the top 100.\nIf you click on each individual and group name, you can see the rank change graph.\nWe are making donations to meaningful places in the name of an idol and its fandom, which was ranked as the top accumulated number one in the 30-day rankings!\n\n✅ Aggregation method\n- Member: #1 accumulated score for the previous 30 days, including the 10th of each month (announced on the 11th)\n- Group: #1 accumulated score for the previous 30 days, including the 15th of each month (announced on the 16th)\n- Other categories: Separately notified when proceeding\n\n✅ Reward\n- Donation of 500,000 won to the Welfare Organizations in the Artist and the Fandom\'s name.\n- Posting an Electronic Board Ad in Seoul Subway</string>
+    <string name="level_heart_guide_desc1">This is the total of the scores obtained from the daily voting rankings in the last 30 days. It shows the top 100.\nIf you click on each individual and group name, you can see the rank change graph.\nWe are making donations to meaningful places in the name of an idol and its fandom, which was ranked as #1 in the cumulative 30-day ranking!!\n\n✅ Aggregation method\n- Member: #1 cumulative score for the past 30 days, including the 10th of each month (announced on the 11th)\n- Group: #1 cumulative score for the previous 30 days, including the 15th of each month (announced on the 16th)\n- Other categories: Separately notified when proceeding\n\n✅ Reward\n- Donation of 500,000 won to the Welfare Organizations in the Artist and the Fandom\'s name.\n- Posting an Electronic Board Ad in Seoul Subway</string>
     <string name="level_heart_guide_desc3">Each league\'s members are determined according to the league change criteria on the 11th (Individual) and the 16th (Group).\nIf the league is changed, the Hall of Fame cumulative ranking score starts with 0 points.</string>
     <string name="level_heart_guide_desc4">-The league of individuals and groups is separate. (Even if the group is in League S, individuals can be in League A.)\n- If a tie occurs, all ties will be assigned according to league allocation rules and will be reallocated to the existing number of teams or individuals the following month.\ne.g.) If 3 teams get the same score in League A, 3 teams will move to League S (Changing the quota of League S to 13). Low-ranked three teams will be moved to League A the following month to keep 12 teams in League S.\n- The newly added idols start in League A.\n- The ranking history before the introduction of the league system in the Hall of Fame is marked as \'ALL\'.</string>
     <string name="title_heart_vote_ranking__format" formatted="false">%s Top 100 Votes</string>
@@ -583,7 +583,7 @@
     <string name="setting_menu_cache">Delete cache</string>
     <string name="are_you_sure">Are you sure?</string>
     <string name="setting_menu_push_hearts">Hearts</string>
-    <string name="setting_menu_push_comments">Comment</string>
+    <string name="setting_menu_push_comments">Comments and Friend Request</string>
     <string name="menu_2016_gaon" translatable="false">2016 Gaon Awards</string>
     <string name="menu_menu_kin">Idol Q &amp; A</string>
     <string name="actor_menu_menu_kin">Q &amp; A</string>
@@ -682,7 +682,7 @@
     <string name="confirm_change_account">You are already subscribed to the same email. Would you like to change this account to the login method you selected?</string>
     <string name="facebook_no_email">Could not get email information from Facebook.</string>
     <string name="menu_freeboard">Board</string>
-    <string name="myheart_today_earn">Ever Heart earned today</string>
+    <string name="myheart_today_earn">Heart earned today</string>
     <string name="myheart_today_earn_help">If you collect %1$s Ever Hearts, \nthe first place idol profile image will be changed with my idol\'s profile. \nThe changed profile image will be reset tomorrow.</string>
     <string name="actor_myheart_today_earn_help">If you earn %1$s "Ever Hearts", \nthe first place profile images will be changed to My actor’s profile. \nThe changed profile images will be reset tomorrow.</string>
     <string name="label_image_option">Photo aspect ratio</string>
@@ -819,7 +819,7 @@
     <string name="use_coupon">Use</string>
     <string name="expire_coupon">Validity</string>
     <string name="my_info">Profile</string>
-    <string name="my_info_vote">Accumulated votes</string>
+    <string name="my_info_vote">Cumulative Votes</string>
     <string name="my_info_reg_date">Joined</string>
     <string name="used_coupon">Used</string>
     <string name="set_all_in_day">Set All-in day</string>
@@ -1071,7 +1071,7 @@
     <string name="title_notifications">Notification</string>
     <string name="label_no_notifications">No notifications.</string>
     <string name="label_delete_all_notifications">Clear all?</string>
-    <string name="actor_level_heart_guide_desc1">The rankings are based on accumulated scores that are combined and aggregated over the past 30 days from each fandom on Hall of Fame. Only top100 are displayed.\nIf you click on each fandom, corresponding change of ranking will be shown.\nDonations will be made in the names of celebrities based on the accumulated rankings over the past 30 days!\n\n✅ Achievement criteria\n- Condition1 : an average of 3,000,000 votes or more over the past 30 days\n- Condition2 : ranked 1st or 2nd in corresponding category on Hall of Fame on the 6th of the month\n- Both conditions must be met to be selected as Charity Angel.\n\n✅ Reward\n- Category 1st place\n(1)Donation of 500,000KRW to Miral Welfare Foundation\n(2)Subway advertisement at Hongdae entrance station\n(3)Full-page banner ad\n(4)Menu sliding ad \n- Category 2nd place\n(1)Donation of 500,000KRW to Miral Welfare Foundation\n(2)Subway advertisement at Hongdae entrance station\n(3)Full-page banner ad</string>
+    <string name="actor_level_heart_guide_desc1">The rankings are based on cumulative scores from each fandom on the Hall of Fame over the past 30 days. Only the top 100 are displayed.\nIf you click on a fandom, you can see its ranking change graph.\nDonations are made in the names of celebrities according to the cumulative rankings over the past 30 days!\n\n✅ Achievement criteria\n- Condition1 :An average of 3,000,000 votes or more over the past 30 days\n- Condition2 : Ranked 1st or 2nd in the corresponding category on the Hall of Fame as of the 6th of each month\n- Both conditions must be met to be selected as Charity Angel.\n\n✅ Reward\n- Category 1st place\n(1)Donation of 500,000KRW to Miral Welfare Foundation\n(2)Subway advertisement at Hongdae entrance station\n(3)Full-page banner ad\n(4)Menu sliding ad \n- Category 2nd place\n(1)Donation of 500,000KRW to Miral Welfare Foundation\n(2)Subway advertisement at Hongdae entrance station\n(3)Full-page banner ad</string>
     <string name="AAA">AAA</string>
     <string name="award_guide">Info</string>
     <string name="award_example">Lineup</string>
@@ -1908,6 +1908,7 @@ Give a special gift to my idol on CHOEAEDOL!💖</string>
     <string name="video_image_picker_not_found">Video and image selection is not supported</string>
     <string name="push_setting_guide_head">Wanna support your idol? Hurry up!</string>
     <string name="push_setting_guide_body">Turn on notifications and don\'t miss out on updates of your bias!</string>
+    <string name="setting_menu_push_comments_only">Comment</string>
     <string name="setting_menu_push_likes">Likes</string>
     <string name="setting_menu_push_hotposts">Trending posts</string>
     <string name="levelheart_bonus_yes">🎬 Watch AD</string>
@@ -1962,22 +1963,8 @@ Give a special gift to my idol on CHOEAEDOL!💖</string>
     <string name="invite_friend_detail_title">Invite Friends</string>
     <string name="reward_invite_mission_bonus">Friend Invitation Mission Bonus Reward</string>
     <string name="reward_invite_mission_completion">Friend Invitation Mission Completion Reward</string>
-    <string name="signup_desc2_noreward">Enter your recommender\'s invitation code to exchange Hearts as friends.</string>
+    <string name="signup_desc2_noreward">Enter your recommender’s invitation code to exchange Hearts as friends.</string>
     <string name="signup_toast_auto_fill_recommender">The copied invitation code has been entered automatically.</string>
-
-    <!-- Sign Up Error Messages -->
-    <string name="error_need_agree_age">You must be 14 years old or older to sign up.</string>
-    <string name="error_need_agree_all">Please accept all required terms and conditions.</string>
-    <string name="error_invalid_password_format">Password must be 8–20 characters long and contain both letters and numbers.</string>
-    <string name="error_password_not_match">Passwords do not match.</string>
-    <string name="error_invalid_nickname_length">Nickname must be 2–10 characters long.</string>
-    <string name="error_email_already_used">This email is already in use.</string>
-    <string name="error_nickname_already_used">This nickname is already in use.</string>
-    <string name="error_signup_failed">Sign up failed.</string>
-    <string name="error_check_input_fields">Please check the input fields.</string>
-    <string name="error_please_agree_terms">Please accept the terms and conditions.</string>
-    <string name="success_email_available">This email is available.</string>
-    <string name="success_nickname_available">This nickname is available.</string>
-    <string name="error_email_check_failed">Email verification failed.</string>
-    <string name="error_nickname_check_failed">Nickname verification failed.</string>
+    <string name="vote_ranking">VOTED</string>
+    <string name="heart_arcade_description1">Play mini-games🕹️ and earn hearts🩷</string>
 </resources>

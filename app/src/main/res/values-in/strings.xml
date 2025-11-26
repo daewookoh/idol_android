@@ -80,8 +80,8 @@
     <string name="actor_title_review">Tulis ulasan untuk CHOEAEDOL Seleb</string>
     <string name="title_show_option">Pengaturan Privasi</string>
     <string name="title_signup">Daftar</string>
-    <string name="title_level_heart">Apa itu Akumulasi peringkat?</string>
-    <string name="actor_title_level_heart">Apa itu Akumulasi peringkat?</string>
+    <string name="title_level_heart">Peringkat Kumulatif?</string>
+    <string name="actor_title_level_heart">Peringkat Kumulatif?</string>
     <string name="heart_count_format" formatted="false">%s buah</string>
     <string name="vote_count_format" formatted="false">%s suara</string>
     <string name="rank_count_format" formatted="false">%s</string>
@@ -111,7 +111,7 @@
     <string name="btn_signup_finish">Mendaftar</string>
     <string name="btn_signup_finish_1">Pendaftaran Selesai</string>
     <string name="my_action">Aktivitas Saya</string>
-    <string name="my_vote">Akumulasi suara saya</string>
+    <string name="my_vote">Suara Kumulatif Saya</string>
     <string name="menu_menu00">Event</string>
     <string name="menu_menu01">Pengaturan Idol Saya</string>
     <string name="actor_menu_menu01">Pengaturan Seleb Saya</string>
@@ -389,13 +389,13 @@ Sedang menunggu untuk disetujui</string>
     <string name="error_8003">Anda telah berteman.</string>
     <string name="error_9997">Dapat dikirim setelah 10 menit.</string>
     <string name="error_9998">Dalam sehari hanya dapat mengirimkan 3 heart/teman</string>
-    <string name="voting_guide_title1">Apa itu akumulasi suara saya?</string>
-    <string name="voting_guide_title2">Syarat Level</string>
-    <string name="voting_guide_desc1">- Ini adalah jumlah hati yang kamu pilih untuk Idolamu.\n- Nilai dan akumulasi suaramu akan diatur ulang jika kamu tidak masuk dalam jangka waktu tertentu.\n(Semuanya akan kembali saat kamu masuk dan memberikan suara lagi.)\n- Kamu akan menerima 100 hati setiap hari saat meluncurkan aplikasi , serta hadiah level bonus hati berdasarkan status level Anda!</string>
-    <string name="actor_voting_guide_desc1">- Ini adalah jumlah hati yang kamu pilih untuk Selebritimu.\n- Level dan akumulasi suaramu akan diatur ulang jika kamu tidak masuk dalam jangka waktu tertentu.\n(Semuanya akan kembali saat kamu masuk dan memberikan suara lagi.)\n- Kamu akan menerima 100 hati setiap hari saat meluncurkan aplikasi , serta hadiah level bonus hati berdasarkan status level Anda!</string>
+    <string name="voting_guide_title1">Apa itu ‘Suara Kumulatif Saya’?</string>
+    <string name="voting_guide_title2">Panduan Level</string>
+    <string name="voting_guide_desc1">- Ini adalah jumlah hati yang kamu pilih untuk Idolamu.\n- Level dan suara kumulatif Anda akan direset jika Anda tidak masuk selama jangka waktu tertentu.\n(Semuanya akan kembali saat kamu masuk dan memberikan suara lagi.)\n- Kamu akan menerima 100 hati setiap hari saat meluncurkan aplikasi , serta hadiah level bonus hati berdasarkan status level Anda!</string>
+    <string name="actor_voting_guide_desc1">- Ini adalah jumlah hati yang kamu pilih untuk Selebritimu.\n- Level dan suara kumulatif Anda akan direset jika Anda tidak masuk selama jangka waktu tertentu.\n(Semuanya akan kembali saat kamu masuk dan memberikan suara lagi.)\n- Kamu akan menerima 100 hati setiap hari saat meluncurkan aplikasi , serta hadiah level bonus hati berdasarkan status level Anda!</string>
     <string name="level_heart_format" formatted="false">Akumulasi suara:%s</string>
-    <string name="level_heart_guide_title1">Tempat pertama dalam akumulasi skor menjadi Malaikat Amal👼</string>
-    <string name="actor_level_heart_guide_title1">Tempat pertama dalam akumulasi skor menjadi Malaikat Amal👼</string>
+    <string name="level_heart_guide_title1">Peringkat pertama dalam Skor Kumulatif akan menjadi Malaikat Amal👼</string>
+    <string name="actor_level_heart_guide_title1">Peringkat pertama dalam Skor Kumulatif akan menjadi Malaikat Amal👼</string>
     <string name="level_heart_guide_title2">Point berdasarkan peringkat</string>
     <string name="level_heart_guide_title3">Hall of Fame - Peringkat Kumulatif</string>
     <string name="level_heart_guide_title4">Melihat</string>
@@ -582,12 +582,16 @@ Apakah Anda ingin mendapatkan Heart?</string>
     <string name="message_send_heart">Kirim dengan Heart</string>
     <string name="message_empty">Tidak ada pesan</string>
     <!-- permissoin (korean only) -->
+    <string name="permission_required">[Izin yang Diperlukan]</string>
+    <string name="permission_optional">[Izin Opsional]</string>
+    <string name="permission_contact">Kontak: Diperlukan untuk stasiun isi ulang jantung gratis. Diperlukan untuk masuk ke akun Google.</string>
+    <string name="permission_phone">Telepon: Diperlukan untuk stasiun isi ulang jantung gratis</string>
     <string name="permission_storage">Penyimpanan: Diperlukan untuk mengunggah dan menyimpan foto.</string>
-    <string name="permission_desc"></string>
-    <string name="actor_permission_desc"></string>
+    <string name="permission_desc">Anda tidak perlu memberikan izin akses untuk menggunakan CHOEAEDOL.\n\nCHOEAEDOL tidak mengumpulkan informasi pribadi apa pun.</string>
+    <string name="actor_permission_desc">Anda tidak perlu memberikan izin akses untuk menggunakan CHOEAEDOL Celeb.\n\nCHOEAEDOL Celeb tidak mengumpulkan informasi pribadi apa pun.</string>
     <string name="allow">Izinkan</string>
     <string name="deny">Tolak</string>
-    <string name="label_see_video_for_heartbox">Dapatkan Heart Box dengan melihat Video Iklan</string>
+    <string name="label_see_video_for_heartbox">Tonton iklan video untuk membuka lebih banyak Heart Box!</string>
     <!-- bj app -->
     <string name="profile_additional_info">Infomasi tambahan</string>
     <string name="profile_birth">Tahun, Bulan, Tanggal lahir</string>
@@ -653,7 +657,7 @@ Apakah Anda ingin mendapatkan Heart?</string>
     <string name="confirm_change_account">Telah terdaftar dengan e-mail ini. Ganti metode log-in dengan akun yang sudah dipilih?</string>
     <string name="facebook_no_email">Tidak bisa mendapatkan informasi e-mail dari FACEBOOK</string>
     <string name="menu_freeboard">Papan</string>
-    <string name="myheart_today_earn">Ever Heart hari ini</string>
+    <string name="myheart_today_earn">Heart yang didapat hari ini</string>
     <string name="myheart_today_earn_help">Jika mengumpulkan %1$s Heart, \n Foto Profil Idol peringkat pertama akan diubah dengan foto Profil Idol saya. \n
 Gambar profil yang diubah akan disetel ulang keesokan harinya.</string>
     <string name="actor_myheart_today_earn_help">Jika mengumpulkan %1$s Heart, \n Foto Profil Seleb peringkat pertama akan diubah dengan foto Profil Seleb saya. \nGambar profil yang diubah akan disetel ulang keesokan harinya.</string>
@@ -792,7 +796,7 @@ Pilih \'Seleb Saya\' sekarang?</string>
     <string name="use_coupon">Gunakan</string>
     <string name="expire_coupon">Masa berlaku</string>
     <string name="my_info">Profil Saya</string>
-    <string name="my_info_vote">Akumulasi suara</string>
+    <string name="my_info_vote">Suara Kumulatif</string>
     <string name="my_info_reg_date">Bergabung</string>
     <string name="used_coupon">Telah digunakan</string>
     <string name="set_all_in_day">Set All-in day</string>
@@ -1044,7 +1048,7 @@ Mungkin ditampilkan dalam polling.</string>
     <string name="title_notifications">Pemberitahuan</string>
     <string name="label_no_notifications">Tidak ada pemberitahuan.</string>
     <string name="label_delete_all_notifications">Bersihkan semua?</string>
-    <string name="actor_level_heart_guide_desc1">Pemeringkatan didasarkan pada akumulasi skor yang digabungkan dan dikumpulkan selama 30 hari terakhir dari setiap fandom di Hall of Fame. Hanya 100 teratas yang ditampilkan.\nJika Anda mengklik setiap fandom, perubahan peringkat yang sesuai akan ditampilkan.\nSumbangan akan diberikan atas nama selebriti berdasarkan akumulasi peringkat selama 30 hari terakhir!\n\n✅ Kriteria pencapaian\n- Kondisi1 : rata-rata 3.000.000 suara atau lebih selama 30 hari terakhir\n- Kondisi2 : peringkat 1 atau 2 di setiap kategori selama 6 hari terakhir di Hall of Fame\n- Kedua kondisi tersebut harus dipenuhi untuk dapat dipilih sebagai Malaikat Amal.\n\n✅ Hadiah\n- Kategori Juara 1\n(1) Donasi sebesar 500.000KRW kepada Miral Welfare Foundation\n(2)Iklan kereta bawah tanah di stasiun pintu masuk Hongdae\n(3)Iklan banner satu halaman penuh\n(4)Iklan geser menu\n- Kategori Juara 2\n(1)Sumbangan sebesar 500.000KRW kepada Miral Welfare Foundation\n(2)Iklan kereta bawah tanah di stasiun masuk Hongdae\n(3)Iklan spanduk satu halaman penuh</string>
+    <string name="actor_level_heart_guide_desc1">Pemeringkatan didasarkan pada akumulasi skor yang digabungkan dan dikumpulkan selama 30 hari terakhir dari setiap fandom di Hall of Fame. Hanya 100 teratas yang ditampilkan.\nJika Anda mengklik setiap fandom, perubahan peringkat yang sesuai akan ditampilkan.\nSumbangan akan diberikan atas nama selebriti berdasarkan akumulasi peringkat selama 30 hari terakhir!\n\n✅ Kriteria pencapaian\n- Kondisi1 : rata-rata 3.000.000 suara atau lebih selama 30 hari terakhir\n- Kondisi2 : peringkat 1 atau 2 di kategori terkait di Hall of Fame pada tanggal 6 setiap bulan\n- Kedua kondisi tersebut harus dipenuhi untuk dapat dipilih sebagai Malaikat Amal.\n\n✅ Hadiah\n- Kategori Juara 1\n(1) Donasi sebesar 500.000KRW kepada Miral Welfare Foundation\n(2)Iklan kereta bawah tanah di stasiun pintu masuk Hongdae\n(3)Iklan banner satu halaman penuh\n(4)Iklan geser menu\n- Kategori Juara 2\n(1)Sumbangan sebesar 500.000KRW kepada Miral Welfare Foundation\n(2)Iklan kereta bawah tanah di stasiun masuk Hongdae\n(3)Iklan spanduk satu halaman penuh</string>
     <string name="AAA">AAA</string>
     <string name="award_guide">Info</string>
     <string name="award_example">barisan</string>
@@ -1877,6 +1881,7 @@ Berikan hadiah spesial untuk idola saya di CHOEAEDOL!💖</string>
     <string name="video_image_picker_not_found">Pemilihan video dan gambar tidak didukung</string>
     <string name="push_setting_guide_head">Waktu Dukjil</string>
     <string name="push_setting_guide_body">Nyalakan notifikasi dan jangan pernah ketinggalan berita favorit Anda!</string>
+    <string name="setting_menu_push_comments_only">Komentar</string>
     <string name="setting_menu_push_likes">Suka</string>
     <string name="setting_menu_push_hotposts">Postingan panas</string>
     <string name="levelheart_bonus_yes">🎬 Tonton IKLAN</string>
@@ -1934,4 +1939,6 @@ Silakan beralih ke negara atau wilayah lain dan coba lagi.</string>
     <string name="reward_invite_mission_completion">Hadiah Penyelesaian Misi Undangan Teman</string>
     <string name="signup_desc2_noreward">Masukkan kode undangan dari teman yang merekomendasikan Anda untuk bertukar Hati sebagai teman.</string>
     <string name="signup_toast_auto_fill_recommender">Kode undangan yang disalin telah dimasukkan secara otomatis.</string>
+    <string name="vote_ranking">Sudah voting</string>
+    <string name="heart_arcade_description1">Main mini-game🕹️ dan dapatkan hati🩷</string>
 </resources>
