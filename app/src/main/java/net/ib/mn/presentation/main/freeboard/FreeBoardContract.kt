@@ -26,11 +26,13 @@ class FreeBoardContract {
         val selectedLanguageId: String = "",
         val showPopular: Boolean = false,
         val isEmpty: Boolean = false,
+        val hasMostIdol: Boolean = true,  // 최애가 설정되어 있는지 여부
         val error: String? = null
     ) : UiState {
         companion object {
-            const val TAG_ID_HOT = 0      // 인기글
-            const val TAG_ID_ALL = 9898   // ALL
+            const val TAG_ID_HOT = 0              // 인기글
+            const val TAG_ID_ALL = 9898           // ALL
+            const val TAG_ID_MY_FAVORITE = 999    // 최애 탭
 
             const val FILTER_DATE_ORDER = "-created_at"
             const val FILTER_COMMENT_ORDER = "-num_comments"

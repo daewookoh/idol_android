@@ -765,6 +765,11 @@ class UserRepositoryImpl @Inject constructor(
                                 userCacheRepository.setDefaultChartCode(chartCode)
                             }
 
+                            if (isInitialLoad) {
+                                preferencesManager.setFreeBoardSelectedTagId(net.ib.mn.util.Constants.MY_FAVORITE_TAG_ID)
+                                android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ✓ Initial load: Setting FreeBoardSelectedTagId to ${net.ib.mn.util.Constants.MY_FAVORITE_TAG_ID} (MY_FAVORITE_TAG)")
+                            }
+
                             kotlinx.coroutines.delay(100)
                         }
                     }

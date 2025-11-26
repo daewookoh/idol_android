@@ -25,6 +25,11 @@ class FreeBoardViewModel @Inject constructor(
     private val gson: Gson
 ) : BaseViewModel<FreeBoardContract.State, FreeBoardContract.Intent, FreeBoardContract.Effect>() {
 
+    companion object {
+        // 기본 탭 인덱스 (HOT = 0)
+        const val DEFAULT_TAB_INDEX = FreeBoardContract.State.TAG_ID_HOT
+    }
+
     private var nextUrl: String? = null
 
     override fun createInitialState() = FreeBoardContract.State()
@@ -57,15 +62,23 @@ class FreeBoardViewModel @Inject constructor(
                 val tags = parseTags(tagsJson)
 
                 // 저장된 탭 ID 로드 (없으면 HOT가 기본)
+                // startup에서 최애 아이돌 ID로 설정됨
                 val savedTagId = preferencesManager.getFreeBoardSelectedTagId()
-                val initialTagId = savedTagId ?: FreeBoardContract.State.TAG_ID_HOT
+                val initialTagId = savedTagId ?: DEFAULT_TAB_INDEX
 
-                Log.d(TAG, "loadInitialData: savedTagId=$savedTagId, initialTagId=$initialTagId")
+                // 최애 설정 여부 확인
+                val mostIdolId = preferencesManager.getMostIdolId()
+                val hasMostIdol = mostIdolId != null &&
+                    mostIdolId != Constants.NON_FAVORITE_IDOL_ID &&
+                    mostIdolId > 0
+
+                Log.d(TAG, "loadInitialData: savedTagId=$savedTagId, initialTagId=$initialTagId, mostIdolId=$mostIdolId, hasMostIdol=$hasMostIdol")
 
                 setState {
                     copy(
                         tags = tags.map { it.copy(selected = it.id == initialTagId) },
-                        selectedTagId = initialTagId
+                        selectedTagId = initialTagId,
+                        hasMostIdol = hasMostIdol
                     )
                 }
 
@@ -93,6 +106,20 @@ class FreeBoardViewModel @Inject constructor(
             val selectedTagId = currentState.selectedTagId
 
             Log.d(TAG, "loadArticles: selectedTagId=$selectedTagId, orderBy=$orderBy, keyword=$keyword, locale=$locale")
+
+            // 최애 탭인데 최애가 설정되지 않은 경우 빈 화면 표시
+            if (selectedTagId == FreeBoardContract.State.TAG_ID_MY_FAVORITE && !currentState.hasMostIdol) {
+                Log.d(TAG, "loadArticles: 최애 탭인데 최애 미설정 -> 빈 화면 표시")
+                setState {
+                    copy(
+                        isLoading = false,
+                        isRefreshing = false,
+                        articles = emptyList(),
+                        isEmpty = true
+                    )
+                }
+                return@launch
+            }
 
             val flow = when (selectedTagId) {
                 FreeBoardContract.State.TAG_ID_HOT -> {
