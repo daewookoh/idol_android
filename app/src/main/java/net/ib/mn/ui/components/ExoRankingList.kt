@@ -57,6 +57,8 @@ data class RankingItem(
     val top3VideoUrls: List<String?> = listOf(null, null, null),  // 펼치기 동영상 3개
     val percentage: Int = 0,  // 투표율 (하트픽용, 전체 투표수 대비 비율)
     val mostCount: Int = 0,  // 최애 수 (팔로워 수)
+    val groupId: Int? = null,  // 그룹 ID (솔로 아이돌의 경우 소속 그룹 ID)
+    val fandomName: String? = null,  // 팬덤 이름 (커뮤니티 탭에서 사용)
 ) {
     /**
      * 현재 로케일에 맞는 이름 반환

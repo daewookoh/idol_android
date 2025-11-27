@@ -47,6 +47,19 @@ object ProfileImageType {
 }
 
 /**
+ * 기념일 배지 설정 데이터 클래스
+ */
+private data class AnniversaryBadgeConfig(
+    val birthDebutSize: Dp,
+    val badgeOffsetX: Dp,
+    val badgeOffsetY: Dp,
+    val badgePaddingTop: Dp,
+    val memorialDayPadding: Modifier,
+    val memorialDayOffsetX: Dp,
+    val memorialDayOffsetY: Dp
+)
+
+/**
  * ExoProfileImage - 공용 프로필 이미지 컴포넌트
  *
  * ExoTop3 방식의 디폴트 이미지 처리를 적용한 AsyncImage wrapper
@@ -248,14 +261,23 @@ private fun BoxScope.AnniversaryBadge(
     type: String
 ) {
     // 타입별 배지 크기 및 위치
-    val (birthDebutSize, badgeOffsetX, badgeOffsetY, badgePaddingTop, memorialDayPadding) = remember(type) {
+    // memorialDayOffset: (offsetX, offsetY) - MEDIUM_CIRCLE은 우측 15dp, 아래 5dp
+    val badgeConfig = remember(type) {
         when (type) {
-            ProfileImageType.LARGE_CIRCLE -> listOf(48.dp, (-7).dp, 0.dp, 7.dp, Modifier as Modifier)
-            ProfileImageType.MEDIUM_CIRCLE -> listOf(40.dp, (-14).dp, 0.dp, 0.dp, Modifier as Modifier)
-            ProfileImageType.SMALL_CIRCLE, ProfileImageType.SMALL -> listOf(36.dp, (-7).dp, 0.dp, 7.dp, Modifier.padding(end = 7.dp, bottom = 11.dp))
-            else -> listOf(48.dp, (-7).dp, 0.dp, 7.dp, Modifier as Modifier)
+            ProfileImageType.LARGE_CIRCLE -> AnniversaryBadgeConfig(48.dp, (-7).dp, 0.dp, 7.dp, Modifier, (-10).dp, (-10).dp)
+            ProfileImageType.MEDIUM_CIRCLE -> AnniversaryBadgeConfig(40.dp, (-14).dp, 0.dp, 0.dp, Modifier, 15.dp, 5.dp)
+            ProfileImageType.SMALL_CIRCLE, ProfileImageType.SMALL -> AnniversaryBadgeConfig(36.dp, (-7).dp, 0.dp, 7.dp, Modifier.padding(end = 7.dp, bottom = 11.dp), (-10).dp, (-10).dp)
+            else -> AnniversaryBadgeConfig(48.dp, (-7).dp, 0.dp, 7.dp, Modifier, (-10).dp, (-10).dp)
         }
     }
+
+    val birthDebutSize = badgeConfig.birthDebutSize
+    val badgeOffsetX = badgeConfig.badgeOffsetX
+    val badgeOffsetY = badgeConfig.badgeOffsetY
+    val badgePaddingTop = badgeConfig.badgePaddingTop
+    val memorialDayPadding = badgeConfig.memorialDayPadding
+    val memorialDayOffsetX = badgeConfig.memorialDayOffsetX
+    val memorialDayOffsetY = badgeConfig.memorialDayOffsetY
 
     val comebackWidth = 66.dp
     val comebackHeight = 56.dp
@@ -272,10 +294,10 @@ private fun BoxScope.AnniversaryBadge(
                 contentDescription = if (idolType == "S") "생일" else "데뷔일",
                 tint = Color.Unspecified,
                 modifier = Modifier
-                    .size(birthDebutSize as Dp)
+                    .size(birthDebutSize)
                     .align(Alignment.TopStart)
-                    .offset(x = badgeOffsetX as Dp, y = badgeOffsetY as Dp)
-                    .padding(top = badgePaddingTop as Dp)
+                    .offset(x = badgeOffsetX, y = badgeOffsetY)
+                    .padding(top = badgePaddingTop)
             )
         }
         "E" -> {  // 데뷔 (dEbut)
@@ -284,10 +306,10 @@ private fun BoxScope.AnniversaryBadge(
                 contentDescription = "데뷔일",
                 tint = Color.Unspecified,
                 modifier = Modifier
-                    .size(birthDebutSize as Dp)
+                    .size(birthDebutSize)
                     .align(Alignment.TopStart)
-                    .offset(x = badgeOffsetX as Dp, y = badgeOffsetY as Dp)
-                    .padding(top = badgePaddingTop as Dp)
+                    .offset(x = badgeOffsetX, y = badgeOffsetY)
+                    .padding(top = badgePaddingTop)
             )
         }
         "C" -> {  // 컴백 (Comeback)
@@ -305,8 +327,8 @@ private fun BoxScope.AnniversaryBadge(
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .offset(x = (-10).dp, y = (-10).dp)
-                    .then(memorialDayPadding as Modifier)
+                    .offset(x = memorialDayOffsetX, y = memorialDayOffsetY)
+                    .then(memorialDayPadding)
                     .background(
                         color = ColorPalette.main,
                         shape = RoundedCornerShape(10.dp)

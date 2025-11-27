@@ -213,4 +213,10 @@ object Constants {
     // Special User States (old Const.kt)
     // ============================================================
     const val NON_FAVORITE_IDOL_ID: Int = 99980 // 최애 미설정 상태 ID (비밀의 방)
+
+    // ============================================================
+    // User Levels (old Const.kt)
+    // ============================================================
+    const val LEVEL_ADMIN: Int = 10  // 관리자 레벨
+    const val LEVEL_MANAGER: Int = 5 // 매니저 레벨
 }

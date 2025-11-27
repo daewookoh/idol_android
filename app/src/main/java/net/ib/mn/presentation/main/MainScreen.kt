@@ -15,9 +15,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -41,7 +43,7 @@ import net.ib.mn.presentation.main.menu.MenuPage
 import net.ib.mn.presentation.main.myfavorite.MyFavoritePage
 import net.ib.mn.presentation.main.myinfo.MyInfoPage
 import net.ib.mn.presentation.main.ranking.RankingPage
-import net.ib.mn.presentation.main.community.CommunityScreen
+import net.ib.mn.presentation.community.CommunityScreen
 import java.util.Locale
 
 /**
@@ -244,9 +246,18 @@ fun MainScreen(
 
     // CommunityScreen 오버레이 (RankingItem 클릭 시 표시)
     selectedRankingItem?.let { rankingItem ->
+        var showChattingTab by remember { mutableStateOf(false) }
+
+        // 채팅 탭 표시 여부 계산
+        LaunchedEffect(rankingItem) {
+            showChattingTab = viewModel.shouldShowChattingTab(rankingItem)
+        }
+
         CommunityScreen(
             rankingItem = rankingItem,
             wikiRepository = viewModel.wikiRepository,
+            showChattingTab = showChattingTab,
+            fandomName = rankingItem.fandomName,
             onBackClick = {
                 viewModel.closeCommunity()
             }

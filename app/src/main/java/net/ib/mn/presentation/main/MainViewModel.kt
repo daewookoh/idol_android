@@ -122,6 +122,42 @@ class MainViewModel @Inject constructor(
     }
 
     /**
+     * 채팅 탭 표시 여부 계산 (old 프로젝트의 setIsShowChattingTab과 동일)
+     * 조건: 최애이거나, 최애의 그룹이거나, 관리자인 경우
+     *
+     * @param rankingItem 현재 커뮤니티의 아이돌
+     * @return 채팅 탭 표시 여부
+     */
+    suspend fun shouldShowChattingTab(rankingItem: net.ib.mn.ui.components.RankingItem): Boolean {
+        val userHeart = _userInfo.value?.heart ?: 0
+        val mostIdolId = preferencesManager.getMostIdolId()
+
+        val idolId = rankingItem.id.toIntOrNull() ?: 0
+        val groupId = rankingItem.groupId
+
+        // 관리자인 경우
+        if (userHeart == Constants.LEVEL_ADMIN) {
+            android.util.Log.d(TAG, "[MainViewModel] 🔓 showChattingTab=true (ADMIN)")
+            return true
+        }
+
+        // 최애인 경우
+        if (mostIdolId != null && mostIdolId == idolId) {
+            android.util.Log.d(TAG, "[MainViewModel] 🔓 showChattingTab=true (MOST)")
+            return true
+        }
+
+        // 최애의 그룹인 경우 (현재 아이돌이 그룹이고, 최애가 해당 그룹의 멤버인 경우)
+        if (groupId != null && mostIdolId != null && groupId == mostIdolId) {
+            android.util.Log.d(TAG, "[MainViewModel] 🔓 showChattingTab=true (MOST_GROUP)")
+            return true
+        }
+
+        android.util.Log.d(TAG, "[MainViewModel] 🔒 showChattingTab=false (userHeart=$userHeart, mostIdolId=$mostIdolId, idolId=$idolId, groupId=$groupId)")
+        return false
+    }
+
+    /**
      * CommunityScreen 닫기
      */
     fun closeCommunity() {

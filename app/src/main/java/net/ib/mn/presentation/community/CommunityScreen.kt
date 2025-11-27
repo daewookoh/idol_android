@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.main.community
+package net.ib.mn.presentation.community
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -17,9 +17,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.PrimaryScrollableTabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +45,10 @@ import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.data.repository.WikiRepository
 import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.presentation.community.subpage.CommunityChatSubPage
+import net.ib.mn.presentation.community.subpage.CommunityFanTalkSubPage
+import net.ib.mn.presentation.community.subpage.CommunityFeedSubPage
+import net.ib.mn.presentation.community.subpage.CommunityScheduleSubPage
 import net.ib.mn.presentation.webview.WebViewScreen
 import net.ib.mn.ui.components.ExoNameWithGroup
 import net.ib.mn.ui.components.ExoProfileImage
@@ -46,20 +57,35 @@ import net.ib.mn.ui.components.ExoTop3
 import net.ib.mn.ui.components.ProfileImageType
 import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.NumberFormatUtil
+
+/**
+ * CommunityTab - 커뮤니티 탭 타입
+ */
+enum class CommunityTab {
+    FEED,
+    FAN_TALK,
+    CHAT,
+    SCHEDULE
+}
 
 /**
  * CommunityScreen - 커뮤니티 화면
  *
  * @param rankingItem 선택된 랭킹 아이템 데이터
  * @param wikiRepository WikiRepository 인스턴스
+ * @param showChattingTab 채팅 탭 표시 여부 (최애이거나, 최애의 그룹이거나, 관리자일 경우 true)
+ * @param fandomName 팬덤 이름
  * @param onBackClick 뒤로가기 클릭 이벤트
  */
 @Composable
 fun CommunityScreen(
     rankingItem: RankingItem,
     wikiRepository: WikiRepository? = null,
+    showChattingTab: Boolean = false,
+    fandomName: String? = null,
     onBackClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -68,6 +94,39 @@ fun CommunityScreen(
     var showWikiWebView by remember { mutableStateOf(false) }
     var wikiUrl by remember { mutableStateOf<String?>(null) }
     var isLoadingWiki by remember { mutableStateOf(false) }
+
+    // 탭 목록 생성 (showChattingTab이 true인 경우에만 채팅 탭 포함)
+    val tabs = remember(showChattingTab) {
+        buildList {
+            add(CommunityTab.FEED)
+            add(CommunityTab.FAN_TALK)
+            if (showChattingTab) {
+                add(CommunityTab.CHAT)
+            }
+            add(CommunityTab.SCHEDULE)
+        }
+    }
+
+    val pagerState = rememberPagerState(pageCount = { tabs.size })
+
+    // 탭 제목 생성
+    val tabTitles = remember(fandomName, showChattingTab) {
+        buildList {
+            add(context.getString(R.string.community_feed))
+            // 팬덤 이름이 있으면 "%s Talk" 형식, 없으면 "Fan Talk"
+            add(
+                if (fandomName.isNullOrEmpty()) {
+                    context.getString(R.string.community_board)
+                } else {
+                    context.getString(R.string.community_board2, fandomName)
+                }
+            )
+            if (showChattingTab) {
+                add(context.getString(R.string.community_chat))
+            }
+            add(context.getString(R.string.community_schedule))
+        }
+    }
 
     BackHandler {
         if (showWikiWebView) {
@@ -138,6 +197,34 @@ fun CommunityScreen(
                     },
                     onMoreClick = { /* TODO */ }
                 )
+
+                // 탭 레이아웃
+                CommunityTabRow(
+                    tabTitles = tabTitles,
+                    selectedTabIndex = pagerState.currentPage,
+                    onTabSelected = { index ->
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    }
+                )
+
+                // 탭 컨텐츠 (ViewPager)
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize(),
+                    userScrollEnabled = false // 좌우 스크롤 막음 (old와 동일)
+                ) { page ->
+                    when (tabs[page]) {
+                        CommunityTab.FEED -> CommunityFeedSubPage(rankingItem = rankingItem)
+                        CommunityTab.FAN_TALK -> CommunityFanTalkSubPage(
+                            rankingItem = rankingItem,
+                            fandomName = fandomName
+                        )
+                        CommunityTab.CHAT -> CommunityChatSubPage(rankingItem = rankingItem)
+                        CommunityTab.SCHEDULE -> CommunityScheduleSubPage(rankingItem = rankingItem)
+                    }
+                }
             }
         }
 
@@ -170,6 +257,71 @@ fun CommunityScreen(
                 CircularProgressIndicator(color = ColorPalette.main)
             }
         }
+    }
+}
+
+/**
+ * CommunityTabRow - 커뮤니티 탭 레이아웃 (RankingPage와 동일한 스타일)
+ * - PrimaryScrollableTabRow 사용 (탭이 wrap_content, 스크롤 가능)
+ * - 탭 인디케이터는 텍스트 너비만큼만 표시
+ * - 탭 간격 최소화, 왼쪽 정렬
+ */
+@Composable
+private fun CommunityTabRow(
+    tabTitles: List<String>,
+    selectedTabIndex: Int,
+    onTabSelected: (Int) -> Unit
+) {
+    val coroutineScope = rememberCoroutineScope()
+    val textDefaultColor = ColorPalette.textDefault
+    val textDimmedColor = ColorPalette.textDimmed
+
+    Column {
+        PrimaryScrollableTabRow(
+            selectedTabIndex = selectedTabIndex,
+            minTabWidth = 0.dp,
+            containerColor = ColorPalette.background100,
+            contentColor = textDefaultColor,
+            edgePadding = 3.dp,
+            divider = {},
+            indicator = @Composable {
+                TabRowDefaults.SecondaryIndicator(
+                    modifier = Modifier
+                        .tabIndicatorOffset(selectedTabIndex)
+                        .padding(horizontal = 12.dp),
+                    color = textDefaultColor
+                )
+            }
+        ) {
+            tabTitles.forEachIndexed { index, title ->
+                Box(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .height(48.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            onTabSelected(index)
+                        }
+                        .padding(horizontal = 12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = title,
+                        style = ExoTypo.title14.copy(
+                            lineHeight = 14.sp,
+                            color = if (selectedTabIndex == index) textDefaultColor else textDimmedColor
+                        )
+                    )
+                }
+            }
+        }
+        // 하단 구분선 (old의 border_gray100과 동일)
+        HorizontalDivider(
+            thickness = 1.dp,
+            color = ColorPalette.gray100
+        )
     }
 }
 
