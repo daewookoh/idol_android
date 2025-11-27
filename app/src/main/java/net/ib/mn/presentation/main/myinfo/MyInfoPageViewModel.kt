@@ -9,8 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.repository.UserCacheRepository
-import java.text.NumberFormat
-import java.util.Locale
+import net.ib.mn.util.NumberFormatUtil
 import javax.inject.Inject
 
 /**
@@ -157,7 +156,7 @@ class MyInfoPageViewModel @Inject constructor(
                     _favoriteIdolSubName.value = favoriteIdolSubName
                     _levelProgress.value = progress
                     _levelUpText.value = levelUpText
-                    _totalExp.value = NumberFormat.getNumberInstance(Locale.getDefault()).format(levelHeart)
+                    _totalExp.value = NumberFormatUtil.formatWithComma(levelHeart)
                     _subscriptionName.value = null // TODO: subscriptions 필드 추가 시 구현
                     _hasNewFeed.value = false // TODO: 피드 새 알림 로직 추가 시 구현
 
@@ -166,10 +165,10 @@ class MyInfoPageViewModel @Inject constructor(
                     val weakHeartValue = userData.weakHeart ?: 0L
                     val totalHeart = strongHeartValue + weakHeartValue
 
-                    _heartCount.value = NumberFormat.getNumberInstance(Locale.getDefault()).format(totalHeart)
-                    _strongHeart.value = NumberFormat.getNumberInstance(Locale.getDefault()).format(strongHeartValue)
-                    _weakHeart.value = NumberFormat.getNumberInstance(Locale.getDefault()).format(weakHeartValue)
-                    _diaCount.value = NumberFormat.getNumberInstance(Locale.getDefault()).format(userData.diamond ?: 0)
+                    _heartCount.value = NumberFormatUtil.formatWithComma(totalHeart)
+                    _strongHeart.value = NumberFormatUtil.formatWithComma(strongHeartValue)
+                    _weakHeart.value = NumberFormatUtil.formatWithComma(weakHeartValue)
+                    _diaCount.value = NumberFormatUtil.formatWithComma(userData.diamond ?: 0)
 
                     android.util.Log.d(TAG, "✅ UI state updated:")
                     android.util.Log.d(TAG, "  - Nickname: ${userData.nickname}")
@@ -213,7 +212,7 @@ class MyInfoPageViewModel @Inject constructor(
         }
 
         val remainingHeart = (nextLevelHeart - levelHeart).coerceAtLeast(0)
-        val levelUpText = NumberFormat.getNumberInstance(Locale.US).format(remainingHeart)
+        val levelUpText = NumberFormatUtil.formatWithComma(remainingHeart)
 
         return Pair(progress, levelUpText)
     }

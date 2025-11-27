@@ -45,7 +45,8 @@ fun UnifiedRankingSubPage(
     listState: LazyListState? = null,
     modifier: Modifier = Modifier,
     isForFavorite: Boolean = false,
-    onRankItemsLoaded: ((List<net.ib.mn.ui.components.RankingItem>) -> Unit)? = null
+    onRankItemsLoaded: ((List<net.ib.mn.ui.components.RankingItem>) -> Unit)? = null,
+    onItemClick: ((net.ib.mn.ui.components.RankingItem) -> Unit)? = null
 ) {
     android.util.Log.d("UnifiedRankingSubPage", "🎨 [Composing] ${dataSource.type} for chartCode: $chartCode")
 
@@ -151,6 +152,7 @@ fun UnifiedRankingSubPage(
                     listState = scrollState,
                     onItemClick = { rank, item ->
                         android.util.Log.d("UnifiedRankingSubPage", "Clicked: Rank $rank - ${item.name}")
+                        onItemClick?.invoke(item)
                     },
                     onVoteSuccess = { idolId, voteCount ->
                         viewModel.updateVote(idolId, voteCount)

@@ -190,7 +190,7 @@ fun ExoProfileImage(
                     anniversary = anniversary,
                     anniversaryDays = anniversaryDays,
                     idolType = idolType,
-                    isSmall = type == ProfileImageType.MEDIUM_CIRCLE  // MEDIUM_CIRCLE은 small
+                    type = type
                 )
             }
         }
@@ -219,7 +219,7 @@ fun ExoProfileImage(
                     anniversary = anniversary,
                     anniversaryDays = anniversaryDays,
                     idolType = idolType,
-                    isSmall = boxSize <= 40.dp
+                    type = type
                 )
             }
         }
@@ -235,26 +235,28 @@ fun ExoProfileImage(
  * - C: 컴백 (Comeback) - 마이크
  * - D: 기념일 (memorial Day) - N일 텍스트 박스
  *
- * 사이즈별 스펙 (old 프로젝트 기준):
- * - Small (40dp 이하): hall_item.xml 기준
- *   - Birth/Debut: 36x36dp, marginTop=7dp
- *   - Comeback: 66x56dp, marginTop=12dp
- *   - MemorialDay: marginEnd=7dp, marginBottom=11dp
- *
- * - Large (45dp 이상): ranking_item.xml 기준
- *   - Birth/Debut: 44dp, marginTop=7dp
- *   - Comeback: 66x56dp, marginTop=12dp
- *   - MemorialDay: BottomEnd
+ * 타입별 스펙:
+ * - LARGE_CIRCLE: 48dp 배지, offset(-7, 0), paddingTop=7dp
+ * - MEDIUM_CIRCLE: 48dp 배지, offset(-15, -10), paddingTop=0dp
+ * - SMALL_CIRCLE/SMALL: 36dp 배지
  */
 @Composable
 private fun BoxScope.AnniversaryBadge(
     anniversary: String,
     anniversaryDays: Int,
     idolType: String,
-    isSmall: Boolean
+    type: String
 ) {
-    // 사이즈별 배지 크기 (MAIN: 48dp, Small: 36dp)
-    val birthDebutSize = if (isSmall) 36.dp else 48.dp
+    // 타입별 배지 크기 및 위치
+    val (birthDebutSize, badgeOffsetX, badgeOffsetY, badgePaddingTop, memorialDayPadding) = remember(type) {
+        when (type) {
+            ProfileImageType.LARGE_CIRCLE -> listOf(48.dp, (-7).dp, 0.dp, 7.dp, Modifier as Modifier)
+            ProfileImageType.MEDIUM_CIRCLE -> listOf(40.dp, (-14).dp, 0.dp, 0.dp, Modifier as Modifier)
+            ProfileImageType.SMALL_CIRCLE, ProfileImageType.SMALL -> listOf(36.dp, (-7).dp, 0.dp, 7.dp, Modifier.padding(end = 7.dp, bottom = 11.dp))
+            else -> listOf(48.dp, (-7).dp, 0.dp, 7.dp, Modifier as Modifier)
+        }
+    }
+
     val comebackWidth = 66.dp
     val comebackHeight = 56.dp
 
@@ -270,10 +272,10 @@ private fun BoxScope.AnniversaryBadge(
                 contentDescription = if (idolType == "S") "생일" else "데뷔일",
                 tint = Color.Unspecified,
                 modifier = Modifier
-                    .size(birthDebutSize)
+                    .size(birthDebutSize as Dp)
                     .align(Alignment.TopStart)
-                    .offset(x = (-7).dp)
-                    .padding(top = 7.dp)
+                    .offset(x = badgeOffsetX as Dp, y = badgeOffsetY as Dp)
+                    .padding(top = badgePaddingTop as Dp)
             )
         }
         "E" -> {  // 데뷔 (dEbut)
@@ -282,10 +284,10 @@ private fun BoxScope.AnniversaryBadge(
                 contentDescription = "데뷔일",
                 tint = Color.Unspecified,
                 modifier = Modifier
-                    .size(birthDebutSize)
+                    .size(birthDebutSize as Dp)
                     .align(Alignment.TopStart)
-                    .offset(x = (-7).dp)
-                    .padding(top = 7.dp)
+                    .offset(x = badgeOffsetX as Dp, y = badgeOffsetY as Dp)
+                    .padding(top = badgePaddingTop as Dp)
             )
         }
         "C" -> {  // 컴백 (Comeback)
@@ -304,13 +306,7 @@ private fun BoxScope.AnniversaryBadge(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .offset(x = (-10).dp, y = (-10).dp)
-                    .then(
-                        if (isSmall) {
-                            Modifier.padding(end = 7.dp, bottom = 11.dp)
-                        } else {
-                            Modifier
-                        }
-                    )
+                    .then(memorialDayPadding as Modifier)
                     .background(
                         color = ColorPalette.main,
                         shape = RoundedCornerShape(10.dp)

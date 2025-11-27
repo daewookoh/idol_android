@@ -56,8 +56,7 @@ import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.data.remote.dto.VoteResponse
 import net.ib.mn.presentation.main.ranking.idol_subpage.VoteViewModel
-import java.text.NumberFormat
-import java.util.Locale
+import net.ib.mn.util.NumberFormatUtil
 
 /**
  * ExoVoteDialog - 하트 투표 다이얼로그
@@ -192,7 +191,7 @@ fun ExoVoteDialog(
                         )
                         Spacer(modifier = Modifier.height(5.dp))
                         Text(
-                            text = NumberFormat.getNumberInstance(Locale.US).format(totalHeart),
+                            text = NumberFormatUtil.formatWithComma(totalHeart),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = ColorPalette.mainLight
@@ -219,7 +218,7 @@ fun ExoVoteDialog(
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
                                 Text(
-                                    text = NumberFormat.getNumberInstance(Locale.US).format(strongHeart),
+                                    text = NumberFormatUtil.formatWithComma(strongHeart),
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = ColorPalette.textGray,
@@ -248,7 +247,7 @@ fun ExoVoteDialog(
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
                                 Text(
-                                    text = NumberFormat.getNumberInstance(Locale.US).format(freeHeart),
+                                    text = NumberFormatUtil.formatWithComma(freeHeart),
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = ColorPalette.textGray,
@@ -570,10 +569,10 @@ fun VoteCompleteBottomSheet(
     val displaySubtitle = if (subtitle.isEmpty()) {
         stringResource(
             R.string.response_v1_articles_give_heart,
-            NumberFormat.getNumberInstance(Locale.US).format(voteCount),
+            NumberFormatUtil.formatWithComma(voteCount),
             idolName,
-            NumberFormat.getNumberInstance(Locale.US).format(currentVoteCount),
-            NumberFormat.getNumberInstance(Locale.US).format(voteCount)
+            NumberFormatUtil.formatWithComma(currentVoteCount),
+            NumberFormatUtil.formatWithComma(voteCount)
         )
     } else {
         subtitle

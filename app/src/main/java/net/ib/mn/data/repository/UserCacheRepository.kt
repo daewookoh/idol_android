@@ -15,6 +15,7 @@ import net.ib.mn.data.remote.dto.UserSelfData
 import net.ib.mn.data.remote.dto.toEntity
 import net.ib.mn.domain.model.MostPicksModel
 import net.ib.mn.presentation.main.myfavorite.MyFavoriteContract
+import net.ib.mn.util.NumberFormatUtil
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -382,7 +383,7 @@ class UserCacheRepository @Inject constructor(
      * 하트 수 포맷팅
      */
     private fun formatHeartCount(count: Int): String {
-        return java.text.NumberFormat.getNumberInstance(java.util.Locale.US).format(count)
+        return NumberFormatUtil.formatWithComma(count)
     }
 
     /**

@@ -243,6 +243,32 @@ interface MiscApi {
 }
 
 // ============================================================
+// Wiki API
+// ============================================================
+interface WikiApi {
+
+    /**
+     * 위키 이름 조회
+     * @param idolId 아이돌 ID
+     * @param locale 로케일 (ko, en, ja, zh-cn, zh-tw)
+     */
+    @GET("idols/wiki_name/")
+    suspend fun getWikiName(
+        @Query("idol_id") idolId: Int,
+        @Query("locale") locale: String
+    ): Response<WikiNameResponse>
+
+    /**
+     * 리다이렉트 URL 조회
+     * @param url 원본 URL
+     */
+    @GET("/redirect/")
+    suspend fun redirect(
+        @Query("url") url: String
+    ): Response<RedirectResponse>
+}
+
+// ============================================================
 // Stamps API (출석체크)
 // ============================================================
 interface StampsApi {

@@ -41,6 +41,7 @@ import net.ib.mn.presentation.main.menu.MenuPage
 import net.ib.mn.presentation.main.myfavorite.MyFavoritePage
 import net.ib.mn.presentation.main.myinfo.MyInfoPage
 import net.ib.mn.presentation.main.ranking.RankingPage
+import net.ib.mn.presentation.main.community.CommunityScreen
 import java.util.Locale
 
 /**
@@ -59,6 +60,9 @@ fun MainScreen(
     val logoutCompleted by viewModel.logoutCompleted.collectAsState()
     val timerText by topBarViewModel.timerText.collectAsState()
     val hasNewNotification by topBarViewModel.hasNewNotification.collectAsState()
+
+    // CommunityScreen 표시 상태
+    val selectedRankingItem by viewModel.selectedRankingItem.collectAsState()
 
     // 즉시 반응하는 로컬 카테고리 상태 사용 (UI 반응성 개선)
     val currentCategory by viewModel.currentCategory.collectAsState()
@@ -224,7 +228,11 @@ fun MainScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 when (tab) {
-                    0 -> RankingPage()
+                    0 -> RankingPage(
+                        onItemClick = { rankingItem ->
+                            viewModel.openCommunity(rankingItem)
+                        }
+                    )
                     1 -> MyFavoritePage()
                     2 -> MyInfoPage()
                     3 -> FreeBoardPage()
@@ -232,6 +240,17 @@ fun MainScreen(
                 }
             }
         }
+    }
+
+    // CommunityScreen 오버레이 (RankingItem 클릭 시 표시)
+    selectedRankingItem?.let { rankingItem ->
+        CommunityScreen(
+            rankingItem = rankingItem,
+            wikiRepository = viewModel.wikiRepository,
+            onBackClick = {
+                viewModel.closeCommunity()
+            }
+        )
     }
 }
 

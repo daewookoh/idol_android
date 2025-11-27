@@ -138,4 +138,9 @@ object NetworkModule {
     @Singleton
     fun provideStampsApi(retrofit: Retrofit): StampsApi =
         retrofit.create(StampsApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideWikiApi(retrofit: Retrofit): WikiApi =
+        retrofit.create(WikiApi::class.java)
 }

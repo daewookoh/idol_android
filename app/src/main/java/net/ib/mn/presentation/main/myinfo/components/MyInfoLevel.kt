@@ -18,8 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.ib.mn.R
-import java.text.NumberFormat
-import java.util.Locale
+import net.ib.mn.util.NumberFormatUtil
 
 /**
  * MyInfo 레벨 프로그레스 바 컴포넌트
@@ -72,7 +71,7 @@ fun MyInfoLevel(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // tv_level: "Lv. 30" (12sp, bold, main_light)
-                val formattedLevel = NumberFormat.getNumberInstance(Locale.getDefault()).format(level)
+                val formattedLevel = NumberFormatUtil.formatWithComma(level)
                 Text(
                     text = "Lv. $formattedLevel",
                     color = mainLightColor,

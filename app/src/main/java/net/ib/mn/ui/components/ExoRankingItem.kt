@@ -54,7 +54,7 @@ import androidx.compose.ui.unit.sp
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
-import java.text.NumberFormat
+import net.ib.mn.util.NumberFormatUtil
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -944,7 +944,7 @@ fun HofAccumulativeTop1RankingItem(
                                 if (item.difference != 0) {
                                     Text(
                                         text = remember(item.difference) {
-                                            NumberFormat.getNumberInstance().format(item.difference)
+                                            NumberFormatUtil.formatWithComma(item.difference)
                                         },
                                         style = ExoTypo.label9.copy(color = ColorPalette.gray580)
                                     )
@@ -978,7 +978,7 @@ fun HofAccumulativeTop1RankingItem(
 
                     // 점수 (old: score, "/ 점수점")
                     val scoreText = remember(item.score) {
-                        val scoreCount = NumberFormat.getNumberInstance().format(item.score)
+                        val scoreCount = NumberFormatUtil.formatWithComma(item.score)
                             .replace(",", "")
                         "/ ${scoreCount}점"
                     }
@@ -1143,7 +1143,7 @@ fun HofAccumulativeRankingItem(
                             if (item.difference != 0) {
                                 Text(
                                     text = remember(item.difference) {
-                                        NumberFormat.getNumberInstance().format(item.difference)
+                                        NumberFormatUtil.formatWithComma(item.difference)
                                     },
                                     style = ExoTypo.label9.copy(color = ColorPalette.textDefault)
                                 )
@@ -1187,7 +1187,7 @@ fun HofAccumulativeRankingItem(
 
                 // 점수 표시 (old: score)
                 val scoreText = remember(item.score) {
-                    val scoreCount = NumberFormat.getNumberInstance().format(item.score)
+                    val scoreCount = NumberFormatUtil.formatWithComma(item.score)
                         .replace(",", "")
                     "${scoreCount}점"
                 }
@@ -1566,10 +1566,7 @@ fun HofDailyRankingItem(
                 ) {
                     // 투표수 (old: tv_count)
                     val voteCountText = remember(item.heart) {
-                        val voteCountComma = java.text.NumberFormat.getNumberInstance(
-                            androidx.appcompat.app.AppCompatDelegate.getApplicationLocales()[0] ?: java.util.Locale.getDefault()
-                        ).format(item.heart)
-                        voteCountComma
+                        NumberFormatUtil.formatWithComma(item.heart)
                     }
                     Text(
                         text = stringResource(R.string.vote_count_format, voteCountText),

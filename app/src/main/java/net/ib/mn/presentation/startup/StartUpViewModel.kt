@@ -26,8 +26,7 @@ import net.ib.mn.domain.usecase.GetUserSelfUseCase
 import net.ib.mn.domain.usecase.GetUserStatusUseCase
 import net.ib.mn.domain.usecase.UpdateTimezoneUseCase
 import net.ib.mn.util.Constants
-import java.text.NumberFormat
-import java.util.Locale
+import net.ib.mn.util.NumberFormatUtil
 import javax.inject.Inject
 
 /**
@@ -1040,6 +1039,6 @@ class StartUpViewModel @Inject constructor(
      * 하트 수를 포맷팅 (천 단위 콤마)
      */
     private fun formatHeartCount(count: Int): String {
-        return NumberFormat.getNumberInstance(Locale.US).format(count)
+        return NumberFormatUtil.formatWithComma(count)
     }
 }

@@ -20,7 +20,7 @@ import net.ib.mn.ui.components.HeartPickState
 import net.ib.mn.ui.components.IdolRankInfo
 import net.ib.mn.util.IdolImageUtil
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
-import java.text.NumberFormat
+import net.ib.mn.util.NumberFormatUtil
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -116,7 +116,7 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
                         name = first.title,
                         groupName = first.subtitle,
                         photoUrl = first.imageUrl.toSecureUrl(),
-                        voteCount = NumberFormat.getNumberInstance(Locale.US).format(first.vote),
+                        voteCount = NumberFormatUtil.formatWithComma(first.vote),
                         percentage = percentage
                     )
                 } else null
@@ -131,7 +131,7 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
                             name = idol.title,
                             groupName = idol.subtitle,
                             photoUrl = idol.imageUrl.toSecureUrl(),
-                            voteCount = NumberFormat.getNumberInstance(Locale.US).format(idol.vote),
+                            voteCount = NumberFormatUtil.formatWithComma(idol.vote),
                             percentage = percentage
                         )
                     }
@@ -163,8 +163,8 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
                     dDay = dDay,
                     firstPlaceIdol = firstPlaceIdol,
                     otherIdols = otherIdols,
-                    heartVoteCount = NumberFormat.getNumberInstance(Locale.US).format(heartPick.vote),
-                    commentCount = NumberFormat.getNumberInstance(Locale.US).format(heartPick.numComments),
+                    heartVoteCount = NumberFormatUtil.formatWithComma(heartPick.vote),
+                    commentCount = NumberFormatUtil.formatWithComma(heartPick.numComments),
                     periodDate = periodDate,
                     openDate = openDate,
                     openPeriod = openPeriod,

@@ -786,3 +786,25 @@ data class CommonResponse(
     @SerializedName("mcode")
     val mcode: Int? = null
 )
+
+// ============================================================
+// /idols/wiki_name/ - 위키 이름 조회
+// ============================================================
+data class WikiNameResponse(
+    @SerializedName("success")
+    val success: Boolean,
+
+    @SerializedName("wiki_name")
+    val wikiName: String?
+)
+
+// ============================================================
+// /redirect/ - 리다이렉트 URL 조회
+// ============================================================
+data class RedirectResponse(
+    @SerializedName("success")
+    val success: Boolean,
+
+    @SerializedName("url")
+    val url: String?
+)

@@ -11,6 +11,8 @@ import net.ib.mn.data.repository.OnepickRepositoryImpl
 import net.ib.mn.data.repository.ThemepickRepositoryImpl
 import net.ib.mn.data.repository.UserRepositoryImpl
 import net.ib.mn.data.repository.UtilityRepositoryImpl
+import net.ib.mn.data.repository.WikiRepository
+import net.ib.mn.data.repository.WikiRepositoryImpl
 import net.ib.mn.domain.repository.AdRepository
 import net.ib.mn.domain.repository.ArticlesRepository
 import net.ib.mn.domain.repository.ConfigRepository
@@ -102,4 +104,10 @@ abstract class RepositoryModule {
     abstract fun bindArticlesRepository(
         impl: ArticlesRepositoryImpl
     ): ArticlesRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindWikiRepository(
+        impl: WikiRepositoryImpl
+    ): WikiRepository
 }

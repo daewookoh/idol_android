@@ -17,8 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import java.text.NumberFormat
-import java.util.Locale
+import net.ib.mn.util.NumberFormatUtil
 
 /**
  * ExoHeartCounter
@@ -63,7 +62,7 @@ fun ExoHeartCounter(
 
     // 포맷팅
     val formattedText = if (formatWithComma) {
-        NumberFormat.getNumberInstance(Locale.US).format(displayValue)
+        NumberFormatUtil.formatWithComma(displayValue)
     } else {
         displayValue.toString()
     }

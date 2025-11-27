@@ -20,6 +20,7 @@ import net.ib.mn.data.local.UserInfo
 import net.ib.mn.data.remote.udp.IdolBroadcastManager
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.UserRepository
+import net.ib.mn.data.repository.WikiRepository
 import net.ib.mn.util.DeviceUtil
 import javax.inject.Inject
 
@@ -31,6 +32,7 @@ class MainViewModel @Inject constructor(
     private val deviceUtil: DeviceUtil,
     private val idolBroadcastManager: IdolBroadcastManager,
     private val idolRepository: net.ib.mn.domain.repository.IdolRepository,
+    val wikiRepository: WikiRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -43,6 +45,10 @@ class MainViewModel @Inject constructor(
 
     private val _logoutCompleted = MutableStateFlow(false)
     val logoutCompleted: StateFlow<Boolean> = _logoutCompleted.asStateFlow()
+
+    // CommunityScreen 표시 상태 (RankingItem 클릭 시 사용)
+    private val _selectedRankingItem = MutableStateFlow<net.ib.mn.ui.components.RankingItem?>(null)
+    val selectedRankingItem: StateFlow<net.ib.mn.ui.components.RankingItem?> = _selectedRankingItem.asStateFlow()
 
     // 즉시 반응하는 로컬 카테고리 상태 (UI 반응성 개선)
     private val _currentCategory = MutableStateFlow<String?>(null)
@@ -105,6 +111,22 @@ class MainViewModel @Inject constructor(
 
         // 기존 콜백 제거 - 새 전략에서는 onTabSelected()에서 직접 API 호출 여부를 판단
         // idolBroadcastManager.setOnReactionEnabledCallback { ... }
+    }
+
+    /**
+     * CommunityScreen 열기 (RankingItem 클릭 시)
+     */
+    fun openCommunity(rankingItem: net.ib.mn.ui.components.RankingItem) {
+        _selectedRankingItem.value = rankingItem
+        android.util.Log.d(TAG, "[MainViewModel] 📖 Opening Community for: ${rankingItem.name}")
+    }
+
+    /**
+     * CommunityScreen 닫기
+     */
+    fun closeCommunity() {
+        _selectedRankingItem.value = null
+        android.util.Log.d(TAG, "[MainViewModel] 📕 Closing Community")
     }
 
     /**

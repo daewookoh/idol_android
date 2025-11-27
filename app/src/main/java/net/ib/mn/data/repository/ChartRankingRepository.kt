@@ -23,10 +23,9 @@ import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.util.Constants
 import net.ib.mn.util.IdolImageUtil
+import net.ib.mn.util.NumberFormatUtil
 import net.ib.mn.util.ProcessedRankData
 import net.ib.mn.util.RankingUtil
-import java.text.NumberFormat
-import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -184,7 +183,7 @@ class ChartRankingRepository @Inject constructor(
                     // 기존 mostFavoriteIdol의 heartCount와 voteCount만 업데이트
                     val updatedMostIdol = currentMostIdol.copy(
                         heartCount = newTotalHeart,
-                        voteCount = NumberFormat.getNumberInstance(Locale.US).format(newTotalHeart)
+                        voteCount = NumberFormatUtil.formatWithComma(newTotalHeart)
                     )
                     _mostFavoriteIdolRankingItem.value = updatedMostIdol
                     Log.d(TAG, "✅ Updated mostFavoriteIdol: hearts=$newTotalHeart")
@@ -470,7 +469,7 @@ class ChartRankingRepository @Inject constructor(
                     id = idol.id.toString(),
                     rank = rank,
                     heartCount = idol.heart,
-                    voteCount = NumberFormat.getNumberInstance(Locale.US).format(idol.heart),
+                    voteCount = NumberFormatUtil.formatWithComma(idol.heart),
                     maxHeartCount = maxHeart,
                     minHeartCount = minHeart,
                     name = localizedName,
@@ -484,7 +483,8 @@ class ChartRankingRepository @Inject constructor(
                     anniversaryDays = idol.anniversaryDays ?: 0,
                     top3ImageUrls = imageUrls,
                     top3VideoUrls = videoUrls,
-                    isFavorite = mostIdolId?.let { idol.id == it } ?: false
+                    isFavorite = mostIdolId?.let { idol.id == it } ?: false,
+                    mostCount = idol.mostCount
                 )
             }
 
@@ -537,7 +537,7 @@ class ChartRankingRepository @Inject constructor(
                     val specialItem = RankingItem(
                         rank = 0,  // 비밀의 방은 순위 없음
                         name = localizedName,
-                        voteCount = NumberFormat.getNumberInstance(Locale.US).format(idolEntity.heart),
+                        voteCount = NumberFormatUtil.formatWithComma(idolEntity.heart),
                         photoUrl = idolEntity.imageUrl,
                         id = idolEntity.id.toString(),
                         heartCount = idolEntity.heart,
@@ -547,7 +547,8 @@ class ChartRankingRepository @Inject constructor(
                             idolEntity.imageUrl3
                         ),
                         top3VideoUrls = emptyList(),
-                        isFavorite = true  // 비밀의 방은 항상 최애
+                        isFavorite = true,  // 비밀의 방은 항상 최애
+                        mostCount = idolEntity.mostCount
                     )
                     _mostFavoriteIdolRankingItem.value = specialItem
                     Log.d(TAG, "✅ Loaded special idol: ${specialItem.name}, heart=${specialItem.heartCount}")
