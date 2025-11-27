@@ -1,6 +1,9 @@
 package net.ib.mn.presentation.main.community
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -138,16 +141,22 @@ fun CommunityScreen(
             }
         }
 
-        // 위키 웹뷰
-        if (showWikiWebView && wikiUrl != null) {
-            WebViewScreen(
-                url = wikiUrl!!,
-                title = "Wiki",
-                onNavigateBack = {
-                    showWikiWebView = false
-                    wikiUrl = null
-                }
-            )
+        // 위키 웹뷰 (아래에서 올라오는 애니메이션)
+        AnimatedVisibility(
+            visible = showWikiWebView && wikiUrl != null,
+            enter = slideInVertically(initialOffsetY = { it }),
+            exit = slideOutVertically(targetOffsetY = { it })
+        ) {
+            wikiUrl?.let { url ->
+                WebViewScreen(
+                    url = url,
+                    title = "Wiki",
+                    onNavigateBack = {
+                        showWikiWebView = false
+                        wikiUrl = null
+                    }
+                )
+            }
         }
 
         // 로딩 인디케이터
