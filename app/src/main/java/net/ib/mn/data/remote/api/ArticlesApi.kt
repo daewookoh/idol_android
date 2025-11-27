@@ -1,8 +1,14 @@
 package net.ib.mn.data.remote.api
 
+import net.ib.mn.data.remote.dto.ArticleLikeRequest
+import net.ib.mn.data.remote.dto.ArticleLikeResponse
+import net.ib.mn.data.remote.dto.ArticleVoteRequest
+import net.ib.mn.data.remote.dto.ArticleVoteResponse
 import okhttp3.ResponseBody
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Query
 import retrofit2.http.Url
 
@@ -96,4 +102,22 @@ interface ArticlesApi {
         @Query("keyword") keyword: String? = null,
         @Query("locale") locale: String? = null,
     ): Response<ResponseBody>
+
+    /**
+     * 게시글 투표 (하트 투표)
+     * Old 프로젝트: POST "articles/give_heart/"
+     */
+    @POST("articles/give_heart/")
+    suspend fun voteArticle(
+        @Body request: ArticleVoteRequest
+    ): ArticleVoteResponse
+
+    /**
+     * 게시글 좋아요
+     * Old 프로젝트: POST "articles/like/"
+     */
+    @POST("articles/like/")
+    suspend fun likeArticle(
+        @Body request: ArticleLikeRequest
+    ): ArticleLikeResponse
 }

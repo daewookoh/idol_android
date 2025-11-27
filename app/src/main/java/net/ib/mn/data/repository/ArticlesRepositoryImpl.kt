@@ -6,6 +6,10 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import net.ib.mn.data.remote.api.ArticlesApi
+import net.ib.mn.data.remote.dto.ArticleLikeRequest
+import net.ib.mn.data.remote.dto.ArticleLikeResponse
+import net.ib.mn.data.remote.dto.ArticleVoteRequest
+import net.ib.mn.data.remote.dto.ArticleVoteResponse
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.NoticeModel
@@ -252,6 +256,112 @@ class ArticlesRepositoryImpl @Inject constructor(
                 message = "Unknown error: ${e.message}"
             ))
         }
+    }
+
+    override fun getCommunityFeed(
+        idolId: Int,
+        isMost: Boolean,
+        orderBy: String,
+        imageOnly: String?,
+        primaryFileType: String?
+    ): Flow<ApiResult<ArticlesResponse>> = flow {
+        emit(ApiResult.Loading)
+
+        try {
+            val response = articlesApi.getArticles(
+                idolId = idolId,
+                orderBy = orderBy,
+                isMost = if (isMost) "Y" else "N",
+                primaryFileType = primaryFileType,
+                imageOnly = imageOnly
+            )
+
+            if (response.isSuccessful && response.body() != null) {
+                val bodyString = response.body()!!.string()
+                val articlesResponse = parseArticlesResponse(bodyString)
+                emit(ApiResult.Success(articlesResponse))
+            } else {
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code(),
+                message = "HTTP ${e.code()}: ${e.message()}"
+            ))
+        } catch (e: IOException) {
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Network error: ${e.message}"
+            ))
+        } catch (e: Exception) {
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Unknown error: ${e.message}"
+            ))
+        }
+    }
+
+    override fun getCommunityFeedNext(
+        nextUrl: String,
+        isMost: Boolean,
+        imageOnly: String?,
+        primaryFileType: String?
+    ): Flow<ApiResult<ArticlesResponse>> = flow {
+        emit(ApiResult.Loading)
+
+        try {
+            val response = articlesApi.getArticlesNext(
+                url = nextUrl,
+                isMost = if (isMost) "Y" else "N",
+                primaryFileType = primaryFileType,
+                imageOnly = imageOnly
+            )
+
+            if (response.isSuccessful && response.body() != null) {
+                val bodyString = response.body()!!.string()
+                val articlesResponse = parseArticlesResponse(bodyString)
+                emit(ApiResult.Success(articlesResponse))
+            } else {
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code(),
+                message = "HTTP ${e.code()}: ${e.message()}"
+            ))
+        } catch (e: IOException) {
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Network error: ${e.message}"
+            ))
+        } catch (e: Exception) {
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Unknown error: ${e.message}"
+            ))
+        }
+    }
+
+    override suspend fun voteArticle(articleId: String, hearts: Long): ArticleVoteResponse {
+        Log.d(TAG, "voteArticle: articleId=$articleId, hearts=$hearts")
+        return articlesApi.voteArticle(
+            ArticleVoteRequest(articleId = articleId, hearts = hearts)
+        )
+    }
+
+    override suspend fun likeArticle(articleId: String, like: Boolean): ArticleLikeResponse {
+        Log.d(TAG, "likeArticle: articleId=$articleId, like=$like")
+        return articlesApi.likeArticle(
+            ArticleLikeRequest(articleId = articleId, like = like)
+        )
     }
 
     /**

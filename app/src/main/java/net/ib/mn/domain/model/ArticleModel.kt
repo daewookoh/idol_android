@@ -21,6 +21,9 @@ data class ArticleModel(
     @SerializedName("thumbnail_url")
     val thumbnailUrl: String? = null,
 
+    @SerializedName("umjjal_url")
+    val umjjalUrl: String? = null,
+
     @SerializedName("heart")
     val heart: Long = 0,
 
@@ -73,7 +76,32 @@ data class ArticleModel(
     // Files
     @SerializedName("files")
     val files: List<ArticleFile> = emptyList()
-)
+) {
+    /**
+     * 미디어 파일 목록 반환
+     * Old 프로젝트의 BaseArticleViewHolder.setReOrganizeArticleModel() 로직과 동일
+     * - files가 비어있으면 imageUrl, thumbnailUrl, umjjalUrl로 생성
+     * - seq 순으로 정렬
+     */
+    val mediaFiles: List<ArticleFile>
+        get() {
+            return if (files.isEmpty()) {
+                // 옛날에 올린 경우, files가 없어서 직접 생성
+                val thumbnail = thumbnailUrl ?: imageUrl
+                if (thumbnail != null || umjjalUrl != null) {
+                    listOf(ArticleFile(
+                        originUrl = null,
+                        thumbnailUrl = thumbnail,
+                        umjjalUrl = umjjalUrl
+                    ))
+                } else {
+                    emptyList()
+                }
+            } else {
+                files.sortedBy { it.seq }
+            }
+        }
+}
 
 /**
  * 게시글 작성자 정보
@@ -100,10 +128,14 @@ data class ArticleUser(
 
 /**
  * 게시글 첨부 파일
+ * Old 프로젝트의 RemoteFileModel과 호환
  */
 data class ArticleFile(
     @SerializedName("id")
     val id: Int = 0,
+
+    @SerializedName("origin_url")
+    val originUrl: String? = null,
 
     @SerializedName("file_url")
     val fileUrl: String? = null,
@@ -111,12 +143,76 @@ data class ArticleFile(
     @SerializedName("thumbnail_url")
     val thumbnailUrl: String? = null,
 
+    @SerializedName("umjjal_url")
+    val umjjalUrl: String? = null,
+
     @SerializedName("file_type")
     val fileType: String? = null, // image, video, etc.
+
+    @SerializedName("seq")
+    val seq: Int = 1,
 
     @SerializedName("width")
     val width: Int = 0,
 
     @SerializedName("height")
     val height: Int = 0
-)
+) {
+    /**
+     * 비디오 파일인지 확인 (mp4 확장자)
+     */
+    val isVideo: Boolean
+        get() = originUrl?.endsWith(".mp4", ignoreCase = true) == true
+
+    /**
+     * GIF/움짤인지 확인 (umjjalUrl이 있으면 GIF)
+     */
+    val isGif: Boolean
+        get() = !umjjalUrl.isNullOrEmpty()
+
+    /**
+     * 미디어 타입 (VIDEO, GIF, IMAGE)
+     */
+    val mediaType: MediaType
+        get() = when {
+            isVideo -> MediaType.VIDEO
+            isGif -> MediaType.GIF
+            else -> MediaType.IMAGE
+        }
+
+    /**
+     * 표시할 이미지/썸네일 URL 반환
+     * - 비디오/GIF: thumbnailUrl 사용
+     * - 이미지: originUrl > fileUrl > thumbnailUrl
+     */
+    val displayUrl: String?
+        get() = when {
+            isVideo || isGif -> thumbnailUrl
+            else -> originUrl ?: fileUrl ?: thumbnailUrl
+        }
+
+    /**
+     * 원본 이미지 URL (고화질)
+     */
+    val originalUrl: String?
+        get() = originUrl ?: fileUrl
+
+    /**
+     * 재생할 미디어 URL (GIF는 umjjalUrl, 비디오는 originUrl)
+     */
+    val playableUrl: String?
+        get() = when {
+            isGif -> umjjalUrl
+            isVideo -> originUrl
+            else -> null
+        }
+}
+
+/**
+ * 미디어 타입
+ */
+enum class MediaType {
+    IMAGE,  // 일반 이미지
+    GIF,    // 움짤 (umjjalUrl 사용)
+    VIDEO   // 동영상 (mp4)
+}

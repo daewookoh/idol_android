@@ -1,6 +1,8 @@
 package net.ib.mn.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import net.ib.mn.data.remote.dto.ArticleLikeResponse
+import net.ib.mn.data.remote.dto.ArticleVoteResponse
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.NoticeModel
@@ -88,6 +90,56 @@ interface ArticlesRepository {
         locale: String? = null,
         limit: Int = 50
     ): Flow<ApiResult<ArticlesResponse>>
+
+    /**
+     * 커뮤니티 피드 게시물 조회
+     *
+     * @param idolId 아이돌 ID
+     * @param isMost 최애 여부
+     * @param orderBy 정렬 기준 ("-heart", "-created_at", "-num_comments", "-like_count")
+     * @param imageOnly 이미지만 보기 ("Y", "N", null)
+     * @param primaryFileType 파일 타입 필터 ("wp" = 배경화면)
+     */
+    fun getCommunityFeed(
+        idolId: Int,
+        isMost: Boolean,
+        orderBy: String,
+        imageOnly: String? = null,
+        primaryFileType: String? = null
+    ): Flow<ApiResult<ArticlesResponse>>
+
+    /**
+     * 커뮤니티 피드 다음 페이지 조회
+     *
+     * @param nextUrl 다음 페이지 URL
+     * @param isMost 최애 여부
+     * @param imageOnly 이미지만 보기
+     * @param primaryFileType 파일 타입 필터
+     */
+    fun getCommunityFeedNext(
+        nextUrl: String,
+        isMost: Boolean,
+        imageOnly: String? = null,
+        primaryFileType: String? = null
+    ): Flow<ApiResult<ArticlesResponse>>
+
+    /**
+     * 게시글 투표 (하트 투표)
+     *
+     * @param articleId 게시글 ID
+     * @param hearts 투표할 하트 개수
+     * @return 투표 결과
+     */
+    suspend fun voteArticle(articleId: String, hearts: Long): ArticleVoteResponse
+
+    /**
+     * 게시글 좋아요
+     *
+     * @param articleId 게시글 ID
+     * @param like 좋아요 여부 (true: 좋아요, false: 좋아요 취소)
+     * @return 좋아요 결과
+     */
+    suspend fun likeArticle(articleId: String, like: Boolean): ArticleLikeResponse
 }
 
 /**

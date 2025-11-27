@@ -6,6 +6,8 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,12 +16,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -29,19 +33,31 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import net.ib.mn.R
 import net.ib.mn.data.repository.WikiRepository
 import net.ib.mn.domain.model.ApiResult
@@ -137,43 +153,57 @@ fun CommunityScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        ExoScaffold {
+    val density = LocalDensity.current
+
+    // Top3 영역 높이 측정 (스크롤 시 숨겨질 영역)
+    var top3HeightPx by remember { mutableFloatStateOf(0f) }
+
+    // 현재 스크롤 offset (0 ~ -top3HeightPx)
+    var toolbarOffsetHeightPx by remember { mutableFloatStateOf(0f) }
+
+    // NestedScrollConnection - 스크롤 이벤트를 가로채서 Top3 영역 숨김/표시 처리
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                val delta = available.y
+                val newOffset = toolbarOffsetHeightPx + delta
+                // offset은 0 ~ -top3HeightPx 사이로 제한
+                toolbarOffsetHeightPx = newOffset.coerceIn(-top3HeightPx, 0f)
+                return Offset.Zero
+            }
+        }
+    }
+
+    // Top3 영역이 완전히 숨겨졌는지 여부
+    val isCollapsed by remember {
+        derivedStateOf { toolbarOffsetHeightPx <= -top3HeightPx + 1 }
+    }
+
+    ExoScaffold {
+        // clipToBounds로 Top3가 SafeArea 밖으로 나가지 않게 함
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clipToBounds()
+                .background(ColorPalette.background100)
+                .nestedScroll(nestedScrollConnection)
+        ) {
+            // 메인 컨텐츠 영역 (프로필 + 탭 + 페이저)
+            // Top3 영역이 숨겨질수록 위로 올라감
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(ColorPalette.background100)
-            ) {
-                // 상단 ExoTop3 + 뒤로가기 버튼
-                Box {
-                    ExoTop3(
-                        rankingItemData = rankingItem,
-                        isVisible = true,
-                        onItemClick = { /* TODO */ }
-                    )
-
-                    // 뒤로가기 버튼
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .padding(start = 10.dp, top = 11.dp)
-                            .size(28.dp)
-                            .background(Color.Black.copy(alpha = 0.3f), CircleShape)
-                            .clickable { onBackClick() },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.sharp_arrow_back_white_24),
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
+                    .offset {
+                        IntOffset(
+                            x = 0,
+                            y = (top3HeightPx + toolbarOffsetHeightPx).roundToInt()
                         )
                     }
-                }
-
+            ) {
                 // 프로필 영역
                 IdolProfile(
                     rankingItem = rankingItem,
+                    isCollapsed = isCollapsed,
                     onProfileImageClick = {
                         wikiRepository?.let { repo ->
                             val idolId = rankingItem.id.toIntOrNull() ?: return@let
@@ -195,6 +225,7 @@ fun CommunityScreen(
                             }
                         }
                     },
+                    onBackClick = onBackClick,
                     onMoreClick = { /* TODO */ }
                 )
 
@@ -216,7 +247,9 @@ fun CommunityScreen(
                     userScrollEnabled = false // 좌우 스크롤 막음 (old와 동일)
                 ) { page ->
                     when (tabs[page]) {
-                        CommunityTab.FEED -> CommunityFeedSubPage(rankingItem = rankingItem)
+                        CommunityTab.FEED -> CommunityFeedSubPage(
+                            rankingItem = rankingItem
+                        )
                         CommunityTab.FAN_TALK -> CommunityFanTalkSubPage(
                             rankingItem = rankingItem,
                             fandomName = fandomName
@@ -226,36 +259,72 @@ fun CommunityScreen(
                     }
                 }
             }
-        }
 
-        // 위키 웹뷰 (아래에서 올라오는 애니메이션)
-        AnimatedVisibility(
-            visible = showWikiWebView && wikiUrl != null,
-            enter = slideInVertically(initialOffsetY = { it }),
-            exit = slideOutVertically(targetOffsetY = { it })
-        ) {
-            wikiUrl?.let { url ->
-                WebViewScreen(
-                    url = url,
-                    title = "Wiki",
-                    onNavigateBack = {
-                        showWikiWebView = false
-                        wikiUrl = null
-                    }
-                )
-            }
-        }
-
-        // 로딩 인디케이터
-        if (isLoadingWiki) {
+            // 상단 ExoTop3 + 뒤로가기 버튼 (스크롤 시 위로 올라가며 숨겨짐)
+            // graphicsLayer로 위치 이동 (클리핑되어 SafeArea 바깥으로 나가지 않음)
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f)),
-                contentAlignment = Alignment.Center
+                    .graphicsLayer {
+                        translationY = toolbarOffsetHeightPx
+                    }
+                    .onSizeChanged { size ->
+                        top3HeightPx = size.height.toFloat()
+                    }
             ) {
-                CircularProgressIndicator(color = ColorPalette.main)
+                ExoTop3(
+                    rankingItemData = rankingItem,
+                    isVisible = !isCollapsed, // 완전히 숨겨지면 비디오 정지
+                    onItemClick = { /* TODO */ }
+                )
+
+                // 뒤로가기 버튼
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(start = 10.dp, top = 11.dp)
+                        .size(28.dp)
+                        .background(Color.Black.copy(alpha = 0.3f), CircleShape)
+                        .clickable { onBackClick() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.sharp_arrow_back_white_24),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
+        }
+    }
+
+    // 위키 웹뷰 (아래에서 올라오는 애니메이션) - ExoScaffold 위에 표시
+    AnimatedVisibility(
+        visible = showWikiWebView && wikiUrl != null,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        wikiUrl?.let { url ->
+            WebViewScreen(
+                url = url,
+                title = "Wiki",
+                onNavigateBack = {
+                    showWikiWebView = false
+                    wikiUrl = null
+                }
+            )
+        }
+    }
+
+    // 로딩 인디케이터
+    if (isLoadingWiki) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = ColorPalette.main)
         }
     }
 }
@@ -288,7 +357,7 @@ private fun CommunityTabRow(
                 TabRowDefaults.SecondaryIndicator(
                     modifier = Modifier
                         .tabIndicatorOffset(selectedTabIndex)
-                        .padding(horizontal = 12.dp),
+                        .padding(horizontal = 12.dp).height(2.dp),
                     color = textDefaultColor
                 )
             }
@@ -327,65 +396,104 @@ private fun CommunityTabRow(
 
 /**
  * IdolProfile - 아이돌 프로필 컴포넌트
+ *
+ * @param isCollapsed Top3가 숨겨졌을 때 true - 간소화된 툴바 형태로 표시
+ * @param onBackClick Collapsed 상태에서 뒤로가기 버튼 클릭
  */
 @Composable
 private fun IdolProfile(
     rankingItem: RankingItem,
+    isCollapsed: Boolean = false,
     onProfileImageClick: () -> Unit = {},
+    onBackClick: () -> Unit = {},
     onMoreClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(70.dp),
+            .height(if (isCollapsed) 56.dp else 70.dp)
+            .background(ColorPalette.background100),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(modifier = Modifier.width(10.dp))
+        if (isCollapsed) {
+            // Collapsed 상태: 뒤로가기 + 이름/그룹 + 더보기
+            // 뒤로가기 버튼
+            Box(
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .size(28.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onBackClick() },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.btn_navigation_back),
+                    contentDescription = "Back",
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
 
-        // 프로필 이미지
-        Box(
-            modifier = Modifier.clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { onProfileImageClick() }
-        ) {
-            ExoProfileImage(
-                imageUrl = rankingItem.photoUrl ?: "",
-                type = ProfileImageType.MEDIUM_CIRCLE,
-                rank = 0,
-                anniversary = rankingItem.anniversary ?: "N",
-                anniversaryDays = rankingItem.anniversaryDays
-            )
-        }
+            Spacer(modifier = Modifier.width(10.dp))
 
-        Spacer(modifier = Modifier.width(5.dp))
-
-        // 이름 + 그룹명 + 팔로워
-        Column(modifier = Modifier.weight(1f)) {
+            // 이름 + 그룹명만 표시
             ExoNameWithGroup(
                 fullName = rankingItem.name,
                 nameFontSize = 16.sp,
-                groupFontSize = 11.sp
+                groupFontSize = 11.sp,
+                modifier = Modifier.weight(1f)
             )
+        } else {
+            // Expanded 상태: 프로필 이미지 + 이름/그룹 + 팔로워 + 더보기
+            Spacer(modifier = Modifier.width(10.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(R.drawable.icon_community_person),
-                    contentDescription = null,
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(12.dp)
+            // 프로필 이미지
+            Box(
+                modifier = Modifier.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { onProfileImageClick() }
+            ) {
+                ExoProfileImage(
+                    imageUrl = rankingItem.photoUrl ?: "",
+                    type = ProfileImageType.MEDIUM_CIRCLE,
+                    rank = 0,
+                    anniversary = rankingItem.anniversary ?: "N",
+                    anniversaryDays = rankingItem.anniversaryDays
                 )
-                Spacer(modifier = Modifier.width(2.dp))
-                Text(
-                    text = NumberFormatUtil.formatFollowerCount(rankingItem.mostCount),
-                    fontSize = 12.sp,
-                    lineHeight = 12.sp,
-                    color = ColorPalette.textDimmed
+            }
+
+            Spacer(modifier = Modifier.width(5.dp))
+
+            // 이름 + 그룹명 + 팔로워
+            Column(modifier = Modifier.weight(1f)) {
+                ExoNameWithGroup(
+                    fullName = rankingItem.name,
+                    nameFontSize = 16.sp,
+                    groupFontSize = 11.sp
                 )
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(R.drawable.icon_community_person),
+                        contentDescription = null,
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Spacer(modifier = Modifier.width(2.dp))
+                    Text(
+                        text = NumberFormatUtil.formatFollowerCount(rankingItem.mostCount),
+                        fontSize = 12.sp,
+                        lineHeight = 12.sp,
+                        color = ColorPalette.textDimmed
+                    )
+                }
             }
         }
 
-        // 더보기 버튼
+        // 더보기 버튼 (공통)
         Icon(
             painter = painterResource(R.drawable.btn_navigation_view_more),
             contentDescription = null,
