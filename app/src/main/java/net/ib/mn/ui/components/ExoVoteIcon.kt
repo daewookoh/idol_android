@@ -110,22 +110,19 @@ fun ExoVoteIcon(
         }
         else -> {
             Box(
-                modifier = modifier.padding(5.dp)
+                modifier = modifier.padding(horizontal = 15.dp)
             ) {
                 IconButton(
                     onClick = {
-                        // 다이얼로그만 표시 (하트 정보는 다이얼로그에서 로드)
                         showVoteDialog = true
                     },
-                    modifier = Modifier.size(60.dp)
+                    modifier = Modifier.size(30.dp)
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.btn_ranking_vote_heart),
                         contentDescription = "투표",
                         tint = ColorPalette.main,
-                        modifier = Modifier
-                            .size(60.dp)
-                            .padding(15.dp)
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
             }

@@ -480,7 +480,7 @@ class ChartRankingRepository @Inject constructor(
                     angelCount = idol.angelCount,
                     rookieCount = idol.rookieCount,
                     superRookieCount = 0,
-                    anniversary = if (idol.anniversary == "Y") idol.anniversary else null,
+                    anniversary = idol.anniversary.takeIf { it != "N" },
                     anniversaryDays = idol.anniversaryDays ?: 0,
                     top3ImageUrls = imageUrls,
                     top3VideoUrls = videoUrls,

@@ -55,6 +55,7 @@ data class RankingItem(
     val minHeartCount: Long = 0,  // 꼴등 하트 수 (프로그레스 바 계산용)
     val top3ImageUrls: List<String?> = listOf(null, null, null),  // 펼치기 이미지 3개
     val top3VideoUrls: List<String?> = listOf(null, null, null),  // 펼치기 동영상 3개
+    val percentage: Int = 0,  // 투표율 (하트픽용, 전체 투표수 대비 비율)
 ) {
     /**
      * 현재 로케일에 맞는 이름 반환

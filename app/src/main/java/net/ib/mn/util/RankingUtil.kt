@@ -233,6 +233,8 @@ object RankingUtil {
                 maxHeartCount = 0L,  // 아래에서 계산
                 minHeartCount = 0L,  // 아래에서 계산
                 isFavorite = isFavorite,  // 최애 여부 설정
+                anniversary = idol.anniversary.takeIf { it != "N" },
+                anniversaryDays = idol.anniversaryDays ?: 0,
                 top3ImageUrls = IdolImageUtil.getTop3ImageUrls(idol),
                 top3VideoUrls = IdolImageUtil.getTop3VideoUrls(idol)
             )

@@ -20,22 +20,20 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,7 +45,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -65,776 +62,724 @@ import java.time.format.FormatStyle
 import java.util.Locale
 
 /**
- * ExoRankingItem - 랭킹 아이템 리스트 렌더링 (로우레벨 구현)
+ * 랭킹 아이템 타입
+ */
+object RankingItemType {
+    const val MAIN = "MAIN"                 // 메인 랭킹 (그룹/솔로)
+    const val DAILY = "DAILY"               // 기적/루키 일일 랭킹
+    const val CUMULATIVE = "CUMULATIVE"     // 기적/루키 누적 랭킹
+    const val HEARTPICK = "HEARTPICK"       // 하트픽 랭킹
+    const val HOF_DAILY = "HOF_DAILY"       // 명예의 전당 일일 랭킹
+    const val HOF_CUMULATIVE = "HOF_CUMULATIVE" // 명예의 전당 누적 랭킹
+}
+
+// ==================== 공통 유틸리티 함수 ====================
+
+/**
+ * 프로그레스 퍼센트 계산
+ * old 프로젝트와 동일한 로직: 38% ~ 100% 범위, 4th root 사용
+ */
+private fun calculateProgressPercent(heartCount: Long, maxHeartCount: Long): Float {
+    return if (maxHeartCount == 0L || heartCount == 0L) {
+        0.38f
+    } else {
+        val voteRoot = kotlin.math.sqrt(kotlin.math.sqrt(heartCount.toDouble()))
+        val maxRoot = kotlin.math.sqrt(kotlin.math.sqrt(maxHeartCount.toDouble()))
+        val p = 38 + (voteRoot * 62 / maxRoot)
+        (p / 100f).toFloat().coerceIn(0.38f, 1f)
+    }
+}
+
+// ==================== 공통 UI 컴포넌트 ====================
+
+/**
+ * 순위 왕관 아이콘 (1,2,3위)
+ */
+@Composable
+private fun RankCrownIcon(rank: Int) {
+    when (rank) {
+        1 -> Icon(
+            painter = painterResource(R.drawable.icon_rating_heart_voting_1st),
+            contentDescription = "1st",
+            tint = Color.Unspecified,
+            modifier = Modifier.size(width = 18.dp, height = 12.dp)
+        )
+        2 -> Icon(
+            painter = painterResource(R.drawable.icon_rating_heart_voting_2nd),
+            contentDescription = "2nd",
+            tint = Color.Unspecified,
+            modifier = Modifier.size(width = 18.dp, height = 12.dp)
+        )
+        3 -> Icon(
+            painter = painterResource(R.drawable.icon_rating_heart_voting_3rd),
+            contentDescription = "3rd",
+            tint = Color.Unspecified,
+            modifier = Modifier.size(width = 18.dp, height = 12.dp)
+        )
+    }
+}
+
+/**
+ * 순위 텍스트 (색상 옵션)
+ */
+@Composable
+private fun RankText(rank: Int, useMainColorForTop3: Boolean = true) {
+    val textColor = if (useMainColorForTop3 && rank <= 3) ColorPalette.main else ColorPalette.gray580
+    Text(
+        text = stringResource(R.string.rank_count_format, rank),
+        style = ExoTypo.body11.copy(color = textColor)
+    )
+}
+
+/**
+ * 투표수 텍스트 오버레이
+ */
+@Composable
+private fun VoteCountOverlay(
+    item: RankingItem,
+    animatedProgress: Float
+) {
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val barWidth = maxWidth * animatedProgress
+        var textWidthPx by remember(item.voteCount) { mutableStateOf(0) }
+        val density = LocalDensity.current
+        val textWidthDp = remember(textWidthPx) { with(density) { textWidthPx.toDp() } }
+
+        Box(
+            modifier = Modifier
+                .offset(x = (barWidth - textWidthDp - 6.dp).coerceAtLeast(0.dp))
+                .wrapContentWidth()
+                .height(17.dp)
+                .onGloballyPositioned { coordinates ->
+                    val newWidth = coordinates.size.width
+                    if (textWidthPx != newWidth) textWidthPx = newWidth
+                },
+            contentAlignment = Alignment.CenterStart
+        ) {
+            ExoHeartCounter(
+                count = item.heartCount,
+                style = ExoTypo.stat11.copy(fontWeight = FontWeight.Normal, lineHeight = 17.sp)
+            )
+        }
+    }
+}
+
+/**
+ * 순위 + 이름 영역 (공통 레이아웃)
+ */
+@Composable
+private fun RankAndNameRow(
+    rank: Int,
+    name: String,
+    nameFontSize: androidx.compose.ui.unit.TextUnit = 15.sp,
+    groupFontSize: androidx.compose.ui.unit.TextUnit = 10.sp
+) {
+    Row(
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = if (rank == 0) "-" else stringResource(R.string.rank_count_format, rank),
+            style = ExoTypo.title15
+        )
+        Spacer(modifier = Modifier.width(5.dp))
+        ExoNameWithGroup(fullName = name, nameFontSize = nameFontSize, groupFontSize = groupFontSize)
+    }
+}
+
+/**
+ * 펼치기 영역 (ExoTop3)
+ */
+@Composable
+private fun ExpandableTop3(
+    isExpanded: Boolean,
+    rank: Int,
+    imageUrls: List<String?>,
+    videoUrls: List<String?>
+) {
+    AnimatedVisibility(visible = isExpanded, enter = expandVertically(), exit = shrinkVertically()) {
+        ExoTop3(
+            id = remember(rank) { "ranking_item_${rank}" },
+            imageUrls = imageUrls,
+            videoUrls = videoUrls,
+            isVisible = isExpanded
+        )
+    }
+}
+
+/**
+ * 하단 구분선
+ */
+@Composable
+private fun ItemDivider() {
+    HorizontalDivider(thickness = 0.5.dp, color = ColorPalette.gray200)
+}
+
+/**
+ * 반짝임 효과 (10초마다 반복)
+ */
+@Composable
+private fun ShimmerEffect() {
+    val shimmerProgress = remember { androidx.compose.animation.core.Animatable(0f) }
+
+    LaunchedEffect(Unit) {
+        shimmerProgress.snapTo(0f)
+        shimmerProgress.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 1000, easing = LinearEasing)
+        )
+        while (true) {
+            kotlinx.coroutines.delay(10000)
+            shimmerProgress.snapTo(0f)
+            shimmerProgress.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(durationMillis = 1000, easing = LinearEasing)
+            )
+        }
+    }
+
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+    ) {
+        val canvasWidth = size.width
+        val progress = shimmerProgress.value
+
+        if (progress > 0f && progress < 1f) {
+            val shimmerWidth = canvasWidth * 0.3f
+            val shimmerPosition = (canvasWidth + shimmerWidth) * progress - shimmerWidth
+
+            drawRect(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        ColorPalette.fixWhite.copy(alpha = 0f),
+                        ColorPalette.fixWhite.copy(alpha = 0.3f),
+                        ColorPalette.fixWhite.copy(alpha = 0f)
+                    ),
+                    startX = shimmerPosition,
+                    endX = shimmerPosition + shimmerWidth
+                ),
+                size = size
+            )
+        }
+    }
+}
+
+/**
+ * ExoRankingItem - 랭킹 아이템 리스트 렌더링 라우터
  *
- * MainRankingList의 LazyColumn 내부에서 랭킹 아이템들을 표시
- *
- * old 프로젝트 ranking_item.xml 기반 리뉴얼
- * 주요 기능:
- * 1. 프로필 이미지 + 테두리 (miracleCount, fairyCount, angelCount 기준)
- * 2. 배지 시스템 (생일, 데뷔, 컴백, 몰빵일, 올인데이)
- * 3. 순위 + 이름 + 그룹명
- * 4. 투표수 프로그레스 바
- * 5. 아이콘 배지 (Angel, Fairy, Miracle, Rookie, Super Rookie)
- * 6. 하트 투표 버튼
- * 7. 최애 하이라이트 (배경색 변경)
- * 8. 펼치기 기능 (ExoTop3 사용)
+ * 타입에 따라 적절한 랭킹 아이템 함수로 분기
  *
  * @param items 랭킹 아이템 리스트
- * @param type 랭킹 타입 ("MAIN" = 큰 이미지, "DAILY" = 작은 이미지, "AGGREGATE" = 누적 랭킹 아이템, 기본값: "MAIN")
+ * @param type 랭킹 타입 (RankingItemType 참조)
  * @param onItemClick 아이템 클릭 이벤트
+ * @param onVoteSuccess 투표 성공 이벤트
  * @param disableAnimation 애니메이션 비활성화 (기본값: false)
  */
 fun LazyListScope.exoRankingItems(
     items: List<RankingItem>,
-    type: String = "MAIN",
+    type: String = RankingItemType.MAIN,
     onItemClick: (Int, RankingItem) -> Unit = { _, _ -> },
     onVoteSuccess: (idolId: Int, voteCount: Long) -> Unit = { _, _ -> },
     disableAnimation: Boolean = false
 ) {
-    // 랭킹 아이템 리스트
-    // key를 사용하여 아이템이 변경될 때 올바른 리컴포지션 수행
-    // animateItemPlacement: 순위 변경 시 리스트 내 위치 이동 애니메이션
+    when (type) {
+        RankingItemType.MAIN -> mainRankingItems(items, onItemClick, onVoteSuccess, disableAnimation)
+        RankingItemType.DAILY -> dailyRankingItems(items, onItemClick, onVoteSuccess, disableAnimation)
+        RankingItemType.CUMULATIVE, RankingItemType.HOF_CUMULATIVE -> cumulativeRankingItems(items, onItemClick)
+        RankingItemType.HEARTPICK -> heartPickRankingItems(items, onItemClick)
+        else -> mainRankingItems(items, onItemClick, onVoteSuccess, disableAnimation)
+    }
+}
+
+/**
+ * MainRankingItem - 메인 랭킹 아이템 (그룹/솔로)
+ *
+ * old 프로젝트 ranking_item.xml 기반
+ * - 큰 프로필 이미지 (77dp, 테두리 포함)
+ * - 프로그레스 바 + 반짝임 애니메이션
+ * - 배지 시스템 (Angel, Fairy, Miracle, Rookie)
+ * - 하트 투표 버튼
+ * - 펼치기 기능 (ExoTop3)
+ */
+fun LazyListScope.mainRankingItems(
+    items: List<RankingItem>,
+    onItemClick: (Int, RankingItem) -> Unit = { _, _ -> },
+    onVoteSuccess: (idolId: Int, voteCount: Long) -> Unit = { _, _ -> },
+    disableAnimation: Boolean = false
+) {
     itemsIndexed(
         items = items,
         key = { _, item -> item.itemKey() }
     ) { index, item ->
-        // 리컴포지션 카운터 (디버그용)
-        var recompositionCount by remember { mutableStateOf(0) }
-        SideEffect {
-            recompositionCount++
-            // 5회 이상 리컴포지션되면 경고 로그 (최적화 필요 신호)
-            if (recompositionCount == 5) {
-                android.util.Log.w("Recomposition", "⚠️ Item ${item.id} (${item.name}) recomposed $recompositionCount times")
-            } else if (recompositionCount > 10) {
-                android.util.Log.e("Recomposition", "🔴 Item ${item.id} (${item.name}) recomposed $recompositionCount times - Optimization needed!")
-            }
-        }
-
-        // AGGREGATE 타입: 완전히 다른 UI 구조 (누적 랭킹용)
-        if (type == "AGGREGATE") {
-            AggregatedRankingItem(
-                index = index,
-                item = item,
-                totalItems = items.size,
-                onItemClick = onItemClick
-            )
-            return@itemsIndexed
-        }
-
-        // 타입에 따른 프로필 이미지 사이즈
-        val (profileAreaWidth, borderSize, imageSize) = remember(type) {
-            when (type) {
-                "DAILY" -> Triple(60.dp, 40.dp, 32.dp)  // DAILY: 작은 사이즈
-                else -> Triple(81.dp, 55.dp, 45.dp)  // MAIN: 기본 사이즈
-            }
-        }
-
         var isExpanded by remember { mutableStateOf(false) }
-
-        // 최애 여부에 따른 배경색
         val backgroundColor = if (item.isFavorite) ColorPalette.main100 else ColorPalette.background100
 
-        // 애니메이션 적용 (disableAnimation이 false일 때만)
         val itemModifier = if (disableAnimation) {
-            Modifier
-                .fillMaxWidth()
-                .background(backgroundColor)
+            Modifier.fillMaxWidth().background(backgroundColor)
         } else {
             Modifier
                 .animateItem(
                     fadeInSpec = null,
                     fadeOutSpec = null,
-                    placementSpec = tween(
-                        durationMillis = 500,
-                        easing = androidx.compose.animation.core.FastOutSlowInEasing
-                    )
+                    placementSpec = tween(durationMillis = 500, easing = androidx.compose.animation.core.FastOutSlowInEasing)
                 )
                 .fillMaxWidth()
                 .background(backgroundColor)
         }
 
         Column(modifier = itemModifier) {
-            // 메인 랭킹 아이템 (old: line 16-337)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onItemClick(index, item) }
-                    .padding(vertical = 8.dp),
+                    .heightIn(min = 79.dp)
+                    .clickable { onItemClick(index, item) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // 프로필 영역 (old: line 30-135, width: 81dp + marginStart: 20dp)
-                Spacer(modifier = Modifier.width(20.dp))
+                Spacer(modifier = Modifier.width(10.dp))
 
-                Box(
-                    modifier = Modifier.size(borderSize),
-                    contentAlignment = Alignment.Center
-                ) {
-                    // 프로필 테두리 + 이미지 (old PNG 사용)
-                    Box(
-                        modifier = Modifier.size(borderSize),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        // 테두리 이미지 결정 (old 프로젝트의 flag 기반 로직)
-                        val borderDrawable = remember(item.miracleCount, item.fairyCount, item.angelCount) {
-                            var flag = 0
-                            if (item.miracleCount >= 1) flag += 1
-                            if (item.fairyCount >= 1) flag += 2
-                            if (item.angelCount >= 1) flag += 4
+                ExoProfileImage(
+                    imageUrl = item.photoUrl,
+                    type = ProfileImageType.LARGE_CIRCLE,
+                    rank = item.rank,
+                    contentDescription = "프로필 이미지",
+                    modifier = Modifier.clickable { isExpanded = !isExpanded },
+                    anniversary = item.anniversary ?: "N",
+                    anniversaryDays = item.anniversaryDays,
+                    miracleCount = item.miracleCount,
+                    fairyCount = item.fairyCount,
+                    angelCount = item.angelCount
+                )
 
-                            when (flag) {
-                                0 -> R.drawable.profile_round_off
-                                1 -> R.drawable.profile_round_miracle
-                                2 -> R.drawable.profile_round_fairy
-                                3 -> R.drawable.profile_round_fairy_miracle
-                                4 -> R.drawable.profile_round_angel
-                                5 -> R.drawable.profile_round_angel_miracle
-                                6 -> R.drawable.profile_round_angel_fairy
-                                7 -> R.drawable.profile_round_angel_fairy_miracle
-                                else -> R.drawable.profile_round_off
-                            }
-                        }
-
-                        // 테두리 PNG 이미지
-                        Icon(
-                            painter = painterResource(borderDrawable),
-                            contentDescription = "Profile border",
-                            modifier = Modifier.size(borderSize),
-                            tint = Color.Unspecified
-                        )
-
-                        // 프로필 이미지
-                        ExoProfileImage(
-                            imageUrl = item.photoUrl,
-                            rank = item.rank,
-                            contentDescription = "프로필 이미지",
-                            modifier = Modifier
-                                .size(imageSize)
-                                .clickable { isExpanded = !isExpanded }
-                        )
-                    }
-
-                    // 기념일 배지
-                    Box(modifier = Modifier.size(borderSize)) {
-                        when (item.anniversary) {
-                            "BIRTH" -> {
-                                Box(
-                                    modifier = Modifier
-                                        .align(Alignment.TopStart)
-                                        .padding(start = 5.dp, top = 3.dp)
-                                        .size(16.dp)
-                                        .background(ColorPalette.badgeBirth, CircleShape),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "B",
-                                        style = ExoTypo.label8
-                                    )
-                                }
-                            }
-                            "DEBUT" -> {
-                                Box(
-                                    modifier = Modifier
-                                        .align(Alignment.TopStart)
-                                        .padding(start = 5.dp, top = 3.dp)
-                                        .size(16.dp)
-                                        .background(ColorPalette.badgeDebut, CircleShape),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "D",
-                                        style = ExoTypo.label8
-                                    )
-                                }
-                            }
-                            "COMEBACK" -> {
-                                Box(
-                                    modifier = Modifier
-                                        .align(Alignment.BottomStart)
-                                        .padding(start = 3.dp)
-                                        .size(16.dp)
-                                        .background(ColorPalette.badgeComeback, CircleShape),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "C",
-                                        style = ExoTypo.label8
-                                    )
-                                }
-                            }
-                            "MEMORIAL_DAY" -> {
-                                // 몰빵일 배지 - 다국어 처리
-                                // lable_day: ko=일, ja=日, zh=日, en=""
-                                Box(
-                                    modifier = Modifier
-                                        .align(Alignment.BottomEnd)
-                                        .background(
-                                            color = ColorPalette.badgeMemorialDay,
-                                            shape = androidx.compose.foundation.shape.RoundedCornerShape(
-                                                4.dp
-                                            )
-                                        )
-                                        .padding(horizontal = 5.dp, vertical = 2.dp)
-                                ) {
-                                    val dayLabel = stringResource(R.string.lable_day)
-                                    Text(
-                                        text = remember(item.anniversaryDays, dayLabel) {
-                                            "${item.anniversaryDays}$dayLabel"
-                                        },
-                                        style = ExoTypo.label7.copy(color = ColorPalette.white)
-                                    )
-                                }
-                            }
-                            "ALL_IN_DAY" -> {
-                                Box(
-                                    modifier = Modifier
-                                        .align(Alignment.TopStart)
-                                        .padding(start = 15.dp, top = 5.dp)
-                                        .size(16.dp)
-                                        .background(ColorPalette.badgeAllinDay, CircleShape),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "A",
-                                        style = ExoTypo.label8
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // 정보 영역 (old: line 137-323)
-                // paddingStart: 15dp (old: line 140)
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(start = 15.dp)
+                        .padding(start = 5.dp)
                 ) {
-                    // 순위 + 이름 + 그룹명
-                    // 순위: 세로 중앙, 이름: 순위와 세로 중앙 정렬, 그룹명: 이름의 bottom에 맞춤
-                    Row(
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // 순위 (세로 중앙 정렬)
-                        Text(
-                            text = if(item.rank == 0) "-"  else stringResource(R.string.rank_count_format,  item.rank),
-                            style = ExoTypo.title15
-                        )
-
-                        Spacer(modifier = Modifier.width(5.dp))
-
-                        // 이름 + 그룹명 (이름은 세로 중앙, 그룹명은 이름 bottom에 맞춤)
-                        ExoNameWithGroup(
-                            fullName = item.name,
-                            nameFontSize = 15.sp,
-                            groupFontSize = 10.sp
-                        )
-                    }
-
+                    RankAndNameRow(rank = item.rank, name = item.name)
                     Spacer(modifier = Modifier.height(3.dp))
-
-                    // 프로그레스 바 + 투표수 + 배지 아이콘 (old: line 195-330)
-                    // old: FrameLayout으로 배지를 프로그레스바 위에 겹침
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 3.dp) // old: paddingBottom="3dp"
-                    ) {
-                        // 프로그레스 바 + 투표수 (old: ConstraintLayout, line 208-243)
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(17.dp) // old: minHeight="17dp"
-                        ) {
-                            // 프로그레스 바 계산: old 프로젝트와 동일한 로직
-                            // 38% ~ 100% 범위, 4th root 사용 (sqrt의 sqrt)
-                            val progressPercent = remember(item.heartCount, item.maxHeartCount) {
-                                if (item.maxHeartCount == 0L) {
-                                    0.38f // 기본값 38%
-                                } else if (item.heartCount == 0L) {
-                                    0.38f // 0표는 38%
-                                } else {
-                                    // old: 38 + (sqrt(sqrt(voteCount)) * 62 / sqrt(sqrt(maxVoteCount)))
-                                    val voteRoot = kotlin.math.sqrt(kotlin.math.sqrt(item.heartCount.toDouble()))
-                                    val maxRoot = kotlin.math.sqrt(kotlin.math.sqrt(item.maxHeartCount.toDouble()))
-                                    val p = 38 + (voteRoot * 62 / maxRoot) // toInt() 제거하여 정확한 계산
-                                    (p / 100f).toFloat().coerceIn(0.38f, 1f)
-                                }
-                            }
-
-                            val animatedProgress by animateFloatAsState(targetValue = progressPercent, label = "progress")
-
-                            // 색칠된 프로그레스 바 영역
-                            // type "DAILY": a_league_progress 단색, 애니메이션 없음
-                            // type "MAIN": s_league_progress → main gradient, 10초마다 반복 애니메이션
-                            val isTypeDaily = type == "DAILY"
-
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth(animatedProgress)
-                                    .fillMaxHeight()
-                                    .background(
-                                        brush = if (isTypeDaily) {
-                                            // DAILY: a_league_progress 단색 (Old 프로젝트 기준)
-                                            Brush.horizontalGradient(
-                                                colors = listOf(
-                                                    ColorPalette.aLeagueProgress,
-                                                    ColorPalette.aLeagueProgress
-                                                )
-                                            )
-                                        } else {
-                                            // MAIN: gradient
-                                            Brush.horizontalGradient(
-                                                colors = listOf(
-                                                    ColorPalette.sLeagueProgress,
-                                                    ColorPalette.main
-                                                )
-                                            )
-                                        },
-                                        shape = androidx.compose.foundation.shape.RoundedCornerShape(
-                                            8.dp
-                                        )
-                                    )
-                            ) {
-                                // type에 따른 애니메이션 처리
-                                // type "MAIN": 10초마다 반복 애니메이션
-                                // type "DAILY": 애니메이션 없음
-                                // 기타: progressPercent 변경 시에만 애니메이션
-                                val isTypeMain = type == "MAIN"
-
-                                if (!isTypeDaily) {
-                                    // 애니메이션 진행도
-                                    val shimmerProgress = remember { androidx.compose.animation.core.Animatable(0f) }
-
-                                    if (isTypeMain) {
-                                        // type "MAIN": 처음 렌더링 시 바로 반짝임 + 10초마다 반복 애니메이션
-                                        LaunchedEffect(Unit) {
-                                            // 처음 렌더링 시 즉시 반짝임 실행
-                                            shimmerProgress.snapTo(0f)
-                                            shimmerProgress.animateTo(
-                                                targetValue = 1f,
-                                                animationSpec = tween(
-                                                    durationMillis = 1000,
-                                                    easing = LinearEasing
-                                                )
-                                            )
-
-                                            // 그 후 10초마다 반복
-                                            while (true) {
-                                                kotlinx.coroutines.delay(10000) // 10초 대기
-                                                shimmerProgress.snapTo(0f)
-                                                shimmerProgress.animateTo(
-                                                    targetValue = 1f,
-                                                    animationSpec = tween(
-                                                        durationMillis = 1000,
-                                                        easing = LinearEasing
-                                                    )
-                                                )
-                                            }
-                                        }
-                                    } else {
-                                        // 기타: progressPercent 변경 시 애니메이션 트리거
-                                        LaunchedEffect(progressPercent) {
-                                            shimmerProgress.snapTo(0f)
-                                            shimmerProgress.animateTo(
-                                                targetValue = 1f,
-                                                animationSpec = tween(
-                                                    durationMillis = 1000,
-                                                    easing = LinearEasing
-                                                )
-                                            )
-                                        }
-                                    }
-
-                                    // 반짝임 효과 Canvas
-                                    Canvas(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .fillMaxHeight()
-                                            .clip(
-                                                androidx.compose.foundation.shape.RoundedCornerShape(
-                                                    8.dp
-                                                )
-                                            )
-                                    ) {
-                                        val canvasWidth = size.width
-                                        val canvasHeight = size.height
-                                        val progress = shimmerProgress.value
-
-                                        if (progress > 0f && progress < 1f) {
-                                            // 반짝이는 흰색 그라데이션 라인
-                                            val shimmerWidth = canvasWidth * 0.3f
-                                            val shimmerPosition = (canvasWidth + shimmerWidth) * progress - shimmerWidth
-
-                                            drawRect(
-                                                brush = Brush.horizontalGradient(
-                                                    colors = listOf(
-                                                        ColorPalette.fixWhite.copy(alpha = 0f),
-                                                        ColorPalette.fixWhite.copy(alpha = 0.3f),
-                                                        ColorPalette.fixWhite.copy(alpha = 0f)
-                                                    ),
-                                                    startX = shimmerPosition,
-                                                    endX = shimmerPosition + shimmerWidth
-                                                ),
-                                                size = size
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-
-                            // 투표수 텍스트 - 애니메이션 위에 오버레이
-                            // 최적화: voteCount가 변경될 때만 너비 재측정
-                            BoxWithConstraints(
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                val barWidth = maxWidth * animatedProgress
-
-                                // 텍스트 너비 측정 - voteCount 변경 시에만 재측정
-                                var textWidthPx by remember(item.voteCount) { mutableStateOf(0) }
-                                val density = LocalDensity.current
-                                val textWidthDp = remember(textWidthPx) {
-                                    with(density) { textWidthPx.toDp() }
-                                }
-
-                                Box(
-                                    modifier = Modifier
-                                        .offset(x = (barWidth - textWidthDp - 6.dp).coerceAtLeast(0.dp))
-                                        .wrapContentWidth()
-                                        .height(17.dp)
-                                        .onGloballyPositioned { coordinates ->
-                                            // voteCount가 같으면 재측정하지 않음
-                                            val newWidth = coordinates.size.width
-                                            if (textWidthPx != newWidth) {
-                                                textWidthPx = newWidth
-                                            }
-                                        },
-                                    contentAlignment = Alignment.CenterStart
-                                ) {
-                                    ExoHeartCounter(
-                                        count = item.heartCount,
-                                        style = ExoTypo.stat11.copy(
-                                            fontWeight = FontWeight.Normal,
-                                            lineHeight = 17.sp
-                                        )
-                                    )
-                                }
-                            }
-                        }
-
-                        // 아이콘 배지 - 프로그레스바 위에 겹침 (old: line 247-328)
-                        // old: marginStart="5dp", marginTop="-3dp"
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(2.dp),
-                            verticalAlignment = Alignment.Top,
-                            modifier = Modifier
-                                .padding(start = 4.dp)
-                                .offset(y = (-3).dp) // old: marginTop="-3dp"
-                        ) {
-                        // Angel 배지 (old: line 253-266)
-                        if (item.angelCount > 0) {
-                            Box(
-                                modifier = Modifier.size(13.dp, 16.dp),
-                                contentAlignment = Alignment.TopCenter
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.charity_angel_badge),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(13.dp, 16.dp),
-                                    tint = Color.Unspecified
-                                )
-                                Text(
-                                    text = remember(item.angelCount) { item.angelCount.toString() },
-                                    style = ExoTypo.label7.copy(color = ColorPalette.textAngel),
-                                    modifier = Modifier.offset(y = 5.dp)
-                                )
-                            }
-                        }
-
-                        // Fairy 배지 (old: line 268-282)
-                        if (item.fairyCount > 0) {
-                            Box(
-                                modifier = Modifier.size(13.dp, 16.dp),
-                                contentAlignment = Alignment.TopCenter
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.charity_fairy_badge),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(13.dp, 16.dp),
-                                    tint = Color.Unspecified
-                                )
-                                Text(
-                                    text = remember(item.fairyCount) { item.fairyCount.toString() },
-                                    style = ExoTypo.label7.copy(color = ColorPalette.textFairy),
-                                    modifier = Modifier.offset(y = 5.dp)
-                                )
-                            }
-                        }
-
-                        // Miracle 배지 (old: line 284-297)
-                        if (item.miracleCount > 0) {
-                            Box(
-                                modifier = Modifier.size(13.dp, 16.dp),
-                                contentAlignment = Alignment.TopCenter
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.charity_miracle_badge),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(13.dp, 16.dp),
-                                    tint = Color.Unspecified
-                                )
-                                Text(
-                                    text = remember(item.miracleCount) { item.miracleCount.toString() },
-                                    style = ExoTypo.label7.copy(color = ColorPalette.textMiracle),
-                                    modifier = Modifier.offset(y = 5.dp)
-                                )
-                            }
-                        }
-
-                        // Rookie 배지 (old: line 299-312)
-                        // rookieCount가 3 이상이면 Super Rookie로 표시
-                        if (item.rookieCount > 0) {
-                            val isSuper = item.rookieCount >= 3
-                            Box(
-                                modifier = Modifier.size(13.dp, 16.dp),
-                                contentAlignment = Alignment.TopCenter
-                            ) {
-                                Icon(
-                                    painter = painterResource(
-                                        if (isSuper) R.drawable.charity_super_rookie_badge
-                                        else R.drawable.charity_rookie_badge
-                                    ),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(13.dp, 16.dp),
-                                    tint = Color.Unspecified
-                                )
-                                Text(
-                                    text = remember(item.rookieCount, isSuper) {
-                                        if (isSuper) "S" else item.rookieCount.toString()
-                                    },
-                                    style = ExoTypo.label7.copy(
-                                        color = if (isSuper) ColorPalette.textSuperRookie
-                                                else ColorPalette.textRookie
-                                    ),
-                                    modifier = Modifier.offset(y = 5.dp)
-                                )
-                            }
-                        }
-
-                        // Super Rookie 배지 (old: line 314-327)
-                        if (item.superRookieCount > 0) {
-                            Box(
-                                modifier = Modifier.size(13.dp, 16.dp),
-                                contentAlignment = Alignment.TopCenter
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.charity_super_rookie_badge),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(13.dp, 16.dp),
-                                    tint = Color.Unspecified
-                                )
-                                Text(
-                                    text = "S",
-                                    style = ExoTypo.label7.copy(color = ColorPalette.textSuperRookie),
-                                    modifier = Modifier.offset(y = 5.dp)
-                                )
-                            }
-                        }
-                        }
-                    }
+                    MainProgressBarWithBadges(item = item, useShimmer = true)
                 }
 
-                // 하트 투표 버튼 (old: line 327-335)
-                // layout_width/height: 50dp, padding: 10dp, layout_margin: 5dp
                 ExoVoteIcon(
                     idolId = item.id.toIntOrNull() ?: 0,
-                    fullName = item.name,  // name은 이미 "이름_그룹명" 형식
-                    idolHeart = item.heartCount,  // 아이돌의 현재 총 투표 수
+                    fullName = item.name,
+                    idolHeart = item.heartCount,
                     onVoteSuccess = { votedHeart ->
-                        android.util.Log.d("ExoRankingItem", "💗 Voted $votedHeart hearts to ${item.name}")
-                        // 부모 컴포넌트에 투표 성공 알림
-                        val idolId = item.id.toIntOrNull() ?: 0
-                        onVoteSuccess(idolId, votedHeart)
+                        onVoteSuccess(item.id.toIntOrNull() ?: 0, votedHeart)
                     }
                 )
             }
 
-            // 펼치기 영역 (ExoTop3)
-            AnimatedVisibility(
-                visible = isExpanded,
-                enter = expandVertically(),
-                exit = shrinkVertically()
-            ) {
-                ExoTop3(
-                    id = remember(item.rank) { "ranking_item_${item.rank}" },
-                    imageUrls = item.top3ImageUrls,
-                    videoUrls = item.top3VideoUrls,
-                    isVisible = isExpanded
-                )
-            }
+            ExpandableTop3(isExpanded, item.rank, item.top3ImageUrls, item.top3VideoUrls)
 
-            // 하단 Divider (아이템 구분선)
-            // old 버전에서는 RecyclerView ItemDecoration으로 처리했지만
-            // Compose에서는 아이템에 직접 추가
             if (index < items.size - 1) {
-                HorizontalDivider(
-                    thickness = 0.5.dp,
-                    color = ColorPalette.gray200
-                )
+                ItemDivider()
             }
         }
     }
 }
 
 /**
- * AggregatedRankingItem - 누적 랭킹 아이템 (old: aggregated_hof_item.xml 기반)
+ * DailyRankingItem - 기적/루키 일일 랭킹 아이템
  *
- * 주요 차이점:
- * - 순위 아이콘 (1/2/3위 왕관, 나머지 숫자)
- * - 순위 변동 표시 (NEW, UP/DOWN)
- * - 작은 원형 프로필 이미지 (테두리 없음)
- * - 점수 표시 (하트 개수 대신)
- * - 날짜 표시
- * - 투표 버튼 없음
- * - 프로그레스 바 없음
+ * - 중간 프로필 이미지 (62dp, 테두리 포함)
+ * - 프로그레스 바 (단색, 애니메이션 없음)
+ * - 배지 시스템
+ * - 하트 투표 버튼
+ * - 펼치기 기능
  */
-@Composable
-private fun AggregatedRankingItem(
-    index: Int,
-    item: RankingItem,
-    totalItems: Int,
-    onItemClick: (Int, RankingItem) -> Unit
+fun LazyListScope.dailyRankingItems(
+    items: List<RankingItem>,
+    onItemClick: (Int, RankingItem) -> Unit = { _, _ -> },
+    onVoteSuccess: (idolId: Int, voteCount: Long) -> Unit = { _, _ -> },
+    disableAnimation: Boolean = false
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(ColorPalette.background100)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onItemClick(index, item) }
-                .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // 순위 영역 (old: container_ranking, 45dp width)
-            Column(
-                modifier = Modifier.width(45.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterVertically)  // old: constraintTop_toBottomOf with no margin
-            ) {
-                // 1,2,3위 왕관 아이콘 (old: icon_ranking)
-                when (item.rank) {
-                    1 -> Icon(
-                        painter = painterResource(R.drawable.icon_rating_heart_voting_1st),
-                        contentDescription = "1st",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.size(width = 18.dp, height = 12.dp)
-                    )
-                    2 -> Icon(
-                        painter = painterResource(R.drawable.icon_rating_heart_voting_2nd),
-                        contentDescription = "2nd",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.size(width = 18.dp, height = 12.dp)
-                    )
-                    3 -> Icon(
-                        painter = painterResource(R.drawable.icon_rating_heart_voting_3rd),
-                        contentDescription = "3rd",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.size(width = 18.dp, height = 12.dp)
-                    )
-                }
+    itemsIndexed(
+        items = items,
+        key = { _, item -> item.itemKey() }
+    ) { index, item ->
+        var isExpanded by remember { mutableStateOf(false) }
+        val backgroundColor = if (item.isFavorite) ColorPalette.main100 else ColorPalette.background100
 
-                // 순위 텍스트 (old: rank)
-                // 1,2,3등은 main 컬러, 그 외는 gray580 컬러 (old: HallOfFameAggAdapter.kt line 263, 266)
-                Text(
-                    text = stringResource(R.string.rank_count_format, item.rank),
-                    style = ExoTypo.body11.copy(
-                        color = if (item.rank <= 3) ColorPalette.main else ColorPalette.gray580
-                    )
+        val itemModifier = if (disableAnimation) {
+            Modifier.fillMaxWidth().background(backgroundColor)
+        } else {
+            Modifier
+                .animateItem(
+                    fadeInSpec = null,
+                    fadeOutSpec = null,
+                    placementSpec = tween(durationMillis = 500, easing = androidx.compose.animation.core.FastOutSlowInEasing)
                 )
-
-                // 순위 변동 표시 (TODO: rankChange 필드 추가 필요)
-                // icon_change_ranking_new, icon_change_ranking_up, icon_change_ranking_down
-            }
-
-            // 프로필 이미지
-            ExoProfileImage(
-                imageUrl = item.photoUrl,
-                rank = item.rank,
-                contentDescription = "프로필 이미지",
-                modifier = Modifier.size(41.dp)
-            )
-
-            Spacer(modifier = Modifier.width(10.dp))
-
-            // 이름 + 그룹 + 점수 + 날짜 영역 (old: cl_name with chainStyle="packed", marginStart="10dp")
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterVertically)  // chainStyle="packed" 재현
-            ) {
-                // 이름 + 그룹명 (old: name, group)
-                Row(
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    ExoNameWithGroup(
-                        fullName = item.name,
-                        nameFontSize = 14.sp,
-                        groupFontSize = 10.sp
-                    )
-                }
-
-                // 점수 + 날짜 (old: score, date)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // 점수 (TODO: score 필드 추가 필요, 현재는 voteCount 사용)
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        ExoHeartCounter(
-                            count = item.heartCount,
-                            style = ExoTypo.body11
-                        )
-                        Text(
-                            text = "점",
-                            style = ExoTypo.body11
-                        )
-                    }
-
-                    // 날짜 (TODO: date 필드 추가 필요)
-                    // Text(
-                    //     text = item.date ?: "",
-                    //     fontSize = 12.sp,
-                    //     color = ColorPalette.gray200
-                    // )
-                }
-            }
-
-            // 우측 화살표 (old: iv_arrow_go, 8dp)
-            Icon(
-                painter = painterResource(R.drawable.btn_go),
-                contentDescription = "Go",
-                modifier = Modifier
-                    .size(8.dp)
-                    .padding(end = 20.dp),
-                tint = Color.Unspecified
-            )
+                .fillMaxWidth()
+                .background(backgroundColor)
         }
 
-        // 하단 Divider
-        if (index < totalItems - 1) {
-            HorizontalDivider(
-                thickness = 0.5.dp,
-                color = ColorPalette.gray200
-            )
+        Column(modifier = itemModifier) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 67.dp)
+                    .clickable { onItemClick(index, item) },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(modifier = Modifier.width(10.dp))
+
+                ExoProfileImage(
+                    imageUrl = item.photoUrl,
+                    type = ProfileImageType.MEDIUM_CIRCLE,
+                    rank = item.rank,
+                    contentDescription = "프로필 이미지",
+                    modifier = Modifier.padding(horizontal = 6.dp).clickable { isExpanded = !isExpanded },
+                    anniversary = item.anniversary ?: "N",
+                    anniversaryDays = item.anniversaryDays,
+                    miracleCount = item.miracleCount,
+                    fairyCount = item.fairyCount,
+                    angelCount = item.angelCount
+                )
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 5.dp)
+                ) {
+                    RankAndNameRow(rank = item.rank, name = item.name)
+                    Spacer(modifier = Modifier.height(3.dp))
+                    DailyProgressBarWithBadges(item = item)
+                }
+
+                ExoVoteIcon(
+                    idolId = item.id.toIntOrNull() ?: 0,
+                    fullName = item.name,
+                    idolHeart = item.heartCount,
+                    onVoteSuccess = { votedHeart ->
+                        onVoteSuccess(item.id.toIntOrNull() ?: 0, votedHeart)
+                    }
+                )
+            }
+
+            ExpandableTop3(isExpanded, item.rank, item.top3ImageUrls, item.top3VideoUrls)
+
+            if (index < items.size - 1) {
+                ItemDivider()
+            }
         }
     }
 }
+
+/**
+ * CumulativeRankingItem - 기적/루키 누적 랭킹 아이템 (CUMULATIVE 타입)
+ *
+ * old 프로젝트의 AggregatedRankingItem 기반
+ * - 프로필 이미지 (41dp, 테두리 없음)
+ * - 순위 + 이름 + 점수
+ * - 투표 버튼 없음
+ * - 프로그레스 바 없음
+ */
+fun LazyListScope.cumulativeRankingItems(
+    items: List<RankingItem>,
+    onItemClick: (Int, RankingItem) -> Unit = { _, _ -> }
+) {
+    itemsIndexed(
+        items = items,
+        key = { _, item -> item.itemKey() }
+    ) { index, item ->
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(ColorPalette.background100)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onItemClick(index, item) }
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // 순위 영역 (왕관 + 텍스트)
+                Column(
+                    modifier = Modifier.width(45.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterVertically)
+                ) {
+                    RankCrownIcon(item.rank)
+                    RankText(item.rank)
+                }
+
+                // 프로필 이미지 (41dp, 테두리 없음) - old 버전과 동일
+                ExoProfileImage(
+                    imageUrl = item.photoUrl,
+                    modifier = Modifier.size(41.dp),
+                    rank = item.rank,
+                    contentDescription = "프로필 이미지"
+                )
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterVertically)
+                ) {
+                    ExoNameWithGroup(fullName = item.name, nameFontSize = 14.sp, groupFontSize = 10.sp)
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        ExoHeartCounter(count = item.heartCount, style = ExoTypo.body11)
+                        Text(text = "점", style = ExoTypo.body11)
+                    }
+                }
+
+                Icon(
+                    painter = painterResource(R.drawable.btn_go),
+                    contentDescription = "Go",
+                    modifier = Modifier
+                        .size(8.dp)
+                        .padding(end = 20.dp),
+                    tint = Color.Unspecified
+                )
+            }
+
+            if (index < items.size - 1) {
+                ItemDivider()
+            }
+        }
+    }
+}
+
+/**
+ * HeartPickRankingItem - 하트픽 랭킹 아이템
+ *
+ * LazyRow에서 사용
+ * - 중간 프로필 이미지 (55dp, 테두리 없음)
+ * - 프로그레스 바 + 퍼센트
+ * - 투표 버튼 없음
+ */
+fun LazyListScope.heartPickRankingItems(
+    items: List<RankingItem>,
+    onItemClick: (Int, RankingItem) -> Unit = { _, _ -> }
+) {
+    itemsIndexed(
+        items = items,
+        key = { _, item -> item.itemKey() }
+    ) { index, item ->
+        HeartPickRankingItem(item = item)
+    }
+}
+
+/**
+ * MainProgressBarWithBadges - MAIN 타입용 프로그레스바 + 배지
+ *
+ * - gradient 프로그레스 바
+ * - 10초마다 반짝임 애니메이션
+ * - 배지 아이콘
+ */
+@Composable
+private fun MainProgressBarWithBadges(
+    item: RankingItem,
+    useShimmer: Boolean = true
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 3.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(17.dp)
+        ) {
+            val progressPercent = remember(item.heartCount, item.maxHeartCount) {
+                calculateProgressPercent(item.heartCount, item.maxHeartCount)
+            }
+            val animatedProgress by animateFloatAsState(targetValue = progressPercent, label = "progress")
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(animatedProgress)
+                    .fillMaxHeight()
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(ColorPalette.sLeagueProgress, ColorPalette.main)
+                        ),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                    )
+            ) {
+                if (useShimmer) {
+                    ShimmerEffect()
+                }
+            }
+
+            VoteCountOverlay(item = item, animatedProgress = animatedProgress)
+        }
+
+        RankingBadges(item = item)
+    }
+}
+
+/**
+ * DailyProgressBarWithBadges - DAILY 타입용 프로그레스바 + 배지
+ *
+ * - 단색 프로그레스 바
+ * - 애니메이션 없음
+ * - 배지 아이콘
+ */
+@Composable
+private fun DailyProgressBarWithBadges(item: RankingItem) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 3.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(17.dp)
+        ) {
+            val progressPercent = remember(item.heartCount, item.maxHeartCount) {
+                calculateProgressPercent(item.heartCount, item.maxHeartCount)
+            }
+            val animatedProgress by animateFloatAsState(targetValue = progressPercent, label = "progress")
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(animatedProgress)
+                    .fillMaxHeight()
+                    .background(
+                        color = ColorPalette.aLeagueProgress,
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                    )
+            )
+
+            VoteCountOverlay(item = item, animatedProgress = animatedProgress)
+        }
+
+        RankingBadges(item = item)
+    }
+}
+
+/**
+ * RankingBadges - 배지 아이콘 공통 컴포넌트
+ */
+@Composable
+private fun RankingBadges(item: RankingItem) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        verticalAlignment = Alignment.Top,
+        modifier = Modifier
+            .padding(start = 4.dp)
+            .offset(y = (-3).dp)
+    ) {
+        // Angel 배지
+        if (item.angelCount > 0) {
+            Box(
+                modifier = Modifier.size(13.dp, 16.dp),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.charity_angel_badge),
+                    contentDescription = null,
+                    modifier = Modifier.size(13.dp, 16.dp),
+                    tint = Color.Unspecified
+                )
+                Text(
+                    text = remember(item.angelCount) { item.angelCount.toString() },
+                    style = ExoTypo.label7.copy(color = ColorPalette.textAngel),
+                    modifier = Modifier.offset(y = 5.dp)
+                )
+            }
+        }
+
+        // Fairy 배지
+        if (item.fairyCount > 0) {
+            Box(
+                modifier = Modifier.size(13.dp, 16.dp),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.charity_fairy_badge),
+                    contentDescription = null,
+                    modifier = Modifier.size(13.dp, 16.dp),
+                    tint = Color.Unspecified
+                )
+                Text(
+                    text = remember(item.fairyCount) { item.fairyCount.toString() },
+                    style = ExoTypo.label7.copy(color = ColorPalette.textFairy),
+                    modifier = Modifier.offset(y = 5.dp)
+                )
+            }
+        }
+
+        // Miracle 배지
+        if (item.miracleCount > 0) {
+            Box(
+                modifier = Modifier.size(13.dp, 16.dp),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.charity_miracle_badge),
+                    contentDescription = null,
+                    modifier = Modifier.size(13.dp, 16.dp),
+                    tint = Color.Unspecified
+                )
+                Text(
+                    text = remember(item.miracleCount) { item.miracleCount.toString() },
+                    style = ExoTypo.label7.copy(color = ColorPalette.textMiracle),
+                    modifier = Modifier.offset(y = 5.dp)
+                )
+            }
+        }
+
+        // Rookie 배지
+        if (item.rookieCount > 0) {
+            val isSuper = item.rookieCount >= 3
+            Box(
+                modifier = Modifier.size(13.dp, 16.dp),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Icon(
+                    painter = painterResource(
+                        if (isSuper) R.drawable.charity_super_rookie_badge
+                        else R.drawable.charity_rookie_badge
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier.size(13.dp, 16.dp),
+                    tint = Color.Unspecified
+                )
+                Text(
+                    text = remember(item.rookieCount, isSuper) {
+                        if (isSuper) "S" else item.rookieCount.toString()
+                    },
+                    style = ExoTypo.label7.copy(
+                        color = if (isSuper) ColorPalette.textSuperRookie else ColorPalette.textRookie
+                    ),
+                    modifier = Modifier.offset(y = 5.dp)
+                )
+            }
+        }
+
+        // Super Rookie 배지
+        if (item.superRookieCount > 0) {
+            Box(
+                modifier = Modifier.size(13.dp, 16.dp),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.charity_super_rookie_badge),
+                    contentDescription = null,
+                    modifier = Modifier.size(13.dp, 16.dp),
+                    tint = Color.Unspecified
+                )
+                Text(
+                    text = "S",
+                    style = ExoTypo.label7.copy(color = ColorPalette.textSuperRookie),
+                    modifier = Modifier.offset(y = 5.dp)
+                )
+            }
+        }
+    }
+}
+
 
 /**
  * HofAccumulativeTop1RankingItem - 명예의 전당 누적 랭킹 1위 전용 아이템
@@ -918,12 +863,13 @@ fun HofAccumulativeTop1RankingItem(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // 프로필 영역 (old: best1_profile, 180dp x 98dp)
+                Spacer(modifier = Modifier.height(15.dp))
+
+                // 프로필 영역 (old: best1_profile, 180dp x 98dp, marginTop=15dp)
                 Box(
                     modifier = Modifier
-                        .width(180.dp)
-                        .height(98.dp)
-                        .padding(top = 15.dp),
+                        .width(200.dp)
+                        .height(110.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     // 날개 배경 (old: bg_cumulative_voting_wing_2)
@@ -945,18 +891,19 @@ fun HofAccumulativeTop1RankingItem(
 
                     // padding을 size 안에 넣으면 찌그러지므로 Box로 감싸서 margin 효과
                     Box(
-                        modifier = Modifier.padding(top = 5.dp, bottom = 26.dp)
+                        modifier = Modifier.padding(top = 5.dp, bottom = 20.dp)
                     ) {
                         ExoProfileImage(
                             imageUrl = imageUrl,
                             rank = item.scoreRank,
-                            modifier = Modifier.size(72.dp),
+                            type = ProfileImageType.LARGE,
                             contentDescription = "프로필 이미지"
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(5.dp))
+                // 하단 정보 영역 (old: ll_best1_info, marginTop=120dp - 98dp - 15dp = 7dp 추가 여백)
+                Spacer(modifier = Modifier.height(7.dp))
 
                 // 하단 정보 영역 (old: ll_best1_info)
                 Row(
@@ -1297,24 +1244,21 @@ fun HofAccumulativeRankingItem(
 /**
  * HeartPickRankingItem for use in LazyRow
  * LazyRow 내부에서 사용할 수 있는 단일 ExoRankingItem
+ *
+ * old 프로젝트의 item_heart_pick_idol.xml 기준:
+ * - 전체 크기: 250dp x 79dp
+ * - 프로그레스바 높이: 17dp
+ * - 투표율 글자색: text_dimmed
  */
 @Composable
 fun HeartPickRankingItem(
     item: RankingItem,
 ) {
-    // HeartPick용 고정 사이즈
-    val imageSize = 50.dp
-
-    // 기기 너비 가져오기
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val minWidth = screenWidth * 0.6f
-
-    // 메인 랭킹 아이템 Row
+    // 메인 랭킹 아이템 Row (old: 250dp -> 줄여서 180dp)
     Row(
         modifier = Modifier
-            .widthIn(min = minWidth)
-            .padding(vertical = 8.dp),
+            .width(200.dp)
+            .padding(top = 14.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // 순위 번호 (왼쪽 큰 숫자)
@@ -1324,12 +1268,12 @@ fun HeartPickRankingItem(
             modifier = Modifier.width(24.dp)
         )
 
-        // 프로필 이미지
+        // 프로필 이미지 (2위 이하 표시용 - MEDIUM, 55dp)
         ExoProfileImage(
             imageUrl = item.photoUrl,
+            type = ProfileImageType.MEDIUM,
             rank = item.rank,
-            contentDescription = "프로필 이미지",
-            modifier = Modifier.size(imageSize)
+            contentDescription = "프로필 이미지"
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -1338,20 +1282,20 @@ fun HeartPickRankingItem(
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            // 이름
+            // 이름 (old: name 15dp, group 10dp)
             ExoNameWithGroup(
                 fullName = item.name,
-                nameFontSize = 12.sp,
+                nameFontSize = 15.sp,
                 groupFontSize = 10.sp
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // 프로그레스 바 (MAIN 스타일 gradient)
+            // 프로그레스 바 (old: minHeight 17dp)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(20.dp)
+                    .height(17.dp)
             ) {
                 // 프로그레스 계산: 20% ~ 80% 범위, 4th root 사용
                 val progressPercent = remember(item.heartCount, item.maxHeartCount) {
@@ -1367,12 +1311,12 @@ fun HeartPickRankingItem(
                     }
                 }
 
-                // 배경 (회색)
+                // 배경 (회색 - old: progressbar_ranking_background_400)
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
-                            color = ColorPalette.gray100,
+                            color = ColorPalette.background400,
                             shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
                         )
                 )
@@ -1393,17 +1337,8 @@ fun HeartPickRankingItem(
                         )
                 )
 
-                // 퍼센트 계산
-                val percentage = remember(item.heartCount, item.maxHeartCount) {
-                    android.util.Log.d("HeartPickPercentage", "Rank ${item.rank}: heartCount=${item.heartCount}, maxHeartCount=${item.maxHeartCount}")
-                    if (item.maxHeartCount > 0) {
-                        val percent = (100.0 * item.heartCount / item.maxHeartCount).toInt()
-                        android.util.Log.d("HeartPickPercentage", "Rank ${item.rank}: Calculated percentage=${percent}%")
-                        "${percent}%"
-                    } else {
-                        "0%"
-                    }
-                }
+                // 퍼센트 표시 (ViewModel에서 계산된 percentage 사용)
+                val percentageText = "${item.percentage}%"
 
                 // 투표수와 퍼센트를 함께 배치
                 Row(
@@ -1419,12 +1354,12 @@ fun HeartPickRankingItem(
                     ) {
                         ExoHeartCounter(
                             count = item.heartCount,
-                            style = ExoTypo.stat10.copy(lineHeight = 20.sp),
+                            style = ExoTypo.stat10.copy(lineHeight = 17.sp),
                             modifier = Modifier.padding(end = 4.dp)
                         )
                     }
 
-                    // 퍼센트: 나머지 영역의 우측에 배치
+                    // 퍼센트: 나머지 영역의 우측에 배치 (old: text_dimmed 색상)
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -1432,9 +1367,12 @@ fun HeartPickRankingItem(
                         contentAlignment = Alignment.CenterEnd
                     ) {
                         Text(
-                            text = percentage,
-                            style = ExoTypo.stat10.copy(lineHeight = 20.sp),
-                            modifier = Modifier.padding(end = 8.dp)
+                            text = percentageText,
+                            style = ExoTypo.stat10.copy(
+                                lineHeight = 17.sp,
+                                color = ColorPalette.textDimmed
+                            ),
+                            modifier = Modifier.padding(end = 6.dp)
                         )
                     }
                 }

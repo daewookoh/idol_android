@@ -61,9 +61,9 @@ fun ExoTabSwitch(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
-            .padding(top = 15.dp)
-            .height(50.dp)
-            .clip(RoundedCornerShape(23.dp))
+            .padding(top = 16.dp)
+            .height(44.dp)
+            .clip(RoundedCornerShape(22.dp))
             .background(ColorPalette.gray120)
             .padding(4.dp)
     ) {
@@ -73,7 +73,7 @@ fun ExoTabSwitch(
                 .fillMaxWidth(1f / tabs.size)
                 .fillMaxHeight()
                 .align(BiasAlignment(animatedBias, 0f))
-                .clip(RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(18.dp))
                 .background(ColorPalette.white)
         )
 
@@ -114,7 +114,7 @@ private fun TabItem(
                 indication = null,  // hover/ripple 효과 제거
                 interactionSource = remember { MutableInteractionSource() }
             )
-            .padding(10.dp),
+            .padding(vertical = 8.dp, horizontal = 10.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(

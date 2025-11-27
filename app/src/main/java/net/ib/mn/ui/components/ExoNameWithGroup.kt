@@ -114,7 +114,7 @@ fun ExoNameWithGroupColor(
 
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Bottom
     ) {
         // 이름
         Text(
@@ -126,7 +126,7 @@ fun ExoNameWithGroupColor(
             textAlign = textAlign
         )
 
-        // 그룹명 (있는 경우만 표시)
+        // 그룹명 (있는 경우만 표시, old: marginBottom=1dp, gravity=bottom)
         if (!groupName.isNullOrEmpty()) {
             Spacer(modifier = Modifier.width(spacing))
             Text(
@@ -136,7 +136,7 @@ fun ExoNameWithGroupColor(
                 fontWeight = FontWeight.Bold,
                 color = groupColor,
                 textAlign = textAlign,
-                modifier = Modifier.align(Alignment.Bottom)
+                modifier = Modifier.padding(bottom = 1.dp)
             )
         }
     }

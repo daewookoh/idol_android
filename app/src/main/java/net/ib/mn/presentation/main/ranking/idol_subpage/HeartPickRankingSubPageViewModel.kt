@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.math.roundToInt
 
 /**
  * HeartPick 랭킹 ViewModel
@@ -103,10 +104,12 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
 
                 val dDay = calculateDDay(heartPick.endAt, heartPick.status)
 
+                val totalVote = heartPick.vote
+
                 val firstPlaceIdol = if (state != HeartPickState.UPCOMING && heartPick.heartPickIdols?.isNotEmpty() == true) {
                     val first = heartPick.heartPickIdols[0]
-                    val percentage = if (heartPick.vote > 0) {
-                        (100.0 * first.vote / heartPick.vote).toInt()
+                    val percentage = if (totalVote > 0) {
+                        (100.0f * first.vote.toFloat() / totalVote.toFloat()).roundToInt()
                     } else 0
 
                     IdolRankInfo(
@@ -120,17 +123,27 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
 
                 val otherIdols = if (state != HeartPickState.UPCOMING && heartPick.heartPickIdols != null && heartPick.heartPickIdols.size > 1) {
                     heartPick.heartPickIdols.drop(1).take(10).map { idol ->
+                        val percentage = if (totalVote > 0) {
+                            (100.0f * idol.vote.toFloat() / totalVote.toFloat()).roundToInt()
+                        } else 0
+
                         IdolRankInfo(
                             name = idol.title,
                             groupName = idol.subtitle,
                             photoUrl = idol.imageUrl.toSecureUrl(),
                             voteCount = NumberFormat.getNumberInstance(Locale.US).format(idol.vote),
-                            percentage = 0
+                            percentage = percentage
                         )
                     }
                 } else emptyList()
 
-                val periodDate = formatPeriodDate(heartPick.beginAt, heartPick.endAt)
+                // 상태에 따라 날짜 형식 다르게 처리
+                // ACTIVE: "Until 2024.01.01" / "2024.01.01까지" 형식
+                // ENDED: "2024.01.01 ~ 2024.01.02" 형식
+                val periodDate = when (state) {
+                    HeartPickState.ACTIVE -> formatEndDateWithUntil(heartPick.endAt)
+                    else -> formatPeriodDate(heartPick.beginAt, heartPick.endAt)
+                }
                 val (openDate, openPeriod) = if (state == HeartPickState.UPCOMING) {
                     calculateOpenDate(heartPick.beginAt) to formatPeriod(heartPick.beginAt, heartPick.endAt)
                 } else {
@@ -225,6 +238,27 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
             }
         } catch (e: Exception) {
             "Vote Open"
+        }
+    }
+
+    /**
+     * 종료일을 "Until 2024.01.01" / "2024.01.01까지" 형식으로 포맷
+     * strings.xml의 finish_at 문자열 사용
+     */
+    private fun formatEndDateWithUntil(endAt: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
+
+            val endDate = inputFormat.parse(endAt)
+            if (endDate != null) {
+                val dateStr = outputFormat.format(endDate)
+                context.getString(net.ib.mn.R.string.finish_at, dateStr)
+            } else {
+                ""
+            }
+        } catch (e: Exception) {
+            ""
         }
     }
 

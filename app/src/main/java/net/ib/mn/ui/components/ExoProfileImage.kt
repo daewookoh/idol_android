@@ -1,20 +1,50 @@
 package net.ib.mn.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
+
+/**
+ * 프로필 이미지 타입별 사이즈
+ *
+ * CIRCLE 타입: 테두리 이미지 포함 (miracleCount, fairyCount, angelCount 기반)
+ * 일반 타입: 테두리 없이 이미지만
+ */
+object ProfileImageType {
+    const val LARGE_CIRCLE = "LARGE_CIRCLE"     // 메인 랭킹: 전체 77dp, 테두리 60dp, 이미지 50dp
+    const val LARGE = "LARGE"     // 하트픽1위: 전체 70dp(테두리 없음)
+    const val MEDIUM_CIRCLE = "MEDIUM_CIRCLE"   // 기적/루키: 전체 62dp, 테두리 52dp, 이미지 42dp
+    const val MEDIUM = "MEDIUM"                 // 하트픽: 55dp (테두리 없음)
+    const val SMALL_CIRCLE = "SMALL_CIRCLE"     // 명예의 전당: 45dp (테두리 없음, 원형)
+    const val SMALL = "SMALL"                   // 기본: 50dp (테두리 없음)
+}
 
 /**
  * ExoProfileImage - 공용 프로필 이미지 컴포넌트
@@ -26,25 +56,56 @@ import net.ib.mn.util.IdolImageUtil.toSecureUrl
  * - 짝수 순위: menu_profile_2
  * - 홀수 순위: menu_profile_1
  * - Circular 클립과 회색 배경 기본 적용
+ * - 기념일 배지 지원 (타입별 자동 조정)
+ * - MAIN 타입: 테두리 이미지 포함 (miracleCount, fairyCount, angelCount 기반)
  *
  * @param imageUrl 이미지 URL (null 가능)
- * @param modifier Modifier (size, clip 등 추가 가능)
+ * @param modifier Modifier (추가 스타일 적용)
+ * @param type 프로필 이미지 타입 (LARGE_CIRCLE/MEDIUM_CIRCLE/MEDIUM/SMALL_CIRCLE/SMALL)
  * @param rank 순위 (디폴트 이미지 선택에 사용, 기본값 0)
  * @param contentDescription 이미지 설명
  * @param contentScale ContentScale (기본값: Crop)
  * @param useCircleClip 원형 클립 사용 여부 (기본값: true)
  * @param useGrayBackground 회색 배경 사용 여부 (기본값: true)
+ * @param anniversary 기념일 코드 (Y/E/C/D/N, 기본값: "N" = 표시 안함)
+ * @param anniversaryDays 기념일 일수 (D 코드일 때 사용, 기본값: 0)
+ * @param idolType 아이돌 타입 ("S"=솔로, "G"=그룹, 기본값: "S")
+ * @param miracleCount 미라클 카운트 (MAIN 타입 테두리용, 기본값: 0)
+ * @param fairyCount 페어리 카운트 (MAIN 타입 테두리용, 기본값: 0)
+ * @param angelCount 엔젤 카운트 (MAIN 타입 테두리용, 기본값: 0)
  */
 @Composable
 fun ExoProfileImage(
     imageUrl: String?,
     modifier: Modifier = Modifier,
+    type: String = ProfileImageType.LARGE_CIRCLE,
     rank: Int = 0,
     contentDescription: String = "프로필 이미지",
     contentScale: ContentScale = ContentScale.Crop,
     useCircleClip: Boolean = true,
-    useGrayBackground: Boolean = true
+    useGrayBackground: Boolean = true,
+    anniversary: String = "N",
+    anniversaryDays: Int = 0,
+    idolType: String = "S",
+    miracleCount: Int = 0,
+    fairyCount: Int = 0,
+    angelCount: Int = 0
 ) {
+    // 타입별 사이즈
+    // CIRCLE 타입: (전체 Box, 테두리, 이미지) - 테두리 포함
+    // 일반 타입: (전체 Box, 0, 이미지) - 테두리 없음
+    val (boxSize, borderSize, imageSize) = remember(type) {
+        when (type) {
+            ProfileImageType.LARGE_CIRCLE -> Triple(77.dp, 60.dp, 50.dp)   // 메인 랭킹
+            ProfileImageType.MEDIUM_CIRCLE -> Triple(62.dp, 52.dp, 42.dp)  // 기적/루키
+            ProfileImageType.LARGE -> Triple(77.dp, 0.dp, 77.dp)          // 하트픽
+            ProfileImageType.MEDIUM -> Triple(55.dp, 0.dp, 55.dp)          // 하트픽
+            ProfileImageType.SMALL_CIRCLE -> Triple(45.dp, 0.dp, 45.dp)    // 명예의 전당
+            ProfileImageType.SMALL -> Triple(40.dp, 0.dp, 40.dp)           // 기본
+            else -> Triple(50.dp, 0.dp, 50.dp)
+        }
+    }
+
     val context = LocalContext.current
 
     // ImageRequest 생성
@@ -62,22 +123,208 @@ fun ExoProfileImage(
         R.drawable.menu_profile_2
     }
 
-    // Modifier 구성
-    var finalModifier = modifier
-        .aspectRatio(1f)  // 항상 정사각형 비율 유지 (가로:세로 = 1:1)
-    if (useCircleClip) {
-        finalModifier = finalModifier.clip(CircleShape)
-    }
-    if (useGrayBackground) {
-        finalModifier = finalModifier.background(ColorPalette.gray100)
-    }
+    // CIRCLE 타입: 테두리 포함
+    if (type == ProfileImageType.LARGE_CIRCLE || type == ProfileImageType.MEDIUM_CIRCLE) {
+        // 테두리 이미지 결정 (old 프로젝트의 flag 기반 로직)
+        val borderDrawable = remember(miracleCount, fairyCount, angelCount) {
+            var flag = 0
+            if (miracleCount >= 1) flag += 1
+            if (fairyCount >= 1) flag += 2
+            if (angelCount >= 1) flag += 4
 
-    AsyncImage(
-        model = imageModel,
-        contentDescription = contentDescription,
-        modifier = finalModifier,
-        contentScale = contentScale,
-        error = painterResource(defaultImageRes),
-//        placeholder = painterResource(defaultImageRes)
-    )
+            when (flag) {
+                0 -> R.drawable.profile_round_off
+                1 -> R.drawable.profile_round_miracle
+                2 -> R.drawable.profile_round_fairy
+                3 -> R.drawable.profile_round_fairy_miracle
+                4 -> R.drawable.profile_round_angel
+                5 -> R.drawable.profile_round_angel_miracle
+                6 -> R.drawable.profile_round_angel_fairy
+                7 -> R.drawable.profile_round_angel_fairy_miracle
+                else -> R.drawable.profile_round_off
+            }
+        }
+
+        Box(
+            modifier = modifier
+                .size(boxSize)
+                .then(
+                    if (type == ProfileImageType.MEDIUM_CIRCLE) Modifier.padding(horizontal = 5.dp)
+                    else Modifier
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            // 테두리 PNG 이미지
+            Icon(
+                painter = painterResource(borderDrawable),
+                contentDescription = "Profile border",
+                modifier = Modifier.size(borderSize),
+                tint = Color.Unspecified
+            )
+
+            // 프로필 이미지 (테두리 안에 배치)
+            Box(
+                modifier = Modifier.size(imageSize),
+                contentAlignment = Alignment.Center
+            ) {
+                var imageModifier = Modifier.fillMaxSize()
+                if (useCircleClip) {
+                    imageModifier = imageModifier.clip(CircleShape)
+                }
+                if (useGrayBackground) {
+                    imageModifier = imageModifier.background(ColorPalette.gray100)
+                }
+
+                AsyncImage(
+                    model = imageModel,
+                    contentDescription = contentDescription,
+                    modifier = imageModifier,
+                    contentScale = contentScale,
+                    error = painterResource(defaultImageRes),
+                )
+            }
+
+            // 기념일 배지 (N이 아닐 때만 표시)
+            if (anniversary != "N") {
+                AnniversaryBadge(
+                    anniversary = anniversary,
+                    anniversaryDays = anniversaryDays,
+                    idolType = idolType,
+                    isSmall = type == ProfileImageType.MEDIUM_CIRCLE  // MEDIUM_CIRCLE은 small
+                )
+            }
+        }
+    } else {
+        // 기타 타입: 테두리 없이 이미지만
+        var imageModifier = Modifier.fillMaxSize()
+        if (useCircleClip) {
+            imageModifier = imageModifier.clip(CircleShape)
+        }
+        if (useGrayBackground) {
+            imageModifier = imageModifier.background(ColorPalette.gray100)
+        }
+
+        Box(modifier = modifier.size(boxSize)) {
+            AsyncImage(
+                model = imageModel,
+                contentDescription = contentDescription,
+                modifier = imageModifier,
+                contentScale = contentScale,
+                error = painterResource(defaultImageRes),
+            )
+
+            // 기념일 배지 (N이 아닐 때만 표시)
+            if (anniversary != "N") {
+                AnniversaryBadge(
+                    anniversary = anniversary,
+                    anniversaryDays = anniversaryDays,
+                    idolType = idolType,
+                    isSmall = boxSize <= 40.dp
+                )
+            }
+        }
+    }
+}
+
+/**
+ * AnniversaryBadge - 기념일 배지 내부 컴포넌트
+ *
+ * API 코드:
+ * - Y: 생일 (Birthday) - 빨간/노란 꼬깔 (그룹은 데뷔 아이콘)
+ * - E: 데뷔 (dEbut) - 파란/보라 꼬깔
+ * - C: 컴백 (Comeback) - 마이크
+ * - D: 기념일 (memorial Day) - N일 텍스트 박스
+ *
+ * 사이즈별 스펙 (old 프로젝트 기준):
+ * - Small (40dp 이하): hall_item.xml 기준
+ *   - Birth/Debut: 36x36dp, marginTop=7dp
+ *   - Comeback: 66x56dp, marginTop=12dp
+ *   - MemorialDay: marginEnd=7dp, marginBottom=11dp
+ *
+ * - Large (45dp 이상): ranking_item.xml 기준
+ *   - Birth/Debut: 44dp, marginTop=7dp
+ *   - Comeback: 66x56dp, marginTop=12dp
+ *   - MemorialDay: BottomEnd
+ */
+@Composable
+private fun BoxScope.AnniversaryBadge(
+    anniversary: String,
+    anniversaryDays: Int,
+    idolType: String,
+    isSmall: Boolean
+) {
+    // 사이즈별 배지 크기 (MAIN: 48dp, Small: 36dp)
+    val birthDebutSize = if (isSmall) 36.dp else 48.dp
+    val comebackWidth = 66.dp
+    val comebackHeight = 56.dp
+
+    when (anniversary) {
+        "Y" -> {  // 생일 (Birthday) - 솔로는 생일, 그룹은 데뷔 아이콘
+            val iconRes = if (idolType == "S") {
+                R.drawable.icon_anniversary_birth_medium
+            } else {
+                R.drawable.icon_anniversary_debut_medium
+            }
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = if (idolType == "S") "생일" else "데뷔일",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .size(birthDebutSize)
+                    .align(Alignment.TopStart)
+                    .offset(x = (-7).dp)
+                    .padding(top = 7.dp)
+            )
+        }
+        "E" -> {  // 데뷔 (dEbut)
+            Icon(
+                painter = painterResource(R.drawable.icon_anniversary_debut_medium),
+                contentDescription = "데뷔일",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .size(birthDebutSize)
+                    .align(Alignment.TopStart)
+                    .offset(x = (-7).dp)
+                    .padding(top = 7.dp)
+            )
+        }
+        "C" -> {  // 컴백 (Comeback)
+            Icon(
+                painter = painterResource(R.drawable.icon_anniversary_comeback_medium),
+                contentDescription = "컴백일",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .size(width = comebackWidth, height = comebackHeight)
+                    .align(Alignment.TopStart)
+                    .padding(top = 12.dp)
+            )
+        }
+        "D" -> {  // 기념일 (memorial Day)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = (-10).dp, y = (-10).dp)
+                    .then(
+                        if (isSmall) {
+                            Modifier.padding(end = 7.dp, bottom = 11.dp)
+                        } else {
+                            Modifier
+                        }
+                    )
+                    .background(
+                        color = ColorPalette.main,
+                        shape = RoundedCornerShape(10.dp)
+                    )
+                    .padding(horizontal = 5.dp, vertical = 2.dp)
+            ) {
+                Text(
+                    text = "${anniversaryDays}${stringResource(R.string.lable_day)}",
+                    style = ExoTypo.body7.copy(
+                        color = ColorPalette.textWhiteBlack,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            }
+        }
+    }
 }

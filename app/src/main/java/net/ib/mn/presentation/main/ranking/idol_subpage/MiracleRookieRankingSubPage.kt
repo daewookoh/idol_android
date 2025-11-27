@@ -43,6 +43,7 @@ import coil.compose.AsyncImage
 import net.ib.mn.R
 import net.ib.mn.domain.ranking.RankingDataSource
 import net.ib.mn.ui.components.ExoRankingList
+import net.ib.mn.ui.components.RankingItemType
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
 
 /**
@@ -335,8 +336,8 @@ fun MiracleRookieRankingSubPage(
                         )
                     }
                 } else {
-                    // 누적 랭킹(AGGREGATE)과 실시간 랭킹(DAILY)에 따라 itemType 설정
-                    val itemType = if (selectedTabIndex == 0) "AGGREGATE" else "DAILY"
+                    // 누적 랭킹(CUMULATIVE)과 실시간 랭킹(DAILY)에 따라 itemType 설정
+                    val itemType = if (selectedTabIndex == 0) RankingItemType.CUMULATIVE else RankingItemType.DAILY
 
                     ExoRankingList(
                         items = currentState.items,

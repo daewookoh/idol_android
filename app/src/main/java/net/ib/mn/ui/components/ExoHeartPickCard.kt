@@ -466,12 +466,12 @@ private fun ActiveHeartPickCard(
 
                 // 1위 아이돌 정보
                 if (firstPlaceIdol != null) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(90.dp)
-                                    .background(ColorPalette.background200)
-                            ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(90.dp)
+                            .background(ColorPalette.background200)
+                    ) {
                         // 1위 프로필 이미지 (타이틀 영역을 침범하도록 위로 이동)
                         Box(
                             modifier = Modifier
@@ -481,6 +481,7 @@ private fun ActiveHeartPickCard(
                         ) {
                             ExoProfileImage(
                                 imageUrl = firstPlaceIdol.photoUrl,
+                                type = ProfileImageType.LARGE,
                                 rank = 1,
                                 contentDescription = "First Place",
                                 modifier = Modifier.fillMaxSize()
@@ -552,16 +553,18 @@ private fun ActiveHeartPickCard(
                     }
                 }
 
-                // 다른 아이돌 목록
+
+                // 다른 아이돌 목록 (gradient_up_to_down: gray1000_shadow_12 -> background_200)
                 if (otherIdols.isNotEmpty()) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .offset(y = (-6).dp)
                             .aspectRatio(1f / 0.24f)
                             .background(
                                 brush = Brush.verticalGradient(
                                     colors = listOf(
-                                        ColorPalette.background200.copy(alpha = 0f),
+                                        ColorPalette.gray1000Shadow12,
                                         ColorPalette.background200
                                     )
                                 )
@@ -574,7 +577,7 @@ private fun ActiveHeartPickCard(
 
                             otherIdols.mapIndexed { index, idol ->
                                 val idolVotes = idol.voteCount.replace(",", "").toLongOrNull() ?: 0L
-                                android.util.Log.d("HeartPickCard", "Rank ${index + 2}: ${idol.name}, votes=${idol.voteCount}, parsed=$idolVotes, maxHeartCount=$firstPlaceVotes")
+                                android.util.Log.d("HeartPickCard", "Rank ${index + 2}: ${idol.name}, votes=${idol.voteCount}, parsed=$idolVotes, maxHeartCount=$firstPlaceVotes, percentage=${idol.percentage}")
 
                                 RankingItem(
                                     rank = index + 2,
@@ -583,7 +586,8 @@ private fun ActiveHeartPickCard(
                                     photoUrl = idol.photoUrl,
                                     id = "${index + 2}_${idol.name}",
                                     heartCount = idolVotes,
-                                    maxHeartCount = firstPlaceVotes
+                                    maxHeartCount = firstPlaceVotes,
+                                    percentage = idol.percentage
                                 )
                             }
                         }
@@ -810,6 +814,7 @@ private fun EndedHeartPickCard(
                         ) {
                             ExoProfileImage(
                                 imageUrl = firstPlaceIdol.photoUrl,
+                                type = ProfileImageType.LARGE,
                                 rank = 1,
                                 contentDescription = "First Place",
                                 modifier = Modifier.fillMaxSize()

@@ -407,6 +407,9 @@ data class IdolData(
     @SerializedName("anniversary")
     val anniversary: String?,
 
+    @SerializedName("anniversary_days")
+    val anniversaryDays: Int?,
+
     @SerializedName("burning_day")
     val burningDay: String?,
 
@@ -472,7 +475,7 @@ fun IdolData.toEntity(): net.ib.mn.data.local.entity.IdolEntity {
         angelCount = angelCount ?: 0,
         rookieCount = rookieCount ?: 0,
         anniversary = anniversary ?: "N",
-        anniversaryDays = null,  // API에 없음
+        anniversaryDays = anniversaryDays,
         birthDay = birthday,
         burningDay = burningDay,
         category = category ?: "",
