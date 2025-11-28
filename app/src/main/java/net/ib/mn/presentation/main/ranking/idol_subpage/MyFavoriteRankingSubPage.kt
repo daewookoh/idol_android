@@ -104,6 +104,11 @@ sealed class MyFavoriteRankingData {
 
 /**
  * LazyListScope extension to add My Favorite ranking items
+ *
+ * LocalRankingItemClick은 ExoRankingItem 내부에서 직접 처리됨
+ *
+ * @param chartCode 차트 코드
+ * @param data 랭킹 데이터
  */
 fun LazyListScope.myFavoriteRankingItems(
     chartCode: String,
@@ -150,7 +155,8 @@ fun LazyListScope.myFavoriteRankingItems(
             exoRankingItems(
                 items = data.items,
                 type = "MAIN",
-                onItemClick = { _, _ -> /* TODO: 클릭 처리 */ },
+                // LocalRankingItemClick은 ExoRankingItem 내부에서 직접 처리됨
+                onItemClick = { _, _ -> },
                 onVoteSuccess = { idolId, voteCount ->
                     data.viewModel.updateVote(idolId, voteCount)
                 },

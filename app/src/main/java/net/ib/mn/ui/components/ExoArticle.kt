@@ -101,6 +101,7 @@ fun ExoArticle(
     profileImageUrl: String,
     userName: String,
     userLevel: Int = 0,
+    userEmoticonUrl: String? = null,
     createdAt: String,
     title: String? = null,
     content: String,
@@ -169,10 +170,22 @@ fun ExoArticle(
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
-                    // 이름 + 레벨 아이콘
+                    // 이모티콘 + 레벨 아이콘 + 이름 (Old 프로젝트: emoticon -> level -> name)
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // 이모티콘 (Old 프로젝트의 BaseArticleViewHolder.setUserSection과 동일)
+                        if (!userEmoticonUrl.isNullOrEmpty()) {
+                            AsyncImage(
+                                model = userEmoticonUrl,
+                                contentDescription = "Emoticon",
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .padding(end = 1.dp),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
+
                         // 레벨 아이콘
                         if (userLevel in 0..9) {
                             val levelIconRes = when (userLevel) {

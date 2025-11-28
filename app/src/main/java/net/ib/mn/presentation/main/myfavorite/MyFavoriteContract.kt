@@ -4,6 +4,7 @@ import net.ib.mn.base.UiEffect
 import net.ib.mn.base.UiIntent
 import net.ib.mn.base.UiState
 import net.ib.mn.domain.model.MostPicksModel
+import net.ib.mn.ui.components.RankingItem
 
 /**
  * My Favorite Contract
@@ -54,11 +55,6 @@ class MyFavoriteContract {
         data object LoadFavorites : Intent()
 
         /**
-         * 최애 아이돌 클릭
-         */
-        data class OnIdolClick(val idolId: Int) : Intent()
-
-        /**
          * 최애 설정 버튼 클릭
          */
         data object OnSettingClick : Intent()
@@ -83,11 +79,6 @@ class MyFavoriteContract {
      * Side Effect
      */
     sealed class Effect : UiEffect {
-        /**
-         * 아이돌 상세 페이지로 이동
-         */
-        data class NavigateToIdolDetail(val idolId: Int) : Effect()
-
         /**
          * 최애 설정 페이지로 이동
          */
@@ -143,5 +134,23 @@ class MyFavoriteContract {
         val heart: Long?,                  // 해당 차트에서의 하트 수
         val chartCode: String?,            // 기준 차트 코드
         val imageUrl: String?              // 기본 이미지 URL
-    )
+    ) {
+        /**
+         * RankingItem으로 변환 (CommunityScreen 이동용)
+         */
+        fun toRankingItem(): RankingItem {
+            return RankingItem(
+                id = idolId.toString(),
+                name = name,
+                photoUrl = imageUrl ?: "",
+                rank = rank ?: 0,
+                heartCount = heart ?: 0L,
+                voteCount = (heart ?: 0L).toString(),
+                maxHeartCount = heart ?: 0L,
+                top3ImageUrls = top3ImageUrls,
+                top3VideoUrls = top3VideoUrls,
+                isFavorite = true
+            )
+        }
+    }
 }

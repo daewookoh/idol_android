@@ -47,6 +47,7 @@ import java.util.Locale
 import net.ib.mn.presentation.main.ranking.idol_subpage.rememberMyFavoriteRankingState
 import net.ib.mn.presentation.main.ranking.idol_subpage.myFavoriteRankingItems
 import net.ib.mn.ui.components.ExoTop3
+import net.ib.mn.ui.components.LocalRankingItemClick
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 
@@ -58,7 +59,6 @@ import net.ib.mn.ui.theme.ExoTypo
  */
 @Composable
 fun MyFavoritePage(
-    onNavigateToIdolDetail: (Int) -> Unit = {},
     onNavigateToFavoriteSetting: () -> Unit = {},
     viewModel: MyFavoriteViewModel = hiltViewModel()
 ) {
@@ -132,9 +132,6 @@ fun MyFavoritePage(
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
-                is MyFavoriteContract.Effect.NavigateToIdolDetail -> {
-                    onNavigateToIdolDetail(effect.idolId)
-                }
                 is MyFavoriteContract.Effect.NavigateToFavoriteSetting -> {
                     onNavigateToFavoriteSetting()
                 }
@@ -230,6 +227,9 @@ private fun MyFavoriteContent(
                     )
                 }
 
+                // LocalRankingItemClick은 ExoRankingItem 및 ExoTop3에서 직접 사용됨
+                val onRankingItemClick = LocalRankingItemClick.current
+
                 // LazyColumn으로 전체 스크롤 가능하게 (wrapContent 형식)
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
@@ -241,7 +241,9 @@ private fun MyFavoriteContent(
                                 mostFavoriteIdol = mostFavoriteIdol,
                                 mostPicksModel = state.mostPicksModel,
                                 onIdolClick = {
-                                    onIntent(MyFavoriteContract.Intent.OnIdolClick(mostFavoriteIdol.idolId))
+                                    // MostFavoriteIdol을 RankingItem으로 변환하여 CommunityScreen으로 이동
+                                    val rankingItem = mostFavoriteIdol.toRankingItem()
+                                    onRankingItemClick(rankingItem)
                                 },
                                 onVoteSuccess = { idolId, votedHeart ->
                                     onIntent(MyFavoriteContract.Intent.OnVoteSuccess(idolId, votedHeart))
@@ -264,6 +266,7 @@ private fun MyFavoriteContent(
                         }
 
                         // 랭킹 아이템들을 wrapContent 형식으로 추가
+                        // LocalRankingItemClick은 ExoRankingItem 내부에서 직접 처리됨
                         myFavoriteRankingItems(
                             chartCode = section.chartCode,
                             data = rankingData

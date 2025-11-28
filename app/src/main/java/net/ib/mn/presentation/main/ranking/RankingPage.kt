@@ -83,8 +83,7 @@ import net.ib.mn.util.ServerUrl
 @Composable
 fun RankingPage(
     viewModel: RankingPageViewModel = hiltViewModel(),
-    mainViewModel: MainViewModel = hiltViewModel(),
-    onItemClick: (net.ib.mn.ui.components.RankingItem) -> Unit = {}
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
     // CELEB: typeList 사용
     // 일반: MainChartModel 사용 (old 프로젝트와 동일)
@@ -511,8 +510,7 @@ fun RankingPage(
                                 onRankItemsLoaded = if (pageIndex == 0) { items ->
                                     // 첫 번째 탭(개인)의 랭킹 데이터가 로드되면 최애 토스트 체크
                                     viewModel.checkMyFavToast(items)
-                                } else null,
-                                onItemClick = onItemClick
+                                } else null
                             )
                         }
                         "GROUP" -> {
@@ -520,8 +518,7 @@ fun RankingPage(
                             net.ib.mn.presentation.main.ranking.idol_subpage.UnifiedRankingSubPage(
                                 chartCode = currentType.code ?: "",
                                 dataSource = groupDataSource,
-                                isVisible = subPagerState.currentPage == pageIndex,
-                                onItemClick = onItemClick
+                                isVisible = subPagerState.currentPage == pageIndex
                             )
                         }
                         "MIRACLE" -> {
@@ -567,8 +564,7 @@ fun RankingPage(
                             net.ib.mn.presentation.main.ranking.idol_subpage.UnifiedRankingSubPage(
                                 chartCode = currentType.code ?: "",
                                 dataSource = globalDataSource,
-                                isVisible = subPagerState.currentPage == pageIndex,
-                                onItemClick = onItemClick
+                                isVisible = subPagerState.currentPage == pageIndex
                             )
                         }
                         else -> {

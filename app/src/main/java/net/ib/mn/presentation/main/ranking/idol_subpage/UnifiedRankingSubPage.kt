@@ -45,9 +45,9 @@ fun UnifiedRankingSubPage(
     listState: LazyListState? = null,
     modifier: Modifier = Modifier,
     isForFavorite: Boolean = false,
-    onRankItemsLoaded: ((List<net.ib.mn.ui.components.RankingItem>) -> Unit)? = null,
-    onItemClick: ((net.ib.mn.ui.components.RankingItem) -> Unit)? = null
+    onRankItemsLoaded: ((List<net.ib.mn.ui.components.RankingItem>) -> Unit)? = null
 ) {
+    // LocalRankingItemClick은 ExoRankingItem 내부에서 직접 사용됨
     android.util.Log.d("UnifiedRankingSubPage", "🎨 [Composing] ${dataSource.type} for chartCode: $chartCode")
 
     // ViewModel 생성 (key를 사용하여 각 타입별로 다른 인스턴스 생성)
@@ -151,8 +151,8 @@ fun UnifiedRankingSubPage(
                     isVisible = isVisible,
                     listState = scrollState,
                     onItemClick = { rank, item ->
+                        // 로그만 출력 (실제 클릭은 ExoRankingItem 내부에서 LocalRankingItemClick으로 처리)
                         android.util.Log.d("UnifiedRankingSubPage", "Clicked: Rank $rank - ${item.name}")
-                        onItemClick?.invoke(item)
                     },
                     onVoteSuccess = { idolId, voteCount ->
                         viewModel.updateVote(idolId, voteCount)

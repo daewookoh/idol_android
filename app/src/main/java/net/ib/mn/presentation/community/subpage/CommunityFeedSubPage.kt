@@ -176,6 +176,7 @@ fun CommunityFeedSubPage(
                         profileImageUrl = article.user?.imageUrlCommunity ?: "",
                         userName = article.user?.nickname ?: "",
                         userLevel = article.user?.level ?: 0,
+                        userEmoticonUrl = article.user?.emoticon?.emojiUrl,
                         createdAt = DateTimeUtil.formatFullDate(article.createdAt),
                         content = article.content ?: "",
                         mediaFiles = article.mediaFiles,

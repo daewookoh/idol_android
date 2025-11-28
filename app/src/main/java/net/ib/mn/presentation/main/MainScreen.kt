@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,6 +45,7 @@ import net.ib.mn.presentation.main.myfavorite.MyFavoritePage
 import net.ib.mn.presentation.main.myinfo.MyInfoPage
 import net.ib.mn.presentation.main.ranking.RankingPage
 import net.ib.mn.presentation.community.CommunityScreen
+import net.ib.mn.ui.components.LocalRankingItemClick
 import java.util.Locale
 
 /**
@@ -174,71 +176,75 @@ fun MainScreen(
     val showMainMenu = selectedTab in 0..3
     val showMyInfoMenu = selectedTab == 4
 
-    ExoScaffold(
-        topBar = {
-            MainTopBar(
-                timerText = timerText,
-                showToggleButton = showToggleButton,
-                showMainMenu = showMainMenu,
-                showMyInfoMenu = showMyInfoMenu,
-                hasNewNotification = hasNewNotification,
-                toggleButton = {
-                    SwitchToggleButton(
-                        genderList = genderStrings,
-                        isMaleSelected = isMaleSelected,
-                        boxBackgroundColor = colorResource(id = R.color.gray100),
-                        boxTextColor = colorResource(id = R.color.text_gray),
-                        thumbBackgroundColor = colorResource(id = R.color.text_default),
-                        thumbTextColor = colorResource(id = R.color.text_white_black),
-                        onCategoryChanged = { category ->
-                            // 즉시 UI 업데이트 (setCategory 함수가 로컬 상태를 먼저 업데이트)
-                            viewModel.setCategory(category)
-                        }
-                    )
-                },
-                onSearchClick = { },
-                onFriendsClick = { },
-                onAttendanceClick = { },
-                onNotificationClick = { },
-                onSettingClick = { }
-            )
-        },
-        bottomBar = {
-            MainBottomNavigation(
-                menus = menus,
-                iconsOfSelected = iconsOfSelected,
-                iconsOfUnSelected = iconsOfUnSelected,
-                initialSelectedIndex = selectedTab,
-                defaultBackgroundColor = colorResource(id = R.color.background_200),
-                defaultBorderColor = colorResource(id = R.color.gray150),
-                defaultTextColor = colorResource(id = R.color.text_default),
-                onTabSelected = {
-                    selectedTab = it
-                    viewModel.onTabSelected(it)  // UDP 반응 활성화/비활성화
-                }
-            )
+    // CompositionLocalProvider로 랭킹 아이템 클릭 콜백을 전역으로 제공
+    // ExoRankingItem에서 직접 소비하여 콜백 체인 제거
+    CompositionLocalProvider(
+        LocalRankingItemClick provides { rankingItem ->
+            viewModel.openCommunity(rankingItem)
         }
     ) {
-        AnimatedContent(
-            targetState = selectedTab,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
+        ExoScaffold(
+            topBar = {
+                MainTopBar(
+                    timerText = timerText,
+                    showToggleButton = showToggleButton,
+                    showMainMenu = showMainMenu,
+                    showMyInfoMenu = showMyInfoMenu,
+                    hasNewNotification = hasNewNotification,
+                    toggleButton = {
+                        SwitchToggleButton(
+                            genderList = genderStrings,
+                            isMaleSelected = isMaleSelected,
+                            boxBackgroundColor = colorResource(id = R.color.gray100),
+                            boxTextColor = colorResource(id = R.color.text_gray),
+                            thumbBackgroundColor = colorResource(id = R.color.text_default),
+                            thumbTextColor = colorResource(id = R.color.text_white_black),
+                            onCategoryChanged = { category ->
+                                // 즉시 UI 업데이트 (setCategory 함수가 로컬 상태를 먼저 업데이트)
+                                viewModel.setCategory(category)
+                            }
+                        )
+                    },
+                    onSearchClick = { },
+                    onFriendsClick = { },
+                    onAttendanceClick = { },
+                    onNotificationClick = { },
+                    onSettingClick = { }
+                )
             },
-            label = "tab_content"
-        ) { tab ->
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                when (tab) {
-                    0 -> RankingPage(
-                        onItemClick = { rankingItem ->
-                            viewModel.openCommunity(rankingItem)
-                        }
-                    )
-                    1 -> MyFavoritePage()
-                    2 -> MyInfoPage()
-                    3 -> FreeBoardPage()
-                    4 -> MenuPage()
+            bottomBar = {
+                MainBottomNavigation(
+                    menus = menus,
+                    iconsOfSelected = iconsOfSelected,
+                    iconsOfUnSelected = iconsOfUnSelected,
+                    initialSelectedIndex = selectedTab,
+                    defaultBackgroundColor = colorResource(id = R.color.background_200),
+                    defaultBorderColor = colorResource(id = R.color.gray150),
+                    defaultTextColor = colorResource(id = R.color.text_default),
+                    onTabSelected = {
+                        selectedTab = it
+                        viewModel.onTabSelected(it)  // UDP 반응 활성화/비활성화
+                    }
+                )
+            }
+        ) {
+            AnimatedContent(
+                targetState = selectedTab,
+                transitionSpec = {
+                    fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
+                },
+                label = "tab_content"
+            ) { tab ->
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    when (tab) {
+                        0 -> RankingPage()
+                        1 -> MyFavoritePage()
+                        2 -> MyInfoPage()
+                        3 -> FreeBoardPage()
+                        4 -> MenuPage()
+                    }
                 }
             }
         }

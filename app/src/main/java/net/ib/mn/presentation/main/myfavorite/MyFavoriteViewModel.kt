@@ -106,7 +106,6 @@ class MyFavoriteViewModel @Inject constructor(
         when (intent) {
             is MyFavoriteContract.Intent.LoadFavorites -> loadFavoritesFromCache()
             is MyFavoriteContract.Intent.RefreshFavorites -> loadFavoritesFromCache()
-            is MyFavoriteContract.Intent.OnIdolClick -> onIdolClick(intent.idolId)
             is MyFavoriteContract.Intent.OnSettingClick -> onSettingClick()
             is MyFavoriteContract.Intent.OnPageVisible -> onPageVisible()
             is MyFavoriteContract.Intent.OnScreenVisible -> {}
@@ -255,10 +254,6 @@ class MyFavoriteViewModel @Inject constructor(
         }
 
         _chartSections.value = sections
-    }
-
-    private fun onIdolClick(idolId: Int) {
-        setEffect { MyFavoriteContract.Effect.NavigateToIdolDetail(idolId) }
     }
 
     private fun onSettingClick() {

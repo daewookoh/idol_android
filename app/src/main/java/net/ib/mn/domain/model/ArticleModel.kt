@@ -127,11 +127,33 @@ data class ArticleUser(
     val level: Int = 0,
 
     @SerializedName("resource_uri")
-    val resourceUri: String? = null
+    val resourceUri: String? = null,
+
+    // 이모티콘 (Old 프로젝트의 UserModel.emoticon과 동일)
+    @SerializedName("emoticon")
+    val emoticon: UserEmoticon? = null
 ) {
     val imageUrlCommunity: String
         get() = imageUrl?.replace("/profile/", "/profile_community/") ?: ""
 }
+
+/**
+ * 사용자 이모티콘 정보
+ * Old 프로젝트의 EmoticonModel과 동일
+ */
+data class UserEmoticon(
+    @SerializedName("id")
+    val id: Int = 0,
+
+    @SerializedName("title")
+    val title: String? = null,
+
+    @SerializedName("emoji_url")
+    val emojiUrl: String? = null,
+
+    @SerializedName("is_viewable")
+    val isViewable: String? = null
+)
 
 /**
  * 게시글 첨부 파일
