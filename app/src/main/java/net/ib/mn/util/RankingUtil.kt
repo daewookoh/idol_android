@@ -67,6 +67,30 @@ object RankingUtil {
     }
 
     /**
+     * IdolEntity에서 현재 언어에 맞는 팬덤 이름을 가져오기
+     *
+     * @param idol IdolEntity 인스턴스
+     * @param context Context (언어 설정 확인용)
+     * @return 현재 언어에 맞는 팬덤 이름 (없으면 null)
+     */
+    fun getLocalizedFandomName(idol: IdolEntity, context: Context): String? {
+        try {
+            val locale = AppCompatDelegate.getApplicationLocales()[0] ?: Locale.getDefault()
+            val lang = locale.language.lowercase()
+
+            return when {
+                lang.startsWith("ko") && !idol.fdName.isNullOrEmpty() -> idol.fdName
+                !idol.fdNameEn.isNullOrEmpty() -> idol.fdNameEn
+                !idol.fdName.isNullOrEmpty() -> idol.fdName
+                else -> null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return idol.fdNameEn ?: idol.fdName
+        }
+    }
+
+    /**
      * 이름을 "_"로 분리 (이름_그룹명 형식)
      * old 프로젝트의 Util.nameSplit(name) 로직과 동일
      *
@@ -236,7 +260,8 @@ object RankingUtil {
                 anniversary = idol.anniversary.takeIf { it != "N" },
                 anniversaryDays = idol.anniversaryDays ?: 0,
                 top3ImageUrls = IdolImageUtil.getTop3ImageUrls(idol),
-                top3VideoUrls = IdolImageUtil.getTop3VideoUrls(idol)
+                top3VideoUrls = IdolImageUtil.getTop3VideoUrls(idol),
+                fandomName = getLocalizedFandomName(idol, context)
             )
         }
 

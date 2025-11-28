@@ -64,7 +64,8 @@ class MyFavoriteViewModel @Inject constructor(
                     rank = it.rank,
                     heart = it.heartCount,
                     chartCode = chartCode,
-                    imageUrl = it.photoUrl
+                    imageUrl = it.photoUrl,
+                    fandomName = it.fandomName
                 )
             }
         }.stateIn(

@@ -1,28 +1,37 @@
 package net.ib.mn.presentation.community.subpage
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import net.ib.mn.presentation.main.freeboard.FreeBoardContent
+import net.ib.mn.presentation.main.freeboard.FreeBoardContract
+import net.ib.mn.presentation.main.freeboard.FreeBoardViewModel
 import net.ib.mn.ui.components.RankingItem
 
 /**
  * CommunityFanTalkSubPage - 커뮤니티 팬톡 탭
  *
- * @param rankingItem 선택된 아이돌 정보
- * @param fandomName 팬덤 이름 (없으면 기본값 사용)
+ * FreeBoardPage의 최애 탭과 동일한 UI를 재사용하며,
+ * 선택된 아이돌(rankingItem.id)의 덕질게시판을 표시합니다.
  */
 @Composable
 fun CommunityFanTalkSubPage(
     rankingItem: RankingItem,
-    fandomName: String?
+    fandomName: String?,
+    viewModel: FreeBoardViewModel = hiltViewModel(key = "fanTalk_${rankingItem.id}")
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = "${fandomName ?: "팬톡"} - ${rankingItem.name}")
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(rankingItem.id) {
+        rankingItem.id.toIntOrNull()?.let { viewModel.setExternalIdolId(it) }
+        viewModel.sendIntent(FreeBoardContract.Intent.LoadInitialData)
     }
+
+    FreeBoardContent(
+        state = state,
+        onIntent = viewModel::sendIntent,
+        isExternalIdolMode = viewModel.isExternalIdolMode
+    )
 }

@@ -133,7 +133,8 @@ class MyFavoriteContract {
         val rank: Int?,                    // 해당 차트에서의 순위
         val heart: Long?,                  // 해당 차트에서의 하트 수
         val chartCode: String?,            // 기준 차트 코드
-        val imageUrl: String?              // 기본 이미지 URL
+        val imageUrl: String?,             // 기본 이미지 URL
+        val fandomName: String? = null     // 팬덤 이름
     ) {
         /**
          * RankingItem으로 변환 (CommunityScreen 이동용)
@@ -149,7 +150,8 @@ class MyFavoriteContract {
                 maxHeartCount = heart ?: 0L,
                 top3ImageUrls = top3ImageUrls,
                 top3VideoUrls = top3VideoUrls,
-                isFavorite = true
+                isFavorite = true,
+                fandomName = fandomName
             )
         }
     }

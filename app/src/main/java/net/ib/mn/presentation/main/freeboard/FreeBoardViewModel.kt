@@ -14,6 +14,7 @@ import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.TagModel
 import net.ib.mn.domain.repository.ArticlesRepository
 import net.ib.mn.util.Constants
+import androidx.lifecycle.SavedStateHandle
 import javax.inject.Inject
 
 private const val TAG = "FreeBoardViewModel"
@@ -22,12 +23,33 @@ private const val TAG = "FreeBoardViewModel"
 class FreeBoardViewModel @Inject constructor(
     private val preferencesManager: PreferencesManager,
     private val articlesRepository: ArticlesRepository,
-    private val gson: Gson
+    private val gson: Gson,
+    savedStateHandle: SavedStateHandle
 ) : BaseViewModel<FreeBoardContract.State, FreeBoardContract.Intent, FreeBoardContract.Effect>() {
 
     companion object {
         // 기본 탭 인덱스 (HOT = 0)
         const val DEFAULT_TAB_INDEX = FreeBoardContract.State.TAG_ID_HOT
+        // 외부에서 idol_id를 전달받을 때 사용하는 키
+        const val ARG_IDOL_ID = "idolId"
+    }
+
+    // 외부에서 전달된 idolId (CommunityFanTalkSubPage 등에서 사용)
+    // null이면 기존 FreeBoardPage 동작 (최애 탭에서 preferencesManager.getMostIdolId() 사용)
+    private var externalIdolId: Int? = savedStateHandle.get<Int>(ARG_IDOL_ID)
+
+    // 외부에서 idolId가 전달된 경우 (덕질게시판 전용 모드)
+    val isExternalIdolMode: Boolean
+        get() = externalIdolId != null && externalIdolId!! > 0
+
+    /**
+     * 외부에서 idolId를 설정 (CommunityFanTalkSubPage 등에서 사용)
+     * LoadInitialData 호출 전에 설정해야 함
+     */
+    fun setExternalIdolId(idolId: Int) {
+        if (idolId > 0) {
+            externalIdolId = idolId
+        }
     }
 
     private var nextUrl: String? = null
@@ -57,6 +79,22 @@ class FreeBoardViewModel @Inject constructor(
             setState { copy(isLoading = true) }
 
             try {
+                // 외부에서 idolId가 전달된 경우 (CommunityFanTalkSubPage 등)
+                // 태그 없이 바로 해당 아이돌의 덕질게시판만 로드
+                if (isExternalIdolMode) {
+                    Log.d(TAG, "loadInitialData: externalIdolMode with idolId=$externalIdolId")
+                    setState {
+                        copy(
+                            tags = emptyList(),
+                            selectedTagId = FreeBoardContract.State.TAG_ID_MY_FAVORITE,
+                            hasMostIdol = true
+                        )
+                    }
+                    loadArticles()
+                    return@launch
+                }
+
+                // 기존 FreeBoardPage 동작
                 // Load tags from preferences
                 val tagsJson = preferencesManager.boardTags.first()
                 val tags = parseTags(tagsJson)
@@ -140,11 +178,11 @@ class FreeBoardViewModel @Inject constructor(
                     )
                 }
                 FreeBoardContract.State.TAG_ID_MY_FAVORITE -> {
-                    // 최애 탭: 최애 아이돌 ID로 덕질게시판 API 호출
-                    val mostIdolId = preferencesManager.getMostIdolId() ?: 0
-                    Log.d(TAG, "Calling getMyFavoriteArticles with mostIdolId=$mostIdolId")
+                    // 외부에서 idolId가 전달된 경우 해당 ID 사용, 아니면 최애 아이돌 ID 사용
+                    val idolId = externalIdolId ?: (preferencesManager.getMostIdolId() ?: 0)
+                    Log.d(TAG, "Calling getMyFavoriteArticles with idolId=$idolId (external=$externalIdolId)")
                     articlesRepository.getMyFavoriteArticles(
-                        idolId = mostIdolId,
+                        idolId = idolId,
                         orderBy = orderBy,
                         keyword = keyword,
                         locale = locale

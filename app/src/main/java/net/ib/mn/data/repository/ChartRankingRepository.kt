@@ -484,7 +484,8 @@ class ChartRankingRepository @Inject constructor(
                     top3ImageUrls = imageUrls,
                     top3VideoUrls = videoUrls,
                     isFavorite = mostIdolId?.let { idol.id == it } ?: false,
-                    mostCount = idol.mostCount
+                    mostCount = idol.mostCount,
+                    fandomName = RankingUtil.getLocalizedFandomName(idol, context)
                 )
             }
 
@@ -548,7 +549,8 @@ class ChartRankingRepository @Inject constructor(
                         ),
                         top3VideoUrls = emptyList(),
                         isFavorite = true,  // 비밀의 방은 항상 최애
-                        mostCount = idolEntity.mostCount
+                        mostCount = idolEntity.mostCount,
+                        fandomName = RankingUtil.getLocalizedFandomName(idolEntity, context)
                     )
                     _mostFavoriteIdolRankingItem.value = specialItem
                     Log.d(TAG, "✅ Loaded special idol: ${specialItem.name}, heart=${specialItem.heartCount}")

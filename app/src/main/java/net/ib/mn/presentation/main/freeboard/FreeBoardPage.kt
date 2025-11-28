@@ -81,11 +81,19 @@ fun FreeBoardPage(
     )
 }
 
+/**
+ * FreeBoardContent - 재사용 가능한 게시판 콘텐츠
+ *
+ * @param state FreeBoardContract.State
+ * @param onIntent Intent 핸들러
+ * @param isExternalIdolMode 외부에서 idolId를 전달받은 모드 (태그탭 숨김, 글쓰기 버튼 표시)
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun FreeBoardContent(
+fun FreeBoardContent(
     state: FreeBoardContract.State,
-    onIntent: (FreeBoardContract.Intent) -> Unit
+    onIntent: (FreeBoardContract.Intent) -> Unit,
+    isExternalIdolMode: Boolean = false
 ) {
     // state.searchKeyword와 동기화되는 검색 텍스트
     var searchText by remember { mutableStateOf(state.searchKeyword ?: "") }
@@ -115,8 +123,8 @@ private fun FreeBoardContent(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Tags Section (Scrollable Tabs)
-            if (state.tags.isNotEmpty()) {
+            // Tags Section (Scrollable Tabs) - 외부 idol 모드에서는 숨김
+            if (!isExternalIdolMode && state.tags.isNotEmpty()) {
                 TagTabRow(
                     tags = state.tags,
                     selectedTagId = state.selectedTagId,
@@ -286,8 +294,11 @@ private fun FreeBoardContent(
 
         // Write Button (FAB) - old 프로젝트와 동일한 UI
         // btn_write_contents drawable 자체에 그라데이션 배경 + 아이콘이 포함되어 있음
-        // 최애 탭에서는 플로팅 버튼 숨김
-        if (state.selectedTagId != FreeBoardContract.State.TAG_ID_MY_FAVORITE) {
+        // 기존 FreeBoardPage: 최애 탭에서는 플로팅 버튼 숨김
+        // 외부 idol 모드 (CommunityFanTalkSubPage 등): 숨김
+        val showWriteButton = !isExternalIdolMode &&
+            state.selectedTagId != FreeBoardContract.State.TAG_ID_MY_FAVORITE
+        if (showWriteButton) {
             Icon(
                 painter = painterResource(R.drawable.btn_write_contents),
                 contentDescription = "Write",

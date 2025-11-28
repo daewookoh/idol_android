@@ -6,6 +6,9 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,24 +42,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 import net.ib.mn.R
 import net.ib.mn.data.repository.WikiRepository
 import net.ib.mn.domain.model.ApiResult
@@ -75,6 +74,7 @@ import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.NumberFormatUtil
+import kotlin.math.roundToInt
 
 /**
  * CommunityTab - 커뮤니티 탭 타입
@@ -319,6 +319,49 @@ fun CommunityScreen(
                     )
                 }
             }
+
+            // 플로팅 버튼 - 탭별로 아이콘/액션이 다름
+            // 피드, 팬톡: 글쓰기 버튼 (btn_write_contents)
+            // 채팅: 채팅방 추가 버튼 (btn_add_chat)
+            // 스케줄: 글쓰기 버튼 (btn_write_contents) - 스케줄 작성
+            val currentTab = tabs.getOrNull(pagerState.currentPage)
+            val fabIcon = when (currentTab) {
+                CommunityTab.CHAT -> R.drawable.btn_add_chat
+                else -> R.drawable.btn_write_contents
+            }
+
+            Icon(
+                painter = painterResource(fabIcon),
+                contentDescription = when (currentTab) {
+                    CommunityTab.FEED -> "Write Feed"
+                    CommunityTab.FAN_TALK -> "Write Fan Talk"
+                    CommunityTab.CHAT -> "Create Chat Room"
+                    CommunityTab.SCHEDULE -> "Write Schedule"
+                    else -> "Write"
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 16.dp, bottom = 16.dp)
+                    .size(53.dp)
+                    .clickable {
+                        when (currentTab) {
+                            CommunityTab.FEED -> {
+                                // TODO: 피드 글쓰기
+                            }
+                            CommunityTab.FAN_TALK -> {
+                                // TODO: 팬톡 글쓰기
+                            }
+                            CommunityTab.CHAT -> {
+                                // TODO: 채팅방 만들기
+                            }
+                            CommunityTab.SCHEDULE -> {
+                                // TODO: 스케줄 작성
+                            }
+                            else -> {}
+                        }
+                    },
+                tint = Color.Unspecified
+            )
         }
     }
 
@@ -365,24 +408,21 @@ private fun CommunityTabRow(
     selectedTabIndex: Int,
     onTabSelected: (Int) -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val textDefaultColor = ColorPalette.textDefault
-    val textDimmedColor = ColorPalette.textDimmed
-
     Column {
         PrimaryScrollableTabRow(
             selectedTabIndex = selectedTabIndex,
             minTabWidth = 0.dp,
             containerColor = ColorPalette.background100,
-            contentColor = textDefaultColor,
+            contentColor = ColorPalette.textDefault,
             edgePadding = 3.dp,
             divider = {},
             indicator = @Composable {
                 TabRowDefaults.SecondaryIndicator(
                     modifier = Modifier
                         .tabIndicatorOffset(selectedTabIndex)
-                        .padding(horizontal = 12.dp).height(2.dp),
-                    color = textDefaultColor
+                        .padding(horizontal = 12.dp)
+                        .height(2.dp),
+                    color = ColorPalette.textDefault
                 )
             }
         ) {
@@ -394,9 +434,7 @@ private fun CommunityTabRow(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null
-                        ) {
-                            onTabSelected(index)
-                        }
+                        ) { onTabSelected(index) }
                         .padding(horizontal = 12.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -404,7 +442,7 @@ private fun CommunityTabRow(
                         text = title,
                         style = ExoTypo.title14.copy(
                             lineHeight = 14.sp,
-                            color = if (selectedTabIndex == index) textDefaultColor else textDimmedColor
+                            color = if (selectedTabIndex == index) ColorPalette.textDefault else ColorPalette.textDimmed
                         )
                     )
                 }
