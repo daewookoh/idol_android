@@ -143,4 +143,9 @@ object NetworkModule {
     @Singleton
     fun provideWikiApi(retrofit: Retrofit): WikiApi =
         retrofit.create(WikiApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideChatApi(retrofit: Retrofit): ChatApi =
+        retrofit.create(ChatApi::class.java)
 }

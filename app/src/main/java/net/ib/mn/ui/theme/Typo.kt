@@ -304,4 +304,14 @@ object ExoTypo {
             color = ColorPalette.textDimmed,
             textAlign = TextAlign.Center
         )
+
+    /**
+     * 작은 텍스트 스타일 (11.sp, TextDimmed)
+     */
+    val caption11
+        @Composable get() = TextStyle(
+            fontSize = 11.sp,
+            lineHeight = 13.sp,
+            color = ColorPalette.textDimmed
+        )
 }

@@ -1271,4 +1271,15 @@ class PreferencesManager @Inject constructor(
     suspend fun getHasNewOnePick(): Boolean {
         return context.dataStore.data.first()[KEY_HAS_NEW_ONE_PICK] ?: false
     }
+
+    // ============================================================
+    // User Level (Chat feature)
+    // ============================================================
+
+    /**
+     * 유저 레벨 가져오기 (일회성)
+     */
+    suspend fun getUserLevel(): Int {
+        return context.dataStore.data.first()[KEY_USER_LEVEL] ?: 0
+    }
 }
