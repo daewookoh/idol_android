@@ -48,7 +48,6 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -153,8 +152,6 @@ fun CommunityScreen(
         }
     }
 
-    val density = LocalDensity.current
-
     // Top3 영역 높이 측정 (스크롤 시 숨겨질 영역)
     var top3HeightPx by remember { mutableFloatStateOf(0f) }
 
@@ -184,6 +181,9 @@ fun CommunityScreen(
     val isCollapsed by remember {
         derivedStateOf { toolbarOffsetHeightPx <= -top3HeightPx + 1 }
     }
+
+    // 첫 번째 아티클의 비디오/움짤이 재생 중인지 여부 (Top3 비디오 정지용)
+    var isFirstArticleVideoPlaying by remember { mutableStateOf(false) }
 
     ExoScaffold {
         // clipToBounds로 Top3가 SafeArea 밖으로 나가지 않게 함
@@ -263,7 +263,10 @@ fun CommunityScreen(
                 ) { page ->
                     when (tabs[page]) {
                         CommunityTab.FEED -> CommunityFeedSubPage(
-                            rankingItem = rankingItem
+                            rankingItem = rankingItem,
+                            onFirstArticleVideoPlaying = { isPlaying ->
+                                isFirstArticleVideoPlaying = isPlaying
+                            }
                         )
                         CommunityTab.FAN_TALK -> CommunityFanTalkSubPage(
                             rankingItem = rankingItem,
@@ -293,7 +296,8 @@ fun CommunityScreen(
             ) {
                 ExoTop3(
                     rankingItemData = rankingItem,
-                    isVisible = !isCollapsed, // 완전히 숨겨지면 비디오 정지
+                    // Top3 비디오 정지 조건: 완전히 숨겨졌거나, 첫 번째 아티클 비디오가 재생 중일 때
+                    isVisible = !isCollapsed && !isFirstArticleVideoPlaying,
                     onItemClick = { /* TODO */ }
                 )
 

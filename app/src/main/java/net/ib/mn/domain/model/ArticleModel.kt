@@ -192,9 +192,11 @@ data class ArticleFile(
 ) {
     /**
      * 비디오 파일인지 확인 (mp4 확장자)
+     * originUrl 또는 umjjalUrl 중 하나라도 mp4면 비디오로 인식
      */
     val isVideo: Boolean
-        get() = originUrl?.endsWith(".mp4", ignoreCase = true) == true
+        get() = originUrl?.endsWith(".mp4", ignoreCase = true) == true ||
+                umjjalUrl?.endsWith(".mp4", ignoreCase = true) == true
 
     /**
      * GIF/움짤인지 확인 (umjjalUrl이 있으면 GIF)
