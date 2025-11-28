@@ -277,20 +277,24 @@ private fun ShimmerEffect() {
  * @param onItemClick 아이템 클릭 이벤트
  * @param onVoteSuccess 투표 성공 이벤트
  * @param disableAnimation 애니메이션 비활성화 (기본값: false)
+ * @param expandedItemIds 확장된 아이템 ID 목록 (스크롤 시에도 상태 유지)
+ * @param onExpandedChange 확장 상태 변경 콜백
  */
 fun LazyListScope.exoRankingItems(
     items: List<RankingItem>,
     type: String = RankingItemType.MAIN,
     onItemClick: (Int, RankingItem) -> Unit = { _, _ -> },
     onVoteSuccess: (idolId: Int, voteCount: Long) -> Unit = { _, _ -> },
-    disableAnimation: Boolean = false
+    disableAnimation: Boolean = false,
+    expandedItemIds: Set<String> = emptySet(),
+    onExpandedChange: (String, Boolean) -> Unit = { _, _ -> }
 ) {
     when (type) {
-        RankingItemType.MAIN -> mainRankingItems(items, onItemClick, onVoteSuccess, disableAnimation)
-        RankingItemType.DAILY -> dailyRankingItems(items, onItemClick, onVoteSuccess, disableAnimation)
+        RankingItemType.MAIN -> mainRankingItems(items, onItemClick, onVoteSuccess, disableAnimation, expandedItemIds, onExpandedChange)
+        RankingItemType.DAILY -> dailyRankingItems(items, onItemClick, onVoteSuccess, disableAnimation, expandedItemIds, onExpandedChange)
         RankingItemType.CUMULATIVE, RankingItemType.HOF_CUMULATIVE -> cumulativeRankingItems(items, onItemClick)
         RankingItemType.HEARTPICK -> heartPickRankingItems(items, onItemClick)
-        else -> mainRankingItems(items, onItemClick, onVoteSuccess, disableAnimation)
+        else -> mainRankingItems(items, onItemClick, onVoteSuccess, disableAnimation, expandedItemIds, onExpandedChange)
     }
 }
 
@@ -308,7 +312,9 @@ fun LazyListScope.mainRankingItems(
     items: List<RankingItem>,
     onItemClick: (Int, RankingItem) -> Unit = { _, _ -> },
     onVoteSuccess: (idolId: Int, voteCount: Long) -> Unit = { _, _ -> },
-    disableAnimation: Boolean = false
+    disableAnimation: Boolean = false,
+    expandedItemIds: Set<String> = emptySet(),
+    onExpandedChange: (String, Boolean) -> Unit = { _, _ -> }
 ) {
     itemsIndexed(
         items = items,
@@ -317,7 +323,8 @@ fun LazyListScope.mainRankingItems(
         // LocalRankingItemClick 사용 (Composable 컨텍스트 내부)
         val localOnItemClick = LocalRankingItemClick.current
 
-        var isExpanded by remember { mutableStateOf(false) }
+        val itemKey = item.itemKey()
+        val isExpanded = expandedItemIds.contains(itemKey)
         val backgroundColor = if (item.isFavorite) ColorPalette.main100 else ColorPalette.background100
 
         val itemModifier = if (disableAnimation) {
@@ -352,7 +359,7 @@ fun LazyListScope.mainRankingItems(
                     type = ProfileImageType.LARGE_CIRCLE,
                     rank = item.rank,
                     contentDescription = "프로필 이미지",
-                    modifier = Modifier.clickable { isExpanded = !isExpanded },
+                    modifier = Modifier.clickable { onExpandedChange(itemKey, !isExpanded) },
                     anniversary = item.anniversary ?: "N",
                     anniversaryDays = item.anniversaryDays,
                     miracleCount = item.miracleCount,
@@ -402,13 +409,16 @@ fun LazyListScope.dailyRankingItems(
     items: List<RankingItem>,
     onItemClick: (Int, RankingItem) -> Unit = { _, _ -> },
     onVoteSuccess: (idolId: Int, voteCount: Long) -> Unit = { _, _ -> },
-    disableAnimation: Boolean = false
+    disableAnimation: Boolean = false,
+    expandedItemIds: Set<String> = emptySet(),
+    onExpandedChange: (String, Boolean) -> Unit = { _, _ -> }
 ) {
     itemsIndexed(
         items = items,
         key = { _, item -> item.itemKey() }
     ) { index, item ->
-        var isExpanded by remember { mutableStateOf(false) }
+        val itemKey = item.itemKey()
+        val isExpanded = expandedItemIds.contains(itemKey)
         val backgroundColor = if (item.isFavorite) ColorPalette.main100 else ColorPalette.background100
 
         val itemModifier = if (disableAnimation) {
@@ -439,7 +449,7 @@ fun LazyListScope.dailyRankingItems(
                     type = ProfileImageType.MEDIUM_CIRCLE,
                     rank = item.rank,
                     contentDescription = "프로필 이미지",
-                    modifier = Modifier.padding(horizontal = 6.dp).clickable { isExpanded = !isExpanded },
+                    modifier = Modifier.padding(horizontal = 6.dp).clickable { onExpandedChange(itemKey, !isExpanded) },
                     anniversary = item.anniversary ?: "N",
                     anniversaryDays = item.anniversaryDays,
                     miracleCount = item.miracleCount,

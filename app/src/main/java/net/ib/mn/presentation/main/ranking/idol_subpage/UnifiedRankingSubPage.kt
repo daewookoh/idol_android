@@ -11,6 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import net.ib.mn.ui.theme.ColorPalette
@@ -131,6 +134,12 @@ fun UnifiedRankingSubPage(
                 }
             }
 
+            // 확장된 아이템 ID 목록 (스크롤 시에도 상태 유지)
+            var expandedItemIds by remember { mutableStateOf(emptySet<String>()) }
+
+            // 최상단 Top3 비디오 재생 여부: 모든 하위 Top3가 닫혀있을 때만 재생
+            val isTop3VideoVisible = isVisible && expandedItemIds.isEmpty()
+
             if (success.items.isEmpty()) {
                 Box(
                     modifier = Modifier
@@ -148,7 +157,7 @@ fun UnifiedRankingSubPage(
                 ExoRankingList(
                     items = success.items,
                     topIdol = if (isForFavorite) null else success.topIdol, // Favorite용이면 ExoTop3 숨김
-                    isVisible = isVisible,
+                    isVisible = isTop3VideoVisible,
                     listState = scrollState,
                     onItemClick = { rank, item ->
                         // 로그만 출력 (실제 클릭은 ExoRankingItem 내부에서 LocalRankingItemClick으로 처리)
@@ -157,7 +166,15 @@ fun UnifiedRankingSubPage(
                     onVoteSuccess = { idolId, voteCount ->
                         viewModel.updateVote(idolId, voteCount)
                     },
-                    disableAnimation = true  // 애니메이션 딜레이 제거
+                    disableAnimation = true,  // 애니메이션 딜레이 제거
+                    expandedItemIds = expandedItemIds,
+                    onExpandedChange = { itemKey, isExpanded ->
+                        expandedItemIds = if (isExpanded) {
+                            expandedItemIds + itemKey
+                        } else {
+                            expandedItemIds - itemKey
+                        }
+                    }
                 )
             }
         }

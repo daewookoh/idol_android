@@ -152,6 +152,8 @@ data class RankingItem(
  * @param onItemClick 아이템 클릭 이벤트 (index, item)
  * @param onVoteSuccess 투표 성공 콜백 (ViewModel로 전달)
  * @param disableAnimation 애니메이션 비활성화 여부 (기본값: false)
+ * @param expandedItemIds 확장된 아이템 ID 목록 (스크롤 시에도 상태 유지, 외부에서 관리)
+ * @param onExpandedChange 확장 상태 변경 콜백 (외부 상태 업데이트)
  */
 @Composable
 fun ExoRankingList(
@@ -162,7 +164,9 @@ fun ExoRankingList(
     listState: LazyListState = rememberLazyListState(),
     onItemClick: (Int, RankingItem) -> Unit = { _, _ -> },
     onVoteSuccess: (Int, Long) -> Unit = { _, _ -> },
-    disableAnimation: Boolean = false
+    disableAnimation: Boolean = false,
+    expandedItemIds: Set<String> = emptySet(),
+    onExpandedChange: (String, Boolean) -> Unit = { _, _ -> }
 ) {
     LazyColumn(
         state = listState,
@@ -187,7 +191,9 @@ fun ExoRankingList(
             type = itemType,
             onItemClick = onItemClick,
             onVoteSuccess = onVoteSuccess,
-            disableAnimation = disableAnimation
+            disableAnimation = disableAnimation,
+            expandedItemIds = expandedItemIds,
+            onExpandedChange = onExpandedChange
         )
     }
 }
