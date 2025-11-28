@@ -186,28 +186,22 @@ fun ExoArticle(
                             )
                         }
 
-                        // 레벨 아이콘
-                        if (userLevel in 0..9) {
-                            val levelIconRes = when (userLevel) {
-                                0 -> R.drawable.icon_level_0
-                                1 -> R.drawable.icon_level_1
-                                2 -> R.drawable.icon_level_2
-                                3 -> R.drawable.icon_level_3
-                                4 -> R.drawable.icon_level_4
-                                5 -> R.drawable.icon_level_5
-                                6 -> R.drawable.icon_level_6
-                                7 -> R.drawable.icon_level_7
-                                8 -> R.drawable.icon_level_8
-                                9 -> R.drawable.icon_level_9
-                                else -> R.drawable.icon_level_0
-                            }
-                            Image(
-                                painter = painterResource(levelIconRes),
-                                contentDescription = "Level $userLevel",
-                                modifier = Modifier
-                                    .padding(top = 4.dp, end = 2.dp)
-                            )
-                        }
+                        // 레벨 아이콘 (Old 프로젝트: Util.getLevelResId - 0~40까지 지원)
+                        val context = LocalContext.current
+                        val maxLevel = 40
+                        val clampedLevel = userLevel.coerceIn(0, maxLevel)
+                        val levelIconRes = context.resources.getIdentifier(
+                            "icon_level_$clampedLevel",
+                            "drawable",
+                            context.packageName
+                        ).takeIf { it != 0 } ?: R.drawable.icon_level_0
+
+                        Image(
+                            painter = painterResource(levelIconRes),
+                            contentDescription = "Level $userLevel",
+                            modifier = Modifier
+                                .padding(top = 4.dp, end = 2.dp)
+                        )
 
                         Text(
                             text = userName,

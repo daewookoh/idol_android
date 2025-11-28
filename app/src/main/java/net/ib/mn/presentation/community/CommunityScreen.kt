@@ -6,8 +6,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +21,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -56,6 +53,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import net.ib.mn.R
@@ -174,6 +174,12 @@ fun CommunityScreen(
         }
     }
 
+    // Top3, 프로필, 탭 영역에서 드래그 시 스크롤 처리 (Old 프로젝트의 AppBarLayout 동작과 동일)
+    val headerDraggableState = rememberDraggableState { delta ->
+        val newOffset = toolbarOffsetHeightPx + delta
+        toolbarOffsetHeightPx = newOffset.coerceIn(-top3HeightPx, 0f)
+    }
+
     // Top3 영역이 완전히 숨겨졌는지 여부
     val isCollapsed by remember {
         derivedStateOf { toolbarOffsetHeightPx <= -top3HeightPx + 1 }
@@ -200,45 +206,54 @@ fun CommunityScreen(
                         )
                     }
             ) {
-                // 프로필 영역
-                IdolProfile(
-                    rankingItem = rankingItem,
-                    isCollapsed = isCollapsed,
-                    onProfileImageClick = {
-                        wikiRepository?.let { repo ->
-                            val idolId = rankingItem.id.toIntOrNull() ?: return@let
-                            if (idolId <= 0) return@let
+                // 프로필 + 탭 영역을 하나로 묶어서 draggable 적용
+                // (Old의 AppBarLayout 동작과 동일 - 프로필/탭 영역 드래그 시 스크롤)
+                Column(
+                    modifier = Modifier.draggable(
+                        state = headerDraggableState,
+                        orientation = Orientation.Vertical
+                    )
+                ) {
+                    // 프로필 영역
+                    IdolProfile(
+                        rankingItem = rankingItem,
+                        isCollapsed = isCollapsed,
+                        onProfileImageClick = {
+                            wikiRepository?.let { repo ->
+                                val idolId = rankingItem.id.toIntOrNull() ?: return@let
+                                if (idolId <= 0) return@let
 
-                            coroutineScope.launch {
-                                isLoadingWiki = true
-                                val locale = LocaleUtil.getWikiLocale(context)
+                                coroutineScope.launch {
+                                    isLoadingWiki = true
+                                    val locale = LocaleUtil.getWikiLocale(context)
 
-                                when (val result = repo.getWikiUrl(idolId, locale)) {
-                                    is ApiResult.Success -> {
-                                        wikiUrl = result.data
-                                        showWikiWebView = true
+                                    when (val result = repo.getWikiUrl(idolId, locale)) {
+                                        is ApiResult.Success -> {
+                                            wikiUrl = result.data
+                                            showWikiWebView = true
+                                        }
+                                        is ApiResult.Error -> { /* 에러 무시 */ }
+                                        is ApiResult.Loading -> { /* no-op */ }
                                     }
-                                    is ApiResult.Error -> { /* 에러 무시 */ }
-                                    is ApiResult.Loading -> { /* no-op */ }
+                                    isLoadingWiki = false
                                 }
-                                isLoadingWiki = false
+                            }
+                        },
+                        onBackClick = onBackClick,
+                        onMoreClick = { /* TODO */ }
+                    )
+
+                    // 탭 레이아웃
+                    CommunityTabRow(
+                        tabTitles = tabTitles,
+                        selectedTabIndex = pagerState.currentPage,
+                        onTabSelected = { index ->
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
                             }
                         }
-                    },
-                    onBackClick = onBackClick,
-                    onMoreClick = { /* TODO */ }
-                )
-
-                // 탭 레이아웃
-                CommunityTabRow(
-                    tabTitles = tabTitles,
-                    selectedTabIndex = pagerState.currentPage,
-                    onTabSelected = { index ->
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(index)
-                        }
-                    }
-                )
+                    )
+                }
 
                 // 탭 컨텐츠 (ViewPager)
                 HorizontalPager(
@@ -262,6 +277,7 @@ fun CommunityScreen(
 
             // 상단 ExoTop3 + 뒤로가기 버튼 (스크롤 시 위로 올라가며 숨겨짐)
             // graphicsLayer로 위치 이동 (클리핑되어 SafeArea 바깥으로 나가지 않음)
+            // draggable 추가: Top3 영역에서 드래그 시에도 스크롤 동작 (Old의 AppBarLayout 동작)
             Box(
                 modifier = Modifier
                     .graphicsLayer {
@@ -270,6 +286,10 @@ fun CommunityScreen(
                     .onSizeChanged { size ->
                         top3HeightPx = size.height.toFloat()
                     }
+                    .draggable(
+                        state = headerDraggableState,
+                        orientation = Orientation.Vertical
+                    )
             ) {
                 ExoTop3(
                     rankingItemData = rankingItem,
