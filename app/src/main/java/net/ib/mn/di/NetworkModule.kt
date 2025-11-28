@@ -148,4 +148,9 @@ object NetworkModule {
     @Singleton
     fun provideChatApi(retrofit: Retrofit): ChatApi =
         retrofit.create(ChatApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideScheduleApi(retrofit: Retrofit): ScheduleApi =
+        retrofit.create(ScheduleApi::class.java)
 }

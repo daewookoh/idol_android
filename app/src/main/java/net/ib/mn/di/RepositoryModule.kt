@@ -12,9 +12,11 @@ import net.ib.mn.data.repository.ThemepickRepositoryImpl
 import net.ib.mn.data.repository.UserRepositoryImpl
 import net.ib.mn.data.repository.UtilityRepositoryImpl
 import net.ib.mn.data.repository.ChatRepositoryImpl
+import net.ib.mn.data.repository.ScheduleRepositoryImpl
 import net.ib.mn.data.repository.WikiRepository
 import net.ib.mn.data.repository.WikiRepositoryImpl
 import net.ib.mn.domain.repository.ChatRepository
+import net.ib.mn.domain.repository.ScheduleRepository
 import net.ib.mn.domain.repository.AdRepository
 import net.ib.mn.domain.repository.ArticlesRepository
 import net.ib.mn.domain.repository.ConfigRepository
@@ -118,4 +120,10 @@ abstract class RepositoryModule {
     abstract fun bindChatRepository(
         impl: ChatRepositoryImpl
     ): ChatRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindScheduleRepository(
+        impl: ScheduleRepositoryImpl
+    ): ScheduleRepository
 }

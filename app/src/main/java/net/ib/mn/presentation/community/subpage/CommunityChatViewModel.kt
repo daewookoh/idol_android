@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.community.chat
+package net.ib.mn.presentation.community.subpage
 
 import android.app.Application
 import androidx.lifecycle.viewModelScope

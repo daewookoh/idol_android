@@ -53,8 +53,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.domain.model.ChatRoomModel
-import net.ib.mn.presentation.community.chat.CommunityChatContract
-import net.ib.mn.presentation.community.chat.CommunityChatViewModel
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.theme.ColorPalette

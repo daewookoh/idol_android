@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.community.chat
+package net.ib.mn.presentation.community.subpage
 
 import net.ib.mn.base.UiEffect
 import net.ib.mn.base.UiIntent
