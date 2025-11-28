@@ -18,38 +18,44 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
-import coil.decode.VideoFrameDecoder
 import coil.request.ImageRequest
 import coil.request.repeatCount
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleFile
-import net.ib.mn.domain.model.MediaType
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
+import net.ib.mn.util.MediaCacheUtil
 import net.ib.mn.util.NumberFormatUtil
+import net.ib.mn.util.YoutubeHelper
+import java.util.concurrent.TimeUnit
 
 /**
  * ExoArticle 타입
@@ -99,6 +105,10 @@ fun ExoArticle(
     title: String? = null,
     content: String,
     mediaFiles: List<ArticleFile> = emptyList(),
+    linkUrl: String? = null,
+    linkTitle: String? = null,
+    imageUrl: String? = null,
+    umjjalUrl: String? = null,
     heartCount: Int = 0,
     likeCount: Int = 0,
     commentCount: Int = 0,
@@ -117,6 +127,8 @@ fun ExoArticle(
     onMediaClick: (Int) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    // YouTube 링크 여부 확인
+    val isYoutubeLink = YoutubeHelper.isYoutubeLink(linkUrl, imageUrl, umjjalUrl)
     var isExpanded by remember { mutableStateOf(false) }
 
     Column(
@@ -269,30 +281,35 @@ fun ExoArticle(
                 }
             }
 
-            // 4. 내용
-            Text(
-                text = content,
-                style = ExoTypo.body14,
-                maxLines = if (isExpanded) Int.MAX_VALUE else 3,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            )
-
-            // 더보기 버튼
-            if (!isExpanded && content.length > 100) {
+            // 4. 내용 (YouTube 링크인 경우 content에서 링크 제거)
+            val displayContent = if (isYoutubeLink) YoutubeHelper.removeYoutubeLink(content) else content
+            if (displayContent.isNotEmpty()) {
                 Text(
-                    text = "... 더보기",
-                    style = ExoTypo.body13.copy(color = ColorPalette.textDimmed),
+                    text = displayContent,
+                    style = ExoTypo.body14,
+                    maxLines = if (isExpanded) Int.MAX_VALUE else 3,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
-                        .padding(start = 20.dp, top = 13.dp, end = 20.dp)
-                        .clickable { isExpanded = true }
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
                 )
+
+                // 더보기 버튼
+                if (!isExpanded && displayContent.length > 100) {
+                    Text(
+                        text = "... 더보기",
+                        style = ExoTypo.body13.copy(color = ColorPalette.textDimmed),
+                        modifier = Modifier
+                            .padding(start = 20.dp, top = 13.dp, end = 20.dp)
+                            .clickable { isExpanded = true }
+                    )
+                }
             }
 
-            // 번역 버튼 (FEED 타입이고, 내용이 있을 때만 표시)
-            if (type == ArticleType.FEED && showTranslation && content.isNotEmpty()) {
+            // 번역 버튼 (FEED 타입이고, 번역할 내용이 있을 때만 표시)
+            // 유튜브 링크만 있는 경우 번역 버튼 숨김 (Old 프로젝트 TranslateUiHelper 로직)
+            val hasTranslatableContent = content.isNotEmpty() && !isYoutubeLink
+            if (type == ArticleType.FEED && showTranslation && hasTranslatableContent) {
                 Text(
                     text = stringResource(R.string.see_translate),
                     style = ExoTypo.body12.copy(color = ColorPalette.textGray),
@@ -302,34 +319,34 @@ fun ExoArticle(
                 )
             }
 
-            // 5. 미디어 (첫 번째 미디어만 표시)
+            // 5. YouTube 링크 + 임베드 플레이어
+            // Old 프로젝트: 2025.4.11 링크 URL 텍스트 제거됨 - 플레이어만 표시
+            val hasValidLinkTitle = !linkTitle.isNullOrEmpty() && linkTitle != "None"
+            if (isYoutubeLink && !linkUrl.isNullOrEmpty() && hasValidLinkTitle) {
+                // YouTube 임베드 플레이어 (Old 프로젝트와 동일)
+                ExoYouTubePlayer(
+                    linkUrl = linkUrl,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 5.dp)
+                )
+            }
+            // 6. 미디어 (첫 번째 미디어만 표시, 유튜브가 아닌 경우)
             // 정사각 영역에 이미지가 짤리지 않고 가운데에 표시
             // GIF/비디오의 경우 화면에 보일 때만 원본 로드, 그렇지 않으면 썸네일
-            if (mediaFiles.isNotEmpty()) {
+            else if (mediaFiles.isNotEmpty()) {
                 val context = LocalContext.current
                 val firstMedia = mediaFiles.first()
 
-                // GIF/비디오인 경우: 화면에 보일 때만 움짤(playableUrl) 로드, 아니면 썸네일
-                // 일반 이미지: 항상 displayUrl 사용
-                val imageUrl = when {
-                    firstMedia.isGif -> {
-                        if (isVisible) firstMedia.umjjalUrl else firstMedia.thumbnailUrl
-                    }
-                    firstMedia.isVideo -> firstMedia.thumbnailUrl
-                    else -> firstMedia.displayUrl
-                }
-
-                // GIF/Video 지원 ImageLoader (움짤 자동 재생용)
+                // GIF ImageLoader (움짤 자동 재생용)
                 val gifImageLoader = remember(context) {
                     ImageLoader.Builder(context)
                         .components {
-                            // Android P 이상에서는 ImageDecoder 사용 (더 효율적)
                             if (android.os.Build.VERSION.SDK_INT >= 28) {
                                 add(ImageDecoderDecoder.Factory())
                             } else {
                                 add(GifDecoder.Factory())
                             }
-                            add(VideoFrameDecoder.Factory())
                         }
                         .build()
                 }
@@ -339,60 +356,143 @@ fun ExoArticle(
                         .fillMaxWidth()
                         .aspectRatio(1f)
                         .background(ColorPalette.background100)
+                        .clip(RoundedCornerShape(0.dp)) // 영역 밖으로 넘치지 않도록 clip
                         .clickable { onMediaClick(0) },
                     contentAlignment = Alignment.Center
                 ) {
-                    // GIF인 경우 무한 반복 재생
-                    if (firstMedia.isGif && isVisible && !firstMedia.umjjalUrl.isNullOrEmpty()) {
-                        AsyncImage(
-                            model = ImageRequest.Builder(context)
-                                .data(firstMedia.umjjalUrl)
-                                .repeatCount(-1) // 무한 반복 (-1 = INFINITE)
-                                .crossfade(true)
-                                .build(),
-                            imageLoader = gifImageLoader,
-                            contentDescription = "GIF Media",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Fit
-                        )
-                    } else {
-                        // 일반 이미지 또는 GIF 썸네일
-                        AsyncImage(
-                            model = imageUrl,
-                            contentDescription = "Media",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Fit
-                        )
+                    // 비디오 duration 상태 (Old처럼 MediaMetadataRetriever로 가져옴)
+                    var videoDurationMs by remember { mutableStateOf(0L) }
+
+                    // Old 프로젝트처럼 MediaMetadataRetriever로 duration 가져오기
+                    LaunchedEffect(firstMedia.originUrl) {
+                        if (firstMedia.isVideo && videoDurationMs == 0L && !firstMedia.originUrl.isNullOrEmpty()) {
+                            MediaCacheUtil.getVideoDuration(firstMedia.originUrl!!)?.let { duration ->
+                                videoDurationMs = duration
+                            }
+                        }
                     }
 
-                    // GIF 표시 라벨 (움짤인 경우, 썸네일 표시 중일 때만)
-                    if (firstMedia.isGif && !firstMedia.isVideo && !isVisible) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .padding(bottom = 10.dp, end = 10.dp)
-                                .background(
-                                    color = Color.Black.copy(alpha = 0.5f),
-                                    shape = RoundedCornerShape(4.dp)
+                    // duration 포맷팅 (Old convertTimeMillsToTimerFormat과 동일)
+                    fun formatDurationMs(durationMs: Long): String {
+                        if (durationMs <= 0) return ""
+                        val minutes = TimeUnit.MILLISECONDS.toMinutes(durationMs)
+                        val seconds = TimeUnit.MILLISECONDS.toSeconds(durationMs) - TimeUnit.MINUTES.toSeconds(minutes)
+                        return "%02d:%02d".format(minutes, seconds)
+                    }
+
+                    // duration 표시 (MediaMetadataRetriever에서 가져온 값 사용)
+                    val displayDuration = formatDurationMs(videoDurationMs)
+
+                    // 첫 프레임 렌더링 여부 (Old의 onRenderedFirstFrame과 동일)
+                    // isVisible이 변경될 때 리셋하여 깜빡임 방지
+                    var isFirstFrameRendered by remember(isVisible) { mutableStateOf(false) }
+                    val coroutineScope = rememberCoroutineScope()
+
+                    when {
+                        // MP4 비디오인 경우: ExoPlayer로 재생 + 썸네일 오버레이
+                        firstMedia.isVideo && isVisible && !firstMedia.umjjalUrl.isNullOrEmpty() -> {
+                            // 비디오 플레이어
+                            ExoVideoPlayer(
+                                videoUrl = firstMedia.umjjalUrl!!,
+                                isVisible = isVisible,
+                                modifier = Modifier.fillMaxSize(),
+                                isMuted = true,
+                                isLooping = true,
+                                onFirstFrameRendered = {
+                                    // 첫 프레임 렌더링 후 0.1초 후에 썸네일 숨김 (깜빡임 방지)
+                                    coroutineScope.launch {
+                                        delay(100L)
+                                        isFirstFrameRendered = true
+                                    }
+                                }
+                            )
+                            // 첫 프레임 렌더링 전까지 썸네일 오버레이 (검은 화면/깜빡임 방지)
+                            if (!isFirstFrameRendered) {
+                                AsyncImage(
+                                    model = firstMedia.thumbnailUrl,
+                                    contentDescription = "Video Thumbnail",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
                                 )
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
-                        ) {
-                            Text(
-                                text = "GIF",
-                                style = ExoTypo.stat10.copy(color = Color.White)
+                            }
+                        }
+                        // MP4 비디오 썸네일 (보이지 않을 때)
+                        firstMedia.isVideo -> {
+                            AsyncImage(
+                                model = firstMedia.thumbnailUrl,
+                                contentDescription = "Video Thumbnail",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                        // GIF인 경우: 화면에 보일 때 움짤 재생
+                        firstMedia.isGif && isVisible && !firstMedia.umjjalUrl.isNullOrEmpty() -> {
+                            AsyncImage(
+                                model = ImageRequest.Builder(context)
+                                    .data(firstMedia.umjjalUrl)
+                                    .repeatCount(-1) // 무한 반복 (-1 = INFINITE)
+                                    .crossfade(true)
+                                    .build(),
+                                imageLoader = gifImageLoader,
+                                contentDescription = "GIF Media",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
+                        // GIF 썸네일 (보이지 않을 때)
+                        firstMedia.isGif -> {
+                            AsyncImage(
+                                model = firstMedia.thumbnailUrl,
+                                contentDescription = "GIF Thumbnail",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit
+                            )
+                            // GIF 라벨 표시
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .padding(bottom = 10.dp, end = 10.dp)
+                                    .background(
+                                        color = Color.Black.copy(alpha = 0.5f),
+                                        shape = RoundedCornerShape(4.dp)
+                                    )
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = "GIF",
+                                    style = ExoTypo.stat10.copy(color = Color.White)
+                                )
+                            }
+                        }
+                        // 일반 이미지
+                        else -> {
+                            AsyncImage(
+                                model = ImageRequest.Builder(context)
+                                    .data(firstMedia.displayUrl)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = "Media",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit
                             )
                         }
                     }
 
-                    // 비디오 표시 (MP4 아이콘)
-                    if (firstMedia.isVideo) {
-                        Icon(
-                            painter = painterResource(R.drawable.icon_mp4),
-                            contentDescription = "Video",
-                            tint = Color.Unspecified,
+                    // 비디오 duration 표시 (우측 상단) - Old 프로젝트 스타일: 흰색 텍스트 + 그림자
+                    if (firstMedia.isVideo && displayDuration.isNotEmpty()) {
+                        Text(
+                            text = displayDuration,
+                            style = ExoTypo.body12.copy(
+                                color = Color.White,
+                                shadow = Shadow(
+                                    color = Color.Black,
+                                    offset = Offset(3f, 3f),
+                                    blurRadius = 3f
+                                )
+                            ),
                             modifier = Modifier
-                                .size(48.dp)
-                                .align(Alignment.Center)
+                                .align(Alignment.TopEnd)
+                                .padding(top = 16.dp, end = 16.dp)
                         )
                     }
 
@@ -401,7 +501,7 @@ fun ExoArticle(
                         Box(
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
-                                .padding(top = 29.dp, end = 16.dp)
+                                .padding(top = if (firstMedia.isVideo) 40.dp else 29.dp, end = 16.dp)
                                 .height(24.dp)
                                 .background(
                                     color = ColorPalette.textDefault.copy(alpha = 0.7f),

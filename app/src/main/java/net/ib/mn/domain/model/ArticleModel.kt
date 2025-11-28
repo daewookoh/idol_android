@@ -69,6 +69,13 @@ data class ArticleModel(
     @SerializedName("user_like")
     val isUserLike: Boolean = false,
 
+    // Link info (YouTube 등)
+    @SerializedName("link_url")
+    val linkUrl: String? = null,
+
+    @SerializedName("link_title")
+    val linkTitle: String? = null,
+
     // User info (nested)
     @SerializedName("user")
     val user: ArticleUser? = null,
@@ -156,7 +163,10 @@ data class ArticleFile(
     val width: Int = 0,
 
     @SerializedName("height")
-    val height: Int = 0
+    val height: Int = 0,
+
+    @SerializedName("duration")
+    val duration: Int = 0 // 영상 길이 (초)
 ) {
     /**
      * 비디오 파일인지 확인 (mp4 확장자)

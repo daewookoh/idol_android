@@ -424,9 +424,14 @@ dependencies {
     // Media3 (ExoPlayer)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.ui.compose)
+    implementation(libs.androidx.media3.datasource)
 
     // Lottie
     implementation(libs.lottie.compose)
+
+    // YouTube Player
+    implementation(libs.android.youtube.player)
 
     // Room
     implementation(libs.androidx.room.runtime)
@@ -449,6 +454,7 @@ dependencies {
 
     // Material
     implementation(libs.material)
+    implementation(libs.androidx.compose.material.icons)
 
     // Firebase (old 프로젝트와 동일한 버전)
     implementation(platform(libs.firebase.bom))

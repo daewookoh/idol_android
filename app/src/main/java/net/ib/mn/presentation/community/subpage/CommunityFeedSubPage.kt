@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
@@ -144,14 +145,31 @@ fun CommunityFeedSubPage(
                     items = uiState.articles,
                     key = { _, article -> article.id }
                 ) { index, article ->
-                    // 현재 아이템이 화면에 보이는지 확인 (GIF 최적화용)
-                    val isVisible = remember(listState.layoutInfo.visibleItemsInfo) {
-                        listState.layoutInfo.visibleItemsInfo.any { it.index == index + 2 } // +2는 notice와 header 때문
-                    }
-
                     // 로컬 상태로 즉시 UI 업데이트 (Old 프로젝트의 ViewHolder 방식)
                     var localIsLiked by remember(article.id) { mutableStateOf(article.isUserLike) }
                     var localLikeCount by remember(article.id) { mutableStateOf(article.likeCount) }
+
+                    // 80% 이상 보일 때만 비디오 재생
+                    // LazyColumn 인덱스: notices(0~n-1) + header(n) + articles(n+1~)
+                    val actualIndex = index + uiState.notices.size + 1
+                    val isVisible by remember {
+                        derivedStateOf {
+                            val layoutInfo = listState.layoutInfo
+                            val itemInfo = layoutInfo.visibleItemsInfo.find { it.index == actualIndex }
+                            if (itemInfo == null) {
+                                false
+                            } else {
+                                val viewportHeight = layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset
+                                val itemTop = itemInfo.offset
+                                val itemBottom = itemInfo.offset + itemInfo.size
+                                val visibleTop = maxOf(itemTop, layoutInfo.viewportStartOffset)
+                                val visibleBottom = minOf(itemBottom, layoutInfo.viewportEndOffset)
+                                val visibleHeight = (visibleBottom - visibleTop).coerceAtLeast(0)
+                                val visibilityRatio = if (itemInfo.size > 0) visibleHeight.toFloat() / itemInfo.size else 0f
+                                visibilityRatio >= 0.8f
+                            }
+                        }
+                    }
 
                     ExoArticle(
                         type = ArticleType.FEED,
@@ -161,6 +179,10 @@ fun CommunityFeedSubPage(
                         createdAt = DateTimeUtil.formatFullDate(article.createdAt),
                         content = article.content ?: "",
                         mediaFiles = article.mediaFiles,
+                        linkUrl = article.linkUrl,
+                        linkTitle = article.linkTitle,
+                        imageUrl = article.imageUrl,
+                        umjjalUrl = article.umjjalUrl,
                         heartCount = article.heart.toInt(),
                         likeCount = localLikeCount,
                         commentCount = article.commentCount,

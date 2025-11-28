@@ -61,9 +61,9 @@ fun ExoNameWithGroup(
 
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically  // 이름은 세로 중앙 정렬
+        verticalAlignment = Alignment.Bottom  // 하단 정렬로 이름과 그룹명 baseline 맞춤
     ) {
-        // 이름 (세로 중앙 정렬)
+        // 이름
         Text(
             text = name,
             fontSize = nameFontSize,
@@ -73,8 +73,7 @@ fun ExoNameWithGroup(
             textAlign = textAlign
         )
 
-        // 그룹명 (있는 경우만 표시)
-        // 그룹명은 이름의 bottom에 맞춤
+        // 그룹명 (있는 경우만 표시, old: marginBottom=1dp, gravity=bottom)
         if (!groupName.isNullOrEmpty()) {
             Spacer(modifier = Modifier.width(spacing))
             Text(
@@ -84,7 +83,7 @@ fun ExoNameWithGroup(
                 fontWeight = FontWeight.Bold,
                 color = colorResource(groupColor),
                 textAlign = textAlign,
-                modifier = Modifier.align(Alignment.Bottom)  // 그룹명은 Row의 bottom에 맞춤
+                modifier = Modifier.padding(bottom = 1.dp)
             )
         }
     }
