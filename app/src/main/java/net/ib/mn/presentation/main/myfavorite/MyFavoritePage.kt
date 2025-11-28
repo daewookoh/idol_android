@@ -25,6 +25,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -230,6 +233,9 @@ private fun MyFavoriteContent(
                 // LocalRankingItemClick은 ExoRankingItem 및 ExoTop3에서 직접 사용됨
                 val onRankingItemClick = LocalRankingItemClick.current
 
+                // Top3 펼침 상태 관리
+                var expandedItemIds by remember { mutableStateOf(emptySet<String>()) }
+
                 // LazyColumn으로 전체 스크롤 가능하게 (wrapContent 형식)
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
@@ -269,7 +275,15 @@ private fun MyFavoriteContent(
                         // LocalRankingItemClick은 ExoRankingItem 내부에서 직접 처리됨
                         myFavoriteRankingItems(
                             chartCode = section.chartCode,
-                            data = rankingData
+                            data = rankingData,
+                            expandedItemIds = expandedItemIds,
+                            onExpandedChange = { itemKey, isExpanded ->
+                                expandedItemIds = if (isExpanded) {
+                                    expandedItemIds + setOf(itemKey)
+                                } else {
+                                    expandedItemIds - setOf(itemKey)
+                                }
+                            }
                         )
                     }
                 }

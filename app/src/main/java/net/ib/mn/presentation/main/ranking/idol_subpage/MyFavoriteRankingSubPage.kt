@@ -109,10 +109,14 @@ sealed class MyFavoriteRankingData {
  *
  * @param chartCode 차트 코드
  * @param data 랭킹 데이터
+ * @param expandedItemIds 확장된 아이템 ID 목록
+ * @param onExpandedChange 확장 상태 변경 콜백
  */
 fun LazyListScope.myFavoriteRankingItems(
     chartCode: String,
-    data: MyFavoriteRankingData
+    data: MyFavoriteRankingData,
+    expandedItemIds: Set<String> = emptySet(),
+    onExpandedChange: (String, Boolean) -> Unit = { _, _ -> }
 ) {
     when (data) {
         is MyFavoriteRankingData.Empty -> {
@@ -160,7 +164,9 @@ fun LazyListScope.myFavoriteRankingItems(
                 onVoteSuccess = { idolId, voteCount ->
                     data.viewModel.updateVote(idolId, voteCount)
                 },
-                disableAnimation = true  // MyFavoritePage에서는 애니메이션 비활성화
+                disableAnimation = true,  // MyFavoritePage에서는 애니메이션 비활성화
+                expandedItemIds = expandedItemIds,
+                onExpandedChange = onExpandedChange
             )
         }
     }
