@@ -261,7 +261,8 @@ object RankingUtil {
                 anniversaryDays = idol.anniversaryDays ?: 0,
                 top3ImageUrls = IdolImageUtil.getTop3ImageUrls(idol),
                 top3VideoUrls = IdolImageUtil.getTop3VideoUrls(idol),
-                fandomName = getLocalizedFandomName(idol, context)
+                fandomName = getLocalizedFandomName(idol, context),
+                birthday = idol.birthDay  // 생일 추가
             )
         }
 

@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
@@ -61,6 +62,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -642,147 +645,59 @@ private fun IdolDialog(
             dismissOnClickOutside = true
         )
     ) {
-        Column(
-            modifier = Modifier.width(300.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        // 외부 컨테이너: 320dp (Old: android:layout_width="320dp", clipChildren="false")
+        Box(
+            modifier = Modifier.width(320.dp),
+            contentAlignment = Alignment.TopCenter
         ) {
-            // 메인 다이얼로그 컨텐츠
+            // 메인 다이얼로그 컨텐츠: 300dp (Old: marginTop으로 배지 공간 확보)
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
+                    .padding(top = 10.dp)  // 배지가 삐져나갈 공간
+                    .width(300.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .border(
+                        width = 1.dp,
+                        color = ColorPalette.gray150,
+                        shape = RoundedCornerShape(6.dp)
+                    )
                     .background(ColorPalette.background100)
                     .padding(bottom = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // 상단 배지 + 최애/즐겨찾기 버튼 영역
+                // 상단 최애/즐겨찾기 버튼 영역 (Old: marginTop="15dp", marginEnd="14dp")
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 12.dp, start = 12.dp, end = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                        .padding(top = 15.dp, end = 14.dp),
+                    horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // 왼쪽: 배지 영역
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(2.dp),
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        // Angel 배지
-                        if (rankingItem.angelCount > 0) {
-                            Box(
-                                modifier = Modifier.size(13.dp, 16.dp),
-                                contentAlignment = Alignment.TopCenter
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.charity_angel_badge),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(13.dp, 16.dp),
-                                    tint = Color.Unspecified
-                                )
-                                Text(
-                                    text = rankingItem.angelCount.toString(),
-                                    fontSize = 7.sp,
-                                    color = ColorPalette.textAngel,
-                                    modifier = Modifier.offset(y = 5.dp)
-                                )
-                            }
-                        }
-                        // Fairy 배지
-                        if (rankingItem.fairyCount > 0) {
-                            Box(
-                                modifier = Modifier.size(13.dp, 16.dp),
-                                contentAlignment = Alignment.TopCenter
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.charity_fairy_badge),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(13.dp, 16.dp),
-                                    tint = Color.Unspecified
-                                )
-                                Text(
-                                    text = rankingItem.fairyCount.toString(),
-                                    fontSize = 7.sp,
-                                    color = ColorPalette.textFairy,
-                                    modifier = Modifier.offset(y = 5.dp)
-                                )
-                            }
-                        }
-                        // Miracle 배지
-                        if (rankingItem.miracleCount > 0) {
-                            Box(
-                                modifier = Modifier.size(13.dp, 16.dp),
-                                contentAlignment = Alignment.TopCenter
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.charity_miracle_badge),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(13.dp, 16.dp),
-                                    tint = Color.Unspecified
-                                )
-                                Text(
-                                    text = rankingItem.miracleCount.toString(),
-                                    fontSize = 7.sp,
-                                    color = ColorPalette.textMiracle,
-                                    modifier = Modifier.offset(y = 5.dp)
-                                )
-                            }
-                        }
-                        // Rookie 배지
-                        if (rankingItem.rookieCount > 0) {
-                            val isSuper = rankingItem.rookieCount >= 3
-                            Box(
-                                modifier = Modifier.size(13.dp, 16.dp),
-                                contentAlignment = Alignment.TopCenter
-                            ) {
-                                Icon(
-                                    painter = painterResource(
-                                        if (isSuper) R.drawable.charity_super_rookie_badge
-                                        else R.drawable.charity_rookie_badge
-                                    ),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(13.dp, 16.dp),
-                                    tint = Color.Unspecified
-                                )
-                                Text(
-                                    text = if (isSuper) "S" else rankingItem.rookieCount.toString(),
-                                    fontSize = 7.sp,
-                                    color = if (isSuper) ColorPalette.textSuperRookie else ColorPalette.textRookie,
-                                    modifier = Modifier.offset(y = 5.dp)
-                                )
-                            }
-                        }
-                    }
+                    // 최애 버튼 (Old: btn_most = 하트, 24dp x 24dp)
+                    Icon(
+                        painter = painterResource(
+                            if (isMost) R.drawable.btn_favorite_on else R.drawable.btn_favorite_off
+                        ),
+                        contentDescription = "Most Favorite",
+                        tint = Color.Unspecified,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable { onMostChange(!isMost) }
+                    )
 
-                    // 오른쪽: 최애/즐겨찾기 버튼
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // 최애 버튼 (하트)
-                        Icon(
-                            painter = painterResource(
-                                if (isMost) R.drawable.btn_favorite_on else R.drawable.btn_favorite_off
-                            ),
-                            contentDescription = "Most Favorite",
-                            tint = Color.Unspecified,
-                            modifier = Modifier
-                                .size(17.dp)
-                                .clickable { onMostChange(!isMost) }
-                        )
+                    Spacer(modifier = Modifier.width(9.dp))
 
-                        // 즐겨찾기 버튼 (별)
-                        Icon(
-                            painter = painterResource(
-                                if (isFavorite) R.drawable.btn_bookmark_on else R.drawable.btn_bookmark_off
-                            ),
-                            contentDescription = "Favorite",
-                            tint = Color.Unspecified,
-                            modifier = Modifier
-                                .size(17.dp)
-                                .clickable { onFavoriteChange(!isFavorite) }
-                        )
-                    }
+                    // 즐겨찾기 버튼 (Old: btn_favorite = 별, 24dp x 24dp)
+                    Icon(
+                        painter = painterResource(
+                            if (isFavorite) R.drawable.btn_bookmark_on else R.drawable.btn_bookmark_off
+                        ),
+                        contentDescription = "Favorite",
+                        tint = Color.Unspecified,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable { onFavoriteChange(!isFavorite) }
+                    )
                 }
 
                 // 스크롤 가능한 컨텐츠 영역
@@ -792,59 +707,54 @@ private fun IdolDialog(
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    // 프로필 이미지
+                    // 프로필 이미지 (Old: 90dp x 90dp, marginTop="20dp")
+                    // 다이얼로그 내에서는 뱃지 표기 없음
+                    Spacer(modifier = Modifier.height(20.dp))
                     ExoProfileImage(
                         imageUrl = rankingItem.photoUrl ?: "",
                         type = ProfileImageType.LARGE,
-                        rank = rankingItem.rank,
-                        anniversary = rankingItem.anniversary ?: "N",
-                        anniversaryDays = rankingItem.anniversaryDays,
-                        miracleCount = rankingItem.miracleCount,
-                        fairyCount = rankingItem.fairyCount,
-                        angelCount = rankingItem.angelCount
+                        rank = 0,
+                        anniversary = "N",
+                        anniversaryDays = 0,
+                        miracleCount = 0,
+                        fairyCount = 0,
+                        angelCount = 0
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // 이름 + 그룹명
+                    // 이름 + 그룹명 (Old: marginTop="10dp", name=17sp bold, group=15sp bold marginStart=5dp)
+                    Spacer(modifier = Modifier.height(10.dp))
                     ExoNameWithGroup(
                         fullName = rankingItem.name,
-                        nameFontSize = 16.sp,
-                        groupFontSize = 14.sp
+                        nameFontSize = 17.sp,
+                        groupFontSize = 15.sp
                     )
 
-                    // 생일
+                    // 생일 (Old: marginTop="10dp", 10sp, text_gray)
                     rankingItem.birthday?.let { birthday ->
                         if (birthday.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
                             Text(
                                 text = birthday,
-                                fontSize = 11.sp,
-                                color = ColorPalette.textGray,
-                                lineHeight = 14.sp
+                                fontSize = 10.sp,
+                                color = ColorPalette.textGray
                             )
                         }
                     }
 
-                    // 최애 수
-                    Spacer(modifier = Modifier.height(4.dp))
+                    // 최애 수 (Old: 10sp, text_gray)
                     Text(
                         text = stringResource(R.string.most_favorite) + " : " +
                                 NumberFormatUtil.formatFollowerCount(rankingItem.mostCount),
-                        fontSize = 11.sp,
-                        color = ColorPalette.textGray,
-                        lineHeight = 14.sp
+                        fontSize = 10.sp,
+                        color = ColorPalette.textGray
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // 메뉴 버튼 1행: 투표랭킹, 배너그램, 순위변동
+                    // 메뉴 버튼 1행 (Old: marginTop="14dp", marginStart/End="10dp", paddingStart/End="5dp")
+                    Spacer(modifier = Modifier.height(14.dp))
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 15.dp),
+                            .padding(horizontal = 10.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         IdolDialogMenuItem(
@@ -864,13 +774,12 @@ private fun IdolDialog(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    // 메뉴 버튼 2행: 공유, 올인데이
+                    // 메뉴 버튼 2행 (Old: marginTop="14dp", marginBottom="14dp")
+                    Spacer(modifier = Modifier.height(14.dp))
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 15.dp),
+                            .padding(horizontal = 10.dp),
                         horizontalArrangement = Arrangement.Start
                     ) {
                         Spacer(modifier = Modifier.width(5.dp))
@@ -889,7 +798,105 @@ private fun IdolDialog(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
+                }
+            }
+
+            // 좌측 상단 배지 (다이얼로그 위로 삐져나감)
+            // Old: marginStart="13dp", marginTop="-8dp" (다이얼로그 상단 기준)
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(start = 23.dp, top = 2.dp),  // 10dp(다이얼로그 margin) - 8dp(배지 offset) = 2dp
+                horizontalArrangement = Arrangement.spacedBy(3.dp)
+            ) {
+                // Angel 배지 (Old: 30dp x 35dp, paddingTop="12dp", textSize="10sp")
+                if (rankingItem.angelCount > 0) {
+                    Box(
+                        modifier = Modifier.size(30.dp, 35.dp),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.charity_angel_badge),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            tint = Color.Unspecified
+                        )
+                        Text(
+                            text = rankingItem.angelCount.toString(),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorPalette.textAngel,
+                            modifier = Modifier.padding(top = 12.dp)
+                        )
+                    }
+                }
+                // Fairy 배지
+                if (rankingItem.fairyCount > 0) {
+                    Box(
+                        modifier = Modifier.size(30.dp, 35.dp),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.charity_fairy_badge),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            tint = Color.Unspecified
+                        )
+                        Text(
+                            text = rankingItem.fairyCount.toString(),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorPalette.textFairy,
+                            modifier = Modifier.padding(top = 12.dp)
+                        )
+                    }
+                }
+                // Miracle 배지
+                if (rankingItem.miracleCount > 0) {
+                    Box(
+                        modifier = Modifier.size(30.dp, 35.dp),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.charity_miracle_badge),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            tint = Color.Unspecified
+                        )
+                        Text(
+                            text = rankingItem.miracleCount.toString(),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorPalette.textMiracle,
+                            modifier = Modifier.padding(top = 12.dp)
+                        )
+                    }
+                }
+                // Rookie 배지
+                if (rankingItem.rookieCount > 0) {
+                    val isSuper = rankingItem.rookieCount >= 3
+                    Box(
+                        modifier = Modifier.size(30.dp, 35.dp),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                if (isSuper) R.drawable.charity_super_rookie_badge
+                                else R.drawable.charity_rookie_badge
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            tint = Color.Unspecified
+                        )
+                        Text(
+                            text = if (isSuper) "S" else rankingItem.rookieCount.toString(),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isSuper) ColorPalette.textSuperRookie else ColorPalette.textRookie,
+                            modifier = Modifier.padding(top = 12.dp)
+                        )
+                    }
                 }
             }
         }
@@ -898,6 +905,7 @@ private fun IdolDialog(
 
 /**
  * IdolDialogMenuItem - 다이얼로그 메뉴 아이템
+ * Old: 90dp 너비, 아이콘 50dp, 텍스트 13sp gray580, marginTop="10dp"
  */
 @Composable
 private fun IdolDialogMenuItem(
@@ -907,7 +915,7 @@ private fun IdolDialogMenuItem(
 ) {
     Column(
         modifier = Modifier
-            .width(85.dp)
+            .width(90.dp)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
@@ -918,16 +926,14 @@ private fun IdolDialogMenuItem(
             painter = painterResource(iconRes),
             contentDescription = title,
             tint = Color.Unspecified,
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(50.dp)
         )
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = title,
-            fontSize = 11.sp,
-            color = ColorPalette.textDefault,
-            textAlign = TextAlign.Center,
-            lineHeight = 14.sp,
-            maxLines = 2
+            fontSize = 13.sp,
+            color = ColorPalette.gray580,
+            textAlign = TextAlign.Center
         )
     }
 }
