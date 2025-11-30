@@ -84,6 +84,7 @@ import net.ib.mn.ui.components.ProfileImageType
 import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
+import net.ib.mn.util.Constants
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.NumberFormatUtil
 import kotlin.math.roundToInt
@@ -603,7 +604,10 @@ private fun IdolProfile(
             tint = Color.Unspecified,
             modifier = Modifier
                 .padding(end = 16.dp)
-                .clickable { onMoreClick() }
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { onMoreClick() }
         )
     }
 }
@@ -666,38 +670,51 @@ private fun IdolDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // 상단 최애/즐겨찾기 버튼 영역 (Old: marginTop="15dp", marginEnd="14dp")
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 15.dp, end = 14.dp),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // 최애 버튼 (Old: btn_most = 하트, 24dp x 24dp)
-                    Icon(
-                        painter = painterResource(
-                            if (isMost) R.drawable.btn_favorite_on else R.drawable.btn_favorite_off
-                        ),
-                        contentDescription = "Most Favorite",
-                        tint = Color.Unspecified,
+                // 비밀의 방 아이돌인 경우 숨김
+                val isSecretRoom = rankingItem.id.toIntOrNull() == Constants.SECRET_ROOM_IDOL_ID
+                if (!isSecretRoom) {
+                    Row(
                         modifier = Modifier
-                            .size(24.dp)
-                            .clickable { onMostChange(!isMost) }
-                    )
+                            .fillMaxWidth()
+                            .padding(top = 15.dp, end = 14.dp),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // 최애 버튼 (Old: btn_most = 하트, 아이콘 17dp)
+                        Icon(
+                            painter = painterResource(
+                                if (isMost) R.drawable.btn_favorite_on else R.drawable.btn_favorite_off
+                            ),
+                            contentDescription = "Most Favorite",
+                            tint = Color.Unspecified,
+                            modifier = Modifier
+                                .size(17.dp)
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null
+                                ) { onMostChange(!isMost) }
+                        )
 
-                    Spacer(modifier = Modifier.width(9.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
 
-                    // 즐겨찾기 버튼 (Old: btn_favorite = 별, 24dp x 24dp)
-                    Icon(
-                        painter = painterResource(
-                            if (isFavorite) R.drawable.btn_bookmark_on else R.drawable.btn_bookmark_off
-                        ),
-                        contentDescription = "Favorite",
-                        tint = Color.Unspecified,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clickable { onFavoriteChange(!isFavorite) }
-                    )
+                        // 즐겨찾기 버튼 (Old: btn_favorite = 별, 아이콘 17dp)
+                        Icon(
+                            painter = painterResource(
+                                if (isFavorite) R.drawable.btn_bookmark_on else R.drawable.btn_bookmark_off
+                            ),
+                            contentDescription = "Favorite",
+                            tint = Color.Unspecified,
+                            modifier = Modifier
+                                .size(17.dp)
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null
+                                ) { onFavoriteChange(!isFavorite) }
+                        )
+                    }
+                } else {
+                    // 비밀의 방 아이돌: 버튼 영역 높이만 확보
+                    Spacer(modifier = Modifier.height(15.dp))
                 }
 
                 // 스크롤 가능한 컨텐츠 영역
@@ -712,7 +729,7 @@ private fun IdolDialog(
                     Spacer(modifier = Modifier.height(20.dp))
                     ExoProfileImage(
                         imageUrl = rankingItem.photoUrl ?: "",
-                        type = ProfileImageType.LARGE,
+                        type = ProfileImageType.XLARGE,
                         rank = 0,
                         anniversary = "N",
                         anniversaryDays = 0,
@@ -729,13 +746,13 @@ private fun IdolDialog(
                         groupFontSize = 15.sp
                     )
 
-                    // 생일 (Old: marginTop="10dp", 10sp, text_gray)
+                    // 생일 (Old: birthday와 most_count는 붙어 있음)
                     rankingItem.birthday?.let { birthday ->
                         if (birthday.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(10.dp))
                             Text(
                                 text = birthday,
                                 fontSize = 10.sp,
+                                lineHeight = 14.sp,
                                 color = ColorPalette.textGray
                             )
                         }
@@ -746,6 +763,7 @@ private fun IdolDialog(
                         text = stringResource(R.string.most_favorite) + " : " +
                                 NumberFormatUtil.formatFollowerCount(rankingItem.mostCount),
                         fontSize = 10.sp,
+                        lineHeight = 14.sp,
                         color = ColorPalette.textGray
                     )
 
@@ -827,7 +845,7 @@ private fun IdolDialog(
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = ColorPalette.textAngel,
-                            modifier = Modifier.padding(top = 12.dp)
+                            modifier = Modifier.padding(top = 8.dp)
                         )
                     }
                 }
@@ -848,7 +866,7 @@ private fun IdolDialog(
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = ColorPalette.textFairy,
-                            modifier = Modifier.padding(top = 12.dp)
+                            modifier = Modifier.padding(top = 8.dp)
                         )
                     }
                 }
@@ -869,7 +887,7 @@ private fun IdolDialog(
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = ColorPalette.textMiracle,
-                            modifier = Modifier.padding(top = 12.dp)
+                            modifier = Modifier.padding(top = 8.dp)
                         )
                     }
                 }
@@ -894,7 +912,7 @@ private fun IdolDialog(
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (isSuper) ColorPalette.textSuperRookie else ColorPalette.textRookie,
-                            modifier = Modifier.padding(top = 12.dp)
+                            modifier = Modifier.padding(top = 8.dp)
                         )
                     }
                 }

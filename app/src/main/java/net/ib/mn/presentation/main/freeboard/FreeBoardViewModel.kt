@@ -107,7 +107,7 @@ class FreeBoardViewModel @Inject constructor(
                 // 최애 설정 여부 확인
                 val mostIdolId = preferencesManager.getMostIdolId()
                 val hasMostIdol = mostIdolId != null &&
-                    mostIdolId != Constants.NON_FAVORITE_IDOL_ID &&
+                    mostIdolId != Constants.SECRET_ROOM_IDOL_ID &&
                     mostIdolId > 0
 
                 Log.d(TAG, "loadInitialData: savedTagId=$savedTagId, initialTagId=$initialTagId, mostIdolId=$mostIdolId, hasMostIdol=$hasMostIdol")

@@ -38,6 +38,7 @@ import net.ib.mn.util.IdolImageUtil.toSecureUrl
  * 일반 타입: 테두리 없이 이미지만
  */
 object ProfileImageType {
+    const val XLARGE = "XLARGE"     // 아이돌 다이얼로그: 전체 90dp(테두리 없음)
     const val LARGE_CIRCLE = "LARGE_CIRCLE"     // 메인 랭킹: 전체 77dp, 테두리 60dp, 이미지 50dp
     const val LARGE = "LARGE"     // 하트픽1위: 전체 70dp(테두리 없음)
     const val MEDIUM_CIRCLE = "MEDIUM_CIRCLE"   // 기적/루키: 전체 62dp, 테두리 52dp, 이미지 42dp
@@ -109,6 +110,7 @@ fun ExoProfileImage(
     // 일반 타입: (전체 Box, 0, 이미지) - 테두리 없음
     val (boxSize, borderSize, imageSize) = remember(type) {
         when (type) {
+            ProfileImageType.XLARGE -> Triple(90.dp, 0.dp, 90.dp)          // 아이돌 다이얼로그
             ProfileImageType.LARGE_CIRCLE -> Triple(77.dp, 60.dp, 50.dp)   // 메인 랭킹
             ProfileImageType.MEDIUM_CIRCLE -> Triple(62.dp, 52.dp, 42.dp)  // 기적/루키
             ProfileImageType.LARGE -> Triple(77.dp, 0.dp, 77.dp)          // 하트픽

@@ -7,6 +7,8 @@ import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.data.local.entity.IdolEntity
 import net.ib.mn.ui.components.RankingItem
 import java.text.Collator
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.Locale
 
 /**
@@ -87,6 +89,33 @@ object RankingUtil {
         } catch (e: Exception) {
             e.printStackTrace()
             return idol.fdNameEn ?: idol.fdName
+        }
+    }
+
+    /**
+     * 생일 포맷팅 (yyyy-MM-dd -> 로케일에 맞는 날짜 형식)
+     * Old 프로젝트의 IdolCommunityDialogFragment 로직과 동일
+     *
+     * @param birthDay "yyyy-MM-dd" 형식의 생일 문자열
+     * @param isLunarBirthday 음력 생일 여부 ("Y" 또는 null)
+     * @param context Context (로케일 확인용)
+     * @return 포맷된 생일 문자열 (예: "1995년 1월 1일" 또는 "Jan 1, 1995")
+     */
+    fun formatBirthday(birthDay: String?, isLunarBirthday: String?, context: Context): String? {
+        if (birthDay.isNullOrEmpty()) return null
+        return try {
+            val locale = AppCompatDelegate.getApplicationLocales()[0] ?: Locale.getDefault()
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd", locale)
+            val date = inputFormat.parse(birthDay) ?: return null
+            val outputFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, locale)
+            var formattedDate = outputFormat.format(date)
+            if (isLunarBirthday == "Y") {
+                formattedDate += " (음력)"
+            }
+            formattedDate
+        } catch (e: Exception) {
+            e.printStackTrace()
+            birthDay  // 파싱 실패 시 원본 반환
         }
     }
 
@@ -262,7 +291,9 @@ object RankingUtil {
                 top3ImageUrls = IdolImageUtil.getTop3ImageUrls(idol),
                 top3VideoUrls = IdolImageUtil.getTop3VideoUrls(idol),
                 fandomName = getLocalizedFandomName(idol, context),
-                birthday = idol.birthDay  // 생일 추가
+                birthday = formatBirthday(idol.birthDay, idol.isLunarBirthday, context).also {
+                    android.util.Log.d("RankingUtil", "🎂 idol=${idol.name}, birthDay=${idol.birthDay}, isLunar=${idol.isLunarBirthday}, formatted=$it")
+                }
             )
         }
 
