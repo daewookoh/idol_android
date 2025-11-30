@@ -20,7 +20,6 @@ import net.ib.mn.data.local.UserInfo
 import net.ib.mn.data.remote.udp.IdolBroadcastManager
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.UserRepository
-import net.ib.mn.data.repository.WikiRepository
 import net.ib.mn.util.DeviceUtil
 import javax.inject.Inject
 
@@ -32,7 +31,6 @@ class MainViewModel @Inject constructor(
     private val deviceUtil: DeviceUtil,
     private val idolBroadcastManager: IdolBroadcastManager,
     private val idolRepository: net.ib.mn.domain.repository.IdolRepository,
-    val wikiRepository: WikiRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 

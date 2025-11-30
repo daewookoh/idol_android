@@ -233,115 +233,108 @@ fun ExoConfirmDialog(
         },
         properties = DialogProperties(
             dismissOnBackPress = dismissOnBackPress,
-            dismissOnClickOutside = dismissOnClickOutside,
-            usePlatformDefaultWidth = false
+            dismissOnClickOutside = dismissOnClickOutside
         )
     ) {
-        Box(
+        // Old와 동일: dimmed 처리는 Dialog 영역만 (전체 화면 아님)
+        Column(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f)),
-            contentAlignment = Alignment.Center
+                .width(290.dp)
+                .background(
+                    color = colorResource(id = R.color.text_white_black),
+                    shape = RoundedCornerShape(6.dp)
+                )
+                .border(
+                    width = 1.dp,
+                    color = colorResource(id = R.color.gray150),
+                    shape = RoundedCornerShape(6.dp)
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
+            // 타이틀
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+                color = colorResource(id = R.color.main),
+                textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .width(290.dp)
-                    .background(
-                        color = colorResource(id = R.color.text_white_black),
-                        shape = RoundedCornerShape(6.dp)
-                    )
-                    .border(
-                        width = 1.dp,
-                        color = colorResource(id = R.color.gray150),
-                        shape = RoundedCornerShape(6.dp)
-                    ),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 10.dp)
+            )
+
+            // 메시지
+            val scrollState = rememberScrollState()
+            Text(
+                text = message,
+                fontSize = 14.sp,
+                lineHeight = 20.sp,
+                fontWeight = FontWeight.Normal,
+                color = colorResource(id = R.color.gray580),
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .heightIn(max = 400.dp)
+                    .verticalScroll(scrollState)
+            )
+
+            // 구분선
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 30.dp),
+                thickness = 1.dp,
+                color = colorResource(id = R.color.gray100)
+            )
+
+            // 버튼 Row (Old와 동일: 확인(왼쪽) | 취소(오른쪽))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(44.dp)
             ) {
-                // 타이틀
-                Text(
-                    text = title,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = colorResource(id = R.color.main),
-                    textAlign = TextAlign.Center,
+                // 확인 버튼 (왼쪽) - Old: btn_ok
+                TextButton(
+                    onClick = onConfirm,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 20.dp)
-                )
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    shape = RoundedCornerShape(bottomStart = 6.dp),
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = colorResource(id = R.color.gray580)
+                    )
+                ) {
+                    Text(
+                        text = confirmButtonText,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
 
-                // 메시지
-                val scrollState = rememberScrollState()
-                Text(
-                    text = message,
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = colorResource(id = R.color.gray580),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                        .heightIn(max = 400.dp)
-                        .verticalScroll(scrollState)
-                )
-
-                // 구분선
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 30.dp),
+                // 버튼 사이 구분선
+                VerticalDivider(
+                    modifier = Modifier.fillMaxHeight(),
                     thickness = 1.dp,
                     color = colorResource(id = R.color.gray100)
                 )
 
-                // 버튼 Row
-                Row(
+                // 취소 버튼 (오른쪽) - Old: btn_cancel
+                TextButton(
+                    onClick = onDismiss,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(44.dp)
-                ) {
-                    // 취소 버튼
-                    TextButton(
-                        onClick = onDismiss,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(),
-                        shape = RoundedCornerShape(bottomStart = 6.dp),
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = colorResource(id = R.color.gray580)
-                        )
-                    ) {
-                        Text(
-                            text = dismissButtonText,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Normal
-                        )
-                    }
-
-                    // 버튼 사이 구분선
-                    VerticalDivider(
-                        modifier = Modifier.fillMaxHeight(),
-                        thickness = 1.dp,
-                        color = colorResource(id = R.color.gray100)
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    shape = RoundedCornerShape(bottomEnd = 6.dp),
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = colorResource(id = R.color.gray580)
                     )
-
-                    // 확인 버튼
-                    TextButton(
-                        onClick = onConfirm,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(),
-                        shape = RoundedCornerShape(bottomEnd = 6.dp),
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = colorResource(id = R.color.main)
-                        )
-                    ) {
-                        Text(
-                            text = confirmButtonText,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Normal
-                        )
-                    }
+                ) {
+                    Text(
+                        text = dismissButtonText,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    )
                 }
             }
         }

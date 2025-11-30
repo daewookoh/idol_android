@@ -261,7 +261,6 @@ fun MainScreen(
 
         CommunityScreen(
             rankingItem = rankingItem,
-            wikiRepository = viewModel.wikiRepository,
             showChattingTab = showChattingTab,
             fandomName = rankingItem.fandomName,
             onBackClick = {

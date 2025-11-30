@@ -452,4 +452,43 @@ class UserCacheRepository @Inject constructor(
             throw e
         }
     }
+
+    /**
+     * 사용자 resource URI 가져오기
+     */
+    fun getUserResourceUri(): String? {
+        return _userData.value?.resourceUri
+    }
+
+    /**
+     * 최애 아이돌 로컬 캐시 업데이트
+     * API 호출 성공 후 호출하여 로컬 상태 동기화
+     *
+     * @param idolId 새 최애 아이돌 ID (null이면 최애 해제)
+     * @param idolCategory 아이돌 카테고리 (M/F)
+     * @param idolChartCode 아이돌 차트 코드
+     */
+    fun updateMostIdolCache(
+        idolId: Int?,
+        idolCategory: String?,
+        idolChartCode: String?
+    ) {
+        _mostIdolId.value = idolId
+        _mostIdolCategory.value = idolCategory
+        _mostIdolChartCode.value = idolChartCode
+
+        Log.d(TAG, "✅ Most idol cache updated:")
+        Log.d(TAG, "  - ID: $idolId")
+        Log.d(TAG, "  - Category: $idolCategory")
+        Log.d(TAG, "  - ChartCode: $idolChartCode")
+
+        // SharedPreference에 백업
+        ioScope.launch {
+            try {
+                preferencesManager.saveMostIdolInfo(idolId, idolCategory, idolChartCode)
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Failed to save most idol info to SharedPreference: ${e.message}", e)
+            }
+        }
+    }
 }

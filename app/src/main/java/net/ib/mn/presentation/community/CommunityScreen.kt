@@ -1,5 +1,6 @@
 package net.ib.mn.presentation.community
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -11,40 +12,15 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.PrimaryScrollableTabRow
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,29 +35,23 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import net.ib.mn.R
-import net.ib.mn.data.repository.WikiRepository
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.presentation.community.subpage.CommunityChatSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFanTalkSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFeedSubPage
 import net.ib.mn.presentation.community.subpage.CommunityScheduleSubPage
 import net.ib.mn.presentation.webview.WebViewScreen
-import net.ib.mn.ui.components.ExoNameWithGroup
-import net.ib.mn.ui.components.ExoProfileImage
-import net.ib.mn.ui.components.ExoScaffold
-import net.ib.mn.ui.components.ExoTop3
-import net.ib.mn.ui.components.ProfileImageType
-import net.ib.mn.ui.components.RankingItem
+import net.ib.mn.ui.components.*
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.Constants
@@ -103,26 +73,40 @@ enum class CommunityTab {
  * CommunityScreen - 커뮤니티 화면
  *
  * @param rankingItem 선택된 랭킹 아이템 데이터
- * @param wikiRepository WikiRepository 인스턴스
  * @param showChattingTab 채팅 탭 표시 여부 (최애이거나, 최애의 그룹이거나, 관리자일 경우 true)
  * @param fandomName 팬덤 이름
  * @param onBackClick 뒤로가기 클릭 이벤트
+ * @param onMostChanged 최애 변경 콜백
  */
 @Composable
 fun CommunityScreen(
     rankingItem: RankingItem,
-    wikiRepository: WikiRepository? = null,
     showChattingTab: Boolean = false,
     fandomName: String? = null,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onMostChanged: (Boolean) -> Unit = {},
+    viewModel: CommunityViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+
+    // 아이돌 ID
+    val idolId = rankingItem.id.toIntOrNull()
+
+    // ViewModel에서 최애/즐겨찾기 상태 확인
+    val initialIsMost = remember(idolId) { viewModel.isMostIdol(idolId) }
+    val initialIsFavorite = remember(idolId) { viewModel.isFavoriteIdol(idolId) }
+
+    // ViewModel 상태 구독
+    val isUpdatingMost by viewModel.isUpdatingMost.collectAsState()
 
     var showWikiWebView by remember { mutableStateOf(false) }
     var wikiUrl by remember { mutableStateOf<String?>(null) }
     var isLoadingWiki by remember { mutableStateOf(false) }
     var showIdolDialog by remember { mutableStateOf(false) }
+    var showChangeMostDialog by remember { mutableStateOf(false) }
+    var currentIsMost by remember(initialIsMost) { mutableStateOf(initialIsMost) }
+    var currentIsFavorite by remember(initialIsFavorite) { mutableStateOf(initialIsFavorite) }
 
     // 탭 목록 생성 (showChattingTab이 true인 경우에만 채팅 탭 포함)
     val tabs = remember(showChattingTab) {
@@ -233,24 +217,22 @@ fun CommunityScreen(
                         rankingItem = rankingItem,
                         isCollapsed = isCollapsed,
                         onProfileImageClick = {
-                            wikiRepository?.let { repo ->
-                                val idolId = rankingItem.id.toIntOrNull() ?: return@let
-                                if (idolId <= 0) return@let
+                            val wikiIdolId = rankingItem.id.toIntOrNull() ?: return@IdolProfile
+                            if (wikiIdolId <= 0) return@IdolProfile
 
-                                coroutineScope.launch {
-                                    isLoadingWiki = true
-                                    val locale = LocaleUtil.getWikiLocale(context)
+                            coroutineScope.launch {
+                                isLoadingWiki = true
+                                val locale = LocaleUtil.getWikiLocale(context)
 
-                                    when (val result = repo.getWikiUrl(idolId, locale)) {
-                                        is ApiResult.Success -> {
-                                            wikiUrl = result.data
-                                            showWikiWebView = true
-                                        }
-                                        is ApiResult.Error -> { /* 에러 무시 */ }
-                                        is ApiResult.Loading -> { /* no-op */ }
+                                when (val result = viewModel.wikiRepository.getWikiUrl(wikiIdolId, locale)) {
+                                    is ApiResult.Success -> {
+                                        wikiUrl = result.data
+                                        showWikiWebView = true
                                     }
-                                    isLoadingWiki = false
+                                    is ApiResult.Error -> { /* 에러 무시 */ }
+                                    is ApiResult.Loading -> { /* no-op */ }
                                 }
+                                isLoadingWiki = false
                             }
                         },
                         onBackClick = onBackClick,
@@ -413,7 +395,17 @@ fun CommunityScreen(
     if (showIdolDialog) {
         IdolDialog(
             rankingItem = rankingItem,
+            isFavorite = currentIsFavorite,
+            isMost = currentIsMost,
             onDismiss = { showIdolDialog = false },
+            onFavoriteChange = { newValue ->
+                currentIsFavorite = newValue
+                // TODO: 즐겨찾기 API 호출
+            },
+            onMostChange = { newValue ->
+                // 최애 변경 확인 다이얼로그 표시
+                showChangeMostDialog = true
+            },
             onVoteRankingClick = {
                 showIdolDialog = false
                 // TODO: 하트 투표 랭킹 화면으로 이동
@@ -435,6 +427,66 @@ fun CommunityScreen(
                 // TODO: 올인데이 설정
             }
         )
+    }
+
+    // 최애 변경 확인 다이얼로그 (Old 프로젝트의 showChangeMostDialog 구현)
+    if (showChangeMostDialog) {
+        val idolName = rankingItem.name.split("_").firstOrNull() ?: rankingItem.name
+        val message = if (currentIsMost) {
+            // 최애 해제 시
+            context.getString(R.string.msg_favorite_unregi_guide2) + "\n" +
+                    context.getString(R.string.msg_favorite_unregi_guide1)
+        } else {
+            // 최애 설정 시
+            String.format(
+                context.getString(R.string.msg_favorite_guide_1) + "\n" +
+                        context.getString(R.string.msg_favorite_guide_2__),
+                idolName
+            )
+        }
+
+        ExoConfirmDialog(
+            title = context.getString(R.string.my_idol),
+            message = message,
+            confirmButtonText = stringResource(R.string.yes),
+            dismissButtonText = stringResource(R.string.no),
+            onConfirm = {
+                showChangeMostDialog = false
+                // ViewModel의 updateMostIdol 호출
+                coroutineScope.launch {
+                    viewModel.updateMostIdol(
+                        rankingItem = rankingItem,
+                        currentIsMost = currentIsMost,
+                        onSuccess = { newIsMost ->
+                            currentIsMost = newIsMost
+                            onMostChanged(newIsMost)
+                        },
+                        onError = { errorMessage ->
+                            Toast.makeText(
+                                context,
+                                errorMessage ?: context.getString(R.string.error_abnormal_default),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    )
+                }
+            },
+            onDismiss = {
+                showChangeMostDialog = false
+            }
+        )
+    }
+
+    // 최애 변경 로딩 인디케이터
+    if (isUpdatingMost) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = ColorPalette.main)
+        }
     }
 }
 

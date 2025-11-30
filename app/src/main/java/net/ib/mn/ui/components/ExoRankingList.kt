@@ -60,6 +60,9 @@ data class RankingItem(
     val groupId: Int? = null,  // 그룹 ID (솔로 아이돌의 경우 소속 그룹 ID)
     val fandomName: String? = null,  // 팬덤 이름 (커뮤니티 탭에서 사용)
     val birthday: String? = null,  // 생일 (yyyy-MM-dd 또는 포맷된 문자열)
+    val resourceUri: String? = null,  // API resource URI (ex: "/api/v1/idols/123/")
+    val category: String? = null,  // 카테고리 (M/F)
+    val chartCode: String? = null,  // 차트 코드
 ) {
     /**
      * 현재 로케일에 맞는 이름 반환
