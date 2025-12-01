@@ -205,7 +205,12 @@ fun ExoArticle(
 
                         Text(
                             text = userName,
-                            style = ExoTypo.body14Main
+                            style = ExoTypo.body14Main,
+                            modifier = Modifier.clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = onProfileClick
+                            )
                         )
                     }
 
