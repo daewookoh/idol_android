@@ -62,6 +62,66 @@ class UsersRepository @Inject constructor(
     }
 
     /**
+     * 유저 상태 정보 조회
+     *
+     * old 프로젝트: FeedActivity에서 사용
+     * 응답: { "success": true, "status_message": "...", "item_no": 0, "feed_is_viewable": "Y", ... }
+     *
+     * @param userId 유저 ID
+     * @return Result<JSONObject>
+     */
+    suspend fun getStatus(userId: Int): Result<JSONObject> {
+        return try {
+            Log.d(TAG, "getStatus called for userId: $userId")
+            val response = usersApi.getStatus(userId)
+
+            if (response.isSuccessful) {
+                val jsonString = response.body()?.string() ?: "{}"
+                val jsonObject = JSONObject(jsonString)
+                Log.d(TAG, "getStatus success: $jsonObject")
+                Result.success(jsonObject)
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Unknown error"
+                Log.e(TAG, "getStatus failed: ${response.code()} - $errorBody")
+                Result.failure(Exception("API Error: ${response.code()} - $errorBody"))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "getStatus exception: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * 친구(유저) 정보 조회
+     *
+     * old 프로젝트: FeedActivity에서 사용
+     * 응답: { "success": true, "objects": [{ "user": {..., "most": {...}}, ... }] }
+     *
+     * @param userId 유저 ID
+     * @return Result<JSONObject>
+     */
+    suspend fun getFriendInfo(userId: Int): Result<JSONObject> {
+        return try {
+            Log.d(TAG, "getFriendInfo called for userId: $userId")
+            val response = usersApi.getFriendInfo(userId)
+
+            if (response.isSuccessful) {
+                val jsonString = response.body()?.string() ?: "{}"
+                val jsonObject = JSONObject(jsonString)
+                Log.d(TAG, "getFriendInfo success: $jsonObject")
+                Result.success(jsonObject)
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Unknown error"
+                Log.e(TAG, "getFriendInfo failed: ${response.code()} - $errorBody")
+                Result.failure(Exception("API Error: ${response.code()} - $errorBody"))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "getFriendInfo exception: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
      * 특정 아이돌에게 투표한 유저 랭킹 조회
      *
      * old 프로젝트: HeartVoteRankingActivity에서 사용

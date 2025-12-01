@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -54,20 +55,24 @@ import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.DateTimeUtil
+import net.ib.mn.util.LocaleUtil
 
 /**
  * CommunityFeedSubPage - 커뮤니티 피드 탭
  *
  * @param rankingItem 선택된 아이돌 정보
  * @param onFirstArticleVideoPlaying 첫 번째 아티클의 비디오/움짤 재생 상태 콜백 (Top3 비디오 제어용)
+ * @param onUserProfileClick 유저 프로필 클릭 콜백 (userId, nickname, imageUrl, level, mostIdolName)
  * @param viewModel ViewModel
  */
 @Composable
 fun CommunityFeedSubPage(
     rankingItem: RankingItem,
     onFirstArticleVideoPlaying: (Boolean) -> Unit = {},
+    onUserProfileClick: (userId: Int, nickname: String, imageUrl: String?, level: Int, mostIdolName: String?) -> Unit = { _, _, _, _, _ -> },
     viewModel: CommunityFeedViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
 
@@ -210,7 +215,19 @@ fun CommunityFeedSubPage(
                             showTranslation = true,
                             isVisible = isVisible,
                             onProfileClick = {
-                                // TODO: 프로필 클릭 처리
+                                article.user?.let { user ->
+                                    // most에서 언어별 이름 추출
+                                    val mostIdolName = user.most?.let { most ->
+                                        LocaleUtil.getLocalizedIdolName(context, most)
+                                    }
+                                    onUserProfileClick(
+                                        user.id,
+                                        user.nickname ?: "",
+                                        user.imageUrlCommunity,
+                                        user.level,
+                                        mostIdolName
+                                    )
+                                }
                             },
                             onMoreClick = {
                                 // TODO: 더보기 클릭 처리

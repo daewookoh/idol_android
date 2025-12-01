@@ -2,6 +2,7 @@ package net.ib.mn.util
 
 import android.content.Context
 import android.os.Build
+import net.ib.mn.data.remote.dto.MostIdol
 import java.util.Locale
 
 /**
@@ -72,6 +73,30 @@ object LocaleUtil {
         } else {
             @Suppress("DEPRECATION")
             context.resources.configuration.locale
+        }
+    }
+
+    /**
+     * MostIdol 객체에서 언어에 맞는 아이돌 이름 추출
+     * Old 프로젝트의 로직과 동일
+     *
+     * @param context Context
+     * @param most MostIdol 객체
+     * @return 언어에 맞는 아이돌 이름
+     */
+    fun getLocalizedIdolName(context: Context, most: MostIdol): String {
+        val lang = getSystemLanguage(context).lowercase()
+        val name = most.name ?: ""
+        val nameEn = most.nameEn ?: ""
+
+        return when {
+            lang.startsWith("ko") -> name.ifEmpty { nameEn }
+            lang.startsWith("en") && nameEn.isNotEmpty() -> nameEn
+            lang.startsWith("zh_tw") && !most.nameZhTw.isNullOrEmpty() -> most.nameZhTw
+            lang.startsWith("zh") && !most.nameZh.isNullOrEmpty() -> most.nameZh
+            lang.startsWith("ja") && !most.nameJp.isNullOrEmpty() -> most.nameJp
+            nameEn.isNotEmpty() -> nameEn
+            else -> name.ifEmpty { nameEn }
         }
     }
 }

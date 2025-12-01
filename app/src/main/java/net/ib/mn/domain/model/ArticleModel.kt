@@ -1,6 +1,7 @@
 package net.ib.mn.domain.model
 
 import com.google.gson.annotations.SerializedName
+import net.ib.mn.data.remote.dto.MostIdol
 
 /**
  * 게시글 모델
@@ -131,7 +132,11 @@ data class ArticleUser(
 
     // 이모티콘 (Old 프로젝트의 UserModel.emoticon과 동일)
     @SerializedName("emoticon")
-    val emoticon: UserEmoticon? = null
+    val emoticon: UserEmoticon? = null,
+
+    // 최애 아이돌 (Old 프로젝트의 UserModel.most와 동일)
+    @SerializedName("most")
+    val most: MostIdol? = null
 ) {
     val imageUrlCommunity: String
         get() = imageUrl?.replace("/profile/", "/profile_community/") ?: ""

@@ -1,6 +1,9 @@
 package net.ib.mn.presentation.community
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,7 +34,9 @@ import coil.request.ImageRequest
 import net.ib.mn.R
 import net.ib.mn.R.color.main
 import net.ib.mn.data.remote.dto.VoterTop100Model
+import net.ib.mn.data.repository.UserCacheRepository
 import net.ib.mn.data.repository.UsersRepository
+import net.ib.mn.presentation.community.profile.ProfileScreen
 import net.ib.mn.ui.components.ExoNameWithGroupColor
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold
@@ -51,6 +56,7 @@ import java.text.NumberFormat
  * @param groupName 그룹 이름
  * @param onBackClick 뒤로가기 클릭 이벤트
  * @param usersRepository UsersRepository 인스턴스
+ * @param userCacheRepository UserCacheRepository 인스턴스
  */
 @Composable
 fun VoterTop100Screen(
@@ -58,7 +64,8 @@ fun VoterTop100Screen(
     idolName: String,
     groupName: String,
     onBackClick: () -> Unit = {},
-    usersRepository: UsersRepository
+    usersRepository: UsersRepository,
+    userCacheRepository: UserCacheRepository
 ) {
     val context = LocalContext.current
     val listState = rememberLazyListState()
@@ -77,8 +84,15 @@ fun VoterTop100Screen(
         NumberFormat.getNumberInstance(appLocale)
     }
 
+    // 선택된 유저 프로필 화면 표시 상태
+    var selectedUser by remember { mutableStateOf<VoterTop100Model?>(null) }
+
     BackHandler {
-        onBackClick()
+        if (selectedUser != null) {
+            selectedUser = null
+        } else {
+            onBackClick()
+        }
     }
 
     ExoScaffold(
@@ -214,12 +228,38 @@ fun VoterTop100Screen(
                         ) { item ->
                             VoterTop100UserItem(
                                 item = item,
-                                numberFormat = numberFormat
+                                numberFormat = numberFormat,
+                                onItemClick = { selectedUser = item }
                             )
                         }
                     }
                 }
             }
+        }
+    }
+
+    // ProfileScreen (전체 화면으로 표시)
+    AnimatedVisibility(
+        visible = selectedUser != null,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        selectedUser?.let { user ->
+            // most에서 언어별 이름 추출
+            val mostIdolName = user.most?.let { most ->
+                LocaleUtil.getLocalizedIdolName(context, most)
+            }
+            ProfileScreen(
+                userId = user.id,
+                userNickname = user.nickname,
+                userImageUrl = user.imageUrl,
+                userLevel = user.level,
+                mostIdolName = mostIdolName,
+                isMine = false,  // 타인의 프로필
+                onBackClick = { selectedUser = null },
+                usersRepository = usersRepository,
+                userCacheRepository = userCacheRepository
+            )
         }
     }
 }
@@ -232,7 +272,8 @@ fun VoterTop100Screen(
 @Composable
 private fun VoterTop100UserItem(
     item: VoterTop100Model,
-    numberFormat: NumberFormat
+    numberFormat: NumberFormat,
+    onItemClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
 
@@ -246,6 +287,10 @@ private fun VoterTop100UserItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { onItemClick() }
                 .padding(7.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

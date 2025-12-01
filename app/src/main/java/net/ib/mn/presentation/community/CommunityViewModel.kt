@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CommunityViewModel @Inject constructor(
     val usersRepository: UsersRepository,
-    private val userCacheRepository: UserCacheRepository,
+    val userCacheRepository: UserCacheRepository,
     private val favoritesRepository: FavoritesRepository,
     private val chartRankingRepository: net.ib.mn.data.repository.ChartRankingRepository,
     val wikiRepository: WikiRepository

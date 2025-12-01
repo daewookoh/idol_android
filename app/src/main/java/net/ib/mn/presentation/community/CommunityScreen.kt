@@ -49,6 +49,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.presentation.community.profile.ProfileScreen
 import net.ib.mn.presentation.community.subpage.CommunityChatSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFanTalkSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFeedSubPage
@@ -113,6 +114,9 @@ fun CommunityScreen(
     var currentIsMost by remember(initialIsMost) { mutableStateOf(initialIsMost) }
     var currentIsFavorite by remember(initialIsFavorite) { mutableStateOf(initialIsFavorite) }
 
+    // 유저 프로필 화면 상태
+    var selectedUserProfile by remember { mutableStateOf<UserProfileInfo?>(null) }
+
     // 탭 목록 생성 (showChattingTab이 true인 경우에만 채팅 탭 포함)
     val tabs = remember(showChattingTab) {
         buildList {
@@ -147,7 +151,9 @@ fun CommunityScreen(
     }
 
     BackHandler {
-        if (showVoterTop100Screen) {
+        if (selectedUserProfile != null) {
+            selectedUserProfile = null
+        } else if (showVoterTop100Screen) {
             showVoterTop100Screen = false
         } else if (showWikiWebView) {
             showWikiWebView = false
@@ -269,6 +275,15 @@ fun CommunityScreen(
                             rankingItem = rankingItem,
                             onFirstArticleVideoPlaying = { isPlaying ->
                                 isFirstArticleVideoPlaying = isPlaying
+                            },
+                            onUserProfileClick = { userId, nickname, imageUrl, level, mostIdolName ->
+                                selectedUserProfile = UserProfileInfo(
+                                    userId = userId,
+                                    nickname = nickname,
+                                    imageUrl = imageUrl,
+                                    level = level,
+                                    mostIdolName = mostIdolName
+                                )
                             }
                         )
                         CommunityTab.FAN_TALK -> CommunityFanTalkSubPage(
@@ -562,10 +577,43 @@ fun CommunityScreen(
             idolName = displayIdolName,
             groupName = displayGroupName,
             onBackClick = { showVoterTop100Screen = false },
-            usersRepository = viewModel.usersRepository
+            usersRepository = viewModel.usersRepository,
+            userCacheRepository = viewModel.userCacheRepository
         )
     }
+
+    // ProfileScreen (전체 화면으로 표시)
+    AnimatedVisibility(
+        visible = selectedUserProfile != null,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        selectedUserProfile?.let { userInfo ->
+            ProfileScreen(
+                userId = userInfo.userId,
+                userNickname = userInfo.nickname,
+                userImageUrl = userInfo.imageUrl,
+                userLevel = userInfo.level,
+                mostIdolName = userInfo.mostIdolName,
+                isMine = false,  // 타인의 프로필
+                onBackClick = { selectedUserProfile = null },
+                usersRepository = viewModel.usersRepository,
+                userCacheRepository = viewModel.userCacheRepository
+            )
+        }
+    }
 }
+
+/**
+ * 유저 프로필 정보 데이터 클래스
+ */
+data class UserProfileInfo(
+    val userId: Int,
+    val nickname: String,
+    val imageUrl: String?,
+    val level: Int,
+    val mostIdolName: String? = null
+)
 
 /**
  * CommunityTabRow - 커뮤니티 탭 레이아웃 (RankingPage와 동일한 스타일)

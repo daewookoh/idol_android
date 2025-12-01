@@ -19,6 +19,7 @@ data class VoterTop100Model(
     val level: Int = 0,
     val email: String? = null,
     val emoticon: EmoticonModel? = null,
+    val most: MostIdol? = null,
     // 순위 (클라이언트에서 설정, 0부터 시작)
     var rank: Int = 0
 )

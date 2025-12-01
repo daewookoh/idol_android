@@ -49,4 +49,32 @@ interface UsersApi {
         @Query("idol_id") idolId: Int,
         @Query("league") league: String? = null
     ): Response<ResponseBody>
+
+    /**
+     * 유저 상태 정보 조회
+     * GET users/status/
+     *
+     * old 프로젝트: FeedActivity에서 사용
+     * 응답: { "success": true, "status_message": "...", "item_no": 0, "feed_is_viewable": "Y", ... }
+     *
+     * @param userId 유저 ID
+     */
+    @GET("users/status/")
+    suspend fun getStatus(
+        @Query("user_id") userId: Int
+    ): Response<ResponseBody>
+
+    /**
+     * 친구(유저) 정보 조회
+     * GET friends/friend_info/
+     *
+     * old 프로젝트: FeedActivity에서 사용
+     * 응답: { "success": true, "objects": [{ "user": {..., "most": {...}}, ... }] }
+     *
+     * @param userId 유저 ID
+     */
+    @GET("friends/friend_info/")
+    suspend fun getFriendInfo(
+        @Query("friend_id") userId: Int
+    ): Response<ResponseBody>
 }
