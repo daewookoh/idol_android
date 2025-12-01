@@ -36,7 +36,6 @@ fun OnePickRankingSubPage(
     listState: LazyListState? = null,
     modifier: Modifier = Modifier
 ) {
-    android.util.Log.d("OnePickRankingSubPage", "🎨 [Composing] OnePick for chartCode: $chartCode")
 
     val viewModel: OnePickRankingSubPageViewModel = hiltViewModel<OnePickRankingSubPageViewModel, OnePickRankingSubPageViewModel.Factory> { factory ->
         factory.create(chartCode)
@@ -47,7 +46,6 @@ fun OnePickRankingSubPage(
 
     // 초기 로드
     LaunchedEffect(Unit) {
-        android.util.Log.d("OnePickRankingSubPage", "[OnePick] LaunchedEffect triggered")
         viewModel.reloadIfNeeded()
     }
 
@@ -136,10 +134,8 @@ fun OnePickRankingSubPage(
                                 voteCount = cardData.voteCount,
                                 periodDate = cardData.periodDate,
                                 onCardClick = {
-                                    android.util.Log.d("OnePickRankingSubPage", "ThemePick Card clicked: ${cardData.title}")
                                 },
                                 onVoteClick = {
-                                    android.util.Log.d("OnePickRankingSubPage", "ThemePick Vote clicked: ${cardData.title}")
                                 }
                             )
                         }
@@ -174,10 +170,8 @@ fun OnePickRankingSubPage(
                                 voteCount = cardData.voteCount,
                                 periodDate = cardData.periodDate,
                                 onCardClick = {
-                                    android.util.Log.d("OnePickRankingSubPage", "ImagePick Card clicked: ${cardData.title}")
                                 },
                                 onVoteClick = {
-                                    android.util.Log.d("OnePickRankingSubPage", "ImagePick Vote clicked: ${cardData.title}")
                                 }
                             )
                         }

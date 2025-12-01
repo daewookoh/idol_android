@@ -87,7 +87,6 @@ fun ExoVoteIcon(
             },
             onNavigateToCertificate = { certIdolId ->
                 // TODO: 투표 인증서 화면 이동 처리
-                android.util.Log.d("ExoVoteIcon", "Navigate to certificate for idol: $certIdolId")
             },
             voteViewModel = voteViewModel
         )

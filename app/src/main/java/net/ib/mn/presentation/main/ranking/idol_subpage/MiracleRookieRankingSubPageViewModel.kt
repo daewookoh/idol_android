@@ -84,7 +84,6 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
      */
     fun setSelectedTabIndex(index: Int) {
         savedStateHandle[KEY_SELECTED_TAB_INDEX] = index
-        android.util.Log.d(logTag, "📌 Selected tab index updated: $index")
     }
 
     // 캐시된 아이돌 ID 리스트
@@ -105,7 +104,6 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
     private val logTag = "MiracleRookieVM[${dataSource.type}]"
 
     init {
-        android.util.Log.d(logTag, "🆕 ViewModel created for chartCode: $chartCode")
         loadConfigInfo()
         loadChartInfo()
         loadRankingData()
@@ -118,13 +116,11 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
      * 화면이 보일 때 호출 - 데이터 새로고침
      */
     fun onScreenVisible() {
-        android.util.Log.d(logTag, "👁️ Screen became visible")
         isScreenVisible = true
 
         // DB에서 최신 데이터 로드
         val cachedIds = cachedIdolIds
         if (cachedIds != null && cachedIds.isNotEmpty()) {
-            android.util.Log.d(logTag, "🔄 Refreshing data from DB (${cachedIds.size} items)")
             viewModelScope.launch(Dispatchers.IO) {
                 queryIdolsByIdsFromDb(cachedIds)
             }
@@ -135,7 +131,6 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
      * 화면이 사라질 때 호출
      */
     fun onScreenHidden() {
-        android.util.Log.d(logTag, "🙈 Screen hidden")
         isScreenVisible = false
     }
 
@@ -147,11 +142,9 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
             broadcastManager.updateEvent.collect { changedIds ->
                 // 화면이 보이지 않으면 무시
                 if (!isScreenVisible) {
-                    android.util.Log.d(logTag, "⏭️ Screen not visible, ignoring UDP update")
                     return@collect
                 }
 
-                android.util.Log.d(logTag, "🔄 UDP update event received - ${changedIds.size} idols changed")
 
                 // 캐시된 ID 리스트가 있으면 DB에서 전체 재조회
                 val cachedIds = cachedIdolIds
@@ -160,15 +153,11 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
                     val hasRelevantChanges = changedIds.any { it in cachedIds }
 
                     if (hasRelevantChanges) {
-                        android.util.Log.d(logTag, "📊 Reloading all ${cachedIds.size} idols from DB")
-                        android.util.Log.d(logTag, "   → Changed IDs in this chart: ${changedIds.filter { it in cachedIds }}")
-                        android.util.Log.d(logTag, "   → Full ranking recalculation (순위 변경 가능)")
 
                         launch(Dispatchers.IO) {
                             queryIdolsByIdsFromDb(cachedIds)
                         }
                     } else {
-                        android.util.Log.d(logTag, "⏭️ No relevant changes for this chart - skipping update")
                     }
                 }
             }
@@ -178,7 +167,6 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
     override fun onCleared() {
         super.onCleared()
         udpSubscriptionJob?.cancel()
-        android.util.Log.d(logTag, "♻️ ViewModel cleared")
     }
 
     /**
@@ -187,7 +175,6 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
     fun reloadIfNeeded() {
         val cachedIds = cachedIdolIds
         if (cachedIds != null && cachedIds.isNotEmpty()) {
-            android.util.Log.d(logTag, "✓ Using cached data")
             viewModelScope.launch(Dispatchers.IO) {
                 queryIdolsByIdsFromDb(cachedIds)
             }
@@ -214,7 +201,6 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
                         else -> 0
                     }
 
-                    android.util.Log.d(logTag, "✅ Config info loaded: infoEventId=$infoEventId")
 
                     // 이미 Success 상태면 infoEventId 포함하여 재업데이트
                     val currentState = _uiState.value
@@ -223,7 +209,6 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
                     }
                 }
             } catch (e: Exception) {
-                android.util.Log.e(logTag, "❌ Exception loading config info: ${e.message}", e)
             }
         }
     }
@@ -238,12 +223,10 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
     private fun loadChartInfo() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                android.util.Log.d(logTag, "🖼️ Loading chart info from charts/current/ API")
 
                 val response = chartsApi.getChartsCurrent()
 
                 if (!response.isSuccessful || response.body()?.success != true) {
-                    android.util.Log.e(logTag, "❌ Failed to load chart info: ${response.code()}")
                     return@launch
                 }
 
@@ -284,7 +267,6 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
                 }
 
             } catch (e: Exception) {
-                android.util.Log.e(logTag, "❌ Exception loading chart info: ${e.message}", e)
             }
         }
     }
@@ -293,23 +275,17 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = UiState.Loading
 
-            android.util.Log.d(logTag, "========================================")
-            android.util.Log.d(logTag, "[${dataSource.type}] Loading ranking data")
-            android.util.Log.d(logTag, "  - chartCode: $chartCode")
 
             // DataSource를 통해 idol_ids 로드
             dataSource.loadIdolIds(chartCode).collect { result ->
                 when (result) {
                     is ApiResult.Loading -> {
-                        android.util.Log.d(logTag, "⏳ Loading...")
                     }
                     is ApiResult.Success -> {
-                        android.util.Log.d(logTag, "✅ SUCCESS - IDs count: ${result.data.size}")
                         cachedIdolIds = result.data
                         queryIdolsByIdsFromDb(result.data)
                     }
                     is ApiResult.Error -> {
-                        android.util.Log.e(logTag, "❌ ERROR: ${result.message}")
                         _uiState.value = UiState.Error(result.message ?: "Error loading data")
                     }
                 }
@@ -356,7 +332,6 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
                 )
             }
 
-            android.util.Log.d(logTag, "✅ Processed ${finalItems.size} items (sorted, max=$maxHeart, min=$minHeart)")
 
             _uiState.value = UiState.Success(
                 items = finalItems,
@@ -366,7 +341,6 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
                 infoEventId = infoEventId
             )
         } catch (e: Exception) {
-            android.util.Log.e(logTag, "❌ Exception: ${e.message}", e)
             _uiState.value = UiState.Error(e.message ?: "Error")
         }
     }
@@ -378,7 +352,6 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
         val currentState = _uiState.value
         if (currentState !is UiState.Success) return
 
-        android.util.Log.d(logTag, "💗 Updating vote: idol=$idolId, votes=$voteCount")
 
         viewModelScope.launch(Dispatchers.IO) {
             // RankingUtil을 사용하여 투표 업데이트 및 재정렬 (DB + 메모리)
@@ -401,8 +374,6 @@ class MiracleRookieRankingSubPageViewModel @AssistedInject constructor(
 
             val maxHeart = finalItems.firstOrNull()?.maxHeartCount ?: 0L
             val minHeart = finalItems.firstOrNull()?.minHeartCount ?: 0L
-            android.util.Log.d(logTag, "✅ Vote updated and re-ranked (${finalItems.size} items)")
-            android.util.Log.d(logTag, "   → New max: $maxHeart, min: $minHeart")
         }
     }
 

@@ -83,11 +83,9 @@ class MyFavoriteViewModel @Inject constructor(
             try {
                 val mostIdolChartCode = userCacheRepository.getMostIdolChartCode()
                 if (mostIdolChartCode != null) {
-                    android.util.Log.d(TAG, "🚀 Init: Loading mostIdol chart: $mostIdolChartCode")
                     chartDatabaseRepository.refreshChart(mostIdolChartCode)
                 }
             } catch (e: Exception) {
-                android.util.Log.e(TAG, "❌ Failed to load mostIdol chart in init: ${e.message}", e)
             }
         }
 
@@ -152,7 +150,6 @@ class MyFavoriteViewModel @Inject constructor(
                 // ✅ mostIdol의 차트를 먼저 갱신하여 빠른 응답
                 val mostIdolChartCode = userCacheRepository.getMostIdolChartCode()
                 if (mostIdolChartCode != null && mostIdolChartCode in CHART_CODES) {
-                    android.util.Log.d(TAG, "🔄 Refreshing mostIdol chart first: $mostIdolChartCode")
                     chartDatabaseRepository.refreshChart(mostIdolChartCode)
                 }
 
@@ -163,9 +160,7 @@ class MyFavoriteViewModel @Inject constructor(
                     }
                 }
 
-                android.util.Log.d(TAG, "✅ Background refresh completed")
             } catch (e: Exception) {
-                android.util.Log.e(TAG, "❌ Background refresh failed: ${e.message}", e)
                 // 에러가 나도 DB 데이터는 이미 보여주고 있으므로 사용자에게 에러 표시 안 함
             }
         }
@@ -296,7 +291,6 @@ class MyFavoriteViewModel @Inject constructor(
                     chartCode = chartCode
                 )
             } catch (e: Exception) {
-                android.util.Log.e(TAG, "❌ Failed to update vote in DB: ${e.message}", e)
             }
         }
     }

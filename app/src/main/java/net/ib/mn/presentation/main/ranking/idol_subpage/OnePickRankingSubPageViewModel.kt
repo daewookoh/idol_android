@@ -77,8 +77,6 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
         }
 
     init {
-        android.util.Log.d("OnePickRankingVM", "🆕 ViewModel created for chartCode: $chartCode")
-        android.util.Log.d("OnePickRankingVM", "📌 Restored tab: $currentTab")
         // 저장된 탭 상태에 따라 로드
         when (currentTab) {
             TabType.THEME_PICK -> loadThemePickList()
@@ -90,7 +88,6 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
         when (currentTab) {
             TabType.THEME_PICK -> {
                 if (cachedThemePickData != null) {
-                    android.util.Log.d("OnePickRankingVM", "✓ Using cached ThemePick data")
                     _uiState.value = UiState.ThemePickSuccess(cachedThemePickData!!)
                 } else {
                     loadThemePickList()
@@ -98,7 +95,6 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
             }
             TabType.IMAGE_PICK -> {
                 if (cachedImagePickData != null) {
-                    android.util.Log.d("OnePickRankingVM", "✓ Using cached ImagePick data")
                     _uiState.value = UiState.ImagePickSuccess(cachedImagePickData!!)
                 } else {
                     loadImagePickList()
@@ -114,7 +110,6 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
         if (currentTab == tabType) return
 
         currentTab = tabType
-        android.util.Log.d("OnePickRankingVM", "🔄 Switching tab to: $tabType")
 
         when (tabType) {
             TabType.THEME_PICK -> {
@@ -141,21 +136,15 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = UiState.Loading
 
-            android.util.Log.d("OnePickRankingVM", "========================================")
-            android.util.Log.d("OnePickRankingVM", "[ThemePick] Loading theme pick list")
-            android.util.Log.d("OnePickRankingVM", "  - API: themepick/")
 
             themepickRepository.getThemePickList(offset = 0, limit = 30).collect { result ->
                 when (result) {
                     is ApiResult.Loading -> {
-                        android.util.Log.d("OnePickRankingVM", "⏳ Loading...")
                     }
                     is ApiResult.Success -> {
-                        android.util.Log.d("OnePickRankingVM", "✅ SUCCESS - ThemePicks count: ${result.data.size}")
                         processThemePickData(result.data)
                     }
                     is ApiResult.Error -> {
-                        android.util.Log.e("OnePickRankingVM", "❌ ERROR: ${result.message}")
                         _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
                     }
                 }
@@ -170,21 +159,15 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = UiState.Loading
 
-            android.util.Log.d("OnePickRankingVM", "========================================")
-            android.util.Log.d("OnePickRankingVM", "[ImagePick] Loading image pick list")
-            android.util.Log.d("OnePickRankingVM", "  - API: onepick/")
 
             onepickRepository.getImagePickList(offset = 0, limit = 30).collect { result ->
                 when (result) {
                     is ApiResult.Loading -> {
-                        android.util.Log.d("OnePickRankingVM", "⏳ Loading...")
                     }
                     is ApiResult.Success -> {
-                        android.util.Log.d("OnePickRankingVM", "✅ SUCCESS - ImagePicks count: ${result.data.size}")
                         processImagePickData(result.data)
                     }
                     is ApiResult.Error -> {
-                        android.util.Log.e("OnePickRankingVM", "❌ ERROR: ${result.message}")
                         _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
                     }
                 }
@@ -222,12 +205,10 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
                 )
             }
 
-            android.util.Log.d("OnePickRankingVM", "✅ Processed ${cardDataList.size} theme picks")
 
             cachedThemePickData = cardDataList
             _uiState.value = UiState.ThemePickSuccess(cardDataList)
         } catch (e: Exception) {
-            android.util.Log.e("OnePickRankingVM", "❌ Exception: ${e.message}", e)
             _uiState.value = UiState.Error(e.message ?: "Error")
         }
     }
@@ -262,12 +243,10 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
                 )
             }
 
-            android.util.Log.d("OnePickRankingVM", "✅ Processed ${cardDataList.size} image picks")
 
             cachedImagePickData = cardDataList
             _uiState.value = UiState.ImagePickSuccess(cardDataList)
         } catch (e: Exception) {
-            android.util.Log.e("OnePickRankingVM", "❌ Exception: ${e.message}", e)
             _uiState.value = UiState.Error(e.message ?: "Error")
         }
     }

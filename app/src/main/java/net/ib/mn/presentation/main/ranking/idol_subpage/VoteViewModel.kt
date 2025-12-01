@@ -54,12 +54,7 @@ class VoteViewModel @Inject constructor(
                             totalHeart = strong + weak
                             freeHeart = weak
 
-                            android.util.Log.d("VoteViewModel", "✅ User hearts loaded from API:")
-                            android.util.Log.d("VoteViewModel", "  - totalHeart: $totalHeart")
-                            android.util.Log.d("VoteViewModel", "  - freeHeart: $freeHeart")
-                            android.util.Log.d("VoteViewModel", "  - strongHeart: $strong")
                         } else {
-                            android.util.Log.e("VoteViewModel", "❌ User data is empty")
                             totalHeart = 0L
                             freeHeart = 0L
                         }
@@ -76,24 +71,17 @@ class VoteViewModel @Inject constructor(
                                 totalHeart = strong + weak
                                 freeHeart = weak
 
-                                android.util.Log.d("VoteViewModel", "✅ User hearts loaded from cache (HTTP 304):")
-                                android.util.Log.d("VoteViewModel", "  - totalHeart: $totalHeart")
-                                android.util.Log.d("VoteViewModel", "  - freeHeart: $freeHeart")
-                                android.util.Log.d("VoteViewModel", "  - strongHeart: $strong")
                             } else {
-                                android.util.Log.e("VoteViewModel", "❌ Cached user data is null")
                                 totalHeart = 0L
                                 freeHeart = 0L
                             }
                         } else {
-                            android.util.Log.e("VoteViewModel", "❌ Failed to load user hearts: ${result.message}")
                             totalHeart = 0L
                             freeHeart = 0L
                         }
                         onComplete()
                     }
                     is ApiResult.Loading -> {
-                        android.util.Log.d("VoteViewModel", "⏳ Loading user hearts...")
                     }
                 }
             }
@@ -126,14 +114,10 @@ class VoteViewModel @Inject constructor(
             return
         }
 
-        android.util.Log.d("VoteViewModel", "💗 Voting to idol $idolId with $heart hearts")
 
         voteIdolUseCase(idolId, heart).collect { result ->
             when (result) {
                 is ApiResult.Success -> {
-                    android.util.Log.d("VoteViewModel", "✅ Vote SUCCESS")
-                    android.util.Log.d("VoteViewModel", "  - msg: ${result.data.msg}")
-                    android.util.Log.d("VoteViewModel", "  - bonusHeart: ${result.data.bonusHeart}")
 
                     // 투표 성공 후 하트 차감
                     totalHeart -= heart
@@ -145,17 +129,14 @@ class VoteViewModel @Inject constructor(
                     val newStrongHeart = totalHeart - freeHeart
 
                     // DataStore 캐시 업데이트
-                    android.util.Log.d("VoteViewModel", "💾 Updating DataStore cache...")
                     preferencesManager.updateUserHearts(newStrongHeart, freeHeart)
 
                     onSuccess(result.data)
                 }
                 is ApiResult.Error -> {
-                    android.util.Log.e("VoteViewModel", "❌ Vote FAILED: ${result.message}")
                     onError(result.message ?: "투표에 실패했습니다")
                 }
                 is ApiResult.Loading -> {
-                    android.util.Log.d("VoteViewModel", "⏳ Voting...")
                 }
             }
         }

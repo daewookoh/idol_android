@@ -80,19 +80,9 @@ fun HallOfFameRankingSecondSubAccumulativePage(
 
     // ExoTabSwitch 선택이 바뀔 때 새로운 차트 코드로 데이터 로드
     LaunchedEffect(selectedSubTabIndex) {
-        android.util.Log.d("HoF_Accumulative", "🔄 ExoTabSwitch changed to index $selectedSubTabIndex")
         dataViewModel.loadData(currentChartCode)
     }
 
-    android.util.Log.d("HoF_Accumulative", "========================================")
-    android.util.Log.d("HoF_Accumulative", "🎨 Accumulative Page State")
-    android.util.Log.d("HoF_Accumulative", "  - chartCode: $chartCode")
-    android.util.Log.d("HoF_Accumulative", "  - currentChartCode: $currentChartCode")
-    android.util.Log.d("HoF_Accumulative", "  - tabbarType: $tabbarType (0=30일누적, 1=일일)")
-    android.util.Log.d("HoF_Accumulative", "  - exoTabSwitchType: $selectedSubTabIndex (선택된 서브탭)")
-    android.util.Log.d("HoF_Accumulative", "  - topThreeTabs: $topThreeTabs")
-    android.util.Log.d("HoF_Accumulative", "  - isVisible: $isVisible")
-    android.util.Log.d("HoF_Accumulative", "========================================")
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -104,7 +94,6 @@ fun HallOfFameRankingSecondSubAccumulativePage(
                 selectedIndex = selectedSubTabIndex,
                 onTabSelected = { index ->
                     viewModel.setAccumulativeSubTabIndex(index)
-                    android.util.Log.d("HoF_Accumulative", "Sub-tab selected: $index")
                 },
                 modifier = Modifier.padding(bottom=16.dp)
             )
@@ -178,10 +167,8 @@ fun HallOfFameRankingSecondSubAccumulativePage(
                                     cdnUrl = cdnUrl,
                                     period = period,
                                     onItemClick = {
-                                        android.util.Log.d("HoF_Accumulative", "Clicked on 1st: ${rankingData[0].name}")
                                     },
                                     onInfoClick = {
-                                        android.util.Log.d("HoF_Accumulative", "Info button clicked")
                                         // TODO: LevelHeartGuideActivity로 이동
                                     }
                                 )
@@ -197,7 +184,6 @@ fun HallOfFameRankingSecondSubAccumulativePage(
                                 item = item,
                                 cdnUrl = cdnUrl,
                                 onItemClick = {
-                                    android.util.Log.d("HoF_Accumulative", "Clicked on ${item.name} (rank: ${item.scoreRank})")
                                 }
                             )
                         }

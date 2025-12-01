@@ -79,7 +79,6 @@ class PasswordResetViewModel @Inject constructor(
                     when (result) {
                         is ApiResult.Success -> {
                             val response = result.data
-                            android.util.Log.d(TAG, "Find password response: success=${response.success}, message=${response.message}")
                             
                             setState { copy(isLoading = false) }
                             
@@ -104,7 +103,6 @@ class PasswordResetViewModel @Inject constructor(
                             }
                         }
                         is ApiResult.Error -> {
-                            android.util.Log.e(TAG, "Find password error: ${result.message}")
                             setState { copy(isLoading = false) }
                             // old 프로젝트: errorListener에서 error_abnormal_exception 표시
                             // 하지만 비밀번호 찾기 화면에서는 "이메일을 확인해 주세요"가 더 적절
@@ -120,7 +118,6 @@ class PasswordResetViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                android.util.Log.e(TAG, "Find password exception", e)
                 setState { copy(isLoading = false) }
                 // old 프로젝트: 예외 발생 시 error_abnormal_exception 표시
                 // 하지만 비밀번호 찾기 화면에서는 "이메일을 확인해 주세요"가 더 적절

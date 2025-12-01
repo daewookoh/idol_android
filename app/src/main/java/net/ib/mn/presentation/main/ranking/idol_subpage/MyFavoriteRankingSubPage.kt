@@ -80,10 +80,6 @@ fun rememberMyFavoriteRankingState(
                 val itemIdInt = item.id.toIntOrNull()
                 itemIdInt != null && favoriteIdSet.contains(itemIdInt)
             }
-            android.util.Log.d(
-                "MyFavoriteRanking",
-                "📊 Chart $chartCode: ${success.items.size} total → ${filteredItems.size} favorites (ranks preserved)"
-            )
             MyFavoriteRankingData.Success(filteredItems, viewModel)
         }
     }

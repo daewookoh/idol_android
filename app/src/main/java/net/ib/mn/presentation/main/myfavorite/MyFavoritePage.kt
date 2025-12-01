@@ -1,55 +1,41 @@
 package net.ib.mn.presentation.main.myfavorite
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
 import net.ib.mn.R
-import net.ib.mn.ui.components.ExoHeartCounter
-import net.ib.mn.ui.components.ExoVoteIcon
-import java.text.NumberFormat
-import java.util.Locale
-import net.ib.mn.presentation.main.ranking.idol_subpage.rememberMyFavoriteRankingState
+import net.ib.mn.domain.model.MostPicksModel
 import net.ib.mn.presentation.main.ranking.idol_subpage.myFavoriteRankingItems
+import net.ib.mn.presentation.main.ranking.idol_subpage.rememberMyFavoriteRankingState
+import net.ib.mn.ui.components.ExoHeartCounter
 import net.ib.mn.ui.components.ExoTop3
+import net.ib.mn.ui.components.ExoVoteIcon
 import net.ib.mn.ui.components.LocalRankingItemClick
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
@@ -69,85 +55,28 @@ fun MyFavoritePage(
     val chartSections by viewModel.chartSections.collectAsState()
     val mostFavoriteIdol by viewModel.mostFavoriteIdol.collectAsState()
     val context = LocalContext.current
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Lifecycle 이벤트 관찰 (모든 진입 상황 감지)
-    androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
-        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
-            when (event) {
-                androidx.lifecycle.Lifecycle.Event.ON_CREATE -> {
-                    android.util.Log.d("MyFavoritePage", "========================================")
-                    android.util.Log.d("MyFavoritePage", "📱 ON_CREATE - Page created")
-                    android.util.Log.d("MyFavoritePage", "========================================")
-                }
-                androidx.lifecycle.Lifecycle.Event.ON_START -> {
-                    android.util.Log.d("MyFavoritePage", "========================================")
-                    android.util.Log.d("MyFavoritePage", "▶️ ON_START - Page started (visible in background)")
-                    android.util.Log.d("MyFavoritePage", "========================================")
-                }
-                androidx.lifecycle.Lifecycle.Event.ON_RESUME -> {
-                    android.util.Log.d("MyFavoritePage", "========================================")
-                    android.util.Log.d("MyFavoritePage", "✅ ON_RESUME - Page fully visible and interactive")
-                    android.util.Log.d("MyFavoritePage", "   - From background: returning from other app")
-                    android.util.Log.d("MyFavoritePage", "   - From other tab: switched back to this tab")
-                    android.util.Log.d("MyFavoritePage", "   - From dialog: dialog was closed")
-                    android.util.Log.d("MyFavoritePage", "========================================")
-                    viewModel.sendIntent(MyFavoriteContract.Intent.OnPageVisible)
-                }
-                androidx.lifecycle.Lifecycle.Event.ON_PAUSE -> {
-                    android.util.Log.d("MyFavoritePage", "========================================")
-                    android.util.Log.d("MyFavoritePage", "⏸️ ON_PAUSE - Page paused (no longer interactive)")
-                    android.util.Log.d("MyFavoritePage", "   - To background: switching to other app")
-                    android.util.Log.d("MyFavoritePage", "   - To other tab: switching to another tab")
-                    android.util.Log.d("MyFavoritePage", "   - To dialog: dialog opened")
-                    android.util.Log.d("MyFavoritePage", "========================================")
-                }
-                androidx.lifecycle.Lifecycle.Event.ON_STOP -> {
-                    android.util.Log.d("MyFavoritePage", "========================================")
-                    android.util.Log.d("MyFavoritePage", "⏹️ ON_STOP - Page stopped (not visible)")
-                    android.util.Log.d("MyFavoritePage", "========================================")
-                }
-                androidx.lifecycle.Lifecycle.Event.ON_DESTROY -> {
-                    android.util.Log.d("MyFavoritePage", "========================================")
-                    android.util.Log.d("MyFavoritePage", "💀 ON_DESTROY - Page destroyed")
-                    android.util.Log.d("MyFavoritePage", "========================================")
-                }
-                else -> {}
+    // Lifecycle 이벤트 관찰 - ON_RESUME 시에만 데이터 갱신
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.sendIntent(MyFavoriteContract.Intent.OnPageVisible)
             }
         }
-
         lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            android.util.Log.d("MyFavoritePage", "🗑️ DisposableEffect cleanup")
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    // 페이지 최초 진입 시
+    // 페이지 최초 진입 및 Effect 수집
     LaunchedEffect(Unit) {
-        android.util.Log.d("MyFavoritePage", "========================================")
-        android.util.Log.d("MyFavoritePage", "🎬 LaunchedEffect - Initial composition")
-        android.util.Log.d("MyFavoritePage", "========================================")
         viewModel.sendIntent(MyFavoriteContract.Intent.OnPageVisible)
-    }
-
-    LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
-                is MyFavoriteContract.Effect.NavigateToFavoriteSetting -> {
-                    onNavigateToFavoriteSetting()
-                }
-                is MyFavoriteContract.Effect.ShowError -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
-                }
-                is MyFavoriteContract.Effect.ShowToast -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
-                }
-                is MyFavoriteContract.Effect.NavigateToWebPage -> {
-                    // TODO: WebView 또는 외부 브라우저로 열기
-                    android.util.Log.d("MyFavoritePage", "Navigate to: ${effect.url}")
-                }
+                is MyFavoriteContract.Effect.NavigateToFavoriteSetting -> onNavigateToFavoriteSetting()
+                is MyFavoriteContract.Effect.ShowError -> Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                is MyFavoriteContract.Effect.ShowToast -> Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                is MyFavoriteContract.Effect.NavigateToWebPage -> { /* TODO: WebView 또는 외부 브라우저로 열기 */ }
             }
         }
     }
@@ -171,7 +100,6 @@ private fun MyFavoriteContent(
     onIntent: (MyFavoriteContract.Intent) -> Unit,
     viewModel: MyFavoriteViewModel = hiltViewModel()
 ) {
-    android.util.Log.d("MyFavoriteContent", "mostPicksModel: ${state.mostPicksModel}")
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -322,7 +250,7 @@ private fun SectionHeader(sectionName: String) {
 @Composable
 private fun MostFavoriteIdolHeader(
     mostFavoriteIdol: MyFavoriteContract.MostFavoriteIdol,
-    mostPicksModel: net.ib.mn.domain.model.MostPicksModel?,
+    mostPicksModel: MostPicksModel?,
     onIdolClick: () -> Unit,
     onVoteSuccess: (idolId: Int, votedHeart: Long) -> Unit = { _, _ -> },
     onSupportBiasBarClick: (id: Int, kind: String) -> Unit = { _, _ -> }
@@ -369,7 +297,6 @@ private fun MostFavoriteInfoBar(
     mostFavoriteIdol: MyFavoriteContract.MostFavoriteIdol,
     onVoteSuccess: (idolId: Int, votedHeart: Long) -> Unit
 ) {
-    android.util.Log.d("MostFavoriteInfoBar", "mostFavoriteIdol: $mostFavoriteIdol")
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -454,10 +381,7 @@ private fun MostFavoriteInfoBar(
                 fullName = mostFavoriteIdol.name,
                 type = "CIRCLE",
                 onVoteSuccess = { votedHeart ->
-                    // 콜백 호출 (RankingCacheRepository가 UDP를 통해 자동으로 업데이트됨)
                     onVoteSuccess(mostFavoriteIdol.idolId, votedHeart)
-                    android.util.Log.d("MostFavoriteInfoBar",
-                        "✅ Vote success: idol=${mostFavoriteIdol.idolId}, votes=$votedHeart (auto-update via UDP)")
                 },
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
@@ -492,7 +416,7 @@ private fun MostFavoriteIdolHeaderLoading() {
 @Composable
 private fun SupportBiasBar(
     idolId: Int,
-    mostPicksModel: net.ib.mn.domain.model.MostPicksModel,
+    mostPicksModel: MostPicksModel,
     onClick: (id: Int, kind: String) -> Unit
 ) {
     // 픽 참여 정보 결정 (old 로직과 동일)
@@ -524,14 +448,10 @@ private fun SupportBiasBar(
             val start = message.indexOf(bannerTitle)
             val end = start + bannerTitle.length
 
-            val annotatedString = androidx.compose.ui.text.buildAnnotatedString {
+            val annotatedString = buildAnnotatedString {
                 append(message)
                 if (start >= 0) {
-                    addStyle(
-                        style = androidx.compose.ui.text.SpanStyle(fontWeight = FontWeight.Bold),
-                        start = start,
-                        end = end
-                    )
+                    addStyle(SpanStyle(fontWeight = FontWeight.Bold), start, end)
                 }
             }
 
@@ -557,7 +477,7 @@ private fun SupportBiasBar(
 /**
  * 배너 정보 결정 (old 로직과 동일)
  */
-private fun getBannerInfo(model: net.ib.mn.domain.model.MostPicksModel): Triple<String, Int, String> {
+private fun getBannerInfo(model: MostPicksModel): Triple<String, Int, String> {
     val themepick = "themepick"
     val heartpick = "heartpick"
     val miracle = "miracle"

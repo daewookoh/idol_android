@@ -736,17 +736,6 @@ class SignUpViewModel @Inject constructor(
         val signUpTag = getSignUpTag(domain)
 
         // 회원가입 API 호출 전 로그 출력
-        android.util.Log.d(signUpTag, "========================================")
-        android.util.Log.d(signUpTag, "[signUp] Called")
-        android.util.Log.d(signUpTag, "  - email: ${currentState.email}")
-        android.util.Log.d(signUpTag, "  - password: ${currentState.password.take(20)}...")
-        android.util.Log.d(signUpTag, "  - nickname: '${currentState.nickname}'")
-        android.util.Log.d(signUpTag, "  - nickname length: ${currentState.nickname.length}")
-        android.util.Log.d(signUpTag, "  - domain: $domain")
-        android.util.Log.d(signUpTag, "  - recommenderCode: ${currentState.recommenderCode}")
-        android.util.Log.d(signUpTag, "  - appId: ${Constants.APP_ID}")
-        android.util.Log.d(signUpTag, "  - isBadWordsNickName: ${currentState.isBadWordsNickName}")
-        android.util.Log.d(signUpTag, "========================================")
 
         viewModelScope.launch {
             setState { copy(isLoading = true) }
@@ -755,41 +744,29 @@ class SignUpViewModel @Inject constructor(
             try {
                 // Old 프로젝트: CHINA 빌드는 FCM 사용 안 함
                 if (Constants.IS_CHINA) {
-                    android.util.Log.d(signUpTag, "[signUp] CHINA build, skipping FCM token")
                     performSignUp()
                     return@launch
                 }
 
                 // Old 프로젝트: DEBUG + 에뮬레이터는 빈 문자열 사용
                 if (BuildConfig.DEBUG && android.os.Build.FINGERPRINT.startsWith("generic")) {
-                    android.util.Log.d(signUpTag, "[signUp] DEBUG + Emulator, using empty FCM token")
                     preferencesManager.setFcmToken("")
                     performSignUp()
                     return@launch
                 }
 
                 val currentFcmToken = preferencesManager.fcmToken.first()
-                android.util.Log.d(signUpTag, "========================================")
-                android.util.Log.d(signUpTag, "[signUp] Checking FCM token")
-                android.util.Log.d(signUpTag, "  - currentFcmToken: ${currentFcmToken?.take(20) ?: "null"}")
-                android.util.Log.d(signUpTag, "========================================")
 
                 if (currentFcmToken.isNullOrEmpty()) {
                     // FCM token이 없으면 먼저 가져오기 (Old 프로젝트의 registerDevice와 동일)
-                    android.util.Log.d(signUpTag, "[signUp] FCM token is empty, fetching token first...")
 
                     try {
                         com.google.firebase.messaging.FirebaseMessaging.getInstance().token
                             .addOnSuccessListener { token ->
-                                android.util.Log.d(signUpTag, "========================================")
-                                android.util.Log.d(signUpTag, "FCM token retrieved successfully")
-                                android.util.Log.d(signUpTag, "  - token: ${token.take(20)}...")
-                                android.util.Log.d(signUpTag, "========================================")
 
                                 // Token 저장
                                 viewModelScope.launch {
                                     preferencesManager.setFcmToken(token)
-                                    android.util.Log.d(signUpTag, "FCM token saved to DataStore")
 
                                     // 이제 회원가입 진행
                                     performSignUp()
@@ -838,13 +815,9 @@ class SignUpViewModel @Inject constructor(
                     }
                 } else {
                     // FCM token이 이미 있으면 바로 회원가입 진행
-                    android.util.Log.d(signUpTag, "[signUp] FCM token exists, proceeding with signup")
                     performSignUp()
                 }
             } catch (e: Exception) {
-                android.util.Log.e(signUpTag, "========================================")
-                android.util.Log.e(signUpTag, "SignUp Exception", e)
-                android.util.Log.e(signUpTag, "========================================")
                 setState { copy(isLoading = false) }
                 setEffect { SignUpContract.Effect.ShowError(e.message ?: context.getString(net.ib.mn.R.string.error_abnormal_exception)) }
             }
@@ -870,14 +843,6 @@ class SignUpViewModel @Inject constructor(
                     when (result) {
                         is ApiResult.Success -> {
                             val response = result.data
-                            android.util.Log.d(signUpTag, "========================================")
-                            android.util.Log.d(signUpTag, "SignUp API Response received")
-                            android.util.Log.d(signUpTag, "  success: ${response.success}")
-                            android.util.Log.d(signUpTag, "  message: ${response.message}")
-                            android.util.Log.d(signUpTag, "  msg: ${response.msg}")
-                            android.util.Log.d(signUpTag, "  gcode: ${response.gcode}")
-                            android.util.Log.d(signUpTag, "  mcode: ${response.mcode}")
-                            android.util.Log.d(signUpTag, "========================================")
                             
                             if (response.success) {
                                 // Old 프로젝트: 회원가입 성공 후 msg가 있으면 다이얼로그 표시하고 로그인하지 않음
@@ -887,28 +852,15 @@ class SignUpViewModel @Inject constructor(
                                 
                                 if (!emailVerificationMessage.isNullOrEmpty()) {
                                     // 이메일 발송 확인 다이얼로그 표시 (old 프로젝트와 동일)
-                                    android.util.Log.d(signUpTag, "========================================")
-                                    android.util.Log.d(signUpTag, "SignUp success - showing email verification dialog")
-                                    android.util.Log.d(signUpTag, "  msg: ${response.msg}")
-                                    android.util.Log.d(signUpTag, "  message: ${response.message}")
-                                    android.util.Log.d(signUpTag, "  final message: $emailVerificationMessage")
-                                    android.util.Log.d(signUpTag, "========================================")
                                     
                                     setState { copy(isLoading = false) }
                                     setEffect { SignUpContract.Effect.ShowEmailVerificationDialog(emailVerificationMessage) }
                                 } else {
                                     // msg가 없으면 바로 로그인 진행 (old 프로젝트와 동일)
-                                    android.util.Log.d(signUpTag, "SignUp success - no message, calling signIn API")
                                     performSignInAfterSignUp()
                                 }
                             } else {
                                 setState { copy(isLoading = false) }
-                                android.util.Log.e(signUpTag, "========================================")
-                                android.util.Log.e(signUpTag, "SignUp API failed")
-                                android.util.Log.e(signUpTag, "  message: ${response.message}")
-                                android.util.Log.e(signUpTag, "  gcode: ${response.gcode}")
-                                android.util.Log.e(signUpTag, "  mcode: ${response.mcode}")
-                                android.util.Log.e(signUpTag, "========================================")
                                 
                                 // Old 프로젝트: gcode에 따라 다른 필드에 에러 표시
                                 val gcode = response.gcode ?: 0
@@ -921,7 +873,6 @@ class SignUpViewModel @Inject constructor(
                                             net.ib.mn.R.string.error_abnormal,
                                             gcode.toString()
                                         )
-                                        android.util.Log.e(signUpTag, "  -> Version error (gcode: 9000): $versionErrorMessage")
                                         setEffect {
                                             SignUpContract.Effect.ShowError(versionErrorMessage)
                                         }
@@ -931,8 +882,6 @@ class SignUpViewModel @Inject constructor(
                                         // Old 프로젝트: 회원가입 API에서도 gcode: 88888이 나올 수 있음
                                         // 닉네임 필드에 에러 표시하고 isBadWordsNickName = true로 설정
                                         val badWordsMessage = context.getString(net.ib.mn.R.string.bad_words)
-                                        android.util.Log.e(signUpTag, "  -> Setting nickname error: $badWordsMessage")
-                                        android.util.Log.e(signUpTag, "  -> Setting isBadWordsNickName = true")
                                         setState {
                                             copy(
                                                 isLoading = false,
@@ -946,7 +895,6 @@ class SignUpViewModel @Inject constructor(
                                         // 중복 닉네임 (ERROR_1011)
                                         // 닉네임 필드에 에러 표시
                                         val duplicateMessage = context.getString(net.ib.mn.R.string.error_1011)
-                                        android.util.Log.e(signUpTag, "  -> Setting nickname error: $duplicateMessage")
                                         setState {
                                             copy(
                                                 isLoading = false,
@@ -959,7 +907,6 @@ class SignUpViewModel @Inject constructor(
                                         // 추천인을 찾지 못함 (ERROR_1012)
                                         // 추천인 필드에 에러 표시
                                         val recommenderMessage = context.getString(net.ib.mn.R.string.error_1012)
-                                        android.util.Log.e(signUpTag, "  -> Setting recommender error: $recommenderMessage")
                                         setState {
                                             copy(
                                                 isLoading = false,
@@ -976,7 +923,6 @@ class SignUpViewModel @Inject constructor(
                                         // 10분 이내에 두번 이상 가입할 수 없음 (ERROR_1013)
                                         // 다이얼로그로 표시
                                         val tooManyAttemptsMessage = context.getString(net.ib.mn.R.string.error_1013)
-                                        android.util.Log.e(signUpTag, "  -> Showing dialog: $tooManyAttemptsMessage")
                                         setEffect {
                                             SignUpContract.Effect.ShowError(tooManyAttemptsMessage)
                                         }
@@ -984,7 +930,6 @@ class SignUpViewModel @Inject constructor(
                                     else -> {
                                         // 그 외: 일반 에러 메시지 표시 (old 프로젝트: error_abnormal_default)
                                         val defaultMessage = context.getString(net.ib.mn.R.string.error_abnormal_default)
-                                        android.util.Log.e(signUpTag, "  -> Showing error: $defaultMessage")
                                         setEffect {
                                             SignUpContract.Effect.ShowError(defaultMessage)
                                         }
@@ -994,26 +939,16 @@ class SignUpViewModel @Inject constructor(
                         }
                         is ApiResult.Error -> {
                             setState { copy(isLoading = false) }
-                            android.util.Log.e(signUpTag, "========================================")
-                            android.util.Log.e(signUpTag, "SignUp API Error")
-                            android.util.Log.e(signUpTag, "  message: ${result.message}")
-                            android.util.Log.e(signUpTag, "  code: ${result.code}")
-                            android.util.Log.e(signUpTag, "  exception: ${result.exception?.message}")
-                            android.util.Log.e(signUpTag, "========================================")
                             setEffect {
                                 SignUpContract.Effect.ShowError(result.message ?: context.getString(net.ib.mn.R.string.error_abnormal_exception))
                             }
                         }
                         is ApiResult.Loading -> {
-                            android.util.Log.d(signUpTag, "SignUp API: Loading...")
                         }
                     }
                 }
         } catch (e: Exception) {
             setState { copy(isLoading = false) }
-            android.util.Log.e(signUpTag, "========================================")
-            android.util.Log.e(signUpTag, "SignUp Exception", e)
-            android.util.Log.e(signUpTag, "========================================")
             setEffect { SignUpContract.Effect.ShowError(e.message ?: context.getString(net.ib.mn.R.string.error_abnormal_exception)) }
         }
     }
@@ -1034,27 +969,12 @@ class SignUpViewModel @Inject constructor(
                 val domain = currentState.domain ?: Constants.DOMAIN_EMAIL
                 val signUpTag = getSignUpTag(domain)
 
-                android.util.Log.d(signUpTag, "========================================")
-                android.util.Log.d(signUpTag, "performSignInAfterSignUp() called")
-                android.util.Log.d(signUpTag, "  email: $email")
-                android.util.Log.d(signUpTag, "  domain: $domain")
-                android.util.Log.d(signUpTag, "========================================")
 
                 // Device info
                 val deviceId = deviceUtil.getDeviceUUID()
                 val gmail = deviceUtil.getGmail()
                 val deviceKey = preferencesManager.fcmToken.first() ?: ""
 
-                android.util.Log.d(signUpTag, "========================================")
-                android.util.Log.d(signUpTag, "SignIn API Parameters:")
-                android.util.Log.d(signUpTag, "  domain: $domain")
-                android.util.Log.d(signUpTag, "  email: $email")
-                android.util.Log.d(signUpTag, "  passwd: ${password.take(20)}...")
-                android.util.Log.d(signUpTag, "  push_key: $deviceKey")
-                android.util.Log.d(signUpTag, "  gmail: $gmail")
-                android.util.Log.d(signUpTag, "  device_id: $deviceId")
-                android.util.Log.d(signUpTag, "  app_id: ${Constants.APP_ID}")
-                android.util.Log.d(signUpTag, "========================================")
 
                 signInUseCase(
                     domain = domain,
@@ -1067,21 +987,11 @@ class SignUpViewModel @Inject constructor(
                 ).collect { result ->
                     when (result) {
                         is ApiResult.Loading -> {
-                            android.util.Log.d(signUpTag, "SignIn API: Loading...")
                         }
                         is ApiResult.Success -> {
                             val response = result.data
-                            android.util.Log.d(signUpTag, "========================================")
-                            android.util.Log.d(signUpTag, "SignIn API: Success")
-                            android.util.Log.d(signUpTag, "  response.success: ${response.success}")
-                            android.util.Log.d(signUpTag, "  response.data: ${response.data != null}")
-                            android.util.Log.d(signUpTag, "  response.message: ${response.message}")
-                            android.util.Log.d(signUpTag, "========================================")
 
                             if (response.success) {
-                                android.util.Log.d(signUpTag, "========================================")
-                                android.util.Log.d(signUpTag, "Login SUCCESS after signup")
-                                android.util.Log.d(signUpTag, "========================================")
 
                                 // 인증 정보 저장
                                 if (response.data != null) {
@@ -1106,18 +1016,9 @@ class SignUpViewModel @Inject constructor(
                                         domain = domain
                                     )
                                     
-                                    android.util.Log.d(signUpTag, "✓ Login credentials saved to DataStore")
-                                    android.util.Log.d(signUpTag, "  - Email: ${userData.email}")
-                                    android.util.Log.d(signUpTag, "  - Domain: $domain")
-                                    android.util.Log.d(signUpTag, "  - Token: ${token.take(20)}...")
                                 } else {
                                     // response.data가 null인 경우 (Old 프로젝트와 동일)
                                     // 사용자 정보는 이후에 별도로 가져옴 (StartUpScreen에서 getUserSelf 호출)
-                                    android.util.Log.d(signUpTag, "========================================")
-                                    android.util.Log.d(signUpTag, "User data is null - will be fetched separately")
-                                    android.util.Log.d(signUpTag, "  email: $email")
-                                    android.util.Log.d(signUpTag, "  domain: $domain")
-                                    android.util.Log.d(signUpTag, "========================================")
                                     
                                     // 1. AuthRepository에 기본 정보 저장 (메모리 캐시 + DataStore)
                                     authRepository.login(
@@ -1139,21 +1040,11 @@ class SignUpViewModel @Inject constructor(
                                         domain = domain
                                     )
                                     
-                                    android.util.Log.d(signUpTag, "✓ Basic login credentials saved to DataStore")
-                                    android.util.Log.d(signUpTag, "  - Email: $email")
-                                    android.util.Log.d(signUpTag, "  - Domain: $domain")
-                                    android.util.Log.d(signUpTag, "  - Token: ${password.take(20)}...")
-                                    android.util.Log.d(signUpTag, "  - Note: User info will be fetched in StartUpScreen")
                                 }
 
                                 setState { copy(isLoading = false) }
                                 setEffect { SignUpContract.Effect.NavigateToMain }
                             } else {
-                                android.util.Log.e(signUpTag, "========================================")
-                                android.util.Log.e(signUpTag, "SignIn API: FAILED")
-                                android.util.Log.e(signUpTag, "  response.success: ${response.success}")
-                                android.util.Log.e(signUpTag, "  response.message: ${response.message}")
-                                android.util.Log.e(signUpTag, "========================================")
 
                                 setState { copy(isLoading = false) }
                                 setEffect {
@@ -1164,12 +1055,6 @@ class SignUpViewModel @Inject constructor(
                             }
                         }
                         is ApiResult.Error -> {
-                            android.util.Log.e(signUpTag, "========================================")
-                            android.util.Log.e(signUpTag, "SignIn API: ERROR")
-                            android.util.Log.e(signUpTag, "  error message: ${result.message}")
-                            android.util.Log.e(signUpTag, "  error code: ${result.code}")
-                            android.util.Log.e(signUpTag, "  exception: ${result.exception?.message}")
-                            android.util.Log.e(signUpTag, "========================================")
 
                             setState { copy(isLoading = false) }
                             setEffect {
@@ -1184,9 +1069,6 @@ class SignUpViewModel @Inject constructor(
                 val currentState = this@SignUpViewModel.currentState
                 val domain = currentState.domain ?: Constants.DOMAIN_EMAIL
                 val signUpTag = getSignUpTag(domain)
-                android.util.Log.e(signUpTag, "========================================")
-                android.util.Log.e(signUpTag, "performSignInAfterSignUp() EXCEPTION", e)
-                android.util.Log.e(signUpTag, "========================================")
                 setState { copy(isLoading = false) }
                 setEffect {
                     SignUpContract.Effect.ShowError(

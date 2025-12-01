@@ -36,7 +36,6 @@ fun HeartPickRankingSubPage(
     listState: LazyListState? = null,
     modifier: Modifier = Modifier
 ) {
-    android.util.Log.d("HeartPickRankingSubPage", "🎨 [Composing] HeartPick for chartCode: $chartCode")
 
     // 독립적인 HeartPickRankingSubPageViewModel
     val viewModel: HeartPickRankingSubPageViewModel = hiltViewModel<HeartPickRankingSubPageViewModel, HeartPickRankingSubPageViewModel.Factory> { factory ->
@@ -48,7 +47,6 @@ fun HeartPickRankingSubPage(
 
     // 초기 로드
     LaunchedEffect(Unit) {
-        android.util.Log.d("HeartPickRankingSubPage", "[HeartPick] LaunchedEffect triggered")
         viewModel.reloadIfNeeded()
     }
 
@@ -117,10 +115,8 @@ fun HeartPickRankingSubPage(
                             openPeriod = cardData.openPeriod,
                             isNew = cardData.isNew,
                             onCardClick = {
-                                android.util.Log.d("HeartPickRankingSubPage", "Card clicked: ${cardData.title}")
                             },
                             onVoteClick = {
-                                android.util.Log.d("HeartPickRankingSubPage", "Vote clicked: ${cardData.title}")
                             }
                         )
                     }

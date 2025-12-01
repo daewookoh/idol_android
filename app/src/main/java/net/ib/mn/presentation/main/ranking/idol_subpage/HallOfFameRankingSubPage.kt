@@ -47,13 +47,6 @@ fun HallOfFameRankingSubPage(
     topThreeChartCodes: List<String> = emptyList(),
     listState: LazyListState? = null
 ) {
-    android.util.Log.d("HallOfFameRankingSubPage", "========================================")
-    android.util.Log.d("HallOfFameRankingSubPage", "🎨 [Composing] HallOfFame")
-    android.util.Log.d("HallOfFameRankingSubPage", "  - chartCode: '$chartCode' (isEmpty: ${chartCode.isEmpty()})")
-    android.util.Log.d("HallOfFameRankingSubPage", "  - topTabs: $topThreeTabs")
-    android.util.Log.d("HallOfFameRankingSubPage", "  - topThreeChartCodes: $topThreeChartCodes")
-    android.util.Log.d("HallOfFameRankingSubPage", "  - isVisible: $isVisible")
-    android.util.Log.d("HallOfFameRankingSubPage", "========================================")
 
     // 독립적인 HallOfFameRankingSubPageViewModel
     val viewModel: HallOfFameRankingSubPageViewModel = hiltViewModel<HallOfFameRankingSubPageViewModel, HallOfFameRankingSubPageViewModel.Factory> { factory ->

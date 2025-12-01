@@ -90,7 +90,6 @@ fun ExoVoteDialog(
 ) {
     // 다이얼로그 표시 시 사용자 하트 정보 로드
     LaunchedEffect(Unit) {
-        android.util.Log.d("ExoVoteDialog", "🔄 Loading user hearts...")
         voteViewModel.loadUserHearts()
     }
 
@@ -107,7 +106,6 @@ fun ExoVoteDialog(
     val coroutineScope = rememberCoroutineScope()
     val voteRankingTitle = stringResource(R.string.vote_ranking)
 
-    android.util.Log.d("ExoVoteDialog", "💰 Current hearts - total: $totalHeart, free: $freeHeart, strong: $strongHeart")
 
     // 투표 완료 바텀시트
     if (showVoteCompleteSheet && voteResult != null) {
@@ -409,7 +407,6 @@ fun ExoVoteDialog(
                                             onVote(voteHeart)
                                         },
                                         onError = { errorMsg ->
-                                            android.util.Log.e("ExoVoteDialog", "❌ Vote failed: $errorMsg")
                                             // TODO: 에러 토스트 표시
                                         }
                                     )

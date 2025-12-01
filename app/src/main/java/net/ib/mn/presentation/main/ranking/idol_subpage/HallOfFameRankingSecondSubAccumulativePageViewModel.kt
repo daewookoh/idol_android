@@ -53,11 +53,6 @@ class HallOfFameRankingSecondSubAccumulativePageViewModel @AssistedInject constr
         )
 
     init {
-        android.util.Log.d("HoF_Accum_VM", "========================================")
-        android.util.Log.d("HoF_Accum_VM", "📦 ViewModel initialized")
-        android.util.Log.d("HoF_Accum_VM", "  - chartCode: $chartCode")
-        android.util.Log.d("HoF_Accum_VM", "  - exoTabSwitchType: $exoTabSwitchType")
-        android.util.Log.d("HoF_Accum_VM", "========================================")
 
         loadData()
     }
@@ -66,17 +61,14 @@ class HallOfFameRankingSecondSubAccumulativePageViewModel @AssistedInject constr
         val codeToUse = newChartCode ?: chartCode
 
         viewModelScope.launch {
-            android.util.Log.d("HoF_Accum_VM", "🔵 Loading 30일 누적 data for chartCode=$codeToUse, exoTabSwitchType=$exoTabSwitchType")
 
             rankingRepository.getChartRanks(codeToUse).collect { result ->
                 when (result) {
                     is ApiResult.Loading -> {
-                        android.util.Log.d("HoF_Accum_VM", "⏳ Loading...")
                         _isLoading.value = true
                         _error.value = null
                     }
                     is ApiResult.Success -> {
-                        android.util.Log.d("HoF_Accum_VM", "✅ Success: received ${result.data.size} items")
                         _isLoading.value = false
                         _error.value = null
 
@@ -84,10 +76,8 @@ class HallOfFameRankingSecondSubAccumulativePageViewModel @AssistedInject constr
                         val processedData = calculateSuddenIncrease(result.data)
                         _rankingData.value = processedData
 
-                        android.util.Log.d("HoF_Accum_VM", "Ranking data count: ${result.data.size}")
                     }
                     is ApiResult.Error -> {
-                        android.util.Log.e("HoF_Accum_VM", "❌ Error: ${result.message}")
                         _isLoading.value = false
                         _error.value = result.message ?: "Unknown error"
                     }
@@ -124,16 +114,13 @@ class HallOfFameRankingSecondSubAccumulativePageViewModel @AssistedInject constr
             ?.difference
 
         if (maxDifference == null || maxDifference <= 0) {
-            android.util.Log.d("HoF_Accum_VM", "No sudden increase items found")
             return data
         }
 
-        android.util.Log.d("HoF_Accum_VM", "Max difference for sudden increase: $maxDifference")
 
         // 3. 최대 difference와 동일한 값을 가진 모든 "increase" 아이템을 suddenIncrease = true로 설정
         return data.map { item ->
             if (item.status.equals("increase", ignoreCase = true) && item.difference == maxDifference) {
-                android.util.Log.d("HoF_Accum_VM", "Marking ${item.name} as sudden increase (diff: ${item.difference})")
                 item.copy(suddenIncrease = true)
             } else {
                 item

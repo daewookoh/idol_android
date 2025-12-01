@@ -312,11 +312,9 @@ fun CommunityFeedSubPage(
                         articleId = selectedArticleId,
                         hearts = hearts,
                         onSuccess = { response ->
-                            android.util.Log.d("CommunityFeedSubPage", "Vote success: ${response.msg}")
                             onSuccess(response)
                         },
                         onError = { errorMsg ->
-                            android.util.Log.e("CommunityFeedSubPage", "Vote failed: $errorMsg")
                             onError(errorMsg)
                         }
                     )

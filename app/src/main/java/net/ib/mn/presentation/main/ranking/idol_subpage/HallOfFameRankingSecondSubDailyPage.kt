@@ -84,7 +84,6 @@ fun HallOfFameRankingSecondSubDailyPage(
         topThreeChartCodes.getOrNull(selectedSubTabIndex) ?: chartCode
     }
 
-    android.util.Log.d("HoF_Daily", "📌 currentChartCode calculated: $currentChartCode (index=$selectedSubTabIndex)")
 
     val rankingData by dataViewModel.rankingData.collectAsState()
     val isLoading by dataViewModel.isLoading.collectAsState()
@@ -98,19 +97,9 @@ fun HallOfFameRankingSecondSubDailyPage(
     // ExoTabSwitch 선택이 바뀔 때만 새로운 차트 코드로 데이터 로드 (기간 유지)
     // OLD 프로젝트: historyParam = tagArrayList[currentPosition]
     LaunchedEffect(selectedSubTabIndex) {
-        android.util.Log.d("HoF_Daily", "🔄 ExoTabSwitch changed to index $selectedSubTabIndex, chartCode=$currentChartCode")
         dataViewModel.onTabChanged(currentChartCode)
     }
 
-    android.util.Log.d("HoF_Daily", "========================================")
-    android.util.Log.d("HoF_Daily", "🎨 Daily Page Recomposition")
-    android.util.Log.d("HoF_Daily", "  - chartCode: $chartCode")
-    android.util.Log.d("HoF_Daily", "  - currentChartCode: $currentChartCode")
-    android.util.Log.d("HoF_Daily", "  - tabbarType: $tabbarType (0=30일누적, 1=일일)")
-    android.util.Log.d("HoF_Daily", "  - selectedSubTabIndex: $selectedSubTabIndex")
-    android.util.Log.d("HoF_Daily", "  - rankingData.size: ${rankingData.size}")
-    android.util.Log.d("HoF_Daily", "  - isVisible: $isVisible")
-    android.util.Log.d("HoF_Daily", "========================================")
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -121,7 +110,6 @@ fun HallOfFameRankingSecondSubDailyPage(
                 tabs = topThreeTabs.take(3),
                 selectedIndex = selectedSubTabIndex,
                 onTabSelected = { index ->
-                    android.util.Log.d("HoF_Daily", "👆 User clicked tab index: $index")
                     viewModel.setDailySubTabIndex(index)
                 }
             )
@@ -160,7 +148,6 @@ fun HallOfFameRankingSecondSubDailyPage(
                         }
                         // update에서 리스너를 설정하여 최신 currentChartCode를 캡처
                         imageView.setOnClickListener {
-                            android.util.Log.d("HoF_Daily", "⬅️ Prev button clicked with currentChartCode=$currentChartCode")
                             dataViewModel.onPrevClicked(currentChartCode)
                         }
                     },
@@ -209,7 +196,6 @@ fun HallOfFameRankingSecondSubDailyPage(
                         }
                         // update에서 리스너를 설정하여 최신 currentChartCode를 캡처
                         imageView.setOnClickListener {
-                            android.util.Log.d("HoF_Daily", "➡️ Next button clicked with currentChartCode=$currentChartCode")
                             dataViewModel.onNextClicked(currentChartCode)
                         }
                     },
@@ -262,7 +248,6 @@ fun HallOfFameRankingSecondSubDailyPage(
                                 item = item,
                                 cdnUrl = cdnUrl,
                                 onItemClick = {
-                                    android.util.Log.d("HoF_Daily", "Clicked on ${item.idol?.name} (id: ${item.id})")
                                 }
                             )
                         }

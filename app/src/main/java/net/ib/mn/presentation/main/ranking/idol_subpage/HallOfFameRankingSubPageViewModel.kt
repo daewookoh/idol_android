@@ -54,7 +54,6 @@ class HallOfFameRankingSubPageViewModel @AssistedInject constructor(
     val dailySubTabIndex: StateFlow<Int> = savedStateHandle.getStateFlow(KEY_DAILY_SUB_TAB_INDEX, 0)
 
     init {
-        android.util.Log.d("HallOfFameRankingVM", "🆕 ViewModel created for chartCode: $chartCode")
     }
 
     /**
@@ -62,7 +61,6 @@ class HallOfFameRankingSubPageViewModel @AssistedInject constructor(
      * @param index 0 = 30일 누적, 1 = 일일
      */
     fun onTabSelected(index: Int) {
-        android.util.Log.d("HallOfFameRankingVM", "🔄 Tab selected: $index (${if (index == 0) "30일 누적" else "일일"})")
         savedStateHandle[KEY_SELECTED_TAB_INDEX] = index
     }
 
@@ -71,7 +69,6 @@ class HallOfFameRankingSubPageViewModel @AssistedInject constructor(
      * @param index 0 = 개인, 1 = 그룹, 2 = 글로벌
      */
     fun setAccumulativeSubTabIndex(index: Int) {
-        android.util.Log.d("HallOfFameRankingVM", "🔄 Accumulative sub-tab selected: $index")
         savedStateHandle[KEY_ACCUMULATIVE_SUB_TAB_INDEX] = index
     }
 
@@ -80,13 +77,11 @@ class HallOfFameRankingSubPageViewModel @AssistedInject constructor(
      * @param index 0 = 개인, 1 = 그룹, 2 = 글로벌
      */
     fun setDailySubTabIndex(index: Int) {
-        android.util.Log.d("HallOfFameRankingVM", "🔄 Daily sub-tab selected: $index")
         savedStateHandle[KEY_DAILY_SUB_TAB_INDEX] = index
     }
 
     override fun onCleared() {
         super.onCleared()
-        android.util.Log.d("HallOfFameRankingVM", "♻️ ViewModel cleared")
     }
 
     @AssistedFactory

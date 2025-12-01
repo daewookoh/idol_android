@@ -57,40 +57,11 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            android.util.Log.d(TAG, "========================================")
-            android.util.Log.d(TAG, "[MainViewModel] Subscribing to DataStore userInfo")
-            android.util.Log.d(TAG, "========================================")
 
             // DataStore의 userInfo를 구독하여 _userInfo 업데이트
             preferencesManager.userInfo.collect { info ->
-                android.util.Log.d(TAG, "[MainViewModel] ========================================")
-                android.util.Log.d(TAG, "[MainViewModel] DataStore userInfo received")
-                android.util.Log.d(TAG, "[MainViewModel] ========================================")
 
                 if (info != null) {
-                    android.util.Log.d(TAG, "[MainViewModel] ✓ User info updated from DataStore:")
-                    android.util.Log.d(TAG, "[MainViewModel]   - ID: ${info.id}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - Email: ${info.email}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - Username: ${info.username}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - Nickname: ${info.nickname}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - ProfileImage: ${info.profileImage}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - Hearts: ${info.heart}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - Diamond: ${info.diamond}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - StrongHeart: ${info.strongHeart}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - WeakHeart: ${info.weakHeart}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - Level: ${info.level}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - LevelHeart: ${info.levelHeart}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - Power: ${info.power}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - ResourceUri: ${info.resourceUri}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - PushKey: ${info.pushKey}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - CreatedAt: ${info.createdAt}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - PushFilter: ${info.pushFilter}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - StatusMessage: ${info.statusMessage}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - TS: ${info.ts}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - ItemNo: ${info.itemNo}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - Domain: ${info.domain}")
-                    android.util.Log.d(TAG, "[MainViewModel]   - GiveHeart: ${info.giveHeart}")
-                    android.util.Log.d(TAG, "[MainViewModel] ========================================")
                     _userInfo.value = info
                 } else {
                     android.util.Log.w(TAG, "[MainViewModel] ⚠️ UserInfo is null")
@@ -103,7 +74,6 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             preferencesManager.defaultCategory.collect { category ->
                 _currentCategory.value = category
-                android.util.Log.d(TAG, "[MainViewModel] ✓ Category updated: $category")
             }
         }
 
@@ -116,7 +86,6 @@ class MainViewModel @Inject constructor(
      */
     fun openCommunity(rankingItem: net.ib.mn.ui.components.RankingItem) {
         _selectedRankingItem.value = rankingItem
-        android.util.Log.d(TAG, "[MainViewModel] 📖 Opening Community for: ${rankingItem.name}")
     }
 
     /**
@@ -135,23 +104,19 @@ class MainViewModel @Inject constructor(
 
         // 관리자인 경우
         if (userHeart == Constants.LEVEL_ADMIN) {
-            android.util.Log.d(TAG, "[MainViewModel] 🔓 showChattingTab=true (ADMIN)")
             return true
         }
 
         // 최애인 경우
         if (mostIdolId != null && mostIdolId == idolId) {
-            android.util.Log.d(TAG, "[MainViewModel] 🔓 showChattingTab=true (MOST)")
             return true
         }
 
         // 최애의 그룹인 경우 (현재 아이돌이 그룹이고, 최애가 해당 그룹의 멤버인 경우)
         if (groupId != null && mostIdolId != null && groupId == mostIdolId) {
-            android.util.Log.d(TAG, "[MainViewModel] 🔓 showChattingTab=true (MOST_GROUP)")
             return true
         }
 
-        android.util.Log.d(TAG, "[MainViewModel] 🔒 showChattingTab=false (userHeart=$userHeart, mostIdolId=$mostIdolId, idolId=$idolId, groupId=$groupId)")
         return false
     }
 
@@ -160,7 +125,6 @@ class MainViewModel @Inject constructor(
      */
     fun closeCommunity() {
         _selectedRankingItem.value = null
-        android.util.Log.d(TAG, "[MainViewModel] 📕 Closing Community")
     }
 
     /**
@@ -181,22 +145,16 @@ class MainViewModel @Inject constructor(
      * UDP 연결이 끊어진 경우에만 백그라운드 동안 놓친 데이터를 API로 복구
      */
     fun onAppResume() {
-        android.util.Log.d(TAG, "[MainViewModel] ========================================")
-        android.util.Log.d(TAG, "[MainViewModel] 👁️ App resumed")
-        android.util.Log.d(TAG, "[MainViewModel] ========================================")
 
         // UDP 연결 상태 확인
         val isUdpConnected = idolBroadcastManager.isConnected()
-        android.util.Log.d(TAG, "[MainViewModel] UDP connection status: ${if (isUdpConnected) "CONNECTED" else "DISCONNECTED"}")
 
         // UDP 연결이 끊어진 경우에만 API로 데이터 복구
         if (!isUdpConnected) {
-            android.util.Log.d(TAG, "[MainViewModel] 🔄 UDP disconnected - refreshing all charts from API")
             viewModelScope.launch(Dispatchers.IO) {
                 chartDatabaseRepository.refreshAllChartsFromApi(idolRepository)
             }
         } else {
-            android.util.Log.d(TAG, "[MainViewModel] ✅ UDP connected - no API refresh needed")
         }
     }
 
@@ -204,7 +162,6 @@ class MainViewModel @Inject constructor(
      * 앱이 포그라운드에서 백그라운드로 갈 때 호출
      */
     fun onAppPause() {
-        android.util.Log.d(TAG, "[MainViewModel] 🙈 App paused")
     }
 
     /**
@@ -215,7 +172,6 @@ class MainViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             try {
-                android.util.Log.d(TAG, "[MainViewModel] 🔴 Logging out - clearing all data")
 
                 // DataStore의 모든 데이터 삭제
                 preferencesManager.clearAll()
@@ -226,9 +182,7 @@ class MainViewModel @Inject constructor(
                 // 로그아웃 완료 플래그 설정
                 _logoutCompleted.value = true
 
-                android.util.Log.d(TAG, "[MainViewModel] ✓ Logout completed successfully")
             } catch (e: Exception) {
-                android.util.Log.e(TAG, "[MainViewModel] ❌ Logout failed: ${e.message}", e)
             }
         }
     }
@@ -267,10 +221,8 @@ class MainViewModel @Inject constructor(
 
             if (isUdpAlive) {
                 // UDP가 살아있음 → API 호출 불필요
-                android.util.Log.d(TAG, "[MainViewModel] 📌 Tab: $tabName - UDP alive, no API refresh needed")
             } else {
                 // UDP가 죽어있음 → UDP 활성화 + API 호출
-                android.util.Log.d(TAG, "[MainViewModel] 📌 Tab: $tabName - UDP dead, enabling + API refresh")
                 idolBroadcastManager.setReactionEnabled(true, "MainViewModel.onTabSelected($tabName)")
 
                 viewModelScope.launch(Dispatchers.IO) {
@@ -280,16 +232,13 @@ class MainViewModel @Inject constructor(
         } else {
             // 다른 탭 진입: 15초 후 UDP 종료 (기존 Job이 있으면 유지)
             if (udpStopJob == null) {
-                android.util.Log.d(TAG, "[MainViewModel] 📌 Tab: $tabName - scheduling UDP stop in ${Constants.UDP_STOP_DELAY_MS / 1000}s")
 
                 udpStopJob = viewModelScope.launch {
                     delay(Constants.UDP_STOP_DELAY_MS)
-                    android.util.Log.d(TAG, "[MainViewModel] ⏰ ${Constants.UDP_STOP_DELAY_MS / 1000}s passed - stopping UDP reaction")
                     idolBroadcastManager.setReactionEnabled(false, "MainViewModel.delayedStop($tabName)")
                     udpStopJob = null
                 }
             } else {
-                android.util.Log.d(TAG, "[MainViewModel] 📌 Tab: $tabName - UDP stop already scheduled")
             }
         }
     }
@@ -307,7 +256,6 @@ class MainViewModel @Inject constructor(
                 val gmail = deviceUtil.getGmail()
                 val deviceId = deviceUtil.getDeviceUUID()
 
-                android.util.Log.d(TAG, "[MainViewModel] 📡 Calling checkEvent API...")
 
                 userRepository.checkEvent(
                     version = version,
@@ -318,22 +266,18 @@ class MainViewModel @Inject constructor(
                 ).collect { result ->
                     when (result) {
                         is ApiResult.Loading -> {
-                            android.util.Log.d(TAG, "[MainViewModel] checkEvent loading...")
                         }
                         is ApiResult.Success -> {
                             val showWelcomeMission = result.data.showWelcomeMission ?: false
-                            android.util.Log.d(TAG, "[MainViewModel] ✓ checkEvent success: showWelcomeMission=$showWelcomeMission")
 
                             // PreferencesManager에 저장
                             preferencesManager.setShowWelcomeMission(showWelcomeMission)
                         }
                         is ApiResult.Error -> {
-                            android.util.Log.e(TAG, "[MainViewModel] ❌ checkEvent error: ${result.message}")
                         }
                     }
                 }
             } catch (e: Exception) {
-                android.util.Log.e(TAG, "[MainViewModel] ❌ checkEvent exception: ${e.message}", e)
             }
         }
     }

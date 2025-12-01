@@ -161,7 +161,6 @@ private fun UpcomingHeartPickCard(
                 ) {
                     // 배경 이미지
                     if (backgroundImageUrl.isNotEmpty()) {
-                        android.util.Log.d("HeartPickUpcoming", "Loading background image: $backgroundImageUrl")
 
                         val context = LocalContext.current
                         val imageModel = remember(backgroundImageUrl) {
@@ -170,13 +169,10 @@ private fun UpcomingHeartPickCard(
                                 .crossfade(true)
                                 .listener(
                                     onStart = {
-                                        android.util.Log.d("HeartPickUpcoming", "Image load started: $backgroundImageUrl")
                                     },
                                     onSuccess = { _, _ ->
-                                        android.util.Log.d("HeartPickUpcoming", "Image load SUCCESS: $backgroundImageUrl")
                                     },
                                     onError = { _, result ->
-                                        android.util.Log.e("HeartPickUpcoming", "Image load FAILED: $backgroundImageUrl, error: ${result.throwable.message}")
                                     }
                                 )
                                 .build()
@@ -573,11 +569,9 @@ private fun ActiveHeartPickCard(
                         // RankingItem 리스트 생성
                         val rankingItems = remember(otherIdols, firstPlaceIdol) {
                             val firstPlaceVotes = firstPlaceIdol?.voteCount?.replace(",", "")?.toLongOrNull() ?: 0L
-                            android.util.Log.d("HeartPickCard", "firstPlaceIdol voteCount: ${firstPlaceIdol?.voteCount}, parsed: $firstPlaceVotes")
 
                             otherIdols.mapIndexed { index, idol ->
                                 val idolVotes = idol.voteCount.replace(",", "").toLongOrNull() ?: 0L
-                                android.util.Log.d("HeartPickCard", "Rank ${index + 2}: ${idol.name}, votes=${idol.voteCount}, parsed=$idolVotes, maxHeartCount=$firstPlaceVotes, percentage=${idol.percentage}")
 
                                 RankingItem(
                                     rank = index + 2,

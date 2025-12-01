@@ -78,21 +78,17 @@ fun MiracleRookieRankingSubPage(
     modifier: Modifier = Modifier
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
-    android.util.Log.d("MiracleRookieSubPage", "🎨 [Composing] ${dataSource.type} for chartCode: $chartCode")
 
     // ViewModel key 생성 (각 chartCode별로 독립적인 ViewModel 인스턴스 생성)
     val viewModelKey = "miracle_rookie_${dataSource.type}_$chartCode"
-    android.util.Log.d("MiracleRookieSubPage", "🔑 ViewModel key: $viewModelKey")
 
     // ViewModel 생성
     val viewModel: MiracleRookieRankingSubPageViewModel = hiltViewModel<MiracleRookieRankingSubPageViewModel, MiracleRookieRankingSubPageViewModel.Factory>(
         key = viewModelKey
     ) { factory ->
-        android.util.Log.d("MiracleRookieSubPage", "🏭 Factory creating ViewModel for type=${dataSource.type}, chartCode=$chartCode")
         factory.create(chartCode, dataSource)
     }
 
-    android.util.Log.d("MiracleRookieSubPage", "✅ ViewModel instance: ${viewModel.hashCode()}, type=${dataSource.type}")
 
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = listState ?: rememberLazyListState()
@@ -123,10 +119,8 @@ fun MiracleRookieRankingSubPage(
     // 화면 가시성 변경 시 UDP 구독 관리 및 데이터 새로고침
     LaunchedEffect(isVisible) {
         if (isVisible) {
-            android.util.Log.d("MiracleRookieSubPage", "[SubPage] 👁️ Screen became visible")
             viewModel.onScreenVisible()
         } else {
-            android.util.Log.d("MiracleRookieSubPage", "[SubPage] 🙈 Screen hidden")
             viewModel.onScreenHidden()
         }
     }
@@ -345,10 +339,8 @@ fun MiracleRookieRankingSubPage(
                         isVisible = isVisible && (effectiveAccumulatedChartCode == null || selectedTabIndex == 1),  // 실시간 탭일 때만 타이머 동작
                         listState = scrollState,
                         onItemClick = { rank, item ->
-                            android.util.Log.d("MiracleRookieSubPage", "Clicked: Rank $rank - ${item.name}")
                         },
                         onVoteSuccess = { idolId, voteCount ->
-                            android.util.Log.d("MiracleRookieSubPage", "Vote success: idol=$idolId, votes=$voteCount")
                             viewModel.updateVote(idolId, voteCount)
                         }
                     )

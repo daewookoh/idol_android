@@ -133,7 +133,6 @@ class RankingPageViewModel @Inject constructor(
      */
     fun setSelectedTabIndex(index: Int) {
         savedStateHandle[KEY_SELECTED_TAB_INDEX] = index
-        android.util.Log.d("RankingViewModel", "📌 Selected tab index updated: $index")
     }
 
     /**
@@ -141,53 +140,38 @@ class RankingPageViewModel @Inject constructor(
      */
     fun initializeTabFromDefaultChartCode(tabDataList: List<*>, getCodeFromTab: (Any) -> String?) {
         if (!_shouldInitializeTab.value) {
-            android.util.Log.d("RankingViewModel", "⏭️ Tab already initialized, skipping")
             return
         }
 
         // 이미 SavedStateHandle에 값이 있으면 (이전에 선택한 탭이 있으면) 초기화하지 않음
         if (savedStateHandle.get<Int>(KEY_SELECTED_TAB_INDEX) != null && savedStateHandle.get<Int>(KEY_SELECTED_TAB_INDEX) != DEFAULT_TAB_INDEX) {
-            android.util.Log.d("RankingViewModel", "⏭️ SavedStateHandle has previous tab selection, skipping initialization")
             _shouldInitializeTab.value = false
             return
         }
 
         viewModelScope.launch {
             val defaultChartCode = configRepository.getDefaultChartCode()
-            android.util.Log.d("RankingViewModel", "========================================")
-            android.util.Log.d("RankingViewModel", "[RankingViewModel] Initializing tab from defaultChartCode")
-            android.util.Log.d("RankingViewModel", "  - defaultChartCode: $defaultChartCode")
-            android.util.Log.d("RankingViewModel", "  - tabDataList size: ${tabDataList.size}")
 
             if (defaultChartCode != null) {
                 // defaultChartCode에 해당하는 탭 찾기
                 val tabIndex = tabDataList.indexOfFirst { tab ->
                     val code = tab?.let { getCodeFromTab(it) }
-                    android.util.Log.d("RankingViewModel", "  - Checking tab: code=$code")
                     code == defaultChartCode
                 }
 
                 if (tabIndex >= 0) {
-                    android.util.Log.d("RankingViewModel", "✅ Found matching tab at index: $tabIndex")
                     setSelectedTabIndex(tabIndex)
                 } else {
                     android.util.Log.w("RankingViewModel", "⚠️ No matching tab found for chartCode: $defaultChartCode, using default index 0")
                 }
             } else {
-                android.util.Log.d("RankingViewModel", "ℹ️ No defaultChartCode set, using default index 0")
             }
 
-            android.util.Log.d("RankingViewModel", "========================================")
             _shouldInitializeTab.value = false
         }
     }
 
     init {
-        android.util.Log.d("RankingViewModel", "========================================")
-        android.util.Log.d("RankingViewModel", "[RankingViewModel] Initialized")
-        android.util.Log.d("RankingViewModel", "  - BuildConfig.CELEB: ${BuildConfig.CELEB}")
-        android.util.Log.d("RankingViewModel", "  - Using direct StateFlow from ConfigRepository (zero-copy)")
-        android.util.Log.d("RankingViewModel", "========================================")
 
         // 프로세스 복원 시 데이터가 없으면 재로드
         if (!BuildConfig.CELEB && configRepository.getMainChartModel() == null) {
@@ -264,7 +248,6 @@ class RankingPageViewModel @Inject constructor(
      */
     fun reloadChartData() {
         if (BuildConfig.CELEB) {
-            android.util.Log.d("RankingViewModel", "CELEB app - skipping chart reload")
             return
         }
 
@@ -273,7 +256,6 @@ class RankingPageViewModel @Inject constructor(
             _error.value = null
 
             try {
-                android.util.Log.d("RankingViewModel", "📡 Reloading ChartsCurrent...")
                 val response = chartsApi.getChartsCurrent()
 
                 if (response.isSuccessful && response.body() != null) {
@@ -283,25 +265,20 @@ class RankingPageViewModel @Inject constructor(
                         // MainChartModel 저장
                         body.main?.let { mainChartModel ->
                             configRepository.setMainChartModel(mainChartModel)
-                            android.util.Log.d("RankingViewModel", "✓ MainChartModel reloaded and cached")
                         }
 
                         // ChartObjects 저장 (MIRACLE, ROOKIE 등)
                         body.objects?.let { objects ->
                             configRepository.setChartObjects(objects)
-                            android.util.Log.d("RankingViewModel", "✓ ChartObjects reloaded and cached")
                         }
                     } else {
                         _error.value = "API returned success=false"
-                        android.util.Log.e("RankingViewModel", "❌ API returned success=false")
                     }
                 } else {
                     _error.value = "Failed to load chart data"
-                    android.util.Log.e("RankingViewModel", "❌ Chart API failed: ${response.code()}")
                 }
             } catch (e: Exception) {
                 _error.value = e.message
-                android.util.Log.e("RankingViewModel", "❌ Exception: ${e.message}", e)
             } finally {
                 _isLoading.value = false
             }

@@ -123,23 +123,14 @@ class MyInfoPageViewModel @Inject constructor(
         viewModelScope.launch {
             preferencesManager.videoHeart.collect { videoHeart ->
                 _videoAdHeartCount.value = videoHeart
-                android.util.Log.d(TAG, "Video Ad Heart Count updated: $videoHeart")
             }
         }
 
         // UserCacheRepository의 userData를 구독
         viewModelScope.launch {
             userCacheRepository.userData.collect { userData ->
-                android.util.Log.d(TAG, "========================================")
-                android.util.Log.d(TAG, "📥 UserData received from cache: ${userData != null}")
-                android.util.Log.d(TAG, "========================================")
 
                 if (userData != null) {
-                    android.util.Log.d(TAG, "  - Nickname: ${userData.nickname}")
-                    android.util.Log.d(TAG, "  - Level: ${userData.level}")
-                    android.util.Log.d(TAG, "  - LevelHeart: ${userData.levelHeart}")
-                    android.util.Log.d(TAG, "  - ProfileImage: ${userData.profileImage}")
-                    android.util.Log.d(TAG, "  - Most: ${userData.most?.name}")
 
                     // UI 상태 업데이트
                     val level = userData.level ?: 0
@@ -170,16 +161,9 @@ class MyInfoPageViewModel @Inject constructor(
                     _weakHeart.value = NumberFormatUtil.formatWithComma(weakHeartValue)
                     _diaCount.value = NumberFormatUtil.formatWithComma(userData.diamond ?: 0)
 
-                    android.util.Log.d(TAG, "✅ UI state updated:")
-                    android.util.Log.d(TAG, "  - Nickname: ${userData.nickname}")
-                    android.util.Log.d(TAG, "  - Progress: $progress%")
-                    android.util.Log.d(TAG, "  - LevelUpText: $levelUpText")
-                    android.util.Log.d(TAG, "  - TotalExp: ${_totalExp.value}")
                 } else {
                     // userData가 null일 때는 기본값 유지
-                    android.util.Log.d(TAG, "⚠️ UserData is null, keeping default state")
                 }
-                android.util.Log.d(TAG, "========================================")
             }
         }
     }

@@ -99,12 +99,6 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
     private var currentLoadJob: Job? = null
 
     init {
-        android.util.Log.d("HoF_Daily_VM", "========================================")
-        android.util.Log.d("HoF_Daily_VM", "📦 ViewModel initialized")
-        android.util.Log.d("HoF_Daily_VM", "  - chartCode: $chartCode")
-        android.util.Log.d("HoF_Daily_VM", "  - exoTabSwitchType: $exoTabSwitchType")
-        android.util.Log.d("HoF_Daily_VM", "  - restored currentPosition: $currentPosition")
-        android.util.Log.d("HoF_Daily_VM", "========================================")
 
         // 초기 로드는 Page의 LaunchedEffect에서 처리
     }
@@ -126,35 +120,24 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
         currentLoadJob?.cancel()
 
         currentLoadJob = viewModelScope.launch {
-            android.util.Log.d("HoF_Daily_VM", "========================================")
-            android.util.Log.d("HoF_Daily_VM", "🔵 Loading 일일 data")
-            android.util.Log.d("HoF_Daily_VM", "  - chartCode: $codeToUse")
-            android.util.Log.d("HoF_Daily_VM", "  - explicitHistoryParam: $explicitHistoryParam")
-            android.util.Log.d("HoF_Daily_VM", "  - currentPosition: $currentPosition")
-            android.util.Log.d("HoF_Daily_VM", "========================================")
 
             rankingRepository.getHofs(codeToUse, explicitHistoryParam).collect { result ->
                 when (result) {
                     is ApiResult.Loading -> {
-                        android.util.Log.d("HoF_Daily_VM", "⏳ Loading...")
                         _isLoading.value = true
                         _error.value = null
                     }
                     is ApiResult.Success -> {
-                        android.util.Log.d("HoF_Daily_VM", "✅ Success: received JSON")
                         _isLoading.value = false
                         _error.value = null
 
                         // Parse ranking data from JSON
                         val rankingList = parseRankingData(result.data)
-                        android.util.Log.d("HoF_Daily_VM", "📊 Parsed ${rankingList.size} items from JSON")
 
                         // Calculate rank for top3 (old 프로젝트 HallOfFameViewModel 로직과 동일)
                         val processedList = calculateRank(rankingList)
-                        android.util.Log.d("HoF_Daily_VM", "🔢 Setting _rankingData with ${processedList.size} items")
 
                         _rankingData.value = processedList
-                        android.util.Log.d("HoF_Daily_VM", "✅ _rankingData updated! Current size: ${_rankingData.value.size}")
 
                         // Parse history only when explicitHistoryParam is null (initial load)
                         // OLD 프로젝트: if (historyParam != null) return@get
@@ -165,7 +148,6 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
                         updatePrevNextVisibility()
                     }
                     is ApiResult.Error -> {
-                        android.util.Log.e("HoF_Daily_VM", "❌ Error: ${result.message}")
                         _isLoading.value = false
                         _error.value = result.message ?: "Unknown error"
                     }
@@ -188,7 +170,6 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
                 // API에서 "11" 같은 숫자로 오면 "11월" (한국어) 또는 "Nov" (영어)로 변환
                 val historyMonth = formatHistoryMonth(historyMonthRaw)
 
-                android.util.Log.d("HoF_Daily_VM", "History[$i] - Year: '$historyYear', Month raw: '$historyMonthRaw', formatted: '$historyMonth'")
 
                 historyList.add(
                     HistoryItem(
@@ -201,9 +182,7 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
             }
 
             historyList.reverse()
-            android.util.Log.d("HoF_Daily_VM", "Parsed ${historyList.size} history items")
         } catch (e: Exception) {
-            android.util.Log.e("HoF_Daily_VM", "Error parsing history", e)
         }
     }
 
@@ -220,7 +199,6 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
             val date = stringToDate.parse(monthString)
             date?.let { dateToString.format(it) } ?: monthString
         } catch (e: Exception) {
-            android.util.Log.e("HoF_Daily_VM", "Error formatting month: $monthString", e)
             monthString
         }
     }
@@ -236,7 +214,6 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
             _historyMonth.value = item?.historyMonth ?: ""
             _showNextButton.value = true
 
-            android.util.Log.d("HoF_Daily_VM", "updatePrevNextVisibility - Year: '${item?.historyYear}', Month: '${item?.historyMonth}'")
         }
 
         _showPrevButton.value = currentPosition < historyList.size
@@ -254,7 +231,6 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
         if (currentPosition < historyList.size) {
             currentPosition += 1
             val historyParam = buildHistoryParam()
-            android.util.Log.d("HoF_Daily_VM", "⬅️ Prev clicked: position=$currentPosition, historyParam=$historyParam")
             loadData(currentChartCode, historyParam)
         }
     }
@@ -271,7 +247,6 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
         if (currentPosition != 0) {
             currentPosition -= 1
             val historyParam = buildHistoryParam()
-            android.util.Log.d("HoF_Daily_VM", "➡️ Next clicked: position=$currentPosition, historyParam=$historyParam")
             loadData(currentChartCode, historyParam)
         }
     }
@@ -301,7 +276,6 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
      */
     fun onTabChanged(newChartCode: String) {
         val historyParam = buildHistoryParam()
-        android.util.Log.d("HoF_Daily_VM", "🔄 Tab changed to chartCode=$newChartCode, keeping position=$currentPosition, historyParam=$historyParam")
         loadData(newChartCode, historyParam)
     }
 
@@ -315,10 +289,6 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
      */
     private fun parseRankingData(jsonString: String): List<net.ib.mn.data.remote.dto.DailyRankModel> {
         return try {
-            android.util.Log.d("HoF_Daily_VM", "========================================")
-            android.util.Log.d("HoF_Daily_VM", "📥 API Response JSON:")
-            android.util.Log.d("HoF_Daily_VM", jsonString)
-            android.util.Log.d("HoF_Daily_VM", "========================================")
 
             val jsonObject = JSONObject(jsonString)
 
@@ -326,11 +296,9 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
             val objectsArray = jsonObject.optJSONArray("objects")
 
             if (objectsArray == null) {
-                android.util.Log.e("HoF_Daily_VM", "No 'objects' array in JSON response")
                 return emptyList()
             }
 
-            android.util.Log.d("HoF_Daily_VM", "📊 Objects array length: ${objectsArray.length()}")
 
             val gson = Gson()
             val listType = object : TypeToken<List<net.ib.mn.data.remote.dto.DailyRankModel>>() {}.type
@@ -338,12 +306,10 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
             val result: List<net.ib.mn.data.remote.dto.DailyRankModel>? =
                 gson.fromJson(objectsArray.toString(), listType)
 
-            android.util.Log.d("HoF_Daily_VM", "✅ Parsed ${result?.size ?: 0} ranking items from 'objects' array")
 
             // old 프로젝트: _dayHofList.postValue(presentDayHofList.reversed())
             result?.reversed() ?: emptyList()
         } catch (e: Exception) {
-            android.util.Log.e("HoF_Daily_VM", "Error parsing ranking data: ${e.message}", e)
             emptyList()
         }
     }
@@ -362,7 +328,6 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
         // top3의 각 아이템에 index(0, 1, 2) 매핑
         val rankMap = top3.mapIndexed { index, item -> item.id to index }.toMap()
 
-        android.util.Log.d("HoF_Daily_VM", "Top3 IDs for ranking: ${rankMap.keys.joinToString()}")
 
         // 원본 리스트를 순회하면서 rankMap에 있는 아이템만 rank 설정
         return list.map { item ->

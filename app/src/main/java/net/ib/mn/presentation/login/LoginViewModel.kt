@@ -78,26 +78,15 @@ class LoginViewModel @Inject constructor(
      * LoginScreen에서 Kakao SDK로 받은 정보를 처리합니다.
      */
     private fun loginWithKakao() {
-        android.util.Log.d(KAKAO_LOGIN_TAG, "========================================")
-        android.util.Log.d(KAKAO_LOGIN_TAG, "loginWithKakao() called")
-        android.util.Log.d(KAKAO_LOGIN_TAG, "========================================")
         
         viewModelScope.launch {
             try {
                 setState { copy(isLoading = true, loginType = LoginContract.LoginType.KAKAO) }
-                android.util.Log.d(TAG, "Kakao login started")
-                android.util.Log.d(KAKAO_LOGIN_TAG, "State updated: isLoading=true, loginType=KAKAO")
 
                 // Kakao SDK 호출은 LoginScreen에서 처리
                 setEffect { LoginContract.Effect.StartSocialLogin(LoginContract.LoginType.KAKAO) }
-                android.util.Log.d(KAKAO_LOGIN_TAG, "StartSocialLogin effect sent")
 
             } catch (e: Exception) {
-                android.util.Log.e(KAKAO_LOGIN_TAG, "========================================")
-                android.util.Log.e(KAKAO_LOGIN_TAG, "loginWithKakao() EXCEPTION")
-                android.util.Log.e(KAKAO_LOGIN_TAG, "  error: ${e.message}")
-                android.util.Log.e(KAKAO_LOGIN_TAG, "  stackTrace:", e)
-                android.util.Log.e(KAKAO_LOGIN_TAG, "========================================")
                 handleError(e)
             }
         }
@@ -118,13 +107,6 @@ class LoginViewModel @Inject constructor(
         profileImageUrl: String?,
         accessToken: String
     ) {
-        android.util.Log.d(KAKAO_LOGIN_TAG, "========================================")
-        android.util.Log.d(KAKAO_LOGIN_TAG, "handleKakaoLoginResult() called")
-        android.util.Log.d(KAKAO_LOGIN_TAG, "  userId: $userId")
-        android.util.Log.d(KAKAO_LOGIN_TAG, "  nickname: $nickname")
-        android.util.Log.d(KAKAO_LOGIN_TAG, "  profileImageUrl: $profileImageUrl")
-        android.util.Log.d(KAKAO_LOGIN_TAG, "  accessToken: ${accessToken.take(20)}...")
-        android.util.Log.d(KAKAO_LOGIN_TAG, "========================================")
         
         viewModelScope.launch {
             try {
@@ -136,27 +118,12 @@ class LoginViewModel @Inject constructor(
                 tempDisplayName = nickname
                 tempProfileImageUrl = profileImageUrl
 
-                android.util.Log.d(KAKAO_LOGIN_TAG, "========================================")
-                android.util.Log.d(KAKAO_LOGIN_TAG, "Temp data set")
-                android.util.Log.d(KAKAO_LOGIN_TAG, "  tempEmail: $email")
-                android.util.Log.d(KAKAO_LOGIN_TAG, "  tempPassword: ${accessToken.take(20)}...")
-                android.util.Log.d(KAKAO_LOGIN_TAG, "  tempDomain: ${Constants.DOMAIN_KAKAO}")
-                android.util.Log.d(KAKAO_LOGIN_TAG, "  tempDisplayName: $nickname")
-                android.util.Log.d(KAKAO_LOGIN_TAG, "  tempProfileImageUrl: $profileImageUrl")
-                android.util.Log.d(KAKAO_LOGIN_TAG, "========================================")
 
-                android.util.Log.d(TAG, "Kakao login success - userId: $userId, email: $email, nickname: $nickname")
-                android.util.Log.d(KAKAO_LOGIN_TAG, "Calling validateAndSignIn()")
                 
                 // validate API 호출하여 회원 여부 확인
                 validateAndSignIn(email, Constants.DOMAIN_KAKAO)
 
             } catch (e: Exception) {
-                android.util.Log.e(KAKAO_LOGIN_TAG, "========================================")
-                android.util.Log.e(KAKAO_LOGIN_TAG, "handleKakaoLoginResult() EXCEPTION")
-                android.util.Log.e(KAKAO_LOGIN_TAG, "  error: ${e.message}")
-                android.util.Log.e(KAKAO_LOGIN_TAG, "  stackTrace:", e)
-                android.util.Log.e(KAKAO_LOGIN_TAG, "========================================")
                 handleError(e)
             }
         }
@@ -173,50 +140,24 @@ class LoginViewModel @Inject constructor(
             else -> TAG
         }
         
-        android.util.Log.d(loginTag, "========================================")
-        android.util.Log.d(loginTag, "validateAndSignIn() called")
-        android.util.Log.d(loginTag, "  email: $email")
-        android.util.Log.d(loginTag, "  domain: $domain")
-        android.util.Log.d(loginTag, "  appId: ${Constants.APP_ID}")
-        android.util.Log.d(loginTag, "========================================")
         
         validateUserUseCase(
             type = "email",
             value = email,
             appId = Constants.APP_ID
         ).collect { result ->
-            android.util.Log.d(loginTag, "========================================")
-            android.util.Log.d(loginTag, "validateUserUseCase result received")
-            android.util.Log.d(loginTag, "  result type: ${result.javaClass.simpleName}")
-            android.util.Log.d(loginTag, "========================================")
             
             when (result) {
                 is ApiResult.Loading -> {
-                    android.util.Log.d(loginTag, "Validate API: Loading...")
                 }
                 is ApiResult.Success -> {
                     val response = result.data
                     val registeredDomain = response.domain
-                    android.util.Log.d(loginTag, "========================================")
-                    android.util.Log.d(loginTag, "Validate API: Success")
-                    android.util.Log.d(loginTag, "  response.success: ${response.success}")
-                    android.util.Log.d(loginTag, "  response.domain: $registeredDomain")
-                    android.util.Log.d(loginTag, "  response.message: ${response.message}")
-                    android.util.Log.d(loginTag, "  current domain: $domain")
-                    android.util.Log.d(loginTag, "========================================")
 
                     // **핵심 수정**: registeredDomain이 있고 현재 domain과 일치하면 기존 회원으로 처리
                     // success 값에 관계없이 도메인이 일치하면 이미 가입된 회원입니다.
                     // signIn API를 호출하여 서버 토큰을 받아옵니다.
                     if (registeredDomain != null && registeredDomain.equals(domain, ignoreCase = true)) {
-                        android.util.Log.d(loginTag, "========================================")
-                        android.util.Log.d(loginTag, "EXISTING USER - Domain matches (regardless of success value)")
-                        android.util.Log.d(loginTag, "  email: $email")
-                        android.util.Log.d(loginTag, "  domain: $domain")
-                        android.util.Log.d(loginTag, "  registeredDomain: $registeredDomain")
-                        android.util.Log.d(loginTag, "  response.success: ${response.success}")
-                        android.util.Log.d(loginTag, "  Calling performSignIn() to get server token")
-                        android.util.Log.d(loginTag, "========================================")
 
                         // Old 프로젝트와 동일: 기존 회원인 경우에도 signIn API를 호출하여 서버 토큰을 받아옴
                         // validate API는 회원 여부만 확인하고, 실제 로그인(서버 토큰 발급)은 signIn API에서 처리
@@ -228,16 +169,9 @@ class LoginViewModel @Inject constructor(
                     if (response.success) {
                         // success == true이지만 domain이 null이면 미가입자로 처리
                         if (registeredDomain == null) {
-                            android.util.Log.d(loginTag, "========================================")
-                            android.util.Log.d(loginTag, "NEW USER - success=true but domain is null")
-                            android.util.Log.d(loginTag, "  email: $email")
-                            android.util.Log.d(loginTag, "  domain: $domain")
-                            android.util.Log.d(loginTag, "  registeredDomain: null")
-                            android.util.Log.d(loginTag, "========================================")
                             
                             // 신규 회원: 회원가입 화면으로 이동
                             val password = tempPassword ?: run {
-                                android.util.Log.e(loginTag, "ERROR: tempPassword is null")
                                 setState { copy(isLoading = false) }
                                 setEffect {
                                     LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
@@ -245,7 +179,6 @@ class LoginViewModel @Inject constructor(
                                 return@collect
                             }
                             val currentDomain = tempDomain ?: run {
-                                android.util.Log.e(loginTag, "ERROR: tempDomain is null")
                                 setState { copy(isLoading = false) }
                                 setEffect {
                                     LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
@@ -257,12 +190,6 @@ class LoginViewModel @Inject constructor(
                             val displayName = if (currentDomain == Constants.DOMAIN_EMAIL) tempDisplayName else null
                             val profileImageUrl = tempProfileImageUrl
                             
-                            android.util.Log.d(loginTag, "Navigating to SignUp screen")
-                            android.util.Log.d(loginTag, "  email: $email")
-                            android.util.Log.d(loginTag, "  password: ${password.take(20)}...")
-                            android.util.Log.d(loginTag, "  domain: $currentDomain")
-                            android.util.Log.d(loginTag, "  displayName: $displayName")
-                            android.util.Log.d(loginTag, "  profileImageUrl: $profileImageUrl")
                             
                             setState { copy(isLoading = false) }
                             setEffect {
@@ -303,15 +230,6 @@ class LoginViewModel @Inject constructor(
                         val isDuplicateEmail = errorMessage.contains("중복되는 이메일", ignoreCase = true) ||
                                 errorMessage.contains("중복", ignoreCase = true)
                         
-                        android.util.Log.d(loginTag, "========================================")
-                        android.util.Log.d(loginTag, "NEW USER or EMAIL ERROR - Checking conditions")
-                        android.util.Log.d(loginTag, "  email: $email")
-                        android.util.Log.d(loginTag, "  domain: $domain")
-                        android.util.Log.d(loginTag, "  registeredDomain: $registeredDomain")
-                        android.util.Log.d(loginTag, "  errorMessage: $errorMessage")
-                        android.util.Log.d(loginTag, "  isEmailError: $isEmailError")
-                        android.util.Log.d(loginTag, "  isDuplicateEmail: $isDuplicateEmail")
-                        android.util.Log.d(loginTag, "========================================")
 
                         // 다른 소셜 로그인으로 가입된 경우 에러 표시
                         // 이미 line 210에서 domain이 일치하는 경우를 처리했으므로,
@@ -327,15 +245,9 @@ class LoginViewModel @Inject constructor(
                             return@collect
                         }
                         
-                        android.util.Log.d(loginTag, "========================================")
-                        android.util.Log.d(loginTag, "NEW USER - NavigateToSignUp")
-                        android.util.Log.d(loginTag, "  email: $email")
-                        android.util.Log.d(loginTag, "  domain: $domain")
-                        android.util.Log.d(loginTag, "========================================")
                         
                         // 신규 회원: 회원가입 화면으로 이동
                         val password = tempPassword ?: run {
-                            android.util.Log.e(loginTag, "ERROR: tempPassword is null")
                             setState { copy(isLoading = false) }
                             setEffect {
                                 LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
@@ -343,7 +255,6 @@ class LoginViewModel @Inject constructor(
                             return@collect
                         }
                         val currentDomain = tempDomain ?: run {
-                            android.util.Log.e(loginTag, "ERROR: tempDomain is null")
                             setState { copy(isLoading = false) }
                             setEffect {
                                 LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
@@ -355,14 +266,6 @@ class LoginViewModel @Inject constructor(
                         val displayName = if (currentDomain == Constants.DOMAIN_EMAIL) tempDisplayName else null
                         val profileImageUrl = tempProfileImageUrl
                         
-                        android.util.Log.d(loginTag, "========================================")
-                        android.util.Log.d(loginTag, "Navigating to SignUp screen")
-                        android.util.Log.d(loginTag, "  email: $email")
-                        android.util.Log.d(loginTag, "  password: ${password.take(20)}...")
-                        android.util.Log.d(loginTag, "  domain: $currentDomain")
-                        android.util.Log.d(loginTag, "  displayName: $displayName")
-                        android.util.Log.d(loginTag, "  profileImageUrl: $profileImageUrl")
-                        android.util.Log.d(loginTag, "========================================")
                         
                         setState { copy(isLoading = false) }
                         setEffect {
@@ -377,11 +280,6 @@ class LoginViewModel @Inject constructor(
                     }
                 }
                 is ApiResult.Error -> {
-                    android.util.Log.e(loginTag, "========================================")
-                    android.util.Log.e(loginTag, "Validate API: ERROR")
-                    android.util.Log.e(loginTag, "  error message: ${result.message}")
-                    android.util.Log.e(loginTag, "  error exception: ${result.exception?.message}")
-                    android.util.Log.e(loginTag, "========================================")
                     setState { copy(isLoading = false) }
                     setEffect {
                         LoginContract.Effect.ShowError(result.message ?: context.getString(R.string.error_1031))
@@ -412,12 +310,6 @@ class LoginViewModel @Inject constructor(
             else -> TAG
         }
 
-        android.util.Log.d(loginTag, "========================================")
-        android.util.Log.d(loginTag, "performSignIn() called")
-        android.util.Log.d(loginTag, "  email: $email")
-        android.util.Log.d(loginTag, "  domain: $domain")
-        android.util.Log.d(loginTag, "  password: ${password.take(20)}...")
-        android.util.Log.d(loginTag, "========================================")
 
         // Device info
         val deviceId = getDeviceId()
@@ -425,16 +317,6 @@ class LoginViewModel @Inject constructor(
         val deviceKey = getFcmToken() // FCM token from DataStore
 
         // SignIn API 파라미터 로그 출력
-        android.util.Log.d(loginTag, "========================================")
-        android.util.Log.d(loginTag, "SignIn API Parameters:")
-        android.util.Log.d(loginTag, "  domain: $domain")
-        android.util.Log.d(loginTag, "  email: $email")
-        android.util.Log.d(loginTag, "  passwd: ${password.take(20)}...")
-        android.util.Log.d(loginTag, "  push_key: $deviceKey")
-        android.util.Log.d(loginTag, "  gmail: $gmail")
-        android.util.Log.d(loginTag, "  device_id: $deviceId")
-        android.util.Log.d(loginTag, "  app_id: ${Constants.APP_ID}")
-        android.util.Log.d(loginTag, "========================================")
 
         signInUseCase(
             domain = domain,
@@ -445,50 +327,25 @@ class LoginViewModel @Inject constructor(
             deviceId = deviceId,
             appId = Constants.APP_ID
         ).collect { result ->
-            android.util.Log.d(loginTag, "========================================")
-            android.util.Log.d(loginTag, "signInUseCase result received")
-            android.util.Log.d(loginTag, "  result type: ${result.javaClass.simpleName}")
-            android.util.Log.d(loginTag, "========================================")
             
             when (result) {
                 is ApiResult.Loading -> {
-                    android.util.Log.d(loginTag, "SignIn API: Loading...")
                 }
                 is ApiResult.Success -> {
                     val response = result.data
-                    android.util.Log.d(loginTag, "========================================")
-                    android.util.Log.d(loginTag, "SignIn API: Success")
-                    android.util.Log.d(loginTag, "  response.success: ${response.success}")
-                    android.util.Log.d(loginTag, "  response.data: ${response.data != null}")
-                    android.util.Log.d(loginTag, "  response.message: ${response.message}")
-                    android.util.Log.d(loginTag, "========================================")
 
                     // Old 프로젝트: response.optBoolean("success")만 체크
                     // response.data가 null이어도 성공으로 처리 (사용자 정보는 이후에 별도로 가져옴)
                     if (response.success) {
-                        android.util.Log.d(loginTag, "========================================")
-                        android.util.Log.d(loginTag, "Login SUCCESS")
-                        android.util.Log.d(loginTag, "  Note: response.data may be null, user info will be fetched separately")
-                        android.util.Log.d(loginTag, "========================================")
 
                         // Old 프로젝트: 카카오 로그인 성공 후 unlink 호출
                         if (domain == Constants.DOMAIN_KAKAO) {
-                            android.util.Log.d(loginTag, "Calling requestKakaoUnlink()")
                             requestKakaoUnlink()
                         }
 
                         // response.data가 있는 경우에만 저장 (Old 프로젝트는 afterSignin에서 별도로 처리)
                         if (response.data != null) {
                             val userData = response.data
-                            android.util.Log.d(loginTag, "========================================")
-                            android.util.Log.d(loginTag, "User data available in response")
-                            android.util.Log.d(loginTag, "  userId: ${userData.userId}")
-                            android.util.Log.d(loginTag, "  email: ${userData.email}")
-                            android.util.Log.d(loginTag, "  username: ${userData.username}")
-                            android.util.Log.d(loginTag, "  nickname: ${userData.nickname}")
-                            android.util.Log.d(loginTag, "  profileImage: ${userData.profileImage}")
-                            android.util.Log.d(loginTag, "  token: ${userData.token.take(20)}...")
-                            android.util.Log.d(loginTag, "========================================")
 
                             // 1. 인증 정보 저장 (AuthRepository에 저장 - 자동으로 DataStore 및 메모리 캐시)
                             // Old 프로젝트: IdolAccount.createAccount(this, email, hashToken, domain)
@@ -497,12 +354,10 @@ class LoginViewModel @Inject constructor(
                                 domain = domain,
                                 token = userData.token
                             )
-                            android.util.Log.d(loginTag, "Auth credentials saved to AuthRepository (memory + DataStore)")
                             
                             // 3. 디바이스 ID 저장 (아이디 찾기용)
                             // old 프로젝트: 로그인 시 서버에 deviceId가 전달되지만, 로컬에도 저장하여 재설치 시에도 사용 가능하도록 함
                             preferencesManager.setDeviceId(deviceId)
-                            android.util.Log.d(loginTag, "✓ Device ID saved: $deviceId")
                             
                             // 4. old 프로젝트와 동일: 최소한의 정보만 저장 (email, domain, token)
                             // 전체 사용자 정보는 StartUpScreen의 getUserSelf에서 가져옴
@@ -516,19 +371,9 @@ class LoginViewModel @Inject constructor(
                                 heart = null,
                                 domain = domain
                             )
-                            android.util.Log.d(loginTag, "✓ Auth credentials saved (email, domain, token)")
-                            android.util.Log.d(loginTag, "  - Email: ${userData.email}")
-                            android.util.Log.d(loginTag, "  - Domain: $domain")
-                            android.util.Log.d(loginTag, "  - Token: ${userData.token.take(20)}...")
-                            android.util.Log.d(loginTag, "  - Note: Full user info will be fetched in StartUpScreen")
                         } else {
                             // response.data가 null인 경우 (Old 프로젝트와 동일)
                             // 사용자 정보는 이후에 별도로 가져옴 (StartUpScreen 또는 getUserSelf에서)
-                            android.util.Log.d(loginTag, "========================================")
-                            android.util.Log.d(loginTag, "User data is null - will be fetched separately")
-                            android.util.Log.d(loginTag, "  email: $email")
-                            android.util.Log.d(loginTag, "  domain: $domain")
-                            android.util.Log.d(loginTag, "========================================")
 
                             // Old 프로젝트의 afterSignin 로직:
                             // - hashToken 계산 (domain에 따라)
@@ -555,7 +400,6 @@ class LoginViewModel @Inject constructor(
                             // 3. 디바이스 ID 저장 (아이디 찾기용)
                             // old 프로젝트: 로그인 시 서버에 deviceId가 전달되지만, 로컬에도 저장하여 재설치 시에도 사용 가능하도록 함
                             preferencesManager.setDeviceId(deviceId)
-                            android.util.Log.d(loginTag, "✓ Device ID saved: $deviceId")
                             
                             // 4. old 프로젝트와 동일: 최소한의 정보만 저장 (email, domain, token)
                             // 전체 사용자 정보는 StartUpScreen의 getUserSelf에서 가져옴
@@ -569,17 +413,8 @@ class LoginViewModel @Inject constructor(
                                 heart = null,
                                 domain = domain
                             )
-                            android.util.Log.d(loginTag, "✓ Auth credentials saved (email, domain, token)")
-                            android.util.Log.d(loginTag, "  - Email: $email")
-                            android.util.Log.d(loginTag, "  - Domain: $domain")
-                            android.util.Log.d(loginTag, "  - Token: ${hashToken.take(20)}...")
-                            android.util.Log.d(loginTag, "  - Note: Full user info will be fetched in StartUpScreen")
                         }
 
-                        android.util.Log.d(TAG, "✓ Login successful")
-                        android.util.Log.d(loginTag, "========================================")
-                        android.util.Log.d(loginTag, "NavigateToMain effect sent")
-                        android.util.Log.d(loginTag, "========================================")
 
                         setState { copy(isLoading = false, loginType = null) }
                         setEffect { LoginContract.Effect.NavigateToMain }
@@ -594,14 +429,6 @@ class LoginViewModel @Inject constructor(
                                 errorMessage.contains("email", ignoreCase = true) ||
                                 errorMessage.contains("잘못", ignoreCase = true)
                         
-                        android.util.Log.e(loginTag, "========================================")
-                        android.util.Log.e(loginTag, "SignIn API: FAILED")
-                        android.util.Log.e(loginTag, "  response.success: ${response.success}")
-                        android.util.Log.e(loginTag, "  response.message: $errorMessage")
-                        android.util.Log.e(loginTag, "  isEmailError: $isEmailError")
-                        android.util.Log.e(loginTag, "  isExistingUser: $isExistingUser")
-                        android.util.Log.e(loginTag, "  domain: $domain")
-                        android.util.Log.e(loginTag, "========================================")
                         
                         // Old 프로젝트: validate API에서 이미 회원으로 확인된 경우(isExistingUser == true)
                         // signIn API가 실패해도 회원가입으로 이동하지 않고 로그인 처리
@@ -636,7 +463,6 @@ class LoginViewModel @Inject constructor(
                             // 3. 디바이스 ID 저장 (아이디 찾기용)
                             // old 프로젝트: 로그인 시 서버에 deviceId가 전달되지만, 로컬에도 저장하여 재설치 시에도 사용 가능하도록 함
                             preferencesManager.setDeviceId(deviceId)
-                            android.util.Log.d(loginTag, "✓ Device ID saved: $deviceId")
                             
                             // 4. old 프로젝트와 동일: 최소한의 정보만 저장 (email, domain, token)
                             // 전체 사용자 정보는 StartUpScreen의 getUserSelf에서 가져옴
@@ -650,11 +476,6 @@ class LoginViewModel @Inject constructor(
                                 heart = null,
                                 domain = domain
                             )
-                            android.util.Log.d(loginTag, "✓ Auth credentials saved (email, domain, token)")
-                            android.util.Log.d(loginTag, "  - Email: $email")
-                            android.util.Log.d(loginTag, "  - Domain: $domain")
-                            android.util.Log.d(loginTag, "  - Token: ${hashToken.take(20)}...")
-                            android.util.Log.d(loginTag, "  - Note: Full user info will be fetched in StartUpScreen")
                             
                             setState { copy(isLoading = false, loginType = null) }
                             setEffect { LoginContract.Effect.NavigateToMain }
@@ -665,20 +486,8 @@ class LoginViewModel @Inject constructor(
                         // "이메일이 잘못되었습니다" 에러가 나오면 신규 회원으로 간주하고 회원가입 플로우로 이동
                         if (isEmailError && !isExistingUser) {
                             // 이메일 오류인 경우 신규 회원으로 간주하고 회원가입 플로우로 이동
-                            android.util.Log.d(loginTag, "========================================")
-                            android.util.Log.d(loginTag, "Email error detected - NavigateToSignUp")
-                            android.util.Log.d(loginTag, "  Checking temp data...")
-                            android.util.Log.d(loginTag, "  tempEmail: $tempEmail")
-                            android.util.Log.d(loginTag, "  tempPassword: ${tempPassword?.take(20)}...")
-                            android.util.Log.d(loginTag, "  tempDomain: $tempDomain")
-                            android.util.Log.d(loginTag, "  tempDisplayName: $tempDisplayName")
-                            android.util.Log.d(loginTag, "  tempProfileImageUrl: $tempProfileImageUrl")
-                            android.util.Log.d(loginTag, "========================================")
                             
                             val email = tempEmail ?: run {
-                                android.util.Log.e(loginTag, "========================================")
-                                android.util.Log.e(loginTag, "ERROR: tempEmail is null")
-                                android.util.Log.e(loginTag, "========================================")
                                 setState { copy(isLoading = false) }
                                 setEffect {
                                     LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
@@ -686,9 +495,6 @@ class LoginViewModel @Inject constructor(
                                 return@collect
                             }
                             val password = tempPassword ?: run {
-                                android.util.Log.e(loginTag, "========================================")
-                                android.util.Log.e(loginTag, "ERROR: tempPassword is null")
-                                android.util.Log.e(loginTag, "========================================")
                                 setState { copy(isLoading = false) }
                                 setEffect {
                                     LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
@@ -696,9 +502,6 @@ class LoginViewModel @Inject constructor(
                                 return@collect
                             }
                             val currentDomain = tempDomain ?: run {
-                                android.util.Log.e(loginTag, "========================================")
-                                android.util.Log.e(loginTag, "ERROR: tempDomain is null")
-                                android.util.Log.e(loginTag, "========================================")
                                 setState { copy(isLoading = false) }
                                 setEffect {
                                     LoginContract.Effect.ShowError(context.getString(R.string.error_abnormal_exception))
@@ -710,14 +513,6 @@ class LoginViewModel @Inject constructor(
                             val displayName = if (currentDomain == Constants.DOMAIN_EMAIL) tempDisplayName else null
                             val profileImageUrl = tempProfileImageUrl
                             
-                            android.util.Log.d(loginTag, "========================================")
-                            android.util.Log.d(loginTag, "NEW USER - NavigateToSignUp (from SignIn API email error)")
-                            android.util.Log.d(loginTag, "  email: $email")
-                            android.util.Log.d(loginTag, "  password: ${password.take(20)}...")
-                            android.util.Log.d(loginTag, "  domain: $currentDomain")
-                            android.util.Log.d(loginTag, "  displayName: $displayName")
-                            android.util.Log.d(loginTag, "  profileImageUrl: $profileImageUrl")
-                            android.util.Log.d(loginTag, "========================================")
                             
                             setState { copy(isLoading = false) }
                             setEffect {
@@ -731,7 +526,6 @@ class LoginViewModel @Inject constructor(
                             }
                         } else {
                             // 그 외의 경우는 에러만 표시
-                            android.util.Log.e(loginTag, "Non-email error - showing error dialog")
                             setState { copy(isLoading = false) }
                             setEffect {
                                 LoginContract.Effect.ShowError(
@@ -742,11 +536,6 @@ class LoginViewModel @Inject constructor(
                     }
                 }
                 is ApiResult.Error -> {
-                    android.util.Log.e(loginTag, "========================================")
-                    android.util.Log.e(loginTag, "SignIn API: ERROR")
-                    android.util.Log.e(loginTag, "  error message: ${result.message}")
-                    android.util.Log.e(loginTag, "  error exception: ${result.exception?.message}")
-                    android.util.Log.e(loginTag, "========================================")
                     
                     setState { copy(isLoading = false) }
                         setEffect {
@@ -761,26 +550,15 @@ class LoginViewModel @Inject constructor(
      * Google 로그인.
      */
     private fun loginWithGoogle() {
-        android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
-        android.util.Log.d(GOOGLE_LOGIN_TAG, "loginWithGoogle() called")
-        android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
         
         viewModelScope.launch {
             try {
                 setState { copy(isLoading = true, loginType = LoginContract.LoginType.GOOGLE) }
-                android.util.Log.d(GOOGLE_LOGIN_TAG, "Google login started")
-                android.util.Log.d(GOOGLE_LOGIN_TAG, "State updated: isLoading=true, loginType=GOOGLE")
 
                 // Google SDK 호출은 LoginScreen에서 처리
                 setEffect { LoginContract.Effect.StartSocialLogin(LoginContract.LoginType.GOOGLE) }
-                android.util.Log.d(GOOGLE_LOGIN_TAG, "StartSocialLogin effect sent")
 
             } catch (e: Exception) {
-                android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
-                android.util.Log.e(GOOGLE_LOGIN_TAG, "loginWithGoogle() EXCEPTION")
-                android.util.Log.e(GOOGLE_LOGIN_TAG, "  error: ${e.message}")
-                android.util.Log.e(GOOGLE_LOGIN_TAG, "  stackTrace:", e)
-                android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
                 handleError(e)
             }
         }
@@ -798,29 +576,17 @@ class LoginViewModel @Inject constructor(
         displayName: String?,
         accessToken: String
     ) {
-        android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
-        android.util.Log.d(GOOGLE_LOGIN_TAG, "handleGoogleLoginResult() called")
-        android.util.Log.d(GOOGLE_LOGIN_TAG, "  email: $email")
-        android.util.Log.d(GOOGLE_LOGIN_TAG, "  displayName: $displayName")
-        android.util.Log.d(GOOGLE_LOGIN_TAG, "  accessToken: ${accessToken.take(20)}...")
-        android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
         
         viewModelScope.launch {
             try {
                 // Old 프로젝트와 동일: email이 필수, 없으면 에러 처리
                 if (email.isEmpty()) {
-                    android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
-                    android.util.Log.e(GOOGLE_LOGIN_TAG, "Google login error: email is empty")
-                    android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
                     handleSnsLoginError(context.getString(R.string.facebook_no_email))
                     return@launch
                 }
 
                 // Old 프로젝트: access token이 필수 (mPasswd = mAuthToken)
                 if (accessToken.isEmpty()) {
-                    android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
-                    android.util.Log.e(GOOGLE_LOGIN_TAG, "Google login error: accessToken is empty")
-                    android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
                     handleSnsLoginError(context.getString(R.string.error_abnormal_exception))
                     return@launch
                 }
@@ -831,24 +597,11 @@ class LoginViewModel @Inject constructor(
                 tempDisplayName = displayName
                 tempProfileImageUrl = null // Google은 프로필 이미지 URL을 별도로 받지 않음
 
-                android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
-                android.util.Log.d(GOOGLE_LOGIN_TAG, "Temp data set")
-                android.util.Log.d(GOOGLE_LOGIN_TAG, "  tempEmail: $email")
-                android.util.Log.d(GOOGLE_LOGIN_TAG, "  tempPassword: ${accessToken.take(20)}...")
-                android.util.Log.d(GOOGLE_LOGIN_TAG, "  tempDomain: ${Constants.DOMAIN_GOOGLE}")
-                android.util.Log.d(GOOGLE_LOGIN_TAG, "  tempDisplayName: $displayName")
-                android.util.Log.d(GOOGLE_LOGIN_TAG, "========================================")
-                android.util.Log.d(GOOGLE_LOGIN_TAG, "Calling validateAndSignIn()")
 
                 // validate API 호출하여 회원 여부 확인
                 validateAndSignIn(email, Constants.DOMAIN_GOOGLE)
 
             } catch (e: Exception) {
-                android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
-                android.util.Log.e(GOOGLE_LOGIN_TAG, "handleGoogleLoginResult() EXCEPTION")
-                android.util.Log.e(GOOGLE_LOGIN_TAG, "  error: ${e.message}")
-                android.util.Log.e(GOOGLE_LOGIN_TAG, "  stackTrace:", e)
-                android.util.Log.e(GOOGLE_LOGIN_TAG, "========================================")
                 handleError(e)
             }
         }
@@ -863,7 +616,6 @@ class LoginViewModel @Inject constructor(
             try {
                 // Line SDK 자체 로딩 UI가 있으므로 isLoading은 false로 유지
                 setState { copy(loginType = LoginContract.LoginType.LINE) }
-                android.util.Log.d(TAG, "Line login started")
                 setEffect { LoginContract.Effect.StartSocialLogin(LoginContract.LoginType.LINE) }
             } catch (e: Exception) {
                 handleError(e)
@@ -897,7 +649,6 @@ class LoginViewModel @Inject constructor(
                 tempDisplayName = displayName
                 tempProfileImageUrl = null // Line은 프로필 이미지 URL을 별도로 받지 않음
 
-                android.util.Log.d(TAG, "Line login success - userId: $userId, email: $email, displayName: $displayName")
 
                 // validate API 호출하여 회원 여부 확인
                 validateAndSignIn(email, Constants.DOMAIN_LINE)
@@ -917,7 +668,6 @@ class LoginViewModel @Inject constructor(
             try {
                 // Facebook SDK 자체 로딩 UI가 있으므로 isLoading은 false로 유지
                 setState { copy(loginType = LoginContract.LoginType.FACEBOOK) }
-                android.util.Log.d(TAG, "Facebook login started")
                 setEffect { LoginContract.Effect.StartSocialLogin(LoginContract.LoginType.FACEBOOK) }
             } catch (e: Exception) {
                 handleError(e)
@@ -945,7 +695,6 @@ class LoginViewModel @Inject constructor(
                 // Facebook SDK UI가 닫힌 후 우리의 로딩바 시작
                 setState { copy(isLoading = true) }
 
-                android.util.Log.d(TAG, "Facebook login success - email: $email, name: $name, facebookId: $facebookId")
 
                 tempEmail = email
                 tempPassword = accessToken // old 코드: mPasswd = mAuthToken
@@ -985,7 +734,6 @@ class LoginViewModel @Inject constructor(
         }
 
         setEffect { LoginContract.Effect.ShowError(errorMessage) }
-        android.util.Log.e(TAG, "Login error: $errorMessage", exception)
     }
 
     /**
@@ -993,7 +741,6 @@ class LoginViewModel @Inject constructor(
      * 로딩 상태만 해제하고 에러 메시지를 표시하지 않습니다.
      */
     fun handleSnsLoginCancelled() {
-        android.util.Log.d(TAG, "SNS login cancelled")
         setState {
             copy(
                 isLoading = false,
@@ -1008,10 +755,6 @@ class LoginViewModel @Inject constructor(
      * 로딩 상태를 해제하고 에러 메시지를 표시합니다.
      */
     fun handleSnsLoginError(errorMessage: String? = null) {
-        android.util.Log.e(KAKAO_LOGIN_TAG, "========================================")
-        android.util.Log.e(KAKAO_LOGIN_TAG, "handleSnsLoginError() called")
-        android.util.Log.e(KAKAO_LOGIN_TAG, "  errorMessage: $errorMessage")
-        android.util.Log.e(KAKAO_LOGIN_TAG, "========================================")
         
         setState {
             copy(
@@ -1020,11 +763,8 @@ class LoginViewModel @Inject constructor(
                 loginType = null
             )
         }
-        android.util.Log.e(TAG, "SNS login error: $errorMessage")
-        android.util.Log.d(KAKAO_LOGIN_TAG, "State updated: isLoading=false, loginType=null")
 
         setEffect { LoginContract.Effect.ShowError(errorMessage ?: context.getString(R.string.error_1031)) }
-        android.util.Log.d(KAKAO_LOGIN_TAG, "ShowError effect sent")
     }
 
     /**
@@ -1057,17 +797,11 @@ class LoginViewModel @Inject constructor(
      * Old 프로젝트: OnRegistered 콜백에서 Util.setPreference(this@AuthActivity, Const.PREF_GCM_PUSH_KEY, id) 호출
      */
     fun registerFcmToken(token: String) {
-        android.util.Log.d(TAG, "========================================")
-        android.util.Log.d(TAG, "registerFcmToken() called")
-        android.util.Log.d(TAG, "  token: ${token.take(20)}...")
-        android.util.Log.d(TAG, "========================================")
         
         viewModelScope.launch {
             try {
                 preferencesManager.setFcmToken(token)
-                android.util.Log.d(TAG, "FCM token saved to DataStore")
             } catch (e: Exception) {
-                android.util.Log.e(TAG, "Failed to save FCM token to DataStore", e)
             }
         }
     }
@@ -1101,33 +835,15 @@ class LoginViewModel @Inject constructor(
      * - 에러가 발생해도 무시하고 계속 진행
      */
     private fun requestKakaoUnlink() {
-        android.util.Log.d(KAKAO_LOGIN_TAG, "========================================")
-        android.util.Log.d(KAKAO_LOGIN_TAG, "requestKakaoUnlink() called")
-        android.util.Log.d(KAKAO_LOGIN_TAG, "========================================")
         
         viewModelScope.launch {
             try {
-                android.util.Log.d(TAG, "Kakao unlink called")
                 UserApiClient.instance.unlink { throwable ->
                     if (throwable != null) {
-                        android.util.Log.e(TAG, "Kakao unlink error: ${throwable.message}", throwable)
-                        android.util.Log.e(KAKAO_LOGIN_TAG, "========================================")
-                        android.util.Log.e(KAKAO_LOGIN_TAG, "Kakao unlink ERROR")
-                        android.util.Log.e(KAKAO_LOGIN_TAG, "  error: ${throwable.message}")
-                        android.util.Log.e(KAKAO_LOGIN_TAG, "========================================")
                     } else {
-                        android.util.Log.d(TAG, "Kakao unlink success")
-                        android.util.Log.d(KAKAO_LOGIN_TAG, "========================================")
-                        android.util.Log.d(KAKAO_LOGIN_TAG, "Kakao unlink SUCCESS")
-                        android.util.Log.d(KAKAO_LOGIN_TAG, "========================================")
                     }
                 }
             } catch (e: Exception) {
-                android.util.Log.e(TAG, "Kakao unlink exception: ${e.message}", e)
-                android.util.Log.e(KAKAO_LOGIN_TAG, "========================================")
-                android.util.Log.e(KAKAO_LOGIN_TAG, "Kakao unlink EXCEPTION")
-                android.util.Log.e(KAKAO_LOGIN_TAG, "  error: ${e.message}")
-                android.util.Log.e(KAKAO_LOGIN_TAG, "========================================")
             }
         }
     }

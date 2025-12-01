@@ -124,22 +124,14 @@ class StartUpViewModel @Inject constructor(
 
                 // 앱 시작 시 최애 이동 토스트 초기화 (old 프로젝트의 StartupActivity와 동일)
                 preferencesManager.resetMyFavToast()
-                android.util.Log.d(TAG, "✓ My favorite toast reset")
 
                 // Step 0: 저장된 인증 정보 확인 (old 프로젝트의 IdolAccount.getAccount() 역할)
                 // AuthRepository를 통해 인증 정보 유효성 확인
-                android.util.Log.d("USER_INFO", "========================================")
-                android.util.Log.d("USER_INFO", "[StartUpViewModel] Checking auth credentials via AuthRepository...")
 
                 val hasValidCredentials = authRepository.hasValidCredentialsAsync()
 
                 if (hasValidCredentials) {
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] ✓ Valid auth credentials found")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] AuthRepository will automatically provide credentials to AuthInterceptor")
-                    android.util.Log.d("USER_INFO", "[StartUpViewModel] Ready to make authenticated API calls")
-                    android.util.Log.d("USER_INFO", "========================================")
 
-                    android.util.Log.d(TAG, "✓ Auth credentials validated via AuthRepository")
                 } else {
                     android.util.Log.w("USER_INFO", "========================================")
                     android.util.Log.w("USER_INFO", "[StartUpViewModel] ⚠️ Auth credentials incomplete or missing")
@@ -220,34 +212,25 @@ class StartUpViewModel @Inject constructor(
      * Phase 3: 나머지 API들 병렬 호출
      */
     private suspend fun loadAllStartupAPIs() {
-        android.util.Log.d(TAG, "========================================")
-        android.util.Log.d(TAG, "Starting API Initialization (Old Project Order)")
-        android.util.Log.d(TAG, "Server: ${Constants.BASE_URL}")
-        android.util.Log.d(TAG, "========================================")
 
         // Phase 1: ConfigSelf 먼저 호출 (필수 전제조건)
         // old 코드: async { getConfigSelf(context) }.await()
-        android.util.Log.d(TAG, "Phase 1: Loading ConfigSelf (prerequisite)...")
         loadConfigSelf()
 
         // Phase 1-1: InAppBanner 로드
-        android.util.Log.d(TAG, "Phase 1-1: Loading InAppBanner...")
         loadInAppBanner()
 
         // Phase 2: ConfigStartup (critical path - 실패 시 중단)
         // old 코드: val isStartupSuccess = async { getConfigStartup(context) }.await()
-        android.util.Log.d(TAG, "Phase 2: Loading ConfigStartup (critical)...")
         val isStartupSuccess = loadConfigStartup()
 
         if (!isStartupSuccess) {
-            android.util.Log.e(TAG, "❌ ConfigStartup failed - aborting initialization")
             android.util.Log.w(TAG, "⚠️  This is likely because BASE_URL points to a non-existent server")
             android.util.Log.w(TAG, "⚠️  Check Constants.BASE_URL = \"${Constants.BASE_URL}\"")
             android.util.Log.w(TAG, "⚠️  Clearing all auth credentials and local data...")
 
             // 모든 인증 정보 및 로컬 데이터 삭제
             preferencesManager.clearAll()
-            android.util.Log.d(TAG, "✓ All auth credentials and local data cleared")
 
             // 로그인 페이지로 이동
             setState { copy(isLoading = false, progress = 0f, currentStep = "Login required") }
@@ -255,7 +238,6 @@ class StartUpViewModel @Inject constructor(
             return
         }
 
-        android.util.Log.d(TAG, "Phase 3: Loading remaining APIs in parallel...")
 
         loadIdols()
 
@@ -282,12 +264,9 @@ class StartUpViewModel @Inject constructor(
             awaitAll(*tasks.toTypedArray())
         }
 
-        android.util.Log.d(TAG, "✓ All APIs completed successfully")
 
         // Phase 4: Initialize chart rankings in SharedPreference
-        android.util.Log.d(TAG, "Phase 4: Initializing chart rankings...")
         chartDatabaseRepository.initializeChartsInDatabase()
-        android.util.Log.d(TAG, "✓ Chart rankings initialized")
     }
 
     /**
@@ -315,42 +294,14 @@ class StartUpViewModel @Inject constructor(
                         isSuccess = true
                         val data = result.data.data
 
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "ConfigStartup API Response")
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "BadWords count: ${data?.badWords?.size ?: 0}")
                     data?.badWords?.take(3)?.forEach { badWord ->
-                        android.util.Log.d(TAG, "  - ${badWord.word} (type: ${badWord.type}, exc: ${badWord.exc.size})")
                     }
-                    android.util.Log.d(TAG, "----------------------------------------")
-                    android.util.Log.d(TAG, "Board Tags count: ${data?.boardTags?.size ?: 0}")
                     data?.boardTags?.take(3)?.forEach { tag ->
-                        android.util.Log.d(TAG, "  - [${tag.id}] ${tag.name}")
                     }
-                    android.util.Log.d(TAG, "----------------------------------------")
-                    android.util.Log.d(TAG, "SNS Channels count: ${data?.snsChannels?.size ?: 0}")
                     data?.snsChannels?.forEach { channel ->
-                        android.util.Log.d(TAG, "  - ${channel.name}: ${channel.url}")
                     }
-                    android.util.Log.d(TAG, "----------------------------------------")
-                    android.util.Log.d(TAG, "Notice List: ${if (data?.noticeList.isNullOrEmpty()) "Empty" else "JSON String (${data?.noticeList?.length} chars)"}")
-                    android.util.Log.d(TAG, "----------------------------------------")
-                    android.util.Log.d(TAG, "Event List: ${if (data?.eventList.isNullOrEmpty()) "Empty" else "JSON String (${data?.eventList?.length} chars)"}")
-                    android.util.Log.d(TAG, "----------------------------------------")
-                    android.util.Log.d(TAG, "Family Apps count: ${data?.familyAppList?.size ?: 0}")
                     data?.familyAppList?.forEach { app ->
-                        android.util.Log.d(TAG, "  - ${app.name} (${app.packageName})")
                     }
-                    android.util.Log.d(TAG, "----------------------------------------")
-                    android.util.Log.d(TAG, "Upload Video Spec:")
-                    android.util.Log.d(TAG, "  - Max Duration: ${data?.uploadVideoSpec?.maxDurationSec}s")
-                    android.util.Log.d(TAG, "  - Max Size: ${data?.uploadVideoSpec?.maxSizeMb} MB")
-                    android.util.Log.d(TAG, "  - Allowed Formats: ${data?.uploadVideoSpec?.allowedFormats?.joinToString(", ")}")
-                    android.util.Log.d(TAG, "----------------------------------------")
-                    android.util.Log.d(TAG, "End Popup: ${data?.endPopup?.title ?: "None"}")
-                    android.util.Log.d(TAG, "New Picks: ${data?.newPicks}")
-                    android.util.Log.d(TAG, "Help Infos: ${data?.helpInfos}")
-                    android.util.Log.d(TAG, "========================================")
 
                     // DataStore에 저장
                     data?.let { configData ->
@@ -372,7 +323,6 @@ class StartUpViewModel @Inject constructor(
                             )
                         }
 
-                        android.util.Log.d(TAG, "✓ ConfigStartup data saved to DataStore")
                     }
                     // NOTE: 메모리 캐싱이 필요한 경우 구현 방법:
                     // 1. Application 클래스에 ConfigCache 싱글톤 생성
@@ -382,14 +332,12 @@ class StartUpViewModel @Inject constructor(
                     is ApiResult.Error -> {
                         // 에러 처리
                         isSuccess = false
-                        android.util.Log.e("StartUpViewModel", "ConfigStartup error: ${result.message}")
 
                         // ConfigStartup은 critical path이므로 실패 시 전체 초기화 중단
                     }
                 }
             }
         } catch (e: Exception) {
-            android.util.Log.e("StartUpViewModel", "ConfigStartup exception: ${e.message}", e)
             isSuccess = false
         }
 
@@ -411,38 +359,21 @@ class StartUpViewModel @Inject constructor(
                     is ApiResult.Success -> {
                     val data = result.data
 
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "ConfigSelf API Response")
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "UDP Broadcast URL: ${data.udpBroadcastUrl}")
-                    android.util.Log.d(TAG, "UDP Stage: ${data.udpStage}")
-                    android.util.Log.d(TAG, "CDN URL: ${data.cdnUrl}")
-                    android.util.Log.d(TAG, "Video Heart: ${data.videoHeart}")
-                    android.util.Log.d(TAG, "----------------------------------------")
-                    android.util.Log.d(TAG, "Daily Idol Update: ${data.dailyIdolUpdate}")
-                    android.util.Log.d(TAG, "All Idol Update: ${data.allIdolUpdate}")
-                    android.util.Log.d(TAG, "Show Miracle Tab: ${data.showMiracleTab}")
-                    android.util.Log.d(TAG, "Show Award Tab: ${data.showAwardTab}")
-                    android.util.Log.d(TAG, "========================================")
 
                     // DataStore에 UDP 설정 저장
                     data.udpBroadcastUrl?.let {
                         preferencesManager.setUdpBroadcastUrl(it)
-                        android.util.Log.d(TAG, "✓ UDP Broadcast URL saved: $it")
                     }
 
                     preferencesManager.setUdpStage(data.udpStage)
-                    android.util.Log.d(TAG, "✓ UDP Stage saved: ${data.udpStage}")
 
                     // CDN URL 저장
                     data.cdnUrl?.let {
                         preferencesManager.setCdnUrl(it)
-                        android.util.Log.d(TAG, "✓ CDN URL saved: $it")
                     }
 
                     // Video Heart 저장
                     preferencesManager.setVideoHeart(data.videoHeart)
-                    android.util.Log.d(TAG, "✓ Video Heart saved: ${data.videoHeart}")
 
                     // Menu Config 저장
                     preferencesManager.setMenuNoticeMain(data.menuNoticeMain)
@@ -452,15 +383,12 @@ class StartUpViewModel @Inject constructor(
                     preferencesManager.setShowFreeChargeMarker(data.showFreeChargeMarker)
                     preferencesManager.setShowLiveStreamingTab(data.showLiveStreamingTab)
 
-                    android.util.Log.d(TAG, "✓ ConfigSelf data saved to DataStore")
                 }
                     is ApiResult.Error -> {
-                        android.util.Log.e(TAG, "ConfigSelf error: ${result.message}")
                     }
                 }
             }
         } catch (e: Exception) {
-            android.util.Log.e(TAG, "ConfigSelf exception: ${e.message}", e)
         }
     }
 
@@ -469,12 +397,10 @@ class StartUpViewModel @Inject constructor(
      */
     private suspend fun loadInAppBanner() {
         try {
-            android.util.Log.d(TAG, "Calling InAppBanner API...")
             val response = configsApi.getInAppBanner()
 
             if (response.isSuccessful && response.body() != null) {
                 val responseBody = response.body()!!.string()
-                android.util.Log.d(TAG, "InAppBanner response: $responseBody")
 
                 // JSON 파싱
                 val jsonObject = org.json.JSONObject(responseBody)
@@ -498,7 +424,6 @@ class StartUpViewModel @Inject constructor(
                             )
                         }
 
-                        android.util.Log.d(TAG, "✓ InAppBanner API success (${bannerList.size} banners)")
 
                         // section별로 그룹화
                         val bannersBySection = bannerList.groupBy { it.section }
@@ -517,23 +442,17 @@ class StartUpViewModel @Inject constructor(
                                 )
                             })
                             preferencesManager.setInAppBannerMenu(menuBannersJson)
-                            android.util.Log.d(TAG, "✓ Menu banners saved (${menuBanners.size} banners)")
                         } else {
                             preferencesManager.setInAppBannerMenu(null)
-                            android.util.Log.d(TAG, "✓ No menu banners found")
                         }
                     } else {
                         preferencesManager.setInAppBannerMenu(null)
-                        android.util.Log.d(TAG, "✓ No banners in response")
                     }
                 } else {
-                    android.util.Log.e(TAG, "InAppBanner API success=false")
                 }
             } else {
-                android.util.Log.e(TAG, "InAppBanner API error: ${response.code()}")
             }
         } catch (e: Exception) {
-            android.util.Log.e(TAG, "InAppBanner exception: ${e.message}", e)
         }
     }
 
@@ -548,13 +467,6 @@ class StartUpViewModel @Inject constructor(
                 is ApiResult.Success -> {
                     val data = result.data.data
 
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "UpdateInfo API Response")
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "All Idol Update: ${data?.allIdolUpdate}")
-                    android.util.Log.d(TAG, "Daily Idol Update: ${data?.dailyIdolUpdate}")
-                    android.util.Log.d(TAG, "SNS Channel Update: ${data?.snsChannelUpdate}")
-                    android.util.Log.d(TAG, "========================================")
 
                     // DataStore에 저장 및 기존 플래그와 비교
                     data?.let { updateData ->
@@ -566,35 +478,29 @@ class StartUpViewModel @Inject constructor(
                         // 플래그 비교 및 동기화 필요 여부 로그
                         updateData.allIdolUpdate?.let { newFlag ->
                             if (oldAllIdolUpdate != newFlag) {
-                                android.util.Log.d(TAG, "⚠️  AllIdolUpdate changed: $oldAllIdolUpdate -> $newFlag (sync needed)")
                             }
                             preferencesManager.setAllIdolUpdate(newFlag)
                         }
 
                         updateData.dailyIdolUpdate?.let { newFlag ->
                             if (oldDailyIdolUpdate != newFlag) {
-                                android.util.Log.d(TAG, "⚠️  DailyIdolUpdate changed: $oldDailyIdolUpdate -> $newFlag (sync needed)")
                             }
                             preferencesManager.setDailyIdolUpdate(newFlag)
                         }
 
                         updateData.snsChannelUpdate?.let { newFlag ->
                             if (oldSnsChannelUpdate != newFlag) {
-                                android.util.Log.d(TAG, "⚠️  SnsChannelUpdate changed: $oldSnsChannelUpdate -> $newFlag (sync needed)")
                             }
                             preferencesManager.setSnsChannelUpdate(newFlag)
                         }
 
-                        android.util.Log.d(TAG, "✓ UpdateInfo flags saved to DataStore")
                     }
                 }
                 is ApiResult.Error -> {
-                    android.util.Log.e(TAG, "UpdateInfo error: ${result.message}")
                 }
             }
         }
         } catch (e: Exception) {
-            android.util.Log.e(TAG, "UpdateInfo exception: ${e.message}", e)
         }
     }
 
@@ -613,7 +519,6 @@ class StartUpViewModel @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            android.util.Log.e(TAG, "UserSelf exception: ${e.message}", e)
         }
     }
 
@@ -624,7 +529,6 @@ class StartUpViewModel @Inject constructor(
         try {
             favoritesRepository.loadAndSaveFavoriteSelf()
         } catch (e: Exception) {
-            android.util.Log.e(TAG, "FavoritesSelf exception: ${e.message}", e)
         }
     }
 
@@ -638,23 +542,15 @@ class StartUpViewModel @Inject constructor(
                 is ApiResult.Success -> {
                     val data = result.data.data
 
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "UserStatus API Response")
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "Tutorial Completed: ${data?.tutorialCompleted}")
-                    android.util.Log.d(TAG, "First Login: ${data?.firstLogin}")
-                    android.util.Log.d(TAG, "========================================")
 
                     // 사용자 상태 DataStore 저장
                     data?.let { statusData ->
                         statusData.tutorialCompleted?.let { preferencesManager.setTutorialCompleted(it) }
                         statusData.firstLogin?.let { preferencesManager.setFirstLogin(it) }
 
-                        android.util.Log.d(TAG, "✓ UserStatus data saved to DataStore")
                     }
                 }
                 is ApiResult.Error -> {
-                    android.util.Log.e(TAG, "UserStatus error: ${result.message}")
                 }
             }
         }
@@ -670,18 +566,10 @@ class StartUpViewModel @Inject constructor(
                 is ApiResult.Success -> {
                     val data = result.data.data
 
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "AdTypeList API Response")
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "Ad Types count: ${data?.size ?: 0}")
                     data?.forEach { adType ->
-                        android.util.Log.d(TAG, "  - ${adType.type} (ID: ${adType.id})")
-                        android.util.Log.d(TAG, "    Reward: ${adType.reward}")
                     }
-                    android.util.Log.d(TAG, "========================================")
                 }
                 is ApiResult.Error -> {
-                    android.util.Log.e(TAG, "AdTypeList error: ${result.message}")
                 }
             }
         }
@@ -697,18 +585,10 @@ class StartUpViewModel @Inject constructor(
                 is ApiResult.Success -> {
                     val data = result.data.data
 
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "MessageCoupon API Response")
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "Coupon Messages count: ${data?.size ?: 0}")
                     data?.forEach { coupon ->
-                        android.util.Log.d(TAG, "  - [${coupon.id}] ${coupon.message}")
-                        android.util.Log.d(TAG, "    Code: ${coupon.couponCode}")
                     }
-                    android.util.Log.d(TAG, "========================================")
                 }
                 is ApiResult.Error -> {
-                    android.util.Log.e(TAG, "MessageCoupon error: ${result.message}")
                 }
             }
         }
@@ -724,15 +604,8 @@ class StartUpViewModel @Inject constructor(
             when (result) {
                 is ApiResult.Loading -> {}
                 is ApiResult.Success -> {
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "Timezone Update API Response")
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "Device Timezone: $timezone")
-                    android.util.Log.d(TAG, "Update Success: ${result.data.success}")
-                    android.util.Log.d(TAG, "========================================")
                 }
                 is ApiResult.Error -> {
-                    android.util.Log.e(TAG, "Timezone error: ${result.message}")
                 }
             }
         }
@@ -750,41 +623,26 @@ class StartUpViewModel @Inject constructor(
                     val response = result.data
                     val data = response.data
 
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "Idols API Response")
-                    android.util.Log.d(TAG, "========================================")
-                    android.util.Log.d(TAG, "All Idol Update: ${response.allIdolUpdate}")
-                    android.util.Log.d(TAG, "Daily Idol Update: ${response.dailyIdolUpdate}")
-                    android.util.Log.d(TAG, "Meta - Total Count: ${response.meta?.totalCount}")
-                    android.util.Log.d(TAG, "Meta - Limit: ${response.meta?.limit}")
-                    android.util.Log.d(TAG, "Meta - Offset: ${response.meta?.offset}")
-                    android.util.Log.d(TAG, "Total Idols count: ${data?.size ?: 0}")
-                    android.util.Log.d(TAG, "========================================")
 
                     // Room Database에 저장
                     data?.let { idolList ->
                         // Top3 데이터 로깅 (디버깅용 - 첫 5개만)
                         idolList.take(5).forEach { idol ->
-                            android.util.Log.d(TAG, "🖼️ API Data - Idol ${idol.id} (${idol.name}): top3=${idol.top3}, top3Type=${idol.top3Type}, top3ImageVer=${idol.top3ImageVer}")
                         }
 
                         val entities = idolList.map { it.toEntity() }
                         idolDao.insert(entities)  // old 프로젝트와 동일한 메서드명
-                        android.util.Log.d(TAG, "✓ ${entities.size} idols saved to Room Database")
 
                         // 저장된 데이터 검증 (디버깅용 - 첫 5개만)
                         entities.take(5).forEach { entity ->
-                            android.util.Log.d(TAG, "🖼️ Saved to DB - Idol ${entity.id} (${entity.name}): top3=${entity.top3}, top3Type=${entity.top3Type}")
                         }
                     }
                 }
                 is ApiResult.Error -> {
-                    android.util.Log.e(TAG, "Idols error: ${result.message}")
                 }
             }
         }
         } catch (e: Exception) {
-            android.util.Log.e(TAG, "Idols exception: ${e.message}", e)
         }
     }
 
@@ -796,12 +654,9 @@ class StartUpViewModel @Inject constructor(
      * old 프로젝트의 StartupViewModel.getTypeList()와 동일한 로직
      */
     private suspend fun loadTypeList() {
-        android.util.Log.d(TAG, "========================================")
-        android.util.Log.d(TAG, "Loading TypeList (old logic)...")
 
         try {
             getTypeListUseCase(forceRefresh = true).collect { typeListData ->
-                android.util.Log.d("API_RESPONSE", "TypeList received: ${typeListData.size} items")
 
                 // old 프로젝트와 동일: A, S 타입은 isDivided = "Y"로 설정
                 val arrayTypeList = typeListData.toMutableList()
@@ -844,16 +699,12 @@ class StartUpViewModel @Inject constructor(
 
                 // ConfigRepository 캐시에 처리된 typeList 저장
                 configRepository.setTypeListCache(arrayTypeList)
-                android.util.Log.d("API_RESPONSE", "✓ TypeList cached in ConfigRepository (${arrayTypeList.size} items)")
 
                 arrayTypeList.forEachIndexed { index, type ->
-                    android.util.Log.d("API_RESPONSE", "  [$index] id=${type.id}, name=${type.name}, type=${type.type}, isDivided=${type.isDivided}, isFemale=${type.isFemale}, showDivider=${type.showDivider}")
                 }
 
-                android.util.Log.d("API_RESPONSE", "========================================")
             }
         } catch (e: Exception) {
-            android.util.Log.e(TAG, "TypeList error: ${e.message}", e)
         }
     }
 
@@ -865,14 +716,10 @@ class StartUpViewModel @Inject constructor(
      * ConfigRepository 캐시에 저장
      */
     private suspend fun loadChartsCurrent() {
-        android.util.Log.d(TAG, "========================================")
-        android.util.Log.d(TAG, "Loading ChartsCurrent (non-CELEB logic)...")
 
         try {
             val response = chartsApi.getChartsCurrent()
 
-            android.util.Log.d("API_RESPONSE", "ChartsCurrent Response code: ${response.code()}")
-            android.util.Log.d("API_RESPONSE", "ChartsCurrent Response successful: ${response.isSuccessful}")
 
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
@@ -881,13 +728,11 @@ class StartUpViewModel @Inject constructor(
                     // MainChartModel 저장 (old 프로젝트와 동일)
                     body.main?.let { mainChartModel ->
                         configRepository.setMainChartModel(mainChartModel)
-                        android.util.Log.d("API_RESPONSE", "✓ MainChartModel saved to cache")
                     }
 
                     // ChartObjects 저장 (MIRACLE, ROOKIE 등)
                     body.objects?.let { objects ->
                         configRepository.setChartObjects(objects)
-                        android.util.Log.d("API_RESPONSE", "✓ ChartObjects saved to cache")
                     }
 
                     // main.males/females를 TypeListModel로 변환
@@ -940,23 +785,16 @@ class StartUpViewModel @Inject constructor(
 
                     // ConfigRepository 캐시에 처리된 typeList 저장
                     configRepository.setTypeListCache(typeListData)
-                    android.util.Log.d("API_RESPONSE", "✓ ChartsCurrent converted and cached (${typeListData.size} items)")
 
                     typeListData.forEachIndexed { index, type ->
-                        android.util.Log.d("API_RESPONSE", "  [$index] name=${type.name}, type=${type.type}, isFemale=${type.isFemale}")
                     }
                 } else {
-                    android.util.Log.e("API_RESPONSE", "ChartsCurrent API returned success=false")
                 }
             } else {
-                android.util.Log.e("API_RESPONSE", "ChartsCurrent Response not successful: ${response.code()}")
-                android.util.Log.e("API_RESPONSE", "Error body: ${response.errorBody()?.string()}")
             }
         } catch (e: Exception) {
-            android.util.Log.e(TAG, "ChartsCurrent error: ${e.message}", e)
         }
 
-        android.util.Log.d("API_RESPONSE", "========================================")
     }
 
     /**
@@ -980,9 +818,6 @@ class StartUpViewModel @Inject constructor(
      * 5. GLOBAL - 글로벌
      */
     private suspend fun fetchChartIdols() {
-        android.util.Log.d(TAG, "========================================")
-        android.util.Log.d(TAG, "📊 Fetching chart idol IDs...")
-        android.util.Log.d(TAG, "========================================")
 
         try {
             // 5개 차트 코드 정의
@@ -992,7 +827,6 @@ class StartUpViewModel @Inject constructor(
                 chartCodes.map { code ->
                     async {
                         try {
-                            android.util.Log.d(TAG, "🔄 Fetching idol IDs for chart: $code")
                             val response = chartsApi.getChartIdolIds(code)
 
                             if (response.isSuccessful && response.body() != null) {
@@ -1000,25 +834,18 @@ class StartUpViewModel @Inject constructor(
                                 if (body.success && body.data != null) {
                                     // SharedPreference에 저장
                                     preferencesManager.saveChartIdolIds(code, body.data)
-                                    android.util.Log.d(TAG, "✅ Saved ${body.data.size} idol IDs for $code")
                                 } else {
                                     android.util.Log.w(TAG, "⚠️ No data for chart: $code")
                                 }
                             } else {
-                                android.util.Log.e(TAG, "❌ Failed to fetch chart $code: ${response.code()}")
                             }
                         } catch (e: Exception) {
-                            android.util.Log.e(TAG, "❌ Error fetching chart $code: ${e.message}", e)
                         }
                     }
                 }.awaitAll()
             }
 
-            android.util.Log.d(TAG, "========================================")
-            android.util.Log.d(TAG, "✅ All chart idol IDs fetched and saved")
-            android.util.Log.d(TAG, "========================================")
         } catch (e: Exception) {
-            android.util.Log.e(TAG, "❌ Failed to fetch chart idols: ${e.message}", e)
         }
     }
 

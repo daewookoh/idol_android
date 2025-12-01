@@ -53,13 +53,11 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
     private var cachedData: List<HeartPickCardData>? = null
 
     init {
-        android.util.Log.d("HeartPickRankingVM", "🆕 ViewModel created for chartCode: $chartCode")
         loadHeartPickList()
     }
 
     fun reloadIfNeeded() {
         if (cachedData != null) {
-            android.util.Log.d("HeartPickRankingVM", "✓ Using cached data")
             _uiState.value = UiState.Success(cachedData!!)
         } else {
             loadHeartPickList()
@@ -70,22 +68,16 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = UiState.Loading
 
-            android.util.Log.d("HeartPickRankingVM", "========================================")
-            android.util.Log.d("HeartPickRankingVM", "[HeartPick] Loading heart pick list")
-            android.util.Log.d("HeartPickRankingVM", "  - API: heartpick/")
 
             // heartpick/ API 호출
             heartpickRepository.getHeartPickList(offset = 0, limit = 100).collect { result ->
                 when (result) {
                     is ApiResult.Loading -> {
-                        android.util.Log.d("HeartPickRankingVM", "⏳ Loading...")
                     }
                     is ApiResult.Success -> {
-                        android.util.Log.d("HeartPickRankingVM", "✅ SUCCESS - HeartPicks count: ${result.data.size}")
                         processHeartPickData(result.data)
                     }
                     is ApiResult.Error -> {
-                        android.util.Log.e("HeartPickRankingVM", "❌ ERROR: ${result.message}")
                         _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
                     }
                 }
@@ -174,13 +166,11 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
                 cardData
             }
 
-            android.util.Log.d("HeartPickRankingVM", "✅ Processed ${cardDataList.size} heart picks")
 
             cachedData = cardDataList
 
             _uiState.value = UiState.Success(cardDataList)
         } catch (e: Exception) {
-            android.util.Log.e("HeartPickRankingVM", "❌ Exception: ${e.message}", e)
             _uiState.value = UiState.Error(e.message ?: "Error")
         }
     }

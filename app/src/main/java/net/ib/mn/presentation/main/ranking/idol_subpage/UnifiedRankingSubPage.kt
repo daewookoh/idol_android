@@ -20,9 +20,9 @@ import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import net.ib.mn.R
 import net.ib.mn.domain.ranking.RankingDataSource
 import net.ib.mn.ui.components.ExoRankingList
+import net.ib.mn.ui.components.RankingItem
 
 /**
  * 통합 랭킹 SubPage (Global, Group, Solo 모두 지원)
@@ -48,23 +48,16 @@ fun UnifiedRankingSubPage(
     listState: LazyListState? = null,
     modifier: Modifier = Modifier,
     isForFavorite: Boolean = false,
-    onRankItemsLoaded: ((List<net.ib.mn.ui.components.RankingItem>) -> Unit)? = null
+    onRankItemsLoaded: ((List<RankingItem>) -> Unit)? = null
 ) {
-    // LocalRankingItemClick은 ExoRankingItem 내부에서 직접 사용됨
-    android.util.Log.d("UnifiedRankingSubPage", "🎨 [Composing] ${dataSource.type} for chartCode: $chartCode")
-
     // ViewModel 생성 (key를 사용하여 각 타입별로 다른 인스턴스 생성)
     val viewModelKey = "unified_ranking_${dataSource.type}_$chartCode"
-    android.util.Log.d("UnifiedRankingSubPage", "🔑 ViewModel key: $viewModelKey")
 
     val viewModel: UnifiedRankingSubPageViewModel = hiltViewModel<UnifiedRankingSubPageViewModel, UnifiedRankingSubPageViewModel.Factory>(
         key = viewModelKey
     ) { factory ->
-        android.util.Log.d("UnifiedRankingSubPage", "🏭 Factory creating ViewModel for type=${dataSource.type}, chartCode=$chartCode")
         factory.create(chartCode, dataSource)
     }
-
-    android.util.Log.d("UnifiedRankingSubPage", "✅ ViewModel instance: ${viewModel.hashCode()}, type=${dataSource.type}")
 
     val uiState by viewModel.uiState.collectAsState()
     // isForFavorite이 true면 새로운 스크롤 상태 생성 (독립적인 스크롤)
@@ -76,13 +69,9 @@ fun UnifiedRankingSubPage(
 
     // 초기 로드 또는 chartCode 변경 시 처리
     LaunchedEffect(chartCode) {
-        android.util.Log.d("UnifiedRankingSubPage", "[${dataSource.type}] LaunchedEffect triggered for: $chartCode")
-
         if (dataSource.supportGenderChange()) {
-            // Group/Solo: 남녀 변경 시 새로운 코드로 재로드
             viewModel.reloadWithNewCode(chartCode)
         } else {
-            // Global: 캐시된 데이터가 있으면 사용
             viewModel.reloadIfNeeded()
         }
     }
@@ -90,15 +79,13 @@ fun UnifiedRankingSubPage(
     // 화면 가시성 변경 시 UDP 구독 관리 및 데이터 새로고침
     LaunchedEffect(isVisible) {
         if (isVisible) {
-            android.util.Log.d("UnifiedRankingSubPage", "[${dataSource.type}] 👁️ Screen became visible")
             viewModel.onScreenVisible()
         } else {
-            android.util.Log.d("UnifiedRankingSubPage", "[${dataSource.type}] 🙈 Screen hidden")
             viewModel.onScreenHidden()
         }
     }
 
-    when (uiState) {
+    when (val state = uiState) {
         is UnifiedRankingSubPageViewModel.UiState.Loading -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -109,15 +96,12 @@ fun UnifiedRankingSubPage(
         }
 
         is UnifiedRankingSubPageViewModel.UiState.Error -> {
-            val error = uiState as UnifiedRankingSubPageViewModel.UiState.Error
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
+                modifier = Modifier.fillMaxSize().padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "오류: ${error.message}",
+                    text = "오류: ${state.message}",
                     fontSize = 16.sp,
                     color = ColorPalette.main
                 )
@@ -125,12 +109,10 @@ fun UnifiedRankingSubPage(
         }
 
         is UnifiedRankingSubPageViewModel.UiState.Success -> {
-            val success = uiState as UnifiedRankingSubPageViewModel.UiState.Success
-
             // 랭킹 데이터 로드 완료 콜백 (최초 1회만 호출)
-            LaunchedEffect(success.items) {
-                if (success.items.isNotEmpty()) {
-                    onRankItemsLoaded?.invoke(success.items)
+            LaunchedEffect(state.items) {
+                if (state.items.isNotEmpty()) {
+                    onRankItemsLoaded?.invoke(state.items)
                 }
             }
 
@@ -140,11 +122,9 @@ fun UnifiedRankingSubPage(
             // 최상단 Top3 비디오 재생 여부: 모든 하위 Top3가 닫혀있을 때만 재생
             val isTop3VideoVisible = isVisible && expandedItemIds.isEmpty()
 
-            if (success.items.isEmpty()) {
+            if (state.items.isEmpty()) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
+                    modifier = Modifier.fillMaxSize().padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -155,25 +135,16 @@ fun UnifiedRankingSubPage(
                 }
             } else {
                 ExoRankingList(
-                    items = success.items,
-                    topIdol = if (isForFavorite) null else success.topIdol, // Favorite용이면 ExoTop3 숨김
+                    items = state.items,
+                    topIdol = if (isForFavorite) null else state.topIdol,
                     isVisible = isTop3VideoVisible,
                     listState = scrollState,
-                    onItemClick = { rank, item ->
-                        // 로그만 출력 (실제 클릭은 ExoRankingItem 내부에서 LocalRankingItemClick으로 처리)
-                        android.util.Log.d("UnifiedRankingSubPage", "Clicked: Rank $rank - ${item.name}")
-                    },
-                    onVoteSuccess = { idolId, voteCount ->
-                        viewModel.updateVote(idolId, voteCount)
-                    },
-                    disableAnimation = true,  // 애니메이션 딜레이 제거
+                    onItemClick = { _, _ -> },
+                    onVoteSuccess = viewModel::updateVote,
+                    disableAnimation = true,
                     expandedItemIds = expandedItemIds,
                     onExpandedChange = { itemKey, isExpanded ->
-                        expandedItemIds = if (isExpanded) {
-                            expandedItemIds + itemKey
-                        } else {
-                            expandedItemIds - itemKey
-                        }
+                        expandedItemIds = if (isExpanded) expandedItemIds + itemKey else expandedItemIds - itemKey
                     }
                 )
             }
