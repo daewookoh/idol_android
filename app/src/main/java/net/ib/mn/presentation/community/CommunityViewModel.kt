@@ -94,6 +94,16 @@ class CommunityViewModel @Inject constructor(
                     idolCategory = rankingItem.category,
                     idolChartCode = newMostIdolChartCode
                 )
+                // 최애 설정 시 즐겨찾기 캐시에도 추가 (Old 프로젝트와 동일 - 서버에서 자동 처리됨)
+                newMostIdolId?.let { idolId ->
+                    if (!userCacheRepository.getFavoriteIdolIds().contains(idolId)) {
+                        // favorite API 호출 없이 캐시만 추가 (서버에서 자동 처리)
+                        // addFavoriteToCache에 favoriteId가 필요하지만,
+                        // 서버에서 자동 추가된 경우 favoriteId를 모르므로 -1로 임시 설정
+                        // (다음 favorites/self API 호출 시 정확한 ID로 갱신됨)
+                        userCacheRepository.addFavoriteToCache(idolId, -1)
+                    }
+                }
             } else {
                 newMostIdolId = null
                 newMostIdolChartCode = null

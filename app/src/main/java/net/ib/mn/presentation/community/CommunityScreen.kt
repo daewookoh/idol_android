@@ -509,6 +509,10 @@ fun CommunityScreen(
                         currentIsMost = currentIsMost,
                         onSuccess = { newIsMost ->
                             currentIsMost = newIsMost
+                            // 최애 설정 시 즐겨찾기도 자동으로 on (Old 프로젝트와 동일)
+                            if (newIsMost) {
+                                currentIsFavorite = true
+                            }
                             onMostChanged(newIsMost)
                         },
                         onError = { errorMessage ->
