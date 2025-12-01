@@ -84,4 +84,15 @@ interface ChartsApi {
      */
     @GET("charts/list_per_idol/")
     suspend fun getIdolChartCodes(): Response<ResponseBody>
+
+    /**
+     * 하트 투표 랭킹 Top100 조회
+     *
+     * old 프로젝트의 trends/most_votes_top100/ API와 동일
+     * 최다득표 순위 탑 100
+     *
+     * @return Response<ResponseBody> JSON 형식의 응답
+     */
+    @GET("trends/most_votes_top100/")
+    suspend fun getVotesTop100(): Response<ResponseBody>
 }

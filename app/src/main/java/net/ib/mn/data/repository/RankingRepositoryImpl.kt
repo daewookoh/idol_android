@@ -360,4 +360,57 @@ class RankingRepositoryImpl @Inject constructor(
             ))
         }
     }
+
+    override fun getVotesTop100(idolId: Int?): Flow<ApiResult<String>> = flow {
+        emit(ApiResult.Loading)
+
+        try {
+            android.util.Log.d("RankingRepo", "========================================")
+            android.util.Log.d("RankingRepo", "🏆 Calling getVotesTop100 API (trends/most_votes_top100/)")
+            android.util.Log.d("RankingRepo", "  - idolId: $idolId")
+            android.util.Log.d("RankingRepo", "========================================")
+
+            val response = chartsApi.getVotesTop100()
+
+            android.util.Log.d("RankingRepo", "📦 Response received:")
+            android.util.Log.d("RankingRepo", "  - HTTP Code: ${response.code()}")
+            android.util.Log.d("RankingRepo", "  - isSuccessful: ${response.isSuccessful}")
+
+            if (response.isSuccessful && response.body() != null) {
+                val jsonString = response.body()!!.string()
+
+                android.util.Log.d("RankingRepo", "✅ getVotesTop100 SUCCESS")
+                android.util.Log.d("RankingRepo", "  - JSON length: ${jsonString.length}")
+                android.util.Log.d("RankingRepo", "  - JSON preview: ${jsonString.take(200)}")
+
+                emit(ApiResult.Success(jsonString))
+            } else {
+                android.util.Log.e("RankingRepo", "❌ Response not successful or body null")
+                android.util.Log.e("RankingRepo", "  - Error body: ${response.errorBody()?.string()}")
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            android.util.Log.e("RankingRepo", "❌ HttpException: ${e.code()} - ${e.message()}", e)
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code(),
+                message = "HTTP ${e.code()}: ${e.message()}"
+            ))
+        } catch (e: IOException) {
+            android.util.Log.e("RankingRepo", "❌ IOException: ${e.message}", e)
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Network error: ${e.message}"
+            ))
+        } catch (e: Exception) {
+            android.util.Log.e("RankingRepo", "❌ Exception: ${e.message}", e)
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Unknown error: ${e.message}"
+            ))
+        }
+    }
 }

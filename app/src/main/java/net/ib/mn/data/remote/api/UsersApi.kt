@@ -3,8 +3,10 @@ package net.ib.mn.data.remote.api
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Query
 import retrofit2.http.Url
 
 /**
@@ -31,4 +33,20 @@ interface UsersApi {
      */
     @POST("users/delmost/")
     suspend fun deleteMost(): Response<ResponseBody>
+
+    /**
+     * 특정 아이돌에게 투표한 유저 랭킹 조회
+     * GET users/ranked_user/
+     *
+     * old 프로젝트: HeartVoteRankingActivity에서 사용
+     * 응답: { "ranks": { "objects": [...] }, "my_rank": "123" }
+     *
+     * @param idolId 아이돌 ID
+     * @param league 리그 (optional)
+     */
+    @GET("users/ranked_user/")
+    suspend fun getRankedUser(
+        @Query("idol_id") idolId: Int,
+        @Query("league") league: String? = null
+    ): Response<ResponseBody>
 }

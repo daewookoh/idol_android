@@ -59,4 +59,19 @@ object LocaleUtil {
             else -> "en"
         }
     }
+
+    /**
+     * 앱 로케일 반환
+     *
+     * @param context Context
+     * @return Locale
+     */
+    fun getAppLocale(context: Context): Locale {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            context.resources.configuration.locales[0]
+        } else {
+            @Suppress("DEPRECATION")
+            context.resources.configuration.locale
+        }
+    }
 }

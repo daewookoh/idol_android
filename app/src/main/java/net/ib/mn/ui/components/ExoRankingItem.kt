@@ -987,8 +987,6 @@ fun HofAccumulativeTop1RankingItem(
                         fullName = item.name,
                         nameFontSize = 17.sp,
                         groupFontSize = 11.sp,
-                        nameColor = ColorPalette.mainLight,
-                        groupColor = ColorPalette.mainLight
                     )
 
                     Spacer(modifier = Modifier.width(3.dp))

@@ -44,7 +44,8 @@ object ProfileImageType {
     const val MEDIUM_CIRCLE = "MEDIUM_CIRCLE"   // 기적/루키: 전체 62dp, 테두리 52dp, 이미지 42dp
     const val MEDIUM = "MEDIUM"                 // 하트픽: 55dp (테두리 없음)
     const val SMALL_CIRCLE = "SMALL_CIRCLE"     // 명예의 전당: 45dp (테두리 없음, 원형)
-    const val SMALL = "SMALL"                   // 기본: 50dp (테두리 없음)
+    const val SMALL = "SMALL"                   // 기본: 40dp (테두리 없음)
+    const val XSMALL = "XSMALL"                 // VoterTop100: 35dp (테두리 없음)
 }
 
 /**
@@ -117,6 +118,7 @@ fun ExoProfileImage(
             ProfileImageType.MEDIUM -> Triple(55.dp, 0.dp, 55.dp)          // 하트픽
             ProfileImageType.SMALL_CIRCLE -> Triple(45.dp, 0.dp, 45.dp)    // 명예의 전당
             ProfileImageType.SMALL -> Triple(40.dp, 0.dp, 40.dp)           // 기본
+            ProfileImageType.XSMALL -> Triple(35.dp, 0.dp, 35.dp)          // VoterTop100
             else -> Triple(50.dp, 0.dp, 50.dp)
         }
     }

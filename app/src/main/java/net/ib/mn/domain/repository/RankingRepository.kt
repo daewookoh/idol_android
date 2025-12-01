@@ -74,4 +74,15 @@ interface RankingRepository {
      * @return Flow<ApiResult<Map<String, List<String>>>> 차트 코드 -> 아이돌 ID 리스트 맵
      */
     fun getIdolChartCodes(): Flow<ApiResult<Map<String, List<String>>>>
+
+    /**
+     * 하트 투표 랭킹 Top100 조회
+     *
+     * old 프로젝트의 TrendsTop100UseCase와 동일
+     * 최다득표 순위 탑 100
+     *
+     * @param idolId 특정 아이돌 ID (optional) - 해당 아이돌의 순위 강조
+     * @return Flow<ApiResult<String>> JSON 형식의 응답
+     */
+    fun getVotesTop100(idolId: Int? = null): Flow<ApiResult<String>>
 }

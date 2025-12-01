@@ -109,6 +109,7 @@ fun CommunityScreen(
     var isLoadingWiki by remember { mutableStateOf(false) }
     var showIdolDialog by remember { mutableStateOf(false) }
     var showChangeMostDialog by remember { mutableStateOf(false) }
+    var showVoterTop100Screen by remember { mutableStateOf(false) }
     var currentIsMost by remember(initialIsMost) { mutableStateOf(initialIsMost) }
     var currentIsFavorite by remember(initialIsFavorite) { mutableStateOf(initialIsFavorite) }
 
@@ -146,7 +147,9 @@ fun CommunityScreen(
     }
 
     BackHandler {
-        if (showWikiWebView) {
+        if (showVoterTop100Screen) {
+            showVoterTop100Screen = false
+        } else if (showWikiWebView) {
             showWikiWebView = false
             wikiUrl = null
         } else {
@@ -437,7 +440,7 @@ fun CommunityScreen(
             },
             onVoteRankingClick = {
                 showIdolDialog = false
-                // TODO: 하트 투표 랭킹 화면으로 이동
+                showVoterTop100Screen = true
             },
             onGalleryClick = {
                 showIdolDialog = false
@@ -541,6 +544,26 @@ fun CommunityScreen(
         ) {
             CircularProgressIndicator(color = ColorPalette.main)
         }
+    }
+
+    // VoterTop100 화면 (전체 화면으로 표시)
+    // name은 "이름_그룹명" 형식 (예: "Leeseo_IVE")
+    val nameParts = rankingItem.name.split("_")
+    val displayIdolName = nameParts.getOrElse(0) { rankingItem.name }
+    val displayGroupName = nameParts.getOrElse(1) { "" }
+
+    AnimatedVisibility(
+        visible = showVoterTop100Screen,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        VoterTop100Screen(
+            idolId = idolId ?: 0,
+            idolName = displayIdolName,
+            groupName = displayGroupName,
+            onBackClick = { showVoterTop100Screen = false },
+            usersRepository = viewModel.usersRepository
+        )
     }
 }
 
