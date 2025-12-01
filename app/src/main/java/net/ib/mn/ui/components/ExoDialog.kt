@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -320,6 +321,146 @@ fun ExoConfirmDialog(
                 )
 
                 // 취소 버튼 (오른쪽) - Old: btn_cancel
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    shape = RoundedCornerShape(bottomEnd = 6.dp),
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = colorResource(id = R.color.gray580)
+                    )
+                ) {
+                    Text(
+                        text = dismissButtonText,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 확인/취소 두 버튼을 가진 Dialog (AnnotatedString 지원)
+ *
+ * 메시지에 스타일(색상, 굵기 등)을 적용할 수 있는 버전
+ *
+ * @param title 다이얼로그 타이틀
+ * @param message AnnotatedString 형식의 다이얼로그 메시지 (스타일 적용 가능)
+ * @param onConfirm 확인 버튼 클릭 콜백
+ * @param onDismiss 다이얼로그 닫기/취소 콜백
+ * @param confirmButtonText 확인 버튼 텍스트 (기본값: "확인")
+ * @param dismissButtonText 취소 버튼 텍스트 (기본값: "취소")
+ * @param dismissOnBackPress 백버튼으로 다이얼로그 닫기 가능 여부 (기본값: true)
+ * @param dismissOnClickOutside 외부 클릭으로 다이얼로그 닫기 가능 여부 (기본값: true)
+ */
+@Composable
+fun ExoConfirmDialog(
+    title: String,
+    message: AnnotatedString,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    confirmButtonText: String = stringResource(R.string.confirm),
+    dismissButtonText: String = stringResource(R.string.btn_cancel),
+    dismissOnBackPress: Boolean = true,
+    dismissOnClickOutside: Boolean = true
+) {
+    Dialog(
+        onDismissRequest = {
+            if (dismissOnBackPress || dismissOnClickOutside) {
+                onDismiss()
+            }
+        },
+        properties = DialogProperties(
+            dismissOnBackPress = dismissOnBackPress,
+            dismissOnClickOutside = dismissOnClickOutside
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .width(290.dp)
+                .background(
+                    color = colorResource(id = R.color.text_white_black),
+                    shape = RoundedCornerShape(6.dp)
+                )
+                .border(
+                    width = 1.dp,
+                    color = colorResource(id = R.color.gray150),
+                    shape = RoundedCornerShape(6.dp)
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // 타이틀
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+                color = colorResource(id = R.color.main),
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 10.dp)
+            )
+
+            // 메시지 (AnnotatedString)
+            val scrollState = rememberScrollState()
+            Text(
+                text = message,
+                fontSize = 14.sp,
+                lineHeight = 20.sp,
+                fontWeight = FontWeight.Normal,
+                color = colorResource(id = R.color.gray580),
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .heightIn(max = 400.dp)
+                    .verticalScroll(scrollState)
+            )
+
+            // 구분선
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 30.dp),
+                thickness = 1.dp,
+                color = colorResource(id = R.color.gray100)
+            )
+
+            // 버튼 Row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(44.dp)
+            ) {
+                // 확인 버튼 (왼쪽)
+                TextButton(
+                    onClick = onConfirm,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    shape = RoundedCornerShape(bottomStart = 6.dp),
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = colorResource(id = R.color.gray580)
+                    )
+                ) {
+                    Text(
+                        text = confirmButtonText,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+
+                // 버튼 사이 구분선
+                VerticalDivider(
+                    modifier = Modifier.fillMaxHeight(),
+                    thickness = 1.dp,
+                    color = colorResource(id = R.color.gray100)
+                )
+
+                // 취소 버튼 (오른쪽)
                 TextButton(
                     onClick = onDismiss,
                     modifier = Modifier

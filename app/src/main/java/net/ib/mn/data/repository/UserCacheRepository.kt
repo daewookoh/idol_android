@@ -73,6 +73,10 @@ class UserCacheRepository @Inject constructor(
     private val _favoriteIdolIds = MutableStateFlow<List<Int>>(emptyList())
     val favoriteIdolIds: Flow<List<Int>> = _favoriteIdolIds.asStateFlow()
 
+    // 즐겨찾기 ID 맵 (idol ID → favorite ID) - 즐겨찾기 삭제 시 사용
+    private val _favoriteIdMap = MutableStateFlow<Map<Int, Int>>(emptyMap())
+    val favoriteIdMap: Flow<Map<Int, Int>> = _favoriteIdMap.asStateFlow()
+
     // 사용자 선택 카테고리 (GLOBALS 탭 필터링용)
     private val _defaultCategory = MutableStateFlow<String?>(null)
     val defaultCategory: Flow<String?> = _defaultCategory.asStateFlow()
@@ -294,6 +298,92 @@ class UserCacheRepository @Inject constructor(
      */
     fun getFavoriteIdolIds(): List<Int> {
         return _favoriteIdolIds.value
+    }
+
+    /**
+     * 즐겨찾기 ID 맵 설정 (idol ID → favorite ID)
+     *
+     * @param idMap idol ID → favorite ID 맵
+     */
+    fun setFavoriteIdMap(idMap: Map<Int, Int>) {
+        _favoriteIdMap.value = idMap
+        Log.d(TAG, "✅ Favorite ID map cached: ${idMap.size} entries")
+    }
+
+    /**
+     * 즐겨찾기 ID 맵 가져오기 (동기)
+     */
+    fun getFavoriteIdMap(): Map<Int, Int> {
+        return _favoriteIdMap.value
+    }
+
+    /**
+     * 특정 아이돌의 favorite ID 가져오기
+     *
+     * @param idolId 아이돌 ID
+     * @return favorite ID (없으면 null)
+     */
+    fun getFavoriteId(idolId: Int): Int? {
+        return _favoriteIdMap.value[idolId]
+    }
+
+    /**
+     * 즐겨찾기에 아이돌 추가 (로컬 캐시)
+     *
+     * @param idolId 아이돌 ID
+     * @param favoriteId API에서 반환된 favorite ID
+     */
+    fun addFavoriteToCache(idolId: Int, favoriteId: Int) {
+        // ID 리스트에 추가
+        val currentIds = _favoriteIdolIds.value.toMutableList()
+        if (!currentIds.contains(idolId)) {
+            currentIds.add(idolId)
+            _favoriteIdolIds.value = currentIds
+        }
+
+        // ID 맵에 추가
+        val currentMap = _favoriteIdMap.value.toMutableMap()
+        currentMap[idolId] = favoriteId
+        _favoriteIdMap.value = currentMap
+
+        Log.d(TAG, "✅ Added favorite to cache: idolId=$idolId, favoriteId=$favoriteId")
+
+        // SharedPreference에 백업
+        ioScope.launch {
+            try {
+                preferencesManager.saveFavoriteIdolIds(currentIds)
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Failed to save favorite IDs to SharedPreference: ${e.message}", e)
+            }
+        }
+    }
+
+    /**
+     * 즐겨찾기에서 아이돌 제거 (로컬 캐시)
+     *
+     * @param idolId 아이돌 ID
+     */
+    fun removeFavoriteFromCache(idolId: Int) {
+        // ID 리스트에서 제거
+        val currentIds = _favoriteIdolIds.value.toMutableList()
+        currentIds.remove(idolId)
+        _favoriteIdolIds.value = currentIds
+
+        // ID 맵에서 제거
+        val currentMap = _favoriteIdMap.value.toMutableMap()
+        currentMap.remove(idolId)
+        _favoriteIdMap.value = currentMap
+
+        Log.d(TAG, "✅ Removed favorite from cache: idolId=$idolId")
+
+        // SharedPreference에 백업
+        ioScope.launch {
+            try {
+                preferencesManager.saveFavoriteIdolIds(currentIds)
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Failed to save favorite IDs to SharedPreference: ${e.message}", e)
+            }
+        }
     }
 
     /**

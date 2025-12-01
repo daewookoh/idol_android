@@ -35,8 +35,11 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -99,6 +102,7 @@ fun CommunityScreen(
 
     // ViewModel 상태 구독
     val isUpdatingMost by viewModel.isUpdatingMost.collectAsState()
+    val isUpdatingFavorite by viewModel.isUpdatingFavorite.collectAsState()
 
     var showWikiWebView by remember { mutableStateOf(false) }
     var wikiUrl by remember { mutableStateOf<String?>(null) }
@@ -397,10 +401,35 @@ fun CommunityScreen(
             rankingItem = rankingItem,
             isFavorite = currentIsFavorite,
             isMost = currentIsMost,
+            isFavoriteEnabled = !isUpdatingFavorite,  // 업데이트 중에는 비활성화
             onDismiss = { showIdolDialog = false },
             onFavoriteChange = { newValue ->
-                currentIsFavorite = newValue
-                // TODO: 즐겨찾기 API 호출
+                // 디바운스: 이미 업데이트 중이면 무시
+                if (isUpdatingFavorite) return@IdolDialog
+
+                // 최애일 경우 즐겨찾기 해제 불가 (Old 프로젝트와 동일)
+                if (currentIsMost && currentIsFavorite && !newValue) {
+                    // 최애는 즐겨찾기 해제 불가 - 체크박스 상태 유지
+                    return@IdolDialog
+                }
+
+                val targetIdolId = idolId ?: return@IdolDialog
+                coroutineScope.launch {
+                    viewModel.toggleFavorite(
+                        idolId = targetIdolId,
+                        currentIsFavorite = currentIsFavorite,
+                        onSuccess = { newIsFavorite ->
+                            currentIsFavorite = newIsFavorite
+                        },
+                        onError = { errorMessage ->
+                            Toast.makeText(
+                                context,
+                                errorMessage ?: context.getString(R.string.error_abnormal_default),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    )
+                }
             },
             onMostChange = { newValue ->
                 // 최애 변경 확인 다이얼로그 표시
@@ -431,18 +460,39 @@ fun CommunityScreen(
 
     // 최애 변경 확인 다이얼로그 (Old 프로젝트의 showChangeMostDialog 구현)
     if (showChangeMostDialog) {
-        val idolName = rankingItem.name.split("_").firstOrNull() ?: rankingItem.name
+        val idolName = rankingItem.name  // 이름_그룹명 전체
         val message = if (currentIsMost) {
             // 최애 해제 시
-            context.getString(R.string.msg_favorite_unregi_guide2) + "\n" +
-                    context.getString(R.string.msg_favorite_unregi_guide1)
+            // 기존 문구: "최애 재설정은 48시간이 지난 이후에 가능합니다.\n등록된 최애를 해제하시겠습니까?"
+            buildAnnotatedString {
+                append(context.getString(R.string.msg_favorite_unregi_guide2))
+                append("\n")
+                append(context.getString(R.string.msg_favorite_unregi_guide1))
+            }
         } else {
-            // 최애 설정 시
-            String.format(
-                context.getString(R.string.msg_favorite_guide_1) + "\n" +
-                        context.getString(R.string.msg_favorite_guide_2__),
-                idolName
-            )
+            // 최애 설정 시 - 아이돌 이름만 빨간색으로 표시
+            // Old 문구 순서: "최애는 한 번 설정하면 48시간이 지난 이후에 변경이 가능합니다.\n아이유_솔로를(을) 최애로 등록하시겠습니까?"
+            val guide2Template = context.getString(R.string.msg_favorite_guide_2__)  // "%s를(을) 최애로 등록하시겠습니까?"
+
+            buildAnnotatedString {
+                append(context.getString(R.string.msg_favorite_guide_1))
+                append("\n")
+                // %s를 아이돌 이름으로 치환하고, 아이돌 이름만 빨간색으로 표시
+                val parts = guide2Template.split("%s")
+                if (parts.size >= 2) {
+                    append(parts[0])  // "%s" 앞 텍스트 (보통 비어있음)
+                    withStyle(style = SpanStyle(color = ColorPalette.main)) {
+                        append(idolName)
+                    }
+                    append(parts[1])  // "%s" 뒤 텍스트 ("를(을) 최애로 등록하시겠습니까?")
+                } else {
+                    // %s가 없는 경우 (예외 처리)
+                    withStyle(style = SpanStyle(color = ColorPalette.main)) {
+                        append(idolName)
+                    }
+                    append(guide2Template)
+                }
+            }
         }
 
         ExoConfirmDialog(
@@ -671,6 +721,7 @@ private fun IdolProfile(
  * @param rankingItem 아이돌 정보
  * @param isFavorite 즐겨찾기 여부
  * @param isMost 최애 여부
+ * @param isFavoriteEnabled 즐겨찾기 버튼 활성화 여부 (디바운스용)
  * @param onDismiss 다이얼로그 닫기
  * @param onFavoriteChange 즐겨찾기 변경
  * @param onMostChange 최애 변경
@@ -685,6 +736,7 @@ private fun IdolDialog(
     rankingItem: RankingItem,
     isFavorite: Boolean = false,
     isMost: Boolean = false,
+    isFavoriteEnabled: Boolean = true,
     onDismiss: () -> Unit = {},
     onFavoriteChange: (Boolean) -> Unit = {},
     onMostChange: (Boolean) -> Unit = {},
@@ -750,6 +802,8 @@ private fun IdolDialog(
                         Spacer(modifier = Modifier.width(12.dp))
 
                         // 즐겨찾기 버튼 (Old: btn_favorite = 별, 아이콘 17dp)
+                        // 최애인 경우 즐겨찾기 해제 불가
+                        val canClickFavorite = isFavoriteEnabled && !(isMost && isFavorite)
                         Icon(
                             painter = painterResource(
                                 if (isFavorite) R.drawable.btn_bookmark_on else R.drawable.btn_bookmark_off
@@ -758,10 +812,16 @@ private fun IdolDialog(
                             tint = Color.Unspecified,
                             modifier = Modifier
                                 .size(17.dp)
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
-                                ) { onFavoriteChange(!isFavorite) }
+                                .then(
+                                    if (canClickFavorite) {
+                                        Modifier.clickable(
+                                            interactionSource = remember { MutableInteractionSource() },
+                                            indication = null
+                                        ) { onFavoriteChange(!isFavorite) }
+                                    } else {
+                                        Modifier // 비활성화 시 클릭 안됨
+                                    }
+                                )
                         )
                     }
                 } else {

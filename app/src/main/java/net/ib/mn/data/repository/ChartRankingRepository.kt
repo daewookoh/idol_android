@@ -79,19 +79,33 @@ class ChartRankingRepository @Inject constructor(
     /**
      * 차트 데이터 Flow로 구독 (반응형)
      *
-     * SharedPreference의 Flow를 구독하여 실시간으로 변경사항을 감지합니다.
+     * SharedPreference의 Flow와 mostIdolId Flow를 combine하여
+     * 최애 변경 시 자동으로 isFavorite 플래그가 갱신됩니다.
      *
      * @param chartCode 차트 코드
      * @return Flow<ProcessedRankData?>
      */
     fun observeChartData(chartCode: String): Flow<ProcessedRankData?> {
-        return preferencesManager.observeChartRanking(chartCode).map { items ->
+        return kotlinx.coroutines.flow.combine(
+            preferencesManager.observeChartRanking(chartCode),
+            userCacheRepository.get().mostIdolId
+        ) { items, mostIdolId ->
             if (items.isEmpty()) {
                 Log.d(TAG, "⚠️ No data in SharedPreference for chart: $chartCode")
                 null
             } else {
+                // mostIdolId에 따라 isFavorite 플래그를 동적으로 설정
+                val updatedItems = items.map { item ->
+                    val idolId = item.id.toIntOrNull()
+                    val shouldBeFavorite = mostIdolId != null && idolId == mostIdolId
+                    if (item.isFavorite != shouldBeFavorite) {
+                        item.copy(isFavorite = shouldBeFavorite)
+                    } else {
+                        item
+                    }
+                }
                 ProcessedRankData(
-                    rankItems = items,
+                    rankItems = updatedItems,
                     topIdol = null
                 )
             }
@@ -324,6 +338,149 @@ class ChartRankingRepository @Inject constructor(
     }
 
     /**
+     * 최애 아이돌 변경 시 호출
+     * mostFavoriteIdolRankingItem을 즉시 업데이트
+     *
+     * 참고: isFavorite 플래그는 observeChartData()의 Flow combine에서
+     * mostIdolId 변경 시 자동으로 갱신됩니다.
+     *
+     * @param newMostIdolId 새 최애 아이돌 ID (null이면 최애 해제)
+     * @param newMostIdolChartCode 새 최애 아이돌의 차트 코드
+     */
+    suspend fun updateMostFavoriteIdol(newMostIdolId: Int?, newMostIdolChartCode: String?) {
+        try {
+            Log.d(TAG, "💖 Updating mostFavoriteIdol: id=$newMostIdolId, chartCode=$newMostIdolChartCode")
+
+            if (newMostIdolId == null) {
+                // 최애 해제 → 비밀의 방 아이돌로 설정
+                Log.d(TAG, "🔐 Most idol cleared - loading 비밀의 방 idol")
+                val secretRoomIdol = idolDao.getIdolById(Constants.SECRET_ROOM_IDOL_ID)
+                if (secretRoomIdol != null) {
+                    val localizedName = RankingUtil.getLocalizedName(secretRoomIdol, context)
+                    val secretRoomItem = RankingItem(
+                        rank = 0,
+                        name = localizedName,
+                        voteCount = NumberFormatUtil.formatWithComma(secretRoomIdol.heart),
+                        photoUrl = secretRoomIdol.imageUrl,
+                        id = secretRoomIdol.id.toString(),
+                        heartCount = secretRoomIdol.heart,
+                        top3ImageUrls = listOfNotNull(
+                            secretRoomIdol.imageUrl,
+                            secretRoomIdol.imageUrl2,
+                            secretRoomIdol.imageUrl3
+                        ),
+                        top3VideoUrls = emptyList(),
+                        isFavorite = true,
+                        mostCount = secretRoomIdol.mostCount,
+                        fandomName = RankingUtil.getLocalizedFandomName(secretRoomIdol, context),
+                        birthday = RankingUtil.formatBirthday(secretRoomIdol.birthDay, secretRoomIdol.isLunarBirthday, context)
+                    )
+                    _mostFavoriteIdolRankingItem.value = secretRoomItem
+                    Log.d(TAG, "✅ Set 비밀의 방 as mostFavoriteIdol: ${secretRoomItem.name}")
+                } else {
+                    _mostFavoriteIdolRankingItem.value = null
+                    Log.d(TAG, "⚠️ 비밀의 방 idol not found in DB")
+                }
+                return
+            }
+
+            // chartCode가 null인 경우: 모든 차트에서 아이돌을 찾아보기
+            val effectiveChartCode = if (newMostIdolChartCode == null) {
+                Log.d(TAG, "⚠️ chartCode is null, searching all charts for idol $newMostIdolId")
+                // 모든 차트에서 아이돌 찾기
+                var foundChartCode: String? = null
+                for (chartCode in DEFAULT_CHART_CODES) {
+                    val rankings = preferencesManager.getChartRanking(chartCode)
+                    val found = rankings.find { it.id.toIntOrNull() == newMostIdolId }
+                    if (found != null) {
+                        foundChartCode = chartCode
+                        Log.d(TAG, "✅ Found idol in chart $chartCode with rank ${found.rank}")
+                        break
+                    }
+                }
+
+                if (foundChartCode == null) {
+                    // 진짜 비밀의 방 아이돌
+                    Log.d(TAG, "🔐 Special idol (비밀의 방) - loading from DB")
+                    val idolEntity = idolDao.getIdolById(newMostIdolId)
+                    if (idolEntity != null) {
+                        val localizedName = RankingUtil.getLocalizedName(idolEntity, context)
+                        val specialItem = RankingItem(
+                            rank = 0,
+                            name = localizedName,
+                            voteCount = NumberFormatUtil.formatWithComma(idolEntity.heart),
+                            photoUrl = idolEntity.imageUrl,
+                            id = idolEntity.id.toString(),
+                            heartCount = idolEntity.heart,
+                            top3ImageUrls = listOfNotNull(
+                                idolEntity.imageUrl,
+                                idolEntity.imageUrl2,
+                                idolEntity.imageUrl3
+                            ),
+                            top3VideoUrls = emptyList(),
+                            isFavorite = true,
+                            mostCount = idolEntity.mostCount,
+                            fandomName = RankingUtil.getLocalizedFandomName(idolEntity, context),
+                            birthday = RankingUtil.formatBirthday(idolEntity.birthDay, idolEntity.isLunarBirthday, context)
+                        )
+                        _mostFavoriteIdolRankingItem.value = specialItem
+                        Log.d(TAG, "✅ Loaded special idol: ${specialItem.name}")
+                    }
+                    return
+                }
+                foundChartCode
+            } else {
+                newMostIdolChartCode
+            }
+
+            // 일반 차트에서 찾기
+            var rankings = preferencesManager.getChartRanking(effectiveChartCode)
+            var foundItem = rankings.find { it.id.toIntOrNull() == newMostIdolId }
+
+            // 차트에서 찾지 못하면, 차트 리프레시 후 다시 찾기
+            if (foundItem == null && rankings.isNotEmpty()) {
+                Log.d(TAG, "⚠️ Idol not found in chart $effectiveChartCode, refreshing chart...")
+                refreshChart(effectiveChartCode)
+                rankings = preferencesManager.getChartRanking(effectiveChartCode)
+                foundItem = rankings.find { it.id.toIntOrNull() == newMostIdolId }
+            }
+
+            if (foundItem != null) {
+                _mostFavoriteIdolRankingItem.value = foundItem.copy(isFavorite = true)
+                Log.d(TAG, "✅ Updated mostFavoriteIdol: ${foundItem.name}, rank=${foundItem.rank}")
+            } else {
+                // 차트에 없으면 DB에서 가져오기 (순위권 밖 또는 비밀의 방)
+                Log.d(TAG, "⚠️ Idol not found in chart $effectiveChartCode, loading from DB")
+                val idolEntity = idolDao.getIdolById(newMostIdolId)
+                if (idolEntity != null) {
+                    val localizedName = RankingUtil.getLocalizedName(idolEntity, context)
+                    val imageUrls = IdolImageUtil.getTop3ImageUrls(idolEntity).filterNotNull()
+                    val videoUrls = IdolImageUtil.getTop3VideoUrls(idolEntity).filterNotNull()
+
+                    val newItem = RankingItem(
+                        rank = 0,  // 순위권 밖
+                        name = localizedName,
+                        voteCount = NumberFormatUtil.formatWithComma(idolEntity.heart),
+                        photoUrl = idolEntity.imageUrl,
+                        id = idolEntity.id.toString(),
+                        heartCount = idolEntity.heart,
+                        top3ImageUrls = imageUrls,
+                        top3VideoUrls = videoUrls,
+                        isFavorite = true,
+                        mostCount = idolEntity.mostCount,
+                        fandomName = RankingUtil.getLocalizedFandomName(idolEntity, context),
+                        birthday = RankingUtil.formatBirthday(idolEntity.birthDay, idolEntity.isLunarBirthday, context)
+                    )
+                    _mostFavoriteIdolRankingItem.value = newItem
+                    Log.d(TAG, "✅ Loaded idol from DB: ${newItem.name}, rank=0 (not in chart)")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Failed to update mostFavoriteIdol: ${e.message}", e)
+        }
+    }
+
+    /**
      * 모든 차트 데이터 삭제
      */
     suspend fun clearAll() {
@@ -523,42 +680,74 @@ class ChartRankingRepository @Inject constructor(
             val mostIdolChartCode: String? = userCacheRepository.get().getMostIdolChartCode()
 
             if (mostIdolId == null) {
-                Log.d(TAG, "⚠️ No mostIdolId set - clearing mostFavoriteIdolRankingItem")
-                _mostFavoriteIdolRankingItem.value = null
+                // 최애가 없으면 비밀의 방 아이돌로 설정 (updateMostFavoriteIdol과 동일)
+                Log.d(TAG, "⚠️ No mostIdolId set - setting 비밀의 방")
+                if (_mostFavoriteIdolRankingItem.value?.id?.toIntOrNull() != Constants.SECRET_ROOM_IDOL_ID) {
+                    val secretRoomIdol = idolDao.getIdolById(Constants.SECRET_ROOM_IDOL_ID)
+                    if (secretRoomIdol != null) {
+                        val localizedName = RankingUtil.getLocalizedName(secretRoomIdol, context)
+                        val secretRoomItem = RankingItem(
+                            rank = 0,
+                            name = localizedName,
+                            voteCount = NumberFormatUtil.formatWithComma(secretRoomIdol.heart),
+                            photoUrl = secretRoomIdol.imageUrl,
+                            id = secretRoomIdol.id.toString(),
+                            heartCount = secretRoomIdol.heart,
+                            top3ImageUrls = listOfNotNull(
+                                secretRoomIdol.imageUrl,
+                                secretRoomIdol.imageUrl2,
+                                secretRoomIdol.imageUrl3
+                            ),
+                            top3VideoUrls = emptyList(),
+                            isFavorite = true,
+                            mostCount = secretRoomIdol.mostCount,
+                            fandomName = RankingUtil.getLocalizedFandomName(secretRoomIdol, context),
+                            birthday = RankingUtil.formatBirthday(secretRoomIdol.birthDay, secretRoomIdol.isLunarBirthday, context)
+                        )
+                        _mostFavoriteIdolRankingItem.value = secretRoomItem
+                        Log.d(TAG, "✅ Set 비밀의 방 as mostFavoriteIdol")
+                    }
+                }
                 return
             }
 
-            // ✅ 비밀의 방 (chartCodes=[] 인 경우) 특수 처리
-            // mostIdolChartCode가 null이면 차트에 속하지 않는 특수 아이돌 (비밀의 방)
+            // mostIdolChartCode가 null이어도 현재 차트에서 아이돌을 찾아보기
+            // (chartCode 정보가 없는 경우에도 랭킹 리스트와 싱크를 맞추기 위함)
             if (mostIdolChartCode == null) {
-                Log.d(TAG, "🔐 Special idol (비밀의 방) detected - loading from DB")
-                val idolEntity = idolDao.getIdolById(mostIdolId)
-                if (idolEntity != null) {
-                    // 다국어 이름 가져오기 (old 프로젝트와 동일)
-                    val localizedName = RankingUtil.getLocalizedName(idolEntity, context)
-                    val specialItem = RankingItem(
-                        rank = 0,  // 비밀의 방은 순위 없음
-                        name = localizedName,
-                        voteCount = NumberFormatUtil.formatWithComma(idolEntity.heart),
-                        photoUrl = idolEntity.imageUrl,
-                        id = idolEntity.id.toString(),
-                        heartCount = idolEntity.heart,
-                        top3ImageUrls = listOfNotNull(
-                            idolEntity.imageUrl,
-                            idolEntity.imageUrl2,
-                            idolEntity.imageUrl3
-                        ),
-                        top3VideoUrls = emptyList(),
-                        isFavorite = true,  // 비밀의 방은 항상 최애
-                        mostCount = idolEntity.mostCount,
-                        fandomName = RankingUtil.getLocalizedFandomName(idolEntity, context),
-                        birthday = RankingUtil.formatBirthday(idolEntity.birthDay, idolEntity.isLunarBirthday, context)
-                    )
-                    _mostFavoriteIdolRankingItem.value = specialItem
-                    Log.d(TAG, "✅ Loaded special idol: ${specialItem.name}, heart=${specialItem.heartCount}")
-                } else {
-                    Log.w(TAG, "⚠️ Special idol not found in DB: id=$mostIdolId")
-                    _mostFavoriteIdolRankingItem.value = null
+                Log.d(TAG, "⚠️ mostIdolChartCode is null, checking if idol exists in current chart $chartCode")
+                val foundItem = rankings.find { it.id.toIntOrNull() == mostIdolId }
+                if (foundItem != null) {
+                    Log.d(TAG, "✅ Found mostIdol in chart $chartCode: rank=${foundItem.rank}")
+                    _mostFavoriteIdolRankingItem.value = foundItem.copy(isFavorite = true)
+                    return
+                }
+                // 현재 차트에 없고, mostFavoriteIdolRankingItem이 아직 설정되지 않았으면 DB에서 로드
+                if (_mostFavoriteIdolRankingItem.value == null ||
+                    _mostFavoriteIdolRankingItem.value?.id?.toIntOrNull() == Constants.SECRET_ROOM_IDOL_ID) {
+                    Log.d(TAG, "🔍 mostIdol not found in chart $chartCode, loading from DB")
+                    val idolEntity = idolDao.getIdolById(mostIdolId)
+                    if (idolEntity != null) {
+                        val localizedName = RankingUtil.getLocalizedName(idolEntity, context)
+                        val imageUrls = IdolImageUtil.getTop3ImageUrls(idolEntity).filterNotNull()
+                        val videoUrls = IdolImageUtil.getTop3VideoUrls(idolEntity).filterNotNull()
+
+                        val newItem = RankingItem(
+                            rank = 0,  // 순위권 밖
+                            name = localizedName,
+                            voteCount = NumberFormatUtil.formatWithComma(idolEntity.heart),
+                            photoUrl = idolEntity.imageUrl,
+                            id = idolEntity.id.toString(),
+                            heartCount = idolEntity.heart,
+                            top3ImageUrls = imageUrls,
+                            top3VideoUrls = videoUrls,
+                            isFavorite = true,
+                            mostCount = idolEntity.mostCount,
+                            fandomName = RankingUtil.getLocalizedFandomName(idolEntity, context),
+                            birthday = RankingUtil.formatBirthday(idolEntity.birthDay, idolEntity.isLunarBirthday, context)
+                        )
+                        _mostFavoriteIdolRankingItem.value = newItem
+                        Log.d(TAG, "✅ Loaded mostIdol from DB: ${newItem.name}")
+                    }
                 }
                 return
             }

@@ -22,9 +22,9 @@ interface FavoritesRepository {
      * 최애 추가
      *
      * @param idolId 아이돌 ID
-     * @return Flow<ApiResult<Unit>>
+     * @return Flow<ApiResult<Int>> 생성된 favorite ID 반환
      */
-    fun addFavorite(idolId: Int): Flow<ApiResult<Unit>>
+    fun addFavorite(idolId: Int): Flow<ApiResult<Int>>
 
     /**
      * 최애 삭제

@@ -92,7 +92,7 @@ class FavoritesRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun addFavorite(idolId: Int): Flow<ApiResult<Unit>> = flow {
+    override fun addFavorite(idolId: Int): Flow<ApiResult<Int>> = flow {
         emit(ApiResult.Loading)
 
         try {
@@ -101,9 +101,27 @@ class FavoritesRepositoryImpl @Inject constructor(
             val request = AddFavoriteRequest(idol_id = idolId)
             val response = favoritesApi.addFavorite(request)
 
-            if (response.isSuccessful) {
-                android.util.Log.d("FavoritesRepo", "✅ addFavorite SUCCESS")
-                emit(ApiResult.Success(Unit))
+            if (response.isSuccessful && response.body() != null) {
+                val jsonString = response.body()!!.string()
+                android.util.Log.d("FavoritesRepo", "📋 addFavorite Response: $jsonString")
+
+                // JSON 파싱하여 id 추출
+                val jsonObject = org.json.JSONObject(jsonString)
+                val success = jsonObject.optBoolean("success", true)
+
+                if (success) {
+                    val favoriteId = jsonObject.optInt("id", -1)
+                    android.util.Log.d("FavoritesRepo", "✅ addFavorite SUCCESS, favoriteId=$favoriteId")
+                    emit(ApiResult.Success(favoriteId))
+                } else {
+                    val errorMsg = jsonObject.optString("msg", "Unknown error")
+                    android.util.Log.e("FavoritesRepo", "❌ addFavorite FAILED: $errorMsg")
+                    emit(ApiResult.Error(
+                        exception = Exception(errorMsg),
+                        code = response.code(),
+                        message = errorMsg
+                    ))
+                }
             } else {
                 android.util.Log.e("FavoritesRepo", "❌ addFavorite FAILED: ${response.code()}")
                 emit(ApiResult.Error(
@@ -189,6 +207,10 @@ class FavoritesRepositoryImpl @Inject constructor(
                         // DB 업데이트는 하지 않고 ID만 캐싱합니다.
                         val idolIds = favorites.map { it.idol.id }
                         userCacheRepository.setFavoriteIdolIds(idolIds)
+
+                        // idol ID → favorite ID 매핑 저장 (삭제 시 사용)
+                        val favoriteIdMap = favorites.associate { it.idol.id to it.id }
+                        userCacheRepository.setFavoriteIdMap(favoriteIdMap)
 
                         success = true
                     }
