@@ -276,7 +276,7 @@ fun CommunityScreen(
                             onFirstArticleVideoPlaying = { isPlaying ->
                                 isFirstArticleVideoPlaying = isPlaying
                             },
-                            onUserProfileClick = { userId, nickname, imageUrl, level, mostIdolName ->
+                            onNavigateToProfile = { userId, nickname, imageUrl, level, mostIdolName ->
                                 selectedUserProfile = UserProfileInfo(
                                     userId = userId,
                                     nickname = nickname,

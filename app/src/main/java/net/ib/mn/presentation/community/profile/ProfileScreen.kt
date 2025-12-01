@@ -295,7 +295,11 @@ fun ProfileScreen(
                                 isMine = isMine,
                                 isFeedPrivate = state.user.isFeedPrivate
                             )
-                            ProfileTab.ACTIVITY -> ProfilePostPage(userId = userId)
+                            ProfileTab.ACTIVITY -> ProfilePostPage(
+                                userId = userId,
+                                isMine = isMine,
+                                isFeedPrivate = state.user.isFeedPrivate
+                            )
                             ProfileTab.COMMENT -> ProfileCommentPage(userId = userId)
                         }
                     }

@@ -24,6 +24,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -40,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.GifDecoder
@@ -50,8 +53,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleFile
+import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
+import net.ib.mn.util.DateTimeUtil
+import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.MediaCacheUtil
 import net.ib.mn.util.NumberFormatUtil
 import net.ib.mn.util.YoutubeHelper
@@ -62,75 +68,65 @@ import java.util.concurrent.TimeUnit
  */
 enum class ArticleType {
     FEED,       // 커뮤니티 피드 - 하트투표, 좋아요, 댓글, 번역기능
-    FREE_BOARD  // 자유게시판 - 좋아요, 댓글 (하트투표 없음)
+    FREE_BOARD, // 자유게시판 - 좋아요, 댓글 (하트투표 없음)
+    COMMUNITY   // 커뮤니티 게시글 (피드에서 표시) - FEED와 동일하나 상단에 커뮤니티 이름 표시
 }
 
 /**
  * ExoArticle - 게시글 아티클 컴포넌트
  *
  * Old 프로젝트의 community_item.xml + CommunityArticleViewHolder 기능을 Compose로 재현
+ * 모든 클릭 액션을 내부에서 처리
  *
- * @param type 게시글 타입 (FEED: 커뮤니티 피드, FREE_BOARD: 자유게시판)
- * @param profileImageUrl 사용자 프로필 이미지 URL
- * @param userName 사용자 이름
- * @param userLevel 사용자 레벨
- * @param createdAt 작성 시간 문자열 (full 형식: 2024.11.27 오후 5:05)
- * @param title 게시글 제목
- * @param content 게시글 내용
- * @param mediaFiles 미디어 파일 리스트 (ArticleFile) - GIF 최적화를 위해 파일 정보 필요
- * @param heartCount 하트 수 (FEED 타입에서만 표시)
- * @param likeCount 좋아요 수
- * @param commentCount 댓글 수
- * @param isPrivate 최애만 보기 여부
- * @param isPopular 인기 게시글 여부
- * @param tag 태그
+ * @param article 게시글 데이터
+ * @param type 게시글 타입 (FEED: 프로필 클릭 활성화, FREE_BOARD: 자유게시판, COMMUNITY: 프로필 클릭 비활성화)
+ * @param isVisible 화면에 보이는지 여부 (GIF/비디오 최적화용)
  * @param showTranslation 번역 버튼 표시 여부
- * @param isVisible 화면에 보이는지 여부 (GIF 최적화용)
- * @param onProfileClick 프로필 클릭 콜백
- * @param onMoreClick 더보기 버튼 클릭 콜백
- * @param onHeartClick 하트 투표 클릭 콜백 (FEED 타입에서만 사용)
- * @param onLikeClick 좋아요 클릭 콜백
- * @param onCommentClick 댓글 클릭 콜백
- * @param onTranslateClick 번역 클릭 콜백
- * @param onMediaClick 미디어 클릭 콜백
+ * @param viewModel ExoArticleViewModel
  * @param modifier Modifier
  */
 @Composable
 fun ExoArticle(
+    article: ArticleModel,
     type: ArticleType = ArticleType.FEED,
-    profileImageUrl: String,
-    userName: String,
-    userLevel: Int = 0,
-    userEmoticonUrl: String? = null,
-    createdAt: String,
-    title: String? = null,
-    content: String,
-    mediaFiles: List<ArticleFile> = emptyList(),
-    linkUrl: String? = null,
-    linkTitle: String? = null,
-    imageUrl: String? = null,
-    umjjalUrl: String? = null,
-    heartCount: Int = 0,
-    likeCount: Int = 0,
-    commentCount: Int = 0,
-    isLiked: Boolean = false,
-    isPrivate: Boolean = false,
-    isPopular: Boolean = false,
-    tag: String? = null,
-    showTranslation: Boolean = false,
     isVisible: Boolean = true,
-    onProfileClick: () -> Unit = {},
-    onMoreClick: () -> Unit = {},
-    onHeartClick: () -> Unit = {},
-    onLikeClick: () -> Unit = {},
-    onCommentClick: () -> Unit = {},
-    onTranslateClick: () -> Unit = {},
-    onMediaClick: (Int) -> Unit = {},
+    showTranslation: Boolean = true,
+    viewModel: ExoArticleViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    // 로컬 상태 (즉시 UI 업데이트용)
+    var localIsLiked by remember(article.id) { mutableStateOf(article.isUserLike) }
+    var localLikeCount by remember(article.id) { mutableIntStateOf(article.likeCount) }
+    var localHeartCount by remember(article.id) { mutableLongStateOf(article.heart) }
+
+    // 좋아요 클릭 throttling
+    var lastLikeClickTime by remember { mutableLongStateOf(0L) }
+
+    // 투표 다이얼로그 상태
+    var showVoteDialog by remember { mutableStateOf(false) }
+
+    // 커뮤니티 이름 (COMMUNITY 타입에서 사용)
+    val communityName = remember(article.idol) {
+        article.idol?.let { LocaleUtil.getLocalizedIdolName(context, it) }
+    }
+
+    // 시간 표시 (COMMUNITY 타입은 풀타임, 나머지는 상대 시간)
+    val createdAt = remember(article.createdAt, type) {
+        when (type) {
+            ArticleType.COMMUNITY -> DateTimeUtil.formatFullDate(article.createdAt)
+            else -> DateTimeUtil.getRelativeTimeSpan(article.createdAt)
+        }
+    }
+
     // YouTube 링크 여부 확인
-    val isYoutubeLink = YoutubeHelper.isYoutubeLink(linkUrl, imageUrl, umjjalUrl)
+    val isYoutubeLink = YoutubeHelper.isYoutubeLink(article.linkUrl, article.imageUrl, article.umjjalUrl)
     var isExpanded by remember { mutableStateOf(false) }
+
+    // 프로필 이미지 URL
+    val profileImageUrl = article.user?.imageUrlCommunity ?: ""
 
     Column(
         modifier = modifier
@@ -143,6 +139,42 @@ fun ExoArticle(
                 .fillMaxWidth()
                 .background(ColorPalette.background100)
         ) {
+            // 0. 커뮤니티 정보 (COMMUNITY 타입에서만 표시)
+            if (type == ArticleType.COMMUNITY && !communityName.isNullOrEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(ColorPalette.background100)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            article.idol?.id?.let { idolId ->
+                                viewModel.navigateToCommunity(idolId)
+                            }
+                        }
+                        .padding(horizontal = 20.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = communityName,
+                        style = ExoTypo.body12.copy(
+                            color = ColorPalette.gray580,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                        )
+                    )
+                    Spacer(modifier = Modifier.width(2.dp))
+                    Text(
+                        text = stringResource(R.string.community_post),
+                        style = ExoTypo.body12.copy(color = ColorPalette.gray300)
+                    )
+                }
+                HorizontalDivider(
+                    color = ColorPalette.gray110,
+                    thickness = 0.5.dp
+                )
+            }
+
             // 1. 사용자 프로필 섹션
             Row(
                 modifier = Modifier
@@ -158,7 +190,27 @@ fun ExoArticle(
                         .size(40.dp)
                         .clip(CircleShape)
                         .background(ColorPalette.gray110)
-                        .clickable(onClick = onProfileClick),
+                        .then(
+                            // COMMUNITY 타입에서는 프로필 클릭 비활성화, FEED/FREE_BOARD는 활성화
+                            if (type == ArticleType.COMMUNITY) {
+                                Modifier
+                            } else {
+                                Modifier.clickable {
+                                    article.user?.let { user ->
+                                        val mostIdolName = user.most?.let { most ->
+                                            LocaleUtil.getLocalizedIdolName(context, most)
+                                        }
+                                        viewModel.navigateToProfile(
+                                            userId = user.id,
+                                            nickname = user.nickname ?: "",
+                                            imageUrl = user.imageUrlCommunity,
+                                            level = user.level,
+                                            mostIdolName = mostIdolName
+                                        )
+                                    }
+                                }
+                            }
+                        ),
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(R.drawable.menu_profile_default2),
                     error = painterResource(R.drawable.menu_profile_default2)
@@ -170,11 +222,11 @@ fun ExoArticle(
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
-                    // 이모티콘 + 레벨 아이콘 + 이름 (Old 프로젝트: emoticon -> level -> name)
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // 이모티콘 (Old 프로젝트의 BaseArticleViewHolder.setUserSection과 동일)
+                        // 이모티콘
+                        val userEmoticonUrl = article.user?.emoticon?.emojiUrl
                         if (!userEmoticonUrl.isNullOrEmpty()) {
                             AsyncImage(
                                 model = userEmoticonUrl,
@@ -186,8 +238,8 @@ fun ExoArticle(
                             )
                         }
 
-                        // 레벨 아이콘 (Old 프로젝트: Util.getLevelResId - 0~40까지 지원)
-                        val context = LocalContext.current
+                        // 레벨 아이콘
+                        val userLevel = article.user?.level ?: 0
                         val maxLevel = 40
                         val clampedLevel = userLevel.coerceIn(0, maxLevel)
                         val levelIconRes = context.resources.getIdentifier(
@@ -199,18 +251,34 @@ fun ExoArticle(
                         Image(
                             painter = painterResource(levelIconRes),
                             contentDescription = "Level $userLevel",
-                            modifier = Modifier
-                                .padding(top = 4.dp, end = 2.dp)
+                            modifier = Modifier.padding(top = 4.dp, end = 2.dp)
                         )
 
                         Text(
-                            text = userName,
+                            text = article.user?.nickname ?: "",
                             style = ExoTypo.body14Main,
-                            modifier = Modifier.clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null,
-                                onClick = onProfileClick
-                            )
+                            modifier = if (type == ArticleType.COMMUNITY) {
+                                // COMMUNITY 타입에서는 프로필 클릭 비활성화
+                                Modifier
+                            } else {
+                                Modifier.clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null
+                                ) {
+                                    article.user?.let { user ->
+                                        val mostIdolName = user.most?.let { most ->
+                                            LocaleUtil.getLocalizedIdolName(context, most)
+                                        }
+                                        viewModel.navigateToProfile(
+                                            userId = user.id,
+                                            nickname = user.nickname ?: "",
+                                            imageUrl = user.imageUrlCommunity,
+                                            level = user.level,
+                                            mostIdolName = mostIdolName
+                                        )
+                                    }
+                                }
+                            }
                         )
                     }
 
@@ -224,7 +292,7 @@ fun ExoArticle(
                             style = ExoTypo.body12
                         )
 
-                        if (isPrivate) {
+                        if (article.isMostOnly == "Y") {
                             Spacer(modifier = Modifier.width(7.dp))
                             Icon(
                                 painter = painterResource(R.drawable.icon_onlymyidol),
@@ -244,38 +312,43 @@ fun ExoArticle(
                     contentDescription = "More",
                     modifier = Modifier
                         .padding(4.dp)
-                        .clickable(onClick = onMoreClick),
+                        .clickable {
+                            viewModel.showMoreOptions(article)
+                        },
                     tint = Color.Unspecified
                 )
             }
 
-            // 2. 태그
-            if (!tag.isNullOrEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .padding(start = 20.dp, top = 9.dp, end = 20.dp, bottom = 6.dp)
-                        .background(
-                            color = ColorPalette.main200,
-                            shape = RoundedCornerShape(6.dp)
+            // 2. 태그 (FREE_BOARD 타입에서만 표시, FEED/COMMUNITY는 태그 숨김)
+            if (type == ArticleType.FREE_BOARD) {
+                val tag = article.type
+                if (!tag.isNullOrEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 20.dp, top = 9.dp, end = 20.dp, bottom = 6.dp)
+                            .background(
+                                color = ColorPalette.main200,
+                                shape = RoundedCornerShape(6.dp)
+                            )
+                            .padding(horizontal = 7.dp, vertical = 3.dp)
+                    ) {
+                        Text(
+                            text = tag,
+                            style = ExoTypo.label13
                         )
-                        .padding(horizontal = 7.dp, vertical = 3.dp)
-                ) {
-                    Text(
-                        text = tag,
-                        style = ExoTypo.label13
-                    )
+                    }
                 }
             }
 
             // 3. 제목
-            if (!title.isNullOrEmpty()) {
+            if (!article.title.isNullOrEmpty()) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 20.dp, end = 20.dp, bottom = 21.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (isPopular) {
+                    if (article.isPopular) {
                         Icon(
                             painter = painterResource(R.drawable.icon_popularpost_title),
                             contentDescription = "Popular post",
@@ -285,7 +358,7 @@ fun ExoArticle(
                     }
 
                     Text(
-                        text = title,
+                        text = article.title!!,
                         style = ExoTypo.title15Default,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -293,7 +366,8 @@ fun ExoArticle(
                 }
             }
 
-            // 4. 내용 (YouTube 링크인 경우 content에서 링크 제거)
+            // 4. 내용
+            val content = article.content ?: ""
             val displayContent = if (isYoutubeLink) YoutubeHelper.removeYoutubeLink(content) else content
             if (displayContent.isNotEmpty()) {
                 Text(
@@ -306,7 +380,6 @@ fun ExoArticle(
                         .padding(horizontal = 20.dp)
                 )
 
-                // 더보기 버튼
                 if (!isExpanded && displayContent.length > 100) {
                     Text(
                         text = "... 더보기",
@@ -318,243 +391,93 @@ fun ExoArticle(
                 }
             }
 
-            // 번역 버튼 (FEED 타입이고, 번역할 내용이 있을 때만 표시)
-            // 유튜브 링크만 있는 경우 번역 버튼 숨김 (Old 프로젝트 TranslateUiHelper 로직)
+            // 번역 버튼
             val hasTranslatableContent = content.isNotEmpty() && !isYoutubeLink
-            if (type == ArticleType.FEED && showTranslation && hasTranslatableContent) {
-                Text(
-                    text = stringResource(R.string.see_translate),
-                    style = ExoTypo.body12.copy(color = ColorPalette.textGray),
-                    modifier = Modifier
-                        .padding(start = 20.dp, top = 6.dp, end = 20.dp, bottom = 6.dp)
-                        .clickable(onClick = onTranslateClick)
-                )
+            when (type) {
+                ArticleType.FEED, ArticleType.COMMUNITY -> {
+                    if (showTranslation && hasTranslatableContent) {
+                        Text(
+                            text = stringResource(R.string.see_translate),
+                            style = ExoTypo.body12.copy(color = ColorPalette.textGray),
+                            modifier = Modifier
+                                .padding(start = 20.dp, top = 6.dp, end = 20.dp, bottom = 6.dp)
+                                .clickable {
+                                    viewModel.translateContent(article.content ?: "", article.nation)
+                                }
+                        )
+                    }
+                }
+                ArticleType.FREE_BOARD -> { /* 자유게시판은 번역 버튼 없음 */ }
             }
 
             // 5. YouTube 링크 + 임베드 플레이어
-            // Old 프로젝트: 2025.4.11 링크 URL 텍스트 제거됨 - 플레이어만 표시
-            val hasValidLinkTitle = !linkTitle.isNullOrEmpty() && linkTitle != "None"
-            if (isYoutubeLink && !linkUrl.isNullOrEmpty() && hasValidLinkTitle) {
-                // YouTube 임베드 플레이어 (Old 프로젝트와 동일)
+            val hasValidLinkTitle = !article.linkTitle.isNullOrEmpty() && article.linkTitle != "None"
+            if (isYoutubeLink && !article.linkUrl.isNullOrEmpty() && hasValidLinkTitle) {
                 ExoYouTubePlayer(
-                    linkUrl = linkUrl,
+                    linkUrl = article.linkUrl!!,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 5.dp)
                 )
             }
-            // 6. 미디어 (첫 번째 미디어만 표시, 유튜브가 아닌 경우)
-            // 정사각 영역에 이미지가 짤리지 않고 가운데에 표시
-            // GIF/비디오의 경우 화면에 보일 때만 원본 로드, 그렇지 않으면 썸네일
-            else if (mediaFiles.isNotEmpty()) {
-                val context = LocalContext.current
-                val firstMedia = mediaFiles.first()
-
-                // GIF ImageLoader (움짤 자동 재생용)
-                val gifImageLoader = remember(context) {
-                    ImageLoader.Builder(context)
-                        .components {
-                            if (android.os.Build.VERSION.SDK_INT >= 28) {
-                                add(ImageDecoderDecoder.Factory())
-                            } else {
-                                add(GifDecoder.Factory())
-                            }
-                        }
-                        .build()
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f)
-                        .background(ColorPalette.background100)
-                        .clip(RoundedCornerShape(0.dp)) // 영역 밖으로 넘치지 않도록 clip
-                        .clickable { onMediaClick(0) },
-                    contentAlignment = Alignment.Center
-                ) {
-                    // 비디오 duration 상태 (Old처럼 MediaMetadataRetriever로 가져옴)
-                    var videoDurationMs by remember { mutableStateOf(0L) }
-
-                    // Old 프로젝트처럼 MediaMetadataRetriever로 duration 가져오기
-                    LaunchedEffect(firstMedia.originUrl) {
-                        if (firstMedia.isVideo && videoDurationMs == 0L && !firstMedia.originUrl.isNullOrEmpty()) {
-                            MediaCacheUtil.getVideoDuration(firstMedia.originUrl!!)?.let { duration ->
-                                videoDurationMs = duration
-                            }
-                        }
+            // 6. 미디어
+            else if (article.mediaFiles.isNotEmpty()) {
+                MediaSection(
+                    mediaFiles = article.mediaFiles,
+                    isVisible = isVisible,
+                    onMediaClick = { mediaIndex ->
+                        viewModel.navigateToMediaDetail(article, mediaIndex)
                     }
-
-                    // duration 포맷팅 (Old convertTimeMillsToTimerFormat과 동일)
-                    fun formatDurationMs(durationMs: Long): String {
-                        if (durationMs <= 0) return ""
-                        val minutes = TimeUnit.MILLISECONDS.toMinutes(durationMs)
-                        val seconds = TimeUnit.MILLISECONDS.toSeconds(durationMs) - TimeUnit.MINUTES.toSeconds(minutes)
-                        return "%02d:%02d".format(minutes, seconds)
-                    }
-
-                    // duration 표시 (MediaMetadataRetriever에서 가져온 값 사용)
-                    val displayDuration = formatDurationMs(videoDurationMs)
-
-                    // 첫 프레임 렌더링 여부 (Old의 onRenderedFirstFrame과 동일)
-                    // isVisible이 변경될 때 리셋하여 깜빡임 방지
-                    var isFirstFrameRendered by remember(isVisible) { mutableStateOf(false) }
-                    val coroutineScope = rememberCoroutineScope()
-
-                    when {
-                        // MP4 비디오인 경우: ExoPlayer로 재생 + 썸네일 오버레이
-                        firstMedia.isVideo && isVisible && !firstMedia.umjjalUrl.isNullOrEmpty() -> {
-                            // 비디오 플레이어
-                            ExoVideoPlayer(
-                                videoUrl = firstMedia.umjjalUrl!!,
-                                isVisible = isVisible,
-                                modifier = Modifier.fillMaxSize(),
-                                isMuted = true,
-                                isLooping = true,
-                                onFirstFrameRendered = {
-                                    // 첫 프레임 렌더링 후 0.1초 후에 썸네일 숨김 (깜빡임 방지)
-                                    coroutineScope.launch {
-                                        delay(100L)
-                                        isFirstFrameRendered = true
-                                    }
-                                }
-                            )
-                            // 첫 프레임 렌더링 전까지 썸네일 오버레이 (검은 화면/깜빡임 방지)
-                            if (!isFirstFrameRendered) {
-                                AsyncImage(
-                                    model = firstMedia.thumbnailUrl,
-                                    contentDescription = "Video Thumbnail",
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
-                        }
-                        // MP4 비디오 썸네일 (보이지 않을 때)
-                        firstMedia.isVideo -> {
-                            AsyncImage(
-                                model = firstMedia.thumbnailUrl,
-                                contentDescription = "Video Thumbnail",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                        // GIF인 경우: 화면에 보일 때 움짤 재생
-                        firstMedia.isGif && isVisible && !firstMedia.umjjalUrl.isNullOrEmpty() -> {
-                            AsyncImage(
-                                model = ImageRequest.Builder(context)
-                                    .data(firstMedia.umjjalUrl)
-                                    .repeatCount(-1) // 무한 반복 (-1 = INFINITE)
-                                    .crossfade(true)
-                                    .build(),
-                                imageLoader = gifImageLoader,
-                                contentDescription = "GIF Media",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Fit
-                            )
-                        }
-                        // GIF 썸네일 (보이지 않을 때)
-                        firstMedia.isGif -> {
-                            AsyncImage(
-                                model = firstMedia.thumbnailUrl,
-                                contentDescription = "GIF Thumbnail",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Fit
-                            )
-                            // GIF 라벨 표시
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.BottomEnd)
-                                    .padding(bottom = 10.dp, end = 10.dp)
-                                    .background(
-                                        color = Color.Black.copy(alpha = 0.5f),
-                                        shape = RoundedCornerShape(4.dp)
-                                    )
-                                    .padding(horizontal = 6.dp, vertical = 2.dp)
-                            ) {
-                                Text(
-                                    text = "GIF",
-                                    style = ExoTypo.stat10.copy(color = Color.White)
-                                )
-                            }
-                        }
-                        // 일반 이미지
-                        else -> {
-                            AsyncImage(
-                                model = ImageRequest.Builder(context)
-                                    .data(firstMedia.displayUrl)
-                                    .crossfade(true)
-                                    .build(),
-                                contentDescription = "Media",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Fit
-                            )
-                        }
-                    }
-
-                    // 비디오 duration 표시 (우측 상단) - Old 프로젝트 스타일: 흰색 텍스트 + 그림자
-                    if (firstMedia.isVideo && displayDuration.isNotEmpty()) {
-                        Text(
-                            text = displayDuration,
-                            style = ExoTypo.body12.copy(
-                                color = Color.White,
-                                shadow = Shadow(
-                                    color = Color.Black,
-                                    offset = Offset(3f, 3f),
-                                    blurRadius = 3f
-                                )
-                            ),
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(top = 16.dp, end = 16.dp)
-                        )
-                    }
-
-                    // 미디어 개수 표시
-                    if (mediaFiles.size > 1) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(top = if (firstMedia.isVideo) 40.dp else 29.dp, end = 16.dp)
-                                .height(24.dp)
-                                .background(
-                                    color = ColorPalette.textDefault.copy(alpha = 0.7f),
-                                    shape = RoundedCornerShape(13.dp)
-                                )
-                                .padding(horizontal = 8.dp)
-                        ) {
-                            Text(
-                                text = "1/${mediaFiles.size}",
-                                style = ExoTypo.stat10.copy(color = ColorPalette.textWhiteBlack),
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-                    }
-                }
+                )
             }
 
-            // 6. 통계 섹션 (viewCount 제외)
-            // 안쪽 카운트 영역 - 항상 기본 아이콘 사용 (색칠 안됨)
+            // 6. 통계 섹션
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 10.dp, top = 13.dp, end = 16.dp, bottom = 13.dp),
                 horizontalArrangement = Arrangement.spacedBy(18.dp)
             ) {
-                // FEED 타입에서만 하트 카운트 표시
-                if (type == ArticleType.FEED) {
-                    StatItem(
-                        iconRes = R.drawable.icon_community_heart,
-                        count = heartCount,
-                        onClick = onHeartClick
-                    )
+                when (type) {
+                    ArticleType.FEED -> {
+                        StatItem(
+                            iconRes = R.drawable.icon_community_heart,
+                            count = localHeartCount.toInt(),
+                            onClick = { showVoteDialog = true }
+                        )
+                    }
+                    ArticleType.COMMUNITY -> {
+                        StatItem(
+                            iconRes = R.drawable.icon_community_heart,
+                            count = localHeartCount.toInt(),
+                            onClick = { showVoteDialog = true }
+                        )
+                    }
+                    ArticleType.FREE_BOARD -> { /* 자유게시판은 하트 카운트 없음 */ }
                 }
-                // 좋아요 - 안쪽 영역은 항상 기본 아이콘 (Old: likeCountIcon은 항상 icon_board_like)
                 StatItem(
                     iconRes = R.drawable.icon_board_like,
-                    count = likeCount,
+                    count = localLikeCount,
                     tintColor = ColorPalette.textDefault,
-                    onClick = onLikeClick
+                    onClick = {
+                        val currentTime = System.currentTimeMillis()
+                        if (currentTime - lastLikeClickTime < 1000L) return@StatItem
+                        lastLikeClickTime = currentTime
+
+                        val newLiked = !localIsLiked
+                        localIsLiked = newLiked
+                        localLikeCount = if (newLiked) localLikeCount + 1 else (localLikeCount - 1).coerceAtLeast(0)
+                        viewModel.postLike(article.id, newLiked)
+                    }
                 )
-                StatItem(R.drawable.icon_community_comment, commentCount, tintColor = ColorPalette.textDefault)
+                StatItem(
+                    iconRes = R.drawable.icon_community_comment,
+                    count = article.commentCount,
+                    tintColor = ColorPalette.textDefault,
+                    onClick = {
+                        viewModel.navigateToArticleDetail(article)
+                    }
+                )
             }
 
             HorizontalDivider(
@@ -562,40 +485,106 @@ fun ExoArticle(
                 thickness = 0.3.dp
             )
 
-            // 7. 액션 버튼 (type에 따라 다르게 표시)
-            // 하단 버튼 영역 - 좋아요 상태에 따라 아이콘 변경 (Old: ivLike)
+            // 7. 액션 버튼
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)
             ) {
-                // FEED 타입: 하트투표, 좋아요, 댓글
-                // FREE_BOARD 타입: 좋아요, 댓글
-                if (type == ArticleType.FEED) {
-                    ActionButton(
-                        iconRes = R.drawable.icon_community_heart,
-                        label = stringResource(R.string.lable_community_heart_vote),
-                        onClick = onHeartClick,
-                        modifier = Modifier.weight(1f)
-                    )
-                    VerticalDivider()
+                when (type) {
+                    ArticleType.FEED -> {
+                        ActionButton(
+                            iconRes = R.drawable.icon_community_heart,
+                            label = stringResource(R.string.lable_community_heart_vote),
+                            onClick = { showVoteDialog = true },
+                            modifier = Modifier.weight(1f)
+                        )
+                        VerticalDivider()
+                        ActionButton(
+                            iconRes = if (localIsLiked) R.drawable.icon_board_like_active else R.drawable.icon_board_like,
+                            label = stringResource(R.string.support_sympathy),
+                            onClick = {
+                                val currentTime = System.currentTimeMillis()
+                                if (currentTime - lastLikeClickTime < 1000L) return@ActionButton
+                                lastLikeClickTime = currentTime
+
+                                val newLiked = !localIsLiked
+                                localIsLiked = newLiked
+                                localLikeCount = if (newLiked) localLikeCount + 1 else (localLikeCount - 1).coerceAtLeast(0)
+                                viewModel.postLike(article.id, newLiked)
+                            },
+                            modifier = Modifier.weight(1f),
+                            tintColor = if (localIsLiked) null else ColorPalette.textDefault
+                        )
+                        VerticalDivider()
+                        ActionButton(
+                            iconRes = R.drawable.icon_community_comment,
+                            label = stringResource(R.string.lable_community_comment),
+                            onClick = { viewModel.navigateToArticleDetail(article) },
+                            modifier = Modifier.weight(1f),
+                            tintColor = ColorPalette.textDefault
+                        )
+                    }
+                    ArticleType.COMMUNITY -> {
+                        ActionButton(
+                            iconRes = R.drawable.icon_community_heart,
+                            label = stringResource(R.string.lable_community_heart_vote),
+                            onClick = { showVoteDialog = true },
+                            modifier = Modifier.weight(1f)
+                        )
+                        VerticalDivider()
+                        ActionButton(
+                            iconRes = if (localIsLiked) R.drawable.icon_board_like_active else R.drawable.icon_board_like,
+                            label = stringResource(R.string.support_sympathy),
+                            onClick = {
+                                val currentTime = System.currentTimeMillis()
+                                if (currentTime - lastLikeClickTime < 1000L) return@ActionButton
+                                lastLikeClickTime = currentTime
+
+                                val newLiked = !localIsLiked
+                                localIsLiked = newLiked
+                                localLikeCount = if (newLiked) localLikeCount + 1 else (localLikeCount - 1).coerceAtLeast(0)
+                                viewModel.postLike(article.id, newLiked)
+                            },
+                            modifier = Modifier.weight(1f),
+                            tintColor = if (localIsLiked) null else ColorPalette.textDefault
+                        )
+                        VerticalDivider()
+                        ActionButton(
+                            iconRes = R.drawable.icon_community_comment,
+                            label = stringResource(R.string.lable_community_comment),
+                            onClick = { viewModel.navigateToArticleDetail(article) },
+                            modifier = Modifier.weight(1f),
+                            tintColor = ColorPalette.textDefault
+                        )
+                    }
+                    ArticleType.FREE_BOARD -> {
+                        ActionButton(
+                            iconRes = if (localIsLiked) R.drawable.icon_board_like_active else R.drawable.icon_board_like,
+                            label = stringResource(R.string.support_sympathy),
+                            onClick = {
+                                val currentTime = System.currentTimeMillis()
+                                if (currentTime - lastLikeClickTime < 1000L) return@ActionButton
+                                lastLikeClickTime = currentTime
+
+                                val newLiked = !localIsLiked
+                                localIsLiked = newLiked
+                                localLikeCount = if (newLiked) localLikeCount + 1 else (localLikeCount - 1).coerceAtLeast(0)
+                                viewModel.postLike(article.id, newLiked)
+                            },
+                            modifier = Modifier.weight(1f),
+                            tintColor = if (localIsLiked) null else ColorPalette.textDefault
+                        )
+                        VerticalDivider()
+                        ActionButton(
+                            iconRes = R.drawable.icon_community_comment,
+                            label = stringResource(R.string.lable_community_comment),
+                            onClick = { viewModel.navigateToArticleDetail(article) },
+                            modifier = Modifier.weight(1f),
+                            tintColor = ColorPalette.textDefault
+                        )
+                    }
                 }
-                // 좋아요 버튼 - 상태에 따라 아이콘 변경 (isLiked면 active 아이콘)
-                ActionButton(
-                    iconRes = if (isLiked) R.drawable.icon_board_like_active else R.drawable.icon_board_like,
-                    label = stringResource(R.string.support_sympathy),
-                    onClick = onLikeClick,
-                    modifier = Modifier.weight(1f),
-                    tintColor = if (isLiked) null else ColorPalette.textDefault
-                )
-                VerticalDivider()
-                ActionButton(
-                    iconRes = R.drawable.icon_community_comment,
-                    label = stringResource(R.string.lable_community_comment),
-                    onClick = onCommentClick,
-                    modifier = Modifier.weight(1f),
-                    tintColor = ColorPalette.textDefault
-                )
             }
         }
 
@@ -605,6 +594,203 @@ fun ExoArticle(
                 .fillMaxWidth()
                 .height(10.dp)
         )
+    }
+
+    // 투표 다이얼로그
+    if (showVoteDialog) {
+        ExoArticleVoteDialog(
+            articleId = article.id,
+            articleHeart = localHeartCount,
+            onVote = { hearts, onSuccess, onError ->
+                viewModel.voteArticle(
+                    articleId = article.id,
+                    hearts = hearts,
+                    onSuccess = { response ->
+                        // 투표한 하트 수만큼 증가 (보너스 하트 포함)
+                        val bonusHeart = response.bonusHeart ?: 0
+                        localHeartCount += hearts + bonusHeart
+                        onSuccess(response)
+                    },
+                    onError = onError
+                )
+            },
+            onDismiss = { showVoteDialog = false }
+        )
+    }
+}
+
+/**
+ * 미디어 섹션
+ */
+@Composable
+private fun MediaSection(
+    mediaFiles: List<ArticleFile>,
+    isVisible: Boolean,
+    onMediaClick: (Int) -> Unit
+) {
+    val context = LocalContext.current
+    val firstMedia = mediaFiles.first()
+    val coroutineScope = rememberCoroutineScope()
+
+    // GIF ImageLoader
+    val gifImageLoader = remember(context) {
+        ImageLoader.Builder(context)
+            .components {
+                if (android.os.Build.VERSION.SDK_INT >= 28) {
+                    add(ImageDecoderDecoder.Factory())
+                } else {
+                    add(GifDecoder.Factory())
+                }
+            }
+            .build()
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .background(ColorPalette.background100)
+            .clip(RoundedCornerShape(0.dp))
+            .clickable { onMediaClick(0) },
+        contentAlignment = Alignment.Center
+    ) {
+        var videoDurationMs by remember { mutableStateOf(0L) }
+
+        LaunchedEffect(firstMedia.originUrl) {
+            if (firstMedia.isVideo && videoDurationMs == 0L && !firstMedia.originUrl.isNullOrEmpty()) {
+                MediaCacheUtil.getVideoDuration(firstMedia.originUrl!!)?.let { duration ->
+                    videoDurationMs = duration
+                }
+            }
+        }
+
+        fun formatDurationMs(durationMs: Long): String {
+            if (durationMs <= 0) return ""
+            val minutes = TimeUnit.MILLISECONDS.toMinutes(durationMs)
+            val seconds = TimeUnit.MILLISECONDS.toSeconds(durationMs) - TimeUnit.MINUTES.toSeconds(minutes)
+            return "%02d:%02d".format(minutes, seconds)
+        }
+
+        val displayDuration = formatDurationMs(videoDurationMs)
+        var isFirstFrameRendered by remember(isVisible) { mutableStateOf(false) }
+
+        when {
+            firstMedia.isVideo && isVisible && !firstMedia.umjjalUrl.isNullOrEmpty() -> {
+                ExoVideoPlayer(
+                    videoUrl = firstMedia.umjjalUrl!!,
+                    isVisible = isVisible,
+                    modifier = Modifier.fillMaxSize(),
+                    isMuted = true,
+                    isLooping = true,
+                    onFirstFrameRendered = {
+                        coroutineScope.launch {
+                            delay(100L)
+                            isFirstFrameRendered = true
+                        }
+                    }
+                )
+                if (!isFirstFrameRendered) {
+                    AsyncImage(
+                        model = firstMedia.thumbnailUrl,
+                        contentDescription = "Video Thumbnail",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+            firstMedia.isVideo -> {
+                AsyncImage(
+                    model = firstMedia.thumbnailUrl,
+                    contentDescription = "Video Thumbnail",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+            firstMedia.isGif && isVisible && !firstMedia.umjjalUrl.isNullOrEmpty() -> {
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(firstMedia.umjjalUrl)
+                        .repeatCount(-1)
+                        .crossfade(true)
+                        .build(),
+                    imageLoader = gifImageLoader,
+                    contentDescription = "GIF Media",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+            }
+            firstMedia.isGif -> {
+                AsyncImage(
+                    model = firstMedia.thumbnailUrl,
+                    contentDescription = "GIF Thumbnail",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = 10.dp, end = 10.dp)
+                        .background(
+                            color = Color.Black.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(4.dp)
+                        )
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = "GIF",
+                        style = ExoTypo.stat10.copy(color = Color.White)
+                    )
+                }
+            }
+            else -> {
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(firstMedia.displayUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Media",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+            }
+        }
+
+        if (firstMedia.isVideo && displayDuration.isNotEmpty()) {
+            Text(
+                text = displayDuration,
+                style = ExoTypo.body12.copy(
+                    color = Color.White,
+                    shadow = Shadow(
+                        color = Color.Black,
+                        offset = Offset(3f, 3f),
+                        blurRadius = 3f
+                    )
+                ),
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 16.dp, end = 16.dp)
+            )
+        }
+
+        if (mediaFiles.size > 1) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = if (firstMedia.isVideo) 40.dp else 29.dp, end = 16.dp)
+                    .height(24.dp)
+                    .background(
+                        color = ColorPalette.textDefault.copy(alpha = 0.7f),
+                        shape = RoundedCornerShape(13.dp)
+                    )
+                    .padding(horizontal = 8.dp)
+            ) {
+                Text(
+                    text = "1/${mediaFiles.size}",
+                    style = ExoTypo.stat10.copy(color = ColorPalette.textWhiteBlack),
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        }
     }
 }
 
@@ -637,7 +823,6 @@ private fun StatItem(
             Modifier
         }
     ) {
-        // 아이콘 (14dp x 14dp)
         Icon(
             painter = painterResource(iconRes),
             contentDescription = null,
@@ -645,7 +830,6 @@ private fun StatItem(
             tint = tintColor ?: Color.Unspecified
         )
         Spacer(modifier = Modifier.width(3.dp))
-        // 애니메이션 없이 즉시 표시 (Old 프로젝트와 동일)
         Text(
             text = NumberFormatUtil.formatWithComma(count.toLong()),
             style = ExoTypo.stat13
@@ -676,7 +860,6 @@ private fun ActionButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            // 아이콘 (14dp x 14dp)
             Icon(
                 painter = painterResource(iconRes),
                 contentDescription = null,

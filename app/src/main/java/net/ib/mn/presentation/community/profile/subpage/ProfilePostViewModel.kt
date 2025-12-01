@@ -7,80 +7,113 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import net.ib.mn.data.repository.UsersRepository
+import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.domain.repository.ArticlesRepository
 import javax.inject.Inject
+
+private const val POST_TYPE = "article"
+private const val PAGE_LIMIT = 20
 
 /**
  * ProfilePostViewModel - 프로필 게시글 탭 ViewModel
- *
- * Old 프로젝트의 FeedActivity.getFeedArticle() 로직을 참고
  */
 @HiltViewModel
 class ProfilePostViewModel @Inject constructor(
-    private val usersRepository: UsersRepository
+    private val articlesRepository: ArticlesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ProfilePostUiState>(ProfilePostUiState.Loading)
     val uiState: StateFlow<ProfilePostUiState> = _uiState.asStateFlow()
 
     private var userId: Int = 0
+    private var isSelf: Boolean = false
     private var currentOffset: Int = 0
-    private val limit: Int = 20
-    private val posts = mutableListOf<ProfilePostItem>()
+    private var hasMoreData: Boolean = true
+    private var isLoading: Boolean = false
+    private val posts = mutableListOf<ArticleModel>()
 
-    /**
-     * 게시글 로드
-     */
-    fun loadPosts(userId: Int) {
-        if (this.userId == userId && posts.isNotEmpty()) {
-            // 이미 로드된 경우 스킵
-            return
-        }
+    fun loadPosts(userId: Int, isSelf: Boolean = false) {
+        if (this.userId == userId && posts.isNotEmpty()) return
 
         this.userId = userId
+        this.isSelf = isSelf
         currentOffset = 0
+        hasMoreData = true
         posts.clear()
         _uiState.value = ProfilePostUiState.Loading
-
         fetchPosts()
     }
 
-    /**
-     * 더 많은 게시글 로드
-     */
     fun loadMore() {
-        if (_uiState.value is ProfilePostUiState.Loading) return
+        if (isLoading || !hasMoreData) return
         fetchPosts()
     }
 
     private fun fetchPosts() {
+        if (isLoading) return
+        isLoading = true
+
         viewModelScope.launch {
-            // TODO: API 구현 필요 - articlesRepository.getFeedActivity(userId, "article", offset, limit, isMine)
-            // 현재는 빈 목록으로 Empty 상태 표시
-            _uiState.value = ProfilePostUiState.Empty
+            articlesRepository.getFeedActivity(
+                userId = userId,
+                type = POST_TYPE,
+                offset = currentOffset,
+                limit = PAGE_LIMIT,
+                isSelf = isSelf
+            ).collect { result ->
+                when (result) {
+                    is ApiResult.Loading -> {
+                        if (posts.isEmpty()) {
+                            _uiState.value = ProfilePostUiState.Loading
+                        }
+                    }
+                    is ApiResult.Success -> handleSuccess(result.data.articles, result.data.totalCount)
+                    is ApiResult.Error -> handleError(result.message)
+                }
+            }
         }
+    }
+
+    private fun handleSuccess(articles: List<ArticleModel>, totalCount: Int) {
+        // 비공개 피드
+        if (totalCount == -1) {
+            _uiState.value = ProfilePostUiState.Private
+            isLoading = false
+            return
+        }
+
+        if (articles.isEmpty()) {
+            hasMoreData = false
+            if (posts.isEmpty()) {
+                _uiState.value = ProfilePostUiState.Empty
+            }
+        } else {
+            posts.addAll(articles)
+            currentOffset += articles.size
+            hasMoreData = articles.size >= PAGE_LIMIT
+
+            _uiState.value = ProfilePostUiState.Success(
+                posts = posts.toList(),
+                hasMore = hasMoreData
+            )
+        }
+        isLoading = false
+    }
+
+    private fun handleError(message: String?) {
+        if (posts.isEmpty()) {
+            _uiState.value = ProfilePostUiState.Error(message ?: "Failed to load posts")
+        }
+        isLoading = false
     }
 }
 
-/**
- * ProfilePostUiState - UI 상태
- */
+/** UI 상태 */
 sealed interface ProfilePostUiState {
     data object Loading : ProfilePostUiState
     data object Empty : ProfilePostUiState
-    data class Success(val posts: List<ProfilePostItem>) : ProfilePostUiState
+    data object Private : ProfilePostUiState
+    data class Success(val posts: List<ArticleModel>, val hasMore: Boolean = true) : ProfilePostUiState
     data class Error(val message: String) : ProfilePostUiState
 }
-
-/**
- * ProfilePostItem - 게시글 데이터
- */
-data class ProfilePostItem(
-    val id: String,
-    val content: String,
-    val imageUrl: String?,
-    val heart: Long,
-    val commentCount: Int,
-    val likeCount: Int,
-    val createdAt: String
-)

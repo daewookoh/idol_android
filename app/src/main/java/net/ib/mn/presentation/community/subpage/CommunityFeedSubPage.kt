@@ -30,7 +30,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,40 +48,60 @@ import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.R
 import net.ib.mn.ui.components.ArticleType
 import net.ib.mn.ui.components.ExoArticle
-import net.ib.mn.ui.components.ExoArticleVoteDialog
+import net.ib.mn.ui.components.ExoArticleNavigation
+import net.ib.mn.ui.components.ExoArticleViewModel
 import net.ib.mn.ui.components.ExoBoardNoticeItem
 import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
-import net.ib.mn.util.DateTimeUtil
-import net.ib.mn.util.LocaleUtil
 
 /**
  * CommunityFeedSubPage - 커뮤니티 피드 탭
  *
  * @param rankingItem 선택된 아이돌 정보
  * @param onFirstArticleVideoPlaying 첫 번째 아티클의 비디오/움짤 재생 상태 콜백 (Top3 비디오 제어용)
- * @param onUserProfileClick 유저 프로필 클릭 콜백 (userId, nickname, imageUrl, level, mostIdolName)
+ * @param onNavigateToProfile 프로필 화면 이동 콜백
+ * @param onNavigateToArticleDetail 게시글 상세 화면 이동 콜백
  * @param viewModel ViewModel
+ * @param articleViewModel ExoArticle 공용 ViewModel
  */
 @Composable
 fun CommunityFeedSubPage(
     rankingItem: RankingItem,
     onFirstArticleVideoPlaying: (Boolean) -> Unit = {},
-    onUserProfileClick: (userId: Int, nickname: String, imageUrl: String?, level: Int, mostIdolName: String?) -> Unit = { _, _, _, _, _ -> },
-    viewModel: CommunityFeedViewModel = hiltViewModel()
+    onNavigateToProfile: (userId: Int, nickname: String, imageUrl: String?, level: Int, mostIdolName: String?) -> Unit = { _, _, _, _, _ -> },
+    onNavigateToArticleDetail: (ArticleModel) -> Unit = {},
+    viewModel: CommunityFeedViewModel = hiltViewModel(),
+    articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
 
-    // 투표 다이얼로그 상태
-    var showVoteDialog by remember { mutableStateOf(false) }
-    var selectedArticleId by remember { mutableStateOf("") }
-    var selectedArticleHeart by remember { mutableLongStateOf(0L) }
-
-    // 좋아요 클릭 throttling - 마지막 클릭 시간 저장 (articleId -> lastClickTime)
-    val likeClickTimes = remember { mutableMapOf<String, Long>() }
+    // ExoArticle 네비게이션 이벤트 처리
+    LaunchedEffect(Unit) {
+        articleViewModel.navigationEvent.collect { event ->
+            when (event) {
+                is ExoArticleNavigation.Profile -> {
+                    onNavigateToProfile(
+                        event.userId,
+                        event.nickname,
+                        event.imageUrl,
+                        event.level,
+                        event.mostIdolName
+                    )
+                }
+                is ExoArticleNavigation.ArticleDetail -> {
+                    onNavigateToArticleDetail(event.article)
+                }
+                is ExoArticleNavigation.MediaDetail -> {
+                    // TODO: 미디어 상세 화면으로 이동
+                }
+                is ExoArticleNavigation.Community -> {
+                    // TODO: 커뮤니티 화면으로 이동
+                }
+            }
+        }
+    }
 
     // 초기 로드 (isMost는 ViewModel에서 PreferencesManager를 통해 직접 확인)
     LaunchedEffect(rankingItem.id) {
@@ -158,12 +177,7 @@ fun CommunityFeedSubPage(
                         items = uiState.articles,
                         key = { _, article -> article.id }
                     ) { index, article ->
-                        // 로컬 상태로 즉시 UI 업데이트 (Old 프로젝트의 ViewHolder 방식)
-                        var localIsLiked by remember(article.id) { mutableStateOf(article.isUserLike) }
-                        var localLikeCount by remember(article.id) { mutableStateOf(article.likeCount) }
-
                         // 80% 이상 보일 때만 비디오 재생
-                        // LazyColumn 인덱스: notices(0~n-1) + header(n) + articles(n+1~)
                         val actualIndex = index + uiState.notices.size + 1
                         val isVisible by remember {
                             derivedStateOf {
@@ -172,7 +186,6 @@ fun CommunityFeedSubPage(
                                 if (itemInfo == null) {
                                     false
                                 } else {
-                                    val viewportHeight = layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset
                                     val itemTop = itemInfo.offset
                                     val itemBottom = itemInfo.offset + itemInfo.size
                                     val visibleTop = maxOf(itemTop, layoutInfo.viewportStartOffset)
@@ -193,76 +206,13 @@ fun CommunityFeedSubPage(
                             }
                         }
 
+                        // ExoArticle - 모든 액션은 내부에서 처리
                         ExoArticle(
+                            article = article,
                             type = ArticleType.FEED,
-                            profileImageUrl = article.user?.imageUrlCommunity ?: "",
-                            userName = article.user?.nickname ?: "",
-                            userLevel = article.user?.level ?: 0,
-                            userEmoticonUrl = article.user?.emoticon?.emojiUrl,
-                            createdAt = DateTimeUtil.formatFullDate(article.createdAt),
-                            content = article.content ?: "",
-                            mediaFiles = article.mediaFiles,
-                            linkUrl = article.linkUrl,
-                            linkTitle = article.linkTitle,
-                            imageUrl = article.imageUrl,
-                            umjjalUrl = article.umjjalUrl,
-                            heartCount = article.heart.toInt(),
-                            likeCount = localLikeCount,
-                            commentCount = article.commentCount,
-                            isLiked = localIsLiked,
-                            isPrivate = article.isMostOnly == "Y",
-                            isPopular = article.isPopular,
-                            showTranslation = true,
                             isVisible = isVisible,
-                            onProfileClick = {
-                                article.user?.let { user ->
-                                    // most에서 언어별 이름 추출
-                                    val mostIdolName = user.most?.let { most ->
-                                        LocaleUtil.getLocalizedIdolName(context, most)
-                                    }
-                                    onUserProfileClick(
-                                        user.id,
-                                        user.nickname ?: "",
-                                        user.imageUrlCommunity,
-                                        user.level,
-                                        mostIdolName
-                                    )
-                                }
-                            },
-                            onMoreClick = {
-                                // TODO: 더보기 클릭 처리
-                            },
-                            onHeartClick = {
-                                selectedArticleId = article.id
-                                selectedArticleHeart = article.heart
-                                showVoteDialog = true
-                            },
-                            onLikeClick = {
-                                // 1초 이내 재클릭 방지
-                                val currentTime = System.currentTimeMillis()
-                                val lastClickTime = likeClickTimes[article.id] ?: 0L
-                                if (currentTime - lastClickTime < 1000L) {
-                                    return@ExoArticle
-                                }
-                                likeClickTimes[article.id] = currentTime
-
-                                // 즉시 로컬 상태 업데이트 (Old의 setLikeIcon과 동일)
-                                val newLiked = !localIsLiked
-                                localIsLiked = newLiked
-                                localLikeCount = if (newLiked) localLikeCount + 1 else (localLikeCount - 1).coerceAtLeast(0)
-
-                                // API 호출
-                                viewModel.postLike(article.id, newLiked)
-                            },
-                            onCommentClick = {
-                                // TODO: 댓글 클릭 처리
-                            },
-                            onTranslateClick = {
-                                // TODO: 번역 처리
-                            },
-                            onMediaClick = { mediaIndex ->
-                                // TODO: 미디어 클릭 처리
-                            }
+                            showTranslation = true,
+                            viewModel = articleViewModel
                         )
                     }
                 } else {
@@ -317,29 +267,6 @@ fun CommunityFeedSubPage(
                     style = ExoTypo.body14.copy(color = ColorPalette.textDimmed)
                 )
             }
-        }
-
-        // 투표 다이얼로그
-        if (showVoteDialog && selectedArticleId.isNotEmpty()) {
-            ExoArticleVoteDialog(
-                articleId = selectedArticleId,
-                articleHeart = selectedArticleHeart,
-                onVote = { hearts, onSuccess, onError ->
-                    viewModel.voteArticle(
-                        articleId = selectedArticleId,
-                        hearts = hearts,
-                        onSuccess = { response ->
-                            onSuccess(response)
-                        },
-                        onError = { errorMsg ->
-                            onError(errorMsg)
-                        }
-                    )
-                },
-                onDismiss = {
-                    showVoteDialog = false
-                }
-            )
         }
     }
 }

@@ -81,6 +81,10 @@ data class ArticleModel(
     @SerializedName("user")
     val user: ArticleUser? = null,
 
+    // Idol info (게시글이 작성된 커뮤니티)
+    @SerializedName("idol")
+    val idol: MostIdol? = null,
+
     // Files
     @SerializedName("files")
     val files: List<ArticleFile> = emptyList()
