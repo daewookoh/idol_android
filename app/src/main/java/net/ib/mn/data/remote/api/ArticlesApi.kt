@@ -120,4 +120,23 @@ interface ArticlesApi {
     suspend fun likeArticle(
         @Body request: ArticleLikeRequest
     ): ArticleLikeResponse
+
+    /**
+     * 유저 피드 활동 조회 (사진/게시글)
+     * Old 프로젝트: GET "articles/activity/"
+     *
+     * @param userId 유저 ID
+     * @param type 타입 ("PHOTO" = 사진, "ALL" = 전체)
+     * @param limit 페이지당 개수
+     * @param offset 시작 위치
+     * @param isSelf 본인 여부 (true면 비공개 포함)
+     */
+    @GET("articles/activity/")
+    suspend fun getFeedActivity(
+        @Query("user_id") userId: Int,
+        @Query("type") type: String,
+        @Query("limit") limit: Int,
+        @Query("offset") offset: Int,
+        @Query("self") isSelf: Boolean? = null
+    ): Response<ResponseBody>
 }

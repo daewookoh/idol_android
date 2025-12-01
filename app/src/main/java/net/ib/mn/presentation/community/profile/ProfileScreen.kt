@@ -290,7 +290,11 @@ fun ProfileScreen(
                         userScrollEnabled = false
                     ) { page ->
                         when (tabs[page]) {
-                            ProfileTab.PHOTO -> ProfilePhotoPage(userId = userId)
+                            ProfileTab.PHOTO -> ProfilePhotoPage(
+                                userId = userId,
+                                isMine = isMine,
+                                isFeedPrivate = state.user.isFeedPrivate
+                            )
                             ProfileTab.ACTIVITY -> ProfilePostPage(userId = userId)
                             ProfileTab.COMMENT -> ProfileCommentPage(userId = userId)
                         }
@@ -410,7 +414,7 @@ private fun ProfileHeader(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
 
                     // 최애 아이돌 이름 + 설정 아이콘 (본인일 때)
                     Row(

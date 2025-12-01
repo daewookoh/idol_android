@@ -364,6 +364,88 @@ class ArticlesRepositoryImpl @Inject constructor(
         )
     }
 
+    override fun getFeedActivity(
+        userId: Int,
+        type: String,
+        offset: Int,
+        limit: Int,
+        isSelf: Boolean
+    ): Flow<ApiResult<ArticlesResponse>> = flow {
+        emit(ApiResult.Loading)
+
+        try {
+            Log.d(TAG, "getFeedActivity: userId=$userId, type=$type, offset=$offset, limit=$limit, isSelf=$isSelf")
+            val response = articlesApi.getFeedActivity(
+                userId = userId,
+                type = type,
+                limit = limit,
+                offset = offset,
+                isSelf = if (isSelf) true else null
+            )
+
+            if (response.isSuccessful && response.body() != null) {
+                val bodyString = response.body()!!.string()
+                val articlesResponse = parseFeedActivityResponse(bodyString)
+                emit(ApiResult.Success(articlesResponse))
+            } else {
+                emit(ApiResult.Error(
+                    exception = HttpException(response),
+                    code = response.code()
+                ))
+            }
+        } catch (e: HttpException) {
+            emit(ApiResult.Error(
+                exception = e,
+                code = e.code(),
+                message = "HTTP ${e.code()}: ${e.message()}"
+            ))
+        } catch (e: IOException) {
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Network error: ${e.message}"
+            ))
+        } catch (e: Exception) {
+            emit(ApiResult.Error(
+                exception = e,
+                message = "Unknown error: ${e.message}"
+            ))
+        }
+    }
+
+    /**
+     * FeedActivity API 응답 JSON을 ArticlesResponse로 파싱
+     */
+    private fun parseFeedActivityResponse(bodyString: String): ArticlesResponse {
+        val jsonObject = JSONObject(bodyString)
+        val success = jsonObject.optBoolean("success", false)
+        val feedIsViewable = jsonObject.optString("feed_is_viewable", "Y")
+        val objectsArray = jsonObject.optJSONArray("objects")
+
+        if (!success) {
+            return ArticlesResponse(emptyList(), emptyList(), 0, null)
+        }
+
+        // 비공개 피드 (feed_is_viewable: "N")
+        if (feedIsViewable == "N") {
+            return ArticlesResponse(emptyList(), emptyList(), -1, null)
+        }
+
+        // 게시글 파싱 (이미지 있는 것만)
+        val articles = if (objectsArray != null && objectsArray.length() > 0) {
+            try {
+                val listType = object : TypeToken<List<ArticleModel>>() {}.type
+                gson.fromJson<List<ArticleModel>>(objectsArray.toString(), listType)
+                    .filter { !it.imageUrl.isNullOrEmpty() || it.files.isNotEmpty() }
+            } catch (e: Exception) {
+                emptyList()
+            }
+        } else {
+            emptyList()
+        }
+
+        return ArticlesResponse(emptyList(), articles, articles.size, null)
+    }
+
     /**
      * API 응답 JSON을 ArticlesResponse로 파싱
      */

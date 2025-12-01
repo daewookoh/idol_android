@@ -140,6 +140,24 @@ interface ArticlesRepository {
      * @return 좋아요 결과
      */
     suspend fun likeArticle(articleId: String, like: Boolean): ArticleLikeResponse
+
+    /**
+     * 유저 피드 활동 조회 (사진/게시글)
+     * Old 프로젝트의 FeedActivity.getFeedPhoto() 참고
+     *
+     * @param userId 유저 ID
+     * @param type 타입 ("PHOTO" = 사진, "ALL" = 전체)
+     * @param offset 시작 위치
+     * @param limit 페이지당 개수
+     * @param isSelf 본인 여부
+     */
+    fun getFeedActivity(
+        userId: Int,
+        type: String,
+        offset: Int,
+        limit: Int,
+        isSelf: Boolean
+    ): Flow<ApiResult<ArticlesResponse>>
 }
 
 /**

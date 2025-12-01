@@ -7,76 +7,134 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import net.ib.mn.data.repository.UsersRepository
+import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.domain.repository.ArticlesRepository
 import javax.inject.Inject
+
+private const val PHOTO_TYPE = "image"
+private const val PAGE_LIMIT = 30
 
 /**
  * ProfilePhotoViewModel - 프로필 사진 탭 ViewModel
- *
- * Old 프로젝트의 FeedActivity.getFeedPhoto() 로직을 참고
  */
 @HiltViewModel
 class ProfilePhotoViewModel @Inject constructor(
-    private val usersRepository: UsersRepository
+    private val articlesRepository: ArticlesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ProfilePhotoUiState>(ProfilePhotoUiState.Loading)
     val uiState: StateFlow<ProfilePhotoUiState> = _uiState.asStateFlow()
 
     private var userId: Int = 0
+    private var isSelf: Boolean = false
     private var currentOffset: Int = 0
-    private val limit: Int = 30
+    private var hasMoreData: Boolean = true
+    private var isLoading: Boolean = false
     private val photos = mutableListOf<ProfilePhotoItem>()
 
-    /**
-     * 사진 로드
-     */
-    fun loadPhotos(userId: Int) {
-        if (this.userId == userId && photos.isNotEmpty()) {
-            // 이미 로드된 경우 스킵
-            return
-        }
+    fun loadPhotos(userId: Int, isSelf: Boolean = false) {
+        if (this.userId == userId && photos.isNotEmpty()) return
 
         this.userId = userId
+        this.isSelf = isSelf
         currentOffset = 0
+        hasMoreData = true
         photos.clear()
         _uiState.value = ProfilePhotoUiState.Loading
-
         fetchPhotos()
     }
 
-    /**
-     * 더 많은 사진 로드
-     */
     fun loadMore() {
-        if (_uiState.value is ProfilePhotoUiState.Loading) return
+        if (isLoading || !hasMoreData) return
         fetchPhotos()
     }
 
     private fun fetchPhotos() {
+        if (isLoading) return
+        isLoading = true
+
         viewModelScope.launch {
-            // TODO: API 구현 필요 - articlesRepository.getFeedActivity(userId, "photo", offset, limit, isMine)
-            // 현재는 빈 목록으로 Empty 상태 표시
-            _uiState.value = ProfilePhotoUiState.Empty
+            articlesRepository.getFeedActivity(
+                userId = userId,
+                type = PHOTO_TYPE,
+                offset = currentOffset,
+                limit = PAGE_LIMIT,
+                isSelf = isSelf
+            ).collect { result ->
+                when (result) {
+                    is ApiResult.Loading -> {
+                        if (photos.isEmpty()) {
+                            _uiState.value = ProfilePhotoUiState.Loading
+                        }
+                    }
+                    is ApiResult.Success -> handleSuccess(result.data.articles, result.data.totalCount)
+                    is ApiResult.Error -> handleError(result.message)
+                }
+            }
         }
+    }
+
+    private fun handleSuccess(articles: List<ArticleModel>, totalCount: Int) {
+        // 비공개 피드
+        if (totalCount == -1) {
+            _uiState.value = ProfilePhotoUiState.Private
+            isLoading = false
+            return
+        }
+
+        if (articles.isEmpty()) {
+            hasMoreData = false
+            if (photos.isEmpty()) {
+                _uiState.value = ProfilePhotoUiState.Empty
+            }
+        } else {
+            photos.addAll(articles.map { it.toPhotoItem() })
+            currentOffset += articles.size
+            hasMoreData = articles.size >= PAGE_LIMIT
+
+            _uiState.value = ProfilePhotoUiState.Success(
+                photos = photos.toList(),
+                hasMore = hasMoreData
+            )
+        }
+        isLoading = false
+    }
+
+    private fun handleError(message: String?) {
+        if (photos.isEmpty()) {
+            _uiState.value = ProfilePhotoUiState.Error(message ?: "Failed to load photos")
+        }
+        isLoading = false
+    }
+
+    private fun ArticleModel.toPhotoItem(): ProfilePhotoItem {
+        val firstFile = files.firstOrNull()
+        return ProfilePhotoItem(
+            id = id,
+            thumbnailUrl = firstFile?.thumbnailUrl ?: thumbnailUrl ?: imageUrl,
+            originalUrl = firstFile?.originUrl ?: firstFile?.fileUrl ?: imageUrl,
+            isVideo = firstFile?.originUrl?.endsWith(".mp4", true) == true ||
+                    umjjalUrl?.endsWith(".mp4", true) == true,
+            isGif = !umjjalUrl.isNullOrEmpty() && umjjalUrl?.endsWith(".mp4", true) != true
+        )
     }
 }
 
-/**
- * ProfilePhotoUiState - UI 상태
- */
+/** UI 상태 */
 sealed interface ProfilePhotoUiState {
     data object Loading : ProfilePhotoUiState
     data object Empty : ProfilePhotoUiState
-    data class Success(val photos: List<ProfilePhotoItem>) : ProfilePhotoUiState
+    data object Private : ProfilePhotoUiState
+    data class Success(val photos: List<ProfilePhotoItem>, val hasMore: Boolean = true) : ProfilePhotoUiState
     data class Error(val message: String) : ProfilePhotoUiState
 }
 
-/**
- * ProfilePhotoItem - 사진 데이터
- */
+/** 사진 아이템 */
 data class ProfilePhotoItem(
     val id: String,
     val thumbnailUrl: String?,
-    val originalUrl: String?
+    val originalUrl: String?,
+    val isVideo: Boolean = false,
+    val isGif: Boolean = false
 )

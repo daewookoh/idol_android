@@ -39,7 +39,8 @@ class ProfileViewModel(
         imageUrl = userImageUrl,
         level = userLevel,
         idolName = mostIdolName,
-        statusMessage = null
+        statusMessage = null,
+        isFeedPrivate = false
     )
 
     init {
@@ -58,11 +59,28 @@ class ProfileViewModel(
                 }
             }
 
-            // 상태 메시지 로드
-            loadStatusMessage()?.let { statusMessage ->
-                currentData = currentData.copy(statusMessage = statusMessage)
-                _uiState.value = ProfileUiState.Success(user = currentData)
-            }
+            // getStatus API에서 상태 메시지 및 비공개 여부 로드
+            loadStatusInfo()
+        }
+    }
+
+    /** getStatus API 호출하여 상태 메시지 및 피드 비공개 여부 로드 */
+    private suspend fun loadStatusInfo() {
+        try {
+            val json = usersRepository.getStatus(userId).getOrNull() ?: return
+            if (!json.optBoolean("success")) return
+
+            val statusMessage = json.optString("status_message", "").takeIf { it.isNotEmpty() && it != "null" }
+            val feedIsViewable = json.optString("feed_is_viewable", "Y")
+            val isFeedPrivate = feedIsViewable == "N" && !isMine
+
+            currentData = currentData.copy(
+                statusMessage = statusMessage,
+                isFeedPrivate = isFeedPrivate
+            )
+            _uiState.value = ProfileUiState.Success(user = currentData)
+        } catch (e: Exception) {
+            // 에러 무시
         }
     }
 
@@ -70,17 +88,6 @@ class ProfileViewModel(
     private fun loadMostFromCache(): String? {
         val most = userCacheRepository.getUserData()?.most ?: return null
         return LocaleUtil.getLocalizedIdolName(context, most).takeIf { it.isNotEmpty() }
-    }
-
-    /** getStatus API 호출하여 상태 메시지 로드 */
-    private suspend fun loadStatusMessage(): String? {
-        return try {
-            val json = usersRepository.getStatus(userId).getOrNull() ?: return null
-            if (!json.optBoolean("success")) return null
-            json.optString("status_message", "").takeIf { it.isNotEmpty() }
-        } catch (e: Exception) {
-            null
-        }
     }
 }
 
@@ -98,7 +105,8 @@ data class ProfileData(
     val imageUrl: String?,
     val level: Int,
     val idolName: String?,
-    val statusMessage: String?
+    val statusMessage: String?,
+    val isFeedPrivate: Boolean = false
 )
 
 /** ProfileViewModelFactory */
