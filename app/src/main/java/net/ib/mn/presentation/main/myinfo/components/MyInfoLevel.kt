@@ -112,7 +112,7 @@ fun MyInfoLevel(
                         .fillMaxWidth(fraction = animatedProgress.coerceIn(0f, 1f))
                         .background(
                             color = colorResource(id = R.color.main),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)
                         )
                 )
             }

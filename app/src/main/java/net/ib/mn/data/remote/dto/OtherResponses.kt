@@ -75,7 +75,7 @@ data class UserSelfData(
     @SerializedName("nickname")
     val nickname: String?,
 
-    @SerializedName("profile_image")
+    @SerializedName("image_url")
     val profileImage: String?,
 
     @SerializedName("heart")

@@ -22,10 +22,12 @@ import net.ib.mn.presentation.main.myinfo.components.MyInfoLinks
 @Composable
 fun MyInfoPage(
     modifier: Modifier = Modifier,
+    onNavigateToProfile: (userId: Int) -> Unit = {},
     viewModel: MyInfoPageViewModel = hiltViewModel()
 ) {
     val scrollState = rememberScrollState()
 
+    val userId by viewModel.userId.collectAsState()
     val userName by viewModel.userName.collectAsState()
     val profileImageUrl by viewModel.profileImageUrl.collectAsState()
     val level by viewModel.level.collectAsState()
@@ -59,7 +61,7 @@ fun MyInfoPage(
             favoriteIdolSubName = favoriteIdolSubName,
             subscriptionName = subscriptionName,
             hasNewFeed = hasNewFeed,
-            onProfileClick = { /* TODO: Navigate to profile */ },
+            onProfileClick = { userId?.let { onNavigateToProfile(it) } },
             onSubscriptionBadgeClick = { /* TODO: Navigate to subscription */ }
         )
 

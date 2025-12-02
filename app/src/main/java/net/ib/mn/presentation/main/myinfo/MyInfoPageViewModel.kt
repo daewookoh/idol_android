@@ -73,6 +73,9 @@ class MyInfoPageViewModel @Inject constructor(
     }
 
     // UI 상태
+    private val _userId = MutableStateFlow<Int?>(null)
+    val userId: StateFlow<Int?> = _userId.asStateFlow()
+
     private val _userName = MutableStateFlow("")
     val userName: StateFlow<String> = _userName.asStateFlow()
 
@@ -129,9 +132,7 @@ class MyInfoPageViewModel @Inject constructor(
         // UserCacheRepository의 userData를 구독
         viewModelScope.launch {
             userCacheRepository.userData.collect { userData ->
-
                 if (userData != null) {
-
                     // UI 상태 업데이트
                     val level = userData.level ?: 0
                     val levelHeart = userData.levelHeart ?: 0L
@@ -140,6 +141,7 @@ class MyInfoPageViewModel @Inject constructor(
                     // 최애 아이돌 이름 처리
                     val (favoriteIdolName, favoriteIdolSubName) = parseMostIdolName(userData.most?.name)
 
+                    _userId.value = userData.id
                     _userName.value = userData.nickname ?: ""
                     _profileImageUrl.value = userData.profileImage ?: ""
                     _level.value = level

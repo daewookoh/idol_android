@@ -37,8 +37,12 @@ import net.ib.mn.presentation.main.myfavorite.MyFavoritePage
 import net.ib.mn.presentation.main.myinfo.MyInfoPage
 import net.ib.mn.presentation.main.ranking.RankingPage
 import net.ib.mn.presentation.community.CommunityScreen
+import net.ib.mn.presentation.community.profile.ProfileScreen
 import net.ib.mn.ui.components.LocalRankingItemClick
 import java.util.Locale
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 
 /**
  * 메인 화면.
@@ -58,6 +62,10 @@ fun MainScreen(
     val selectedRankingItem by viewModel.selectedRankingItem.collectAsState()
     val currentCategory by viewModel.currentCategory.collectAsState()
     val defaultCategory = currentCategory ?: Constants.TYPE_MALE
+
+    // MyInfo 프로필 클릭 시 ProfileScreen 표시 상태
+    var showMyProfile by remember { mutableStateOf(false) }
+    val userData by viewModel.userCacheRepository.userData.collectAsState(initial = null)
 
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
@@ -173,7 +181,9 @@ fun MainScreen(
                 when (selectedTab) {
                     0 -> RankingPage()
                     1 -> MyFavoritePage()
-                    2 -> MyInfoPage()
+                    2 -> MyInfoPage(
+                        onNavigateToProfile = { showMyProfile = true }
+                    )
                     3 -> FreeBoardPage()
                     4 -> MenuPage()
                 }
@@ -192,6 +202,27 @@ fun MainScreen(
             fandomName = rankingItem.fandomName,
             onBackClick = viewModel::closeCommunity
         )
+    }
+
+    // MyInfo 프로필 클릭 시 ProfileScreen 표시
+    AnimatedVisibility(
+        visible = showMyProfile && userData != null,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        userData?.let { user ->
+            ProfileScreen(
+                userId = user.id ?: 0,
+                userNickname = user.nickname ?: "",
+                userImageUrl = user.profileImage,
+                userLevel = user.level ?: 0,
+                mostIdolName = user.most?.name,
+                isMine = true,
+                onBackClick = { showMyProfile = false },
+                usersRepository = viewModel.usersRepository,
+                userCacheRepository = viewModel.userCacheRepository
+            )
+        }
     }
 }
 

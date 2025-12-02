@@ -20,6 +20,8 @@ import net.ib.mn.data.local.UserInfo
 import net.ib.mn.data.remote.udp.IdolBroadcastManager
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.UserRepository
+import net.ib.mn.data.repository.UsersRepository
+import net.ib.mn.data.repository.UserCacheRepository
 import net.ib.mn.util.DeviceUtil
 import javax.inject.Inject
 
@@ -28,6 +30,8 @@ class MainViewModel @Inject constructor(
     val preferencesManager: PreferencesManager,
     private val chartDatabaseRepository: net.ib.mn.data.repository.ChartRankingRepository,
     private val userRepository: UserRepository,
+    val usersRepository: UsersRepository,
+    val userCacheRepository: UserCacheRepository,
     private val deviceUtil: DeviceUtil,
     private val idolBroadcastManager: IdolBroadcastManager,
     private val idolRepository: net.ib.mn.domain.repository.IdolRepository,

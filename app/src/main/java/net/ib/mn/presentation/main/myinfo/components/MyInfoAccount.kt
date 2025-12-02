@@ -2,6 +2,7 @@ package net.ib.mn.presentation.main.myinfo.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.ib.mn.R
 import net.ib.mn.ui.components.ExoProfileImage
+import net.ib.mn.ui.components.ProfileImageType
 
 /**
  * MyInfo 페이지 상단 계정 정보 섹션
@@ -67,11 +69,16 @@ fun MyInfoAccount(
             Box(
                 modifier = Modifier
                     .size(60.dp)
-                    .clickable { onProfileClick() }
+                    .clickable(
+                        onClick = { onProfileClick() },
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    )
             ) {
                 ExoProfileImage(
                     imageUrl = profileImageUrl,
                     modifier = Modifier.fillMaxSize(),
+                    type = ProfileImageType.LARGE,
                     contentDescription = "Profile Image"
                 )
 
@@ -93,7 +100,11 @@ fun MyInfoAccount(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .clickable { onProfileClick() },
+                    .clickable(
+                        onClick = { onProfileClick() },
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ),
                 verticalArrangement = Arrangement.Center
             ) {
                 // level + name Row
