@@ -402,7 +402,7 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.compose.material3)
     ksp(libs.hilt.compiler)  // kapt → ksp
-    implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.navigation.compose)  // hiltViewModel() 사용을 위해 필요
 
     // Retrofit
     implementation(libs.retrofit)
