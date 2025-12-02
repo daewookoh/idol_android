@@ -22,13 +22,13 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -71,6 +71,7 @@ import net.ib.mn.R
 import net.ib.mn.presentation.community.profile.subpage.ProfileCommentPage
 import net.ib.mn.presentation.community.profile.subpage.ProfilePhotoPage
 import net.ib.mn.presentation.community.profile.subpage.ProfilePostPage
+import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoBottomSheetAction
 import net.ib.mn.ui.components.ExoBottomSheetActionItem
 import net.ib.mn.ui.components.ExoConfirmDialog
@@ -284,72 +285,19 @@ fun ProfileScreen(
     }
 
     ExoScaffold(
-        useFullScreen = true,
         topBar = {
-            // 상단 앱바 (status bar 패딩 포함)
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(ColorPalette.background100)
-                    .statusBarsPadding()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .padding(horizontal = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // 뒤로가기 버튼
-                    Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
-                            ) { onBackClick() },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.btn_navigation_back),
-                            contentDescription = "Back",
-                            tint = Color.Unspecified,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    // 타이틀 - 본인이면 "My Feed", 아니면 "Profile" (볼드)
-                    Text(
-                        text = if (isMine) {
-                            stringResource(R.string.feed_my_feed)
-                        } else {
-                            stringResource(R.string.title_profile)
-                        },
-                        fontSize = 18.sp,
-                        lineHeight = 18.sp,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                        color = ColorPalette.textDefault,
-                        maxLines = 1
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
+            ExoAppBar(
+                title = if (isMine) {
+                    stringResource(R.string.feed_my_feed)
+                } else {
+                    stringResource(R.string.title_profile)
+                },
+                onNavigationClick = onBackClick,
+                actions = {
                     // 타인의 프로필일 때 우측 액션 버튼들
                     if (!isMine) {
                         // 신고 버튼
-                        Box(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
-                                ) {
-                                    viewModel.onReportClick()
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
+                        IconButton(onClick = { viewModel.onReportClick() }) {
                             Icon(
                                 painter = painterResource(R.drawable.btn_navigation_report),
                                 contentDescription = "Report",
@@ -357,8 +305,6 @@ fun ProfileScreen(
                                 modifier = Modifier.size(24.dp)
                             )
                         }
-
-                        Spacer(modifier = Modifier.width(16.dp))
 
                         // 친구 버튼 - 상태에 따라 다른 아이콘과 동작
                         FriendButton(
@@ -369,7 +315,7 @@ fun ProfileScreen(
                         )
                     }
                 }
-            }
+            )
         }
     ) {
         when (val state = uiState) {
@@ -1307,72 +1253,61 @@ private fun FriendButton(
     onFriendWaitClick: () -> Unit,
     onAlreadyFriendClick: () -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .size(24.dp)
-            .then(
-                when (friendState) {
-                    is FriendState.CanAdd -> Modifier.clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { onFriendAddClick() }
-                    is FriendState.RequestPending, is FriendState.RequestSent -> Modifier.clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { onFriendWaitClick() }
-                    is FriendState.AlreadyFriend -> Modifier.clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { onAlreadyFriendClick() }
-                    else -> Modifier // Loading, Error, ShowAlreadyRequestedDialog, ShowAlreadyFriendDialog - 클릭 불가
+    // 클릭 핸들러 결정
+    val onClick: (() -> Unit)? = when (friendState) {
+        is FriendState.CanAdd -> onFriendAddClick
+        is FriendState.RequestPending, is FriendState.RequestSent -> onFriendWaitClick
+        is FriendState.AlreadyFriend -> onAlreadyFriendClick
+        else -> null // Loading, Error, ShowAlreadyRequestedDialog, ShowAlreadyFriendDialog - 클릭 불가
+    }
+
+    // 로딩 중일 때는 Box로 표시 (클릭 불가)
+    if (friendState is FriendState.Loading) {
+        Box(
+            modifier = Modifier.size(48.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(18.dp),
+                color = ColorPalette.main,
+                strokeWidth = 2.dp
+            )
+        }
+    } else {
+        // IconButton으로 호버 효과 적용
+        IconButton(
+            onClick = onClick ?: {},
+            enabled = onClick != null
+        ) {
+            when (friendState) {
+                is FriendState.CanAdd, is FriendState.Error -> {
+                    // 친구 추가 가능 또는 에러 상태 - btn_navigation_friend_add
+                    Icon(
+                        painter = painterResource(R.drawable.btn_navigation_friend_add),
+                        contentDescription = "Add Friend",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        when (friendState) {
-            is FriendState.Loading -> {
-                // 로딩 중 - 작은 프로그레스 인디케이터
-                CircularProgressIndicator(
-                    modifier = Modifier.size(18.dp),
-                    color = ColorPalette.main,
-                    strokeWidth = 2.dp
-                )
-            }
-            is FriendState.CanAdd -> {
-                // 친구 추가 가능 - btn_navigation_friend_add
-                Icon(
-                    painter = painterResource(R.drawable.btn_navigation_friend_add),
-                    contentDescription = "Add Friend",
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            is FriendState.AlreadyFriend, is FriendState.ShowAlreadyFriendDialog -> {
-                // 이미 친구 - btn_navigation_friend_already
-                Icon(
-                    painter = painterResource(R.drawable.btn_navigation_friend_already),
-                    contentDescription = "Already Friend",
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            is FriendState.RequestPending, is FriendState.RequestSent, is FriendState.ShowAlreadyRequestedDialog -> {
-                // 친구 요청 대기 중 - btn_navigation_friend_waiting
-                Icon(
-                    painter = painterResource(R.drawable.btn_navigation_friend_waiting),
-                    contentDescription = "Friend Request Pending",
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            is FriendState.Error -> {
-                // 에러 상태 - 친구 추가 버튼으로 복원 (다시 시도 가능)
-                Icon(
-                    painter = painterResource(R.drawable.btn_navigation_friend_add),
-                    contentDescription = "Add Friend",
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(24.dp)
-                )
+                is FriendState.AlreadyFriend, is FriendState.ShowAlreadyFriendDialog -> {
+                    // 이미 친구 - btn_navigation_friend_already
+                    Icon(
+                        painter = painterResource(R.drawable.btn_navigation_friend_already),
+                        contentDescription = "Already Friend",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                is FriendState.RequestPending, is FriendState.RequestSent, is FriendState.ShowAlreadyRequestedDialog -> {
+                    // 친구 요청 대기 중 - btn_navigation_friend_waiting
+                    Icon(
+                        painter = painterResource(R.drawable.btn_navigation_friend_waiting),
+                        contentDescription = "Friend Request Pending",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                else -> {}
             }
         }
     }

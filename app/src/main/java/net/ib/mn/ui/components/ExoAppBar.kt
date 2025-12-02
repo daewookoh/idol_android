@@ -1,6 +1,8 @@
 package net.ib.mn.ui.components
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -8,11 +10,13 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.ib.mn.R
 
@@ -39,14 +43,7 @@ fun ExoAppBar(
     actions: @Composable RowScope.() -> Unit = {},
     colors: TopAppBarColors? = null
 ) {
-    val defaultColors = TopAppBarDefaults.topAppBarColors(
-        containerColor = colorResource(id = R.color.background_100),
-        titleContentColor = colorResource(id = R.color.text_default),
-        navigationIconContentColor = colorResource(id = R.color.text_default),
-        actionIconContentColor = colorResource(id = R.color.text_default)
-    )
-
-    TopAppBar(
+    ExoAppBar(
         title = {
             Text(
                 text = title,
@@ -56,6 +53,41 @@ fun ExoAppBar(
                 overflow = TextOverflow.Ellipsis
             )
         },
+        modifier = modifier,
+        navigationIcon = navigationIcon,
+        onNavigationClick = onNavigationClick,
+        actions = actions,
+        colors = colors
+    )
+}
+
+/**
+ * 앱 전체에서 사용하는 공통 AppBar 컴포넌트 (커스텀 타이틀 지원)
+ *
+ * @param title 커스텀 타이틀 Composable
+ * @param navigationIcon 네비게이션 아이콘 (기본값: 백 버튼)
+ * @param onNavigationClick 네비게이션 아이콘 클릭 리스너
+ * @param actions AppBar 우측 액션 버튼들
+ * @param colors AppBar 색상
+ */
+@Composable
+fun ExoAppBar(
+    title: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    navigationIcon: @Composable (() -> Unit)? = null,
+    onNavigationClick: (() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {},
+    colors: TopAppBarColors? = null
+) {
+    val defaultColors = TopAppBarDefaults.topAppBarColors(
+        containerColor = colorResource(id = R.color.background_100),
+        titleContentColor = colorResource(id = R.color.text_default),
+        navigationIconContentColor = colorResource(id = R.color.text_default),
+        actionIconContentColor = colorResource(id = R.color.text_default)
+    )
+
+    TopAppBar(
+        title = title,
         modifier = modifier,
         navigationIcon = {
             if (navigationIcon != null) {
@@ -69,7 +101,15 @@ fun ExoAppBar(
                 }
             }
         },
-        actions = actions,
+        actions = {
+            // 우측 패딩 10dp 적용
+            Row(
+                modifier = Modifier.padding(end = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                actions()
+            }
+        },
         colors = colors ?: defaultColors
     )
 }

@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -54,6 +53,7 @@ import net.ib.mn.R
 import net.ib.mn.R.color.main
 import net.ib.mn.data.remote.dto.VoterTop100Model
 import net.ib.mn.presentation.community.profile.ProfileScreen
+import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ProfileImageType
@@ -118,89 +118,47 @@ fun VoterTop100Screen(
         }
     }
 
+    // 타이틀 - "Top 100 Votes - {아이돌이름}" 형식 (다국어 지원)
+    // Old: title_heart_vote_ranking__format = "%s Top 100 Votes"
+    // %s를 기준으로 split하여 뒷부분만 사용하고 " - " 추가
+    val titleFormat = stringResource(R.string.title_heart_vote_ranking__format)
+    val titlePrefix = titleFormat.split("%s").getOrElse(1) { " Top 100 Votes" }.trim() + " - "
+
     ExoScaffold(
-        useFullScreen = true,
         topBar = {
-            // 상단 앱바 (status bar 패딩 포함)
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(ColorPalette.background100)
-                    .statusBarsPadding()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // 뒤로가기 버튼
-                    Box(
-                        modifier = Modifier
-                            .padding(start = 10.dp)
-                            .size(24.dp)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
-                            ) { onBackClick() },
-                        contentAlignment = Alignment.Center
+            ExoAppBar(
+                title = {
+                    Row(
+                        modifier = Modifier.wrapContentHeight(),
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.btn_navigation_back),
-                            contentDescription = "Back",
-                            tint = Color.Unspecified,
-                            modifier = Modifier.size(24.dp)
+                        Text(
+                            text = titlePrefix,
+                            fontSize = 18.sp,
+                            lineHeight = 18.sp,
+                            color = ColorPalette.textDefault,
+                            maxLines = 1,
+                            modifier = Modifier.alignByBaseline()
                         )
-                    }
 
-                    Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = idolName,
+                            fontSize = 18.sp,
+                            lineHeight = 18.sp,
+                            modifier = Modifier.alignByBaseline()
+                        )
 
-                    // 타이틀 - "Top 100 Votes - {아이돌이름}" 형식 (다국어 지원)
-                    // Old: title_heart_vote_ranking__format = "%s Top 100 Votes"
-                    // %s를 기준으로 split하여 뒷부분만 사용하고 " - " 추가
-                    val titleFormat = stringResource(R.string.title_heart_vote_ranking__format)
-                    val titlePrefix = titleFormat.split("%s").getOrElse(1) { " Top 100 Votes" }.trim() + " - "
-
-                    // 가운데 정렬 + 하단(baseline) 정렬
-                    Box(
-                        // 1. Box가 내부의 Row 덩어리를 수직 중앙(Center)에 배치합니다.
-                        contentAlignment = Alignment.CenterStart) {
-                        Row(
-                            // 2. [핵심] Row가 부모 높이를 꽉 채우지 않고, 텍스트 높이만큼만 차지하게 합니다.
-                            modifier = Modifier.wrapContentHeight(),
-
-                            // 3. verticalAlignment 속성은 제거합니다.
-                            // (내부 자식들의 alignByBaseline()이 우선순위를 가지므로 불필요합니다)
-                        ) {
-                            // 앞부분 텍스트
+                        if (groupName.isNotEmpty()) {
                             Text(
-                                text = titlePrefix,
-                                fontSize = 18.sp,
-                                lineHeight = 18.sp,
-                                color = ColorPalette.textDefault,
-                                maxLines = 1,
-                                modifier = Modifier.alignByBaseline() // 텍스트끼리 줄 맞춤
-                            )
-
-                            Text(
-                                text = idolName,
-                                fontSize = 18.sp,
+                                text = " $groupName",
+                                fontSize = 10.sp,
                                 lineHeight = 18.sp,
                                 modifier = Modifier.alignByBaseline()
                             )
-
-                            if (groupName.isNotEmpty()) {
-                                Text(
-                                    text = " $groupName",
-                                    fontSize = 10.sp,
-                                    lineHeight = 18.sp,
-                                    modifier = Modifier.alignByBaseline()
-                                )
-                            }
                         }
                     }
-                }
-            }
+                },
+                onNavigationClick = onBackClick
+            )
         }
     ) {
         when (val state = uiState) {
