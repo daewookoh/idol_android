@@ -1,5 +1,7 @@
 package net.ib.mn.data.remote.api
 
+import net.ib.mn.data.remote.dto.BlockUserRequest
+import net.ib.mn.data.remote.dto.CommonResponse
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -76,5 +78,29 @@ interface UsersApi {
     @GET("friends/friend_info/")
     suspend fun getFriendInfo(
         @Query("friend_id") userId: Int
+    ): Response<ResponseBody>
+
+    /**
+     * 사용자 차단/차단해제
+     * POST blocks/add/
+     *
+     * old 프로젝트: FeedActivity에서 사용
+     * @param body BlockUserRequest (target_id, reason, block)
+     */
+    @POST("blocks/add/")
+    suspend fun addBlock(
+        @Body body: BlockUserRequest
+    ): Response<CommonResponse>
+
+    /**
+     * 차단 사용자 목록 조회
+     * GET blocks/
+     *
+     * @param idOnly "Y"면 ID 목록만 반환
+     * @return { "block_ids": [123, 456, ...] }
+     */
+    @GET("blocks/")
+    suspend fun getBlocks(
+        @Query("id_only") idOnly: String = "Y"
     ): Response<ResponseBody>
 }

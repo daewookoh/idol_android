@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,6 +38,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.annotation.StringRes
+import androidx.compose.ui.res.stringResource
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
@@ -54,6 +58,8 @@ data class ExoBottomSheetItem<T>(
 enum class ExoBottomSheetType {
     /** 텍스트 리스트 바텀시트 - 배경색 gray100, 드래그 핸들 표시 */
     LIST,
+    /** 액션 바텀시트 - 배경색 gray100, 드래그 핸들 표시, 텍스트 가운데 정렬 */
+    ACTION,
     /** 커스텀 디자인 바텀시트 - 투명 배경, 드래그 핸들 없음 */
     DESIGN
 }
@@ -82,7 +88,7 @@ fun ExoBottomSheet(
         skipPartiallyExpanded = true
     ),
     containerColor: Color = when (type) {
-        ExoBottomSheetType.LIST -> ColorPalette.gray100
+        ExoBottomSheetType.LIST, ExoBottomSheetType.ACTION -> ColorPalette.gray100
         ExoBottomSheetType.DESIGN -> Color.Transparent
     },
     shape: Shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
@@ -96,7 +102,7 @@ fun ExoBottomSheet(
         containerColor = containerColor,
         shape = shape,
         dragHandle = when (type) {
-            ExoBottomSheetType.LIST -> { { ExoBottomSheetDragHandle() } }
+            ExoBottomSheetType.LIST, ExoBottomSheetType.ACTION -> { { ExoBottomSheetDragHandle() } }
             ExoBottomSheetType.DESIGN -> null
         },
         sheetMaxWidth = BottomSheetDefaults.SheetMaxWidth
@@ -134,12 +140,12 @@ fun ExoBottomSheet(
 fun ExoBottomSheetDragHandle(
     modifier: Modifier = Modifier,
     width: Dp = 36.dp,
-    height: Dp = 3.dp,
+    height: Dp = 4.dp,
     color: Color = ColorPalette.gray150
 ) {
     Box(
         modifier = modifier
-            .padding(top = 10.dp, bottom = 6.dp)
+            .padding(top = 12.dp)
             .size(width = width, height = height)
             .background(
                 color = color,
@@ -218,6 +224,72 @@ fun <T> ExoBottomSheetList(
                     .navigationBarsPadding()
                     .height(16.dp)
             )
+        }
+    }
+}
+
+/**
+ * ExoBottomSheetAction 아이템 데이터
+ *
+ * @param labelResId 다국어 문자열 리소스 ID
+ * @param onClick 클릭 콜백
+ */
+data class ExoBottomSheetActionItem(
+    @StringRes val labelResId: Int,
+    val onClick: () -> Unit
+)
+
+/**
+ * ExoBottomSheetAction - 액션 리스트용 바텀시트
+ *
+ * 텍스트가 가운데 정렬되고, 아이템 사이에 구분선이 있는 액션 바텀시트
+ *
+ * @param items 액션 아이템 리스트
+ * @param onDismissRequest 바텀시트 닫기 요청 콜백
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExoBottomSheetAction(
+    items: List<ExoBottomSheetActionItem>,
+    onDismissRequest: () -> Unit
+) {
+    ExoBottomSheet(
+        onDismissRequest = onDismissRequest,
+        type = ExoBottomSheetType.ACTION
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+        ) {
+            items.forEachIndexed { index, item ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .clickable {
+                            item.onClick()
+                            onDismissRequest()
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(item.labelResId),
+                        style = ExoTypo.body14.copy(fontWeight = FontWeight.Medium),
+                        color = ColorPalette.textDefault,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                if (index < items.lastIndex) {
+                    HorizontalDivider(
+                        thickness = 1.dp,
+                        color = ColorPalette.gray100
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }

@@ -41,9 +41,23 @@ fun ProfilePostPage(
     userId: Int,
     isMine: Boolean = false,
     isFeedPrivate: Boolean = false,
+    isBlocked: Boolean = false,
+    blockStatusChecked: Boolean = true,
     viewModel: ProfilePostViewModel = hiltViewModel(),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
+    // 차단 상태 확인 전에는 로딩 표시
+    if (!blockStatusChecked) {
+        LoadingContent()
+        return
+    }
+
+    // 차단된 사용자일 경우 바로 Blocked 상태 표시
+    if (isBlocked) {
+        BlockedContent()
+        return
+    }
+
     // 비공개 피드일 경우 API 호출 없이 바로 Private 상태 표시
     if (isFeedPrivate) {
         PrivateContent()
@@ -132,6 +146,31 @@ private fun PrivateContent() {
             Spacer(modifier = Modifier.height(14.dp))
             Text(
                 text = stringResource(R.string.feed_private),
+                color = ColorPalette.textGray,
+                fontSize = 12.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun BlockedContent() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(ColorPalette.background100),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                painter = painterResource(R.drawable.icon_feed_lock),
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+                tint = Color.Unspecified
+            )
+            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                text = stringResource(R.string.user_blocked),
                 color = ColorPalette.textGray,
                 fontSize = 12.sp
             )

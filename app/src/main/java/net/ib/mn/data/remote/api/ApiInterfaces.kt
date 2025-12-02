@@ -55,6 +55,14 @@ interface UserApi {
     suspend fun getBlocks(): Response<BlockListResponse>
 
     /**
+     * 사용자 차단/차단해제
+     */
+    @POST("blocks/add/")
+    suspend fun addBlock(
+        @Body body: BlockUserRequest
+    ): Response<CommonResponse>
+
+    /**
      * 사용자 검증 (회원 여부 확인)
      * @param params Map with "type" (email, nickname), "value" (검증할 값), "app_id"
      */

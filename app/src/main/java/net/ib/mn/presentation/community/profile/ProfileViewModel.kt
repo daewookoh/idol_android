@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.ib.mn.data.repository.BlockResult
 import net.ib.mn.data.repository.FriendInfoResult
 import net.ib.mn.data.repository.FriendRequestResult
 import net.ib.mn.data.repository.FriendUserType
@@ -57,6 +58,10 @@ class ProfileViewModel @AssistedInject constructor(
     private val _friendState = MutableStateFlow<FriendState>(FriendState.Loading)
     val friendState: StateFlow<FriendState> = _friendState.asStateFlow()
 
+    // 차단 관련 상태
+    private val _blockState = MutableStateFlow<BlockState>(BlockState.Idle)
+    val blockState: StateFlow<BlockState> = _blockState.asStateFlow()
+
     // SavedStateHandle에서 파라미터 읽기
     private val userId: Int = savedStateHandle.get<Int>("userId") ?: 0
     private val isMine: Boolean = savedStateHandle.get<Boolean>("isMine") ?: false
@@ -87,6 +92,15 @@ class ProfileViewModel @AssistedInject constructor(
                 }
             }
 
+            // 타인의 프로필인 경우 차단 상태 확인
+            if (!isMine) {
+                checkBlockStatus()
+            } else {
+                // 본인 프로필은 차단 상태 확인 불필요
+                currentData = currentData.copy(blockStatusChecked = true)
+                _uiState.value = ProfileUiState.Success(user = currentData)
+            }
+
             // getStatus API에서 상태 메시지 및 비공개 여부 로드
             loadStatusInfo()
 
@@ -95,6 +109,16 @@ class ProfileViewModel @AssistedInject constructor(
                 loadFriendInfo()
             }
         }
+    }
+
+    /** 차단 상태 확인 */
+    private suspend fun checkBlockStatus() {
+        val isBlocked = usersRepository.isUserBlocked(userId)
+        currentData = currentData.copy(
+            isBlocked = isBlocked,
+            blockStatusChecked = true
+        )
+        _uiState.value = ProfileUiState.Success(user = currentData)
     }
 
     /** getStatus API 호출하여 상태 메시지 및 피드 비공개 여부 로드 */
@@ -241,6 +265,65 @@ class ProfileViewModel @AssistedInject constructor(
     fun resetReportState() {
         _reportState.value = ReportState.Idle
     }
+
+    // ========== 차단 관련 함수 ==========
+
+    /** 차단 버튼 클릭 - 확인 다이얼로그 표시 */
+    fun onBlockClick() {
+        _blockState.value = BlockState.ShowConfirmDialog
+    }
+
+    /** 차단 확인 - API 호출 */
+    fun onBlockConfirmed() {
+        viewModelScope.launch {
+            _blockState.value = BlockState.Loading
+            when (val result = usersRepository.addBlock(userId)) {
+                is BlockResult.Success -> {
+                    // 차단 성공 시 isBlocked = true로 업데이트
+                    currentData = currentData.copy(isBlocked = true)
+                    _uiState.value = ProfileUiState.Success(user = currentData)
+                    _blockState.value = BlockState.Success
+                }
+                is BlockResult.Error -> {
+                    _blockState.value = BlockState.Error(
+                        gcode = result.gcode,
+                        message = result.message
+                    )
+                }
+            }
+        }
+    }
+
+    /** 차단 해제 버튼 클릭 - 바로 API 호출 */
+    fun onUnblockClick() {
+        onUnblockConfirmed()
+    }
+
+    /** 차단 해제 확인 - API 호출 */
+    fun onUnblockConfirmed() {
+        viewModelScope.launch {
+            _blockState.value = BlockState.Loading
+            when (val result = usersRepository.removeBlock(userId)) {
+                is BlockResult.Success -> {
+                    // 차단 해제 성공 시 isBlocked = false로 업데이트
+                    currentData = currentData.copy(isBlocked = false)
+                    _uiState.value = ProfileUiState.Success(user = currentData)
+                    _blockState.value = BlockState.UnblockSuccess
+                }
+                is BlockResult.Error -> {
+                    _blockState.value = BlockState.Error(
+                        gcode = result.gcode,
+                        message = result.message
+                    )
+                }
+            }
+        }
+    }
+
+    /** 차단 상태 초기화 */
+    fun resetBlockState() {
+        _blockState.value = BlockState.Idle
+    }
 }
 
 /** 친구 상태 */
@@ -277,6 +360,19 @@ sealed interface ReportState {
     data class Error(val gcode: Int? = null, val message: String? = null) : ReportState
 }
 
+/** 차단 상태 */
+sealed interface BlockState {
+    data object Idle : BlockState
+    data object Loading : BlockState
+    /** 차단 확인 다이얼로그 표시 */
+    data object ShowConfirmDialog : BlockState
+    /** 차단 해제 확인 다이얼로그 표시 */
+    data object ShowUnblockConfirmDialog : BlockState
+    data object Success : BlockState
+    data object UnblockSuccess : BlockState
+    data class Error(val gcode: Int? = null, val message: String? = null) : BlockState
+}
+
 /** ProfileUiState - UI 상태 */
 sealed interface ProfileUiState {
     data object Loading : ProfileUiState
@@ -292,5 +388,7 @@ data class ProfileData(
     val level: Int,
     val idolName: String?,
     val statusMessage: String?,
-    val isFeedPrivate: Boolean = false
+    val isFeedPrivate: Boolean = false,
+    val isBlocked: Boolean = false,
+    val blockStatusChecked: Boolean = false
 )

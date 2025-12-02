@@ -71,7 +71,8 @@ import net.ib.mn.R
 import net.ib.mn.presentation.community.profile.subpage.ProfileCommentPage
 import net.ib.mn.presentation.community.profile.subpage.ProfilePhotoPage
 import net.ib.mn.presentation.community.profile.subpage.ProfilePostPage
-import net.ib.mn.ui.components.ExoBottomSheet
+import net.ib.mn.ui.components.ExoBottomSheetAction
+import net.ib.mn.ui.components.ExoBottomSheetActionItem
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.components.ExoErrorDialog
 import net.ib.mn.ui.components.ExoNameWithGroupColor
@@ -129,6 +130,7 @@ fun ProfileScreen(
     val uiState by viewModel.uiState.collectAsState()
     val reportState by viewModel.reportState.collectAsState()
     val friendState by viewModel.friendState.collectAsState()
+    val blockState by viewModel.blockState.collectAsState()
 
     // 신고 플로우 상태
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -179,6 +181,37 @@ fun ProfileScreen(
                 }
                 showErrorDialog = true
                 viewModel.resetReportState()
+            }
+            else -> {}
+        }
+    }
+
+    // 차단 상태 처리
+    var showBlockConfirmDialog by remember { mutableStateOf(false) }
+    var showUnblockConfirmDialog by remember { mutableStateOf(false) }
+    var showBlockErrorDialog by remember { mutableStateOf(false) }
+    var blockErrorMessage by remember { mutableStateOf("") }
+
+    LaunchedEffect(blockState) {
+        when (val state = blockState) {
+            is BlockState.ShowConfirmDialog -> {
+                showBlockConfirmDialog = true
+                viewModel.resetBlockState()
+            }
+            is BlockState.ShowUnblockConfirmDialog -> {
+                showUnblockConfirmDialog = true
+                viewModel.resetBlockState()
+            }
+            is BlockState.Success -> {
+                viewModel.resetBlockState()
+            }
+            is BlockState.UnblockSuccess -> {
+                viewModel.resetBlockState()
+            }
+            is BlockState.Error -> {
+                blockErrorMessage = state.message ?: context.getString(R.string.error_abnormal_default)
+                showBlockErrorDialog = true
+                viewModel.resetBlockState()
             }
             else -> {}
         }
@@ -365,6 +398,7 @@ fun ProfileScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
+                        .navigationBarsPadding()
                         .background(ColorPalette.background100)
                 ) {
                     // 프로필 헤더
@@ -409,12 +443,16 @@ fun ProfileScreen(
                             ProfileTab.PHOTO -> ProfilePhotoPage(
                                 userId = userId,
                                 isMine = isMine,
-                                isFeedPrivate = state.user.isFeedPrivate
+                                isFeedPrivate = state.user.isFeedPrivate,
+                                isBlocked = state.user.isBlocked,
+                                blockStatusChecked = state.user.blockStatusChecked
                             )
                             ProfileTab.ACTIVITY -> ProfilePostPage(
                                 userId = userId,
                                 isMine = isMine,
-                                isFeedPrivate = state.user.isFeedPrivate
+                                isFeedPrivate = state.user.isFeedPrivate,
+                                isBlocked = state.user.isBlocked,
+                                blockStatusChecked = state.user.blockStatusChecked
                             )
                             ProfileTab.COMMENT -> ProfileCommentPage(userId = userId)
                         }
@@ -426,13 +464,25 @@ fun ProfileScreen(
 
     // 1단계: 신고/차단 바텀시트 (Old: bottom_sheet_feed_report.xml)
     if (showBottomSheet) {
-        ReportBottomSheet(
-            onDismiss = { showBottomSheet = false },
-            onReportClick = {
-                showBottomSheet = false
-                viewModel.onReportSelected()
-            },
-            onCancelClick = { showBottomSheet = false }
+        // 현재 차단 상태 확인
+        val currentIsBlocked = (uiState as? ProfileUiState.Success)?.user?.isBlocked ?: false
+
+        ExoBottomSheetAction(
+            items = listOf(
+                ExoBottomSheetActionItem(R.string.report) {
+                    viewModel.onReportSelected()
+                },
+                if (currentIsBlocked) {
+                    ExoBottomSheetActionItem(R.string.unblock) {
+                        viewModel.onUnblockClick()
+                    }
+                } else {
+                    ExoBottomSheetActionItem(R.string.block) {
+                        viewModel.onBlockClick()
+                    }
+                }
+            ),
+            onDismissRequest = { showBottomSheet = false }
         )
     }
 
@@ -499,69 +549,46 @@ fun ProfileScreen(
             }
         )
     }
-}
 
-/**
- * 1단계: 신고/취소 바텀시트 (Old: bottom_sheet_feed_report.xml)
- */
-@Composable
-private fun ReportBottomSheet(
-    onDismiss: () -> Unit,
-    onReportClick: () -> Unit,
-    onCancelClick: () -> Unit
-) {
-    ExoBottomSheet(
-        onDismissRequest = onDismiss
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .navigationBarsPadding()
-        ) {
-            // 신고 버튼 (Old: tv_option_report)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp)
-                    .clickable { onReportClick() },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.report),
-                    fontSize = 15.sp,
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                    color = ColorPalette.gray900,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
-            }
+    // 차단 확인 다이얼로그
+    if (showBlockConfirmDialog) {
+        ExoConfirmDialog(
+            title = stringResource(R.string.block),
+            message = stringResource(R.string.block_question),
+            onConfirm = {
+                showBlockConfirmDialog = false
+                viewModel.onBlockConfirmed()
+            },
+            onDismiss = { showBlockConfirmDialog = false },
+            confirmButtonText = stringResource(R.string.yes),
+            dismissButtonText = stringResource(R.string.no)
+        )
+    }
 
-            // 구분선
-            HorizontalDivider(
-                thickness = 1.dp,
-                color = ColorPalette.gray100
-            )
+    // 차단 해제 확인 다이얼로그
+    if (showUnblockConfirmDialog) {
+        ExoConfirmDialog(
+            title = stringResource(R.string.unblock),
+            message = stringResource(R.string.block_question),
+            onConfirm = {
+                showUnblockConfirmDialog = false
+                viewModel.onUnblockConfirmed()
+            },
+            onDismiss = { showUnblockConfirmDialog = false },
+            confirmButtonText = stringResource(R.string.yes),
+            dismissButtonText = stringResource(R.string.no)
+        )
+    }
 
-            // 취소 버튼 (Old: tv_option_block → 여기서는 취소로 사용)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp)
-                    .clickable { onCancelClick() },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.btn_cancel),
-                    fontSize = 15.sp,
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                    color = ColorPalette.gray900,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-        }
+    // 차단 에러 다이얼로그
+    if (showBlockErrorDialog) {
+        ExoErrorDialog(
+            message = blockErrorMessage,
+            onDismiss = { showBlockErrorDialog = false }
+        )
     }
 }
+
 
 /**
  * 2단계: 하트 결제 확인 다이얼로그 (Old: dialog_report.xml - ReportFeedDialogFragment)

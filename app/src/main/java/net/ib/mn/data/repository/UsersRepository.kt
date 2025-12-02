@@ -4,6 +4,7 @@ import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import net.ib.mn.data.remote.api.UsersApi
+import net.ib.mn.data.remote.dto.BlockUserRequest
 import net.ib.mn.domain.model.ApiError
 import net.ib.mn.domain.model.ApiResult
 import org.json.JSONObject
@@ -169,4 +170,111 @@ class UsersRepository @Inject constructor(
             emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
+
+    /**
+     * 특정 사용자가 차단되어 있는지 확인
+     *
+     * @param targetId 확인할 사용자 ID
+     * @return Boolean true면 차단됨
+     */
+    suspend fun isUserBlocked(targetId: Int): Boolean {
+        return try {
+            Log.d(TAG, "isUserBlocked called for targetId: $targetId")
+            val response = usersApi.getBlocks("Y")
+
+            if (response.isSuccessful) {
+                val jsonString = response.body()?.string() ?: "{}"
+                val jsonObject = JSONObject(jsonString)
+                val blockIds = jsonObject.optJSONArray("block_ids")
+                if (blockIds != null) {
+                    for (i in 0 until blockIds.length()) {
+                        if (blockIds.optInt(i) == targetId) {
+                            Log.d(TAG, "User $targetId is blocked")
+                            return true
+                        }
+                    }
+                }
+                Log.d(TAG, "User $targetId is NOT blocked")
+                false
+            } else {
+                Log.e(TAG, "isUserBlocked failed: ${response.code()}")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "isUserBlocked exception: ${e.message}", e)
+            false
+        }
+    }
+
+    /**
+     * 사용자 차단
+     *
+     * old 프로젝트: FeedActivity에서 사용
+     * 응답: { "success": true, "gcode": 0 }
+     *
+     * @param targetId 차단할 사용자 ID
+     * @return BlockResult
+     */
+    suspend fun addBlock(targetId: Int): BlockResult {
+        return try {
+            Log.d(TAG, "addBlock called for targetId: $targetId")
+            val request = BlockUserRequest(targetId = targetId, block = "Y")
+            val response = usersApi.addBlock(request)
+
+            if (response.isSuccessful) {
+                val body = response.body()
+                Log.d(TAG, "addBlock success: ${body?.success}, gcode: ${body?.gcode}")
+                if (body?.success == true) {
+                    BlockResult.Success
+                } else {
+                    BlockResult.Error(gcode = body?.gcode ?: -1)
+                }
+            } else {
+                Log.e(TAG, "addBlock failed: ${response.code()}")
+                BlockResult.Error(message = "API Error: ${response.code()}")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "addBlock exception: ${e.message}", e)
+            BlockResult.Error(message = e.message)
+        }
+    }
+
+    /**
+     * 사용자 차단 해제
+     *
+     * old 프로젝트: FeedActivity에서 사용
+     * 응답: { "success": true, "gcode": 0 }
+     *
+     * @param targetId 차단 해제할 사용자 ID
+     * @return BlockResult
+     */
+    suspend fun removeBlock(targetId: Int): BlockResult {
+        return try {
+            Log.d(TAG, "removeBlock called for targetId: $targetId")
+            val request = BlockUserRequest(targetId = targetId, block = "N")
+            val response = usersApi.addBlock(request)
+
+            if (response.isSuccessful) {
+                val body = response.body()
+                Log.d(TAG, "removeBlock success: ${body?.success}, gcode: ${body?.gcode}")
+                if (body?.success == true) {
+                    BlockResult.Success
+                } else {
+                    BlockResult.Error(gcode = body?.gcode ?: -1)
+                }
+            } else {
+                Log.e(TAG, "removeBlock failed: ${response.code()}")
+                BlockResult.Error(message = "API Error: ${response.code()}")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "removeBlock exception: ${e.message}", e)
+            BlockResult.Error(message = e.message)
+        }
+    }
+}
+
+/** 차단 결과 */
+sealed interface BlockResult {
+    data object Success : BlockResult
+    data class Error(val gcode: Int? = null, val message: String? = null) : BlockResult
 }

@@ -542,6 +542,20 @@ data class BlockedUser(
 )
 
 // ============================================================
+// /blocks/add/ - 사용자 차단
+// ============================================================
+data class BlockUserRequest(
+    @SerializedName("target_id")
+    val targetId: Int,
+
+    @SerializedName("reason")
+    val reason: Int = 0,
+
+    @SerializedName("block")
+    val block: String = "Y"  // "Y": 차단, "N": 차단 해제
+)
+
+// ============================================================
 // /users/validate/ - 사용자 검증 (회원 여부 확인)
 // ============================================================
 data class ValidateResponse(
