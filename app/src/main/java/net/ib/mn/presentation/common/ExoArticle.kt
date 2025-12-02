@@ -1,5 +1,7 @@
 package net.ib.mn.presentation.common
 
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
@@ -35,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -55,29 +60,25 @@ import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleFile
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.ui.components.ExoArticleVoteDialog
-import net.ib.mn.ui.components.ExoVideoPlayer
-import net.ib.mn.ui.components.ExoYouTubePlayer
-import net.ib.mn.ui.theme.ColorPalette
-import net.ib.mn.ui.theme.ExoTypo
-import net.ib.mn.util.DateTimeUtil
-import net.ib.mn.util.LocaleUtil
-import net.ib.mn.util.MediaCacheUtil
 import net.ib.mn.ui.components.ExoBottomSheetAction
 import net.ib.mn.ui.components.ExoBottomSheetActionItem
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.components.ExoErrorDialog
 import net.ib.mn.ui.components.ExoProfileImage
+import net.ib.mn.ui.components.ExoVideoPlayer
+import net.ib.mn.ui.components.ExoYouTubePlayer
 import net.ib.mn.ui.components.ProfileImageType
-import android.widget.Toast
+import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
+import net.ib.mn.util.DateTimeUtil
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
+import net.ib.mn.util.LocaleUtil
+import net.ib.mn.util.MediaCacheUtil
 import net.ib.mn.util.NumberFormatUtil
 import net.ib.mn.util.ServerUrl
 import net.ib.mn.util.YoutubeHelper
-import java.util.concurrent.TimeUnit
-import android.content.Intent
 import java.util.Locale
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import java.util.concurrent.TimeUnit
 
 /**
  * ExoArticle 타입
@@ -873,6 +874,7 @@ private fun MediaSection(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1f)
+            .clip(RectangleShape)
             .background(ColorPalette.background100)
     ) {
         HorizontalPager(
@@ -932,7 +934,7 @@ private fun MediaItem(
             .clickable(onClick = onMediaClick),
         contentAlignment = Alignment.Center
     ) {
-        var videoDurationMs by remember { mutableStateOf(0L) }
+        var videoDurationMs by remember { mutableLongStateOf(0L) }
         var isFirstFrameRendered by remember(isVisible) { mutableStateOf(false) }
 
         LaunchedEffect(media.originUrl) {
@@ -1004,21 +1006,6 @@ private fun MediaItem(
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Fit
                 )
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(bottom = 10.dp, end = 10.dp)
-                        .background(
-                            color = Color.Black.copy(alpha = 0.5f),
-                            shape = RoundedCornerShape(4.dp)
-                        )
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        text = "GIF",
-                        style = ExoTypo.stat10.copy(color = Color.White)
-                    )
-                }
             }
             else -> {
                 AsyncImage(
@@ -1049,6 +1036,25 @@ private fun MediaItem(
                     .align(Alignment.TopEnd)
                     .padding(top = 16.dp, end = 16.dp)
             )
+        }
+
+        // GIF 태그 표시
+        if (media.isGif) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 10.dp, end = 10.dp)
+                    .background(
+                        color = Color.Black.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(4.dp)
+                    )
+                    .padding(horizontal = 6.dp, vertical = 2.dp)
+            ) {
+                Text(
+                    text = "GIF",
+                    style = ExoTypo.stat10.copy(color = Color.White)
+                )
+            }
         }
     }
 }
