@@ -651,6 +651,12 @@ fun CommunityScreen(
                     selectedArticle = updatedArticle
                     feedViewModel.updateArticle(updatedArticle)
                 },
+                onArticleDeleted = {
+                    // 삭제 완료 시: 화면 닫고 리스트에서 제거
+                    val deletedArticleId = article.id
+                    selectedArticle = null
+                    feedViewModel.removeArticle(deletedArticleId)
+                },
                 onNavigateToProfile = { userId, nickname, imageUrl, level, mostIdolName ->
                     selectedUserProfile = UserProfileInfo(
                         userId = userId,

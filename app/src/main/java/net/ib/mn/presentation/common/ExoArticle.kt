@@ -77,7 +77,6 @@ import net.ib.mn.util.MediaCacheUtil
 import net.ib.mn.util.NumberFormatUtil
 import net.ib.mn.util.ServerUrl
 import net.ib.mn.util.YoutubeHelper
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 /**
@@ -818,18 +817,29 @@ fun ExoArticle(
 }
 
 /**
- * 게시글 공유
+ * 게시글 공유 (old 프로젝트와 동일한 방식)
  */
 private fun shareArticle(context: android.content.Context, article: ArticleModel) {
-    // locale 설정 (ko, en, ja 등)
-    val locale = Locale.getDefault().language
-
-    // 공유 URL 생성: {HOST}/articles/{articleId}/?locale={locale}
+    val locale = LocaleUtil.getWikiLocale(context)
     val shareUrl = "${ServerUrl.HOST}/articles/${article.id}/?locale=$locale"
 
-    // 공유 텍스트: 제목 + URL
-    val shareText = if (!article.title.isNullOrEmpty()) {
-        "${article.title}\n$shareUrl"
+    // 공유 메시지: 내용 30자 + 아이돌 이름
+    val contentPreview = article.content?.take(30)?.trim() ?: ""
+    val idolName = article.idol?.let { LocaleUtil.getLocalizedIdolName(context, it) } ?: ""
+
+    val shareMsg = buildString {
+        if (contentPreview.isNotEmpty()) {
+            append(contentPreview)
+            if ((article.content?.length ?: 0) > 30) append("...")
+        }
+        if (idolName.isNotEmpty()) {
+            if (isNotEmpty()) append(" - ")
+            append(idolName)
+        }
+    }
+
+    val shareText = if (shareMsg.isNotEmpty()) {
+        "$shareMsg\n$shareUrl"
     } else {
         shareUrl
     }
