@@ -291,4 +291,26 @@ class CommunityFeedViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(articles = updatedArticles)
         Log.d(TAG, "removeArticle: articleId=$articleId, remaining=${updatedArticles.size}")
     }
+
+    /**
+     * 게시글 업데이트 (상세화면에서 돌아올 때 동기화)
+     * 투표수, 좋아요수, 댓글수 업데이트
+     */
+    fun updateArticle(updatedArticle: ArticleModel) {
+        val currentArticles = _uiState.value.articles
+        val updatedArticles = currentArticles.map { article ->
+            if (article.id == updatedArticle.id) {
+                article.copy(
+                    heart = updatedArticle.heart,
+                    likeCount = updatedArticle.likeCount,
+                    isUserLike = updatedArticle.isUserLike,
+                    commentCount = updatedArticle.commentCount
+                )
+            } else {
+                article
+            }
+        }
+        _uiState.value = _uiState.value.copy(articles = updatedArticles)
+        Log.d(TAG, "updateArticle: articleId=${updatedArticle.id}, heart=${updatedArticle.heart}, likeCount=${updatedArticle.likeCount}, comments=${updatedArticle.commentCount}")
+    }
 }

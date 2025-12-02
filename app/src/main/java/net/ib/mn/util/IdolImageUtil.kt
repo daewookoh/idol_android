@@ -38,48 +38,23 @@ object IdolImageUtil {
         val verString = top3ImageVer ?: ""
         val urls = listOf(imageUrl, imageUrl2, imageUrl3)
 
-        android.util.Log.d("IdolImageUtil", "========================================")
-        android.util.Log.d("IdolImageUtil", "getTop3ImageUrls called")
-        android.util.Log.d("IdolImageUtil", "  - imageUrl: $imageUrl")
-        android.util.Log.d("IdolImageUtil", "  - imageUrl2: $imageUrl2")
-        android.util.Log.d("IdolImageUtil", "  - imageUrl3: $imageUrl3")
-        android.util.Log.d("IdolImageUtil", "  - top3: $top3")
-        android.util.Log.d("IdolImageUtil", "  - top3ImageVer: $top3ImageVer")
-        android.util.Log.d("IdolImageUtil", "========================================")
-
         // top3ImageVer가 비어있거나 top3Ids가 모두 null/empty인 경우
         if (verString.isEmpty() || top3Ids.all { it.isEmpty() || it == "0" }) {
-            android.util.Log.d("IdolImageUtil", "→ Using default URLs (no top3 data)")
             return urls
         }
 
-        // top3 ID와 실제 URL 매핑 디버깅
-        android.util.Log.d("IdolImageUtil", "🔍 top3Ids: $top3Ids")
-        android.util.Log.d("IdolImageUtil", "🔍 Mapping process:")
-
         val result = top3Ids.take(3).mapIndexed { index, id ->
-            android.util.Log.d("IdolImageUtil", "  [$index] top3Id=$id")
             if (id.isNotEmpty() && id != "0") {
                 val ver = verString.split(",").getOrNull(index)?.trim() ?: ""
                 val originalUrl = urls.getOrNull(index)
-                val finalUrl = originalUrl?.updateQueryParameter("ver", ver)
-                android.util.Log.d("IdolImageUtil", "    → urls[$index] with ver=$ver")
-                android.util.Log.d("IdolImageUtil", "    → finalUrl: $finalUrl")
-                finalUrl
+                originalUrl?.updateQueryParameter("ver", ver)
             } else {
-                val url = urls.getOrNull(index)
-                android.util.Log.d("IdolImageUtil", "    → Default urls[$index]: $url")
-                url
+                urls.getOrNull(index)
             }
         }.let { list ->
             // 3개 미만이면 나머지 기본 이미지로 채우기
             list + urls.drop(list.size)
         }.take(3)
-
-        android.util.Log.d("IdolImageUtil", "🎯 Final result URLs:")
-        result.forEachIndexed { index, url ->
-            android.util.Log.d("IdolImageUtil", "  [$index] $url")
-        }
 
         return result
     }

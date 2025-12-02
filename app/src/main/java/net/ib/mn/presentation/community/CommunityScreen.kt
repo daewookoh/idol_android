@@ -79,7 +79,9 @@ import net.ib.mn.presentation.community.profile.ProfileScreen
 import net.ib.mn.presentation.community.subpage.CommunityChatSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFanTalkSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFeedSubPage
+import net.ib.mn.presentation.community.subpage.CommunityFeedViewModel
 import net.ib.mn.presentation.community.subpage.CommunityScheduleSubPage
+import net.ib.mn.presentation.article.ArticleDetailScreen
 import net.ib.mn.presentation.webview.WebViewScreen
 import net.ib.mn.ui.components.*
 import net.ib.mn.ui.theme.ColorPalette
@@ -114,7 +116,8 @@ fun CommunityScreen(
     fandomName: String? = null,
     onBackClick: () -> Unit = {},
     onMostChanged: (Boolean) -> Unit = {},
-    viewModel: CommunityViewModel = hiltViewModel()
+    viewModel: CommunityViewModel = hiltViewModel(),
+    feedViewModel: CommunityFeedViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -141,6 +144,9 @@ fun CommunityScreen(
 
     // 유저 프로필 화면 상태
     var selectedUserProfile by remember { mutableStateOf<UserProfileInfo?>(null) }
+
+    // 게시글 상세 화면 상태
+    var selectedArticle by remember { mutableStateOf<net.ib.mn.domain.model.ArticleModel?>(null) }
 
     // 탭 목록 생성 (showChattingTab이 true인 경우에만 채팅 탭 포함)
     val tabs = remember(showChattingTab) {
@@ -309,7 +315,11 @@ fun CommunityScreen(
                                     level = level,
                                     mostIdolName = mostIdolName
                                 )
-                            }
+                            },
+                            onNavigateToArticleDetail = { article ->
+                                selectedArticle = article
+                            },
+                            viewModel = feedViewModel
                         )
                         CommunityTab.FAN_TALK -> CommunityFanTalkSubPage(
                             rankingItem = rankingItem,
@@ -620,6 +630,36 @@ fun CommunityScreen(
                 mostIdolName = userInfo.mostIdolName,
                 isMine = false,  // 타인의 프로필
                 onBackClick = { selectedUserProfile = null }
+            )
+        }
+    }
+
+    // ArticleDetailScreen (전체 화면으로 표시)
+    AnimatedVisibility(
+        visible = selectedArticle != null,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        selectedArticle?.let { article ->
+            ArticleDetailScreen(
+                article = article,
+                onBackClick = {
+                    selectedArticle = null
+                },
+                onArticleUpdated = { updatedArticle ->
+                    // 실시간으로 ViewModel 직접 업데이트 (리스트 즉시 반영)
+                    selectedArticle = updatedArticle
+                    feedViewModel.updateArticle(updatedArticle)
+                },
+                onNavigateToProfile = { userId, nickname, imageUrl, level, mostIdolName ->
+                    selectedUserProfile = UserProfileInfo(
+                        userId = userId,
+                        nickname = nickname,
+                        imageUrl = imageUrl,
+                        level = level,
+                        mostIdolName = mostIdolName
+                    )
+                }
             )
         }
     }

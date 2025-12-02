@@ -49,10 +49,18 @@ fun ExoTop3(
     isVisible: Boolean = true,
     onItemClick: (Int) -> Unit = {}
 ) {
+    // idol 변경 시에만 URL 재계산 (recomposition 시 무한 호출 방지)
+    val imageUrls = remember(idol) {
+        net.ib.mn.util.IdolImageUtil.getTop3ImageUrls(idol)
+    }
+    val videoUrls = remember(idol) {
+        net.ib.mn.util.IdolImageUtil.getTop3VideoUrls(idol)
+    }
+
     ExoTop3Internal(
         id = "exo_top3_${idol.id}",
-        imageUrls = net.ib.mn.util.IdolImageUtil.getTop3ImageUrls(idol),
-        videoUrls = net.ib.mn.util.IdolImageUtil.getTop3VideoUrls(idol),
+        imageUrls = imageUrls,
+        videoUrls = videoUrls,
         isVisible = isVisible,
         onItemClick = onItemClick
     )

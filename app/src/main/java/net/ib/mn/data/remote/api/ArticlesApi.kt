@@ -150,4 +150,13 @@ interface ArticlesApi {
     suspend fun deleteArticle(
         @Path("id") id: Long
     ): Response<ResponseBody>
+
+    /**
+     * 게시글 상세 조회
+     * Old 프로젝트: GET "articles/{id}/"
+     */
+    @GET("articles/{id}/")
+    suspend fun getArticle(
+        @Path("id") id: Long
+    ): ResponseBody
 }

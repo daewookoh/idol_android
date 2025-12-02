@@ -154,6 +154,11 @@ fun NavGraph(
                             }
                         )
                     }
+
+                    // PostDetail 화면 - CommunityScreen 내부에서 직접 표시하므로 여기서는 사용하지 않음
+                    is Screen.PostDetail -> NavEntry(screen) {
+                        // 빈 화면 (실제로는 CommunityScreen에서 AnimatedVisibility로 표시)
+                    }
                 }
             }
         )

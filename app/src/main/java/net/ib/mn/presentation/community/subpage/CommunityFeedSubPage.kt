@@ -61,7 +61,7 @@ import net.ib.mn.ui.theme.ExoTypo
  * @param onFirstArticleVideoPlaying 첫 번째 아티클의 비디오/움짤 재생 상태 콜백 (Top3 비디오 제어용)
  * @param onNavigateToProfile 프로필 화면 이동 콜백
  * @param onNavigateToArticleDetail 게시글 상세 화면 이동 콜백
- * @param viewModel ViewModel
+ * @param viewModel ViewModel (상위에서 주입하여 상태 공유)
  * @param articleViewModel ExoArticle 공용 ViewModel
  */
 @Composable
@@ -213,6 +213,10 @@ fun CommunityFeedSubPage(
                             showTranslation = true,
                             onDeleted = { deletedArticleId ->
                                 viewModel.removeArticle(deletedArticleId)
+                            },
+                            onArticleUpdated = { updatedArticle ->
+                                // ViewModel 직접 업데이트
+                                viewModel.updateArticle(updatedArticle)
                             },
                             viewModel = articleViewModel
                         )

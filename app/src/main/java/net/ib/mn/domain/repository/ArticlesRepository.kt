@@ -166,6 +166,14 @@ interface ArticlesRepository {
      * @return 삭제 결과 (ApiResult<Boolean>)
      */
     fun deleteArticle(articleId: Long): Flow<ApiResult<Boolean>>
+
+    /**
+     * 게시글 상세 조회
+     *
+     * @param articleId 게시글 ID
+     * @return 게시글 모델
+     */
+    suspend fun getArticle(articleId: Long): ArticleModel
 }
 
 /**

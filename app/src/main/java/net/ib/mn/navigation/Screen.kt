@@ -72,4 +72,13 @@ sealed class Screen {
         val url: String,
         val title: String? = null
     ) : Screen()
+
+    /**
+     * PostDetail 화면 - 게시글 상세 (댓글 포함)
+     * @param postId 게시글 ID
+     */
+    @Serializable
+    data class PostDetail(
+        val postId: Int
+    ) : Screen()
 }

@@ -85,7 +85,8 @@ import androidx.compose.foundation.pager.rememberPagerState
 enum class ArticleType {
     FEED,       // 커뮤니티 피드 - 하트투표, 좋아요, 댓글, 번역기능
     FREE_BOARD, // 자유게시판 - 좋아요, 댓글 (하트투표 없음)
-    COMMUNITY   // 커뮤니티 게시글 (피드에서 표시) - FEED와 동일하나 상단에 커뮤니티 이름 표시
+    COMMUNITY,  // 커뮤니티 게시글 (피드에서 표시) - FEED와 동일하나 상단에 커뮤니티 이름 표시
+    DETAIL      // 게시글 상세 - FEED와 동일하나 메뉴 아이콘, 댓글 버튼 없음
 }
 
 /**
@@ -108,6 +109,7 @@ fun ExoArticle(
     isVisible: Boolean = true,
     showTranslation: Boolean = true,
     onDeleted: ((String) -> Unit)? = null,
+    onArticleUpdated: ((ArticleModel) -> Unit)? = null,
     viewModel: ExoArticleViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -115,9 +117,26 @@ fun ExoArticle(
     val coroutineScope = rememberCoroutineScope()
 
     // 로컬 상태 (즉시 UI 업데이트용)
-    var localIsLiked by remember(article.id) { mutableStateOf(article.isUserLike) }
-    var localLikeCount by remember(article.id) { mutableIntStateOf(article.likeCount) }
-    var localHeartCount by remember(article.id) { mutableLongStateOf(article.heart) }
+    // article의 실제 값을 key로 사용하여 외부에서 변경된 값이 반영되도록 함
+    var localIsLiked by remember(article.id, article.isUserLike) { mutableStateOf(article.isUserLike) }
+    var localLikeCount by remember(article.id, article.likeCount) { mutableIntStateOf(article.likeCount) }
+    var localHeartCount by remember(article.id, article.heart) { mutableLongStateOf(article.heart) }
+
+    // 상태 변경 시 콜백 호출 (백스택 데이터 동기화)
+    LaunchedEffect(localIsLiked, localLikeCount, localHeartCount) {
+        // 초기값과 다를 때만 콜백 호출
+        if (localIsLiked != article.isUserLike ||
+            localLikeCount != article.likeCount ||
+            localHeartCount != article.heart) {
+            onArticleUpdated?.invoke(
+                article.copy(
+                    isUserLike = localIsLiked,
+                    likeCount = localLikeCount,
+                    heart = localHeartCount
+                )
+            )
+        }
+    }
 
     // 좋아요 클릭 throttling
     var lastLikeClickTime by remember { mutableLongStateOf(0L) }
@@ -340,20 +359,22 @@ fun ExoArticle(
                     }
                 }
 
-                // 더보기 버튼 (호버 효과 없음)
-                Icon(
-                    painter = painterResource(R.drawable.icon_view_more),
-                    contentDescription = "More",
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) {
-                            showMoreBottomSheet = true
-                        },
-                    tint = Color.Unspecified
-                )
+                // 더보기 버튼 (호버 효과 없음) - DETAIL 타입에서는 숨김
+                if (type != ArticleType.DETAIL) {
+                    Icon(
+                        painter = painterResource(R.drawable.icon_view_more),
+                        contentDescription = "More",
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                showMoreBottomSheet = true
+                            },
+                        tint = Color.Unspecified
+                    )
+                }
             }
 
             // 2. 태그 (FREE_BOARD 타입에서만 표시, FEED/COMMUNITY는 태그 숨김)
@@ -431,7 +452,7 @@ fun ExoArticle(
             // 번역 버튼
             val hasTranslatableContent = content.isNotEmpty() && !isYoutubeLink
             when (type) {
-                ArticleType.FEED, ArticleType.COMMUNITY -> {
+                ArticleType.FEED, ArticleType.COMMUNITY, ArticleType.DETAIL -> {
                     if (showTranslation && hasTranslatableContent) {
                         Text(
                             text = stringResource(R.string.see_translate),
@@ -476,7 +497,7 @@ fun ExoArticle(
                 horizontalArrangement = Arrangement.spacedBy(18.dp)
             ) {
                 when (type) {
-                    ArticleType.FEED -> {
+                    ArticleType.FEED, ArticleType.DETAIL -> {
                         StatItem(
                             iconRes = R.drawable.icon_community_heart,
                             count = localHeartCount.toInt(),
@@ -507,14 +528,23 @@ fun ExoArticle(
                         viewModel.postLike(article.id, newLiked)
                     }
                 )
-                StatItem(
-                    iconRes = R.drawable.icon_community_comment,
-                    count = article.commentCount,
-                    tintColor = ColorPalette.textDefault,
-                    onClick = {
-                        viewModel.navigateToArticleDetail(article)
-                    }
-                )
+                // DETAIL 타입에서는 댓글 통계 클릭 비활성화
+                if (type != ArticleType.DETAIL) {
+                    StatItem(
+                        iconRes = R.drawable.icon_community_comment,
+                        count = article.commentCount,
+                        tintColor = ColorPalette.textDefault,
+                        onClick = {
+                            viewModel.navigateToArticleDetail(article)
+                        }
+                    )
+                } else {
+                    StatItem(
+                        iconRes = R.drawable.icon_community_comment,
+                        count = article.commentCount,
+                        tintColor = ColorPalette.textDefault
+                    )
+                }
             }
 
             HorizontalDivider(
@@ -593,6 +623,32 @@ fun ExoArticle(
                             onClick = { viewModel.navigateToArticleDetail(article) },
                             modifier = Modifier.weight(1f),
                             tintColor = ColorPalette.textDefault
+                        )
+                    }
+                    ArticleType.DETAIL -> {
+                        // DETAIL 타입: 하트투표, 좋아요만 표시 (댓글 버튼 없음)
+                        ActionButton(
+                            iconRes = R.drawable.icon_community_heart,
+                            label = stringResource(R.string.lable_community_heart_vote),
+                            onClick = { showVoteDialog = true },
+                            modifier = Modifier.weight(1f)
+                        )
+                        VerticalDivider()
+                        ActionButton(
+                            iconRes = if (localIsLiked) R.drawable.icon_board_like_active else R.drawable.icon_board_like,
+                            label = stringResource(R.string.support_sympathy),
+                            onClick = {
+                                val currentTime = System.currentTimeMillis()
+                                if (currentTime - lastLikeClickTime < 1000L) return@ActionButton
+                                lastLikeClickTime = currentTime
+
+                                val newLiked = !localIsLiked
+                                localIsLiked = newLiked
+                                localLikeCount = if (newLiked) localLikeCount + 1 else (localLikeCount - 1).coerceAtLeast(0)
+                                viewModel.postLike(article.id, newLiked)
+                            },
+                            modifier = Modifier.weight(1f),
+                            tintColor = if (localIsLiked) null else ColorPalette.textDefault
                         )
                     }
                     ArticleType.FREE_BOARD -> {

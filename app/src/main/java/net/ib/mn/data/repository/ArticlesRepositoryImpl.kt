@@ -289,4 +289,19 @@ class ArticlesRepositoryImpl @Inject constructor(
                 jsonObject.optBoolean("success", false)
             }
         )
+
+    /**
+     * 게시글 상세 조회
+     */
+    override suspend fun getArticle(articleId: Long): ArticleModel {
+        val response = articlesApi.getArticle(articleId)
+        val json = response.string()
+        Log.d(TAG, "getArticle response keys: ${JSONObject(json).keys().asSequence().toList()}")
+        Log.d(TAG, "getArticle full response: $json")
+        val jsonObject = JSONObject(json)
+        // API 응답이 직접 article 객체일 수 있음
+        val articleJson = jsonObject.optJSONObject("article")
+            ?: jsonObject  // article 키가 없으면 전체 객체가 article
+        return gson.fromJson(articleJson.toString(), ArticleModel::class.java)
+    }
 }
