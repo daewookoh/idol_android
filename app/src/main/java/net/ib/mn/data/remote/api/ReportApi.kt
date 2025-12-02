@@ -18,6 +18,14 @@ interface ReportApi {
     ): Response<ResponseBody>
 
     /**
+     * 게시글 신고하기
+     */
+    @POST("reports/")
+    suspend fun reportArticle(
+        @Body body: ReportArticleRequest
+    ): Response<ResponseBody>
+
+    /**
      * 신고 가능 여부 확인
      */
     @GET("reports/possible/user/")
@@ -29,4 +37,8 @@ interface ReportApi {
 data class ReportUserRequest(
     val user_id: Int,
     val reason: String
+)
+
+data class ReportArticleRequest(
+    val article_id: Long
 )

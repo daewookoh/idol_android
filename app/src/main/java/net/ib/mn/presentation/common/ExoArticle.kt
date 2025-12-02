@@ -62,9 +62,22 @@ import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.DateTimeUtil
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.MediaCacheUtil
+import net.ib.mn.ui.components.ExoBottomSheetAction
+import net.ib.mn.ui.components.ExoBottomSheetActionItem
+import net.ib.mn.ui.components.ExoConfirmDialog
+import net.ib.mn.ui.components.ExoErrorDialog
+import net.ib.mn.ui.components.ExoProfileImage
+import net.ib.mn.ui.components.ProfileImageType
+import android.widget.Toast
+import net.ib.mn.util.IdolImageUtil.toSecureUrl
 import net.ib.mn.util.NumberFormatUtil
+import net.ib.mn.util.ServerUrl
 import net.ib.mn.util.YoutubeHelper
 import java.util.concurrent.TimeUnit
+import android.content.Intent
+import java.util.Locale
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 
 /**
  * ExoArticle 타입
@@ -94,6 +107,7 @@ fun ExoArticle(
     type: ArticleType = ArticleType.FEED,
     isVisible: Boolean = true,
     showTranslation: Boolean = true,
+    onDeleted: ((String) -> Unit)? = null,
     viewModel: ExoArticleViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -110,6 +124,24 @@ fun ExoArticle(
 
     // 투표 다이얼로그 상태
     var showVoteDialog by remember { mutableStateOf(false) }
+
+    // 더보기 바텀시트 상태
+    var showMoreBottomSheet by remember { mutableStateOf(false) }
+
+    // 신고 확인 다이얼로그 상태
+    var showReportDialog by remember { mutableStateOf(false) }
+
+    // 신고 에러 다이얼로그 상태
+    var showReportErrorDialog by remember { mutableStateOf(false) }
+    var reportErrorMessage by remember { mutableStateOf("") }
+
+    // 삭제 확인 다이얼로그 상태
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    // 작성자 여부 확인 (ViewModel에서 현재 사용자 정보 가져옴)
+    val myUserId = viewModel.myUserId
+    val isAdmin = viewModel.isAdmin
+    val isMine = myUserId != null && article.user?.id == myUserId
 
     // 커뮤니티 이름 (COMMUNITY 타입에서 사용)
     val communityName = remember(article.idol) {
@@ -129,7 +161,7 @@ fun ExoArticle(
     var isExpanded by remember { mutableStateOf(false) }
 
     // 프로필 이미지 URL
-    val profileImageUrl = article.user?.imageUrlCommunity ?: ""
+    val profileImageUrl = article.user?.imageUrlCommunity
 
     Column(
         modifier = modifier
@@ -186,38 +218,37 @@ fun ExoArticle(
                 verticalAlignment = Alignment.Top
             ) {
                 // 프로필 이미지
-                AsyncImage(
-                    model = profileImageUrl,
-                    contentDescription = "Profile",
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(ColorPalette.gray110)
-                        .then(
-                            // COMMUNITY 타입에서는 프로필 클릭 비활성화, FEED/FREE_BOARD는 활성화
-                            if (type == ArticleType.COMMUNITY) {
-                                Modifier
-                            } else {
-                                Modifier.clickable {
-                                    article.user?.let { user ->
-                                        val mostIdolName = user.most?.let { most ->
-                                            LocaleUtil.getLocalizedIdolName(context, most)
-                                        }
-                                        viewModel.navigateToProfile(
-                                            userId = user.id,
-                                            nickname = user.nickname ?: "",
-                                            imageUrl = user.imageUrlCommunity,
-                                            level = user.level,
-                                            mostIdolName = mostIdolName
-                                        )
+                Box(
+                    modifier = Modifier.then(
+                        // COMMUNITY 타입에서는 프로필 클릭 비활성화, FEED/FREE_BOARD는 활성화
+                        if (type == ArticleType.COMMUNITY) {
+                            Modifier
+                        } else {
+                            Modifier.clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                article.user?.let { user ->
+                                    val mostIdolName = user.most?.let { most ->
+                                        LocaleUtil.getLocalizedIdolName(context, most)
                                     }
+                                    viewModel.navigateToProfile(
+                                        userId = user.id,
+                                        nickname = user.nickname ?: "",
+                                        imageUrl = user.imageUrlCommunity,
+                                        level = user.level,
+                                        mostIdolName = mostIdolName
+                                    )
                                 }
                             }
-                        ),
-                    contentScale = ContentScale.Crop,
-                    placeholder = painterResource(R.drawable.menu_profile_default2),
-                    error = painterResource(R.drawable.menu_profile_default2)
-                )
+                        }
+                    )
+                ) {
+                    ExoProfileImage(
+                        imageUrl = profileImageUrl,
+                        type = ProfileImageType.SMALL
+                    )
+                }
 
                 Spacer(modifier = Modifier.width(10.dp))
 
@@ -309,14 +340,17 @@ fun ExoArticle(
                     }
                 }
 
-                // 더보기 버튼
+                // 더보기 버튼 (호버 효과 없음)
                 Icon(
                     painter = painterResource(R.drawable.icon_view_more),
                     contentDescription = "More",
                     modifier = Modifier
                         .padding(4.dp)
-                        .clickable {
-                            viewModel.showMoreOptions(article)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            showMoreBottomSheet = true
                         },
                     tint = Color.Unspecified
                 )
@@ -620,10 +654,141 @@ fun ExoArticle(
             onDismiss = { showVoteDialog = false }
         )
     }
+
+    // 더보기 바텀시트
+    if (showMoreBottomSheet) {
+        val actionItems = buildList {
+            // 작성자 또는 관리자: 수정, 삭제
+            if (isMine || isAdmin) {
+                add(ExoBottomSheetActionItem(R.string.title_edit) {
+                    viewModel.onEditArticle(article)
+                })
+                add(ExoBottomSheetActionItem(R.string.title_remove) {
+                    showMoreBottomSheet = false
+                    showDeleteDialog = true
+                })
+            }
+            // 본인 게시글이 아닌 경우: 신고
+            if (!isMine) {
+                add(ExoBottomSheetActionItem(R.string.title_report) {
+                    showMoreBottomSheet = false
+                    showReportDialog = true
+                })
+            }
+            // 공유는 모든 사용자에게 표시
+            add(ExoBottomSheetActionItem(R.string.title_share) {
+                shareArticle(context, article)
+            })
+        }
+
+        ExoBottomSheetAction(
+            items = actionItems,
+            onDismissRequest = { showMoreBottomSheet = false }
+        )
+    }
+
+    // 신고 확인 다이얼로그
+    if (showReportDialog) {
+        val reportHeart = viewModel.reportHeart
+        ExoConfirmDialog(
+            title = stringResource(R.string.title_report),
+            message = stringResource(R.string.msg_report_confirm, reportHeart),
+            confirmButtonText = stringResource(R.string.yes),
+            dismissButtonText = stringResource(R.string.no),
+            onConfirm = {
+                showReportDialog = false
+                viewModel.reportArticle(
+                    articleId = article.id,
+                    onSuccess = {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.report_done),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
+                    onError = { gcode ->
+                        reportErrorMessage = when (gcode) {
+                            ExoArticleViewModel.GCODE_ALREADY_REPORTED ->
+                                context.getString(R.string.failed_to_report__already_reported)
+                            ExoArticleViewModel.GCODE_DAILY_LIMIT ->
+                                context.getString(R.string.failed_to_report_2202)
+                            ExoArticleViewModel.GCODE_TIME_LIMIT ->
+                                context.getString(R.string.failed_to_report_2203)
+                            else -> context.getString(R.string.error_abnormal_default)
+                        }
+                        showReportErrorDialog = true
+                    }
+                )
+            },
+            onDismiss = { showReportDialog = false }
+        )
+    }
+
+    // 신고 에러 다이얼로그 (타이틀 없음, 버튼 1개)
+    if (showReportErrorDialog) {
+        ExoErrorDialog(
+            message = reportErrorMessage,
+            onDismiss = { showReportErrorDialog = false }
+        )
+    }
+
+    // 삭제 확인 다이얼로그
+    if (showDeleteDialog) {
+        ExoConfirmDialog(
+            title = stringResource(R.string.title_remove),
+            message = stringResource(R.string.remove_desc),
+            confirmButtonText = stringResource(R.string.yes),
+            dismissButtonText = stringResource(R.string.no),
+            onConfirm = {
+                showDeleteDialog = false
+                viewModel.deleteArticle(
+                    articleId = article.id,
+                    onSuccess = {
+                        onDeleted?.invoke(article.id)
+                    },
+                    onError = {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.error_abnormal_default),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                )
+            },
+            onDismiss = { showDeleteDialog = false }
+        )
+    }
 }
 
 /**
- * 미디어 섹션
+ * 게시글 공유
+ */
+private fun shareArticle(context: android.content.Context, article: ArticleModel) {
+    // locale 설정 (ko, en, ja 등)
+    val locale = Locale.getDefault().language
+
+    // 공유 URL 생성: {HOST}/articles/{articleId}/?locale={locale}
+    val shareUrl = "${ServerUrl.HOST}/articles/${article.id}/?locale=$locale"
+
+    // 공유 텍스트: 제목 + URL
+    val shareText = if (!article.title.isNullOrEmpty()) {
+        "${article.title}\n$shareUrl"
+    } else {
+        shareUrl
+    }
+
+    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, shareText)
+    }
+
+    context.startActivity(
+        Intent.createChooser(shareIntent, context.getString(R.string.title_share))
+    )
+}
+
+/**
+ * 미디어 섹션 (스와이프 지원)
  */
 @Composable
 private fun MediaSection(
@@ -632,8 +797,8 @@ private fun MediaSection(
     onMediaClick: (Int) -> Unit
 ) {
     val context = LocalContext.current
-    val firstMedia = mediaFiles.first()
     val coroutineScope = rememberCoroutineScope()
+    val pagerState = rememberPagerState(pageCount = { mediaFiles.size })
 
     // GIF ImageLoader
     val gifImageLoader = remember(context) {
@@ -653,15 +818,70 @@ private fun MediaSection(
             .fillMaxWidth()
             .aspectRatio(1f)
             .background(ColorPalette.background100)
-            .clip(RoundedCornerShape(0.dp))
-            .clickable { onMediaClick(0) },
+    ) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { pageIndex ->
+            val media = mediaFiles[pageIndex]
+            val isCurrentPageVisible = isVisible && pagerState.currentPage == pageIndex
+
+            MediaItem(
+                media = media,
+                isVisible = isCurrentPageVisible,
+                gifImageLoader = gifImageLoader,
+                onMediaClick = { onMediaClick(pageIndex) }
+            )
+        }
+
+        // 페이지 인디케이터 (여러 장일 경우)
+        if (mediaFiles.size > 1) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 16.dp, end = 16.dp)
+                    .height(24.dp)
+                    .background(
+                        color = ColorPalette.textDefault.copy(alpha = 0.7f),
+                        shape = RoundedCornerShape(13.dp)
+                    )
+                    .padding(horizontal = 8.dp)
+            ) {
+                Text(
+                    text = "${pagerState.currentPage + 1}/${mediaFiles.size}",
+                    style = ExoTypo.stat10.copy(color = ColorPalette.textWhiteBlack),
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        }
+    }
+}
+
+/**
+ * 개별 미디어 아이템
+ */
+@Composable
+private fun MediaItem(
+    media: ArticleFile,
+    isVisible: Boolean,
+    gifImageLoader: ImageLoader,
+    onMediaClick: () -> Unit
+) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable(onClick = onMediaClick),
         contentAlignment = Alignment.Center
     ) {
         var videoDurationMs by remember { mutableStateOf(0L) }
+        var isFirstFrameRendered by remember(isVisible) { mutableStateOf(false) }
 
-        LaunchedEffect(firstMedia.originUrl) {
-            if (firstMedia.isVideo && videoDurationMs == 0L && !firstMedia.originUrl.isNullOrEmpty()) {
-                MediaCacheUtil.getVideoDuration(firstMedia.originUrl!!)?.let { duration ->
+        LaunchedEffect(media.originUrl) {
+            if (media.isVideo && videoDurationMs == 0L && !media.originUrl.isNullOrEmpty()) {
+                MediaCacheUtil.getVideoDuration(media.originUrl!!)?.let { duration ->
                     videoDurationMs = duration
                 }
             }
@@ -675,12 +895,11 @@ private fun MediaSection(
         }
 
         val displayDuration = formatDurationMs(videoDurationMs)
-        var isFirstFrameRendered by remember(isVisible) { mutableStateOf(false) }
 
         when {
-            firstMedia.isVideo && isVisible && !firstMedia.umjjalUrl.isNullOrEmpty() -> {
+            media.isVideo && isVisible && !media.umjjalUrl.isNullOrEmpty() -> {
                 ExoVideoPlayer(
-                    videoUrl = firstMedia.umjjalUrl!!,
+                    videoUrl = media.umjjalUrl!!.toSecureUrl(),
                     isVisible = isVisible,
                     modifier = Modifier.fillMaxSize(),
                     isMuted = true,
@@ -694,25 +913,25 @@ private fun MediaSection(
                 )
                 if (!isFirstFrameRendered) {
                     AsyncImage(
-                        model = firstMedia.thumbnailUrl,
+                        model = media.thumbnailUrl.toSecureUrl(),
                         contentDescription = "Video Thumbnail",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
                 }
             }
-            firstMedia.isVideo -> {
+            media.isVideo -> {
                 AsyncImage(
-                    model = firstMedia.thumbnailUrl,
+                    model = media.thumbnailUrl.toSecureUrl(),
                     contentDescription = "Video Thumbnail",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
             }
-            firstMedia.isGif && isVisible && !firstMedia.umjjalUrl.isNullOrEmpty() -> {
+            media.isGif && isVisible && !media.umjjalUrl.isNullOrEmpty() -> {
                 AsyncImage(
                     model = ImageRequest.Builder(context)
-                        .data(firstMedia.umjjalUrl)
+                        .data(media.umjjalUrl.toSecureUrl())
                         .repeatCount(-1)
                         .crossfade(true)
                         .build(),
@@ -722,9 +941,9 @@ private fun MediaSection(
                     contentScale = ContentScale.Fit
                 )
             }
-            firstMedia.isGif -> {
+            media.isGif -> {
                 AsyncImage(
-                    model = firstMedia.thumbnailUrl,
+                    model = media.thumbnailUrl.toSecureUrl(),
                     contentDescription = "GIF Thumbnail",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Fit
@@ -748,7 +967,7 @@ private fun MediaSection(
             else -> {
                 AsyncImage(
                     model = ImageRequest.Builder(context)
-                        .data(firstMedia.displayUrl)
+                        .data(media.displayUrl.toSecureUrl())
                         .crossfade(true)
                         .build(),
                     contentDescription = "Media",
@@ -758,7 +977,8 @@ private fun MediaSection(
             }
         }
 
-        if (firstMedia.isVideo && displayDuration.isNotEmpty()) {
+        // 비디오 재생 시간 표시
+        if (media.isVideo && displayDuration.isNotEmpty()) {
             Text(
                 text = displayDuration,
                 style = ExoTypo.body12.copy(
@@ -773,26 +993,6 @@ private fun MediaSection(
                     .align(Alignment.TopEnd)
                     .padding(top = 16.dp, end = 16.dp)
             )
-        }
-
-        if (mediaFiles.size > 1) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = if (firstMedia.isVideo) 40.dp else 29.dp, end = 16.dp)
-                    .height(24.dp)
-                    .background(
-                        color = ColorPalette.textDefault.copy(alpha = 0.7f),
-                        shape = RoundedCornerShape(13.dp)
-                    )
-                    .padding(horizontal = 8.dp)
-            ) {
-                Text(
-                    text = "1/${mediaFiles.size}",
-                    style = ExoTypo.stat10.copy(color = ColorPalette.textWhiteBlack),
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
         }
     }
 }

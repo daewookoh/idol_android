@@ -281,4 +281,14 @@ class CommunityFeedViewModel @Inject constructor(
             ViewType.WALLPAPER -> Pair("Y", "wp")
         }
     }
+
+    /**
+     * 게시글 삭제 (로컬 리스트에서 제거)
+     */
+    fun removeArticle(articleId: String) {
+        val currentArticles = _uiState.value.articles
+        val updatedArticles = currentArticles.filter { it.id != articleId }
+        _uiState.value = _uiState.value.copy(articles = updatedArticles)
+        Log.d(TAG, "removeArticle: articleId=$articleId, remaining=${updatedArticles.size}")
+    }
 }

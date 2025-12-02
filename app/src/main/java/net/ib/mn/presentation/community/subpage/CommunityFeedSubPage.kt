@@ -211,6 +211,9 @@ fun CommunityFeedSubPage(
                             type = ArticleType.FEED,
                             isVisible = isVisible,
                             showTranslation = true,
+                            onDeleted = { deletedArticleId ->
+                                viewModel.removeArticle(deletedArticleId)
+                            },
                             viewModel = articleViewModel
                         )
                     }

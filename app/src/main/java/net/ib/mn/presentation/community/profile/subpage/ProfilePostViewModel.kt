@@ -107,6 +107,21 @@ class ProfilePostViewModel @Inject constructor(
         }
         isLoading = false
     }
+
+    /**
+     * 게시글 삭제 (로컬 리스트에서 제거)
+     */
+    fun removeArticle(articleId: String) {
+        posts.removeAll { it.id == articleId }
+        if (posts.isEmpty()) {
+            _uiState.value = ProfilePostUiState.Empty
+        } else {
+            _uiState.value = ProfilePostUiState.Success(
+                posts = posts.toList(),
+                hasMore = hasMoreData
+            )
+        }
+    }
 }
 
 /** UI 상태 */

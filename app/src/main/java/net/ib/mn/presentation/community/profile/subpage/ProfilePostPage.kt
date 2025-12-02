@@ -95,7 +95,8 @@ fun ProfilePostPage(
         is ProfilePostUiState.Success -> PostList(
             state = state,
             listState = listState,
-            articleViewModel = articleViewModel
+            articleViewModel = articleViewModel,
+            postViewModel = viewModel
         )
     }
 }
@@ -182,7 +183,8 @@ private fun BlockedContent() {
 private fun PostList(
     state: ProfilePostUiState.Success,
     listState: androidx.compose.foundation.lazy.LazyListState,
-    articleViewModel: ExoArticleViewModel
+    articleViewModel: ExoArticleViewModel,
+    postViewModel: ProfilePostViewModel
 ) {
     LazyColumn(
         modifier = Modifier
@@ -204,6 +206,9 @@ private fun PostList(
                 type = ArticleType.COMMUNITY,
                 isVisible = isVisible,
                 showTranslation = true,
+                onDeleted = { deletedArticleId ->
+                    postViewModel.removeArticle(deletedArticleId)
+                },
                 viewModel = articleViewModel
             )
         }

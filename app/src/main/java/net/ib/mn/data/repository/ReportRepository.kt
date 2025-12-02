@@ -3,6 +3,7 @@ package net.ib.mn.data.repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.ib.mn.data.remote.api.ReportApi
+import net.ib.mn.data.remote.api.ReportArticleRequest
 import net.ib.mn.data.remote.api.ReportUserRequest
 import net.ib.mn.domain.repository.ConfigRepository
 import org.json.JSONObject
@@ -46,6 +47,30 @@ class ReportRepository @Inject constructor(
     suspend fun reportUser(userId: Int, reason: String): ReportResult = withContext(Dispatchers.IO) {
         try {
             val response = reportApi.reportUser(ReportUserRequest(userId, reason))
+            if (response.isSuccessful) {
+                val body = response.body()?.string() ?: "{}"
+                val json = JSONObject(body)
+                val success = json.optBoolean("success", false)
+                if (success) {
+                    ReportResult.Success
+                } else {
+                    val gcode = json.optInt("gcode", 0)
+                    ReportResult.Error(gcode = gcode)
+                }
+            } else {
+                ReportResult.Error(gcode = 0)
+            }
+        } catch (e: Exception) {
+            ReportResult.Error(gcode = 0)
+        }
+    }
+
+    /**
+     * 게시글 신고하기
+     */
+    suspend fun reportArticle(articleId: Long): ReportResult = withContext(Dispatchers.IO) {
+        try {
+            val response = reportApi.reportArticle(ReportArticleRequest(articleId))
             if (response.isSuccessful) {
                 val body = response.body()?.string() ?: "{}"
                 val json = JSONObject(body)

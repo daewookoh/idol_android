@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import net.ib.mn.data.remote.dto.ArticleVoteResponse
 import net.ib.mn.domain.model.ArticleModel
@@ -17,10 +18,33 @@ import javax.inject.Inject
  *
  * 네비게이션, API 호출, 다이얼로그 등 모든 액션을 중앙에서 관리
  */
+private const val LEVEL_ADMIN = 10
+
 @HiltViewModel
 class ExoArticleViewModel @Inject constructor(
-    private val articlesRepository: ArticlesRepository
+    private val articlesRepository: ArticlesRepository,
+    private val userCacheRepository: net.ib.mn.data.repository.UserCacheRepository,
+    private val reportRepository: net.ib.mn.data.repository.ReportRepository,
+    private val configRepository: net.ib.mn.domain.repository.ConfigRepository
 ) : ViewModel() {
+
+    /**
+     * 현재 로그인한 사용자 ID
+     */
+    val myUserId: Int?
+        get() = userCacheRepository.getUserData()?.id
+
+    /**
+     * 현재 로그인한 사용자가 관리자인지 여부 (heart == 10)
+     */
+    val isAdmin: Boolean
+        get() = userCacheRepository.getUserData()?.heart == LEVEL_ADMIN
+
+    /**
+     * 신고 시 차감될 하트 수
+     */
+    val reportHeart: Int
+        get() = configRepository.getReportHeart()
 
     // 네비게이션 이벤트
     private val _navigationEvent = MutableSharedFlow<ExoArticleNavigation>()
@@ -104,6 +128,42 @@ class ExoArticleViewModel @Inject constructor(
     }
 
     /**
+     * 게시글 수정
+     */
+    fun onEditArticle(article: ArticleModel) {
+        viewModelScope.launch {
+            _dialogEvent.emit(ExoArticleDialog.EditArticle(article = article))
+        }
+    }
+
+    /**
+     * 게시글 삭제
+     */
+    fun onDeleteArticle(article: ArticleModel) {
+        viewModelScope.launch {
+            _dialogEvent.emit(ExoArticleDialog.DeleteArticle(article = article))
+        }
+    }
+
+    /**
+     * 게시글 신고
+     */
+    fun onReportArticle(article: ArticleModel) {
+        viewModelScope.launch {
+            _dialogEvent.emit(ExoArticleDialog.ReportArticle(article = article))
+        }
+    }
+
+    /**
+     * 게시글 공유
+     */
+    fun onShareArticle(article: ArticleModel) {
+        viewModelScope.launch {
+            _dialogEvent.emit(ExoArticleDialog.ShareArticle(article = article))
+        }
+    }
+
+    /**
      * 번역 처리
      */
     fun translateContent(content: String, nation: String?) {
@@ -152,6 +212,63 @@ class ExoArticleViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * 게시글 신고 API 호출
+     */
+    fun reportArticle(
+        articleId: String,
+        onSuccess: () -> Unit,
+        onError: (Int) -> Unit
+    ) {
+        viewModelScope.launch {
+            val articleIdLong = articleId.toLongOrNull()
+            if (articleIdLong == null) {
+                onError(0)
+                return@launch
+            }
+            when (val result = reportRepository.reportArticle(articleIdLong)) {
+                is net.ib.mn.data.repository.ReportResult.Success -> onSuccess()
+                is net.ib.mn.data.repository.ReportResult.Error -> onError(result.gcode)
+            }
+        }
+    }
+
+    /**
+     * 게시글 삭제 API 호출
+     */
+    fun deleteArticle(
+        articleId: String,
+        onSuccess: () -> Unit,
+        onError: () -> Unit
+    ) {
+        viewModelScope.launch {
+            val articleIdLong = articleId.toLongOrNull()
+            if (articleIdLong == null) {
+                onError()
+                return@launch
+            }
+            articlesRepository.deleteArticle(articleIdLong).collect { result ->
+                when (result) {
+                    is net.ib.mn.domain.model.ApiResult.Success -> {
+                        if (result.data) {
+                            onSuccess()
+                        } else {
+                            onError()
+                        }
+                    }
+                    is net.ib.mn.domain.model.ApiResult.Error -> onError()
+                    is net.ib.mn.domain.model.ApiResult.Loading -> { /* 로딩 상태 무시 */ }
+                }
+            }
+        }
+    }
+
+    companion object {
+        const val GCODE_ALREADY_REPORTED = 2201
+        const val GCODE_DAILY_LIMIT = 2202
+        const val GCODE_TIME_LIMIT = 2203
+    }
 }
 
 /**
@@ -187,4 +304,8 @@ sealed interface ExoArticleNavigation {
 sealed interface ExoArticleDialog {
     data class MoreOptions(val article: ArticleModel) : ExoArticleDialog
     data class Translation(val content: String, val nation: String?) : ExoArticleDialog
+    data class EditArticle(val article: ArticleModel) : ExoArticleDialog
+    data class DeleteArticle(val article: ArticleModel) : ExoArticleDialog
+    data class ReportArticle(val article: ArticleModel) : ExoArticleDialog
+    data class ShareArticle(val article: ArticleModel) : ExoArticleDialog
 }

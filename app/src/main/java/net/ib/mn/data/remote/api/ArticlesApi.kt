@@ -7,8 +7,10 @@ import net.ib.mn.data.remote.dto.ArticleVoteResponse
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
 
@@ -138,5 +140,14 @@ interface ArticlesApi {
         @Query("limit") limit: Int,
         @Query("offset") offset: Int,
         @Query("self") isSelf: Boolean? = null
+    ): Response<ResponseBody>
+
+    /**
+     * 게시글 삭제
+     * Old 프로젝트: DELETE "articles/{id}/"
+     */
+    @DELETE("articles/{id}/")
+    suspend fun deleteArticle(
+        @Path("id") id: Long
     ): Response<ResponseBody>
 }

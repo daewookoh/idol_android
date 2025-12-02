@@ -277,4 +277,16 @@ class ArticlesRepositoryImpl @Inject constructor(
             nextUrl = nextUrl
         )
     }
+
+    /**
+     * 게시글 삭제
+     */
+    override fun deleteArticle(articleId: Long): Flow<ApiResult<Boolean>> =
+        safeApiCallWithJsonString(
+            apiCall = { articlesApi.deleteArticle(articleId) },
+            parser = { json ->
+                val jsonObject = JSONObject(json)
+                jsonObject.optBoolean("success", false)
+            }
+        )
 }

@@ -158,6 +158,14 @@ interface ArticlesRepository {
         limit: Int,
         isSelf: Boolean
     ): Flow<ApiResult<ArticlesResponse>>
+
+    /**
+     * 게시글 삭제
+     *
+     * @param articleId 게시글 ID
+     * @return 삭제 결과 (ApiResult<Boolean>)
+     */
+    fun deleteArticle(articleId: Long): Flow<ApiResult<Boolean>>
 }
 
 /**
