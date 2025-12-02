@@ -45,10 +45,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
-import net.ib.mn.ui.components.ArticleType
-import net.ib.mn.ui.components.ExoArticle
-import net.ib.mn.ui.components.ExoArticleNavigation
-import net.ib.mn.ui.components.ExoArticleViewModel
+import net.ib.mn.presentation.common.ArticleType
+import net.ib.mn.presentation.common.ExoArticle
+import net.ib.mn.presentation.common.ExoArticleNavigation
+import net.ib.mn.presentation.common.ExoArticleViewModel
 import net.ib.mn.ui.components.ExoBoardNoticeItem
 import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.theme.ColorPalette

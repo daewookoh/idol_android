@@ -28,9 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
-import net.ib.mn.ui.components.ArticleType
-import net.ib.mn.ui.components.ExoArticle
-import net.ib.mn.ui.components.ExoArticleViewModel
+import net.ib.mn.presentation.common.ArticleType
+import net.ib.mn.presentation.common.ExoArticle
+import net.ib.mn.presentation.common.ExoArticleViewModel
 import net.ib.mn.ui.theme.ColorPalette
 
 /**

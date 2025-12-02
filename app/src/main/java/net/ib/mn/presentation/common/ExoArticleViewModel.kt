@@ -1,4 +1,4 @@
-package net.ib.mn.ui.components
+package net.ib.mn.presentation.common
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

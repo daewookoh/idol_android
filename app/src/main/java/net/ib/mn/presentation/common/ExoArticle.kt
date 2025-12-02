@@ -1,4 +1,4 @@
-package net.ib.mn.ui.components
+package net.ib.mn.presentation.common
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -54,6 +54,9 @@ import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleFile
 import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.ui.components.ExoArticleVoteDialog
+import net.ib.mn.ui.components.ExoVideoPlayer
+import net.ib.mn.ui.components.ExoYouTubePlayer
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.DateTimeUtil
