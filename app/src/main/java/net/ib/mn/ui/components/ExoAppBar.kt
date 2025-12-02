@@ -102,9 +102,9 @@ fun ExoAppBar(
             }
         },
         actions = {
-            // 우측 패딩 10dp 적용
+            // 우측 패딩 5dp 적용
             Row(
-                modifier = Modifier.padding(end = 10.dp),
+                modifier = Modifier.padding(end = 5.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 actions()

@@ -297,7 +297,10 @@ fun ProfileScreen(
                     // 타인의 프로필일 때 우측 액션 버튼들
                     if (!isMine) {
                         // 신고 버튼
-                        IconButton(onClick = { viewModel.onReportClick() }) {
+                        IconButton(
+                            onClick = { viewModel.onReportClick() },
+                            modifier = Modifier.size(36.dp)
+                        ) {
                             Icon(
                                 painter = painterResource(R.drawable.btn_navigation_report),
                                 contentDescription = "Report",
@@ -1264,7 +1267,7 @@ private fun FriendButton(
     // 로딩 중일 때는 Box로 표시 (클릭 불가)
     if (friendState is FriendState.Loading) {
         Box(
-            modifier = Modifier.size(48.dp),
+            modifier = Modifier.size(36.dp),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator(
@@ -1277,7 +1280,8 @@ private fun FriendButton(
         // IconButton으로 호버 효과 적용
         IconButton(
             onClick = onClick ?: {},
-            enabled = onClick != null
+            enabled = onClick != null,
+            modifier = Modifier.size(36.dp)
         ) {
             when (friendState) {
                 is FriendState.CanAdd, is FriendState.Error -> {
