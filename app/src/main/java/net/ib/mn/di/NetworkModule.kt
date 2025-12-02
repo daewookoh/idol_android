@@ -170,4 +170,9 @@ object NetworkModule {
     @Singleton
     fun provideReportApi(retrofit: Retrofit): ReportApi =
         retrofit.create(ReportApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideFriendsApi(retrofit: Retrofit): FriendsApi =
+        retrofit.create(FriendsApi::class.java)
 }

@@ -1,25 +1,23 @@
 package net.ib.mn.data.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.google.gson.annotations.SerializedName
 
 /**
  * Data Transfer Object for User from API.
- * Uses kotlinx.serialization for JSON parsing.
+ * Uses Gson for JSON parsing (consistent with project's Retrofit configuration).
  */
-@Serializable
 data class UserDto(
-    @SerialName("id")
+    @SerializedName("id")
     val id: Int,
-    @SerialName("name")
+    @SerializedName("name")
     val name: String,
-    @SerialName("email")
+    @SerializedName("email")
     val email: String,
-    @SerialName("username")
+    @SerializedName("username")
     val username: String,
-    @SerialName("phone")
+    @SerializedName("phone")
     val phone: String,
-    @SerialName("website")
+    @SerializedName("website")
     val website: String
 )
 

@@ -130,6 +130,7 @@ fun ProfileScreen(
 
     val uiState by viewModel.uiState.collectAsState()
     val reportState by viewModel.reportState.collectAsState()
+    val friendState by viewModel.friendState.collectAsState()
 
     // 신고 플로우 상태
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -180,6 +181,34 @@ fun ProfileScreen(
                 }
                 showErrorDialog = true
                 viewModel.resetReportState()
+            }
+            else -> {}
+        }
+    }
+
+    // 친구 상태 처리
+    var showFriendAlreadyRequestedDialog by remember { mutableStateOf(false) }
+    var showFriendAlreadyFriendDialog by remember { mutableStateOf(false) }
+    var showFriendErrorDialog by remember { mutableStateOf(false) }
+    var friendErrorMessage by remember { mutableStateOf("") }
+
+    LaunchedEffect(friendState) {
+        when (val state = friendState) {
+            is FriendState.ShowAlreadyRequestedDialog -> {
+                showFriendAlreadyRequestedDialog = true
+            }
+            is FriendState.ShowAlreadyFriendDialog -> {
+                showFriendAlreadyFriendDialog = true
+            }
+            is FriendState.Error -> {
+                // Old: ErrorControl.parseError 참고 - gcode 기반 에러 메시지
+                friendErrorMessage = when (state.gcode) {
+                    8000 -> context.getString(R.string.error_8000) // 친구 수 제한
+                    8001 -> context.getString(R.string.error_8001) // 이미 친구
+                    8002 -> context.getString(R.string.error_8002) // 이미 요청 보냄
+                    else -> state.message ?: context.getString(R.string.error_abnormal_default)
+                }
+                showFriendErrorDialog = true
             }
             else -> {}
         }
@@ -300,25 +329,13 @@ fun ProfileScreen(
 
                         Spacer(modifier = Modifier.width(16.dp))
 
-                        // 친구 추가 버튼
-                        Box(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
-                                ) {
-                                    // TODO: 친구 추가 기능
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.btn_navigation_friend_add),
-                                contentDescription = "Add Friend",
-                                tint = Color.Unspecified,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
+                        // 친구 버튼 - 상태에 따라 다른 아이콘과 동작
+                        FriendButton(
+                            friendState = friendState,
+                            onFriendAddClick = { viewModel.onFriendAddClick() },
+                            onFriendWaitClick = { viewModel.onFriendWaitClick() },
+                            onAlreadyFriendClick = { viewModel.onAlreadyFriendClick() }
+                        )
                     }
                 }
             }
@@ -449,6 +466,39 @@ fun ProfileScreen(
         ExoErrorDialog(
             message = errorDialogMessage,
             onDismiss = { showErrorDialog = false }
+        )
+    }
+
+    // 친구 요청 이미 보냄 다이얼로그 (Old: error_8002)
+    if (showFriendAlreadyRequestedDialog) {
+        ExoErrorDialog(
+            message = stringResource(R.string.error_8002),
+            onDismiss = {
+                showFriendAlreadyRequestedDialog = false
+                viewModel.resetFriendState()
+            }
+        )
+    }
+
+    // 친구 에러 다이얼로그
+    if (showFriendErrorDialog) {
+        ExoErrorDialog(
+            message = friendErrorMessage,
+            onDismiss = {
+                showFriendErrorDialog = false
+                viewModel.resetFriendState()
+            }
+        )
+    }
+
+    // 이미 친구 다이얼로그 (Old: error_8003)
+    if (showFriendAlreadyFriendDialog) {
+        ExoErrorDialog(
+            message = stringResource(R.string.error_8003),
+            onDismiss = {
+                showFriendAlreadyFriendDialog = false
+                viewModel.resetFriendState()
+            }
         )
     }
 }
@@ -1228,4 +1278,91 @@ private fun getLevelIconRes(context: android.content.Context, level: Int): Int {
     val resName = String.format(java.util.Locale.ENGLISH, "icon_level_%d", clampedLevel)
     val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
     return if (resId != 0) resId else R.drawable.icon_level_0
+}
+
+/**
+ * FriendButton - 친구 상태에 따른 버튼 표시
+ *
+ * Old 프로젝트의 FeedActivity 친구 버튼 로직과 동일:
+ * - CanAdd: btn_navigation_friend_add (클릭 시 친구 요청)
+ * - AlreadyFriend: btn_navigation_friend_already (클릭 시 이미 친구 다이얼로그)
+ * - RequestPending/RequestSent: btn_navigation_friend_waiting (클릭 시 이미 요청 보냄 다이얼로그)
+ * - Loading: 로딩 중 (버튼 비활성화)
+ */
+@Composable
+private fun FriendButton(
+    friendState: FriendState,
+    onFriendAddClick: () -> Unit,
+    onFriendWaitClick: () -> Unit,
+    onAlreadyFriendClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(24.dp)
+            .then(
+                when (friendState) {
+                    is FriendState.CanAdd -> Modifier.clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onFriendAddClick() }
+                    is FriendState.RequestPending, is FriendState.RequestSent -> Modifier.clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onFriendWaitClick() }
+                    is FriendState.AlreadyFriend -> Modifier.clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onAlreadyFriendClick() }
+                    else -> Modifier // Loading, Error, ShowAlreadyRequestedDialog, ShowAlreadyFriendDialog - 클릭 불가
+                }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        when (friendState) {
+            is FriendState.Loading -> {
+                // 로딩 중 - 작은 프로그레스 인디케이터
+                CircularProgressIndicator(
+                    modifier = Modifier.size(18.dp),
+                    color = ColorPalette.main,
+                    strokeWidth = 2.dp
+                )
+            }
+            is FriendState.CanAdd -> {
+                // 친구 추가 가능 - btn_navigation_friend_add
+                Icon(
+                    painter = painterResource(R.drawable.btn_navigation_friend_add),
+                    contentDescription = "Add Friend",
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            is FriendState.AlreadyFriend, is FriendState.ShowAlreadyFriendDialog -> {
+                // 이미 친구 - btn_navigation_friend_already
+                Icon(
+                    painter = painterResource(R.drawable.btn_navigation_friend_already),
+                    contentDescription = "Already Friend",
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            is FriendState.RequestPending, is FriendState.RequestSent, is FriendState.ShowAlreadyRequestedDialog -> {
+                // 친구 요청 대기 중 - btn_navigation_friend_waiting
+                Icon(
+                    painter = painterResource(R.drawable.btn_navigation_friend_waiting),
+                    contentDescription = "Friend Request Pending",
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            is FriendState.Error -> {
+                // 에러 상태 - 친구 추가 버튼으로 복원 (다시 시도 가능)
+                Icon(
+                    painter = painterResource(R.drawable.btn_navigation_friend_add),
+                    contentDescription = "Add Friend",
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+    }
 }

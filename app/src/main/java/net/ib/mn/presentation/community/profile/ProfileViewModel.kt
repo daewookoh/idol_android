@@ -13,6 +13,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.ib.mn.data.repository.FriendInfoResult
+import net.ib.mn.data.repository.FriendRequestResult
+import net.ib.mn.data.repository.FriendUserType
+import net.ib.mn.data.repository.FriendsRepository
 import net.ib.mn.data.repository.ReportPossibleResult
 import net.ib.mn.data.repository.ReportRepository
 import net.ib.mn.data.repository.ReportResult
@@ -33,6 +37,7 @@ class ProfileViewModel @AssistedInject constructor(
     private val usersRepository: UsersRepository,
     private val userCacheRepository: UserCacheRepository,
     private val reportRepository: ReportRepository,
+    private val friendsRepository: FriendsRepository,
     @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -47,6 +52,10 @@ class ProfileViewModel @AssistedInject constructor(
     // 신고 관련 상태
     private val _reportState = MutableStateFlow<ReportState>(ReportState.Idle)
     val reportState: StateFlow<ReportState> = _reportState.asStateFlow()
+
+    // 친구 관련 상태
+    private val _friendState = MutableStateFlow<FriendState>(FriendState.Loading)
+    val friendState: StateFlow<FriendState> = _friendState.asStateFlow()
 
     // SavedStateHandle에서 파라미터 읽기
     private val userId: Int = savedStateHandle.get<Int>("userId") ?: 0
@@ -80,6 +89,11 @@ class ProfileViewModel @AssistedInject constructor(
 
             // getStatus API에서 상태 메시지 및 비공개 여부 로드
             loadStatusInfo()
+
+            // 타인의 프로필인 경우 친구 정보 로드
+            if (!isMine) {
+                loadFriendInfo()
+            }
         }
     }
 
@@ -103,11 +117,80 @@ class ProfileViewModel @AssistedInject constructor(
         }
     }
 
+    /** 친구 정보 로드 */
+    private suspend fun loadFriendInfo() {
+        when (val result = friendsRepository.getFriendInfo(userId)) {
+            is FriendInfoResult.Success -> {
+                val newState = when {
+                    result.isFriend -> FriendState.AlreadyFriend
+                    result.userType.equals(FriendUserType.RECV_USER, ignoreCase = true) -> FriendState.RequestPending
+                    else -> FriendState.CanAdd
+                }
+                updateFriendState(newState)
+            }
+            is FriendInfoResult.NotFound -> updateFriendState(FriendState.CanAdd)
+            is FriendInfoResult.Error -> updateFriendState(FriendState.CanAdd)
+        }
+    }
+
     /** 본인 프로필: UserCacheRepository에서 most 정보 조회 */
     private fun loadMostFromCache(): String? {
         val most = userCacheRepository.getUserData()?.most ?: return null
         return LocaleUtil.getLocalizedIdolName(context, most).takeIf { it.isNotEmpty() }
     }
+
+    // ========== 친구 관련 함수 ==========
+
+    /** 친구 추가 버튼 클릭 (Old: action_friend_add) */
+    fun onFriendAddClick() {
+        viewModelScope.launch {
+            _friendState.value = FriendState.Loading
+
+            when (val result = friendsRepository.sendFriendRequest(userId)) {
+                is FriendRequestResult.Success -> {
+                    updateFriendState(FriendState.RequestSent)
+                }
+                is FriendRequestResult.Error -> {
+                    // 에러 발생 시 에러 메시지 표시 (이전 상태는 lastStableFriendState에 저장됨)
+                    _friendState.value = FriendState.Error(
+                        gcode = result.gcode,
+                        message = result.message
+                    )
+                }
+            }
+        }
+    }
+
+    /** 친구 요청 대기 버튼 클릭 (Old: action_friend_wait) - 이미 요청 보낸 상태 알림 */
+    fun onFriendWaitClick() {
+        _friendState.value = FriendState.ShowAlreadyRequestedDialog
+    }
+
+    /** 이미 친구 버튼 클릭 (Old: action_friend) - 이미 친구 상태 알림 */
+    fun onAlreadyFriendClick() {
+        _friendState.value = FriendState.ShowAlreadyFriendDialog
+    }
+
+    /** 친구 상태 초기화 (다이얼로그 닫은 후) */
+    fun resetFriendState() {
+        _friendState.value = lastStableFriendState
+    }
+
+    // 마지막 안정적인 친구 상태 (다이얼로그 후 복원용)
+    private var lastStableFriendState: FriendState = FriendState.Loading
+
+    /** 친구 상태 업데이트 (안정적인 상태만 저장) */
+    private fun updateFriendState(newState: FriendState) {
+        // 다이얼로그 상태가 아닌 경우만 저장
+        if (newState !is FriendState.ShowAlreadyRequestedDialog &&
+            newState !is FriendState.ShowAlreadyFriendDialog &&
+            newState !is FriendState.Error) {
+            lastStableFriendState = newState
+        }
+        _friendState.value = newState
+    }
+
+    // ========== 신고 관련 함수 ==========
 
     /** 신고 버튼 클릭 - 바텀시트 표시 (Old: onOptionsItemSelected의 action_report) */
     fun onReportClick() {
@@ -160,6 +243,26 @@ class ProfileViewModel @AssistedInject constructor(
     }
 }
 
+/** 친구 상태 */
+sealed interface FriendState {
+    /** 로딩 중 */
+    data object Loading : FriendState
+    /** 친구 추가 가능 (btn_navigation_friend_add) */
+    data object CanAdd : FriendState
+    /** 이미 친구 (btn_navigation_friend_already) */
+    data object AlreadyFriend : FriendState
+    /** 친구 요청 대기 중 - API에서 받은 상태 (btn_navigation_friend_waiting) */
+    data object RequestPending : FriendState
+    /** 친구 요청 전송 완료 - 방금 보낸 상태 (btn_navigation_friend_waiting) */
+    data object RequestSent : FriendState
+    /** 이미 요청 보냄 다이얼로그 표시 */
+    data object ShowAlreadyRequestedDialog : FriendState
+    /** 이미 친구 다이얼로그 표시 (Old: error_8003) */
+    data object ShowAlreadyFriendDialog : FriendState
+    /** 에러 */
+    data class Error(val gcode: Int? = null, val message: String? = null) : FriendState
+}
+
 /** 신고 상태 */
 sealed interface ReportState {
     data object Idle : ReportState
@@ -170,8 +273,6 @@ sealed interface ReportState {
     data class ShowHeartConfirmDialog(val reportHeart: Int) : ReportState
     /** 3단계: 신고 사유 입력 다이얼로그 */
     data object ShowReportReasonDialog : ReportState
-    /** Old 호환용 - 한 번에 신고 다이얼로그 표시 */
-    data object ShowReportDialog : ReportState
     data object Success : ReportState
     data class Error(val gcode: Int? = null, val message: String? = null) : ReportState
 }
