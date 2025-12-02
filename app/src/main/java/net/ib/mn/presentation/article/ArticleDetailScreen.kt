@@ -16,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,6 +31,7 @@ import net.ib.mn.ui.components.ExoBottomSheetActionItem
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.components.ExoErrorDialog
 import net.ib.mn.ui.components.ExoScaffold
+import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.ServerUrl
 
@@ -94,7 +94,7 @@ fun ArticleDetailScreen(
                             ) {
                                 showMoreBottomSheet = true
                             },
-                        tint = Color.Unspecified
+                        tint = ColorPalette.textDefault
                     )
                 }
             )

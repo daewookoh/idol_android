@@ -48,7 +48,7 @@ fun ExoAppBar(
             Text(
                 text = title,
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
