@@ -1,13 +1,10 @@
 package net.ib.mn.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.ui.NavDisplay
 import net.ib.mn.presentation.login.EmailLoginScreen
 import net.ib.mn.presentation.login.LoginScreen
 import net.ib.mn.presentation.login.PasswordResetScreen
@@ -15,489 +12,150 @@ import net.ib.mn.presentation.main.MainScreen
 import net.ib.mn.presentation.signup.SignUpPagesScreen
 import net.ib.mn.presentation.startup.StartUpScreen
 import net.ib.mn.presentation.webview.WebViewScreen
-import net.ib.mn.util.ToastUtil
-import java.net.URLDecoder
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 /**
- * 앱의 네비게이션 그래프.
- * Splash -> StartUp -> Login (guest) / Main (logged in) 순서로 화면 전환.
- *
- * 화면 전환 애니메이션:
- * - 새 화면 진입: 우측에서 슬라이드 인
- * - 이전 화면 퇴장: 좌측으로 슬라이드 아웃
- * - 뒤로가기 진입: 좌측에서 슬라이드 인
- * - 뒤로가기 퇴장: 우측으로 슬라이드 아웃
- * - 지속 시간: 600ms (0.6초)
+ * CompositionLocal로 AppNavigator를 하위 컴포저블에 전달.
+ * 화면에서 navigator를 직접 주입받지 않고도 네비게이션 가능.
  */
-@Composable
-fun NavGraph(
-    navController: NavHostController,
-    startDestination: String = Screen.StartUp.route
-) {
-    NavHost(
-        navController = navController,
-        startDestination = startDestination
-    ) {
-        // StartUp 화면 (기본 route - startDestination과 매칭)
-        composable(
-            route = Screen.StartUp.route,
-            enterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(600)
-                )
-            },
-        ) {
-            StartUpScreen(
-                onNavigateToMain = {
-                    navController.navigate(Screen.Main.route) {
-                        popUpTo(Screen.StartUp.route) { inclusive = true }
-                    }
-                },
-                onNavigateToLogin = {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(Screen.StartUp.route) { inclusive = true }
-                    }
-                }
-            )
-        }
-        
-        // StartUp 화면 (이메일 회원가입 후 - isEmailSignup 플래그 포함)
-        composable(
-            route = "${Screen.StartUp.route}?isEmailSignup={isEmailSignup}",
-            arguments = listOf(
-                navArgument("isEmailSignup") {
-                    type = NavType.BoolType
-                    defaultValue = false
-                }
-            ),
-            enterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(600)
-                )
-            },
-        ) {
-            // 이메일 회원가입 후 이메일 인증이 필요한 경우를 위한 플래그 확인
-            val isEmailSignup = it.arguments?.getBoolean("isEmailSignup") ?: false
-            
-            StartUpScreen(
-                onNavigateToMain = {
-                    navController.navigate(Screen.Main.route) {
-                        popUpTo(Screen.StartUp.route) { inclusive = true }
-                    }
-                },
-                onNavigateToLogin = {
-                    // old 프로젝트: IS_EMAIL_SIGNUP 플래그가 있으면 EmailLogin 화면으로 이동
-                    if (isEmailSignup) {
-                        navController.navigate(Screen.EmailLogin.route) {
-                            popUpTo(Screen.StartUp.route) { inclusive = true }
-                        }
-                    } else {
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(Screen.StartUp.route) { inclusive = true }
-                        }
-                    }
-                }
-            )
-        }
-
-        // Login 화면
-        composable(
-            route = Screen.Login.route,
-//            enterTransition = {
-//                slideIntoContainer(
-//                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
-//                    animationSpec = tween(600)
-//                )
-//            },
-//            exitTransition = {
-//                slideOutOfContainer(
-//                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
-//                    animationSpec = tween(600)
-//                )
-//            }
-        ) {
-            LoginScreen(
-                onNavigateToMain = {
-                    // Old 프로젝트: afterSignin()에서 StartupActivity로 이동하고 finish() 호출
-                    // 로그인 성공 시 StartUp으로 이동하여 사용자 정보를 가져온 후 Main으로 이동
-                    navController.navigate(Screen.StartUp.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
-                },
-                onNavigateToEmailLogin = {
-                    navController.navigate(Screen.EmailLogin.route)
-                },
-                onNavigateToSignUp = { email, password, displayName, domain, profileImageUrl ->
-                    navController.navigate(
-                        Screen.SignUpPages.createRoute(
-                            email = email,
-                            password = password,
-                            displayName = displayName,
-                            domain = domain,
-                            profileImageUrl = profileImageUrl
-                        )
-                    )
-                }
-            )
-        }
-
-        // Email Login 화면
-        composable(
-            route = Screen.EmailLogin.route,
-//            enterTransition = {
-//                // 위에서 아래로 슬라이드 인
-//                slideIntoContainer(
-//                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
-//                    animationSpec = tween(600)
-//                )
-//            },
-//            exitTransition = {
-//                // 아래로 슬라이드 아웃
-//                slideOutOfContainer(
-//                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
-//                    animationSpec = tween(600)
-//                )
-//            },
-            popEnterTransition = {
-                // 뒤로가기 시 위로 슬라이드 인
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
-                    animationSpec = tween(600)
-                )
-            },
-            popExitTransition = {
-                // 뒤로가기 시 위로 슬라이드 아웃
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
-                    animationSpec = tween(600)
-                )
-            }
-        ) {
-            EmailLoginScreen(
-                onNavigateToStartUp = {
-                    // 로그인 성공 시 StartUp으로 이동 (old 프로젝트의 StartupActivity와 동일)
-                    // StartUpScreen에서 API 호출 후 Main으로 이동
-                    navController.navigate(Screen.StartUp.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
-                },
-                onNavigateToMain = {
-                    // 로그인 성공 시 StartUp으로 이동 (old 프로젝트의 StartupActivity와 동일)
-                    // StartUpScreen에서 API 호출 후 Main으로 이동
-                    navController.navigate(Screen.StartUp.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
-                },
-                onNavigateToSignUp = {
-                    navController.navigate(Screen.SignUpPages.route)
-                },
-                onNavigateToForgotId = {
-                    // NOTE: 아이디 찾기 화면 미구현 - 구현 시 Screen.ForgotId.route로 navigate
-                    ToastUtil.show(
-                        navController.context,
-                        "아이디 찾기 화면은 추후 구현 예정입니다"
-                    )
-                },
-                onNavigateToForgotPassword = {
-                    navController.navigate(Screen.ForgotPassword.route)
-                },
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        // Password Reset 화면 (비밀번호 찾기)
-        composable(
-            route = Screen.ForgotPassword.route,
-            enterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(600)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(600)
-                )
-            },
-            popEnterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(600)
-                )
-            },
-            popExitTransition = {
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(600)
-                )
-            }
-        ) {
-            PasswordResetScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        // SignUp Pages 화면 (파라미터 없이 일반 회원가입)
-        composable(
-            route = Screen.SignUpPages.route
-        ) {
-            SignUpPagesScreen(
-                navController = navController,
-                email = null,
-                password = null,
-                displayName = null,
-                domain = null,
-                onSignUpComplete = {
-                    // 회원가입 완료 시 StartUp으로 이동 (old 프로젝트: IS_EMAIL_SIGNUP 플래그 포함)
-                    // old 프로젝트: startIntent.putExtra(Const.IS_EMAIL_SIGNUP, "true")
-                    navController.navigate(Screen.StartUp.createRoute(isEmailSignup = true)) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                },
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        // SignUp Pages 화면 (파라미터 포함 - SNS 로그인 후 신규 회원)
-        composable(
-            route = Screen.SignUpPages.routeWithArgs,
-            arguments = listOf(
-                navArgument("email") { type = NavType.StringType },
-                navArgument("password") { type = NavType.StringType },
-                navArgument("displayName") {
-                    type = NavType.StringType
-                    nullable = true
-                },
-                navArgument("domain") { type = NavType.StringType },
-                navArgument("profileImageUrl") {
-                    type = NavType.StringType
-                    nullable = true
-                }
-            )
-        ) { backStackEntry ->
-            val encodedEmail = backStackEntry.arguments?.getString("email") ?: ""
-            val encodedPassword = backStackEntry.arguments?.getString("password") ?: ""
-            val encodedDisplayName = backStackEntry.arguments?.getString("displayName")
-            val encodedDomain = backStackEntry.arguments?.getString("domain") ?: ""
-            val encodedProfileImageUrl = backStackEntry.arguments?.getString("profileImageUrl")
-            
-            val email = URLDecoder.decode(encodedEmail, StandardCharsets.UTF_8.toString())
-            val password = URLDecoder.decode(encodedPassword, StandardCharsets.UTF_8.toString())
-            val displayName = encodedDisplayName?.let {
-                URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
-            }
-            val domain = URLDecoder.decode(encodedDomain, StandardCharsets.UTF_8.toString())
-            val profileImageUrl = encodedProfileImageUrl?.let {
-                URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
-            }
-            
-            SignUpPagesScreen(
-                navController = navController,
-                email = email.takeIf { it.isNotEmpty() },
-                password = password.takeIf { it.isNotEmpty() },
-                displayName = displayName,
-                domain = domain.takeIf { it.isNotEmpty() },
-                onSignUpComplete = {
-                    // 회원가입 완료 시 StartUp으로 이동 (old 프로젝트: IS_EMAIL_SIGNUP 플래그 포함)
-                    // old 프로젝트: startIntent.putExtra(Const.IS_EMAIL_SIGNUP, "true")
-                    navController.navigate(Screen.StartUp.createRoute(isEmailSignup = true)) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                },
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        // Main 화면
-        composable(
-            route = Screen.Main.route,
-            enterTransition = {
-                // 우측에서 슬라이드 인 (Android 기본 애니메이션)
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(600)
-                )
-            },
-            exitTransition = {
-                // 좌측으로 슬라이드 아웃
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(600)
-                )
-            },
-            popEnterTransition = {
-                // 뒤로가기 시 좌측에서 슬라이드 인
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(600)
-                )
-            },
-            popExitTransition = {
-                // 뒤로가기 시 우측으로 슬라이드 아웃
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(600)
-                )
-            }
-        ) {
-            MainScreen(
-                onLogout = {
-                    // 로그아웃 시 StartUp으로 이동 (모든 네비게이션 스택 제거)
-                    navController.navigate(Screen.StartUp.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        // WebView 화면
-        composable(
-            route = Screen.WebView.route,
-            arguments = listOf(
-                navArgument("url") { type = NavType.StringType },
-                navArgument("title") {
-                    type = NavType.StringType
-                    nullable = true
-                }
-            ),
-            enterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(600)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(600)
-                )
-            },
-            popEnterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(600)
-                )
-            },
-            popExitTransition = {
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(600)
-                )
-            }
-        ) { backStackEntry ->
-            val encodedUrl = backStackEntry.arguments?.getString("url") ?: ""
-            val url = URLDecoder.decode(encodedUrl, StandardCharsets.UTF_8.toString())
-            val encodedTitle = backStackEntry.arguments?.getString("title")
-            val title = encodedTitle?.let {
-                URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
-            }
-
-            WebViewScreen(
-                url = url,
-                title = title,
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-    }
+val LocalAppNavigator = compositionLocalOf<AppNavigator> {
+    error("No AppNavigator provided")
 }
 
 /**
- * 화면 라우트 정의.
+ * Navigation 3 기반 앱 네비게이션 그래프.
+ *
+ * Navigation 2 대비 개선점:
+ * 1. 백스택 직접 제어 - 개발자가 SnapshotStateList<Screen>으로 백스택을 완전히 소유
+ * 2. 반응형 UI - Compose 상태 변경이 자동으로 UI에 반영
+ * 3. 타입 안전성 - data class로 파라미터 전달 (URL 인코딩 불필요)
+ * 4. 유연한 애니메이션 - 화면별 또는 전역 애니메이션 설정 가능
+ * 5. 모듈화된 구조 - NavDisplay, SceneStrategy 등 컴포넌트 교체 가능
  */
-sealed class Screen(val route: String) {
-    data object StartUp : Screen("startup") {
-        /**
-         * StartUp 화면으로 이동하는 라우트 생성 (이메일 회원가입 후 이메일 인증이 필요한 경우)
-         * @param isEmailSignup 이메일 회원가입 여부
-         */
-        fun createRoute(isEmailSignup: Boolean = false): String {
-            return if (isEmailSignup) {
-                "startup?isEmailSignup=true"
-            } else {
-                "startup"
-            }
-        }
-    }
-    data object Login : Screen("login")
-    data object EmailLogin : Screen("email_login")
-    data object ForgotPassword : Screen("forgot_password")
-    data object SignUpPages : Screen("signup_pages") {
-        // 파라미터 없이 회원가입 화면 이동 (일반 회원가입)
-        val routeWithArgs = "signup_pages/{email}/{password}?displayName={displayName}&domain={domain}&profileImageUrl={profileImageUrl}"
-        
-        /**
-         * 회원가입 화면으로 이동하는 라우트 생성 (SNS 로그인 후 신규 회원인 경우)
-         * @param email SNS 로그인에서 받은 이메일
-         * @param password SNS 로그인에서 받은 access token
-         * @param displayName SNS 로그인에서 받은 표시 이름 (옵션)
-         * @param domain 로그인 도메인 (kakao, google, line, facebook)
-         * @param profileImageUrl 프로필 이미지 URL (옵션)
-         */
-        fun createRoute(
-            email: String,
-            password: String,
-            displayName: String? = null,
-            domain: String,
-            profileImageUrl: String? = null
-        ): String {
-            val encodedEmail = URLEncoder.encode(email, StandardCharsets.UTF_8.toString())
-            val encodedPassword = URLEncoder.encode(password, StandardCharsets.UTF_8.toString())
-            val encodedDisplayName = displayName?.let {
-                URLEncoder.encode(it, StandardCharsets.UTF_8.toString())
-            }
-            val encodedDomain = URLEncoder.encode(domain, StandardCharsets.UTF_8.toString())
-            val encodedProfileImageUrl = profileImageUrl?.let {
-                URLEncoder.encode(it, StandardCharsets.UTF_8.toString())
-            }
-            
-            return buildString {
-                append("signup_pages/$encodedEmail/$encodedPassword")
-                if (encodedDisplayName != null) {
-                    append("?displayName=$encodedDisplayName")
+@Composable
+fun NavGraph(
+    navigator: AppNavigator
+) {
+    // navigator를 CompositionLocal로 제공
+    CompositionLocalProvider(LocalAppNavigator provides navigator) {
+        NavDisplay(
+            backStack = navigator.backStack,
+            onBack = { navigator.popBackStack() },
+            entryProvider = { screen ->
+                when (screen) {
+                    // StartUp 화면
+                    is Screen.StartUp -> NavEntry(screen) {
+                        StartUpScreen(
+                            onNavigateToMain = {
+                                navigator.navigateAndClearStack(Screen.Main)
+                            },
+                            onNavigateToLogin = {
+                                // 이메일 회원가입 후인 경우 EmailLogin으로 이동
+                                if (screen.isEmailSignup) {
+                                    navigator.navigateAndClearStack(Screen.EmailLogin)
+                                } else {
+                                    navigator.navigateAndClearStack(Screen.Login)
+                                }
+                            }
+                        )
+                    }
+
+                    // Login 화면
+                    is Screen.Login -> NavEntry(screen) {
+                        LoginScreen(
+                            onNavigateToMain = {
+                                // 로그인 성공 시 StartUp으로 이동하여 사용자 정보를 가져온 후 Main으로 이동
+                                navigator.navigateAndClearStack(Screen.StartUp())
+                            },
+                            onNavigateToEmailLogin = {
+                                navigator.navigate(Screen.EmailLogin)
+                            },
+                            onNavigateToSignUp = { email, password, displayName, domain, profileImageUrl ->
+                                navigator.navigate(
+                                    Screen.SignUpPages(
+                                        email = email,
+                                        password = password,
+                                        displayName = displayName,
+                                        domain = domain,
+                                        profileImageUrl = profileImageUrl
+                                    )
+                                )
+                            }
+                        )
+                    }
+
+                    // EmailLogin 화면
+                    is Screen.EmailLogin -> NavEntry(screen) {
+                        EmailLoginScreen(
+                            onNavigateToStartUp = {
+                                navigator.navigateAndClearStack(Screen.StartUp())
+                            },
+                            onNavigateToMain = {
+                                navigator.navigateAndClearStack(Screen.StartUp())
+                            },
+                            onNavigateToSignUp = {
+                                navigator.navigate(Screen.SignUpPages())
+                            },
+                            onNavigateToForgotId = {
+                                // NOTE: 아이디 찾기 화면 미구현
+                            },
+                            onNavigateToForgotPassword = {
+                                navigator.navigate(Screen.ForgotPassword)
+                            },
+                            onNavigateBack = {
+                                navigator.popBackStack()
+                            }
+                        )
+                    }
+
+                    // ForgotPassword 화면
+                    is Screen.ForgotPassword -> NavEntry(screen) {
+                        PasswordResetScreen(
+                            onNavigateBack = {
+                                navigator.popBackStack()
+                            }
+                        )
+                    }
+
+                    // SignUpPages 화면
+                    is Screen.SignUpPages -> NavEntry(screen) {
+                        SignUpPagesScreen(
+                            navigator = navigator,
+                            email = screen.email,
+                            password = screen.password,
+                            displayName = screen.displayName,
+                            domain = screen.domain,
+                            onSignUpComplete = {
+                                // 회원가입 완료 시 StartUp으로 이동 (이메일 인증 필요)
+                                navigator.navigateAndClearStack(Screen.StartUp(isEmailSignup = true))
+                            },
+                            onNavigateBack = {
+                                navigator.popBackStack()
+                            }
+                        )
+                    }
+
+                    // Main 화면
+                    is Screen.Main -> NavEntry(screen) {
+                        MainScreen(
+                            onLogout = {
+                                // 로그아웃 시 StartUp으로 이동 (모든 네비게이션 스택 제거)
+                                navigator.navigateAndClearStack(Screen.StartUp())
+                            }
+                        )
+                    }
+
+                    // WebView 화면
+                    is Screen.WebView -> NavEntry(screen) {
+                        WebViewScreen(
+                            url = screen.url,
+                            title = screen.title,
+                            onNavigateBack = {
+                                navigator.popBackStack()
+                            }
+                        )
+                    }
                 }
-                if (encodedDomain.isNotEmpty()) {
-                    append(if (encodedDisplayName != null) "&" else "?")
-                    append("domain=$encodedDomain")
-                }
-                if (encodedProfileImageUrl != null) {
-                    append(if (encodedDisplayName != null || encodedDomain.isNotEmpty()) "&" else "?")
-                    append("profileImageUrl=$encodedProfileImageUrl")
-                }
             }
-        }
-    }
-    data object Main : Screen("main")
-    data object WebView : Screen("webview/{url}?title={title}") {
-        /**
-         * WebView 화면으로 이동하는 라우트 생성
-         * @param url 로드할 URL
-         * @param title AppBar 타이틀 (옵션)
-         */
-        fun createRoute(url: String, title: String? = null): String {
-            val encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
-            val encodedTitle = title?.let {
-                URLEncoder.encode(it, StandardCharsets.UTF_8.toString())
-            }
-            return if (encodedTitle != null) {
-                "webview/$encodedUrl?title=$encodedTitle"
-            } else {
-                "webview/$encodedUrl"
-            }
-        }
+        )
     }
 }

@@ -102,9 +102,8 @@ class StartUpViewModel @Inject constructor(
         )
     }
 
-    init {
-        initialize()
-    }
+    // init에서 initialize() 호출하지 않음
+    // Navigation3에서 ViewModel이 재사용될 수 있으므로 Screen의 LaunchedEffect에서 호출
 
     override fun handleIntent(intent: StartUpContract.Intent) {
         when (intent) {

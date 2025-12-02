@@ -31,9 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.focus.FocusRequester
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import net.ib.mn.R
+import net.ib.mn.navigation.AppNavigator
 import net.ib.mn.navigation.Screen
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ExoAppBar
@@ -60,7 +59,7 @@ import net.ib.mn.util.AgreementUtil
  */
 @Composable
 fun SignUpPagesScreen(
-    navController: NavHostController,
+    navigator: AppNavigator,
     email: String? = null,
     password: String? = null,
     displayName: String? = null,
@@ -103,13 +102,13 @@ fun SignUpPagesScreen(
                     // 이용약관 웹뷰로 이동
                     val url = AgreementUtil.getTermsOfServiceUrl(context)
                     val title = context.getString(R.string.agreement1)
-                    navController.navigate(Screen.WebView.createRoute(url, title))
+                    navigator.navigate(Screen.WebView(url = url, title = title))
                 }
                 is SignUpContract.Effect.NavigateToPrivacyPolicy -> {
                     // 개인정보 처리방침 웹뷰로 이동
                     val url = AgreementUtil.getPrivacyPolicyUrl(context)
                     val title = context.getString(R.string.personal_agreement)
-                    navController.navigate(Screen.WebView.createRoute(url, title))
+                    navigator.navigate(Screen.WebView(url = url, title = title))
                 }
                 is SignUpContract.Effect.NavigateToNextStep -> {
                     // 다음 단계로 이동 (State로 처리됨)

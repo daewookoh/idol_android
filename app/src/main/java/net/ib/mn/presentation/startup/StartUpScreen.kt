@@ -57,6 +57,13 @@ fun StartUpScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    // 화면이 표시될 때마다 초기화 트리거
+    // Navigation3에서 같은 화면으로 이동 시 ViewModel이 재사용될 수 있으므로
+    // LaunchedEffect(Unit) 대신 명시적으로 초기화 요청
+    LaunchedEffect(Unit) {
+        viewModel.sendIntent(StartUpContract.Intent.Initialize)
+    }
+
     // Side effects 처리
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
