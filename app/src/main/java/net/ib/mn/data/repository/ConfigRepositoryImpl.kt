@@ -52,6 +52,10 @@ class ConfigRepositoryImpl @Inject constructor(
     // ChartObjects StateFlow (실시간 업데이트용)
     private val _chartObjectsFlow = MutableStateFlow<List<net.ib.mn.data.remote.dto.ChartModel>>(emptyList())
 
+    // ConfigSelf 캐시 (메모리 캐시) - Old: ConfigModel
+    @Volatile
+    private var cachedConfigSelf: ConfigSelfResponse? = null
+
     override fun getConfigStartup(): Flow<ApiResult<ConfigStartupResponse>> = flow {
         emit(ApiResult.Loading)
 
@@ -133,6 +137,13 @@ class ConfigRepositoryImpl @Inject constructor(
     }
 
     override fun getConfigSelf(): Flow<ApiResult<ConfigSelfResponse>> = flow {
+        // 캐시가 있으면 캐시 반환 (Old: ConfigModel은 앱 시작 시 한 번만 로드)
+        cachedConfigSelf?.let {
+            android.util.Log.d("ConfigRepo", "✓ Returning cached ConfigSelf (reportHeart: ${it.reportHeart})")
+            emit(ApiResult.Success(it))
+            return@flow
+        }
+
         emit(ApiResult.Loading)
 
         try {
@@ -153,6 +164,10 @@ class ConfigRepositoryImpl @Inject constructor(
                 android.util.Log.d("ConfigRepo", "  - udpBroadcastUrl: ${body.udpBroadcastUrl}")
                 android.util.Log.d("ConfigRepo", "  - udpStage: ${body.udpStage}")
                 android.util.Log.d("ConfigRepo", "  - cdnUrl: ${body.cdnUrl}")
+                android.util.Log.d("ConfigRepo", "  - reportHeart: ${body.reportHeart}")
+
+                // 캐시 저장
+                cachedConfigSelf = body
 
                 emit(ApiResult.Success(body))
             } else {
@@ -183,6 +198,14 @@ class ConfigRepositoryImpl @Inject constructor(
                 message = "Unknown error: ${e.message}"
             ))
         }
+    }
+
+    /**
+     * ConfigSelf 캐시에서 reportHeart 가져오기
+     * Old: configModel.reportHeart
+     */
+    override fun getReportHeart(): Int {
+        return cachedConfigSelf?.reportHeart ?: 0
     }
 
     /**
@@ -348,6 +371,7 @@ class ConfigRepositoryImpl @Inject constructor(
         cachedTypeList = null
         cachedMainChartModel = null
         cachedChartObjects = null
+        cachedConfigSelf = null
 
         // StateFlow 초기화
         _typeListFlow.value = emptyList()

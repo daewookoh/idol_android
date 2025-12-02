@@ -7,6 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.ib.mn.data.repository.ReportPossibleResult
+import net.ib.mn.data.repository.ReportRepository
+import net.ib.mn.data.repository.ReportResult
 import net.ib.mn.data.repository.UserCacheRepository
 import net.ib.mn.data.repository.UsersRepository
 import net.ib.mn.util.LocaleUtil
@@ -22,6 +25,7 @@ class ProfileViewModel(
     private val context: Context,
     private val usersRepository: UsersRepository,
     private val userCacheRepository: UserCacheRepository,
+    private val reportRepository: ReportRepository?,
     private val userId: Int,
     userNickname: String,
     userImageUrl: String?,
@@ -32,6 +36,10 @@ class ProfileViewModel(
 
     private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Loading)
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
+
+    // 신고 관련 상태
+    private val _reportState = MutableStateFlow<ReportState>(ReportState.Idle)
+    val reportState: StateFlow<ReportState> = _reportState.asStateFlow()
 
     private var currentData = ProfileData(
         id = userId,
@@ -89,6 +97,77 @@ class ProfileViewModel(
         val most = userCacheRepository.getUserData()?.most ?: return null
         return LocaleUtil.getLocalizedIdolName(context, most).takeIf { it.isNotEmpty() }
     }
+
+    /** 신고 버튼 클릭 - 바텀시트 표시 (Old: onOptionsItemSelected의 action_report) */
+    fun onReportClick() {
+        if (reportRepository == null) return
+        _reportState.value = ReportState.ShowBottomSheet
+    }
+
+    /** 바텀시트에서 '신고' 선택 - 신고 가능 여부 확인 (Old: FeedActivity.report()) */
+    fun onReportSelected() {
+        if (reportRepository == null) return
+
+        viewModelScope.launch {
+            _reportState.value = ReportState.Loading
+            when (val result = reportRepository.getReportPossible(userId)) {
+                is ReportPossibleResult.Success -> {
+                    // 신고 가능 - 하트 결제 확인 다이얼로그 표시
+                    // Old: reportUser() → ReportFeedDialogFragment
+                    _reportState.value = ReportState.ShowHeartConfirmDialog(result.reportHeart)
+                }
+                is ReportPossibleResult.AlreadyReported -> {
+                    _reportState.value = ReportState.Error(gcode = result.gcode)
+                }
+                is ReportPossibleResult.Error -> {
+                    _reportState.value = ReportState.Error(message = result.message)
+                }
+            }
+        }
+    }
+
+    /** 하트 결제 확인 다이얼로그에서 확인 - 신고 사유 입력 다이얼로그 표시 */
+    fun onHeartConfirmAccepted() {
+        _reportState.value = ReportState.ShowReportReasonDialog
+    }
+
+    /** 신고 제출 */
+    fun submitReport(reason: String) {
+        if (reportRepository == null) return
+
+        viewModelScope.launch {
+            _reportState.value = ReportState.Loading
+            when (val result = reportRepository.reportUser(userId, reason)) {
+                is ReportResult.Success -> {
+                    _reportState.value = ReportState.Success
+                }
+                is ReportResult.Error -> {
+                    _reportState.value = ReportState.Error(gcode = result.gcode)
+                }
+            }
+        }
+    }
+
+    /** 신고 상태 초기화 */
+    fun resetReportState() {
+        _reportState.value = ReportState.Idle
+    }
+}
+
+/** 신고 상태 */
+sealed interface ReportState {
+    data object Idle : ReportState
+    data object Loading : ReportState
+    /** 1단계: 바텀시트 표시 (신고/차단 선택) */
+    data object ShowBottomSheet : ReportState
+    /** 2단계: 하트 결제 확인 다이얼로그 */
+    data class ShowHeartConfirmDialog(val reportHeart: Int) : ReportState
+    /** 3단계: 신고 사유 입력 다이얼로그 */
+    data object ShowReportReasonDialog : ReportState
+    /** Old 호환용 - 한 번에 신고 다이얼로그 표시 */
+    data object ShowReportDialog : ReportState
+    data object Success : ReportState
+    data class Error(val gcode: Int? = null, val message: String? = null) : ReportState
 }
 
 /** ProfileUiState - UI 상태 */
@@ -114,6 +193,7 @@ class ProfileViewModelFactory(
     private val context: Context,
     private val usersRepository: UsersRepository,
     private val userCacheRepository: UserCacheRepository,
+    private val reportRepository: ReportRepository?,
     private val userId: Int,
     private val userNickname: String,
     private val userImageUrl: String?,
@@ -124,7 +204,7 @@ class ProfileViewModelFactory(
     @Suppress("UNCHECKED_CAST")
     override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
         return ProfileViewModel(
-            context, usersRepository, userCacheRepository,
+            context, usersRepository, userCacheRepository, reportRepository,
             userId, userNickname, userImageUrl, userLevel, mostIdolName, isMine
         ) as T
     }

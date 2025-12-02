@@ -2,15 +2,22 @@ package net.ib.mn.presentation.community.profile
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,11 +31,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import net.ib.mn.R
+import net.ib.mn.data.repository.ReportRepository
 import net.ib.mn.data.repository.UserCacheRepository
 import net.ib.mn.data.repository.UsersRepository
 import net.ib.mn.presentation.community.profile.subpage.ProfileCommentPage
 import net.ib.mn.presentation.community.profile.subpage.ProfilePhotoPage
 import net.ib.mn.presentation.community.profile.subpage.ProfilePostPage
+import net.ib.mn.ui.components.ExoConfirmDialog
+import net.ib.mn.ui.components.ExoErrorDialog
 import net.ib.mn.ui.components.ExoNameWithGroupColor
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold
@@ -36,6 +46,7 @@ import net.ib.mn.ui.components.ProfileImageType
 import net.ib.mn.ui.theme.ColorPalette
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.runtime.mutableIntStateOf
 
 /**
  * ProfileScreen - 유저 프로필 화면
@@ -61,7 +72,8 @@ fun ProfileScreen(
     isMine: Boolean = false,
     onBackClick: () -> Unit = {},
     usersRepository: UsersRepository,
-    userCacheRepository: UserCacheRepository
+    userCacheRepository: UserCacheRepository,
+    reportRepository: ReportRepository? = null
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -73,6 +85,7 @@ fun ProfileScreen(
             context = context,
             usersRepository = usersRepository,
             userCacheRepository = userCacheRepository,
+            reportRepository = reportRepository,
             userId = userId,
             userNickname = userNickname,
             userImageUrl = userImageUrl,
@@ -83,6 +96,61 @@ fun ProfileScreen(
     )
 
     val uiState by viewModel.uiState.collectAsState()
+    val reportState by viewModel.reportState.collectAsState()
+
+    // 신고 플로우 상태
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var showHeartConfirmDialog by remember { mutableStateOf(false) }
+    var showReportReasonDialog by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorDialogMessage by remember { mutableStateOf("") }
+    var currentReportHeart by remember { mutableIntStateOf(0) }
+
+    // 신고 상태 처리
+    LaunchedEffect(reportState) {
+        when (val state = reportState) {
+            is ReportState.ShowBottomSheet -> {
+                showBottomSheet = true
+                viewModel.resetReportState()
+            }
+            is ReportState.ShowHeartConfirmDialog -> {
+                currentReportHeart = state.reportHeart
+                showHeartConfirmDialog = true
+                viewModel.resetReportState()
+            }
+            is ReportState.ShowReportReasonDialog -> {
+                showReportReasonDialog = true
+                viewModel.resetReportState()
+            }
+            is ReportState.Success -> {
+                android.widget.Toast.makeText(
+                    context,
+                    context.getString(R.string.report_done),
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+                viewModel.resetReportState()
+            }
+            is ReportState.Error -> {
+                // Old: ErrorControl.parseError 참고 - gcode 기반 에러 메시지
+                errorDialogMessage = if (state.message != null) {
+                    state.message
+                } else {
+                    when (state.gcode) {
+                        2200, 2300 -> context.getString(R.string.error_2200)
+                        2201 -> context.getString(R.string.failed_to_report__already_reported)
+                        2301 -> context.getString(R.string.failed_to_report_user__already_reported)
+                        2202, 2302 -> context.getString(R.string.failed_to_report_2202)
+                        2203, 2303 -> context.getString(R.string.failed_to_report_2203)
+                        2204, 2304 -> context.getString(R.string.not_enough_heart)
+                        else -> context.getString(R.string.failed_to_report)
+                    }
+                }
+                showErrorDialog = true
+                viewModel.resetReportState()
+            }
+            else -> {}
+        }
+    }
 
     // 탭 목록 (본인 프로필이면 댓글 탭 포함)
     val tabs = remember(isMine) {
@@ -185,7 +253,7 @@ fun ProfileScreen(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null
                                 ) {
-                                    // TODO: 신고 기능
+                                    viewModel.onReportClick()
                                 },
                             contentAlignment = Alignment.Center
                         ) {
@@ -303,6 +371,323 @@ fun ProfileScreen(
                             ProfileTab.COMMENT -> ProfileCommentPage(userId = userId)
                         }
                     }
+                }
+            }
+        }
+    }
+
+    // 1단계: 신고/차단 바텀시트 (Old: bottom_sheet_feed_report.xml)
+    if (showBottomSheet) {
+        ReportBottomSheet(
+            onDismiss = { showBottomSheet = false },
+            onReportClick = {
+                showBottomSheet = false
+                viewModel.onReportSelected()
+            },
+            onCancelClick = { showBottomSheet = false }
+        )
+    }
+
+    // 2단계: 하트 결제 확인 다이얼로그 (Old: dialog_report.xml - ReportFeedDialogFragment)
+    if (showHeartConfirmDialog) {
+        HeartConfirmDialog(
+            reportHeart = currentReportHeart,
+            onDismiss = { showHeartConfirmDialog = false },
+            onConfirm = {
+                showHeartConfirmDialog = false
+                viewModel.onHeartConfirmAccepted()
+            }
+        )
+    }
+
+    // 3단계: 신고 사유 입력 다이얼로그 (Old: dialog_default_chat_report_two_btn.xml - ReportReasonDialogFragment)
+    if (showReportReasonDialog) {
+        ReportReasonDialog(
+            onDismiss = { showReportReasonDialog = false },
+            onConfirm = { reason ->
+                showReportReasonDialog = false
+                viewModel.submitReport(reason)
+            }
+        )
+    }
+
+    // 에러 다이얼로그 (Old: Util.showDefaultIdolDialogWithBtn1)
+    if (showErrorDialog) {
+        ExoErrorDialog(
+            message = errorDialogMessage,
+            onDismiss = { showErrorDialog = false }
+        )
+    }
+}
+
+/**
+ * 1단계: 신고/취소 바텀시트 (Old: bottom_sheet_feed_report.xml)
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ReportBottomSheet(
+    onDismiss: () -> Unit,
+    onReportClick: () -> Unit,
+    onCancelClick: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState()
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = ColorPalette.gray100,
+        dragHandle = {
+            // Old: 상단 핸들 (36dp x 3dp, gray150)
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 6.dp)
+                    .size(width = 36.dp, height = 3.dp)
+                    .background(ColorPalette.gray150, shape = androidx.compose.foundation.shape.RoundedCornerShape(1.5.dp))
+            )
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+        ) {
+            // 신고 버튼 (Old: tv_option_report)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .clickable { onReportClick() },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.report),
+                    fontSize = 15.sp,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    color = ColorPalette.gray900,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            }
+
+            // 구분선
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = ColorPalette.gray100
+            )
+
+            // 취소 버튼 (Old: tv_option_block → 여기서는 취소로 사용)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .clickable { onCancelClick() },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.btn_cancel),
+                    fontSize = 15.sp,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    color = ColorPalette.gray900,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+}
+
+/**
+ * 2단계: 하트 결제 확인 다이얼로그 (Old: dialog_report.xml - ReportFeedDialogFragment)
+ * ExoConfirmDialog 사용
+ */
+@Composable
+private fun HeartConfirmDialog(
+    reportHeart: Int,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    val title = stringResource(R.string.title_report)
+
+    if (reportHeart > 0) {
+        // 하트 차감 메시지 - 하트 숫자는 main 색상 (Old: msg_report_user_confirm with HTML color)
+        val messageTemplate = stringResource(R.string.msg_report_user_confirm)
+        // %1$s를 하트 숫자로 대체하고, 해당 부분만 main 색상 적용
+        val parts = messageTemplate.split("%1\$s")
+        val annotatedMessage = buildAnnotatedString {
+            if (parts.isNotEmpty()) {
+                append(parts[0])
+            }
+            withStyle(style = androidx.compose.ui.text.SpanStyle(color = ColorPalette.main)) {
+                append(reportHeart.toString())
+            }
+            if (parts.size > 1) {
+                append(parts[1])
+            }
+        }
+
+        ExoConfirmDialog(
+            title = title,
+            message = annotatedMessage,
+            onConfirm = onConfirm,
+            onDismiss = onDismiss,
+            confirmButtonText = stringResource(R.string.yes),
+            dismissButtonText = stringResource(R.string.no)
+        )
+    } else {
+        // 무료 신고 메시지 (Old: report_user_desc)
+        ExoConfirmDialog(
+            title = title,
+            message = stringResource(R.string.report_user_desc),
+            onConfirm = onConfirm,
+            onDismiss = onDismiss,
+            confirmButtonText = stringResource(R.string.yes),
+            dismissButtonText = stringResource(R.string.no)
+        )
+    }
+}
+
+/**
+ * 3단계: 신고 사유 입력 다이얼로그 (Old: dialog_default_chat_report_two_btn.xml - ReportReasonDialogFragment)
+ */
+@Composable
+private fun ReportReasonDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var reason by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    Dialog(
+        onDismissRequest = { /* 바깥 클릭 시 닫히지 않도록 (Old: isCancelable = false) */ },
+        properties = DialogProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .width(290.dp)
+                .background(
+                    color = colorResource(id = R.color.text_white_black),
+                    shape = RoundedCornerShape(6.dp)
+                )
+                .border(
+                    width = 1.dp,
+                    color = colorResource(id = R.color.gray150),
+                    shape = RoundedCornerShape(6.dp)
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // 타이틀: 신고한 이유를 작성해 주세요
+            Text(
+                text = stringResource(R.string.quiz_report_description),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+                color = colorResource(id = R.color.main),
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 10.dp)
+            )
+
+            // 입력 필드
+            OutlinedTextField(
+                value = reason,
+                onValueChange = {
+                    if (it.length <= 2000) {
+                        reason = it
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .heightIn(min = 60.dp, max = 180.dp),
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.quiz_report_hint),
+                        fontSize = 13.sp,
+                        color = colorResource(id = R.color.gray200)
+                    )
+                },
+                textStyle = TextStyle(
+                    fontSize = 13.sp,
+                    color = colorResource(id = R.color.text_gray)
+                ),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = colorResource(id = R.color.gray100),
+                    unfocusedBorderColor = colorResource(id = R.color.gray100),
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
+                ),
+                shape = RoundedCornerShape(4.dp)
+            )
+
+            // 구분선
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 30.dp),
+                thickness = 1.dp,
+                color = colorResource(id = R.color.gray100)
+            )
+
+            // 버튼 Row (확인 왼쪽 | 취소 오른쪽)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(44.dp)
+            ) {
+                // 확인 버튼 (왼쪽)
+                TextButton(
+                    onClick = {
+                        if (reason.length < 10) {
+                            android.widget.Toast.makeText(
+                                context,
+                                context.getString(R.string.comment_minimum_characters, 10),
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            onConfirm(reason)
+                        }
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    shape = RoundedCornerShape(bottomStart = 6.dp),
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = colorResource(id = R.color.gray580)
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.confirm),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+
+                // 버튼 사이 구분선
+                VerticalDivider(
+                    modifier = Modifier.fillMaxHeight(),
+                    thickness = 1.dp,
+                    color = colorResource(id = R.color.gray100)
+                )
+
+                // 취소 버튼 (오른쪽)
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    shape = RoundedCornerShape(bottomEnd = 6.dp),
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = colorResource(id = R.color.gray580)
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.btn_cancel),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    )
                 }
             }
         }

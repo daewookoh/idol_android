@@ -5,6 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import net.ib.mn.data.repository.ReportRepository
 import net.ib.mn.data.repository.UserCacheRepository
 import net.ib.mn.data.repository.UsersRepository
 import net.ib.mn.data.repository.WikiRepository
@@ -17,6 +18,7 @@ import javax.inject.Inject
 class CommunityViewModel @Inject constructor(
     val usersRepository: UsersRepository,
     val userCacheRepository: UserCacheRepository,
+    val reportRepository: ReportRepository,
     private val favoritesRepository: FavoritesRepository,
     private val chartRankingRepository: net.ib.mn.data.repository.ChartRankingRepository,
     val wikiRepository: WikiRepository

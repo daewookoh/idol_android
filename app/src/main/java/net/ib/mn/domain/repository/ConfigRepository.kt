@@ -115,4 +115,12 @@ interface ConfigRepository {
      * 메모리 캐시와 StateFlow를 모두 초기화
      */
     fun clearAllCache()
+
+    /**
+     * 신고 시 차감될 하트 수 가져오기 (캐시된 ConfigSelf에서)
+     * Old: configModel.reportHeart
+     *
+     * @return Int (기본값 0)
+     */
+    fun getReportHeart(): Int
 }

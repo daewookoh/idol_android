@@ -343,6 +343,29 @@ fun ExoConfirmDialog(
 }
 
 /**
+ * 에러 메시지를 표시하는 단일 버튼 Dialog
+ *
+ * Old 프로젝트의 Util.showDefaultIdolDialogWithBtn1을 Compose로 구현
+ * 신고 실패 등 에러 상황에서 사용
+ *
+ * @param message 에러 메시지
+ * @param onDismiss 다이얼로그 닫기 콜백
+ * @param confirmButtonText 확인 버튼 텍스트 (기본값: "확인")
+ */
+@Composable
+fun ExoErrorDialog(
+    message: String,
+    onDismiss: () -> Unit,
+    confirmButtonText: String = stringResource(R.string.confirm)
+) {
+    ExoDialog(
+        message = message,
+        onDismiss = onDismiss,
+        confirmButtonText = confirmButtonText
+    )
+}
+
+/**
  * 확인/취소 두 버튼을 가진 Dialog (AnnotatedString 지원)
  *
  * 메시지에 스타일(색상, 굵기 등)을 적용할 수 있는 버전

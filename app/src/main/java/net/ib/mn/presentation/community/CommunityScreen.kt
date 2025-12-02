@@ -598,7 +598,8 @@ fun CommunityScreen(
                 isMine = false,  // 타인의 프로필
                 onBackClick = { selectedUserProfile = null },
                 usersRepository = viewModel.usersRepository,
-                userCacheRepository = viewModel.userCacheRepository
+                userCacheRepository = viewModel.userCacheRepository,
+                reportRepository = viewModel.reportRepository
             )
         }
     }
