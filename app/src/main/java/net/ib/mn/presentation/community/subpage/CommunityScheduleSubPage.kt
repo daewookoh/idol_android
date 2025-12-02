@@ -21,16 +21,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,9 +46,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.domain.model.ScheduleModel
+import net.ib.mn.ui.components.ExoBottomSheetItem
+import net.ib.mn.ui.components.ExoBottomSheetList
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.theme.ColorPalette
@@ -110,12 +108,25 @@ fun CommunityScheduleSubPage(
     }
 
     if (showLanguageSheet) {
-        LanguageBottomSheet(
-            onLocaleSelected = { locale, localeText ->
-                showLanguageSheet = false
+        val locales = CommunityScheduleContract.State.SCHEDULE_LOCALES
+        val languages = CommunityScheduleContract.State.SCHEDULE_LANGUAGES
+        val languageItems = locales.mapIndexed { index, locale ->
+            ExoBottomSheetItem(
+                value = Pair(locale, languages[index]),
+                label = languages[index]
+            )
+        }
+        val selectedLocale = locales.find { it == state.locale } ?: locales[0]
+        val selectedIndex = locales.indexOf(selectedLocale)
+        val selectedLabel = languages.getOrElse(selectedIndex) { languages[0] }
+
+        ExoBottomSheetList(
+            items = languageItems,
+            selectedValue = Pair(selectedLocale, selectedLabel),
+            onItemSelected = { (locale, localeText) ->
                 viewModel.sendIntent(CommunityScheduleContract.Intent.ChangeLocale(locale, localeText, idolId))
             },
-            onDismiss = { showLanguageSheet = false }
+            onDismissRequest = { showLanguageSheet = false }
         )
     }
 
@@ -600,54 +611,6 @@ private fun ScheduleActionButton(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun LanguageBottomSheet(
-    onLocaleSelected: (String, String) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        containerColor = ColorPalette.background200,
-        dragHandle = {
-            Box(
-                modifier = Modifier
-                    .padding(vertical = 16.dp)
-                    .width(40.dp)
-                    .height(4.dp)
-                    .background(ColorPalette.gray200, RoundedCornerShape(2.dp))
-            )
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            CommunityScheduleContract.State.SCHEDULE_LOCALES.forEachIndexed { index, locale ->
-                val text = CommunityScheduleContract.State.SCHEDULE_LANGUAGES[index]
-                Text(
-                    text = text,
-                    style = ExoTypo.title14,
-                    color = ColorPalette.textDefault,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            scope.launch {
-                                sheetState.hide()
-                                onLocaleSelected(locale, text)
-                            }
-                        }
-                        .padding(vertical = 16.dp)
-                )
-            }
-        }
-    }
-}
 
 @Composable
 private fun getAppLocale(): Locale {

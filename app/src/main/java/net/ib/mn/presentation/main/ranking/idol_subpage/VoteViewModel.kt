@@ -6,10 +6,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.ib.mn.data.remote.dto.VoteResponse
 import net.ib.mn.domain.model.ApiResult
-import net.ib.mn.domain.usecase.GetUserSelfUseCase
 import net.ib.mn.domain.usecase.VoteIdolUseCase
 import javax.inject.Inject
 
@@ -23,7 +23,6 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class VoteViewModel @Inject constructor(
-    private val getUserSelfUseCase: GetUserSelfUseCase,
     private val voteIdolUseCase: VoteIdolUseCase,
     private val preferencesManager: net.ib.mn.data.local.PreferencesManager
 ) : ViewModel() {
@@ -39,38 +38,23 @@ class VoteViewModel @Inject constructor(
     /**
      * 사용자 하트 정보 로드
      *
-     * old 프로젝트의 VoteDialogFragment onCreate에서 하트 정보 가져오는 로직과 동일
-     * 캐시된 데이터를 사용 (old 프로젝트와 동일)
+     * old 프로젝트의 VoteDialogFragment와 동일하게 캐시된 데이터 사용
+     * DataStore에 저장된 strongHeart, weakHeart를 사용
      */
     fun loadUserHearts(onComplete: () -> Unit = {}) {
         viewModelScope.launch {
-            getUserSelfUseCase().collect { result ->
-                when (result) {
-                    is ApiResult.Success -> {
-                        val user = result.data.objects.firstOrNull()
-                        if (user != null) {
-                            val strong = user.strongHeart ?: 0L
-                            val weak = user.weakHeart ?: 0L
-                            totalHeart = strong + weak
-                            freeHeart = weak
-
-                        } else {
-                            totalHeart = 0L
-                            freeHeart = 0L
-                        }
-
-                        onComplete()
-                    }
-                    is ApiResult.Error -> {
-                        // 에러 시 기본값 사용
-                        totalHeart = 0L
-                        freeHeart = 0L
-                        onComplete()
-                    }
-                    is ApiResult.Loading -> {
-                    }
-                }
+            // DataStore에서 캐시된 하트 정보 가져오기
+            val userInfo = preferencesManager.userInfo.first()
+            if (userInfo != null) {
+                val strong = userInfo.strongHeart ?: 0L
+                val weak = userInfo.weakHeart ?: 0L
+                totalHeart = strong + weak
+                freeHeart = weak
+            } else {
+                totalHeart = 0L
+                freeHeart = 0L
             }
+            onComplete()
         }
     }
 

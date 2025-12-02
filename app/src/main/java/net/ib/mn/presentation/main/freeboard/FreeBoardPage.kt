@@ -20,15 +20,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -36,7 +33,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -54,12 +50,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.domain.model.TagModel
 import net.ib.mn.ui.components.ExoBoardItem
 import net.ib.mn.ui.components.ExoBoardItemType
 import net.ib.mn.ui.components.ExoBoardNoticeItem
+import net.ib.mn.ui.components.ExoBottomSheet
+import net.ib.mn.ui.components.ExoBottomSheetItem
+import net.ib.mn.ui.components.ExoBottomSheetList
 import net.ib.mn.ui.components.ExoSearchBox
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.util.BoardLanguage
@@ -129,14 +127,11 @@ fun FreeBoardContent(
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
-    val scope = rememberCoroutineScope()
 
     // 정렬 필터 바텀시트 상태
-    val orderFilterSheetState = rememberModalBottomSheetState()
     var showOrderFilterSheet by remember { mutableStateOf(false) }
 
-    // 언어 필터 바텀시트 상태 (skipPartiallyExpanded = true로 처음부터 확장)
-    val languageFilterSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    // 언어 필터 바텀시트 상태
     var showLanguageFilterSheet by remember { mutableStateOf(false) }
 
     Box(
@@ -338,49 +333,51 @@ fun FreeBoardContent(
 
     // 정렬 필터 바텀시트
     if (showOrderFilterSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showOrderFilterSheet = false },
-            sheetState = orderFilterSheetState,
-            containerColor = ColorPalette.gray100
-        ) {
-            OrderFilterBottomSheetContent(
-                currentOrderBy = state.orderBy,
-                onFilterSelected = { orderBy ->
-                    when (orderBy) {
-                        FreeBoardContract.State.FILTER_DATE_ORDER -> onIntent(FreeBoardContract.Intent.OnFilterLatest)
-                        FreeBoardContract.State.FILTER_LIKE_ORDER -> onIntent(FreeBoardContract.Intent.OnFilterLike)
-                        FreeBoardContract.State.FILTER_COMMENT_ORDER -> onIntent(FreeBoardContract.Intent.OnFilterComments)
-                        FreeBoardContract.State.FILTER_HITS_ORDER -> onIntent(FreeBoardContract.Intent.OnFilterViewCount)
-                    }
-                    scope.launch {
-                        orderFilterSheetState.hide()
-                        showOrderFilterSheet = false
-                    }
+        val orderFilterItems = listOf(
+            ExoBottomSheetItem(FreeBoardContract.State.FILTER_DATE_ORDER, stringResource(R.string.freeboard_order_newest)),
+            ExoBottomSheetItem(FreeBoardContract.State.FILTER_LIKE_ORDER, stringResource(R.string.order_by_like)),
+            ExoBottomSheetItem(FreeBoardContract.State.FILTER_COMMENT_ORDER, stringResource(R.string.freeboard_order_comments)),
+            ExoBottomSheetItem(FreeBoardContract.State.FILTER_HITS_ORDER, stringResource(R.string.order_hit))
+        )
+
+        ExoBottomSheetList(
+            items = orderFilterItems,
+            selectedValue = state.orderBy,
+            onItemSelected = { orderBy ->
+                when (orderBy) {
+                    FreeBoardContract.State.FILTER_DATE_ORDER -> onIntent(FreeBoardContract.Intent.OnFilterLatest)
+                    FreeBoardContract.State.FILTER_LIKE_ORDER -> onIntent(FreeBoardContract.Intent.OnFilterLike)
+                    FreeBoardContract.State.FILTER_COMMENT_ORDER -> onIntent(FreeBoardContract.Intent.OnFilterComments)
+                    FreeBoardContract.State.FILTER_HITS_ORDER -> onIntent(FreeBoardContract.Intent.OnFilterViewCount)
                 }
-            )
-        }
+            },
+            onDismissRequest = { showOrderFilterSheet = false }
+        )
     }
 
-    // 언어 필터 바텀시트 (화면의 70% 높이 고정, 내부 스크롤)
+    // 언어 필터 바텀시트
     if (showLanguageFilterSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showLanguageFilterSheet = false },
-            sheetState = languageFilterSheetState,
-            containerColor = ColorPalette.gray100,
-            sheetMaxWidth = BottomSheetDefaults.SheetMaxWidth
-        ) {
-            LanguageFilterBottomSheetContent(
-                currentLanguageId = state.selectedLanguageId,
-                onLanguageSelected = { language, languageName ->
-                    onIntent(FreeBoardContract.Intent.OnLanguageFilterSelected(languageName, language.code))
-                    scope.launch {
-                        languageFilterSheetState.hide()
-                        showLanguageFilterSheet = false
-                    }
-                },
-                modifier = Modifier.fillMaxHeight(0.7f)
+        // 언어와 이름을 함께 저장하기 위해 Pair 사용
+        val languageItems = BoardLanguage.all().map { language ->
+            val label = stringResource(language.labelResId)
+            ExoBottomSheetItem(
+                value = Pair(language, label),
+                label = label
             )
         }
+
+        val selectedLanguage = BoardLanguage.all().find { it.code == state.selectedLanguageId } ?: BoardLanguage.ALL
+        val selectedLabel = stringResource(selectedLanguage.labelResId)
+
+        ExoBottomSheetList(
+            items = languageItems,
+            selectedValue = Pair(selectedLanguage, selectedLabel),
+            onItemSelected = { (language, languageName) ->
+                val name = if (language == BoardLanguage.ALL) null else languageName
+                onIntent(FreeBoardContract.Intent.OnLanguageFilterSelected(name, language.code))
+            },
+            onDismissRequest = { showLanguageFilterSheet = false }
+        )
     }
 }
 
@@ -589,111 +586,6 @@ private fun NoMostIdolEmptyView() {
                 textAlign = TextAlign.Center
             )
         }
-    }
-}
-
-/**
- * 정렬 필터 바텀시트 내용
- * old 프로젝트의 bottom_sheet_board_filter.xml과 동일
- */
-@Composable
-private fun OrderFilterBottomSheetContent(
-    currentOrderBy: String,
-    onFilterSelected: (String) -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 24.dp)
-    ) {
-        // 최신순
-        FilterOptionItem(
-            text = stringResource(R.string.freeboard_order_newest),
-            isSelected = currentOrderBy == FreeBoardContract.State.FILTER_DATE_ORDER,
-            onClick = { onFilterSelected(FreeBoardContract.State.FILTER_DATE_ORDER) }
-        )
-
-        // 공감순
-        FilterOptionItem(
-            text = stringResource(R.string.order_by_like),
-            isSelected = currentOrderBy == FreeBoardContract.State.FILTER_LIKE_ORDER,
-            onClick = { onFilterSelected(FreeBoardContract.State.FILTER_LIKE_ORDER) }
-        )
-
-        // 댓글순
-        FilterOptionItem(
-            text = stringResource(R.string.freeboard_order_comments),
-            isSelected = currentOrderBy == FreeBoardContract.State.FILTER_COMMENT_ORDER,
-            onClick = { onFilterSelected(FreeBoardContract.State.FILTER_COMMENT_ORDER) }
-        )
-
-        // 조회순
-        FilterOptionItem(
-            text = stringResource(R.string.order_hit),
-            isSelected = currentOrderBy == FreeBoardContract.State.FILTER_HITS_ORDER,
-            onClick = { onFilterSelected(FreeBoardContract.State.FILTER_HITS_ORDER) }
-        )
-    }
-}
-
-/**
- * 언어 필터 바텀시트 내용
- */
-@Composable
-private fun LanguageFilterBottomSheetContent(
-    currentLanguageId: String,
-    onLanguageSelected: (BoardLanguage, String?) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(bottom = 24.dp)
-    ) {
-        // 모든 언어 옵션들
-        items(
-            count = BoardLanguage.all().size,
-            key = { index -> BoardLanguage.all()[index].code }
-        ) { index ->
-            val language = BoardLanguage.all()[index]
-            val languageName = stringResource(language.labelResId)
-            FilterOptionItem(
-                text = languageName,
-                isSelected = currentLanguageId == language.code ||
-                    (currentLanguageId.isEmpty() && language == BoardLanguage.ALL),
-                onClick = {
-                    onLanguageSelected(
-                        language,
-                        if (language == BoardLanguage.ALL) null else languageName
-                    )
-                }
-            )
-        }
-    }
-}
-
-/**
- * 필터 옵션 아이템
- */
-@Composable
-private fun FilterOptionItem(
-    text: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            fontSize = 15.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = if (isSelected) ColorPalette.main else ColorPalette.gray900
-        )
     }
 }
 

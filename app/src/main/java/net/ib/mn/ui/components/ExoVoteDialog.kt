@@ -21,14 +21,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -547,7 +544,6 @@ private fun HeartAllButton(
  * @param onConfirm 확인 버튼 클릭 (100개 이상일 때 인증서 화면 이동)
  * @param onDismiss 닫기 콜백
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VoteCompleteBottomSheet(
     voteCount: Long,
@@ -560,7 +556,6 @@ fun VoteCompleteBottomSheet(
     onDismiss: () -> Unit
 ) {
     val hasBonusHeart = bonusHeart > 0
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     // subtitle이 비어있으면 기본 메시지 생성 (old 프로젝트와 동일)
     val displaySubtitle = if (subtitle.isEmpty()) {
@@ -575,11 +570,9 @@ fun VoteCompleteBottomSheet(
         subtitle
     }
 
-    ModalBottomSheet(
+    ExoBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        containerColor = Color.Transparent,
-        dragHandle = null
+        type = ExoBottomSheetType.DESIGN
     ) {
         // old: cl_reward_root - paddingTop 10dp, transparent background
         Box(

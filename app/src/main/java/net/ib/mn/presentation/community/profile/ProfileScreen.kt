@@ -30,16 +30,13 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -74,6 +71,7 @@ import net.ib.mn.R
 import net.ib.mn.presentation.community.profile.subpage.ProfileCommentPage
 import net.ib.mn.presentation.community.profile.subpage.ProfilePhotoPage
 import net.ib.mn.presentation.community.profile.subpage.ProfilePostPage
+import net.ib.mn.ui.components.ExoBottomSheet
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.components.ExoErrorDialog
 import net.ib.mn.ui.components.ExoNameWithGroupColor
@@ -506,28 +504,14 @@ fun ProfileScreen(
 /**
  * 1단계: 신고/취소 바텀시트 (Old: bottom_sheet_feed_report.xml)
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ReportBottomSheet(
     onDismiss: () -> Unit,
     onReportClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState()
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        containerColor = ColorPalette.gray100,
-        dragHandle = {
-            // Old: 상단 핸들 (36dp x 3dp, gray150)
-            Box(
-                modifier = Modifier
-                    .padding(vertical = 6.dp)
-                    .size(width = 36.dp, height = 3.dp)
-                    .background(ColorPalette.gray150, shape = androidx.compose.foundation.shape.RoundedCornerShape(1.5.dp))
-            )
-        }
+    ExoBottomSheet(
+        onDismissRequest = onDismiss
     ) {
         Column(
             modifier = Modifier

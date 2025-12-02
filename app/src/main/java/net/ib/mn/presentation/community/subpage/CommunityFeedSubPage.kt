@@ -20,8 +20,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -50,6 +48,8 @@ import net.ib.mn.presentation.common.ExoArticle
 import net.ib.mn.presentation.common.ExoArticleNavigation
 import net.ib.mn.presentation.common.ExoArticleViewModel
 import net.ib.mn.ui.components.ExoBoardNoticeItem
+import net.ib.mn.ui.components.ExoBottomSheetItem
+import net.ib.mn.ui.components.ExoBottomSheetList
 import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
@@ -380,49 +380,26 @@ private fun FeedFilterHeader(
                 }
 
                 // 정렬 필터
-                Box {
-                    Row(
-                        modifier = Modifier.clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) {
-                            showOrderByMenu = true
-                        },
-                        verticalAlignment = Alignment.CenterVertically
+                Row(
+                    modifier = Modifier.clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.btn_filter),
-                            contentDescription = "Filter",
-                            modifier = Modifier.size(10.dp),
-                            tint = Color.Unspecified
-                        )
-                        Spacer(modifier = Modifier.width(5.dp))
-                        Text(
-                            text = getOrderByLabel(orderBy),
-                            style = ExoTypo.body12.copy(color = ColorPalette.textGray)
-                        )
-                    }
-
-                    DropdownMenu(
-                        expanded = showOrderByMenu,
-                        onDismissRequest = { showOrderByMenu = false }
-                    ) {
-                        OrderByType.values().forEach { type ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        text = getOrderByLabel(type),
-                                        fontSize = 14.sp,
-                                        color = if (orderBy == type) ColorPalette.main else ColorPalette.textDefault
-                                    )
-                                },
-                                onClick = {
-                                    onOrderByChange(type)
-                                    showOrderByMenu = false
-                                }
-                            )
-                        }
-                    }
+                        showOrderByMenu = true
+                    },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.btn_filter),
+                        contentDescription = "Filter",
+                        modifier = Modifier.size(10.dp),
+                        tint = Color.Unspecified
+                    )
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(
+                        text = getOrderByLabel(orderBy),
+                        style = ExoTypo.body12.copy(color = ColorPalette.textGray)
+                    )
                 }
             }
         }
@@ -431,6 +408,23 @@ private fun FeedFilterHeader(
         HorizontalDivider(
             thickness = 0.3.dp,
             color = ColorPalette.gray110
+        )
+    }
+
+    // 정렬 필터 바텀시트
+    if (showOrderByMenu) {
+        val orderByItems = OrderByType.values().map { type ->
+            ExoBottomSheetItem(
+                value = type,
+                label = getOrderByLabel(type)
+            )
+        }
+
+        ExoBottomSheetList(
+            items = orderByItems,
+            selectedValue = orderBy,
+            onItemSelected = { onOrderByChange(it) },
+            onDismissRequest = { showOrderByMenu = false }
         )
     }
 }
