@@ -582,8 +582,8 @@ private fun ReportReasonDialog(
             Text(
                 text = stringResource(R.string.quiz_report_description),
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                color = colorResource(id = R.color.main),
+                fontWeight = FontWeight.Bold,
+                color = colorResource(id = R.color.text_default),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
