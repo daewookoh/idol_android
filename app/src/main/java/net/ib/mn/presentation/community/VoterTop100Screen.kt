@@ -45,15 +45,14 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.SavedStateHandle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import java.text.NumberFormat
 import net.ib.mn.R
 import net.ib.mn.R.color.main
 import net.ib.mn.data.remote.dto.VoterTop100Model
-import net.ib.mn.data.repository.UserCacheRepository
-import net.ib.mn.data.repository.UsersRepository
 import net.ib.mn.presentation.community.profile.ProfileScreen
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold
@@ -79,17 +78,25 @@ fun VoterTop100Screen(
     idolId: Int,
     idolName: String,
     groupName: String,
-    onBackClick: () -> Unit = {},
-    usersRepository: UsersRepository,
-    userCacheRepository: UserCacheRepository
+    onBackClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val listState = rememberLazyListState()
 
-    // ViewModel 생성
-    val viewModel: VoterTop100ViewModel = viewModel(
+    // ViewModel 생성 - hiltViewModel with SavedStateHandle
+    val viewModel: VoterTop100ViewModel = hiltViewModel(
         key = "voter_top100_$idolId",
-        factory = VoterTop100ViewModelFactory(usersRepository, idolId, idolName, groupName)
+        creationCallback = { factory: VoterTop100ViewModel.Factory ->
+            factory.create(
+                savedStateHandle = SavedStateHandle(
+                    mapOf(
+                        "idolId" to idolId,
+                        "idolName" to idolName,
+                        "groupName" to groupName
+                    )
+                )
+            )
+        }
     )
 
     val uiState by viewModel.uiState.collectAsState()
@@ -272,9 +279,7 @@ fun VoterTop100Screen(
                 userLevel = user.level,
                 mostIdolName = mostIdolName,
                 isMine = false,  // 타인의 프로필
-                onBackClick = { selectedUser = null },
-                usersRepository = usersRepository,
-                userCacheRepository = userCacheRepository
+                onBackClick = { selectedUser = null }
             )
         }
     }
@@ -434,19 +439,4 @@ private fun getLevelIconRes(level: Int): Int {
 
     val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
     return if (resId != 0) resId else R.drawable.icon_level_0
-}
-
-/**
- * VoterTop100ViewModel Factory
- */
-class VoterTop100ViewModelFactory(
-    private val usersRepository: UsersRepository,
-    private val idolId: Int,
-    private val idolName: String,
-    private val groupName: String
-) : androidx.lifecycle.ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-        return VoterTop100ViewModel(usersRepository, idolId, idolName, groupName) as T
-    }
 }

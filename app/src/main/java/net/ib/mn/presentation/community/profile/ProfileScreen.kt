@@ -67,12 +67,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.launch
 import net.ib.mn.R
-import net.ib.mn.data.repository.ReportRepository
-import net.ib.mn.data.repository.UserCacheRepository
-import net.ib.mn.data.repository.UsersRepository
 import net.ib.mn.presentation.community.profile.subpage.ProfileCommentPage
 import net.ib.mn.presentation.community.profile.subpage.ProfilePhotoPage
 import net.ib.mn.presentation.community.profile.subpage.ProfilePostPage
@@ -94,9 +92,9 @@ import net.ib.mn.ui.theme.ColorPalette
  * @param userNickname 유저 닉네임
  * @param userImageUrl 유저 프로필 이미지 URL
  * @param userLevel 유저 레벨
+ * @param mostIdolName 최애 아이돌 이름
  * @param isMine 본인 프로필 여부 (true면 댓글 탭 표시)
  * @param onBackClick 뒤로가기 클릭 이벤트
- * @param usersRepository UsersRepository 인스턴스
  */
 @Composable
 fun ProfileScreen(
@@ -106,29 +104,28 @@ fun ProfileScreen(
     userLevel: Int = 0,
     mostIdolName: String? = null,
     isMine: Boolean = false,
-    onBackClick: () -> Unit = {},
-    usersRepository: UsersRepository,
-    userCacheRepository: UserCacheRepository,
-    reportRepository: ReportRepository? = null
+    onBackClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    // ViewModel 생성
-    val viewModel: ProfileViewModel = viewModel(
+    // ViewModel 생성 - hiltViewModel with SavedStateHandle
+    val viewModel: ProfileViewModel = hiltViewModel(
         key = "user_profile_$userId",
-        factory = ProfileViewModelFactory(
-            context = context,
-            usersRepository = usersRepository,
-            userCacheRepository = userCacheRepository,
-            reportRepository = reportRepository,
-            userId = userId,
-            userNickname = userNickname,
-            userImageUrl = userImageUrl,
-            userLevel = userLevel,
-            mostIdolName = mostIdolName,
-            isMine = isMine
-        )
+        creationCallback = { factory: ProfileViewModel.Factory ->
+            factory.create(
+                savedStateHandle = SavedStateHandle(
+                    mapOf(
+                        "userId" to userId,
+                        "userNickname" to userNickname,
+                        "userImageUrl" to userImageUrl,
+                        "userLevel" to userLevel,
+                        "mostIdolName" to mostIdolName,
+                        "isMine" to isMine
+                    )
+                )
+            )
+        }
     )
 
     val uiState by viewModel.uiState.collectAsState()

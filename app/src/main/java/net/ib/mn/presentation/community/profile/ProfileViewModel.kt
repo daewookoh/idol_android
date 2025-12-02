@@ -1,8 +1,14 @@
 package net.ib.mn.presentation.community.profile
 
 import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,18 +27,19 @@ import net.ib.mn.util.LocaleUtil
  * - 본인 프로필(isMine=true): UserCacheRepository에서 most 정보 조회
  * - 타인 프로필(isMine=false): 전달받은 mostIdolName 사용
  */
-class ProfileViewModel(
-    private val context: Context,
+@HiltViewModel(assistedFactory = ProfileViewModel.Factory::class)
+class ProfileViewModel @AssistedInject constructor(
+    @ApplicationContext private val context: Context,
     private val usersRepository: UsersRepository,
     private val userCacheRepository: UserCacheRepository,
-    private val reportRepository: ReportRepository?,
-    private val userId: Int,
-    userNickname: String,
-    userImageUrl: String?,
-    userLevel: Int,
-    mostIdolName: String?,
-    private val isMine: Boolean
+    private val reportRepository: ReportRepository,
+    @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(savedStateHandle: SavedStateHandle): ProfileViewModel
+    }
 
     private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Loading)
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
@@ -41,12 +48,16 @@ class ProfileViewModel(
     private val _reportState = MutableStateFlow<ReportState>(ReportState.Idle)
     val reportState: StateFlow<ReportState> = _reportState.asStateFlow()
 
+    // SavedStateHandle에서 파라미터 읽기
+    private val userId: Int = savedStateHandle.get<Int>("userId") ?: 0
+    private val isMine: Boolean = savedStateHandle.get<Boolean>("isMine") ?: false
+
     private var currentData = ProfileData(
         id = userId,
-        nickname = userNickname,
-        imageUrl = userImageUrl,
-        level = userLevel,
-        idolName = mostIdolName,
+        nickname = savedStateHandle.get<String>("userNickname") ?: "",
+        imageUrl = savedStateHandle.get<String>("userImageUrl"),
+        level = savedStateHandle.get<Int>("userLevel") ?: 0,
+        idolName = savedStateHandle.get<String>("mostIdolName"),
         statusMessage = null,
         isFeedPrivate = false
     )
@@ -100,14 +111,11 @@ class ProfileViewModel(
 
     /** 신고 버튼 클릭 - 바텀시트 표시 (Old: onOptionsItemSelected의 action_report) */
     fun onReportClick() {
-        if (reportRepository == null) return
         _reportState.value = ReportState.ShowBottomSheet
     }
 
     /** 바텀시트에서 '신고' 선택 - 신고 가능 여부 확인 (Old: FeedActivity.report()) */
     fun onReportSelected() {
-        if (reportRepository == null) return
-
         viewModelScope.launch {
             _reportState.value = ReportState.Loading
             when (val result = reportRepository.getReportPossible(userId)) {
@@ -133,8 +141,6 @@ class ProfileViewModel(
 
     /** 신고 제출 */
     fun submitReport(reason: String) {
-        if (reportRepository == null) return
-
         viewModelScope.launch {
             _reportState.value = ReportState.Loading
             when (val result = reportRepository.reportUser(userId, reason)) {
@@ -187,25 +193,3 @@ data class ProfileData(
     val statusMessage: String?,
     val isFeedPrivate: Boolean = false
 )
-
-/** ProfileViewModelFactory */
-class ProfileViewModelFactory(
-    private val context: Context,
-    private val usersRepository: UsersRepository,
-    private val userCacheRepository: UserCacheRepository,
-    private val reportRepository: ReportRepository?,
-    private val userId: Int,
-    private val userNickname: String,
-    private val userImageUrl: String?,
-    private val userLevel: Int,
-    private val mostIdolName: String?,
-    private val isMine: Boolean
-) : androidx.lifecycle.ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-        return ProfileViewModel(
-            context, usersRepository, userCacheRepository, reportRepository,
-            userId, userNickname, userImageUrl, userLevel, mostIdolName, isMine
-        ) as T
-    }
-}

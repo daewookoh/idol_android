@@ -601,9 +601,7 @@ fun CommunityScreen(
             idolId = idolId ?: 0,
             idolName = displayIdolName,
             groupName = displayGroupName,
-            onBackClick = { showVoterTop100Screen = false },
-            usersRepository = viewModel.usersRepository,
-            userCacheRepository = viewModel.userCacheRepository
+            onBackClick = { showVoterTop100Screen = false }
         )
     }
 
@@ -621,10 +619,7 @@ fun CommunityScreen(
                 userLevel = userInfo.level,
                 mostIdolName = userInfo.mostIdolName,
                 isMine = false,  // 타인의 프로필
-                onBackClick = { selectedUserProfile = null },
-                usersRepository = viewModel.usersRepository,
-                userCacheRepository = viewModel.userCacheRepository,
-                reportRepository = viewModel.reportRepository
+                onBackClick = { selectedUserProfile = null }
             )
         }
     }

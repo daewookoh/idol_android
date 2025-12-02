@@ -1,12 +1,17 @@
 package net.ib.mn.presentation.community
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,16 +39,21 @@ sealed interface VoterTop100UiState {
  *
  * old 프로젝트의 HeartVoteRankingActivity를 참고하여 작성
  * 특정 아이돌에게 투표한 유저들의 Top100 랭킹
- *
- * Note: HiltViewModel을 사용하지 않고 일반 ViewModel로 변경
- * CommunityScreen에서 직접 생성하여 파라미터를 전달
  */
-class VoterTop100ViewModel(
+@HiltViewModel(assistedFactory = VoterTop100ViewModel.Factory::class)
+class VoterTop100ViewModel @AssistedInject constructor(
     private val usersRepository: UsersRepository,
-    private val idolId: Int,
-    private val idolName: String,
-    private val groupName: String
+    @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(savedStateHandle: SavedStateHandle): VoterTop100ViewModel
+    }
+
+    private val idolId: Int = savedStateHandle.get<Int>("idolId") ?: 0
+    private val idolName: String = savedStateHandle.get<String>("idolName") ?: ""
+    private val groupName: String = savedStateHandle.get<String>("groupName") ?: ""
 
     private val _uiState = MutableStateFlow<VoterTop100UiState>(VoterTop100UiState.Loading)
     val uiState: StateFlow<VoterTop100UiState> = _uiState.asStateFlow()

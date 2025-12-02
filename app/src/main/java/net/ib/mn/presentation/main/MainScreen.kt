@@ -218,9 +218,7 @@ fun MainScreen(
                 userLevel = user.level ?: 0,
                 mostIdolName = user.most?.name,
                 isMine = true,
-                onBackClick = { showMyProfile = false },
-                usersRepository = viewModel.usersRepository,
-                userCacheRepository = viewModel.userCacheRepository
+                onBackClick = { showMyProfile = false }
             )
         }
     }
