@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.repository.ArticlesRepository
+import net.ib.mn.util.IdolImageUtil.toSecureUrl
 import javax.inject.Inject
 
 private const val PHOTO_TYPE = "image"
@@ -109,14 +110,21 @@ class ProfilePhotoViewModel @Inject constructor(
     }
 
     private fun ArticleModel.toPhotoItem(): ProfilePhotoItem {
-        val firstFile = files.firstOrNull()
+        // mediaFiles를 사용해야 옛날 게시글(files 비어있음)도 처리됨
+        val firstFile = mediaFiles.firstOrNull()
+        val originUrl = firstFile?.originUrl
+        // GIF 판별: originUrl이 .gif로 끝나거나, umjjalUrl이 있고 originUrl이 mp4가 아닌 경우
+        val isGifFile = originUrl?.endsWith(".gif", ignoreCase = true) == true ||
+                (firstFile?.umjjalUrl != null && originUrl?.endsWith(".mp4", ignoreCase = true) != true)
+        // Video 판별: originUrl이 .mp4로 끝나는 경우 (GIF가 아닌)
+        val isVideoFile = originUrl?.endsWith(".mp4", ignoreCase = true) == true && !isGifFile
+
         return ProfilePhotoItem(
             id = id,
-            thumbnailUrl = firstFile?.thumbnailUrl ?: thumbnailUrl ?: imageUrl,
-            originalUrl = firstFile?.originUrl ?: firstFile?.fileUrl ?: imageUrl,
-            isVideo = firstFile?.originUrl?.endsWith(".mp4", true) == true ||
-                    umjjalUrl?.endsWith(".mp4", true) == true,
-            isGif = !umjjalUrl.isNullOrEmpty() && umjjalUrl?.endsWith(".mp4", true) != true
+            thumbnailUrl = (firstFile?.thumbnailUrl ?: thumbnailUrl ?: imageUrl).toSecureUrl(),
+            originalUrl = (firstFile?.originUrl ?: firstFile?.fileUrl ?: imageUrl).toSecureUrl(),
+            isVideo = isVideoFile,
+            isGif = isGifFile
         )
     }
 }

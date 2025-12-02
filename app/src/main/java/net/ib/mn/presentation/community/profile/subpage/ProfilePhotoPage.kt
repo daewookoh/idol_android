@@ -219,28 +219,24 @@ private fun PhotoItem(photo: ProfilePhotoItem, onClick: () -> Unit) {
             contentScale = ContentScale.Crop
         )
 
-        // GIF 아이콘
-        if (photo.isGif && !photo.isVideo) {
-            Box(
+        // GIF/MP4 아이콘 (old와 동일: 28x18dp, marginEnd=10dp, marginBottom=10dp)
+        when {
+            photo.isGif -> Icon(
+                painter = painterResource(R.drawable.icon_gif),
+                contentDescription = null,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(4.dp)
-                    .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
-                    .padding(horizontal = 6.dp, vertical = 2.dp)
-            ) {
-                Text(text = "GIF", color = Color.White, fontSize = 10.sp)
-            }
-        }
-
-        // Video 아이콘
-        if (photo.isVideo) {
-            Icon(
+                    .padding(end = 10.dp, bottom = 10.dp)
+                    .size(width = 28.dp, height = 18.dp),
+                tint = Color.Unspecified
+            )
+            photo.isVideo -> Icon(
                 painter = painterResource(R.drawable.icon_mp4),
                 contentDescription = null,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(4.dp)
-                    .size(20.dp),
+                    .padding(end = 10.dp, bottom = 10.dp)
+                    .size(width = 28.dp, height = 18.dp),
                 tint = Color.Unspecified
             )
         }
