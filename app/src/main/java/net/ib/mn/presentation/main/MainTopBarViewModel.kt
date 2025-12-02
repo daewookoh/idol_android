@@ -6,16 +6,15 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import net.ib.mn.data.local.PreferencesManager
-import net.ib.mn.domain.repository.MessageRepository
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import net.ib.mn.data.local.PreferencesManager
+import net.ib.mn.domain.repository.MessageRepository
 
 private const val TAG = "MainTopBarViewModel"
 

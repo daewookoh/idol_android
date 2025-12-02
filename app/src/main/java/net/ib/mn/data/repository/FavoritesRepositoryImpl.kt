@@ -1,17 +1,16 @@
 package net.ib.mn.data.repository
 
 import com.google.gson.Gson
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import net.ib.mn.data.remote.api.AddFavoriteRequest
 import net.ib.mn.data.remote.api.FavoritesApi
 import net.ib.mn.data.remote.dto.FavoriteDto
 import net.ib.mn.data.remote.dto.FavoritesResponse
-import net.ib.mn.domain.model.ApiError
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.FavoritesRepository
 import org.json.JSONObject
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * FavoritesRepository 구현체

@@ -6,20 +6,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.unit.dp
-import net.ib.mn.R
-import java.text.NumberFormat
-import java.util.Locale
+import net.ib.mn.ui.theme.ColorPalette
 
 /**
  * 랭킹 아이템 데이터 클래스

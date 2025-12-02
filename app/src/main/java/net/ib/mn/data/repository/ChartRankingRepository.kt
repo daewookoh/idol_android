@@ -3,6 +3,8 @@ package net.ib.mn.data.repository
 import android.content.Context
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -15,7 +17,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.data.remote.dto.toEntity
@@ -26,8 +27,6 @@ import net.ib.mn.util.IdolImageUtil
 import net.ib.mn.util.NumberFormatUtil
 import net.ib.mn.util.ProcessedRankData
 import net.ib.mn.util.RankingUtil
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * 차트 랭킹 데이터를 SharedPreference에 저장하고 관리하는 Repository (SharedPreference 기반)

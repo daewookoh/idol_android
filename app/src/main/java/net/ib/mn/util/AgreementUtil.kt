@@ -2,7 +2,6 @@ package net.ib.mn.util
 
 import android.content.Context
 import android.os.LocaleList
-import androidx.core.os.LocaleListCompat
 import java.util.Locale
 
 /**

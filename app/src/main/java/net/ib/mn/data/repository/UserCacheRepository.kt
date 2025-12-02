@@ -1,8 +1,10 @@
 package net.ib.mn.data.repository
 
+import android.content.Context
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
-import android.content.Context
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -10,14 +12,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import net.ib.mn.data.remote.dto.UserSelfData
-import net.ib.mn.data.remote.dto.toEntity
 import net.ib.mn.domain.model.MostPicksModel
-import net.ib.mn.presentation.main.myfavorite.MyFavoriteContract
 import net.ib.mn.util.NumberFormatUtil
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * 사용자 정보 인메모리 캐시 Repository (SharedPreference 백업 지원)

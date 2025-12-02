@@ -2,7 +2,19 @@ package net.ib.mn.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
@@ -21,14 +33,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import java.text.SimpleDateFormat
+import java.util.*
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleFile
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.ArticleUser
 import net.ib.mn.domain.model.NoticeModel
 import net.ib.mn.ui.theme.ColorPalette
-import java.text.SimpleDateFormat
-import java.util.*
 
 /**
  * 게시글 아이템 타입

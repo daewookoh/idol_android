@@ -1,21 +1,20 @@
 package net.ib.mn.presentation.main.freeboard
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.ib.mn.base.BaseViewModel
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.domain.model.ApiResult
-import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.TagModel
 import net.ib.mn.domain.repository.ArticlesRepository
 import net.ib.mn.util.Constants
-import androidx.lifecycle.SavedStateHandle
-import javax.inject.Inject
 
 private const val TAG = "FreeBoardViewModel"
 

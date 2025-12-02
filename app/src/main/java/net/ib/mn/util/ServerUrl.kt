@@ -1,6 +1,5 @@
 package net.ib.mn.util
 
-import net.ib.mn.BuildConfig
 
 /**
  * 서버 URL 관리 클래스

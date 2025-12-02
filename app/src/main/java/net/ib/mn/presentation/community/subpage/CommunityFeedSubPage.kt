@@ -37,15 +37,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.R
+import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.ui.components.ArticleType
 import net.ib.mn.ui.components.ExoArticle
 import net.ib.mn.ui.components.ExoArticleNavigation

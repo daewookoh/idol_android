@@ -21,15 +21,14 @@ import coil.util.DebugLogger
 import com.facebook.FacebookSdk
 import com.kakao.sdk.common.KakaoSdk
 import dagger.hilt.android.HiltAndroidApp
+import java.security.MessageDigest
+import javax.inject.Inject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.remote.udp.IdolBroadcastManager
 import net.ib.mn.util.Constants
 import net.ib.mn.util.ServerUrl
-import java.security.MessageDigest
-import javax.inject.Inject
 
 /**
  * Application class for Hilt initialization and SNS SDK setup.

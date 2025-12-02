@@ -5,25 +5,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.ib.mn.R
-import net.ib.mn.util.Constants
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.local.UserInfo
 import net.ib.mn.data.remote.udp.IdolBroadcastManager
+import net.ib.mn.data.repository.UserCacheRepository
+import net.ib.mn.data.repository.UsersRepository
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.UserRepository
-import net.ib.mn.data.repository.UsersRepository
-import net.ib.mn.data.repository.UserCacheRepository
+import net.ib.mn.util.Constants
 import net.ib.mn.util.DeviceUtil
-import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(

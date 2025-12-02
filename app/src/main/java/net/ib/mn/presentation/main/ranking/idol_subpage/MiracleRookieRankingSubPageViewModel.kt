@@ -9,19 +9,18 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.text.NumberFormat
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.ranking.RankingDataSource
 import net.ib.mn.ui.components.RankingItem
-import java.text.NumberFormat
-import java.util.Locale
 
 /**
  * 통합 Miracle/Rookie 랭킹 ViewModel
