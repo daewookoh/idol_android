@@ -4,7 +4,6 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import net.ib.mn.data.remote.api.ArticlesApi
 import net.ib.mn.data.remote.dto.ArticleLikeRequest
 import net.ib.mn.data.remote.dto.ArticleLikeResponse
@@ -16,19 +15,19 @@ import net.ib.mn.domain.model.NoticeModel
 import net.ib.mn.domain.repository.ArticlesRepository
 import net.ib.mn.domain.repository.ArticlesResponse
 import org.json.JSONObject
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 private const val TAG = "ArticlesRepository"
 
 /**
- * Articles Repository 구현체
+ * ArticlesRepository 구현체
+ *
+ * BaseRepository의 safeApiCallWithJsonString 패턴 사용
  */
 class ArticlesRepositoryImpl @Inject constructor(
     private val articlesApi: ArticlesApi,
     private val gson: Gson
-) : ArticlesRepository {
+) : BaseRepository(), ArticlesRepository {
 
     override fun getFreeBoardHot(
         orderBy: String,
@@ -36,46 +35,18 @@ class ArticlesRepositoryImpl @Inject constructor(
         locale: String?,
         limit: Int,
         offset: Int
-    ): Flow<ApiResult<ArticlesResponse>> = flow {
-        emit(ApiResult.Loading)
-
-        try {
-            val response = articlesApi.getFreeBoardHot(
+    ): Flow<ApiResult<ArticlesResponse>> = safeApiCallWithJsonString(
+        apiCall = {
+            articlesApi.getFreeBoardHot(
                 orderBy = orderBy,
                 keyword = keyword,
                 locale = locale,
                 limit = limit,
                 offset = offset
             )
-
-            if (response.isSuccessful && response.body() != null) {
-                val bodyString = response.body()!!.string()
-                val articlesResponse = parseArticlesResponse(bodyString)
-                emit(ApiResult.Success(articlesResponse))
-            } else {
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
-            }
-        } catch (e: HttpException) {
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
-        } catch (e: IOException) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
-        } catch (e: Exception) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
-        }
-    }
+        },
+        parser = { json -> parseArticlesResponse(json) }
+    )
 
     override fun getFreeBoardAll(
         orderBy: String,
@@ -83,46 +54,18 @@ class ArticlesRepositoryImpl @Inject constructor(
         locale: String?,
         limit: Int,
         offset: Int
-    ): Flow<ApiResult<ArticlesResponse>> = flow {
-        emit(ApiResult.Loading)
-
-        try {
-            val response = articlesApi.getFreeBoardAll(
+    ): Flow<ApiResult<ArticlesResponse>> = safeApiCallWithJsonString(
+        apiCall = {
+            articlesApi.getFreeBoardAll(
                 orderBy = orderBy,
                 keyword = keyword,
                 locale = locale,
                 limit = limit,
                 offset = offset
             )
-
-            if (response.isSuccessful && response.body() != null) {
-                val bodyString = response.body()!!.string()
-                val articlesResponse = parseArticlesResponse(bodyString)
-                emit(ApiResult.Success(articlesResponse))
-            } else {
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
-            }
-        } catch (e: HttpException) {
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
-        } catch (e: IOException) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
-        } catch (e: Exception) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
-        }
-    }
+        },
+        parser = { json -> parseArticlesResponse(json) }
+    )
 
     override fun getArticles(
         idolId: Int,
@@ -131,11 +74,9 @@ class ArticlesRepositoryImpl @Inject constructor(
         keyword: String?,
         locale: String?,
         isPopular: String?
-    ): Flow<ApiResult<ArticlesResponse>> = flow {
-        emit(ApiResult.Loading)
-
-        try {
-            val response = articlesApi.getArticles(
+    ): Flow<ApiResult<ArticlesResponse>> = safeApiCallWithJsonString(
+        apiCall = {
+            articlesApi.getArticles(
                 idolId = idolId,
                 orderBy = orderBy,
                 tags = tags,
@@ -143,70 +84,15 @@ class ArticlesRepositoryImpl @Inject constructor(
                 locale = locale,
                 isPopular = isPopular
             )
+        },
+        parser = { json -> parseArticlesResponse(json) }
+    )
 
-            if (response.isSuccessful && response.body() != null) {
-                val bodyString = response.body()!!.string()
-                val articlesResponse = parseArticlesResponse(bodyString)
-                emit(ApiResult.Success(articlesResponse))
-            } else {
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
-            }
-        } catch (e: HttpException) {
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
-        } catch (e: IOException) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
-        } catch (e: Exception) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
-        }
-    }
-
-    override fun getArticlesNext(nextUrl: String): Flow<ApiResult<ArticlesResponse>> = flow {
-        emit(ApiResult.Loading)
-
-        try {
-            val response = articlesApi.getFreeBoardHotNext(nextUrl)
-
-            if (response.isSuccessful && response.body() != null) {
-                val bodyString = response.body()!!.string()
-                val articlesResponse = parseArticlesResponse(bodyString)
-                emit(ApiResult.Success(articlesResponse))
-            } else {
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
-            }
-        } catch (e: HttpException) {
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
-        } catch (e: IOException) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
-        } catch (e: Exception) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
-        }
-    }
+    override fun getArticlesNext(nextUrl: String): Flow<ApiResult<ArticlesResponse>> =
+        safeApiCallWithJsonString(
+            apiCall = { articlesApi.getFreeBoardHotNext(nextUrl) },
+            parser = { json -> parseArticlesResponse(json) }
+        )
 
     override fun getMyFavoriteArticles(
         idolId: Int,
@@ -214,12 +100,10 @@ class ArticlesRepositoryImpl @Inject constructor(
         keyword: String?,
         locale: String?,
         limit: Int
-    ): Flow<ApiResult<ArticlesResponse>> = flow {
-        emit(ApiResult.Loading)
-
-        try {
+    ): Flow<ApiResult<ArticlesResponse>> = safeApiCallWithJsonString(
+        apiCall = {
             Log.d(TAG, "getMyFavoriteArticles: idolId=$idolId, orderBy=$orderBy, keyword=$keyword, locale=$locale")
-            val response = articlesApi.getSmallTalkInventory(
+            articlesApi.getSmallTalkInventory(
                 idolId = idolId,
                 isMost = "Y",
                 type = "M",
@@ -228,35 +112,9 @@ class ArticlesRepositoryImpl @Inject constructor(
                 keyword = keyword,
                 locale = locale
             )
-
-            if (response.isSuccessful && response.body() != null) {
-                val bodyString = response.body()!!.string()
-                val articlesResponse = parseArticlesResponse(bodyString)
-                emit(ApiResult.Success(articlesResponse))
-            } else {
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
-            }
-        } catch (e: HttpException) {
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
-        } catch (e: IOException) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
-        } catch (e: Exception) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
-        }
-    }
+        },
+        parser = { json -> parseArticlesResponse(json) }
+    )
 
     override fun getCommunityFeed(
         idolId: Int,
@@ -264,91 +122,35 @@ class ArticlesRepositoryImpl @Inject constructor(
         orderBy: String,
         imageOnly: String?,
         primaryFileType: String?
-    ): Flow<ApiResult<ArticlesResponse>> = flow {
-        emit(ApiResult.Loading)
-
-        try {
-            val response = articlesApi.getArticles(
+    ): Flow<ApiResult<ArticlesResponse>> = safeApiCallWithJsonString(
+        apiCall = {
+            articlesApi.getArticles(
                 idolId = idolId,
                 orderBy = orderBy,
                 isMost = if (isMost) "Y" else "N",
                 primaryFileType = primaryFileType,
                 imageOnly = imageOnly
             )
-
-            if (response.isSuccessful && response.body() != null) {
-                val bodyString = response.body()!!.string()
-                val articlesResponse = parseArticlesResponse(bodyString)
-                emit(ApiResult.Success(articlesResponse))
-            } else {
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
-            }
-        } catch (e: HttpException) {
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
-        } catch (e: IOException) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
-        } catch (e: Exception) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
-        }
-    }
+        },
+        parser = { json -> parseArticlesResponse(json) }
+    )
 
     override fun getCommunityFeedNext(
         nextUrl: String,
         isMost: Boolean,
         imageOnly: String?,
         primaryFileType: String?
-    ): Flow<ApiResult<ArticlesResponse>> = flow {
-        emit(ApiResult.Loading)
-
-        try {
-            val response = articlesApi.getArticlesNext(
+    ): Flow<ApiResult<ArticlesResponse>> = safeApiCallWithJsonString(
+        apiCall = {
+            articlesApi.getArticlesNext(
                 url = nextUrl,
                 isMost = if (isMost) "Y" else "N",
                 primaryFileType = primaryFileType,
                 imageOnly = imageOnly
             )
-
-            if (response.isSuccessful && response.body() != null) {
-                val bodyString = response.body()!!.string()
-                val articlesResponse = parseArticlesResponse(bodyString)
-                emit(ApiResult.Success(articlesResponse))
-            } else {
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
-            }
-        } catch (e: HttpException) {
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
-        } catch (e: IOException) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
-        } catch (e: Exception) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
-        }
-    }
+        },
+        parser = { json -> parseArticlesResponse(json) }
+    )
 
     override suspend fun voteArticle(articleId: String, hearts: Long): ArticleVoteResponse {
         Log.d(TAG, "voteArticle: articleId=$articleId, hearts=$hearts")
@@ -370,51 +172,24 @@ class ArticlesRepositoryImpl @Inject constructor(
         offset: Int,
         limit: Int,
         isSelf: Boolean
-    ): Flow<ApiResult<ArticlesResponse>> = flow {
-        emit(ApiResult.Loading)
-
-        try {
+    ): Flow<ApiResult<ArticlesResponse>> = safeApiCallWithJsonString(
+        apiCall = {
             Log.d(TAG, "getFeedActivity: userId=$userId, type=$type, offset=$offset, limit=$limit, isSelf=$isSelf")
-            val response = articlesApi.getFeedActivity(
+            articlesApi.getFeedActivity(
                 userId = userId,
                 type = type,
                 limit = limit,
                 offset = offset,
                 isSelf = if (isSelf) true else null
             )
+        },
+        parser = { json -> parseFeedActivityResponse(json) }
+    )
 
-            if (response.isSuccessful && response.body() != null) {
-                val bodyString = response.body()!!.string()
-                val articlesResponse = parseFeedActivityResponse(bodyString)
-                emit(ApiResult.Success(articlesResponse))
-            } else {
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
-            }
-        } catch (e: HttpException) {
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
-        } catch (e: IOException) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
-        } catch (e: Exception) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
-        }
-    }
+    // ============================================================
+    // Private Parsers
+    // ============================================================
 
-    /**
-     * FeedActivity API 응답 JSON을 ArticlesResponse로 파싱
-     */
     private fun parseFeedActivityResponse(bodyString: String): ArticlesResponse {
         val jsonObject = JSONObject(bodyString)
         val success = jsonObject.optBoolean("success", false)
@@ -446,19 +221,13 @@ class ArticlesRepositoryImpl @Inject constructor(
         return ArticlesResponse(emptyList(), articles, articles.size, null)
     }
 
-    /**
-     * API 응답 JSON을 ArticlesResponse로 파싱
-     */
     private fun parseArticlesResponse(bodyString: String): ArticlesResponse {
         Log.d(TAG, "parseArticlesResponse: bodyString length=${bodyString.length}")
-        Log.d(TAG, "parseArticlesResponse: bodyString=${bodyString.take(500)}")
 
         val jsonObject = JSONObject(bodyString)
         val meta = jsonObject.optJSONObject("meta")
         val objectsArray = jsonObject.optJSONArray("objects")
         val topNoticesArray = jsonObject.optJSONArray("top_notices")
-
-        Log.d(TAG, "parseArticlesResponse: meta=$meta, objectsArray size=${objectsArray?.length()}, topNotices size=${topNoticesArray?.length()}")
 
         val totalCount = meta?.optInt("total_count", 0) ?: 0
         val nextUrl = meta?.optString("next")?.takeIf { it.isNotEmpty() && it != "null" }
@@ -479,7 +248,6 @@ class ArticlesRepositoryImpl @Inject constructor(
                     )
                     noticeList.add(notice)
                 }
-                Log.d(TAG, "parseArticlesResponse: parsed ${noticeList.size} notices")
                 noticeList
             } catch (e: Exception) {
                 Log.e(TAG, "parseArticlesResponse: Failed to parse notices", e)
@@ -493,15 +261,12 @@ class ArticlesRepositoryImpl @Inject constructor(
         val articles = if (objectsArray != null && objectsArray.length() > 0) {
             try {
                 val listType = object : TypeToken<List<ArticleModel>>() {}.type
-                val parsed = gson.fromJson<List<ArticleModel>>(objectsArray.toString(), listType)
-                Log.d(TAG, "parseArticlesResponse: parsed ${parsed.size} articles")
-                parsed
+                gson.fromJson<List<ArticleModel>>(objectsArray.toString(), listType)
             } catch (e: Exception) {
                 Log.e(TAG, "parseArticlesResponse: Failed to parse articles", e)
                 emptyList()
             }
         } else {
-            Log.d(TAG, "parseArticlesResponse: objectsArray is null or empty")
             emptyList()
         }
 

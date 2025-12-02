@@ -14,10 +14,16 @@ import com.google.gson.annotations.SerializedName
  */
 data class ConfigStartupResponse(
     @SerializedName("success")
-    val success: Boolean,
+    val success: Boolean = false,
 
     @SerializedName("objects")
-    val data: ConfigStartupData?
+    val data: ConfigStartupData? = null,
+
+    @SerializedName("gcode")
+    val gcode: Int = 0,
+
+    @SerializedName("msg")
+    val msg: String? = null
 )
 
 data class ConfigStartupData(

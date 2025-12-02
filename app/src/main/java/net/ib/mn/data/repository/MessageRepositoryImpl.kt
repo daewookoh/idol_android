@@ -1,65 +1,41 @@
 package net.ib.mn.data.repository
 
 import android.util.Log
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import net.ib.mn.data.remote.api.MessageApi
 import net.ib.mn.data.remote.dto.MessageCouponResponse
+import net.ib.mn.domain.model.ApiError
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.MessageRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import org.json.JSONObject
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 private const val TAG = "MessageRepository"
 
+/**
+ * MessageRepository 구현체
+ *
+ * BaseRepository의 safeApiCall 패턴을 사용하여 중복 코드 제거
+ */
 class MessageRepositoryImpl @Inject constructor(
     private val messageApi: MessageApi
-) : MessageRepository {
+) : BaseRepository(), MessageRepository {
 
-    override fun getMessageCoupon(): Flow<ApiResult<MessageCouponResponse>> = flow {
-        emit(ApiResult.Loading)
-
-        try {
-            // AuthInterceptor가 자동으로 Authorization 헤더를 추가
-            val response = messageApi.getMessageCoupon()
-
-            if (response.isSuccessful && response.body() != null) {
-                val body = response.body()!!
-
-                if (body.success) {
-                    emit(ApiResult.Success(body))
-                } else {
-                    emit(ApiResult.Error(
-                        exception = Exception("API returned success=false"),
-                        code = response.code()
-                    ))
+    override fun getMessageCoupon(): Flow<ApiResult<MessageCouponResponse>> =
+        safeApiCall { messageApi.getMessageCoupon() }
+            .map { result ->
+                when (result) {
+                    is ApiResult.Success -> {
+                        if (result.data.success) {
+                            result
+                        } else {
+                            ApiResult.Error(ApiError.Business(gcode = 0, message = "API returned success=false"))
+                        }
+                    }
+                    else -> result
                 }
-            } else {
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
             }
-        } catch (e: HttpException) {
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
-        } catch (e: IOException) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
-        } catch (e: Exception) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
-        }
-    }
 
     override suspend fun checkNewNotification(afterDate: String?): Boolean {
         return try {

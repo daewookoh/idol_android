@@ -4,6 +4,7 @@ import android.content.Context
 import net.ib.mn.data.repository.AuthRepository
 import net.ib.mn.data.remote.api.*
 import net.ib.mn.data.remote.interceptor.AuthInterceptor
+import net.ib.mn.data.remote.interceptor.GcodeInterceptor
 import net.ib.mn.util.Constants
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -43,14 +44,20 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideGcodeInterceptor(): GcodeInterceptor = GcodeInterceptor()
+
+    @Provides
+    @Singleton
     fun provideOkHttpClient(
         authInterceptor: AuthInterceptor,
+        gcodeInterceptor: GcodeInterceptor,
         loggingInterceptor: HttpLoggingInterceptor
     ): OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(Constants.API_TIMEOUT, TimeUnit.MILLISECONDS)
         .readTimeout(Constants.API_TIMEOUT, TimeUnit.MILLISECONDS)
         .writeTimeout(Constants.API_TIMEOUT, TimeUnit.MILLISECONDS)
         .addInterceptor(authInterceptor)
+        .addInterceptor(gcodeInterceptor)  // gcode 88888 (점검 상태) 감지
         .addInterceptor(loggingInterceptor)
         .build()
 

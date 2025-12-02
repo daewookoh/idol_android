@@ -22,5 +22,5 @@ data class VoteResponse(
     @SerializedName("event_heart") val eventHeart: Boolean = false,
     @SerializedName("event_heart_count") val eventHeartCount: Int = 0,
     @SerializedName("msg") val msg: String? = null,
-    @SerializedName("success") val success: Boolean = false
-)
+    @SerializedName("success") override val success: Boolean = false
+) : net.ib.mn.data.repository.HasSuccess

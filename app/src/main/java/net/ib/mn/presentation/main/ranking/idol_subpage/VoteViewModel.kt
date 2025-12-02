@@ -62,23 +62,9 @@ class VoteViewModel @Inject constructor(
                         onComplete()
                     }
                     is ApiResult.Error -> {
-                        // HTTP 304 (캐시 유효) 처리
-                        if (result.code == 304 && result.data != null) {
-                            val userInfo = result.data as? net.ib.mn.data.local.UserInfo
-                            if (userInfo != null) {
-                                val strong = userInfo.strongHeart ?: 0L
-                                val weak = userInfo.weakHeart ?: 0L
-                                totalHeart = strong + weak
-                                freeHeart = weak
-
-                            } else {
-                                totalHeart = 0L
-                                freeHeart = 0L
-                            }
-                        } else {
-                            totalHeart = 0L
-                            freeHeart = 0L
-                        }
+                        // 에러 시 기본값 사용
+                        totalHeart = 0L
+                        freeHeart = 0L
                         onComplete()
                     }
                     is ApiResult.Loading -> {

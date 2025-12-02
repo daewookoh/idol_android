@@ -4,6 +4,7 @@ import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import net.ib.mn.data.remote.api.UsersApi
+import net.ib.mn.domain.model.ApiError
 import net.ib.mn.domain.model.ApiResult
 import org.json.JSONObject
 import retrofit2.HttpException
@@ -155,31 +156,17 @@ class UsersRepository @Inject constructor(
                 emit(ApiResult.Success(jsonString))
             } else {
                 Log.e(TAG, "❌ Response not successful or body null")
-                Log.e(TAG, "  - Error body: ${response.errorBody()?.string()}")
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
+                emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
-            Log.e(TAG, "❌ HttpException: ${e.code()} - ${e.message()}", e)
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
+            Log.e(TAG, "❌ HttpException: ${e.code()}", e)
+            emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: IOException) {
             Log.e(TAG, "❌ IOException: ${e.message}", e)
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Network(exception = e)))
         } catch (e: Exception) {
             Log.e(TAG, "❌ Exception: ${e.message}", e)
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
 }

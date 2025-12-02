@@ -28,11 +28,7 @@ class MiracleRookieRankingDataSource @Inject constructor(
                     val idolIds = result.data.map { it.idolId }
                     ApiResult.Success(idolIds)
                 }
-                is ApiResult.Error -> ApiResult.Error(
-                    exception = result.exception,
-                    code = result.code,
-                    message = result.message
-                )
+                is ApiResult.Error -> ApiResult.Error(result.error)
             }
         }
     }

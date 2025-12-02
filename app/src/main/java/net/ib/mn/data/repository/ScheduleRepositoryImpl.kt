@@ -1,10 +1,8 @@
 package net.ib.mn.data.repository
 
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import net.ib.mn.data.remote.api.ScheduleApi
 import net.ib.mn.data.remote.dto.ScheduleDto
 import net.ib.mn.domain.model.ApiResult
@@ -15,159 +13,99 @@ import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * ScheduleRepository 구현체
+ *
+ * BaseRepository의 safeApiCallWithJsonString 패턴 사용
+ */
 @Singleton
 class ScheduleRepositoryImpl @Inject constructor(
     private val scheduleApi: ScheduleApi,
     private val gson: Gson
-) : ScheduleRepository {
-
-    companion object {
-        private const val TAG = "ScheduleRepo"
-    }
+) : BaseRepository(), ScheduleRepository {
 
     override fun getMonthScheduleIcons(
         idolId: Int,
         yearMonth: String,
         locale: String
-    ): Flow<ApiResult<Map<Int, String>>> = flow {
-        emit(ApiResult.Loading)
-        Log.d(TAG, "getMonthScheduleIcons: idolId=$idolId, yearMonth=$yearMonth, locale=$locale")
-        try {
-            val response = scheduleApi.getSchedules(
+    ): Flow<ApiResult<Map<Int, String>>> = safeApiCallWithJsonString(
+        apiCall = {
+            scheduleApi.getSchedules(
                 idolId = idolId,
                 yearMonth = yearMonth,
                 includeVotes = 1,
                 locale = locale,
                 onlyIcon = "Y"
             )
-            Log.d(TAG, "getMonthScheduleIcons: response code=${response.code()}")
-
-            if (response.isSuccessful) {
-                response.body()?.string()?.let { body ->
-                    Log.d(TAG, "getMonthScheduleIcons: body=$body")
-                    val json = JSONObject(body)
-                    if (json.optBoolean("success", true) && json.optInt("gcode") != 9000) {
-                        val objectsArray = json.optJSONArray("objects")
-                        val iconMap = mutableMapOf<Int, String>()
-
-                        if (objectsArray != null) {
-                            Log.d(TAG, "getMonthScheduleIcons: objectsArray size=${objectsArray.length()}")
-                            val listType = object : TypeToken<List<ScheduleDto>>() {}.type
-                            val dtoList: List<ScheduleDto> = gson.fromJson(objectsArray.toString(), listType)
-
-                            dtoList.forEach { dto ->
-                                dto.dtstart?.let { date ->
-                                    val day = date.date
-                                    if (!iconMap.containsKey(day)) {
-                                        iconMap[day] = dto.category ?: ""
-                                    }
-                                }
-                            }
-                        }
-                        Log.d(TAG, "getMonthScheduleIcons: iconMap=$iconMap")
-                        emit(ApiResult.Success(iconMap))
-                    } else {
-                        Log.d(TAG, "getMonthScheduleIcons: success=false or gcode=9000")
-                        emit(ApiResult.Success(emptyMap()))
-                    }
-                } ?: run {
-                    Log.e(TAG, "getMonthScheduleIcons: Empty response body")
-                    emit(ApiResult.Error(Exception("Empty response")))
-                }
-            } else {
-                Log.e(TAG, "getMonthScheduleIcons: API Error ${response.code()}")
-                emit(ApiResult.Error(Exception("API Error: ${response.code()}")))
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "getMonthScheduleIcons: Exception", e)
-            emit(ApiResult.Error(e))
-        }
-    }
+        },
+        parser = { json -> parseMonthScheduleIcons(json) }
+    )
 
     override fun getDaySchedules(
         idolId: Int,
         yearMonthDay: String,
         locale: String
-    ): Flow<ApiResult<List<ScheduleModel>>> = flow {
-        emit(ApiResult.Loading)
-        Log.d(TAG, "getDaySchedules: idolId=$idolId, yearMonthDay=$yearMonthDay, locale=$locale")
-        try {
-            val response = scheduleApi.getSchedules(
+    ): Flow<ApiResult<List<ScheduleModel>>> = safeApiCallWithJsonString(
+        apiCall = {
+            scheduleApi.getSchedules(
                 idolId = idolId,
                 yearMonthDay = yearMonthDay,
                 includeVotes = 1,
                 locale = locale
             )
-            Log.d(TAG, "getDaySchedules: response code=${response.code()}")
+        },
+        parser = { json -> parseDaySchedules(json) }
+    )
 
-            if (response.isSuccessful) {
-                response.body()?.string()?.let { body ->
-                    Log.d(TAG, "getDaySchedules: body=$body")
-                    val json = JSONObject(body)
-                    if (json.optBoolean("success", true) && json.optInt("gcode") != 9000) {
-                        val objectsArray = json.optJSONArray("objects")
-                        val schedules = mutableListOf<ScheduleModel>()
+    override fun voteSchedule(scheduleId: Int, vote: String): Flow<ApiResult<Boolean>> =
+        safeApiCallWithJsonString(
+            apiCall = { scheduleApi.voteSchedule(scheduleId, vote) },
+            parser = { json -> JSONObject(json).optBoolean("success", false) }
+        )
 
-                        if (objectsArray != null) {
-                            Log.d(TAG, "getDaySchedules: objectsArray size=${objectsArray.length()}")
-                            val listType = object : TypeToken<List<ScheduleDto>>() {}.type
-                            val dtoList: List<ScheduleDto> = gson.fromJson(objectsArray.toString(), listType)
-                            schedules.addAll(dtoList.map { it.toModel() }.sortedBy { it.dtstart })
-                        }
-                        Log.d(TAG, "getDaySchedules: schedules size=${schedules.size}")
-                        emit(ApiResult.Success(schedules))
-                    } else {
-                        Log.d(TAG, "getDaySchedules: success=false or gcode=9000")
-                        emit(ApiResult.Success(emptyList()))
-                    }
-                } ?: run {
-                    Log.e(TAG, "getDaySchedules: Empty response body")
-                    emit(ApiResult.Error(Exception("Empty response")))
+    override fun deleteSchedule(scheduleId: Int): Flow<ApiResult<Boolean>> =
+        safeApiCallWithJsonString(
+            apiCall = { scheduleApi.deleteSchedule(scheduleId) },
+            parser = { json -> JSONObject(json).optBoolean("success", false) }
+        )
+
+    // ============================================================
+    // Private Parsers
+    // ============================================================
+
+    private fun parseMonthScheduleIcons(json: String): Map<Int, String> {
+        val jsonObject = JSONObject(json)
+        if (!jsonObject.optBoolean("success", true) || jsonObject.optInt("gcode") == 9000) {
+            return emptyMap()
+        }
+
+        val objectsArray = jsonObject.optJSONArray("objects") ?: return emptyMap()
+        val listType = object : TypeToken<List<ScheduleDto>>() {}.type
+        val dtoList: List<ScheduleDto> = gson.fromJson(objectsArray.toString(), listType)
+
+        val iconMap = mutableMapOf<Int, String>()
+        dtoList.forEach { dto ->
+            dto.dtstart?.let { date ->
+                val day = date.date
+                if (!iconMap.containsKey(day)) {
+                    iconMap[day] = dto.category ?: ""
                 }
-            } else {
-                Log.e(TAG, "getDaySchedules: API Error ${response.code()}")
-                emit(ApiResult.Error(Exception("API Error: ${response.code()}")))
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "getDaySchedules: Exception", e)
-            emit(ApiResult.Error(e))
         }
+        return iconMap
     }
 
-    override fun voteSchedule(scheduleId: Int, vote: String): Flow<ApiResult<Boolean>> = flow {
-        emit(ApiResult.Loading)
-        try {
-            val response = scheduleApi.voteSchedule(scheduleId, vote)
-
-            if (response.isSuccessful) {
-                response.body()?.string()?.let { body ->
-                    val json = JSONObject(body)
-                    emit(ApiResult.Success(json.optBoolean("success", false)))
-                } ?: emit(ApiResult.Error(Exception("Empty response")))
-            } else {
-                emit(ApiResult.Error(Exception("API Error: ${response.code()}")))
-            }
-        } catch (e: Exception) {
-            emit(ApiResult.Error(e))
+    private fun parseDaySchedules(json: String): List<ScheduleModel> {
+        val jsonObject = JSONObject(json)
+        if (!jsonObject.optBoolean("success", true) || jsonObject.optInt("gcode") == 9000) {
+            return emptyList()
         }
-    }
 
-    override fun deleteSchedule(scheduleId: Int): Flow<ApiResult<Boolean>> = flow {
-        emit(ApiResult.Loading)
-        try {
-            val response = scheduleApi.deleteSchedule(scheduleId)
+        val objectsArray = jsonObject.optJSONArray("objects") ?: return emptyList()
+        val listType = object : TypeToken<List<ScheduleDto>>() {}.type
+        val dtoList: List<ScheduleDto> = gson.fromJson(objectsArray.toString(), listType)
 
-            if (response.isSuccessful) {
-                response.body()?.string()?.let { body ->
-                    val json = JSONObject(body)
-                    emit(ApiResult.Success(json.optBoolean("success", false)))
-                } ?: emit(ApiResult.Error(Exception("Empty response")))
-            } else {
-                emit(ApiResult.Error(Exception("API Error: ${response.code()}")))
-            }
-        } catch (e: Exception) {
-            emit(ApiResult.Error(e))
-        }
+        return dtoList.map { it.toModel() }.sortedBy { it.dtstart }
     }
 
     private fun ScheduleDto.toModel() = ScheduleModel(

@@ -7,6 +7,7 @@ import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.data.remote.api.UserApi
 import net.ib.mn.data.remote.dto.*
+import net.ib.mn.domain.model.ApiError
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.UserRepository
 import net.ib.mn.util.Constants
@@ -66,11 +67,11 @@ class UserRepositoryImpl @Inject constructor(
                 // 304는 데이터가 변경되지 않았음을 의미하므로 로컬 데이터가 최신 상태
                 android.util.Log.d("UserRepositoryImpl", "📦 HTTP 304: Using cached data")
 
-                emit(ApiResult.Error(
-                    exception = Exception("Cache valid - use local data"),
-                    code = 304,
-                    data = userInfo  // 캐시된 데이터를 함께 전달
-                ))
+                emit(ApiResult.Error(ApiError.Http(
+                    httpCode = 304,
+                    message = "Cache valid - use local data",
+                    exception = Exception("Cache valid - use local data")
+                )))
                 return@flow
             }
 
@@ -112,33 +113,21 @@ class UserRepositoryImpl @Inject constructor(
 
                     emit(ApiResult.Success(body))
                 } else {
-                    emit(ApiResult.Error(
-                        exception = Exception("User data not found in response"),
-                        code = response.code()
-                    ))
+                    emit(ApiResult.Error(ApiError.Business(
+                        gcode = 0,
+                        message = "User data not found in response",
+                        exception = Exception("User data not found in response")
+                    )))
                 }
             } else {
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
+                emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
+            emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: IOException) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Network(exception = e)))
         } catch (e: Exception) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
 
@@ -155,33 +144,21 @@ class UserRepositoryImpl @Inject constructor(
                 if (body.success) {
                     emit(ApiResult.Success(body))
                 } else {
-                    emit(ApiResult.Error(
-                        exception = Exception("API returned success=false"),
-                        code = response.code()
-                    ))
+                    emit(ApiResult.Error(ApiError.Business(
+                        gcode = 0,
+                        message = "API returned success=false",
+                        exception = Exception("API returned success=false")
+                    )))
                 }
             } else {
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
+                emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
+            emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: IOException) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Network(exception = e)))
         } catch (e: Exception) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
 
@@ -198,33 +175,21 @@ class UserRepositoryImpl @Inject constructor(
                 if (body.success) {
                     emit(ApiResult.Success(body))
                 } else {
-                    emit(ApiResult.Error(
-                        exception = Exception("API returned success=false"),
-                        code = response.code()
-                    ))
+                    emit(ApiResult.Error(ApiError.Business(
+                        gcode = 0,
+                        message = "API returned success=false",
+                        exception = Exception("API returned success=false")
+                    )))
                 }
             } else {
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
+                emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
+            emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: IOException) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Network(exception = e)))
         } catch (e: Exception) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
 
@@ -241,33 +206,21 @@ class UserRepositoryImpl @Inject constructor(
                 if (body.success) {
                     emit(ApiResult.Success(body))
                 } else {
-                    emit(ApiResult.Error(
-                        exception = Exception("API returned success=false"),
-                        code = response.code()
-                    ))
+                    emit(ApiResult.Error(ApiError.Business(
+                        gcode = 0,
+                        message = "API returned success=false",
+                        exception = Exception("API returned success=false")
+                    )))
                 }
             } else {
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
+                emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
+            emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: IOException) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Network(exception = e)))
         } catch (e: Exception) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
 
@@ -320,27 +273,14 @@ class UserRepositoryImpl @Inject constructor(
                 val errorBody = response.errorBody()?.string()
                 android.util.Log.e("ValidateUserAPI", "API Error: HTTP ${response.code()}")
                 android.util.Log.e("ValidateUserAPI", "Error Body: $errorBody")
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
+                emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
+            emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: IOException) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Network(exception = e)))
         } catch (e: Exception) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
 
@@ -376,27 +316,14 @@ class UserRepositoryImpl @Inject constructor(
                 // gcode, mcode를 포함한 응답을 ViewModel에서 처리하도록 함
                 emit(ApiResult.Success(body))
             } else {
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
+                emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
+            emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: IOException) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Network(exception = e)))
         } catch (e: Exception) {
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
 
@@ -489,10 +416,7 @@ class UserRepositoryImpl @Inject constructor(
                 android.util.Log.e(signUpTag, "SignUp API Error: HTTP ${response.code()}")
                 android.util.Log.e(signUpTag, "Error Body: $errorBody")
                 android.util.Log.e(signUpTag, "========================================")
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
+                emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
             android.util.Log.e(signUpTag, "========================================")
@@ -500,29 +424,19 @@ class UserRepositoryImpl @Inject constructor(
             android.util.Log.e(signUpTag, "  code: ${e.code()}")
             android.util.Log.e(signUpTag, "  message: ${e.message}")
             android.util.Log.e(signUpTag, "========================================")
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: IOException) {
             android.util.Log.e(signUpTag, "========================================")
             android.util.Log.e(signUpTag, "SignUp API IOException", e)
             android.util.Log.e(signUpTag, "  message: ${e.message}")
             android.util.Log.e(signUpTag, "========================================")
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Network(exception = e)))
         } catch (e: Exception) {
             android.util.Log.e(signUpTag, "========================================")
             android.util.Log.e(signUpTag, "SignUp API Exception", e)
             android.util.Log.e(signUpTag, "  message: ${e.message}")
             android.util.Log.e(signUpTag, "========================================")
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Sign up error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
 
@@ -564,31 +478,22 @@ class UserRepositoryImpl @Inject constructor(
                     }
                 } catch (e: org.json.JSONException) {
                     android.util.Log.e("FindIdAPI", "JSON parsing error", e)
-                    emit(ApiResult.Error(
-                        exception = e,
-                        message = "Failed to parse response"
-                    ))
+                    emit(ApiResult.Error(ApiError.Unknown(
+                        message = "Failed to parse response",
+                        exception = e
+                    )))
                 }
             } else {
                 val errorBody = response.errorBody()?.string()
                 android.util.Log.e("FindIdAPI", "HTTP ${response.code()}: $errorBody")
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
+                emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
             android.util.Log.e("FindIdAPI", "HttpException", e)
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code()
-            ))
+            emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: Exception) {
             android.util.Log.e("FindIdAPI", "Exception", e)
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Find ID error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
 
@@ -606,23 +511,14 @@ class UserRepositoryImpl @Inject constructor(
             } else {
                 val errorBody = response.errorBody()?.string()
                 android.util.Log.e("FindPasswordAPI", "HTTP ${response.code()}: $errorBody")
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
+                emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
             android.util.Log.e("FindPasswordAPI", "HttpException", e)
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code()
-            ))
+            emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: Exception) {
             android.util.Log.e("FindPasswordAPI", "Exception", e)
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Find password error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
 
@@ -841,38 +737,26 @@ class UserRepositoryImpl @Inject constructor(
                 if (body.success) {
                     emit(ApiResult.Success(body))
                 } else {
-                    emit(ApiResult.Error(
-                        exception = Exception("API returned success=false"),
-                        code = response.code()
-                    ))
+                    emit(ApiResult.Error(ApiError.Business(
+                        gcode = 0,
+                        message = "API returned success=false",
+                        exception = Exception("API returned success=false")
+                    )))
                 }
             } else {
                 val errorBody = response.errorBody()?.string()
                 android.util.Log.e("CheckEventAPI", "HTTP ${response.code()}: $errorBody")
-                emit(ApiResult.Error(
-                    exception = HttpException(response),
-                    code = response.code()
-                ))
+                emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
             android.util.Log.e("CheckEventAPI", "HttpException", e)
-            emit(ApiResult.Error(
-                exception = e,
-                code = e.code(),
-                message = "HTTP ${e.code()}: ${e.message()}"
-            ))
+            emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: IOException) {
             android.util.Log.e("CheckEventAPI", "IOException", e)
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Network error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Network(exception = e)))
         } catch (e: Exception) {
             android.util.Log.e("CheckEventAPI", "Exception", e)
-            emit(ApiResult.Error(
-                exception = e,
-                message = "Unknown error: ${e.message}"
-            ))
+            emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
 }

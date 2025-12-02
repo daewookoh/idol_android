@@ -1,6 +1,7 @@
 package net.ib.mn.data.repository
 
 import net.ib.mn.data.remote.api.WikiApi
+import net.ib.mn.domain.model.ApiError
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.util.ServerUrl
 import java.net.URLEncoder
@@ -47,13 +48,13 @@ class WikiRepositoryImpl @Inject constructor(
                 if (wikiName != null) {
                     ApiResult.Success(wikiName)
                 } else {
-                    ApiResult.Error(Exception("Wiki name not found"))
+                    ApiResult.Error(ApiError.Business(gcode = 0, message = "Wiki name not found"))
                 }
             } else {
-                ApiResult.Error(Exception("Failed to get wiki name: ${response.code()}"))
+                ApiResult.Error(ApiError.fromHttpCode(response.code(), "Failed to get wiki name"))
             }
         } catch (e: Exception) {
-            ApiResult.Error(e)
+            ApiResult.Error(ApiError.Unknown(exception = e))
         }
     }
 
@@ -79,13 +80,13 @@ class WikiRepositoryImpl @Inject constructor(
                 if (finalUrl != null) {
                     ApiResult.Success(finalUrl)
                 } else {
-                    ApiResult.Error(Exception("Redirect URL not found"))
+                    ApiResult.Error(ApiError.Business(gcode = 0, message = "Redirect URL not found"))
                 }
             } else {
-                ApiResult.Error(Exception("Failed to get redirect URL: ${redirectResponse.code()}"))
+                ApiResult.Error(ApiError.fromHttpCode(redirectResponse.code(), "Failed to get redirect URL"))
             }
         } catch (e: Exception) {
-            ApiResult.Error(e)
+            ApiResult.Error(ApiError.Unknown(exception = e))
         }
     }
 

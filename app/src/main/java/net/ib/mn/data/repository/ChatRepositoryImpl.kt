@@ -3,7 +3,6 @@ package net.ib.mn.data.repository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import net.ib.mn.data.remote.api.ChatApi
 import net.ib.mn.data.remote.dto.ChatRoomDto
 import net.ib.mn.data.remote.dto.ChatRoomJoinRequest
@@ -18,11 +17,16 @@ import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * ChatRepository 구현체
+ *
+ * BaseRepository의 safeApiCallWithJsonString 패턴 사용
+ */
 @Singleton
 class ChatRepositoryImpl @Inject constructor(
     private val chatApi: ChatApi,
     private val gson: Gson
-) : ChatRepository {
+) : BaseRepository(), ChatRepository {
 
     override fun getJoinedChatRooms(
         idolId: Int,
@@ -30,23 +34,12 @@ class ChatRepositoryImpl @Inject constructor(
         orderBy: Int,
         limit: Int,
         offset: Int
-    ): Flow<ApiResult<ChatRoomListResponse>> = flow {
-        emit(ApiResult.Loading)
-        try {
-            val orderByString = getOrderByString(orderBy)
-            val response = chatApi.getChatRoomJoinList(idolId, locale, orderByString, limit, offset)
-
-            if (response.isSuccessful) {
-                response.body()?.string()?.let { body ->
-                    emit(ApiResult.Success(parseRoomListResponse(body, isJoinedRoom = true)))
-                } ?: emit(ApiResult.Error(Exception("Empty response")))
-            } else {
-                emit(ApiResult.Error(Exception("API Error: ${response.code()}")))
-            }
-        } catch (e: Exception) {
-            emit(ApiResult.Error(e))
-        }
-    }
+    ): Flow<ApiResult<ChatRoomListResponse>> = safeApiCallWithJsonString(
+        apiCall = {
+            chatApi.getChatRoomJoinList(idolId, locale, getOrderByString(orderBy), limit, offset)
+        },
+        parser = { json -> parseRoomListResponse(json, isJoinedRoom = true) }
+    )
 
     override fun getAllChatRooms(
         idolId: Int,
@@ -54,67 +47,42 @@ class ChatRepositoryImpl @Inject constructor(
         orderBy: Int,
         limit: Int,
         offset: Int
-    ): Flow<ApiResult<ChatRoomListResponse>> = flow {
-        emit(ApiResult.Loading)
-        try {
-            val orderByString = getOrderByString(orderBy)
-            val response = chatApi.getChatRoomList(idolId, locale, orderByString, limit, offset)
+    ): Flow<ApiResult<ChatRoomListResponse>> = safeApiCallWithJsonString(
+        apiCall = {
+            chatApi.getChatRoomList(idolId, locale, getOrderByString(orderBy), limit, offset)
+        },
+        parser = { json -> parseRoomListResponse(json, isJoinedRoom = false) }
+    )
 
-            if (response.isSuccessful) {
-                response.body()?.string()?.let { body ->
-                    emit(ApiResult.Success(parseRoomListResponse(body, isJoinedRoom = false)))
-                } ?: emit(ApiResult.Error(Exception("Empty response")))
-            } else {
-                emit(ApiResult.Error(Exception("API Error: ${response.code()}")))
+    override fun joinChatRoom(roomId: Int): Flow<ApiResult<ChatRoomJoinResponse>> =
+        safeApiCallWithJsonString(
+            apiCall = { chatApi.joinChatRoom(ChatRoomJoinRequest(roomId)) },
+            parser = { json ->
+                val jsonObject = JSONObject(json)
+                ChatRoomJoinResponse(
+                    success = jsonObject.optBoolean("success", false),
+                    nickname = jsonObject.optString("nickname", null),
+                    userId = jsonObject.optInt("user_id", 0),
+                    message = jsonObject.optString("msg", null)
+                )
             }
-        } catch (e: Exception) {
-            emit(ApiResult.Error(e))
-        }
-    }
+        )
 
-    override fun joinChatRoom(roomId: Int): Flow<ApiResult<ChatRoomJoinResponse>> = flow {
-        emit(ApiResult.Loading)
-        try {
-            val response = chatApi.joinChatRoom(ChatRoomJoinRequest(roomId))
-
-            if (response.isSuccessful) {
-                response.body()?.string()?.let { body ->
-                    val json = JSONObject(body)
-                    emit(ApiResult.Success(ChatRoomJoinResponse(
-                        success = json.optBoolean("success", false),
-                        nickname = json.optString("nickname", null),
-                        userId = json.optInt("user_id", 0),
-                        message = json.optString("msg", null)
-                    )))
-                } ?: emit(ApiResult.Error(Exception("Empty response")))
-            } else {
-                emit(ApiResult.Error(Exception("API Error: ${response.code()}")))
+    override fun leaveChatRoom(roomId: Int): Flow<ApiResult<ChatRoomLeaveResponse>> =
+        safeApiCallWithJsonString(
+            apiCall = { chatApi.leaveChatRoom(ChatRoomLeaveRequest(roomId)) },
+            parser = { json ->
+                val jsonObject = JSONObject(json)
+                ChatRoomLeaveResponse(
+                    success = jsonObject.optBoolean("success", false),
+                    message = jsonObject.optString("msg", null)
+                )
             }
-        } catch (e: Exception) {
-            emit(ApiResult.Error(e))
-        }
-    }
+        )
 
-    override fun leaveChatRoom(roomId: Int): Flow<ApiResult<ChatRoomLeaveResponse>> = flow {
-        emit(ApiResult.Loading)
-        try {
-            val response = chatApi.leaveChatRoom(ChatRoomLeaveRequest(roomId))
-
-            if (response.isSuccessful) {
-                response.body()?.string()?.let { body ->
-                    val json = JSONObject(body)
-                    emit(ApiResult.Success(ChatRoomLeaveResponse(
-                        success = json.optBoolean("success", false),
-                        message = json.optString("msg", null)
-                    )))
-                } ?: emit(ApiResult.Error(Exception("Empty response")))
-            } else {
-                emit(ApiResult.Error(Exception("API Error: ${response.code()}")))
-            }
-        } catch (e: Exception) {
-            emit(ApiResult.Error(e))
-        }
-    }
+    // ============================================================
+    // Private Helpers
+    // ============================================================
 
     private fun getOrderByString(orderBy: Int) = when (orderBy) {
         ChatRepository.ORDER_BY_TALK_COUNT -> "-total_msg_cnt"

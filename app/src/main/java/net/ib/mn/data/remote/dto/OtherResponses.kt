@@ -16,11 +16,11 @@ import com.google.gson.annotations.SerializedName
 // ============================================================
 data class UpdateInfoResponse(
     @SerializedName("success")
-    val success: Boolean,
+    override val success: Boolean,
 
     @SerializedName("data")
     val data: UpdateInfoData?
-)
+) : net.ib.mn.data.repository.HasSuccess
 
 data class UpdateInfoData(
     @SerializedName("all_idol_update")
@@ -301,11 +301,11 @@ data class CouponMessage(
 // ============================================================
 data class TimezoneUpdateResponse(
     @SerializedName("success")
-    val success: Boolean,
+    override val success: Boolean,
 
     @SerializedName("data")
     val data: TimezoneData?
-)
+) : net.ib.mn.data.repository.HasSuccess
 
 data class TimezoneData(
     @SerializedName("timezone")
