@@ -119,8 +119,8 @@ fun ExoBottomSheet(
                     tint = Color.Unspecified,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(top = 16.dp, end = 16.dp)
-                        .size(24.dp)
+                        .padding(top = 24.dp, end = 24.dp)
+                        .size(12.dp)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null
