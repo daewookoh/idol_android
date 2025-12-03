@@ -155,4 +155,28 @@ interface ConfigRepository {
      * @return Flow<ApiResult<AwardModel>>
      */
     fun loadAwardsCurrent(): Flow<ApiResult<net.ib.mn.data.remote.dto.AwardModel>>
+
+    /**
+     * votable 값 가져오기 (캐시된 ConfigSelf에서)
+     * "B" = 투표 준비 중, "Y" = 투표 진행 중, "A" = 투표 종료/결과
+     *
+     * @return String (기본값 "A")
+     */
+    fun getVotable(): String
+
+    /**
+     * awardBegin 값 가져오기 (캐시된 ConfigSelf에서)
+     * 투표 시작일
+     *
+     * @return String? (ISO 8601 format)
+     */
+    fun getAwardBegin(): String?
+
+    /**
+     * awardEnd 값 가져오기 (캐시된 ConfigSelf에서)
+     * 투표 종료일
+     *
+     * @return String? (ISO 8601 format)
+     */
+    fun getAwardEnd(): String?
 }

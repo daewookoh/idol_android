@@ -9,85 +9,60 @@ import java.util.Locale
  * 로케일 관련 유틸리티
  */
 object LocaleUtil {
+
+    private fun getDeviceLocale(context: Context): Locale =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            context.resources.configuration.locales[0]
+        } else {
+            @Suppress("DEPRECATION")
+            context.resources.configuration.locale
+        }
+
     /**
      * 현재 로케일이 지원 로케일 목록에 포함되는지 확인
-     *
-     * @param context Context
-     * @param locales 지원 로케일 목록 (언어 코드 리스트)
-     * @return 현재 로케일이 목록에 포함되면 true
      */
-    fun isExistCurrentLocale(context: Context, locales: List<String>): Boolean {
-        val currentLocale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.resources.configuration.locales[0]
-        } else {
-            @Suppress("DEPRECATION")
-            context.resources.configuration.locale
-        }
-
-        return locales.contains(currentLocale.language)
-    }
+    fun isExistCurrentLocale(context: Context, locales: List<String>): Boolean =
+        locales.contains(getDeviceLocale(context).language)
 
     /**
-     * 시스템 언어 코드 반환
-     * old 프로젝트의 Util.getSystemLanguage()와 동일
-     *
-     * @param context Context
-     * @return 언어_국가 형식 (예: "ko_KR", "en_US", "ja_JP", "zh_CN", "zh_TW")
+     * 시스템 언어 코드 반환 (예: "ko_KR", "en_US", "ja_JP", "zh_CN", "zh_TW")
      */
-    fun getSystemLanguage(context: Context): String {
-        val locale: Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.resources.configuration.locales[0]
-        } else {
-            @Suppress("DEPRECATION")
-            context.resources.configuration.locale
-        }
-
-        return "${locale.language}_${locale.country}"
-    }
+    fun getSystemLanguage(context: Context): String =
+        getDeviceLocale(context).let { "${it.language}_${it.country}" }
 
     /**
-     * 위키용 로케일 코드 반환
-     *
-     * @param context Context
-     * @return 위키 API용 로케일 (ko, en, ja, zh-cn, zh-tw)
+     * 위키용 로케일 코드 반환 (ko, en, ja, zh-cn, zh-tw)
      */
-    fun getWikiLocale(context: Context): String {
-        return when (getSystemLanguage(context)) {
-            "ko_KR" -> "ko"
-            "zh_CN" -> "zh-cn"
-            "zh_TW" -> "zh-tw"
-            "ja_JP" -> "ja"
-            else -> "en"
-        }
+    fun getWikiLocale(context: Context): String = when (getSystemLanguage(context)) {
+        "ko_KR" -> "ko"
+        "zh_CN" -> "zh-cn"
+        "zh_TW" -> "zh-tw"
+        "ja_JP" -> "ja"
+        else -> "en"
     }
 
     /**
      * 앱 로케일 반환
-     *
-     * @param context Context
-     * @return Locale
      */
-    fun getAppLocale(context: Context): Locale {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.resources.configuration.locales[0]
-        } else {
-            @Suppress("DEPRECATION")
-            context.resources.configuration.locale
-        }
+    fun getAppLocale(context: Context): Locale = getDeviceLocale(context)
+
+    /**
+     * 공유용 로케일 코드 반환 (ko, en, ja, zh-cn, zh-tw)
+     */
+    fun getShareLocale(context: Context): String = when (val locale = getSystemLanguage(context)) {
+        "zh_CN" -> "zh-cn"
+        "zh_TW" -> "zh-tw"
+        "ko_KR", "ja_JP" -> locale.substringBefore("_")
+        else -> "en"
     }
 
     /**
      * MostIdol 객체에서 언어에 맞는 아이돌 이름 추출
-     * Old 프로젝트의 로직과 동일
-     *
-     * @param context Context
-     * @param most MostIdol 객체
-     * @return 언어에 맞는 아이돌 이름
      */
     fun getLocalizedIdolName(context: Context, most: MostIdol): String {
         val lang = getSystemLanguage(context).lowercase()
-        val name = most.name ?: ""
-        val nameEn = most.nameEn ?: ""
+        val name = most.name.orEmpty()
+        val nameEn = most.nameEn.orEmpty()
 
         return when {
             lang.startsWith("ko") -> name.ifEmpty { nameEn }

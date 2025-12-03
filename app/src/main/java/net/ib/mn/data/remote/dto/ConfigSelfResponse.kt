@@ -115,5 +115,15 @@ data class ConfigSelfResponse(
     val showStoreEventMarker: String? = null,  // "Y" = 상점 이벤트 뱃지 표시
 
     @SerializedName("show_free_charge_event_marker")
-    val showFreeChargeMarker: String? = null  // "Y" = 무료충전소 뱃지 표시
+    val showFreeChargeMarker: String? = null,  // "Y" = 무료충전소 뱃지 표시
+
+    // Awards 설정
+    @SerializedName("votable")
+    val votable: String? = "A",  // "B" = 투표 준비 중, "Y" = 투표 진행 중, "A" = 투표 종료/결과
+
+    @SerializedName("award_begin")
+    val awardBegin: String? = null,  // 투표 시작일 (ISO 8601 format)
+
+    @SerializedName("award_end")
+    val awardEnd: String? = null  // 투표 종료일 (ISO 8601 format)
 )

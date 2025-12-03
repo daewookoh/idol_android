@@ -386,4 +386,28 @@ class ConfigRepositoryImpl @Inject constructor(
                 },
                 errorMessage = "Award data not found"
             )
+
+    /**
+     * votable 값 가져오기 (캐시된 ConfigSelf에서)
+     * "B" = 투표 준비 중, "Y" = 투표 진행 중, "A" = 투표 종료/결과
+     */
+    override fun getVotable(): String {
+        return cachedConfigSelf?.votable ?: "A"
+    }
+
+    /**
+     * awardBegin 값 가져오기 (캐시된 ConfigSelf에서)
+     * 투표 시작일
+     */
+    override fun getAwardBegin(): String? {
+        return cachedConfigSelf?.awardBegin
+    }
+
+    /**
+     * awardEnd 값 가져오기 (캐시된 ConfigSelf에서)
+     * 투표 종료일
+     */
+    override fun getAwardEnd(): String? {
+        return cachedConfigSelf?.awardEnd
+    }
 }

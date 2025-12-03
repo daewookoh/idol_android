@@ -3,11 +3,10 @@ package net.ib.mn.presentation.article
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -91,18 +90,13 @@ fun ArticleDetailScreen(
                 title = stringResource(R.string.post_detail),
                 onNavigationClick = onBackClick,
                 actions = {
-                    Icon(
-                        painter = painterResource(R.drawable.icon_view_more),
-                        contentDescription = "Menu",
-                        modifier = Modifier
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
-                            ) {
-                                showMoreBottomSheet = true
-                            },
-                        tint = ColorPalette.textDefault
-                    )
+                    IconButton(onClick = { showMoreBottomSheet = true }) {
+                        Icon(
+                            painter = painterResource(R.drawable.icon_view_more),
+                            contentDescription = "Menu",
+                            tint = ColorPalette.textDefault
+                        )
+                    }
                 }
             )
         }
