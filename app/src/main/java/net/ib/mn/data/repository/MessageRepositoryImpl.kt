@@ -1,7 +1,9 @@
 package net.ib.mn.data.repository
 
-import android.util.Log
 import kotlinx.coroutines.flow.Flow
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
+import net.ib.mn.util.logW
 import kotlinx.coroutines.flow.map
 import net.ib.mn.data.remote.api.MessageApi
 import net.ib.mn.data.remote.dto.MessageCouponResponse
@@ -48,18 +50,18 @@ class MessageRepositoryImpl @Inject constructor(
                 if (jsonObject.optBoolean("success", false)) {
                     val meta = jsonObject.optJSONObject("meta")
                     val totalCount = meta?.optInt("total_count", 0) ?: 0
-                    Log.d(TAG, "checkNewNotification: totalCount=$totalCount")
+                    logD(TAG, "checkNewNotification: totalCount=$totalCount")
                     totalCount > 0
                 } else {
-                    Log.w(TAG, "checkNewNotification: API returned success=false")
+                    logW(TAG, "checkNewNotification: API returned success=false")
                     false
                 }
             } else {
-                Log.w(TAG, "checkNewNotification: API call failed with code=${response.code()}")
+                logW(TAG, "checkNewNotification: API call failed with code=${response.code()}")
                 false
             }
         } catch (e: Exception) {
-            Log.e(TAG, "checkNewNotification: Error", e)
+            logE(TAG, "checkNewNotification: Error", e)
             false
         }
     }

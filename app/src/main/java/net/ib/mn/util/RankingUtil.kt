@@ -6,6 +6,9 @@ import androidx.appcompat.app.AppCompatDelegate
 import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.data.local.entity.IdolEntity
 import net.ib.mn.ui.components.RankingItem
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
+import net.ib.mn.util.logW
 import java.text.Collator
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -205,12 +208,12 @@ object RankingUtil {
             if (idol != null) {
                 val newHeart = idol.heart + voteCount
                 idolDao.updateIdolHeart(idolId, newHeart)
-                android.util.Log.d("RankingUtil", "✅ DB updated: idol=$idolId, newHeart=$newHeart")
+                logD("RankingUtil", "✅ DB updated: idol=$idolId, newHeart=$newHeart")
             } else {
-                android.util.Log.w("RankingUtil", "⚠️ Idol not found in DB: idol=$idolId")
+                logW("RankingUtil", "⚠️ Idol not found in DB: idol=$idolId")
             }
         } catch (e: Exception) {
-            android.util.Log.e("RankingUtil", "❌ Failed to update DB: ${e.message}", e)
+            logE("RankingUtil", "❌ Failed to update DB: ${e.message}", e)
         }
 
         // 2. 투표한 아이돌의 하트 수 업데이트 (메모리)
@@ -269,7 +272,7 @@ object RankingUtil {
             // 최애 여부 판단 (old 프로젝트와 동일)
             val isFavorite = mostIdolId != null && idol.id == mostIdolId
             if (isFavorite) {
-                android.util.Log.d("RankingUtil", "💗 Found favorite idol: id=${idol.id}, name=${idol.name}")
+                logD("RankingUtil", "💗 Found favorite idol: id=${idol.id}, name=${idol.name}")
             }
 
             RankingItem(
@@ -292,7 +295,7 @@ object RankingUtil {
                 top3VideoUrls = IdolImageUtil.getTop3VideoUrls(idol),
                 fandomName = getLocalizedFandomName(idol, context),
                 birthday = formatBirthday(idol.birthDay, idol.isLunarBirthday, context).also {
-                    android.util.Log.d("RankingUtil", "🎂 idol=${idol.name}, birthDay=${idol.birthDay}, isLunar=${idol.isLunarBirthday}, formatted=$it")
+                    logD("RankingUtil", "🎂 idol=${idol.name}, birthDay=${idol.birthDay}, isLunar=${idol.isLunarBirthday}, formatted=$it")
                 }
             )
         }

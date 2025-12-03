@@ -2,7 +2,6 @@ package net.ib.mn.data.remote.udp
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +20,10 @@ import net.ib.mn.BuildConfig
 import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.data.local.entity.IdolEntity
 import net.ib.mn.data.remote.dto.toEntity
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
+import net.ib.mn.util.logI
+import net.ib.mn.util.logW
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
@@ -126,11 +129,11 @@ class IdolBroadcastManager @Inject constructor(
     fun setReactionEnabled(enabled: Boolean, source: String = "Unknown") {
         val wasEnabled = isReactionEnabled
         isReactionEnabled = enabled
-        Log.i(TAG, "🔔 Reaction ${if (enabled) "ENABLED" else "DISABLED"} by $source (was: $wasEnabled)")
+        logI(TAG, "🔔 Reaction ${if (enabled) "ENABLED" else "DISABLED"} by $source (was: $wasEnabled)")
 
         // 비활성화 → 활성화 전환 시 콜백 호출 (놓친 데이터 복구)
         if (enabled && !wasEnabled) {
-            Log.i(TAG, "🔄 Triggering data refresh callback (recovering missed UDP data)")
+            logI(TAG, "🔄 Triggering data refresh callback (recovering missed UDP data)")
             onReactionEnabledCallback?.invoke()
         }
     }
@@ -163,12 +166,12 @@ class IdolBroadcastManager @Inject constructor(
                 lbHost = host
                 lbPort = port
 
-                Log.i(TAG, "=== setupConnection host=$host port=$port userId=$userId")
+                logI(TAG, "=== setupConnection host=$host port=$port userId=$userId")
 
                 connect()
                 startHeartbeat()
             } catch (e: Exception) {
-                Log.e(TAG, "=== setupConnection error", e)
+                logE(TAG, "=== setupConnection error", e)
             }
         }
     }
@@ -205,8 +208,8 @@ class IdolBroadcastManager @Inject constructor(
                 val address = InetAddress.getByName(host)
                 socket?.connect(address, port)
 
-                Log.i(TAG, "=== UDP socket created and connected to $host:$port")
-                Log.i(TAG, "=== Socket isConnected: ${socket?.isConnected}, isClosed: ${socket?.isClosed}")
+                logI(TAG, "=== UDP socket created and connected to $host:$port")
+                logI(TAG, "=== Socket isConnected: ${socket?.isConnected}, isClosed: ${socket?.isClosed}")
 
                 // 수신 시작 - 독립적인 scope에서 실행
                 // connectionJob이 완료되어도 receiveJob은 계속 실행되도록
@@ -220,10 +223,10 @@ class IdolBroadcastManager @Inject constructor(
                     send(false)
                 }
 
-                Log.i(TAG, "=== connect completed successfully")
+                logI(TAG, "=== connect completed successfully")
 
             } catch (e: Exception) {
-                Log.e(TAG, "=== connect error", e)
+                logE(TAG, "=== connect error", e)
                 retryConnection()
             }
         }
@@ -238,17 +241,17 @@ class IdolBroadcastManager @Inject constructor(
             try {
                 val currentSocket = socket
                 if (currentSocket == null) {
-                    Log.e(TAG, "=== startReceiving: socket is null!")
+                    logE(TAG, "=== startReceiving: socket is null!")
                     return@launch
                 }
 
                 if (currentSocket.isClosed) {
-                    Log.e(TAG, "=== startReceiving: socket is closed!")
+                    logE(TAG, "=== startReceiving: socket is closed!")
                     return@launch
                 }
 
-                Log.i(TAG, "=== startReceiving: socket ready, waiting for UDP packets...")
-                Log.i(TAG, "=== socket local port: ${currentSocket.localPort}")
+                logI(TAG, "=== startReceiving: socket ready, waiting for UDP packets...")
+                logI(TAG, "=== socket local port: ${currentSocket.localPort}")
 
                 val buffer = ByteArray(8192)
                 val packet = DatagramPacket(buffer, buffer.size)
@@ -259,45 +262,45 @@ class IdolBroadcastManager @Inject constructor(
                         currentSocket.receive(packet)
 
                         val data = packet.data.copyOf(packet.length)
-                        Log.i(TAG, "=== received ${data.size} bytes from ${packet.address}:${packet.port}")
+                        logI(TAG, "=== received ${data.size} bytes from ${packet.address}:${packet.port}")
 
                         if (VERBOSE_LOGGING) {
-                            Log.d(TAG, "📦 UDP 패킷 수신")
-                            Log.d(TAG, "   크기: ${data.size} bytes")
-                            Log.d(TAG, "   송신자: ${packet.address}:${packet.port}")
-                            Log.d(TAG, "   hex: ${bytesToHex(data.copyOf(minOf(data.size, 64)))}")
+                            logD(TAG, "📦 UDP 패킷 수신")
+                            logD(TAG, "   크기: ${data.size} bytes")
+                            logD(TAG, "   송신자: ${packet.address}:${packet.port}")
+                            logD(TAG, "   hex: ${bytesToHex(data.copyOf(minOf(data.size, 64)))}")
                         }
 
                         // 반응 활성화 상태 체크 (랭킹/나의최애 페이지 선택 시에만 반응)
                         if (!isReactionEnabled) {
-                            Log.d(TAG, "⏸️ UDP received but reaction DISABLED - skipping parse (listening only)")
+                            logD(TAG, "⏸️ UDP received but reaction DISABLED - skipping parse (listening only)")
                             continue
                         }
 
                         if (!updatingAll) {
-                            Log.d(TAG, "▶️ UDP received and reaction ENABLED - processing parse")
+                            logD(TAG, "▶️ UDP received and reaction ENABLED - processing parse")
                             launch {
                                 parse(ByteBuffer.wrap(data), data.size)
                             }
                         } else {
-                            Log.i(TAG, "=== updating all is in progress. skip.")
+                            logI(TAG, "=== updating all is in progress. skip.")
                         }
                     } catch (e: java.net.SocketException) {
                         if (isActive && !currentSocket.isClosed) {
-                            Log.e(TAG, "=== socket exception during receive", e)
+                            logE(TAG, "=== socket exception during receive", e)
                             throw e
                         } else {
-                            Log.i(TAG, "=== socket closed, stopping receive loop")
+                            logI(TAG, "=== socket closed, stopping receive loop")
                             break
                         }
                     }
                 }
 
-                Log.i(TAG, "=== startReceiving: loop ended")
+                logI(TAG, "=== startReceiving: loop ended")
 
             } catch (e: Exception) {
                 if (isActive) {
-                    Log.e(TAG, "=== receive error", e)
+                    logE(TAG, "=== receive error", e)
                     retryConnection()
                 }
             }
@@ -313,7 +316,7 @@ class IdolBroadcastManager @Inject constructor(
             repeat(10) {
                 delay(10000) // 10초 간격
                 if (socket?.isClosed != false) {
-                    Log.i(TAG, "=== retry connection attempt ${it + 1}")
+                    logI(TAG, "=== retry connection attempt ${it + 1}")
                     connect()
                 } else {
                     return@launch
@@ -326,13 +329,13 @@ class IdolBroadcastManager @Inject constructor(
      * Heartbeat 전송 시작 (30초마다)
      */
     fun startHeartbeat() {
-        Log.i(TAG, "=== startHeartbeat called")
+        logI(TAG, "=== startHeartbeat called")
         heartbeatJob?.cancel()
         heartbeatJob = scope.launch {
-            Log.i(TAG, "=== heartbeat coroutine started")
+            logI(TAG, "=== heartbeat coroutine started")
             while (isActive) {
                 delay(30000) // 30초
-                Log.i(TAG, "=== 30 sec timer fired. Send request.")
+                logI(TAG, "=== 30 sec timer fired. Send request.")
                 send()
             }
         }
@@ -357,7 +360,7 @@ class IdolBroadcastManager @Inject constructor(
         socket?.close()
         socket = null
 
-        Log.i(TAG, "=== disconnected")
+        logI(TAG, "=== disconnected")
     }
 
     /**
@@ -400,10 +403,10 @@ class IdolBroadcastManager @Inject constructor(
                 socket?.send(packet)
 
                 if (BuildConfig.DEBUG) {
-                    Log.i(TAG, "=== sent ${bytesToHex(ba)} to connected address")
+                    logI(TAG, "=== sent ${bytesToHex(ba)} to connected address")
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "=== send error", e)
+                logE(TAG, "=== send error", e)
             }
         }
     }
@@ -420,7 +423,7 @@ class IdolBroadcastManager @Inject constructor(
 
                 // version 체크
                 if (version < ver) {
-                    Log.w(TAG, "=== version mismatch. client=$version server=$ver")
+                    logW(TAG, "=== version mismatch. client=$version server=$ver")
                     stopHeartbeat()
                     return
                 }
@@ -433,10 +436,10 @@ class IdolBroadcastManager @Inject constructor(
 
                 when (type) {
                     2 -> { // re-route (ip:port)
-                        Log.i(TAG, "=== packet type 2: re-route")
+                        logI(TAG, "=== packet type 2: re-route")
                         host = "${bb[pos + 1].toUByte()}.${bb[pos + 2].toUByte()}.${bb[pos + 3].toUByte()}.${bb[pos + 4].toUByte()}"
                         port = bb[pos + 5].toUByte().toInt().shl(8) or bb[pos + 6].toUByte().toInt()
-                        Log.i(TAG, "=== re-route host=$host port=$port")
+                        logI(TAG, "=== re-route host=$host port=$port")
                         // 순차 실행을 위해 코루틴 내에서 실행
                         scope.launch {
                             disconnect()
@@ -448,9 +451,9 @@ class IdolBroadcastManager @Inject constructor(
                     }
 
                     3 -> { // re-route (port only)
-                        Log.i(TAG, "=== packet type 3: re-route port")
+                        logI(TAG, "=== packet type 3: re-route port")
                         port = bb[pos + 1].toUByte().toInt().shl(8) or bb[pos + 2].toUByte().toInt()
-                        Log.i(TAG, "=== re-route port=$port")
+                        logI(TAG, "=== re-route port=$port")
                         // 순차 실행을 위해 코루틴 내에서 실행
                         scope.launch {
                             disconnect()
@@ -474,7 +477,7 @@ class IdolBroadcastManager @Inject constructor(
                 val nextSeq = (lastOverallSeq + 1u).toUShort()
 
                 if (nextSeq != overallSeq && !isAll) {
-                    Log.e(TAG, "=== 패킷 누락 expected=$nextSeq received=$overallSeq")
+                    logE(TAG, "=== 패킷 누락 expected=$nextSeq received=$overallSeq")
                     send(true)
                     startHeartbeat()
                 }
@@ -490,15 +493,15 @@ class IdolBroadcastManager @Inject constructor(
                 val seq = bb[pos].toUByte().toInt()
                 pos += 1
 
-                Log.i(TAG, "=== overallSeq=$overallSeq total=$total seq=$seq isAll=$isAll")
+                logI(TAG, "=== overallSeq=$overallSeq total=$total seq=$seq isAll=$isAll")
 
                 if (VERBOSE_LOGGING) {
-                    Log.d(TAG, "🔍 패킷 파싱 정보")
-                    Log.d(TAG, "   version: $ver")
-                    Log.d(TAG, "   isAll: $isAll")
-                    Log.d(TAG, "   timestamp: $ts")
-                    Log.d(TAG, "   overallSeq: $overallSeq (prev: $lastOverallSeq)")
-                    Log.d(TAG, "   total: $total, seq: $seq")
+                    logD(TAG, "🔍 패킷 파싱 정보")
+                    logD(TAG, "   version: $ver")
+                    logD(TAG, "   isAll: $isAll")
+                    logD(TAG, "   timestamp: $ts")
+                    logD(TAG, "   overallSeq: $overallSeq (prev: $lastOverallSeq)")
+                    logD(TAG, "   total: $total, seq: $seq")
                 }
 
                 // 전체 패킷의 마지막을 받으면 바로 전송
@@ -563,12 +566,12 @@ class IdolBroadcastManager @Inject constructor(
 
                                 top3 = "$top1,$top2,$top3Value"
                                 top3Type = "$type1,$type2,$type3"
-                                Log.i(TAG, "=== id=$lastId additionType=1 top3=$top3")
+                                logI(TAG, "=== id=$lastId additionType=1 top3=$top3")
                             }
 
                             2 -> { // top3-image-ver
                                 if (pos + additionLength > size) {
-                                    Log.e(TAG, "=== size mismatch!!! pos=$pos additionLength=$additionLength size=$size")
+                                    logE(TAG, "=== size mismatch!!! pos=$pos additionLength=$additionLength size=$size")
                                     return
                                 }
 
@@ -577,7 +580,7 @@ class IdolBroadcastManager @Inject constructor(
                                 val imageVer3 = bb[pos + 2].toUInt()
 
                                 top3ImageVer = "$imageVer1,$imageVer2,$imageVer3"
-                                Log.i(TAG, "=== id=$lastId additionType=2 top3ImageVer=$top3ImageVer")
+                                logI(TAG, "=== id=$lastId additionType=2 top3ImageVer=$top3ImageVer")
                             }
                         }
 
@@ -597,13 +600,13 @@ class IdolBroadcastManager @Inject constructor(
                     idolCount++
 
                     if (VERBOSE_LOGGING) {
-                        Log.d(TAG, "   👤 idol #$idolCount: id=$lastId heart=$votes infoVer=$infoVer top3Ver=$top3Ver")
-                        if (top3 != null) Log.d(TAG, "      top3=$top3 type=$top3Type ver=$top3ImageVer")
+                        logD(TAG, "   👤 idol #$idolCount: id=$lastId heart=$votes infoVer=$infoVer top3Ver=$top3Ver")
+                        if (top3 != null) logD(TAG, "      top3=$top3 type=$top3Type ver=$top3ImageVer")
                     }
                 }
 
                 if (VERBOSE_LOGGING) {
-                    Log.d(TAG, "✅ 파싱 완료: $idolCount 명의 아이돌 데이터")
+                    logD(TAG, "✅ 파싱 완료: $idolCount 명의 아이돌 데이터")
                 }
 
                 // DB 업데이트를 별도 코루틴에서 실행 (old 프로젝트 로직)
@@ -614,7 +617,7 @@ class IdolBroadcastManager @Inject constructor(
                 }
 
             } catch (e: Exception) {
-                Log.e(TAG, "=== parse error", e)
+                logE(TAG, "=== parse error", e)
             }
         }
     }
@@ -630,8 +633,8 @@ class IdolBroadcastManager @Inject constructor(
             if (keyList.isEmpty()) return
 
             if (VERBOSE_LOGGING) {
-                Log.d(TAG, "💾 DB 업데이트 시작")
-                Log.d(TAG, "   수신한 아이돌 수: ${keyList.size}")
+                logD(TAG, "💾 DB 업데이트 시작")
+                logD(TAG, "   수신한 아이돌 수: ${keyList.size}")
             }
 
             // DB에서 기존 데이터 조회
@@ -639,7 +642,7 @@ class IdolBroadcastManager @Inject constructor(
             val idolMap = dbIdols.associateBy { it.id }
 
             if (VERBOSE_LOGGING) {
-                Log.d(TAG, "   DB에서 조회한 아이돌 수: ${dbIdols.size}")
+                logD(TAG, "   DB에서 조회한 아이돌 수: ${dbIdols.size}")
             }
 
             val notExistingIds = ArrayList<Int>()
@@ -657,21 +660,21 @@ class IdolBroadcastManager @Inject constructor(
 
                 // info_ver 변경 (API로 전체 필드 업데이트 필요)
                 if (idol.infoSeq != incomingData.infoSeq) {
-                    Log.i(TAG, "=== info_ver updated id=$id ${idol.infoSeq} → ${incomingData.infoSeq}")
+                    logI(TAG, "=== info_ver updated id=$id ${idol.infoSeq} → ${incomingData.infoSeq}")
                     updatedInfoVerIds.add(id)
                     continue  // ✅ API로 전체 필드 업데이트할 것이므로 여기서 종료
                 }
 
                 // top3_ver 변경 (API로 전체 필드 업데이트 필요)
                 if (idol.top3Seq != incomingData.top3Seq) {
-                    Log.i(TAG, "=== top3_ver updated id=$id ${idol.top3Seq} → ${incomingData.top3Seq}")
+                    logI(TAG, "=== top3_ver updated id=$id ${idol.top3Seq} → ${incomingData.top3Seq}")
                     updatedInfoVerIds.add(id)
                     continue  // ✅ API로 전체 필드 업데이트할 것이므로 여기서 종료
                 }
 
                 // top3_image_ver 변경 (API로 전체 필드 업데이트 필요)
                 if (idol.top3ImageVer != incomingData.top3ImageVer && incomingData.top3ImageVer != null) {
-                    Log.i(TAG, "=== top3_image_ver updated id=$id")
+                    logI(TAG, "=== top3_image_ver updated id=$id")
                     updatedInfoVerIds.add(id)
                     continue  // ✅ API로 전체 필드 업데이트할 것이므로 여기서 종료
                 }
@@ -695,12 +698,12 @@ class IdolBroadcastManager @Inject constructor(
                     updateTs = ts
                 )
 
-                Log.i(TAG, "=== update id=$id heart:${idol.heart}→${incomingData.heart}")
+                logI(TAG, "=== update id=$id heart:${idol.heart}→${incomingData.heart}")
 
                 if (VERBOSE_LOGGING) {
-                    Log.d(TAG, "   🔄 업데이트: id=$id")
-                    if (heartChanged) Log.d(TAG, "      heart: ${idol.heart} → ${incomingData.heart}")
-                    if (top3Changed) Log.d(TAG, "      top3: ${idol.top3} → ${incomingData.top3}")
+                    logD(TAG, "   🔄 업데이트: id=$id")
+                    if (heartChanged) logD(TAG, "      heart: ${idol.heart} → ${incomingData.heart}")
+                    if (top3Changed) logD(TAG, "      top3: ${idol.top3} → ${incomingData.top3}")
                 }
 
                 updatedIdols.add(updated)
@@ -712,15 +715,15 @@ class IdolBroadcastManager @Inject constructor(
             if (updatedIdols.isNotEmpty()) {
                 idolDao.upsertIdols(updatedIdols)
                 changedIdolIds.addAll(updatedIdols.map { it.id })
-                Log.i(TAG, "=== updated ${updatedIdols.size} idols in DB")
+                logI(TAG, "=== updated ${updatedIdols.size} idols in DB")
 
                 if (VERBOSE_LOGGING) {
-                    Log.d(TAG, "✅ DB 업데이트 완료: ${updatedIdols.size}명")
+                    logD(TAG, "✅ DB 업데이트 완료: ${updatedIdols.size}명")
                     updatedIdols.take(5).forEach { idol ->
-                        Log.d(TAG, "   - id=${idol.id} heart=${idol.heart}")
+                        logD(TAG, "   - id=${idol.id} heart=${idol.heart}")
                     }
                     if (updatedIdols.size > 5) {
-                        Log.d(TAG, "   ... 외 ${updatedIdols.size - 5}명")
+                        logD(TAG, "   ... 외 ${updatedIdols.size - 5}명")
                     }
                 }
             }
@@ -733,25 +736,25 @@ class IdolBroadcastManager @Inject constructor(
             // 업데이트 이벤트 발행 - 변경된 아이돌 ID 리스트 전달
             if (changedIdolIds.isNotEmpty()) {
                 _updateEvent.emit(changedIdolIds)
-                Log.i(TAG, "=== emitted update event with ${changedIdolIds.size} changed idols")
+                logI(TAG, "=== emitted update event with ${changedIdolIds.size} changed idols")
 
                 if (VERBOSE_LOGGING) {
-                    Log.d(TAG, "📢 업데이트 이벤트 발행")
-                    Log.d(TAG, "   변경된 아이돌 수: ${changedIdolIds.size}")
-                    Log.d(TAG, "   변경된 ID: ${changedIdolIds.take(10)}")
+                    logD(TAG, "📢 업데이트 이벤트 발행")
+                    logD(TAG, "   변경된 아이돌 수: ${changedIdolIds.size}")
+                    logD(TAG, "   변경된 ID: ${changedIdolIds.take(10)}")
                     if (changedIdolIds.size > 10) {
-                        Log.d(TAG, "   ... 외 ${changedIdolIds.size - 10}개")
+                        logD(TAG, "   ... 외 ${changedIdolIds.size - 10}개")
                     }
-                    Log.d(TAG, "   → ViewModel에서 해당 아이돌만 재계산")
+                    logD(TAG, "   → ViewModel에서 해당 아이돌만 재계산")
                 }
 
                 // Room DB 부분 업데이트 (전체 재생성이 아닌 해당 아이돌만)
-                Log.i(TAG, "🔄 Updating chart DB for ${changedIdolIds.size} idols")
+                logI(TAG, "🔄 Updating chart DB for ${changedIdolIds.size} idols")
                 chartDatabaseRepository.updateIdolsFromUdp(changedIdolIds)
-                Log.i(TAG, "✅ Chart DB partially updated")
+                logI(TAG, "✅ Chart DB partially updated")
             } else {
                 if (VERBOSE_LOGGING) {
-                    Log.d(TAG, "ℹ️ 변경사항 없음 - 이벤트 발행 안 함")
+                    logD(TAG, "ℹ️ 변경사항 없음 - 이벤트 발행 안 함")
                 }
             }
 
@@ -761,29 +764,29 @@ class IdolBroadcastManager @Inject constructor(
             if (needFullRefresh) {
                 // 중복 호출 방지
                 if (updatingAll) {
-                    Log.w(TAG, "⚠️ Already updating all, skipping")
+                    logW(TAG, "⚠️ Already updating all, skipping")
                     return
                 }
                 updatingAll = true
-                Log.w(TAG, "⚠️ Full refresh needed: ${updatedInfoVerIds.size} info changes, ${notExistingIds.size} missing")
+                logW(TAG, "⚠️ Full refresh needed: ${updatedInfoVerIds.size} info changes, ${notExistingIds.size} missing")
                 refreshAllIdols()
                 return  // ✅ 전체 갱신 후 종료
             }
 
             // 부분 업데이트: info_ver 변경된 아이돌 API 호출
             if (updatedInfoVerIds.isNotEmpty()) {
-                Log.i(TAG, "=== ${updatedInfoVerIds.size} idols need info update via API")
+                logI(TAG, "=== ${updatedInfoVerIds.size} idols need info update via API")
                 updateIdolsByIds(updatedInfoVerIds.toList())
             }
 
             // 부분 업데이트: DB에 없는 아이돌 API 호출
             if (notExistingIds.isNotEmpty()) {
-                Log.w(TAG, "=== ${notExistingIds.size} idols not found in DB")
+                logW(TAG, "=== ${notExistingIds.size} idols not found in DB")
                 updateIdolsByIds(notExistingIds.toList())
             }
 
         } catch (e: Exception) {
-            Log.e(TAG, "=== updateDatabase error", e)
+            logE(TAG, "=== updateDatabase error", e)
         }
     }
 
@@ -873,7 +876,7 @@ class IdolBroadcastManager @Inject constructor(
     private fun updateIdolsByIds(ids: List<Int>) {
         scope.launch {
             try {
-                Log.i(TAG, "🔄 Updating ${ids.size} idols via API: $ids")
+                logI(TAG, "🔄 Updating ${ids.size} idols via API: $ids")
 
                 // API 호출 (fields=null이면 모든 필드 반환)
                 idolRepository.getIdolsByIds(ids, fields = null).collect { result ->
@@ -882,18 +885,18 @@ class IdolBroadcastManager @Inject constructor(
                             val idolDataList = result.data.data
 
                             if (idolDataList != null && idolDataList.isNotEmpty()) {
-                                Log.i(TAG, "✅ API returned ${idolDataList.size} idols")
+                                logI(TAG, "✅ API returned ${idolDataList.size} idols")
 
                                 // DB에 업데이트 (isViewable 포함 모든 필드)
                                 val entities = idolDataList.map { it.toEntity() }
                                 idolDao.upsertIdols(entities)
 
-                                Log.i(TAG, "✅ Updated ${entities.size} idols in DB (isViewable included)")
+                                logI(TAG, "✅ Updated ${entities.size} idols in DB (isViewable included)")
 
                                 // isViewable 값 로깅
                                 if (VERBOSE_LOGGING) {
                                     entities.forEach { entity ->
-                                        Log.d(TAG, "  - ID:${entity.id} ${entity.name} isViewable=${entity.isViewable}")
+                                        logD(TAG, "  - ID:${entity.id} ${entity.name} isViewable=${entity.isViewable}")
                                     }
                                 }
 
@@ -905,11 +908,11 @@ class IdolBroadcastManager @Inject constructor(
                                 // 이유: 전체 캐시 재생성 시 사용자의 투표 업데이트가 덮어씌워질 수 있음
                                 // StateFlow 구독 방식으로 UI는 자동으로 업데이트됨
                             } else {
-                                Log.w(TAG, "⚠️ API returned empty data")
+                                logW(TAG, "⚠️ API returned empty data")
                             }
                         }
                         is net.ib.mn.domain.model.ApiResult.Error -> {
-                            Log.e(TAG, "❌ API error: ${result.message}")
+                            logE(TAG, "❌ API error: ${result.message}")
                         }
                         is net.ib.mn.domain.model.ApiResult.Loading -> {
                             // Loading state
@@ -917,7 +920,7 @@ class IdolBroadcastManager @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "❌ updateIdolsByIds error", e)
+                logE(TAG, "❌ updateIdolsByIds error", e)
             }
         }
     }
@@ -931,7 +934,7 @@ class IdolBroadcastManager @Inject constructor(
     private fun refreshAllIdols() {
         scope.launch {
             try {
-                Log.i(TAG, "🔄 Starting full idol refresh via API")
+                logI(TAG, "🔄 Starting full idol refresh via API")
 
                 // API 호출 (type=null, category=null이면 전체 조회)
                 idolRepository.getIdols(type = null, category = null).collect { result ->
@@ -940,18 +943,18 @@ class IdolBroadcastManager @Inject constructor(
                             val idolDataList = result.data.data
 
                             if (idolDataList != null && idolDataList.isNotEmpty()) {
-                                Log.i(TAG, "✅ Full refresh: API returned ${idolDataList.size} idols")
+                                logI(TAG, "✅ Full refresh: API returned ${idolDataList.size} idols")
 
                                 // DB에 전체 업데이트
                                 val entities = idolDataList.map { it.toEntity() }
                                 idolDao.upsertIdols(entities)
 
-                                Log.i(TAG, "✅ Full refresh complete: ${entities.size} idols updated in DB")
+                                logI(TAG, "✅ Full refresh complete: ${entities.size} idols updated in DB")
 
                                 // isViewable 통계 로깅
                                 val viewableCount = entities.count { it.isViewable == "Y" }
                                 val hiddenCount = entities.count { it.isViewable == "N" }
-                                Log.i(TAG, "   Viewable: $viewableCount, Hidden: $hiddenCount")
+                                logI(TAG, "   Viewable: $viewableCount, Hidden: $hiddenCount")
 
                                 // UI 전체 갱신 이벤트 발행 (empty set = 전체 갱신)
                                 _updateEvent.emit(emptySet())
@@ -960,14 +963,14 @@ class IdolBroadcastManager @Inject constructor(
                                 // 이유: 전체 캐시 재생성 시 사용자의 투표 업데이트가 덮어씌워질 수 있음
                                 // StateFlow 구독 방식으로 UI는 자동으로 업데이트됨
                             } else {
-                                Log.w(TAG, "⚠️ Full refresh: API returned empty data")
+                                logW(TAG, "⚠️ Full refresh: API returned empty data")
                             }
 
                             // ✅ 완료 후 updatingAll 플래그 리셋 (old 프로젝트 로직)
                             updatingAll = false
                         }
                         is net.ib.mn.domain.model.ApiResult.Error -> {
-                            Log.e(TAG, "❌ Full refresh error: ${result.message}")
+                            logE(TAG, "❌ Full refresh error: ${result.message}")
                             // ✅ 에러 시에도 updatingAll 플래그 리셋
                             updatingAll = false
                         }
@@ -977,7 +980,7 @@ class IdolBroadcastManager @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "❌ refreshAllIdols error", e)
+                logE(TAG, "❌ refreshAllIdols error", e)
                 // ✅ 예외 발생 시에도 updatingAll 플래그 리셋
                 updatingAll = false
             }

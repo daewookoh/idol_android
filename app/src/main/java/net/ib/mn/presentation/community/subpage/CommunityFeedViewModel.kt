@@ -1,6 +1,5 @@
 package net.ib.mn.presentation.community.subpage
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,6 +13,8 @@ import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.NoticeModel
 import net.ib.mn.domain.repository.ArticlesRepository
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
 import javax.inject.Inject
 
 private const val TAG = "CommunityFeedVM"
@@ -81,7 +82,7 @@ class CommunityFeedViewModel @Inject constructor(
             val mostIdolId = preferencesManager.getMostIdolId()
             isMost = mostIdolId != null && mostIdolId == idolId
 
-            Log.d(TAG, "loadFeed: idolId=$idolId, mostIdolId=$mostIdolId, isMost=$isMost")
+            logD(TAG, "loadFeed: idolId=$idolId, mostIdolId=$mostIdolId, isMost=$isMost")
             loadFeedInternal()
         }
     }
@@ -115,14 +116,14 @@ class CommunityFeedViewModel @Inject constructor(
                         hasNextPage = result.data.nextUrl != null,
                         error = null
                     )
-                    Log.d(TAG, "loadFeed success: notices=${result.data.notices.size}, articles=${result.data.articles.size}")
+                    logD(TAG, "loadFeed success: notices=${result.data.notices.size}, articles=${result.data.articles.size}")
                 }
                 is ApiResult.Error -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         error = result.message ?: "Unknown error"
                     )
-                    Log.e(TAG, "loadFeed error: ${result.message}")
+                    logE(TAG, "loadFeed error: ${result.message}")
                 }
             }
         }
@@ -136,7 +137,7 @@ class CommunityFeedViewModel @Inject constructor(
         if (isLoadingNextPage) return
 
         isLoadingNextPage = true
-        Log.d(TAG, "loadNextPage: url=$url")
+        logD(TAG, "loadNextPage: url=$url")
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoadingMore = true)
@@ -161,14 +162,14 @@ class CommunityFeedViewModel @Inject constructor(
                             articles = currentArticles + result.data.articles,
                             hasNextPage = result.data.nextUrl != null
                         )
-                        Log.d(TAG, "loadNextPage success: added ${result.data.articles.size} articles")
+                        logD(TAG, "loadNextPage success: added ${result.data.articles.size} articles")
                     }
                     is ApiResult.Error -> {
                         _uiState.value = _uiState.value.copy(
                             isLoadingMore = false,
                             error = result.message
                         )
-                        Log.e(TAG, "loadNextPage error: ${result.message}")
+                        logE(TAG, "loadNextPage error: ${result.message}")
                     }
                 }
                 isLoadingNextPage = false
@@ -219,19 +220,19 @@ class CommunityFeedViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             try {
-                Log.d(TAG, "voteArticle: articleId=$articleId, hearts=$hearts")
+                logD(TAG, "voteArticle: articleId=$articleId, hearts=$hearts")
                 val response = articlesRepository.voteArticle(articleId, hearts)
                 if (response.success) {
-                    Log.d(TAG, "voteArticle success: ${response.msg}")
+                    logD(TAG, "voteArticle success: ${response.msg}")
                     // 투표 성공 시 해당 게시글의 하트 수 업데이트
                     updateArticleHeart(articleId, hearts)
                     onSuccess(response)
                 } else {
-                    Log.e(TAG, "voteArticle failed: ${response.msg}")
+                    logE(TAG, "voteArticle failed: ${response.msg}")
                     onError(response.msg ?: "투표에 실패했습니다.")
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "voteArticle error: ${e.message}", e)
+                logE(TAG, "voteArticle error: ${e.message}", e)
                 onError(e.message ?: "Unknown error")
             }
         }
@@ -262,11 +263,11 @@ class CommunityFeedViewModel @Inject constructor(
     fun postLike(articleId: String, like: Boolean) {
         viewModelScope.launch {
             try {
-                Log.d(TAG, "postLike: articleId=$articleId, like=$like")
+                logD(TAG, "postLike: articleId=$articleId, like=$like")
                 val response = articlesRepository.likeArticle(articleId, like)
-                Log.d(TAG, "postLike: success=${response.success}, liked=${response.liked}")
+                logD(TAG, "postLike: success=${response.success}, liked=${response.liked}")
             } catch (e: Exception) {
-                Log.e(TAG, "postLike error: ${e.message}", e)
+                logE(TAG, "postLike error: ${e.message}", e)
             }
         }
     }
@@ -289,7 +290,7 @@ class CommunityFeedViewModel @Inject constructor(
         val currentArticles = _uiState.value.articles
         val updatedArticles = currentArticles.filter { it.id != articleId }
         _uiState.value = _uiState.value.copy(articles = updatedArticles)
-        Log.d(TAG, "removeArticle: articleId=$articleId, remaining=${updatedArticles.size}")
+        logD(TAG, "removeArticle: articleId=$articleId, remaining=${updatedArticles.size}")
     }
 
     /**
@@ -311,6 +312,6 @@ class CommunityFeedViewModel @Inject constructor(
             }
         }
         _uiState.value = _uiState.value.copy(articles = updatedArticles)
-        Log.d(TAG, "updateArticle: articleId=${updatedArticle.id}, heart=${updatedArticle.heart}, likeCount=${updatedArticle.likeCount}, comments=${updatedArticle.commentCount}")
+        logD(TAG, "updateArticle: articleId=${updatedArticle.id}, heart=${updatedArticle.heart}, likeCount=${updatedArticle.likeCount}, comments=${updatedArticle.commentCount}")
     }
 }

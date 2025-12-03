@@ -12,6 +12,9 @@ import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.UserRepository
 import net.ib.mn.util.Constants
 import net.ib.mn.util.DeviceUtil
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
+import net.ib.mn.util.logW
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -48,15 +51,15 @@ class UserRepositoryImpl @Inject constructor(
             val userInfo = preferencesManager.userInfo.first()
             val ts = timestamp ?: (userInfo?.ts ?: 0)
 
-            android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ========================================")
-            android.util.Log.d("USER_INFO", "[UserRepositoryImpl] Calling getUserSelf API")
-            android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - UserInfo exists: ${userInfo != null}")
-            android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - TS from DataStore: ${userInfo?.ts}")
-            android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Timestamp parameter: $timestamp")
-            android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - TS to send: $ts")
-            android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - ETag: $etag")
-            android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Cache-Control: $cacheControl")
-            android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ========================================")
+            logD("USER_INFO", "[UserRepositoryImpl] ========================================")
+            logD("USER_INFO", "[UserRepositoryImpl] Calling getUserSelf API")
+            logD("USER_INFO", "[UserRepositoryImpl]   - UserInfo exists: ${userInfo != null}")
+            logD("USER_INFO", "[UserRepositoryImpl]   - TS from DataStore: ${userInfo?.ts}")
+            logD("USER_INFO", "[UserRepositoryImpl]   - Timestamp parameter: $timestamp")
+            logD("USER_INFO", "[UserRepositoryImpl]   - TS to send: $ts")
+            logD("USER_INFO", "[UserRepositoryImpl]   - ETag: $etag")
+            logD("USER_INFO", "[UserRepositoryImpl]   - Cache-Control: $cacheControl")
+            logD("USER_INFO", "[UserRepositoryImpl] ========================================")
 
             // AuthInterceptor가 자동으로 Authorization 헤더를 추가하므로 여기서는 제거
             val response = userApi.getUserSelf(ts, etag, cacheControl)
@@ -65,7 +68,7 @@ class UserRepositoryImpl @Inject constructor(
             if (response.code() == 304) {
                 // 캐시된 데이터 사용 - DataStore의 userInfo를 그대로 사용
                 // 304는 데이터가 변경되지 않았음을 의미하므로 로컬 데이터가 최신 상태
-                android.util.Log.d("UserRepositoryImpl", "📦 HTTP 304: Using cached data")
+                logD("UserRepositoryImpl", "📦 HTTP 304: Using cached data")
 
                 emit(ApiResult.Error(ApiError.Http(
                     httpCode = 304,
@@ -83,32 +86,32 @@ class UserRepositoryImpl @Inject constructor(
                 if (body.objects.isNotEmpty()) {
                     // 응답 데이터 로그 출력
                     val firstObject = body.objects.firstOrNull()
-                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ========================================")
-                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl] getUserSelf API Response:")
-                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - User ID: ${firstObject?.id}")
+                    logD("USER_INFO", "[UserRepositoryImpl] ========================================")
+                    logD("USER_INFO", "[UserRepositoryImpl] getUserSelf API Response:")
+                    logD("USER_INFO", "[UserRepositoryImpl]   - User ID: ${firstObject?.id}")
 
                     if (firstObject?.most == null) {
-                        android.util.Log.w("USER_INFO", "[UserRepositoryImpl]   ⚠️ Most is NULL - User has no favorite idol set")
+                        logW("USER_INFO", "[UserRepositoryImpl]   ⚠️ Most is NULL - User has no favorite idol set")
                     } else {
-                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most: ${firstObject.most}")
-                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most ID: ${firstObject.most.id}")
-                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most Name: ${firstObject.most.name}")
-                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most Type: ${firstObject.most.type}")
-                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most ChartCode: ${firstObject.most.chartCodes?.firstOrNull()}")
-                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most Category: ${firstObject.most.category}")
-                        android.util.Log.d("USER_INFO", "[UserRepositoryImpl]   - Most GroupId: ${firstObject.most.groupId}")
+                        logD("USER_INFO", "[UserRepositoryImpl]   - Most: ${firstObject.most}")
+                        logD("USER_INFO", "[UserRepositoryImpl]   - Most ID: ${firstObject.most.id}")
+                        logD("USER_INFO", "[UserRepositoryImpl]   - Most Name: ${firstObject.most.name}")
+                        logD("USER_INFO", "[UserRepositoryImpl]   - Most Type: ${firstObject.most.type}")
+                        logD("USER_INFO", "[UserRepositoryImpl]   - Most ChartCode: ${firstObject.most.chartCodes?.firstOrNull()}")
+                        logD("USER_INFO", "[UserRepositoryImpl]   - Most Category: ${firstObject.most.category}")
+                        logD("USER_INFO", "[UserRepositoryImpl]   - Most GroupId: ${firstObject.most.groupId}")
                     }
-                    android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ========================================")
+                    logD("USER_INFO", "[UserRepositoryImpl] ========================================")
 
                     // 새로운 ETag 저장 (cacheControl이 설정되지 않은 경우만, 즉 캐시를 사용하는 경우만)
                     if (cacheControl == null && timestamp == null) {
                         val newETag = response.headers()["ETag"]
                         newETag?.let {
                             preferencesManager.setUserSelfETag(it)
-                            android.util.Log.d("UserRepositoryImpl", "✓ ETag saved: $it")
+                            logD("UserRepositoryImpl", "✓ ETag saved: $it")
                         }
                     } else {
-                        android.util.Log.d("UserRepositoryImpl", "⚠️ ETag not saved (cache disabled: cacheControl=$cacheControl, timestamp=$timestamp)")
+                        logD("UserRepositoryImpl", "⚠️ ETag not saved (cache disabled: cacheControl=$cacheControl, timestamp=$timestamp)")
                     }
 
                     emit(ApiResult.Success(body))
@@ -238,41 +241,41 @@ class UserRepositoryImpl @Inject constructor(
             val params = mutableMapOf<String, String?>(type to value)
             params["app_id"] = appId
 
-            android.util.Log.d("ValidateUserAPI", "========================================")
-            android.util.Log.d("ValidateUserAPI", "API Request Parameters:")
-            android.util.Log.d("ValidateUserAPI", "  - type: $type")
-            android.util.Log.d("ValidateUserAPI", "  - value: $value")
-            android.util.Log.d("ValidateUserAPI", "  - appId: $appId")
-            android.util.Log.d("ValidateUserAPI", "  - params: $params")
-            android.util.Log.d("ValidateUserAPI", "========================================")
+            logD("ValidateUserAPI", "========================================")
+            logD("ValidateUserAPI", "API Request Parameters:")
+            logD("ValidateUserAPI", "  - type: $type")
+            logD("ValidateUserAPI", "  - value: $value")
+            logD("ValidateUserAPI", "  - appId: $appId")
+            logD("ValidateUserAPI", "  - params: $params")
+            logD("ValidateUserAPI", "========================================")
 
             val response = userApi.validate(params)
 
-            android.util.Log.d("ValidateUserAPI", "========================================")
-            android.util.Log.d("ValidateUserAPI", "API Response:")
-            android.util.Log.d("ValidateUserAPI", "  - isSuccessful: ${response.isSuccessful}")
-            android.util.Log.d("ValidateUserAPI", "  - code: ${response.code()}")
-            android.util.Log.d("ValidateUserAPI", "  - errorBody: ${response.errorBody()?.string()}")
-            android.util.Log.d("ValidateUserAPI", "  - body: ${response.body()}")
-            android.util.Log.d("ValidateUserAPI", "========================================")
+            logD("ValidateUserAPI", "========================================")
+            logD("ValidateUserAPI", "API Response:")
+            logD("ValidateUserAPI", "  - isSuccessful: ${response.isSuccessful}")
+            logD("ValidateUserAPI", "  - code: ${response.code()}")
+            logD("ValidateUserAPI", "  - errorBody: ${response.errorBody()?.string()}")
+            logD("ValidateUserAPI", "  - body: ${response.body()}")
+            logD("ValidateUserAPI", "========================================")
 
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
                 
-                android.util.Log.d("ValidateUserAPI", "========================================")
-                android.util.Log.d("ValidateUserAPI", "Parsed Response Body:")
-                android.util.Log.d("ValidateUserAPI", "  - success: ${body.success}")
-                android.util.Log.d("ValidateUserAPI", "  - message: ${body.message}")
-                android.util.Log.d("ValidateUserAPI", "  - domain: ${body.domain}")
-                android.util.Log.d("ValidateUserAPI", "  - gcode: ${body.gcode}")
-                android.util.Log.d("ValidateUserAPI", "  - mcode: ${body.mcode}")
-                android.util.Log.d("ValidateUserAPI", "========================================")
+                logD("ValidateUserAPI", "========================================")
+                logD("ValidateUserAPI", "Parsed Response Body:")
+                logD("ValidateUserAPI", "  - success: ${body.success}")
+                logD("ValidateUserAPI", "  - message: ${body.message}")
+                logD("ValidateUserAPI", "  - domain: ${body.domain}")
+                logD("ValidateUserAPI", "  - gcode: ${body.gcode}")
+                logD("ValidateUserAPI", "  - mcode: ${body.mcode}")
+                logD("ValidateUserAPI", "========================================")
                 
                 emit(ApiResult.Success(body))
             } else {
                 val errorBody = response.errorBody()?.string()
-                android.util.Log.e("ValidateUserAPI", "API Error: HTTP ${response.code()}")
-                android.util.Log.e("ValidateUserAPI", "Error Body: $errorBody")
+                logE("ValidateUserAPI", "API Error: HTTP ${response.code()}")
+                logE("ValidateUserAPI", "Error Body: $errorBody")
                 emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
@@ -382,60 +385,60 @@ class UserRepositoryImpl @Inject constructor(
                 facebookId = null  // 더 이상 사용하지 않음
             )
 
-            android.util.Log.d(signUpTag, "========================================")
-            android.util.Log.d(signUpTag, "SignUp API Request:")
-            android.util.Log.d(signUpTag, "  domain: ${request.domain}")
-            android.util.Log.d(signUpTag, "  email: ${request.email}")
-            android.util.Log.d(signUpTag, "  passwd: ${request.passwd.take(20)}...")
-            android.util.Log.d(signUpTag, "  nickname: ${request.nickname}")
-            android.util.Log.d(signUpTag, "  referralCode: ${request.referralCode}")
-            android.util.Log.d(signUpTag, "  pushKey: ${request.pushKey}")
-            android.util.Log.d(signUpTag, "  gmail: ${request.gmail}")
-            android.util.Log.d(signUpTag, "  version: ${request.version}")
-            android.util.Log.d(signUpTag, "  googleAccount: ${request.googleAccount}")
-            android.util.Log.d(signUpTag, "  time: ${request.time}")
-            android.util.Log.d(signUpTag, "  appId: ${request.appId}")
-            android.util.Log.d(signUpTag, "  deviceId: ${request.deviceId}")
-            android.util.Log.d(signUpTag, "========================================")
+            logD(signUpTag, "========================================")
+            logD(signUpTag, "SignUp API Request:")
+            logD(signUpTag, "  domain: ${request.domain}")
+            logD(signUpTag, "  email: ${request.email}")
+            logD(signUpTag, "  passwd: ${request.passwd.take(20)}...")
+            logD(signUpTag, "  nickname: ${request.nickname}")
+            logD(signUpTag, "  referralCode: ${request.referralCode}")
+            logD(signUpTag, "  pushKey: ${request.pushKey}")
+            logD(signUpTag, "  gmail: ${request.gmail}")
+            logD(signUpTag, "  version: ${request.version}")
+            logD(signUpTag, "  googleAccount: ${request.googleAccount}")
+            logD(signUpTag, "  time: ${request.time}")
+            logD(signUpTag, "  appId: ${request.appId}")
+            logD(signUpTag, "  deviceId: ${request.deviceId}")
+            logD(signUpTag, "========================================")
 
             val response = userApi.signUp(signature, request)
 
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
-                android.util.Log.d(signUpTag, "========================================")
-                android.util.Log.d(signUpTag, "SignUp API Response:")
-                android.util.Log.d(signUpTag, "  success: ${body.success}")
-                android.util.Log.d(signUpTag, "  message: ${body.message}")
-                android.util.Log.d(signUpTag, "  gcode: ${body.gcode}")
-                android.util.Log.d(signUpTag, "  mcode: ${body.mcode}")
-                android.util.Log.d(signUpTag, "========================================")
+                logD(signUpTag, "========================================")
+                logD(signUpTag, "SignUp API Response:")
+                logD(signUpTag, "  success: ${body.success}")
+                logD(signUpTag, "  message: ${body.message}")
+                logD(signUpTag, "  gcode: ${body.gcode}")
+                logD(signUpTag, "  mcode: ${body.mcode}")
+                logD(signUpTag, "========================================")
                 emit(ApiResult.Success(body))
             } else {
                 val errorBody = response.errorBody()?.string()
-                android.util.Log.e(signUpTag, "========================================")
-                android.util.Log.e(signUpTag, "SignUp API Error: HTTP ${response.code()}")
-                android.util.Log.e(signUpTag, "Error Body: $errorBody")
-                android.util.Log.e(signUpTag, "========================================")
+                logE(signUpTag, "========================================")
+                logE(signUpTag, "SignUp API Error: HTTP ${response.code()}")
+                logE(signUpTag, "Error Body: $errorBody")
+                logE(signUpTag, "========================================")
                 emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
-            android.util.Log.e(signUpTag, "========================================")
-            android.util.Log.e(signUpTag, "SignUp API HttpException", e)
-            android.util.Log.e(signUpTag, "  code: ${e.code()}")
-            android.util.Log.e(signUpTag, "  message: ${e.message}")
-            android.util.Log.e(signUpTag, "========================================")
+            logE(signUpTag, "========================================")
+            logE(signUpTag, "SignUp API HttpException", e)
+            logE(signUpTag, "  code: ${e.code()}")
+            logE(signUpTag, "  message: ${e.message}")
+            logE(signUpTag, "========================================")
             emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: IOException) {
-            android.util.Log.e(signUpTag, "========================================")
-            android.util.Log.e(signUpTag, "SignUp API IOException", e)
-            android.util.Log.e(signUpTag, "  message: ${e.message}")
-            android.util.Log.e(signUpTag, "========================================")
+            logE(signUpTag, "========================================")
+            logE(signUpTag, "SignUp API IOException", e)
+            logE(signUpTag, "  message: ${e.message}")
+            logE(signUpTag, "========================================")
             emit(ApiResult.Error(ApiError.Network(exception = e)))
         } catch (e: Exception) {
-            android.util.Log.e(signUpTag, "========================================")
-            android.util.Log.e(signUpTag, "SignUp API Exception", e)
-            android.util.Log.e(signUpTag, "  message: ${e.message}")
-            android.util.Log.e(signUpTag, "========================================")
+            logE(signUpTag, "========================================")
+            logE(signUpTag, "SignUp API Exception", e)
+            logE(signUpTag, "  message: ${e.message}")
+            logE(signUpTag, "========================================")
             emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
@@ -477,7 +480,7 @@ class UserRepositoryImpl @Inject constructor(
                         emit(ApiResult.Success(""))
                     }
                 } catch (e: org.json.JSONException) {
-                    android.util.Log.e("FindIdAPI", "JSON parsing error", e)
+                    logE("FindIdAPI", "JSON parsing error", e)
                     emit(ApiResult.Error(ApiError.Unknown(
                         message = "Failed to parse response",
                         exception = e
@@ -485,14 +488,14 @@ class UserRepositoryImpl @Inject constructor(
                 }
             } else {
                 val errorBody = response.errorBody()?.string()
-                android.util.Log.e("FindIdAPI", "HTTP ${response.code()}: $errorBody")
+                logE("FindIdAPI", "HTTP ${response.code()}: $errorBody")
                 emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
-            android.util.Log.e("FindIdAPI", "HttpException", e)
+            logE("FindIdAPI", "HttpException", e)
             emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: Exception) {
-            android.util.Log.e("FindIdAPI", "Exception", e)
+            logE("FindIdAPI", "Exception", e)
             emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
@@ -506,18 +509,18 @@ class UserRepositoryImpl @Inject constructor(
 
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
-                android.util.Log.d("FindPasswordAPI", "Success: ${body.success}, message: ${body.message}")
+                logD("FindPasswordAPI", "Success: ${body.success}, message: ${body.message}")
                 emit(ApiResult.Success(body))
             } else {
                 val errorBody = response.errorBody()?.string()
-                android.util.Log.e("FindPasswordAPI", "HTTP ${response.code()}: $errorBody")
+                logE("FindPasswordAPI", "HTTP ${response.code()}: $errorBody")
                 emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
-            android.util.Log.e("FindPasswordAPI", "HttpException", e)
+            logE("FindPasswordAPI", "HttpException", e)
             emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: Exception) {
-            android.util.Log.e("FindPasswordAPI", "Exception", e)
+            logE("FindPasswordAPI", "Exception", e)
             emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
@@ -542,7 +545,7 @@ class UserRepositoryImpl @Inject constructor(
             while (md5.length < 32) md5 = "0$md5"
             md5
         } catch (e: NoSuchAlgorithmException) {
-            android.util.Log.e("SignUpAPI", "MD5 error", e)
+            logE("SignUpAPI", "MD5 error", e)
             null
         }
     }
@@ -561,7 +564,7 @@ class UserRepositoryImpl @Inject constructor(
             cipher.init(Cipher.ENCRYPT_MODE, newKey, IvParameterSpec(iv))
             cipher.doFinal(tsBytes)
         } catch (e: Exception) {
-            android.util.Log.e("SignUpAPI", "AES encode error", e)
+            logE("SignUpAPI", "AES encode error", e)
             ByteArray(0)
         }
     }
@@ -579,7 +582,7 @@ class UserRepositoryImpl @Inject constructor(
             output.write(iv)
             output.write(sig)
         } catch (e: IOException) {
-            android.util.Log.e("SignUpAPI", "Signature write error", e)
+            logE("SignUpAPI", "Signature write error", e)
         }
         return Base64.encodeToString(output.toByteArray(), Base64.NO_WRAP)
     }
@@ -651,9 +654,9 @@ class UserRepositoryImpl @Inject constructor(
                             // 이후 로드에서는 사용자가 수동으로 선택한 성별을 존중
                             if (isInitialLoad && category != null) {
                                 userCacheRepository.setDefaultCategory(category)
-                                android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ✓ Initial load: Setting defaultCategory to $category (favorite idol gender)")
+                                logD("USER_INFO", "[UserRepositoryImpl] ✓ Initial load: Setting defaultCategory to $category (favorite idol gender)")
                             } else if (!isInitialLoad && category != null) {
-                                android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ⚠️ Not initial load: Skipping defaultCategory update (user preference preserved)")
+                                logD("USER_INFO", "[UserRepositoryImpl] ⚠️ Not initial load: Skipping defaultCategory update (user preference preserved)")
                             }
 
                             if (chartCode != null) {
@@ -669,7 +672,7 @@ class UserRepositoryImpl @Inject constructor(
                                     net.ib.mn.util.Constants.MY_FAVORITE_TAG_ID
                                 }
                                 preferencesManager.setFreeBoardSelectedTagId(defaultTagId)
-                                android.util.Log.d("USER_INFO", "[UserRepositoryImpl] ✓ Initial load: Setting FreeBoardSelectedTagId to $defaultTagId (${if (net.ib.mn.util.ServerUrl.isTestServer()) "HOT - TestServer" else "MY_FAVORITE - Production"})")
+                                logD("USER_INFO", "[UserRepositoryImpl] ✓ Initial load: Setting FreeBoardSelectedTagId to $defaultTagId (${if (net.ib.mn.util.ServerUrl.isTestServer()) "HOT - TestServer" else "MY_FAVORITE - Production"})")
                             }
 
                             kotlinx.coroutines.delay(100)
@@ -712,27 +715,27 @@ class UserRepositoryImpl @Inject constructor(
                 else -> "F"
             }
 
-            android.util.Log.d("CheckEventAPI", "========================================")
-            android.util.Log.d("CheckEventAPI", "API Request:")
-            android.util.Log.d("CheckEventAPI", "  - version: $version")
-            android.util.Log.d("CheckEventAPI", "  - gmail: $gmail")
-            android.util.Log.d("CheckEventAPI", "  - isVM: $paramVM")
-            android.util.Log.d("CheckEventAPI", "  - deviceId: $deviceId")
-            android.util.Log.d("CheckEventAPI", "========================================")
+            logD("CheckEventAPI", "========================================")
+            logD("CheckEventAPI", "API Request:")
+            logD("CheckEventAPI", "  - version: $version")
+            logD("CheckEventAPI", "  - gmail: $gmail")
+            logD("CheckEventAPI", "  - isVM: $paramVM")
+            logD("CheckEventAPI", "  - deviceId: $deviceId")
+            logD("CheckEventAPI", "========================================")
 
             val response = userApi.checkEvent(version, gmail, paramVM, deviceId)
 
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
 
-                android.util.Log.d("CheckEventAPI", "========================================")
-                android.util.Log.d("CheckEventAPI", "API Response:")
-                android.util.Log.d("CheckEventAPI", "  - success: ${body.success}")
-                android.util.Log.d("CheckEventAPI", "  - showWelcomeMission: ${body.showWelcomeMission}")
-                android.util.Log.d("CheckEventAPI", "  - mostPicks: ${body.mostPicks}")
-                android.util.Log.d("CheckEventAPI", "  - guideUrl: ${body.guideUrl}")
-                android.util.Log.d("CheckEventAPI", "  - banners count: ${body.banners?.size ?: 0}")
-                android.util.Log.d("CheckEventAPI", "========================================")
+                logD("CheckEventAPI", "========================================")
+                logD("CheckEventAPI", "API Response:")
+                logD("CheckEventAPI", "  - success: ${body.success}")
+                logD("CheckEventAPI", "  - showWelcomeMission: ${body.showWelcomeMission}")
+                logD("CheckEventAPI", "  - mostPicks: ${body.mostPicks}")
+                logD("CheckEventAPI", "  - guideUrl: ${body.guideUrl}")
+                logD("CheckEventAPI", "  - banners count: ${body.banners?.size ?: 0}")
+                logD("CheckEventAPI", "========================================")
 
                 if (body.success) {
                     emit(ApiResult.Success(body))
@@ -745,17 +748,17 @@ class UserRepositoryImpl @Inject constructor(
                 }
             } else {
                 val errorBody = response.errorBody()?.string()
-                android.util.Log.e("CheckEventAPI", "HTTP ${response.code()}: $errorBody")
+                logE("CheckEventAPI", "HTTP ${response.code()}: $errorBody")
                 emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
-            android.util.Log.e("CheckEventAPI", "HttpException", e)
+            logE("CheckEventAPI", "HttpException", e)
             emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: IOException) {
-            android.util.Log.e("CheckEventAPI", "IOException", e)
+            logE("CheckEventAPI", "IOException", e)
             emit(ApiResult.Error(ApiError.Network(exception = e)))
         } catch (e: Exception) {
-            android.util.Log.e("CheckEventAPI", "Exception", e)
+            logE("CheckEventAPI", "Exception", e)
             emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }

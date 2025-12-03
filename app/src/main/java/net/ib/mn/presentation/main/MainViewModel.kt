@@ -23,6 +23,7 @@ import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.UserRepository
 import net.ib.mn.util.Constants
 import net.ib.mn.util.DeviceUtil
+import net.ib.mn.util.logW
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -67,7 +68,7 @@ class MainViewModel @Inject constructor(
                 if (info != null) {
                     _userInfo.value = info
                 } else {
-                    android.util.Log.w(TAG, "[MainViewModel] ⚠️ UserInfo is null")
+                    logW(TAG, "[MainViewModel] ⚠️ UserInfo is null")
                     _userInfo.value = null
                 }
             }

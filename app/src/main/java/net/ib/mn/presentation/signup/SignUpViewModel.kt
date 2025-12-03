@@ -18,6 +18,7 @@ import net.ib.mn.domain.usecase.SignUpUseCase
 import net.ib.mn.domain.usecase.ValidateUserUseCase
 import net.ib.mn.util.Constants
 import net.ib.mn.util.DeviceUtil
+import net.ib.mn.util.logW
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -775,11 +776,11 @@ class SignUpViewModel @Inject constructor(
                             .addOnFailureListener { e ->
                                 // Old 프로젝트: 에러 발생 시 조용히 처리하고 빈 문자열로 진행
                                 // IOException, FIS_AUTH_ERROR 등 모든 에러를 무시하고 진행
-                                android.util.Log.w(signUpTag, "========================================")
-                                android.util.Log.w(signUpTag, "Failed to get FCM token (proceeding with empty token)")
-                                android.util.Log.w(signUpTag, "  - error: ${e.javaClass.simpleName}: ${e.message}")
-                                android.util.Log.w(signUpTag, "  - Old project behavior: ignore error and proceed")
-                                android.util.Log.w(signUpTag, "========================================")
+                                logW(signUpTag, "========================================")
+                                logW(signUpTag, "Failed to get FCM token (proceeding with empty token)")
+                                logW(signUpTag, "  - error: ${e.javaClass.simpleName}: ${e.message}")
+                                logW(signUpTag, "  - Old project behavior: ignore error and proceed")
+                                logW(signUpTag, "========================================")
 
                                 // Old 프로젝트: FCM token 실패해도 빈 문자열로 진행
                                 viewModelScope.launch {
@@ -789,10 +790,10 @@ class SignUpViewModel @Inject constructor(
                             }
                     } catch (e: IllegalStateException) {
                         // Old 프로젝트: IllegalStateException만 catch하고 진행
-                        android.util.Log.w(signUpTag, "========================================")
-                        android.util.Log.w(signUpTag, "IllegalStateException while getting FCM token")
-                        android.util.Log.w(signUpTag, "  - Proceeding with empty token (old project behavior)")
-                        android.util.Log.w(signUpTag, "========================================")
+                        logW(signUpTag, "========================================")
+                        logW(signUpTag, "IllegalStateException while getting FCM token")
+                        logW(signUpTag, "  - Proceeding with empty token (old project behavior)")
+                        logW(signUpTag, "========================================")
 
                         // Old 프로젝트: IllegalStateException 발생해도 빈 문자열로 진행
                         viewModelScope.launch {
@@ -801,11 +802,11 @@ class SignUpViewModel @Inject constructor(
                         }
                     } catch (e: Exception) {
                         // Old 프로젝트: 모든 에러를 무시하고 진행
-                        android.util.Log.w(signUpTag, "========================================")
-                        android.util.Log.w(signUpTag, "Exception while getting FCM token (proceeding with empty token)")
-                        android.util.Log.w(signUpTag, "  - error: ${e.javaClass.simpleName}: ${e.message}")
-                        android.util.Log.w(signUpTag, "  - Old project behavior: ignore error and proceed")
-                        android.util.Log.w(signUpTag, "========================================")
+                        logW(signUpTag, "========================================")
+                        logW(signUpTag, "Exception while getting FCM token (proceeding with empty token)")
+                        logW(signUpTag, "  - error: ${e.javaClass.simpleName}: ${e.message}")
+                        logW(signUpTag, "  - Old project behavior: ignore error and proceed")
+                        logW(signUpTag, "========================================")
 
                         // Old 프로젝트: FCM token 실패해도 빈 문자열로 진행
                         viewModelScope.launch {

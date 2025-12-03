@@ -1,8 +1,10 @@
 package net.ib.mn.data.repository
 
 import android.content.Context
-import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
+import net.ib.mn.util.logW
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
@@ -98,14 +100,14 @@ class UserCacheRepository @Inject constructor(
      */
     private suspend fun restoreFromPreferences() {
         try {
-            Log.d(TAG, "========================================")
-            Log.d(TAG, "🔄 Restoring cache from SharedPreference...")
+            logD(TAG, "========================================")
+            logD(TAG, "🔄 Restoring cache from SharedPreference...")
 
             // UserSelfData 복원
             val userData = preferencesManager.getUserSelfData()
             if (userData != null) {
                 _userData.value = userData
-                Log.d(TAG, "✓ Restored UserSelfData: ${userData.email}")
+                logD(TAG, "✓ Restored UserSelfData: ${userData.email}")
             }
 
             // 최애 아이돌 정보 복원
@@ -117,41 +119,41 @@ class UserCacheRepository @Inject constructor(
                 _mostIdolId.value = mostIdolId
                 _mostIdolCategory.value = mostIdolCategory
                 _mostIdolChartCode.value = mostIdolChartCode
-                Log.d(TAG, "✓ Restored most idol: id=$mostIdolId, category=$mostIdolCategory, chartCode=$mostIdolChartCode")
+                logD(TAG, "✓ Restored most idol: id=$mostIdolId, category=$mostIdolCategory, chartCode=$mostIdolChartCode")
             }
 
             // 즐겨찾기 아이돌 ID 리스트 복원
             val favoriteIds = preferencesManager.getFavoriteIdolIds()
             if (favoriteIds.isNotEmpty()) {
                 _favoriteIdolIds.value = favoriteIds
-                Log.d(TAG, "✓ Restored ${favoriteIds.size} favorite idol IDs")
+                logD(TAG, "✓ Restored ${favoriteIds.size} favorite idol IDs")
             }
 
             // 기본 카테고리 복원
             val defaultCategory = preferencesManager.getDefaultCategory()
             if (defaultCategory != null) {
                 _defaultCategory.value = defaultCategory
-                Log.d(TAG, "✓ Restored default category: $defaultCategory")
+                logD(TAG, "✓ Restored default category: $defaultCategory")
             }
 
             // 기본 차트 코드 복원
             val defaultChartCode = preferencesManager.getDefaultChartCode()
             if (defaultChartCode != null) {
                 _defaultChartCode.value = defaultChartCode
-                Log.d(TAG, "✓ Restored default chart code: $defaultChartCode")
+                logD(TAG, "✓ Restored default chart code: $defaultChartCode")
             }
 
             // MostPicks 정보 복원
             val mostPicksModel = preferencesManager.getMostPicksModel()
             if (mostPicksModel != null) {
                 _mostPicksModel.value = mostPicksModel
-                Log.d(TAG, "✓ Restored most picks: $mostPicksModel")
+                logD(TAG, "✓ Restored most picks: $mostPicksModel")
             }
 
-            Log.d(TAG, "✅ Cache restoration completed")
-            Log.d(TAG, "========================================")
+            logD(TAG, "✅ Cache restoration completed")
+            logD(TAG, "========================================")
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Failed to restore cache from SharedPreference: ${e.message}", e)
+            logE(TAG, "❌ Failed to restore cache from SharedPreference: ${e.message}", e)
         }
     }
 
@@ -169,16 +171,16 @@ class UserCacheRepository @Inject constructor(
      * @param userData UserSelfData
      */
     suspend fun setUserData(userData: UserSelfData) {
-        Log.d(TAG, "========================================")
-        Log.d(TAG, "💾 Caching user data")
-        Log.d(TAG, "  - User ID: ${userData.id}")
-        Log.d(TAG, "  - Email: ${userData.email}")
-        Log.d(TAG, "  - Username: ${userData.username}")
-        Log.d(TAG, "  - Nickname: ${userData.nickname}")
-        Log.d(TAG, "  - StrongHeart: ${userData.strongHeart}")
-        Log.d(TAG, "  - WeakHeart: ${userData.weakHeart}")
-        Log.d(TAG, "  - Most: ${userData.most?.name} (id=${userData.most?.id})")
-        Log.d(TAG, "========================================")
+        logD(TAG, "========================================")
+        logD(TAG, "💾 Caching user data")
+        logD(TAG, "  - User ID: ${userData.id}")
+        logD(TAG, "  - Email: ${userData.email}")
+        logD(TAG, "  - Username: ${userData.username}")
+        logD(TAG, "  - Nickname: ${userData.nickname}")
+        logD(TAG, "  - StrongHeart: ${userData.strongHeart}")
+        logD(TAG, "  - WeakHeart: ${userData.weakHeart}")
+        logD(TAG, "  - Most: ${userData.most?.name} (id=${userData.most?.id})")
+        logD(TAG, "========================================")
 
         _userData.value = userData
 
@@ -194,16 +196,16 @@ class UserCacheRepository @Inject constructor(
 
             _mostIdolChartCode.value = chartCode
 
-            Log.d(TAG, "✅ Most idol cached:")
-            Log.d(TAG, "  - ID: ${most.id}")
-            Log.d(TAG, "  - Name: ${most.name}")
-            Log.d(TAG, "  - Category: ${most.category}")
-            Log.d(TAG, "  - ChartCode: $chartCode")
+            logD(TAG, "✅ Most idol cached:")
+            logD(TAG, "  - ID: ${most.id}")
+            logD(TAG, "  - Name: ${most.name}")
+            logD(TAG, "  - Category: ${most.category}")
+            logD(TAG, "  - ChartCode: $chartCode")
         } ?: run {
             _mostIdolId.value = null
             _mostIdolCategory.value = null
             _mostIdolChartCode.value = null
-            Log.w(TAG, "⚠️ No most idol set")
+            logW(TAG, "⚠️ No most idol set")
         }
 
         // **SharedPreference에 자동 백업**
@@ -222,7 +224,7 @@ class UserCacheRepository @Inject constructor(
         } == true
 
         preferencesManager.setHasDailyPack(hasDailyPack)
-        Log.d(TAG, "💳 Daily pack subscription: $hasDailyPack (sku=$dailyPackSkuCode)")
+        logD(TAG, "💳 Daily pack subscription: $hasDailyPack (sku=$dailyPackSkuCode)")
     }
 
     /**
@@ -239,9 +241,9 @@ class UserCacheRepository @Inject constructor(
             val mostIdolChartCode = _mostIdolChartCode.value
             preferencesManager.saveMostIdolInfo(mostIdolId, mostIdolCategory, mostIdolChartCode)
 
-            Log.d(TAG, "💾 Backed up to SharedPreference")
+            logD(TAG, "💾 Backed up to SharedPreference")
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Failed to backup to SharedPreference: ${e.message}", e)
+            logE(TAG, "❌ Failed to backup to SharedPreference: ${e.message}", e)
         }
     }
 
@@ -294,14 +296,14 @@ class UserCacheRepository @Inject constructor(
      */
     fun setFavoriteIdolIds(idolIds: List<Int>) {
         _favoriteIdolIds.value = idolIds
-        Log.d(TAG, "✅ Favorite idol IDs cached: ${idolIds.size} idols")
+        logD(TAG, "✅ Favorite idol IDs cached: ${idolIds.size} idols")
 
         // SharedPreference에 백업
         ioScope.launch {
             try {
                 preferencesManager.saveFavoriteIdolIds(idolIds)
             } catch (e: Exception) {
-                Log.e(TAG, "❌ Failed to save favorite IDs to SharedPreference: ${e.message}", e)
+                logE(TAG, "❌ Failed to save favorite IDs to SharedPreference: ${e.message}", e)
             }
         }
     }
@@ -320,7 +322,7 @@ class UserCacheRepository @Inject constructor(
      */
     fun setFavoriteIdMap(idMap: Map<Int, Int>) {
         _favoriteIdMap.value = idMap
-        Log.d(TAG, "✅ Favorite ID map cached: ${idMap.size} entries")
+        logD(TAG, "✅ Favorite ID map cached: ${idMap.size} entries")
     }
 
     /**
@@ -359,14 +361,14 @@ class UserCacheRepository @Inject constructor(
         currentMap[idolId] = favoriteId
         _favoriteIdMap.value = currentMap
 
-        Log.d(TAG, "✅ Added favorite to cache: idolId=$idolId, favoriteId=$favoriteId")
+        logD(TAG, "✅ Added favorite to cache: idolId=$idolId, favoriteId=$favoriteId")
 
         // SharedPreference에 백업
         ioScope.launch {
             try {
                 preferencesManager.saveFavoriteIdolIds(currentIds)
             } catch (e: Exception) {
-                Log.e(TAG, "❌ Failed to save favorite IDs to SharedPreference: ${e.message}", e)
+                logE(TAG, "❌ Failed to save favorite IDs to SharedPreference: ${e.message}", e)
             }
         }
     }
@@ -387,14 +389,14 @@ class UserCacheRepository @Inject constructor(
         currentMap.remove(idolId)
         _favoriteIdMap.value = currentMap
 
-        Log.d(TAG, "✅ Removed favorite from cache: idolId=$idolId")
+        logD(TAG, "✅ Removed favorite from cache: idolId=$idolId")
 
         // SharedPreference에 백업
         ioScope.launch {
             try {
                 preferencesManager.saveFavoriteIdolIds(currentIds)
             } catch (e: Exception) {
-                Log.e(TAG, "❌ Failed to save favorite IDs to SharedPreference: ${e.message}", e)
+                logE(TAG, "❌ Failed to save favorite IDs to SharedPreference: ${e.message}", e)
             }
         }
     }
@@ -415,16 +417,16 @@ class UserCacheRepository @Inject constructor(
         )
         _userData.value = updatedUserData
 
-        Log.d(TAG, "💗 Heart info updated:")
-        Log.d(TAG, "  - StrongHeart: $strongHeart")
-        Log.d(TAG, "  - WeakHeart: $weakHeart")
+        logD(TAG, "💗 Heart info updated:")
+        logD(TAG, "  - StrongHeart: $strongHeart")
+        logD(TAG, "  - WeakHeart: $weakHeart")
 
         // SharedPreference에 백업
         ioScope.launch {
             try {
                 preferencesManager.saveUserSelfData(updatedUserData)
             } catch (e: Exception) {
-                Log.e(TAG, "❌ Failed to save user data to SharedPreference: ${e.message}", e)
+                logE(TAG, "❌ Failed to save user data to SharedPreference: ${e.message}", e)
             }
         }
     }
@@ -436,14 +438,14 @@ class UserCacheRepository @Inject constructor(
      */
     fun setDefaultCategory(category: String) {
         _defaultCategory.value = category
-        Log.d(TAG, "✅ Default category set: $category")
+        logD(TAG, "✅ Default category set: $category")
 
         // SharedPreference에 백업
         ioScope.launch {
             try {
                 preferencesManager.setDefaultCategory(category)
             } catch (e: Exception) {
-                Log.e(TAG, "❌ Failed to save default category to SharedPreference: ${e.message}", e)
+                logE(TAG, "❌ Failed to save default category to SharedPreference: ${e.message}", e)
             }
         }
     }
@@ -462,14 +464,14 @@ class UserCacheRepository @Inject constructor(
      */
     fun setDefaultChartCode(chartCode: String) {
         _defaultChartCode.value = chartCode
-        Log.d(TAG, "✅ Default chart code set: $chartCode")
+        logD(TAG, "✅ Default chart code set: $chartCode")
 
         // SharedPreference에 백업
         ioScope.launch {
             try {
                 preferencesManager.setDefaultChartCode(chartCode)
             } catch (e: Exception) {
-                Log.e(TAG, "❌ Failed to save default chart code to SharedPreference: ${e.message}", e)
+                logE(TAG, "❌ Failed to save default chart code to SharedPreference: ${e.message}", e)
             }
         }
     }
@@ -500,23 +502,23 @@ class UserCacheRepository @Inject constructor(
         _favoriteIdolIds.value = emptyList()
         _defaultCategory.value = null
         _defaultChartCode.value = null
-        Log.d(TAG, "🗑️ All user cache cleared")
+        logD(TAG, "🗑️ All user cache cleared")
     }
 
     /**
      * 캐시 상태 로깅 (디버깅용)
      */
     fun logCacheStatus() {
-        Log.d(TAG, "========== User Cache Status ==========")
-        Log.d(TAG, "User ID: ${_userData.value?.id}")
-        Log.d(TAG, "Email: ${_userData.value?.email}")
-        Log.d(TAG, "StrongHeart: ${_userData.value?.strongHeart}")
-        Log.d(TAG, "WeakHeart: ${_userData.value?.weakHeart}")
-        Log.d(TAG, "Most Idol ID: ${_mostIdolId.value}")
-        Log.d(TAG, "Most Idol Category: ${_mostIdolCategory.value}")
-        Log.d(TAG, "Most Idol ChartCode: ${_mostIdolChartCode.value}")
-        Log.d(TAG, "Favorite Idol Count: ${_favoriteIdolIds.value.size}")
-        Log.d(TAG, "=========================================")
+        logD(TAG, "========== User Cache Status ==========")
+        logD(TAG, "User ID: ${_userData.value?.id}")
+        logD(TAG, "Email: ${_userData.value?.email}")
+        logD(TAG, "StrongHeart: ${_userData.value?.strongHeart}")
+        logD(TAG, "WeakHeart: ${_userData.value?.weakHeart}")
+        logD(TAG, "Most Idol ID: ${_mostIdolId.value}")
+        logD(TAG, "Most Idol Category: ${_mostIdolCategory.value}")
+        logD(TAG, "Most Idol ChartCode: ${_mostIdolChartCode.value}")
+        logD(TAG, "Favorite Idol Count: ${_favoriteIdolIds.value.size}")
+        logD(TAG, "=========================================")
     }
 
     /**
@@ -526,9 +528,9 @@ class UserCacheRepository @Inject constructor(
         try {
             val result = userRepositoryProvider.get().loadAndSaveUserSelf("no-cache")
             result.getOrThrow()
-            Log.d(TAG, "✅ UserSelf refreshed successfully")
+            logD(TAG, "✅ UserSelf refreshed successfully")
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Failed to refresh UserSelf: ${e.message}", e)
+            logE(TAG, "❌ Failed to refresh UserSelf: ${e.message}", e)
             throw e
         }
     }
@@ -539,7 +541,7 @@ class UserCacheRepository @Inject constructor(
     suspend fun setMostPicksModel(model: MostPicksModel?) {
         _mostPicksModel.value = model
         preferencesManager.saveMostPicksModel(model)
-        Log.d(TAG, "✓ MostPicksModel cached: $model")
+        logD(TAG, "✓ MostPicksModel cached: $model")
     }
 
     /**
@@ -549,9 +551,9 @@ class UserCacheRepository @Inject constructor(
         try {
             val result = favoritesRepositoryProvider.get().loadAndSaveFavoriteSelf()
             result.getOrThrow()
-            Log.d(TAG, "✅ Favorites refreshed successfully")
+            logD(TAG, "✅ Favorites refreshed successfully")
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Failed to refresh Favorites: ${e.message}", e)
+            logE(TAG, "❌ Failed to refresh Favorites: ${e.message}", e)
             throw e
         }
     }
@@ -580,17 +582,17 @@ class UserCacheRepository @Inject constructor(
         _mostIdolCategory.value = idolCategory
         _mostIdolChartCode.value = idolChartCode
 
-        Log.d(TAG, "✅ Most idol cache updated:")
-        Log.d(TAG, "  - ID: $idolId")
-        Log.d(TAG, "  - Category: $idolCategory")
-        Log.d(TAG, "  - ChartCode: $idolChartCode")
+        logD(TAG, "✅ Most idol cache updated:")
+        logD(TAG, "  - ID: $idolId")
+        logD(TAG, "  - Category: $idolCategory")
+        logD(TAG, "  - ChartCode: $idolChartCode")
 
         // SharedPreference에 백업
         ioScope.launch {
             try {
                 preferencesManager.saveMostIdolInfo(idolId, idolCategory, idolChartCode)
             } catch (e: Exception) {
-                Log.e(TAG, "❌ Failed to save most idol info to SharedPreference: ${e.message}", e)
+                logE(TAG, "❌ Failed to save most idol info to SharedPreference: ${e.message}", e)
             }
         }
     }

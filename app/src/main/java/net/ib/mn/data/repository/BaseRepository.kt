@@ -1,7 +1,7 @@
 package net.ib.mn.data.repository
 
-import android.util.Log
 import kotlinx.coroutines.flow.Flow
+import net.ib.mn.util.logE
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import net.ib.mn.domain.model.ApiError
@@ -144,13 +144,13 @@ abstract class BaseRepository {
         return try {
             block()
         } catch (e: HttpException) {
-            Log.e(TAG, "HttpException: ${e.code()} - ${e.message()}", e)
+            logE(TAG, "HttpException: ${e.code()} - ${e.message()}", e)
             ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message()))
         } catch (e: IOException) {
-            Log.e(TAG, "IOException: ${e.message}", e)
+            logE(TAG, "IOException: ${e.message}", e)
             ApiResult.Error(ApiError.Network(exception = e))
         } catch (e: Exception) {
-            Log.e(TAG, "Unknown Exception: ${e.message}", e)
+            logE(TAG, "Unknown Exception: ${e.message}", e)
             ApiResult.Error(ApiError.Unknown(exception = e))
         }
     }

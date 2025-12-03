@@ -1,5 +1,6 @@
 package net.ib.mn.presentation.main.ranking
 
+import net.ib.mn.util.logW
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -162,7 +163,7 @@ class RankingPageViewModel @Inject constructor(
                 if (tabIndex >= 0) {
                     setSelectedTabIndex(tabIndex)
                 } else {
-                    android.util.Log.w("RankingViewModel", "⚠️ No matching tab found for chartCode: $defaultChartCode, using default index 0")
+                    logW("RankingViewModel", "⚠️ No matching tab found for chartCode: $defaultChartCode, using default index 0")
                 }
             } else {
             }
@@ -175,7 +176,7 @@ class RankingPageViewModel @Inject constructor(
 
         // 프로세스 복원 시 데이터가 없으면 재로드
         if (!BuildConfig.CELEB && configRepository.getMainChartModel() == null) {
-            android.util.Log.w("RankingViewModel", "⚠️ MainChartModel is null (process restored) - reloading data")
+            logW("RankingViewModel", "⚠️ MainChartModel is null (process restored) - reloading data")
             reloadChartData()
         }
     }

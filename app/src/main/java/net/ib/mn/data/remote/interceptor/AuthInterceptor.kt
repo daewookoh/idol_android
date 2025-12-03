@@ -6,6 +6,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import net.ib.mn.BuildConfig
 import net.ib.mn.data.repository.AuthRepository
 import net.ib.mn.util.Constants
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
+import net.ib.mn.util.logW
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.util.Locale
@@ -49,10 +52,10 @@ class AuthInterceptor @Inject constructor(
         val token = authRepository.getAccessToken()
 
         // 디버깅: 모든 요청 로깅
-        android.util.Log.d("AuthInterceptor", "========================================")
-        android.util.Log.d("AuthInterceptor", "Request: $method $url")
-        android.util.Log.d("AuthInterceptor", "  Current auth state: email=$email, domain=$domain, token=${token?.take(10)}")
-        android.util.Log.d("AuthInterceptor", "========================================")
+        logD("AuthInterceptor", "========================================")
+        logD("AuthInterceptor", "Request: $method $url")
+        logD("AuthInterceptor", "  Current auth state: email=$email, domain=$domain, token=${token?.take(10)}")
+        logD("AuthInterceptor", "========================================")
 
         // User-Agent 헤더 구성
         val systemUserAgent = System.getProperty("http.agent") ?: ""
@@ -92,20 +95,20 @@ class AuthInterceptor @Inject constructor(
                 val credential = "$email:$domain:$token"
                 val authHeader = "Basic ${Base64.encodeToString(credential.toByteArray(), Base64.NO_WRAP)}"
 
-                android.util.Log.d("USER_INFO", "[AuthInterceptor] Adding Authorization header to request")
-                android.util.Log.d("USER_INFO", "[AuthInterceptor]   - URL: $url")
-                android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Auth type: Basic")
-                android.util.Log.d("USER_INFO", "[AuthInterceptor]   - Credential: $email:$domain:${token.take(10)}...")
+                logD("USER_INFO", "[AuthInterceptor] Adding Authorization header to request")
+                logD("USER_INFO", "[AuthInterceptor]   - URL: $url")
+                logD("USER_INFO", "[AuthInterceptor]   - Auth type: Basic")
+                logD("USER_INFO", "[AuthInterceptor]   - Credential: $email:$domain:${token.take(10)}...")
 
                 requestBuilder.header("Authorization", authHeader)
             } else {
-                android.util.Log.w("USER_INFO", "[AuthInterceptor] ⚠️ No auth credentials available")
-                android.util.Log.w("USER_INFO", "[AuthInterceptor]   - URL: $url")
-                android.util.Log.w("USER_INFO", "[AuthInterceptor]   - Email: $email, Domain: $domain, Token: ${if (token != null) "present" else "null"}")
-                android.util.Log.w("USER_INFO", "[AuthInterceptor]   - This will likely result in 401 Unauthorized")
+                logW("USER_INFO", "[AuthInterceptor] ⚠️ No auth credentials available")
+                logW("USER_INFO", "[AuthInterceptor]   - URL: $url")
+                logW("USER_INFO", "[AuthInterceptor]   - Email: $email, Domain: $domain, Token: ${if (token != null) "present" else "null"}")
+                logW("USER_INFO", "[AuthInterceptor]   - This will likely result in 401 Unauthorized")
             }
         } else if (!requiresAuth) {
-            android.util.Log.d("USER_INFO", "[AuthInterceptor] Skipping auth for public endpoint: $url")
+            logD("USER_INFO", "[AuthInterceptor] Skipping auth for public endpoint: $url")
         }
 
         val request = requestBuilder.build()
@@ -113,11 +116,11 @@ class AuthInterceptor @Inject constructor(
 
         // 401 에러 발생 시 로그
         if (response.code == 401) {
-            android.util.Log.e("USER_INFO", "[AuthInterceptor] ❌ 401 Unauthorized response received")
-            android.util.Log.e("USER_INFO", "[AuthInterceptor]   - URL: $url")
-            android.util.Log.e("USER_INFO", "[AuthInterceptor]   - Email was: $email")
-            android.util.Log.e("USER_INFO", "[AuthInterceptor]   - Domain was: $domain")
-            android.util.Log.e("USER_INFO", "[AuthInterceptor]   - Token was: ${if (token != null) "${token.take(20)}..." else "null"}")
+            logE("USER_INFO", "[AuthInterceptor] ❌ 401 Unauthorized response received")
+            logE("USER_INFO", "[AuthInterceptor]   - URL: $url")
+            logE("USER_INFO", "[AuthInterceptor]   - Email was: $email")
+            logE("USER_INFO", "[AuthInterceptor]   - Domain was: $domain")
+            logE("USER_INFO", "[AuthInterceptor]   - Token was: ${if (token != null) "${token.take(20)}..." else "null"}")
         }
 
         return response

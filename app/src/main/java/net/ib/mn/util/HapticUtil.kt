@@ -8,6 +8,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import androidx.core.content.ContextCompat
+import net.ib.mn.util.logW
 
 /**
  * Haptic 피드백 유틸리티
@@ -45,7 +46,7 @@ object HapticUtil {
             }
         } catch (e: Exception) {
             // 권한이 없거나 다른 오류 발생 시 무시
-            android.util.Log.w("HapticUtil", "Failed to vibrate: ${e.message}")
+            logW("HapticUtil", "Failed to vibrate: ${e.message}")
         }
     }
 }

@@ -1,6 +1,5 @@
 package net.ib.mn.data.repository
 
-import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import net.ib.mn.data.remote.api.UsersApi
@@ -9,6 +8,8 @@ import net.ib.mn.data.remote.dto.ProvideHeartRequest
 import net.ib.mn.data.remote.dto.ProvideHeartResponse
 import net.ib.mn.domain.model.ApiError
 import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
 import org.json.JSONObject
 import retrofit2.HttpException
 import java.io.IOException
@@ -52,15 +53,15 @@ class UsersRepository @Inject constructor(
             if (response.isSuccessful) {
                 val jsonString = response.body()?.string() ?: "{}"
                 val jsonObject = JSONObject(jsonString)
-                Log.d(TAG, "updateMost success: $jsonObject")
+                logD(TAG, "updateMost success: $jsonObject")
                 Result.success(jsonObject)
             } else {
                 val errorBody = response.errorBody()?.string() ?: "Unknown error"
-                Log.e(TAG, "updateMost failed: ${response.code()} - $errorBody")
+                logE(TAG, "updateMost failed: ${response.code()} - $errorBody")
                 Result.failure(Exception("API Error: ${response.code()} - $errorBody"))
             }
         } catch (e: Exception) {
-            Log.e(TAG, "updateMost exception: ${e.message}", e)
+            logE(TAG, "updateMost exception: ${e.message}", e)
             Result.failure(e)
         }
     }
@@ -76,21 +77,21 @@ class UsersRepository @Inject constructor(
      */
     suspend fun getStatus(userId: Int): Result<JSONObject> {
         return try {
-            Log.d(TAG, "getStatus called for userId: $userId")
+            logD(TAG, "getStatus called for userId: $userId")
             val response = usersApi.getStatus(userId)
 
             if (response.isSuccessful) {
                 val jsonString = response.body()?.string() ?: "{}"
                 val jsonObject = JSONObject(jsonString)
-                Log.d(TAG, "getStatus success: $jsonObject")
+                logD(TAG, "getStatus success: $jsonObject")
                 Result.success(jsonObject)
             } else {
                 val errorBody = response.errorBody()?.string() ?: "Unknown error"
-                Log.e(TAG, "getStatus failed: ${response.code()} - $errorBody")
+                logE(TAG, "getStatus failed: ${response.code()} - $errorBody")
                 Result.failure(Exception("API Error: ${response.code()} - $errorBody"))
             }
         } catch (e: Exception) {
-            Log.e(TAG, "getStatus exception: ${e.message}", e)
+            logE(TAG, "getStatus exception: ${e.message}", e)
             Result.failure(e)
         }
     }
@@ -106,21 +107,21 @@ class UsersRepository @Inject constructor(
      */
     suspend fun getFriendInfo(userId: Int): Result<JSONObject> {
         return try {
-            Log.d(TAG, "getFriendInfo called for userId: $userId")
+            logD(TAG, "getFriendInfo called for userId: $userId")
             val response = usersApi.getFriendInfo(userId)
 
             if (response.isSuccessful) {
                 val jsonString = response.body()?.string() ?: "{}"
                 val jsonObject = JSONObject(jsonString)
-                Log.d(TAG, "getFriendInfo success: $jsonObject")
+                logD(TAG, "getFriendInfo success: $jsonObject")
                 Result.success(jsonObject)
             } else {
                 val errorBody = response.errorBody()?.string() ?: "Unknown error"
-                Log.e(TAG, "getFriendInfo failed: ${response.code()} - $errorBody")
+                logE(TAG, "getFriendInfo failed: ${response.code()} - $errorBody")
                 Result.failure(Exception("API Error: ${response.code()} - $errorBody"))
             }
         } catch (e: Exception) {
-            Log.e(TAG, "getFriendInfo exception: ${e.message}", e)
+            logE(TAG, "getFriendInfo exception: ${e.message}", e)
             Result.failure(e)
         }
     }
@@ -138,37 +139,37 @@ class UsersRepository @Inject constructor(
         emit(ApiResult.Loading)
 
         try {
-            Log.d(TAG, "========================================")
-            Log.d(TAG, "🏆 Calling getRankedUser API (users/ranked_user/)")
-            Log.d(TAG, "  - idolId: $idolId")
-            Log.d(TAG, "========================================")
+            logD(TAG, "========================================")
+            logD(TAG, "🏆 Calling getRankedUser API (users/ranked_user/)")
+            logD(TAG, "  - idolId: $idolId")
+            logD(TAG, "========================================")
 
             val response = usersApi.getRankedUser(idolId)
 
-            Log.d(TAG, "📦 Response received:")
-            Log.d(TAG, "  - HTTP Code: ${response.code()}")
-            Log.d(TAG, "  - isSuccessful: ${response.isSuccessful}")
+            logD(TAG, "📦 Response received:")
+            logD(TAG, "  - HTTP Code: ${response.code()}")
+            logD(TAG, "  - isSuccessful: ${response.isSuccessful}")
 
             if (response.isSuccessful && response.body() != null) {
                 val jsonString = response.body()!!.string()
 
-                Log.d(TAG, "✅ getRankedUser SUCCESS")
-                Log.d(TAG, "  - JSON length: ${jsonString.length}")
-                Log.d(TAG, "  - JSON preview: ${jsonString.take(300)}")
+                logD(TAG, "✅ getRankedUser SUCCESS")
+                logD(TAG, "  - JSON length: ${jsonString.length}")
+                logD(TAG, "  - JSON preview: ${jsonString.take(300)}")
 
                 emit(ApiResult.Success(jsonString))
             } else {
-                Log.e(TAG, "❌ Response not successful or body null")
+                logE(TAG, "❌ Response not successful or body null")
                 emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
-            Log.e(TAG, "❌ HttpException: ${e.code()}", e)
+            logE(TAG, "❌ HttpException: ${e.code()}", e)
             emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: IOException) {
-            Log.e(TAG, "❌ IOException: ${e.message}", e)
+            logE(TAG, "❌ IOException: ${e.message}", e)
             emit(ApiResult.Error(ApiError.Network(exception = e)))
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Exception: ${e.message}", e)
+            logE(TAG, "❌ Exception: ${e.message}", e)
             emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
@@ -181,7 +182,7 @@ class UsersRepository @Inject constructor(
      */
     suspend fun isUserBlocked(targetId: Int): Boolean {
         return try {
-            Log.d(TAG, "isUserBlocked called for targetId: $targetId")
+            logD(TAG, "isUserBlocked called for targetId: $targetId")
             val response = usersApi.getBlocks("Y")
 
             if (response.isSuccessful) {
@@ -191,19 +192,19 @@ class UsersRepository @Inject constructor(
                 if (blockIds != null) {
                     for (i in 0 until blockIds.length()) {
                         if (blockIds.optInt(i) == targetId) {
-                            Log.d(TAG, "User $targetId is blocked")
+                            logD(TAG, "User $targetId is blocked")
                             return true
                         }
                     }
                 }
-                Log.d(TAG, "User $targetId is NOT blocked")
+                logD(TAG, "User $targetId is NOT blocked")
                 false
             } else {
-                Log.e(TAG, "isUserBlocked failed: ${response.code()}")
+                logE(TAG, "isUserBlocked failed: ${response.code()}")
                 false
             }
         } catch (e: Exception) {
-            Log.e(TAG, "isUserBlocked exception: ${e.message}", e)
+            logE(TAG, "isUserBlocked exception: ${e.message}", e)
             false
         }
     }
@@ -219,24 +220,24 @@ class UsersRepository @Inject constructor(
      */
     suspend fun addBlock(targetId: Int): BlockResult {
         return try {
-            Log.d(TAG, "addBlock called for targetId: $targetId")
+            logD(TAG, "addBlock called for targetId: $targetId")
             val request = BlockUserRequest(targetId = targetId, block = "Y")
             val response = usersApi.addBlock(request)
 
             if (response.isSuccessful) {
                 val body = response.body()
-                Log.d(TAG, "addBlock success: ${body?.success}, gcode: ${body?.gcode}")
+                logD(TAG, "addBlock success: ${body?.success}, gcode: ${body?.gcode}")
                 if (body?.success == true) {
                     BlockResult.Success
                 } else {
                     BlockResult.Error(gcode = body?.gcode ?: -1)
                 }
             } else {
-                Log.e(TAG, "addBlock failed: ${response.code()}")
+                logE(TAG, "addBlock failed: ${response.code()}")
                 BlockResult.Error(message = "API Error: ${response.code()}")
             }
         } catch (e: Exception) {
-            Log.e(TAG, "addBlock exception: ${e.message}", e)
+            logE(TAG, "addBlock exception: ${e.message}", e)
             BlockResult.Error(message = e.message)
         }
     }
@@ -252,24 +253,24 @@ class UsersRepository @Inject constructor(
      */
     suspend fun removeBlock(targetId: Int): BlockResult {
         return try {
-            Log.d(TAG, "removeBlock called for targetId: $targetId")
+            logD(TAG, "removeBlock called for targetId: $targetId")
             val request = BlockUserRequest(targetId = targetId, block = "N")
             val response = usersApi.addBlock(request)
 
             if (response.isSuccessful) {
                 val body = response.body()
-                Log.d(TAG, "removeBlock success: ${body?.success}, gcode: ${body?.gcode}")
+                logD(TAG, "removeBlock success: ${body?.success}, gcode: ${body?.gcode}")
                 if (body?.success == true) {
                     BlockResult.Success
                 } else {
                     BlockResult.Error(gcode = body?.gcode ?: -1)
                 }
             } else {
-                Log.e(TAG, "removeBlock failed: ${response.code()}")
+                logE(TAG, "removeBlock failed: ${response.code()}")
                 BlockResult.Error(message = "API Error: ${response.code()}")
             }
         } catch (e: Exception) {
-            Log.e(TAG, "removeBlock exception: ${e.message}", e)
+            logE(TAG, "removeBlock exception: ${e.message}", e)
             BlockResult.Error(message = e.message)
         }
     }
@@ -285,18 +286,18 @@ class UsersRepository @Inject constructor(
      */
     suspend fun provideHeart(type: String = "heartbox"): ProvideHeartResult {
         return try {
-            Log.d(TAG, "provideHeart called with type: $type")
+            logD(TAG, "provideHeart called with type: $type")
             val request = ProvideHeartRequest(type = type)
             val response = usersApi.provideHeart(request)
 
             if (response.isSuccessful) {
                 val jsonString = response.body()?.string() ?: "{}"
                 val jsonObject = JSONObject(jsonString)
-                Log.d(TAG, "provideHeart response: $jsonObject")
+                logD(TAG, "provideHeart response: $jsonObject")
 
                 val success = jsonObject.optBoolean("success", false)
                 if (!success) {
-                    Log.d(TAG, "provideHeart: success=false")
+                    logD(TAG, "provideHeart: success=false")
                     return ProvideHeartResult.Error(message = "API returned success=false")
                 }
 
@@ -304,7 +305,7 @@ class UsersRepository @Inject constructor(
                 val heart = jsonObject.optLong("heart", 0)
                 val button = jsonObject.optBoolean("button", false)
 
-                Log.d(TAG, "provideHeart success: viewable=$viewable, heart=$heart, button=$button")
+                logD(TAG, "provideHeart success: viewable=$viewable, heart=$heart, button=$button")
                 ProvideHeartResult.Success(
                     viewable = viewable,
                     heart = heart.toInt(),
@@ -312,11 +313,11 @@ class UsersRepository @Inject constructor(
                 )
             } else {
                 val errorBody = response.errorBody()?.string() ?: "Unknown error"
-                Log.e(TAG, "provideHeart failed: ${response.code()} - $errorBody")
+                logE(TAG, "provideHeart failed: ${response.code()} - $errorBody")
                 ProvideHeartResult.Error(message = "API Error: ${response.code()}")
             }
         } catch (e: Exception) {
-            Log.e(TAG, "provideHeart exception: ${e.message}", e)
+            logE(TAG, "provideHeart exception: ${e.message}", e)
             ProvideHeartResult.Error(message = e.message)
         }
     }

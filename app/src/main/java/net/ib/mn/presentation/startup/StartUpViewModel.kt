@@ -13,6 +13,8 @@ import kotlinx.coroutines.launch
 import net.ib.mn.base.BaseViewModel
 import net.ib.mn.data.remote.dto.toEntity
 import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.util.logD
+import net.ib.mn.util.logW
 import net.ib.mn.domain.usecase.GetAdTypeListUseCase
 import net.ib.mn.domain.usecase.GetBlocksUseCase
 import net.ib.mn.domain.usecase.GetConfigSelfUseCase
@@ -136,12 +138,12 @@ class StartUpViewModel @Inject constructor(
                 if (hasValidCredentials) {
 
                 } else {
-                    android.util.Log.w("USER_INFO", "========================================")
-                    android.util.Log.w("USER_INFO", "[StartUpViewModel] ⚠️ Auth credentials incomplete or missing")
-                    android.util.Log.w("USER_INFO", "[StartUpViewModel] User not logged in - navigating to Login screen")
-                    android.util.Log.w("USER_INFO", "========================================")
+                    logW("USER_INFO", "========================================")
+                    logW("USER_INFO", "[StartUpViewModel] ⚠️ Auth credentials incomplete or missing")
+                    logW("USER_INFO", "[StartUpViewModel] User not logged in - navigating to Login screen")
+                    logW("USER_INFO", "========================================")
 
-                    android.util.Log.w(TAG, "⚠️  Auth credentials incomplete - user not logged in (guest mode)")
+                    logW(TAG, "⚠️  Auth credentials incomplete - user not logged in (guest mode)")
                     // Guest mode - Navigate to Login screen
                     setState { copy(isLoading = false, progress = 0f, currentStep = "Login required") }
 
@@ -228,9 +230,9 @@ class StartUpViewModel @Inject constructor(
         val isStartupSuccess = loadConfigStartup()
 
         if (!isStartupSuccess) {
-            android.util.Log.w(TAG, "⚠️  This is likely because BASE_URL points to a non-existent server")
-            android.util.Log.w(TAG, "⚠️  Check Constants.BASE_URL = \"${Constants.BASE_URL}\"")
-            android.util.Log.w(TAG, "⚠️  Clearing all auth credentials and local data...")
+            logW(TAG, "⚠️  This is likely because BASE_URL points to a non-existent server")
+            logW(TAG, "⚠️  Check Constants.BASE_URL = \"${Constants.BASE_URL}\"")
+            logW(TAG, "⚠️  Clearing all auth credentials and local data...")
 
             // 모든 인증 정보 및 로컬 데이터 삭제
             preferencesManager.clearAll()
@@ -838,7 +840,7 @@ class StartUpViewModel @Inject constructor(
                                     // SharedPreference에 저장
                                     preferencesManager.saveChartIdolIds(code, body.data)
                                 } else {
-                                    android.util.Log.w(TAG, "⚠️ No data for chart: $code")
+                                    logW(TAG, "⚠️ No data for chart: $code")
                                 }
                             } else {
                             }

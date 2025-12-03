@@ -1,7 +1,5 @@
 package net.ib.mn.util
 
-import android.util.Log
-
 /**
  * 성능 측정 유틸리티
  *
@@ -63,7 +61,7 @@ class PerformanceMonitor {
             val currentMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()
             val memoryDelta = currentMemory - startMemory
 
-            Log.d(TAG, """
+            logD(TAG, """
                 [$tag] ⚡ Quick Measure
                 ⏱️  Duration: ${duration}ms
                 💾 Memory Delta: ${memoryDelta / 1024}KB
@@ -91,7 +89,7 @@ class PerformanceMonitor {
             val currentMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()
             val memoryDelta = currentMemory - startMemory
 
-            Log.d(TAG, """
+            logD(TAG, """
                 [$tag] ⚡ Quick Measure (Suspend)
                 ⏱️  Duration: ${duration}ms
                 💾 Memory Delta: ${memoryDelta / 1024}KB
@@ -111,7 +109,7 @@ class PerformanceMonitor {
 
         startTime = System.currentTimeMillis()
         startMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()
-        Log.d(TAG, "[$tag] 📍 Started")
+        logD(TAG, "[$tag] 📍 Started")
     }
 
     /**
@@ -133,7 +131,7 @@ class PerformanceMonitor {
             ""
         }
 
-        Log.d(TAG, """
+        logD(TAG, """
             [$tag] ✅ Completed
             ⏱️  Duration: ${duration}ms
             💾 Memory Delta: ${memoryDelta / 1024}KB
@@ -154,7 +152,7 @@ class PerformanceMonitor {
         val currentMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()
         val memoryDelta = currentMemory - startMemory
 
-        Log.d(TAG, """
+        logD(TAG, """
             [$tag] 🔵 Checkpoint: $checkpointName
             ⏱️  Elapsed: ${duration}ms
             💾 Memory Delta: ${memoryDelta / 1024}KB

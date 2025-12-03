@@ -1,6 +1,5 @@
 package net.ib.mn.data.repository
 
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +13,8 @@ import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.NoticeModel
 import net.ib.mn.domain.repository.ArticlesRepository
 import net.ib.mn.domain.repository.ArticlesResponse
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -102,7 +103,7 @@ class ArticlesRepositoryImpl @Inject constructor(
         limit: Int
     ): Flow<ApiResult<ArticlesResponse>> = safeApiCallWithJsonString(
         apiCall = {
-            Log.d(TAG, "getMyFavoriteArticles: idolId=$idolId, orderBy=$orderBy, keyword=$keyword, locale=$locale")
+            logD(TAG, "getMyFavoriteArticles: idolId=$idolId, orderBy=$orderBy, keyword=$keyword, locale=$locale")
             articlesApi.getSmallTalkInventory(
                 idolId = idolId,
                 isMost = "Y",
@@ -153,14 +154,14 @@ class ArticlesRepositoryImpl @Inject constructor(
     )
 
     override suspend fun voteArticle(articleId: String, hearts: Long): ArticleVoteResponse {
-        Log.d(TAG, "voteArticle: articleId=$articleId, hearts=$hearts")
+        logD(TAG, "voteArticle: articleId=$articleId, hearts=$hearts")
         return articlesApi.voteArticle(
             ArticleVoteRequest(articleId = articleId, hearts = hearts)
         )
     }
 
     override suspend fun likeArticle(articleId: String, like: Boolean): ArticleLikeResponse {
-        Log.d(TAG, "likeArticle: articleId=$articleId, like=$like")
+        logD(TAG, "likeArticle: articleId=$articleId, like=$like")
         return articlesApi.likeArticle(
             ArticleLikeRequest(articleId = articleId, like = like)
         )
@@ -174,7 +175,7 @@ class ArticlesRepositoryImpl @Inject constructor(
         isSelf: Boolean
     ): Flow<ApiResult<ArticlesResponse>> = safeApiCallWithJsonString(
         apiCall = {
-            Log.d(TAG, "getFeedActivity: userId=$userId, type=$type, offset=$offset, limit=$limit, isSelf=$isSelf")
+            logD(TAG, "getFeedActivity: userId=$userId, type=$type, offset=$offset, limit=$limit, isSelf=$isSelf")
             articlesApi.getFeedActivity(
                 userId = userId,
                 type = type,
@@ -222,7 +223,7 @@ class ArticlesRepositoryImpl @Inject constructor(
     }
 
     private fun parseArticlesResponse(bodyString: String): ArticlesResponse {
-        Log.d(TAG, "parseArticlesResponse: bodyString length=${bodyString.length}")
+        logD(TAG, "parseArticlesResponse: bodyString length=${bodyString.length}")
 
         val jsonObject = JSONObject(bodyString)
         val meta = jsonObject.optJSONObject("meta")
@@ -250,7 +251,7 @@ class ArticlesRepositoryImpl @Inject constructor(
                 }
                 noticeList
             } catch (e: Exception) {
-                Log.e(TAG, "parseArticlesResponse: Failed to parse notices", e)
+                logE(TAG, "parseArticlesResponse: Failed to parse notices", e)
                 emptyList()
             }
         } else {
@@ -263,7 +264,7 @@ class ArticlesRepositoryImpl @Inject constructor(
                 val listType = object : TypeToken<List<ArticleModel>>() {}.type
                 gson.fromJson<List<ArticleModel>>(objectsArray.toString(), listType)
             } catch (e: Exception) {
-                Log.e(TAG, "parseArticlesResponse: Failed to parse articles", e)
+                logE(TAG, "parseArticlesResponse: Failed to parse articles", e)
                 emptyList()
             }
         } else {
@@ -296,8 +297,8 @@ class ArticlesRepositoryImpl @Inject constructor(
     override suspend fun getArticle(articleId: Long): ArticleModel {
         val response = articlesApi.getArticle(articleId)
         val json = response.string()
-        Log.d(TAG, "getArticle response keys: ${JSONObject(json).keys().asSequence().toList()}")
-        Log.d(TAG, "getArticle full response: $json")
+        logD(TAG, "getArticle response keys: ${JSONObject(json).keys().asSequence().toList()}")
+        logD(TAG, "getArticle full response: $json")
         val jsonObject = JSONObject(json)
         // API 응답이 직접 article 객체일 수 있음
         val articleJson = jsonObject.optJSONObject("article")

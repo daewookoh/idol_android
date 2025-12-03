@@ -1,10 +1,12 @@
 package net.ib.mn.data.remote.interceptor
 
-import android.util.Log
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import net.ib.mn.domain.model.GCode
+import net.ib.mn.util.logD
+import net.ib.mn.util.logV
+import net.ib.mn.util.logW
 import okhttp3.Interceptor
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -51,11 +53,11 @@ class GcodeInterceptor @Inject constructor() : Interceptor {
 
                 // gcode == 88888: 서버 점검 상태 (old 프로젝트의 SharedBridgeManager.setData 대체)
                 if (gcode == GCode.MAINTENANCE) {
-                    Log.w("GcodeInterceptor", "========================================")
-                    Log.w("GcodeInterceptor", "🔧 서버 점검 상태 감지 (gcode: $gcode)")
-                    Log.w("GcodeInterceptor", "  - URL: ${request.url}")
-                    Log.w("GcodeInterceptor", "  - Response: $body")
-                    Log.w("GcodeInterceptor", "========================================")
+                    logW("GcodeInterceptor", "========================================")
+                    logW("GcodeInterceptor", "🔧 서버 점검 상태 감지 (gcode: $gcode)")
+                    logW("GcodeInterceptor", "  - URL: ${request.url}")
+                    logW("GcodeInterceptor", "  - Response: $body")
+                    logW("GcodeInterceptor", "========================================")
 
                     // 점검 정보 추출
                     val mcode = jsonResponse.optInt("mcode", 0)
@@ -75,12 +77,12 @@ class GcodeInterceptor @Inject constructor() : Interceptor {
 
                 // 일반적인 gcode 로깅 (디버그)
                 if (gcode != 0 && gcode != GCode.MAINTENANCE) {
-                    Log.d("GcodeInterceptor", "API returned gcode: $gcode for ${request.url}")
+                    logD("GcodeInterceptor", "API returned gcode: $gcode for ${request.url}")
                 }
 
             } catch (e: Exception) {
                 // JSON 파싱 실패 시 무시 (비-JSON 응답 가능)
-                Log.v("GcodeInterceptor", "Failed to parse response as JSON: ${e.message}")
+                logV("GcodeInterceptor", "Failed to parse response as JSON: ${e.message}")
             }
         }
 

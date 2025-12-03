@@ -1,6 +1,5 @@
 package net.ib.mn.presentation.community
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,6 +18,8 @@ import kotlinx.coroutines.launch
 import net.ib.mn.data.remote.dto.VoterTop100Model
 import net.ib.mn.data.repository.UsersRepository
 import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
 
 /**
  * VoterTop100 화면의 UI 상태
@@ -87,7 +88,7 @@ class VoterTop100ViewModel @AssistedInject constructor(
                     is ApiResult.Success -> {
                         try {
                             val jsonString = result.data
-                            Log.d("VoterTop100VM", "Parsing JSON response")
+                            logD("VoterTop100VM", "Parsing JSON response")
 
                             // JSON 파싱 - old 프로젝트와 동일한 구조
                             // { "ranks": { "objects": [...] }, "my_rank": "123" }
@@ -99,7 +100,7 @@ class VoterTop100ViewModel @AssistedInject constructor(
                                 it != "null" && it.isNotEmpty()
                             }
 
-                            Log.d("VoterTop100VM", "Parsed - Users: ${items.size}, MyRank: $myRank")
+                            logD("VoterTop100VM", "Parsed - Users: ${items.size}, MyRank: $myRank")
 
                             _uiState.value = VoterTop100UiState.Success(
                                 items = items,
@@ -108,12 +109,12 @@ class VoterTop100ViewModel @AssistedInject constructor(
                                 groupName = groupName
                             )
                         } catch (e: Exception) {
-                            Log.e("VoterTop100VM", "Parse error: ${e.message}", e)
+                            logE("VoterTop100VM", "Parse error: ${e.message}", e)
                             _uiState.value = VoterTop100UiState.Error(e.message ?: "Parse error")
                         }
                     }
                     is ApiResult.Error -> {
-                        Log.e("VoterTop100VM", "API error: ${result.message}")
+                        logE("VoterTop100VM", "API error: ${result.message}")
                         _uiState.value = VoterTop100UiState.Error(result.message ?: "Unknown error")
                     }
                 }
@@ -137,11 +138,11 @@ class VoterTop100ViewModel @AssistedInject constructor(
                     val json = gson.toJson(obj)
                     // 첫 번째 유저 JSON 로그 출력 (디버깅용)
                     if (objectsArray.indexOf(obj) == 0) {
-                        Log.d("VoterTop100VM", "First user JSON: $json")
+                        logD("VoterTop100VM", "First user JSON: $json")
                     }
                     gson.fromJson(json, VoterTop100Model::class.java)
                 } catch (e: Exception) {
-                    Log.e("VoterTop100VM", "Item parse error: ${e.message}")
+                    logE("VoterTop100VM", "Item parse error: ${e.message}")
                     null
                 }
             }.filter {
@@ -156,7 +157,7 @@ class VoterTop100ViewModel @AssistedInject constructor(
 
             items
         } catch (e: Exception) {
-            Log.e("VoterTop100VM", "parseRankedUsers error: ${e.message}", e)
+            logE("VoterTop100VM", "parseRankedUsers error: ${e.message}", e)
             emptyList()
         }
     }

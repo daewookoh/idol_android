@@ -1,8 +1,10 @@
 package net.ib.mn.data.repository
 
 import android.content.Context
-import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
+import net.ib.mn.util.logW
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
@@ -90,7 +92,7 @@ class ChartRankingRepository @Inject constructor(
             userCacheRepository.get().mostIdolId
         ) { items, mostIdolId ->
             if (items.isEmpty()) {
-                Log.d(TAG, "⚠️ No data in SharedPreference for chart: $chartCode")
+                logD(TAG, "⚠️ No data in SharedPreference for chart: $chartCode")
                 null
             } else {
                 // mostIdolId에 따라 isFavorite 플래그를 동적으로 설정
@@ -120,7 +122,7 @@ class ChartRankingRepository @Inject constructor(
     suspend fun getChartData(chartCode: String): ProcessedRankData? {
         val items = preferencesManager.getChartRanking(chartCode)
         return if (items.isEmpty()) {
-            Log.d(TAG, "⚠️ No data in SharedPreference for chart: $chartCode")
+            logD(TAG, "⚠️ No data in SharedPreference for chart: $chartCode")
             null
         } else {
             ProcessedRankData(
@@ -138,26 +140,26 @@ class ChartRankingRepository @Inject constructor(
     suspend fun refreshChart(chartCode: String) {
         try {
             val startTime = System.currentTimeMillis()
-            Log.d(TAG, "🔄 [$chartCode] Refreshing chart from idol DB...")
+            logD(TAG, "🔄 [$chartCode] Refreshing chart from idol DB...")
 
             // 1. SharedPreference에서 아이돌 ID 목록 가져오기
             val existingRankings = preferencesManager.getChartRanking(chartCode)
             if (existingRankings.isEmpty()) {
-                Log.w(TAG, "⚠️ No existing rankings for $chartCode, skipping refresh")
+                logW(TAG, "⚠️ No existing rankings for $chartCode, skipping refresh")
                 return
             }
 
             val idolIds = existingRankings.map { it.id.toIntOrNull() ?: 0 }
-            Log.d(TAG, "🔄 [$chartCode] Refreshing with ${idolIds.size} idols from idol DB")
+            logD(TAG, "🔄 [$chartCode] Refreshing with ${idolIds.size} idols from idol DB")
 
             // 2. idol DB의 최신 데이터로 랭킹 재생성
             buildAndSaveChartRankings(chartCode, idolIds)
 
             val elapsed = System.currentTimeMillis() - startTime
-            Log.d(TAG, "✅ [$chartCode] Refreshed in ${elapsed}ms (${idolIds.size} idols)")
+            logD(TAG, "✅ [$chartCode] Refreshed in ${elapsed}ms (${idolIds.size} idols)")
 
         } catch (e: Exception) {
-            Log.e(TAG, "❌ [$chartCode] Failed to refresh: ${e.message}", e)
+            logE(TAG, "❌ [$chartCode] Failed to refresh: ${e.message}", e)
         }
     }
 
@@ -174,23 +176,23 @@ class ChartRankingRepository @Inject constructor(
      */
     suspend fun updateVoteAndRerank(idolId: Int, votedHeartCount: Long, chartCode: String?) {
         try {
-            Log.d(TAG, "💝 Updating vote: idol=$idolId, votedHearts=$votedHeartCount, chart=$chartCode")
+            logD(TAG, "💝 Updating vote: idol=$idolId, votedHearts=$votedHeartCount, chart=$chartCode")
 
             // 1. 기존 하트 수 가져오기
             val currentIdol = idolDao.getIdolById(idolId)
             val currentHeart = currentIdol?.heart ?: 0L
             val newTotalHeart = currentHeart + votedHeartCount
 
-            Log.d(TAG, "📊 Heart calculation: current=$currentHeart + voted=$votedHeartCount = total=$newTotalHeart")
+            logD(TAG, "📊 Heart calculation: current=$currentHeart + voted=$votedHeartCount = total=$newTotalHeart")
 
             // 2. idol DB 업데이트 (기존 하트 + 투표 하트)
             idolDao.updateIdolHeart(idolId, newTotalHeart)
-            Log.d(TAG, "✅ Updated idol DB: idol=$idolId, hearts=$newTotalHeart")
+            logD(TAG, "✅ Updated idol DB: idol=$idolId, hearts=$newTotalHeart")
 
             // 3. 투표한 아이돌이 최애돌인 경우 mostFavoriteIdolRankingItem도 즉시 업데이트
             val mostIdolId = userCacheRepository.get().mostIdolId.first()
             if (mostIdolId == idolId) {
-                Log.d(TAG, "💖 Voted idol is mostFavorite - updating mostFavoriteIdolRankingItem")
+                logD(TAG, "💖 Voted idol is mostFavorite - updating mostFavoriteIdolRankingItem")
                 val currentMostIdol = _mostFavoriteIdolRankingItem.value
                 if (currentMostIdol != null) {
                     // 기존 mostFavoriteIdol의 heartCount와 voteCount만 업데이트
@@ -199,7 +201,7 @@ class ChartRankingRepository @Inject constructor(
                         voteCount = NumberFormatUtil.formatWithComma(newTotalHeart)
                     )
                     _mostFavoriteIdolRankingItem.value = updatedMostIdol
-                    Log.d(TAG, "✅ Updated mostFavoriteIdol: hearts=$newTotalHeart")
+                    logD(TAG, "✅ Updated mostFavoriteIdol: hearts=$newTotalHeart")
                 }
             }
 
@@ -207,7 +209,7 @@ class ChartRankingRepository @Inject constructor(
             if (chartCode != null) {
                 // 특정 차트만 리프레시
                 refreshChart(chartCode)
-                Log.d(TAG, "✅ Refreshed chart: $chartCode")
+                logD(TAG, "✅ Refreshed chart: $chartCode")
             } else if(idolId != Constants.SECRET_ROOM_IDOL_ID){
                 // 모든 차트 리프레시
                 coroutineScope {
@@ -216,16 +218,16 @@ class ChartRankingRepository @Inject constructor(
                             try {
                                 refreshChart(code)
                             } catch (e: Exception) {
-                                Log.e(TAG, "❌ Failed to refresh chart $code: ${e.message}", e)
+                                logE(TAG, "❌ Failed to refresh chart $code: ${e.message}", e)
                             }
                         }
                     }.awaitAll()
                 }
-                Log.d(TAG, "✅ Refreshed all charts")
+                logD(TAG, "✅ Refreshed all charts")
             }
 
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Failed to update vote and rerank: ${e.message}", e)
+            logE(TAG, "❌ Failed to update vote and rerank: ${e.message}", e)
         }
     }
 
@@ -245,11 +247,11 @@ class ChartRankingRepository @Inject constructor(
 
             // 5초 디바운싱 체크
             if (timeSinceLastUpdate < CHART_UPDATE_DEBOUNCE_MS) {
-                Log.d(TAG, "⏭️ UDP update skipped (last update was ${timeSinceLastUpdate}ms ago, need ${CHART_UPDATE_DEBOUNCE_MS}ms)")
+                logD(TAG, "⏭️ UDP update skipped (last update was ${timeSinceLastUpdate}ms ago, need ${CHART_UPDATE_DEBOUNCE_MS}ms)")
                 return
             }
 
-            Log.d(TAG, "📡 UDP update for ${changedIdolIds.size} idols (${timeSinceLastUpdate}ms since last update)")
+            logD(TAG, "📡 UDP update for ${changedIdolIds.size} idols (${timeSinceLastUpdate}ms since last update)")
 
             // 마지막 업데이트 시간 갱신
             lastChartUpdateTime = currentTime
@@ -261,16 +263,16 @@ class ChartRankingRepository @Inject constructor(
                         try {
                             refreshChart(chartCode)
                         } catch (e: Exception) {
-                            Log.e(TAG, "❌ Failed to refresh chart $chartCode: ${e.message}", e)
+                            logE(TAG, "❌ Failed to refresh chart $chartCode: ${e.message}", e)
                         }
                     }
                 }.awaitAll()
             }
 
-            Log.d(TAG, "✅ All 5 charts refreshed with new rankings")
+            logD(TAG, "✅ All 5 charts refreshed with new rankings")
 
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Failed to update from UDP: ${e.message}", e)
+            logE(TAG, "❌ Failed to update from UDP: ${e.message}", e)
         }
     }
 
@@ -295,7 +297,7 @@ class ChartRankingRepository @Inject constructor(
             }
 
             if (allIdolIds.isEmpty()) {
-                Log.d(TAG, "⚠️ refreshAllChartsFromApi: No idol IDs - charts may not be initialized yet")
+                logD(TAG, "⚠️ refreshAllChartsFromApi: No idol IDs - charts may not be initialized yet")
                 return
             }
 
@@ -316,7 +318,7 @@ class ChartRankingRepository @Inject constructor(
                                 }
                             }
                         }
-                        is ApiResult.Error -> Log.e(TAG, "❌ refreshAllChartsFromApi error: ${result.message}")
+                        is ApiResult.Error -> logE(TAG, "❌ refreshAllChartsFromApi error: ${result.message}")
                         is ApiResult.Loading -> { }
                     }
                 }
@@ -329,10 +331,10 @@ class ChartRankingRepository @Inject constructor(
                         async { refreshChart(chartCode) }
                     }.awaitAll()
                 }
-                Log.d(TAG, "✅ refreshAllChartsFromApi: Updated $totalUpdatedIdols idols in ${System.currentTimeMillis() - startTime}ms")
+                logD(TAG, "✅ refreshAllChartsFromApi: Updated $totalUpdatedIdols idols in ${System.currentTimeMillis() - startTime}ms")
             }
         } catch (e: Exception) {
-            Log.e(TAG, "❌ refreshAllChartsFromApi error", e)
+            logE(TAG, "❌ refreshAllChartsFromApi error", e)
         }
     }
 
@@ -348,11 +350,11 @@ class ChartRankingRepository @Inject constructor(
      */
     suspend fun updateMostFavoriteIdol(newMostIdolId: Int?, newMostIdolChartCode: String?) {
         try {
-            Log.d(TAG, "💖 Updating mostFavoriteIdol: id=$newMostIdolId, chartCode=$newMostIdolChartCode")
+            logD(TAG, "💖 Updating mostFavoriteIdol: id=$newMostIdolId, chartCode=$newMostIdolChartCode")
 
             if (newMostIdolId == null) {
                 // 최애 해제 → 비밀의 방 아이돌로 설정
-                Log.d(TAG, "🔐 Most idol cleared - loading 비밀의 방 idol")
+                logD(TAG, "🔐 Most idol cleared - loading 비밀의 방 idol")
                 val secretRoomIdol = idolDao.getIdolById(Constants.SECRET_ROOM_IDOL_ID)
                 if (secretRoomIdol != null) {
                     val localizedName = RankingUtil.getLocalizedName(secretRoomIdol, context)
@@ -375,17 +377,17 @@ class ChartRankingRepository @Inject constructor(
                         birthday = RankingUtil.formatBirthday(secretRoomIdol.birthDay, secretRoomIdol.isLunarBirthday, context)
                     )
                     _mostFavoriteIdolRankingItem.value = secretRoomItem
-                    Log.d(TAG, "✅ Set 비밀의 방 as mostFavoriteIdol: ${secretRoomItem.name}")
+                    logD(TAG, "✅ Set 비밀의 방 as mostFavoriteIdol: ${secretRoomItem.name}")
                 } else {
                     _mostFavoriteIdolRankingItem.value = null
-                    Log.d(TAG, "⚠️ 비밀의 방 idol not found in DB")
+                    logD(TAG, "⚠️ 비밀의 방 idol not found in DB")
                 }
                 return
             }
 
             // chartCode가 null인 경우: 모든 차트에서 아이돌을 찾아보기
             val effectiveChartCode = if (newMostIdolChartCode == null) {
-                Log.d(TAG, "⚠️ chartCode is null, searching all charts for idol $newMostIdolId")
+                logD(TAG, "⚠️ chartCode is null, searching all charts for idol $newMostIdolId")
                 // 모든 차트에서 아이돌 찾기
                 var foundChartCode: String? = null
                 for (chartCode in DEFAULT_CHART_CODES) {
@@ -393,14 +395,14 @@ class ChartRankingRepository @Inject constructor(
                     val found = rankings.find { it.id.toIntOrNull() == newMostIdolId }
                     if (found != null) {
                         foundChartCode = chartCode
-                        Log.d(TAG, "✅ Found idol in chart $chartCode with rank ${found.rank}")
+                        logD(TAG, "✅ Found idol in chart $chartCode with rank ${found.rank}")
                         break
                     }
                 }
 
                 if (foundChartCode == null) {
                     // 진짜 비밀의 방 아이돌
-                    Log.d(TAG, "🔐 Special idol (비밀의 방) - loading from DB")
+                    logD(TAG, "🔐 Special idol (비밀의 방) - loading from DB")
                     val idolEntity = idolDao.getIdolById(newMostIdolId)
                     if (idolEntity != null) {
                         val localizedName = RankingUtil.getLocalizedName(idolEntity, context)
@@ -423,7 +425,7 @@ class ChartRankingRepository @Inject constructor(
                             birthday = RankingUtil.formatBirthday(idolEntity.birthDay, idolEntity.isLunarBirthday, context)
                         )
                         _mostFavoriteIdolRankingItem.value = specialItem
-                        Log.d(TAG, "✅ Loaded special idol: ${specialItem.name}")
+                        logD(TAG, "✅ Loaded special idol: ${specialItem.name}")
                     }
                     return
                 }
@@ -438,7 +440,7 @@ class ChartRankingRepository @Inject constructor(
 
             // 차트에서 찾지 못하면, 차트 리프레시 후 다시 찾기
             if (foundItem == null && rankings.isNotEmpty()) {
-                Log.d(TAG, "⚠️ Idol not found in chart $effectiveChartCode, refreshing chart...")
+                logD(TAG, "⚠️ Idol not found in chart $effectiveChartCode, refreshing chart...")
                 refreshChart(effectiveChartCode)
                 rankings = preferencesManager.getChartRanking(effectiveChartCode)
                 foundItem = rankings.find { it.id.toIntOrNull() == newMostIdolId }
@@ -446,10 +448,10 @@ class ChartRankingRepository @Inject constructor(
 
             if (foundItem != null) {
                 _mostFavoriteIdolRankingItem.value = foundItem.copy(isFavorite = true)
-                Log.d(TAG, "✅ Updated mostFavoriteIdol: ${foundItem.name}, rank=${foundItem.rank}")
+                logD(TAG, "✅ Updated mostFavoriteIdol: ${foundItem.name}, rank=${foundItem.rank}")
             } else {
                 // 차트에 없으면 DB에서 가져오기 (순위권 밖 또는 비밀의 방)
-                Log.d(TAG, "⚠️ Idol not found in chart $effectiveChartCode, loading from DB")
+                logD(TAG, "⚠️ Idol not found in chart $effectiveChartCode, loading from DB")
                 val idolEntity = idolDao.getIdolById(newMostIdolId)
                 if (idolEntity != null) {
                     val localizedName = RankingUtil.getLocalizedName(idolEntity, context)
@@ -471,11 +473,11 @@ class ChartRankingRepository @Inject constructor(
                         birthday = RankingUtil.formatBirthday(idolEntity.birthDay, idolEntity.isLunarBirthday, context)
                     )
                     _mostFavoriteIdolRankingItem.value = newItem
-                    Log.d(TAG, "✅ Loaded idol from DB: ${newItem.name}, rank=0 (not in chart)")
+                    logD(TAG, "✅ Loaded idol from DB: ${newItem.name}, rank=0 (not in chart)")
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Failed to update mostFavoriteIdol: ${e.message}", e)
+            logE(TAG, "❌ Failed to update mostFavoriteIdol: ${e.message}", e)
         }
     }
 
@@ -493,7 +495,7 @@ class ChartRankingRepository @Inject constructor(
             _mostFavoriteIdolRankingItem.value = null
 
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to clear rankings: ${e.message}", e)
+            logE(TAG, "Failed to clear rankings: ${e.message}", e)
         }
     }
 
@@ -502,9 +504,9 @@ class ChartRankingRepository @Inject constructor(
      */
     suspend fun initializeChartsInDatabase() {
         try {
-            Log.d(TAG, "========================================")
-            Log.d(TAG, "🚀 Initializing 5 charts in SharedPreference...")
-            Log.d(TAG, "========================================")
+            logD(TAG, "========================================")
+            logD(TAG, "🚀 Initializing 5 charts in SharedPreference...")
+            logD(TAG, "========================================")
 
             val startTime = System.currentTimeMillis()
 
@@ -512,22 +514,22 @@ class ChartRankingRepository @Inject constructor(
                 DEFAULT_CHART_CODES.map { chartCode ->
                     async {
                         try {
-                            Log.d(TAG, "📊 [$chartCode] Fetching idol IDs from API...")
+                            logD(TAG, "📊 [$chartCode] Fetching idol IDs from API...")
                             fetchAndSaveChart(chartCode)
                         } catch (e: Exception) {
-                            Log.e(TAG, "❌ [$chartCode] Failed: ${e.message}", e)
+                            logE(TAG, "❌ [$chartCode] Failed: ${e.message}", e)
                         }
                     }
                 }.awaitAll()
             }
 
             val elapsed = System.currentTimeMillis() - startTime
-            Log.d(TAG, "========================================")
-            Log.d(TAG, "✅ All 5 charts initialized in ${elapsed}ms")
-            Log.d(TAG, "========================================")
+            logD(TAG, "========================================")
+            logD(TAG, "✅ All 5 charts initialized in ${elapsed}ms")
+            logD(TAG, "========================================")
 
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Failed to initialize charts: ${e.message}", e)
+            logE(TAG, "❌ Failed to initialize charts: ${e.message}", e)
         }
     }
 
@@ -544,14 +546,14 @@ class ChartRankingRepository @Inject constructor(
                     is ApiResult.Success -> {
                         val idolIds = result.data
                         if (idolIds.isNotEmpty()) {
-                            Log.d(TAG, "✅ [$chartCode] Got ${idolIds.size} idol IDs from API")
+                            logD(TAG, "✅ [$chartCode] Got ${idolIds.size} idol IDs from API")
                             buildAndSaveChartRankings(chartCode, idolIds)
                         } else {
-                            Log.w(TAG, "⚠️ [$chartCode] No idol IDs from API")
+                            logW(TAG, "⚠️ [$chartCode] No idol IDs from API")
                         }
                     }
                     is ApiResult.Error -> {
-                        Log.e(TAG, "❌ [$chartCode] API error: ${result.message}")
+                        logE(TAG, "❌ [$chartCode] API error: ${result.message}")
                     }
                     is ApiResult.Loading -> {
                         // Loading state
@@ -559,7 +561,7 @@ class ChartRankingRepository @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG, "❌ [$chartCode] Failed to fetch: ${e.message}", e)
+            logE(TAG, "❌ [$chartCode] Failed to fetch: ${e.message}", e)
         }
     }
 
@@ -572,7 +574,7 @@ class ChartRankingRepository @Inject constructor(
             val idols = idolDao.getIdolsByIds(idolIds)
 
             if (idols.isEmpty()) {
-                Log.w(TAG, "⚠️ [$chartCode] No idols found in idol DB")
+                logW(TAG, "⚠️ [$chartCode] No idols found in idol DB")
                 return
             }
 
@@ -587,7 +589,7 @@ class ChartRankingRepository @Inject constructor(
             val mostIdolId = try {
                 userCacheRepository.get().getMostIdolId()
             } catch (e: Exception) {
-                Log.w(TAG, "⚠️ Failed to get mostIdolId: ${e.message}")
+                logW(TAG, "⚠️ Failed to get mostIdolId: ${e.message}")
                 null
             }
 
@@ -613,9 +615,9 @@ class ChartRankingRepository @Inject constructor(
 
                 // Top3 파싱 결과 로깅 (디버깅용 - 상위 3명만)
                 if (index < 3) {
-                    Log.d(TAG, "🖼️ [$chartCode] Rank $rank (${idol.name}): hearts=${idol.heart}, images=${imageUrls.size}, videos=${videoUrls.size}")
-                    imageUrls.forEachIndexed { i, url -> Log.d(TAG, "    Image[$i]: $url") }
-                    videoUrls.forEachIndexed { i, url -> Log.d(TAG, "    Video[$i]: $url") }
+                    logD(TAG, "🖼️ [$chartCode] Rank $rank (${idol.name}): hearts=${idol.heart}, images=${imageUrls.size}, videos=${videoUrls.size}")
+                    imageUrls.forEachIndexed { i, url -> logD(TAG, "    Image[$i]: $url") }
+                    videoUrls.forEachIndexed { i, url -> logD(TAG, "    Video[$i]: $url") }
                 }
 
                 // 다국어 이름 가져오기 (old 프로젝트와 동일)
@@ -649,13 +651,13 @@ class ChartRankingRepository @Inject constructor(
             // SharedPreference에 저장
             preferencesManager.saveChartRanking(chartCode, rankings)
 
-            Log.d(TAG, "✅ [$chartCode] Saved ${rankings.size} rankings to SharedPreference")
+            logD(TAG, "✅ [$chartCode] Saved ${rankings.size} rankings to SharedPreference")
 
             // mostFavoriteIdolRankingItem 업데이트 (해당하는 아이돌이 있으면)
             updateMostFavoriteIdolRankingItem(chartCode, rankings)
 
         } catch (e: Exception) {
-            Log.e(TAG, "❌ [$chartCode] Failed to build rankings: ${e.message}", e)
+            logE(TAG, "❌ [$chartCode] Failed to build rankings: ${e.message}", e)
         }
     }
 
@@ -680,7 +682,7 @@ class ChartRankingRepository @Inject constructor(
 
             if (mostIdolId == null) {
                 // 최애가 없으면 비밀의 방 아이돌로 설정 (updateMostFavoriteIdol과 동일)
-                Log.d(TAG, "⚠️ No mostIdolId set - setting 비밀의 방")
+                logD(TAG, "⚠️ No mostIdolId set - setting 비밀의 방")
                 if (_mostFavoriteIdolRankingItem.value?.id?.toIntOrNull() != Constants.SECRET_ROOM_IDOL_ID) {
                     val secretRoomIdol = idolDao.getIdolById(Constants.SECRET_ROOM_IDOL_ID)
                     if (secretRoomIdol != null) {
@@ -704,7 +706,7 @@ class ChartRankingRepository @Inject constructor(
                             birthday = RankingUtil.formatBirthday(secretRoomIdol.birthDay, secretRoomIdol.isLunarBirthday, context)
                         )
                         _mostFavoriteIdolRankingItem.value = secretRoomItem
-                        Log.d(TAG, "✅ Set 비밀의 방 as mostFavoriteIdol")
+                        logD(TAG, "✅ Set 비밀의 방 as mostFavoriteIdol")
                     }
                 }
                 return
@@ -713,17 +715,17 @@ class ChartRankingRepository @Inject constructor(
             // mostIdolChartCode가 null이어도 현재 차트에서 아이돌을 찾아보기
             // (chartCode 정보가 없는 경우에도 랭킹 리스트와 싱크를 맞추기 위함)
             if (mostIdolChartCode == null) {
-                Log.d(TAG, "⚠️ mostIdolChartCode is null, checking if idol exists in current chart $chartCode")
+                logD(TAG, "⚠️ mostIdolChartCode is null, checking if idol exists in current chart $chartCode")
                 val foundItem = rankings.find { it.id.toIntOrNull() == mostIdolId }
                 if (foundItem != null) {
-                    Log.d(TAG, "✅ Found mostIdol in chart $chartCode: rank=${foundItem.rank}")
+                    logD(TAG, "✅ Found mostIdol in chart $chartCode: rank=${foundItem.rank}")
                     _mostFavoriteIdolRankingItem.value = foundItem.copy(isFavorite = true)
                     return
                 }
                 // 현재 차트에 없고, mostFavoriteIdolRankingItem이 아직 설정되지 않았으면 DB에서 로드
                 if (_mostFavoriteIdolRankingItem.value == null ||
                     _mostFavoriteIdolRankingItem.value?.id?.toIntOrNull() == Constants.SECRET_ROOM_IDOL_ID) {
-                    Log.d(TAG, "🔍 mostIdol not found in chart $chartCode, loading from DB")
+                    logD(TAG, "🔍 mostIdol not found in chart $chartCode, loading from DB")
                     val idolEntity = idolDao.getIdolById(mostIdolId)
                     if (idolEntity != null) {
                         val localizedName = RankingUtil.getLocalizedName(idolEntity, context)
@@ -745,7 +747,7 @@ class ChartRankingRepository @Inject constructor(
                             birthday = RankingUtil.formatBirthday(idolEntity.birthDay, idolEntity.isLunarBirthday, context)
                         )
                         _mostFavoriteIdolRankingItem.value = newItem
-                        Log.d(TAG, "✅ Loaded mostIdol from DB: ${newItem.name}")
+                        logD(TAG, "✅ Loaded mostIdol from DB: ${newItem.name}")
                     }
                 }
                 return
@@ -753,27 +755,27 @@ class ChartRankingRepository @Inject constructor(
 
             // 최애 아이돌의 차트 코드와 현재 차트 코드가 일치하지 않으면 스킵
             if (mostIdolChartCode != chartCode) {
-                Log.d(TAG, "⏭️ Skipping chart $chartCode (mostIdol chart is $mostIdolChartCode)")
+                logD(TAG, "⏭️ Skipping chart $chartCode (mostIdol chart is $mostIdolChartCode)")
                 return
             }
 
-            Log.d(TAG, "🔍 Looking for mostIdolId=$mostIdolId in chart $chartCode rankings")
+            logD(TAG, "🔍 Looking for mostIdolId=$mostIdolId in chart $chartCode rankings")
 
             // rankings에서 해당 아이돌 찾기
             val foundItem = rankings.find { it.id.toIntOrNull() == mostIdolId }
 
             if (foundItem != null) {
                 // rankings에 있으면 그대로 설정
-                Log.d(TAG, "✅ Found mostIdol in rankings: ${foundItem.name}, rank=${foundItem.rank}")
+                logD(TAG, "✅ Found mostIdol in rankings: ${foundItem.name}, rank=${foundItem.rank}")
 
                 _mostFavoriteIdolRankingItem.value = foundItem
             } else {
                 // rankings에 없으면 로그만 남기고 업데이트하지 않음
                 // (다른 차트이거나 순위권 밖일 수 있음)
-                Log.d(TAG, "⚠️ mostIdol not found in rankings for chart $chartCode")
+                logD(TAG, "⚠️ mostIdol not found in rankings for chart $chartCode")
             }
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Failed to update mostFavoriteIdolRankingItem: ${e.message}", e)
+            logE(TAG, "❌ Failed to update mostFavoriteIdolRankingItem: ${e.message}", e)
         }
     }
 }

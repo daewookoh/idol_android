@@ -1,5 +1,6 @@
 package net.ib.mn.presentation.login
 
+import net.ib.mn.util.logW
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.kakao.sdk.user.UserApiClient
@@ -207,12 +208,12 @@ class LoginViewModel @Inject constructor(
                         // success==true이고 registeredDomain이 null이 아닌 경우
                         // 이미 line 210에서 domain이 일치하는 경우를 처리했으므로
                         // 여기 도달했다면 다른 도메인으로 가입된 경우입니다.
-                        android.util.Log.w(loginTag, "========================================")
-                        android.util.Log.w(loginTag, "User registered with different domain")
-                        android.util.Log.w(loginTag, "  email: $email")
-                        android.util.Log.w(loginTag, "  current domain: $domain")
-                        android.util.Log.w(loginTag, "  registeredDomain: $registeredDomain")
-                        android.util.Log.w(loginTag, "========================================")
+                        logW(loginTag, "========================================")
+                        logW(loginTag, "User registered with different domain")
+                        logW(loginTag, "  email: $email")
+                        logW(loginTag, "  current domain: $domain")
+                        logW(loginTag, "  registeredDomain: $registeredDomain")
+                        logW(loginTag, "========================================")
                         setState { copy(isLoading = false) }
                         setEffect {
                             LoginContract.Effect.ShowError(
@@ -235,7 +236,7 @@ class LoginViewModel @Inject constructor(
                         // 이미 line 210에서 domain이 일치하는 경우를 처리했으므로,
                         // 여기서는 다른 도메인으로 가입된 경우만 체크
                         if (registeredDomain != null && !registeredDomain.equals(domain, ignoreCase = true)) {
-                            android.util.Log.w(loginTag, "User registered with different method: $registeredDomain")
+                            logW(loginTag, "User registered with different method: $registeredDomain")
                             setState { copy(isLoading = false) }
                             setEffect {
                                 LoginContract.Effect.ShowError(
@@ -435,12 +436,12 @@ class LoginViewModel @Inject constructor(
                         // "이메일이 잘못되었습니다" 에러가 나와도 validate API에서 이미 회원으로 확인되었으므로 로그인 처리
                         if (isExistingUser) {
                             // validate API에서 이미 회원으로 확인되었으므로, signIn API 실패해도 로그인 처리
-                            android.util.Log.w(loginTag, "========================================")
-                            android.util.Log.w(loginTag, "User exists in DB but signIn API failed - proceeding with login")
-                            android.util.Log.w(loginTag, "  errorMessage: $errorMessage")
-                            android.util.Log.w(loginTag, "  isEmailError: $isEmailError")
-                            android.util.Log.w(loginTag, "  Old project: validate success=true means user exists, proceed with login")
-                            android.util.Log.w(loginTag, "========================================")
+                            logW(loginTag, "========================================")
+                            logW(loginTag, "User exists in DB but signIn API failed - proceeding with login")
+                            logW(loginTag, "  errorMessage: $errorMessage")
+                            logW(loginTag, "  isEmailError: $isEmailError")
+                            logW(loginTag, "  Old project: validate success=true means user exists, proceed with login")
+                            logW(loginTag, "========================================")
                             
                             // 로그인 처리 (afterSignin과 동일)
                             val email = tempEmail ?: return@collect

@@ -3,7 +3,6 @@ package net.ib.mn.presentation.main
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +17,8 @@ import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.domain.repository.MessageRepository
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
 
 private const val TAG = "MainTopBarViewModel"
 
@@ -54,14 +55,14 @@ class MainTopBarViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val afterDate = preferencesManager.getRecentNotificationDate()
-                Log.d(TAG, "checkNewNotification: afterDate=$afterDate")
+                logD(TAG, "checkNewNotification: afterDate=$afterDate")
 
                 val hasNew = messageRepository.checkNewNotification(afterDate)
-                Log.d(TAG, "checkNewNotification: hasNew=$hasNew")
+                logD(TAG, "checkNewNotification: hasNew=$hasNew")
 
                 _hasNewNotification.value = hasNew
             } catch (e: Exception) {
-                Log.e(TAG, "checkNewNotification: Error", e)
+                logE(TAG, "checkNewNotification: Error", e)
             }
         }
     }

@@ -15,6 +15,8 @@ import net.ib.mn.navigation.NavGraph
 import net.ib.mn.navigation.rememberAppNavigator
 import net.ib.mn.ui.theme.ExodusTheme
 import net.ib.mn.util.Constants
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -136,7 +138,7 @@ class MainActivity : ComponentActivity() {
                 host
             }
 
-            android.util.Log.d("MainActivity", "URL Scheme: Changing server to $fullHost")
+            logD("MainActivity", "URL Scheme: Changing server to $fullHost")
 
             // 서버 변경 시 모든 데이터 리셋 (인증 정보 제외)
             runBlocking {
@@ -144,21 +146,21 @@ class MainActivity : ComponentActivity() {
                 try {
                     chartDatabaseRepository.clearAll()
                 } catch (e: Exception) {
-                    android.util.Log.e("MainActivity", "Failed to clear Chart DB: ${e.message}", e)
+                    logE("MainActivity", "Failed to clear Chart DB: ${e.message}")
                 }
 
                 // 2. 모든 Room DB 데이터 삭제
                 try {
                     idolDao.deleteAll()
                 } catch (e: Exception) {
-                    android.util.Log.e("MainActivity", "Failed to clear Idol DB: ${e.message}", e)
+                    logE("MainActivity", "Failed to clear Idol DB: ${e.message}")
                 }
 
                 // 3. 인증 정보를 제외한 모든 DataStore 데이터 삭제 (유저 정보, 캐시 등 삭제)
                 try {
                     preferencesManager.clearAllExceptAuth()
                 } catch (e: Exception) {
-                    android.util.Log.e("MainActivity", "Failed to clear DataStore: ${e.message}", e)
+                    logE("MainActivity", "Failed to clear DataStore: ${e.message}")
                 }
 
                 // 4. ConfigRepository 메모리 캐시 삭제
@@ -178,7 +180,7 @@ class MainActivity : ComponentActivity() {
             try {
                 cacheDir.deleteRecursively()
             } catch (e: Exception) {
-                android.util.Log.e("MainActivity", "Failed to clear image cache: ${e.message}", e)
+                logE("MainActivity", "Failed to clear image cache: ${e.message}")
             }
 
             // 프로세스 완전 종료 및 재시작 (모든 메모리, ViewModel, 싱글톤 등 완전 초기화)

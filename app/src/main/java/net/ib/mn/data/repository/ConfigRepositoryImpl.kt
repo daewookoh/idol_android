@@ -9,6 +9,9 @@ import net.ib.mn.domain.model.ApiError
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.GCode
 import net.ib.mn.domain.repository.ConfigRepository
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
+import net.ib.mn.util.logW
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -62,51 +65,51 @@ class ConfigRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading)
 
         try {
-            android.util.Log.d("ConfigRepo", "🔵 Calling ConfigStartup API")
+            logD("ConfigRepo", "🔵 Calling ConfigStartup API")
 
             val response = configsApi.getConfigStartup()
 
-            android.util.Log.d("ConfigRepo", "📦 Response: HTTP ${response.code()}")
+            logD("ConfigRepo", "📦 Response: HTTP ${response.code()}")
 
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
 
                 // gcode 검사 (점검 상태 확인)
                 if (GCode.isMaintenance(body.gcode)) {
-                    android.util.Log.w("ConfigRepo", "⚠️ Server maintenance (gcode: ${body.gcode})")
+                    logW("ConfigRepo", "⚠️ Server maintenance (gcode: ${body.gcode})")
                     emit(ApiResult.Error(ApiError.Maintenance(body.msg)))
                     return@flow
                 }
 
                 // gcode 에러 검사
                 if (!GCode.isSuccess(body.gcode) && body.gcode != 0) {
-                    android.util.Log.e("ConfigRepo", "❌ Business error (gcode: ${body.gcode})")
+                    logE("ConfigRepo", "❌ Business error (gcode: ${body.gcode})")
                     emit(ApiResult.Error(ApiError.fromGcode(body.gcode, body.msg)))
                     return@flow
                 }
 
                 if (body.success) {
-                    android.util.Log.d("ConfigRepo", "✅ ConfigStartup SUCCESS")
+                    logD("ConfigRepo", "✅ ConfigStartup SUCCESS")
                     emit(ApiResult.Success(body))
                 } else {
-                    android.util.Log.e("ConfigRepo", "❌ API returned success=false")
+                    logE("ConfigRepo", "❌ API returned success=false")
                     emit(ApiResult.Error(ApiError.Business(
                         gcode = body.gcode,
                         message = body.msg ?: "Server returned success=false"
                     )))
                 }
             } else {
-                android.util.Log.e("ConfigRepo", "❌ HTTP Error: ${response.code()}")
+                logE("ConfigRepo", "❌ HTTP Error: ${response.code()}")
                 emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
-            android.util.Log.e("ConfigRepo", "❌ HttpException: ${e.code()}", e)
+            logE("ConfigRepo", "❌ HttpException: ${e.code()}", e)
             emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: IOException) {
-            android.util.Log.e("ConfigRepo", "❌ IOException: ${e.message}", e)
+            logE("ConfigRepo", "❌ IOException: ${e.message}", e)
             emit(ApiResult.Error(ApiError.Network(exception = e)))
         } catch (e: Exception) {
-            android.util.Log.e("ConfigRepo", "❌ Exception: ${e.message}", e)
+            logE("ConfigRepo", "❌ Exception: ${e.message}", e)
             emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
@@ -114,7 +117,7 @@ class ConfigRepositoryImpl @Inject constructor(
     override fun getConfigSelf(): Flow<ApiResult<ConfigSelfResponse>> = flow {
         // 캐시가 있으면 캐시 반환 (Old: ConfigModel은 앱 시작 시 한 번만 로드)
         cachedConfigSelf?.let {
-            android.util.Log.d("ConfigRepo", "✓ Returning cached ConfigSelf")
+            logD("ConfigRepo", "✓ Returning cached ConfigSelf")
             emit(ApiResult.Success(it))
             return@flow
         }
@@ -122,33 +125,33 @@ class ConfigRepositoryImpl @Inject constructor(
         emit(ApiResult.Loading)
 
         try {
-            android.util.Log.d("ConfigRepo", "🔵 Calling ConfigSelf API")
+            logD("ConfigRepo", "🔵 Calling ConfigSelf API")
 
             val response = configsApi.getConfigSelf()
 
-            android.util.Log.d("ConfigRepo", "📦 Response: HTTP ${response.code()}")
+            logD("ConfigRepo", "📦 Response: HTTP ${response.code()}")
 
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
 
-                android.util.Log.d("ConfigRepo", "✅ ConfigSelf SUCCESS")
+                logD("ConfigRepo", "✅ ConfigSelf SUCCESS")
 
                 // 캐시 저장
                 cachedConfigSelf = body
 
                 emit(ApiResult.Success(body))
             } else {
-                android.util.Log.e("ConfigRepo", "❌ HTTP Error: ${response.code()}")
+                logE("ConfigRepo", "❌ HTTP Error: ${response.code()}")
                 emit(ApiResult.Error(ApiError.fromHttpCode(response.code(), response.message())))
             }
         } catch (e: HttpException) {
-            android.util.Log.e("ConfigRepo", "❌ HttpException: ${e.code()}", e)
+            logE("ConfigRepo", "❌ HttpException: ${e.code()}", e)
             emit(ApiResult.Error(ApiError.fromHttpCode(e.code(), e.message())))
         } catch (e: IOException) {
-            android.util.Log.e("ConfigRepo", "❌ IOException: ${e.message}", e)
+            logE("ConfigRepo", "❌ IOException: ${e.message}", e)
             emit(ApiResult.Error(ApiError.Network(exception = e)))
         } catch (e: Exception) {
-            android.util.Log.e("ConfigRepo", "❌ Exception: ${e.message}", e)
+            logE("ConfigRepo", "❌ Exception: ${e.message}", e)
             emit(ApiResult.Error(ApiError.Unknown(exception = e)))
         }
     }
@@ -166,26 +169,26 @@ class ConfigRepositoryImpl @Inject constructor(
      * startup에서 호출되어 캐시된 경우 API 호출하지 않음
      */
     override fun getTypeList(forceRefresh: Boolean): Flow<List<TypeListModel>> = flow {
-        android.util.Log.d("API_RESPONSE", "========================================")
-        android.util.Log.d("API_RESPONSE", "[ConfigRepository] getTypeList called")
-        android.util.Log.d("API_RESPONSE", "  - forceRefresh: $forceRefresh")
-        android.util.Log.d("API_RESPONSE", "  - cachedTypeList: ${cachedTypeList?.size ?: 0} items")
+        logD("API_RESPONSE", "========================================")
+        logD("API_RESPONSE", "[ConfigRepository] getTypeList called")
+        logD("API_RESPONSE", "  - forceRefresh: $forceRefresh")
+        logD("API_RESPONSE", "  - cachedTypeList: ${cachedTypeList?.size ?: 0} items")
 
         // 캐시가 있고 forceRefresh가 false면 캐시 반환
         if (!forceRefresh && cachedTypeList != null) {
-            android.util.Log.d("API_RESPONSE", "✓ Returning cached typeList (${cachedTypeList!!.size} items)")
-            android.util.Log.d("API_RESPONSE", "========================================")
+            logD("API_RESPONSE", "✓ Returning cached typeList (${cachedTypeList!!.size} items)")
+            logD("API_RESPONSE", "========================================")
             emit(cachedTypeList!!)
             return@flow
         }
 
         // API 호출
-        android.util.Log.d("API_RESPONSE", "Calling TypeList API: GET configs/typelist/")
+        logD("API_RESPONSE", "Calling TypeList API: GET configs/typelist/")
         try {
             val response = configsApi.getTypeList()
 
-            android.util.Log.d("API_RESPONSE", "Response Code: ${response.code()}")
-            android.util.Log.d("API_RESPONSE", "Response Success: ${response.isSuccessful}")
+            logD("API_RESPONSE", "Response Code: ${response.code()}")
+            logD("API_RESPONSE", "Response Success: ${response.isSuccessful}")
 
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
@@ -193,34 +196,34 @@ class ConfigRepositoryImpl @Inject constructor(
                 if (body.success) {
                     val typeListData = body.objects
 
-                    android.util.Log.d("API_RESPONSE", "TypeList API Response:")
-                    android.util.Log.d("API_RESPONSE", "Success: ${body.success}")
-                    android.util.Log.d("API_RESPONSE", "Total types: ${typeListData.size}")
+                    logD("API_RESPONSE", "TypeList API Response:")
+                    logD("API_RESPONSE", "Success: ${body.success}")
+                    logD("API_RESPONSE", "Total types: ${typeListData.size}")
 
                     typeListData.forEachIndexed { index, type ->
-                        android.util.Log.d("API_RESPONSE", "  [$index] id=${type.id}, name=${type.name}, type=${type.type}, isDivided=${type.isDivided}, isFemale=${type.isFemale}")
+                        logD("API_RESPONSE", "  [$index] id=${type.id}, name=${type.name}, type=${type.type}, isDivided=${type.isDivided}, isFemale=${type.isFemale}")
                     }
 
                     // 캐시 저장
                     cachedTypeList = typeListData
-                    android.util.Log.d("API_RESPONSE", "✓ TypeList cached successfully")
+                    logD("API_RESPONSE", "✓ TypeList cached successfully")
 
                     emit(typeListData)
                 } else {
-                    android.util.Log.e("API_RESPONSE", "Error: API returned success=false")
+                    logE("API_RESPONSE", "Error: API returned success=false")
                     emit(emptyList())
                 }
             } else {
-                android.util.Log.e("API_RESPONSE", "Error: HTTP ${response.code()}")
-                android.util.Log.e("API_RESPONSE", "Error body: ${response.errorBody()?.string()}")
+                logE("API_RESPONSE", "Error: HTTP ${response.code()}")
+                logE("API_RESPONSE", "Error body: ${response.errorBody()?.string()}")
                 emit(emptyList())
             }
         } catch (e: Exception) {
-            android.util.Log.e("API_RESPONSE", "Exception: ${e.message}", e)
+            logE("API_RESPONSE", "Exception: ${e.message}", e)
             emit(emptyList())
         }
 
-        android.util.Log.d("API_RESPONSE", "========================================")
+        logD("API_RESPONSE", "========================================")
     }
 
     /**
@@ -234,15 +237,15 @@ class ConfigRepositoryImpl @Inject constructor(
      * StateFlow도 함께 업데이트하여 모든 구독자에게 알림
      */
     override fun setTypeListCache(typeList: List<TypeListModel>) {
-        android.util.Log.d("API_RESPONSE", "========================================")
-        android.util.Log.d("API_RESPONSE", "[ConfigRepository] setTypeListCache called")
-        android.util.Log.d("API_RESPONSE", "  - typeList size: ${typeList.size}")
+        logD("API_RESPONSE", "========================================")
+        logD("API_RESPONSE", "[ConfigRepository] setTypeListCache called")
+        logD("API_RESPONSE", "  - typeList size: ${typeList.size}")
 
         cachedTypeList = typeList
         _typeListFlow.value = typeList // StateFlow 업데이트 -> 모든 구독자에게 자동 알림
 
-        android.util.Log.d("API_RESPONSE", "✓ TypeList cache & StateFlow updated")
-        android.util.Log.d("API_RESPONSE", "========================================")
+        logD("API_RESPONSE", "✓ TypeList cache & StateFlow updated")
+        logD("API_RESPONSE", "========================================")
     }
 
     /**
@@ -256,16 +259,16 @@ class ConfigRepositoryImpl @Inject constructor(
      * StateFlow도 함께 업데이트하여 모든 구독자에게 알림
      */
     override fun setMainChartModel(mainChartModel: net.ib.mn.data.remote.dto.MainChartModel) {
-        android.util.Log.d("API_RESPONSE", "========================================")
-        android.util.Log.d("API_RESPONSE", "[ConfigRepository] setMainChartModel called")
-        android.util.Log.d("API_RESPONSE", "  - males: ${mainChartModel.males?.size ?: 0}")
-        android.util.Log.d("API_RESPONSE", "  - females: ${mainChartModel.females?.size ?: 0}")
+        logD("API_RESPONSE", "========================================")
+        logD("API_RESPONSE", "[ConfigRepository] setMainChartModel called")
+        logD("API_RESPONSE", "  - males: ${mainChartModel.males?.size ?: 0}")
+        logD("API_RESPONSE", "  - females: ${mainChartModel.females?.size ?: 0}")
 
         cachedMainChartModel = mainChartModel
         _mainChartModelFlow.value = mainChartModel // StateFlow 업데이트
 
-        android.util.Log.d("API_RESPONSE", "✓ MainChartModel cache & StateFlow updated")
-        android.util.Log.d("API_RESPONSE", "========================================")
+        logD("API_RESPONSE", "✓ MainChartModel cache & StateFlow updated")
+        logD("API_RESPONSE", "========================================")
     }
 
     /**
@@ -286,15 +289,15 @@ class ConfigRepositoryImpl @Inject constructor(
      * StateFlow도 함께 업데이트하여 모든 구독자에게 알림
      */
     override fun setChartObjects(chartObjects: List<net.ib.mn.data.remote.dto.ChartModel>) {
-        android.util.Log.d("API_RESPONSE", "========================================")
-        android.util.Log.d("API_RESPONSE", "[ConfigRepository] setChartObjects called")
-        android.util.Log.d("API_RESPONSE", "  - objects size: ${chartObjects.size}")
+        logD("API_RESPONSE", "========================================")
+        logD("API_RESPONSE", "[ConfigRepository] setChartObjects called")
+        logD("API_RESPONSE", "  - objects size: ${chartObjects.size}")
 
         cachedChartObjects = chartObjects
         _chartObjectsFlow.value = chartObjects // StateFlow 업데이트
 
-        android.util.Log.d("API_RESPONSE", "✓ ChartObjects cache & StateFlow updated")
-        android.util.Log.d("API_RESPONSE", "========================================")
+        logD("API_RESPONSE", "✓ ChartObjects cache & StateFlow updated")
+        logD("API_RESPONSE", "========================================")
     }
 
     /**
@@ -316,9 +319,9 @@ class ConfigRepositoryImpl @Inject constructor(
      * 메모리 캐시와 StateFlow를 모두 초기화
      */
     override fun clearAllCache() {
-        android.util.Log.d("ConfigRepo", "========================================")
-        android.util.Log.d("ConfigRepo", "🗑️ Clearing all cache data")
-        android.util.Log.d("ConfigRepo", "========================================")
+        logD("ConfigRepo", "========================================")
+        logD("ConfigRepo", "🗑️ Clearing all cache data")
+        logD("ConfigRepo", "========================================")
 
         // 메모리 캐시 초기화
         cachedTypeList = null
@@ -331,6 +334,6 @@ class ConfigRepositoryImpl @Inject constructor(
         _mainChartModelFlow.value = null
         _chartObjectsFlow.value = emptyList()
 
-        android.util.Log.d("ConfigRepo", "✅ All cache cleared")
+        logD("ConfigRepo", "✅ All cache cleared")
     }
 }

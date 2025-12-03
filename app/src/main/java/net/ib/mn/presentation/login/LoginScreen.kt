@@ -1,5 +1,6 @@
 package net.ib.mn.presentation.login
 
+import net.ib.mn.util.logW
 import android.Manifest
 import android.app.Activity
 import android.content.Context
@@ -265,9 +266,9 @@ fun LoginScreen(
             }
         } else {
             // data가 null인 경우 (사용자가 취소) - 로그인 실패 다이얼로그 표시
-            android.util.Log.w(GOOGLE_LOGIN_TAG, "========================================")
-            android.util.Log.w(GOOGLE_LOGIN_TAG, "Google login cancelled - data is null")
-            android.util.Log.w(GOOGLE_LOGIN_TAG, "========================================")
+            logW(GOOGLE_LOGIN_TAG, "========================================")
+            logW(GOOGLE_LOGIN_TAG, "Google login cancelled - data is null")
+            logW(GOOGLE_LOGIN_TAG, "========================================")
             viewModel.handleSnsLoginError(context.getString(R.string.line_login_failed))
         }
     }

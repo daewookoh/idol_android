@@ -3,6 +3,7 @@ package net.ib.mn.data.repository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import net.ib.mn.data.local.PreferencesManager
+import net.ib.mn.util.logD
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -44,10 +45,10 @@ class AuthRepository @Inject constructor(
      * @param token 액세스 토큰
      */
     suspend fun login(email: String, domain: String, token: String) {
-        android.util.Log.d("USER_INFO", "[AuthRepository] login() called")
-        android.util.Log.d("USER_INFO", "[AuthRepository]   - Email: $email")
-        android.util.Log.d("USER_INFO", "[AuthRepository]   - Domain: $domain")
-        android.util.Log.d("USER_INFO", "[AuthRepository]   - Token: ${token.take(20)}...")
+        logD("USER_INFO", "[AuthRepository] login() called")
+        logD("USER_INFO", "[AuthRepository]   - Email: $email")
+        logD("USER_INFO", "[AuthRepository]   - Domain: $domain")
+        logD("USER_INFO", "[AuthRepository]   - Token: ${token.take(20)}...")
 
         // 인메모리 캐시 설정
         this.email = email
@@ -59,7 +60,7 @@ class AuthRepository @Inject constructor(
         preferencesManager.setLoginDomain(domain)
         preferencesManager.setAccessToken(token)
 
-        android.util.Log.d("USER_INFO", "[AuthRepository] ✓ Auth credentials saved to memory and DataStore")
+        logD("USER_INFO", "[AuthRepository] ✓ Auth credentials saved to memory and DataStore")
     }
 
     /**
@@ -69,7 +70,7 @@ class AuthRepository @Inject constructor(
      * 필요한 경우 개별 삭제 메서드를 사용하거나 clearAllExceptXXX() 메서드 사용
      */
     suspend fun logout() {
-        android.util.Log.d("USER_INFO", "[AuthRepository] logout() called")
+        logD("USER_INFO", "[AuthRepository] logout() called")
 
         // 인메모리 캐시 초기화
         this.email = null
@@ -81,7 +82,7 @@ class AuthRepository @Inject constructor(
         preferencesManager.setLoginEmail("")
         preferencesManager.setLoginDomain("")
 
-        android.util.Log.d("USER_INFO", "[AuthRepository] ✓ Auth credentials cleared from memory and DataStore")
+        logD("USER_INFO", "[AuthRepository] ✓ Auth credentials cleared from memory and DataStore")
     }
 
     /**
@@ -103,7 +104,7 @@ class AuthRepository @Inject constructor(
         return runBlocking {
             val loaded = preferencesManager.loginEmail.first()
             if (loaded != null) {
-                android.util.Log.d("USER_INFO", "[AuthRepository] getEmail() - Loaded from DataStore: $loaded")
+                logD("USER_INFO", "[AuthRepository] getEmail() - Loaded from DataStore: $loaded")
             }
             email = loaded // 로드한 값을 캐시에 저장
             loaded
@@ -122,7 +123,7 @@ class AuthRepository @Inject constructor(
         return runBlocking {
             val loaded = preferencesManager.loginDomain.first()
             if (loaded != null) {
-                android.util.Log.d("USER_INFO", "[AuthRepository] getDomain() - Loaded from DataStore: $loaded")
+                logD("USER_INFO", "[AuthRepository] getDomain() - Loaded from DataStore: $loaded")
             }
             domain = loaded
             loaded
@@ -141,7 +142,7 @@ class AuthRepository @Inject constructor(
         return runBlocking {
             val loaded = preferencesManager.accessToken.first()
             if (loaded != null) {
-                android.util.Log.d("USER_INFO", "[AuthRepository] getAccessToken() - Loaded from DataStore: ${loaded.take(20)}...")
+                logD("USER_INFO", "[AuthRepository] getAccessToken() - Loaded from DataStore: ${loaded.take(20)}...")
             }
             token = loaded
             loaded

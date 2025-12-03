@@ -3,6 +3,7 @@ package net.ib.mn.domain.ranking
 import kotlinx.coroutines.flow.Flow
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.RankingRepository
+import net.ib.mn.util.logD
 
 /**
  * My Favorite 랭킹 데이터 소스
@@ -25,7 +26,7 @@ class MyFavoriteRankingDataSource(
     override suspend fun loadIdolIds(chartCode: String): Flow<ApiResult<List<Int>>> {
         // 전체 idol IDs를 반환 (필터링하지 않음)
         // 순위는 전체 목록 기준으로 계산되어야 하므로
-        android.util.Log.d(
+        logD(
             "MyFavoriteDataSource",
             "📊 Chart $chartCode: Loading FULL idol list for ranking calculation"
         )

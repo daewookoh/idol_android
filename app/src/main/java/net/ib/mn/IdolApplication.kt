@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Base64
-import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -31,6 +30,9 @@ import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.remote.udp.IdolBroadcastManager
 import net.ib.mn.util.Constants
 import net.ib.mn.util.ServerUrl
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
+import net.ib.mn.util.logW
 
 /**
  * Application class for Hilt initialization and SNS SDK setup.
@@ -144,7 +146,7 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
 
         // 앱 전체 생명주기 옵저버 등록 (UDP 관리)
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        Log.d("IdolApplication", "🔄 ProcessLifecycleOwner observer registered")
+        logD("IdolApplication", "🔄 ProcessLifecycleOwner observer registered")
     }
 
     /**
@@ -153,9 +155,9 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
      */
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
-        Log.d("IdolApplication", "========================================")
-        Log.d("IdolApplication", "📱 App lifecycle: ON_START (Foreground)")
-        Log.d("IdolApplication", "========================================")
+        logD("IdolApplication", "========================================")
+        logD("IdolApplication", "📱 App lifecycle: ON_START (Foreground)")
+        logD("IdolApplication", "========================================")
 
         // UDP 설정 및 연결
         owner.lifecycleScope.launch {
@@ -165,28 +167,28 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
                 val userInfo = preferencesManager.userInfo.first()
                 val userId = userInfo?.id ?: 0
 
-                Log.d("IdolApplication", "========================================")
-                Log.d("IdolApplication", "📡 UDP Configuration:")
-                Log.d("IdolApplication", "  - UDP Broadcast URL: $udpBroadcastUrl")
-                Log.d("IdolApplication", "  - UDP Stage: $udpStage")
-                Log.d("IdolApplication", "  - User ID: $userId")
-                Log.d("IdolApplication", "========================================")
+                logD("IdolApplication", "========================================")
+                logD("IdolApplication", "📡 UDP Configuration:")
+                logD("IdolApplication", "  - UDP Broadcast URL: $udpBroadcastUrl")
+                logD("IdolApplication", "  - UDP Stage: $udpStage")
+                logD("IdolApplication", "  - User ID: $userId")
+                logD("IdolApplication", "========================================")
 
                 // UDP Stage가 0보다 클 때만 연결 (old 프로젝트와 동일)
                 if (udpStage > 0 && !udpBroadcastUrl.isNullOrEmpty()) {
-                    Log.d("IdolApplication", "✓ UDP enabled - Starting connection...")
+                    logD("IdolApplication", "✓ UDP enabled - Starting connection...")
                     broadcastManager.setupConnection(udpBroadcastUrl, userId)
                 } else {
                     if (udpStage <= 0) {
-                        Log.w("IdolApplication", "⚠️ UDP disabled (stage=$udpStage)")
+                        logW("IdolApplication", "⚠️ UDP disabled (stage=$udpStage)")
                     }
                     if (udpBroadcastUrl.isNullOrEmpty()) {
-                        Log.w("IdolApplication", "⚠️ UDP URL not configured")
+                        logW("IdolApplication", "⚠️ UDP URL not configured")
                     }
-                    Log.w("IdolApplication", "Skipping UDP connection")
+                    logW("IdolApplication", "Skipping UDP connection")
                 }
             } catch (e: Exception) {
-                Log.e("IdolApplication", "❌ Failed to setup UDP connection", e)
+                logE("IdolApplication", "❌ Failed to setup UDP connection: ${e.message}")
             }
         }
     }
@@ -197,18 +199,18 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
      */
     override fun onStop(owner: LifecycleOwner) {
         super.onStop(owner)
-        Log.d("IdolApplication", "========================================")
-        Log.d("IdolApplication", "📱 App lifecycle: ON_STOP (Background)")
-        Log.d("IdolApplication", "========================================")
-        Log.d("IdolApplication", "🛑 Stopping UDP broadcast...")
+        logD("IdolApplication", "========================================")
+        logD("IdolApplication", "📱 App lifecycle: ON_STOP (Background)")
+        logD("IdolApplication", "========================================")
+        logD("IdolApplication", "🛑 Stopping UDP broadcast...")
 
         // UDP 연결 완전히 해제
         owner.lifecycleScope.launch {
             try {
                 broadcastManager.disconnect()
-                Log.d("IdolApplication", "✓ UDP disconnected")
+                logD("IdolApplication", "✓ UDP disconnected")
             } catch (e: Exception) {
-                Log.e("IdolApplication", "❌ Failed to disconnect UDP", e)
+                logE("IdolApplication", "❌ Failed to disconnect UDP: ${e.message}")
             }
         }
     }
@@ -228,12 +230,12 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
 
             if (!savedUrl.isNullOrEmpty()) {
                 ServerUrl.setHost(savedUrl)
-                Log.d("ServerUrl", "Loaded saved server URL: $savedUrl")
+                logD("ServerUrl", "Loaded saved server URL: $savedUrl")
             } else {
-                Log.d("ServerUrl", "Using default server URL: ${ServerUrl.HOST}")
+                logD("ServerUrl", "Using default server URL: ${ServerUrl.HOST}")
             }
         } catch (e: Exception) {
-            Log.e("ServerUrl", "Failed to load saved URL: ${e.message}", e)
+            logE("ServerUrl", "Failed to load saved URL: ${e.message}")
         }
     }
 
@@ -264,20 +266,20 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
                 md.update(signature.toByteArray())
                 val keyHash = Base64.encodeToString(md.digest(), Base64.NO_WRAP)
 
-                Log.e("KAKAO_KEY_HASH", "========================================")
-                Log.e("KAKAO_KEY_HASH", "Package Name: $packageName")
-                Log.e("KAKAO_KEY_HASH", "Key Hash: $keyHash")
-                Log.e("KAKAO_KEY_HASH", "========================================")
-                Log.e("KAKAO_KEY_HASH", "Constants Kakao App Key: ${Constants.KAKAO_APP_KEY}")
-                Log.e("KAKAO_KEY_HASH", "========================================")
-                Log.e("KAKAO_KEY_HASH", "Copy this Key Hash to Kakao Developers Console:")
-                Log.e("KAKAO_KEY_HASH", "https://developers.kakao.com/")
-                Log.e("KAKAO_KEY_HASH", "Package: $packageName")
-                Log.e("KAKAO_KEY_HASH", "Key Hash: $keyHash")
-                Log.e("KAKAO_KEY_HASH", "========================================")
+                logE("KAKAO_KEY_HASH", "========================================")
+                logE("KAKAO_KEY_HASH", "Package Name: $packageName")
+                logE("KAKAO_KEY_HASH", "Key Hash: $keyHash")
+                logE("KAKAO_KEY_HASH", "========================================")
+                logE("KAKAO_KEY_HASH", "Constants Kakao App Key: ${Constants.KAKAO_APP_KEY}")
+                logE("KAKAO_KEY_HASH", "========================================")
+                logE("KAKAO_KEY_HASH", "Copy this Key Hash to Kakao Developers Console:")
+                logE("KAKAO_KEY_HASH", "https://developers.kakao.com/")
+                logE("KAKAO_KEY_HASH", "Package: $packageName")
+                logE("KAKAO_KEY_HASH", "Key Hash: $keyHash")
+                logE("KAKAO_KEY_HASH", "========================================")
             }
         } catch (e: Exception) {
-            Log.e("KAKAO_KEY_HASH", "Error getting key hash: ${e.message}", e)
+            logE("KAKAO_KEY_HASH", "Error getting key hash: ${e.message}")
         }
     }
 
@@ -312,20 +314,20 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
                 md.update(signature.toByteArray())
                 val keyHash = Base64.encodeToString(md.digest(), Base64.NO_WRAP)
 
-                Log.e("FACEBOOK_KEY_HASH", "========================================")
-                Log.e("FACEBOOK_KEY_HASH", "Facebook Key Hash:")
-                Log.e("FACEBOOK_KEY_HASH", "Package Name: $packageName")
-                Log.e("FACEBOOK_KEY_HASH", "Key Hash: $keyHash")
-                Log.e("FACEBOOK_KEY_HASH", "========================================")
-                Log.e("FACEBOOK_KEY_HASH", "Copy this Key Hash to Facebook Developer Console:")
-                Log.e("FACEBOOK_KEY_HASH", "https://developers.facebook.com/apps/")
-                Log.e("FACEBOOK_KEY_HASH", "Settings → Basic → Key Hashes")
-                Log.e("FACEBOOK_KEY_HASH", "Package: $packageName")
-                Log.e("FACEBOOK_KEY_HASH", "Key Hash: $keyHash")
-                Log.e("FACEBOOK_KEY_HASH", "========================================")
+                logE("FACEBOOK_KEY_HASH", "========================================")
+                logE("FACEBOOK_KEY_HASH", "Facebook Key Hash:")
+                logE("FACEBOOK_KEY_HASH", "Package Name: $packageName")
+                logE("FACEBOOK_KEY_HASH", "Key Hash: $keyHash")
+                logE("FACEBOOK_KEY_HASH", "========================================")
+                logE("FACEBOOK_KEY_HASH", "Copy this Key Hash to Facebook Developer Console:")
+                logE("FACEBOOK_KEY_HASH", "https://developers.facebook.com/apps/")
+                logE("FACEBOOK_KEY_HASH", "Settings → Basic → Key Hashes")
+                logE("FACEBOOK_KEY_HASH", "Package: $packageName")
+                logE("FACEBOOK_KEY_HASH", "Key Hash: $keyHash")
+                logE("FACEBOOK_KEY_HASH", "========================================")
             }
         } catch (e: Exception) {
-            Log.e("FACEBOOK_KEY_HASH", "Error getting Facebook key hash: ${e.message}", e)
+            logE("FACEBOOK_KEY_HASH", "Error getting Facebook key hash: ${e.message}")
         }
     }
 
@@ -355,7 +357,7 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
                         .setTestDeviceIds(testDeviceIds)
                         .build()
                 )
-                Log.d("MobileAds", "Test devices registered: $testDeviceIds")
+                logD("MobileAds", "Test devices registered: $testDeviceIds")
             }
         }
 
@@ -363,9 +365,9 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
         MobileAds.initialize(this) { initializationStatus ->
             val statusMap = initializationStatus.adapterStatusMap
             for ((adapterClass, status) in statusMap) {
-                Log.d("MobileAds", "Adapter: $adapterClass, Status: ${status.initializationState}")
+                logD("MobileAds", "Adapter: $adapterClass, Status: ${status.initializationState}")
             }
-            Log.d("MobileAds", "Mobile Ads SDK initialized successfully")
+            logD("MobileAds", "Mobile Ads SDK initialized successfully")
         }
     }
 }

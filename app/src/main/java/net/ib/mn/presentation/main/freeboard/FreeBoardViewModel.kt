@@ -1,6 +1,5 @@
 package net.ib.mn.presentation.main.freeboard
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -15,6 +14,8 @@ import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.TagModel
 import net.ib.mn.domain.repository.ArticlesRepository
 import net.ib.mn.util.Constants
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
 
 private const val TAG = "FreeBoardViewModel"
 
@@ -81,7 +82,7 @@ class FreeBoardViewModel @Inject constructor(
                 // 외부에서 idolId가 전달된 경우 (CommunityFanTalkSubPage 등)
                 // 태그 없이 바로 해당 아이돌의 덕질게시판만 로드
                 if (isExternalIdolMode) {
-                    Log.d(TAG, "loadInitialData: externalIdolMode with idolId=$externalIdolId")
+                    logD(TAG, "loadInitialData: externalIdolMode with idolId=$externalIdolId")
                     setState {
                         copy(
                             tags = emptyList(),
@@ -109,7 +110,7 @@ class FreeBoardViewModel @Inject constructor(
                     mostIdolId != Constants.SECRET_ROOM_IDOL_ID &&
                     mostIdolId > 0
 
-                Log.d(TAG, "loadInitialData: savedTagId=$savedTagId, initialTagId=$initialTagId, mostIdolId=$mostIdolId, hasMostIdol=$hasMostIdol")
+                logD(TAG, "loadInitialData: savedTagId=$savedTagId, initialTagId=$initialTagId, mostIdolId=$mostIdolId, hasMostIdol=$hasMostIdol")
 
                 setState {
                     copy(
@@ -143,11 +144,11 @@ class FreeBoardViewModel @Inject constructor(
             val locale = currentState.selectedLanguageId.takeIf { it.isNotEmpty() && it != "all" }
             val selectedTagId = currentState.selectedTagId
 
-            Log.d(TAG, "loadArticles: selectedTagId=$selectedTagId, orderBy=$orderBy, keyword=$keyword, locale=$locale")
+            logD(TAG, "loadArticles: selectedTagId=$selectedTagId, orderBy=$orderBy, keyword=$keyword, locale=$locale")
 
             // 최애 탭인데 최애가 설정되지 않은 경우 빈 화면 표시
             if (selectedTagId == FreeBoardContract.State.TAG_ID_MY_FAVORITE && !currentState.hasMostIdol) {
-                Log.d(TAG, "loadArticles: 최애 탭인데 최애 미설정 -> 빈 화면 표시")
+                logD(TAG, "loadArticles: 최애 탭인데 최애 미설정 -> 빈 화면 표시")
                 setState {
                     copy(
                         isLoading = false,
@@ -161,7 +162,7 @@ class FreeBoardViewModel @Inject constructor(
 
             val flow = when (selectedTagId) {
                 FreeBoardContract.State.TAG_ID_HOT -> {
-                    Log.d(TAG, "Calling getFreeBoardHot")
+                    logD(TAG, "Calling getFreeBoardHot")
                     articlesRepository.getFreeBoardHot(
                         orderBy = orderBy,
                         keyword = keyword,
@@ -169,7 +170,7 @@ class FreeBoardViewModel @Inject constructor(
                     )
                 }
                 FreeBoardContract.State.TAG_ID_ALL -> {
-                    Log.d(TAG, "Calling getFreeBoardAll")
+                    logD(TAG, "Calling getFreeBoardAll")
                     articlesRepository.getFreeBoardAll(
                         orderBy = orderBy,
                         keyword = keyword,
@@ -179,7 +180,7 @@ class FreeBoardViewModel @Inject constructor(
                 FreeBoardContract.State.TAG_ID_MY_FAVORITE -> {
                     // 외부에서 idolId가 전달된 경우 해당 ID 사용, 아니면 최애 아이돌 ID 사용
                     val idolId = externalIdolId ?: (preferencesManager.getMostIdolId() ?: 0)
-                    Log.d(TAG, "Calling getMyFavoriteArticles with idolId=$idolId (external=$externalIdolId)")
+                    logD(TAG, "Calling getMyFavoriteArticles with idolId=$idolId (external=$externalIdolId)")
                     articlesRepository.getMyFavoriteArticles(
                         idolId = idolId,
                         orderBy = orderBy,
@@ -188,7 +189,7 @@ class FreeBoardViewModel @Inject constructor(
                     )
                 }
                 else -> {
-                    Log.d(TAG, "Calling getArticles with tagId=$selectedTagId")
+                    logD(TAG, "Calling getArticles with tagId=$selectedTagId")
                     articlesRepository.getArticles(
                         idolId = Constants.FREE_BOARD_IDOL_ID,
                         orderBy = orderBy,
@@ -203,11 +204,11 @@ class FreeBoardViewModel @Inject constructor(
             flow.collect { result ->
                 when (result) {
                     is ApiResult.Loading -> {
-                        Log.d(TAG, "ApiResult.Loading")
+                        logD(TAG, "ApiResult.Loading")
                     }
                     is ApiResult.Success -> {
                         val response = result.data
-                        Log.d(TAG, "ApiResult.Success: notices=${response.notices.size}, articles=${response.articles.size}, totalCount=${response.totalCount}, nextUrl=${response.nextUrl}")
+                        logD(TAG, "ApiResult.Success: notices=${response.notices.size}, articles=${response.articles.size}, totalCount=${response.totalCount}, nextUrl=${response.nextUrl}")
                         nextUrl = response.nextUrl
 
                         val existingArticles = uiState.value.articles
@@ -235,10 +236,10 @@ class FreeBoardViewModel @Inject constructor(
                                 isEmpty = newArticles.isEmpty() && notices.isEmpty()
                             )
                         }
-                        Log.d(TAG, "State updated: notices=${notices.size}, articles=${newArticles.size}, isEmpty=${newArticles.isEmpty() && notices.isEmpty()}")
+                        logD(TAG, "State updated: notices=${notices.size}, articles=${newArticles.size}, isEmpty=${newArticles.isEmpty() && notices.isEmpty()}")
                     }
                     is ApiResult.Error -> {
-                        Log.e(TAG, "ApiResult.Error: ${result.message}", result.exception)
+                        logE(TAG, "ApiResult.Error: ${result.message}", result.exception)
                         setState {
                             copy(
                                 isLoading = false,
@@ -283,7 +284,7 @@ class FreeBoardViewModel @Inject constructor(
         viewModelScope.launch {
             // 선택된 탭 ID 저장
             preferencesManager.setFreeBoardSelectedTagId(tag.id)
-            Log.d(TAG, "onTagSelected: saved tagId=${tag.id}")
+            logD(TAG, "onTagSelected: saved tagId=${tag.id}")
         }
 
         setState {
@@ -303,22 +304,22 @@ class FreeBoardViewModel @Inject constructor(
     private fun loadMore() {
         val currentNextUrl = nextUrl
         if (currentNextUrl.isNullOrEmpty()) {
-            Log.d(TAG, "loadMore: nextUrl is null or empty, skipping")
+            logD(TAG, "loadMore: nextUrl is null or empty, skipping")
             return
         }
 
         val currentState = uiState.value
         if (currentState.isLoading || currentState.isLoadingMore) {
-            Log.d(TAG, "loadMore: already loading, skipping")
+            logD(TAG, "loadMore: already loading, skipping")
             return
         }
 
         if (!currentState.hasMore) {
-            Log.d(TAG, "loadMore: hasMore is false, skipping")
+            logD(TAG, "loadMore: hasMore is false, skipping")
             return
         }
 
-        Log.d(TAG, "loadMore: loading nextUrl=$currentNextUrl")
+        logD(TAG, "loadMore: loading nextUrl=$currentNextUrl")
 
         viewModelScope.launch {
             setState { copy(isLoadingMore = true) }
@@ -326,11 +327,11 @@ class FreeBoardViewModel @Inject constructor(
             articlesRepository.getArticlesNext(currentNextUrl).collect { result ->
                 when (result) {
                     is ApiResult.Loading -> {
-                        Log.d(TAG, "loadMore: ApiResult.Loading")
+                        logD(TAG, "loadMore: ApiResult.Loading")
                     }
                     is ApiResult.Success -> {
                         val response = result.data
-                        Log.d(TAG, "loadMore: Success - articles=${response.articles.size}, nextUrl=${response.nextUrl}")
+                        logD(TAG, "loadMore: Success - articles=${response.articles.size}, nextUrl=${response.nextUrl}")
                         nextUrl = response.nextUrl
 
                         setState {
@@ -343,7 +344,7 @@ class FreeBoardViewModel @Inject constructor(
                         }
                     }
                     is ApiResult.Error -> {
-                        Log.e(TAG, "loadMore: Error - ${result.message}")
+                        logE(TAG, "loadMore: Error - ${result.message}")
                         setState { copy(isLoadingMore = false) }
                         setEffect { FreeBoardContract.Effect.ShowError(result.message ?: "Failed to load more") }
                     }
