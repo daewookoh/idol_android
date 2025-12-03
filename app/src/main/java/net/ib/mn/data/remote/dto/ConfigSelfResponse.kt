@@ -56,7 +56,7 @@ data class ConfigSelfResponse(
     val showAwardHistory: Boolean = false,
 
     @SerializedName("show_award_tab")
-    val showAwardTab: Boolean = false,
+    val showAwardTab: String? = null,  // "Y" = 어워즈 탭 표시
 
     @SerializedName("show_league_tab")
     val showLeagueTab: Boolean = false,

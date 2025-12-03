@@ -60,6 +60,19 @@ class RankingPageViewModel @Inject constructor(
      */
     val mainChartModel: StateFlow<MainChartModel?> = configRepository.observeMainChartModel()
 
+    /**
+     * AwardModel StateFlow를 직접 노출
+     * - 이벤트 플로팅 버튼 이미지 URL 포함
+     * - showAwardTab이 true일 때만 값이 있음
+     */
+    val awardModel: StateFlow<net.ib.mn.data.remote.dto.AwardModel?> = configRepository.observeAwardModel()
+
+    /**
+     * 이벤트 버튼 표시 여부 (showAwardTab && awardModel.mainFloatingImgUrl != null)
+     */
+    private val _showAwardButton = MutableStateFlow(false)
+    val showAwardButton: StateFlow<Boolean> = _showAwardButton.asStateFlow()
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
@@ -89,95 +102,65 @@ class RankingPageViewModel @Inject constructor(
     private val _hasNewOnePick = MutableStateFlow(false)
     val hasNewOnePick: StateFlow<Boolean> = _hasNewOnePick.asStateFlow()
 
-    init {
-        // 웰컴 미션 버튼 표시 여부 구독
-        viewModelScope.launch {
-            preferencesManager.showWelcomeMission.collect { show ->
-                _showWelcomeMission.value = show
-            }
-        }
-
-        // NEW 뱃지 표시 여부 구독 (하트픽)
-        viewModelScope.launch {
-            preferencesManager.hasNewHeartPick.collect { hasNew ->
-                _hasNewHeartPick.value = hasNew
-            }
-        }
-
-        // NEW 뱃지 표시 여부 구독 (원픽)
-        viewModelScope.launch {
-            preferencesManager.hasNewOnePick.collect { hasNew ->
-                _hasNewOnePick.value = hasNew
-            }
-        }
-    }
-
     /**
      * 랭킹 페이지 내 메인 탭 선택 인덱스
      * SavedStateHandle을 사용하여 바텀 네비게이션 이동 시에도 유지
-     *
-     * 초기값 설정 우선순위:
-     * 1. SavedStateHandle에 저장된 값 (이전에 선택한 탭)
-     * 2. defaultChartCode로부터 계산된 인덱스 (앱 첫 실행 시)
-     * 3. 0 (기본값)
      */
     val selectedTabIndex: StateFlow<Int> = savedStateHandle.getStateFlow(KEY_SELECTED_TAB_INDEX, DEFAULT_TAB_INDEX)
 
-    /**
-     * 앱 첫 실행 시 defaultChartCode를 읽어서 초기 탭 인덱스 설정
-     */
+    /** 앱 첫 실행 시 defaultChartCode를 읽어서 초기 탭 인덱스 설정 */
     private val _shouldInitializeTab = MutableStateFlow(true)
     val shouldInitializeTab: StateFlow<Boolean> = _shouldInitializeTab.asStateFlow()
 
-    /**
-     * 선택된 탭 인덱스 업데이트
-     */
+    init {
+        // 웰컴 미션 버튼 표시 여부 구독
+        viewModelScope.launch {
+            preferencesManager.showWelcomeMission.collect { _showWelcomeMission.value = it }
+        }
+        // NEW 뱃지 표시 여부 구독 (하트픽)
+        viewModelScope.launch {
+            preferencesManager.hasNewHeartPick.collect { _hasNewHeartPick.value = it }
+        }
+        // NEW 뱃지 표시 여부 구독 (원픽)
+        viewModelScope.launch {
+            preferencesManager.hasNewOnePick.collect { _hasNewOnePick.value = it }
+        }
+        // 이벤트 버튼 표시 여부 구독
+        viewModelScope.launch {
+            awardModel.collect { award ->
+                _showAwardButton.value = configRepository.getShowAwardTab() &&
+                    !award?.mainFloatingImgUrl.isNullOrEmpty()
+            }
+        }
+        // 프로세스 복원 시 데이터가 없으면 재로드
+        if (!BuildConfig.CELEB && configRepository.getMainChartModel() == null) {
+            logW("RankingViewModel", "MainChartModel is null (process restored) - reloading data")
+            reloadChartData()
+        }
+    }
+
     fun setSelectedTabIndex(index: Int) {
         savedStateHandle[KEY_SELECTED_TAB_INDEX] = index
     }
 
-    /**
-     * defaultChartCode에 해당하는 탭 인덱스를 찾아서 설정
-     */
     fun initializeTabFromDefaultChartCode(tabDataList: List<*>, getCodeFromTab: (Any) -> String?) {
-        if (!_shouldInitializeTab.value) {
-            return
-        }
+        if (!_shouldInitializeTab.value) return
 
-        // 이미 SavedStateHandle에 값이 있으면 (이전에 선택한 탭이 있으면) 초기화하지 않음
-        if (savedStateHandle.get<Int>(KEY_SELECTED_TAB_INDEX) != null && savedStateHandle.get<Int>(KEY_SELECTED_TAB_INDEX) != DEFAULT_TAB_INDEX) {
+        // 이미 SavedStateHandle에 값이 있으면 초기화하지 않음
+        val savedIndex = savedStateHandle.get<Int>(KEY_SELECTED_TAB_INDEX)
+        if (savedIndex != null && savedIndex != DEFAULT_TAB_INDEX) {
             _shouldInitializeTab.value = false
             return
         }
 
         viewModelScope.launch {
-            val defaultChartCode = configRepository.getDefaultChartCode()
-
-            if (defaultChartCode != null) {
-                // defaultChartCode에 해당하는 탭 찾기
+            configRepository.getDefaultChartCode()?.let { defaultChartCode ->
                 val tabIndex = tabDataList.indexOfFirst { tab ->
-                    val code = tab?.let { getCodeFromTab(it) }
-                    code == defaultChartCode
+                    tab?.let { getCodeFromTab(it) } == defaultChartCode
                 }
-
-                if (tabIndex >= 0) {
-                    setSelectedTabIndex(tabIndex)
-                } else {
-                    logW("RankingViewModel", "⚠️ No matching tab found for chartCode: $defaultChartCode, using default index 0")
-                }
-            } else {
+                if (tabIndex >= 0) setSelectedTabIndex(tabIndex)
             }
-
             _shouldInitializeTab.value = false
-        }
-    }
-
-    init {
-
-        // 프로세스 복원 시 데이터가 없으면 재로드
-        if (!BuildConfig.CELEB && configRepository.getMainChartModel() == null) {
-            logW("RankingViewModel", "⚠️ MainChartModel is null (process restored) - reloading data")
-            reloadChartData()
         }
     }
 

@@ -33,6 +33,7 @@ import javax.inject.Inject
  */
 class ConfigRepositoryImpl @Inject constructor(
     private val configsApi: ConfigsApi,
+    private val awardsApi: net.ib.mn.data.remote.api.AwardsApi,
     private val preferencesManager: PreferencesManager
 ) : BaseRepository(), ConfigRepository {
 
@@ -60,6 +61,13 @@ class ConfigRepositoryImpl @Inject constructor(
     // ConfigSelf 캐시 (메모리 캐시) - Old: ConfigModel
     @Volatile
     private var cachedConfigSelf: ConfigSelfResponse? = null
+
+    // AwardModel 캐시 (메모리 캐시)
+    @Volatile
+    private var cachedAwardModel: net.ib.mn.data.remote.dto.AwardModel? = null
+
+    // AwardModel StateFlow (실시간 업데이트용)
+    private val _awardModelFlow = MutableStateFlow<net.ib.mn.data.remote.dto.AwardModel?>(null)
 
     override fun getConfigStartup(): Flow<ApiResult<ConfigStartupResponse>> = flow {
         emit(ApiResult.Loading)
@@ -328,12 +336,54 @@ class ConfigRepositoryImpl @Inject constructor(
         cachedMainChartModel = null
         cachedChartObjects = null
         cachedConfigSelf = null
+        cachedAwardModel = null
 
         // StateFlow 초기화
         _typeListFlow.value = emptyList()
         _mainChartModelFlow.value = null
         _chartObjectsFlow.value = emptyList()
+        _awardModelFlow.value = null
 
         logD("ConfigRepo", "✅ All cache cleared")
     }
+
+    /**
+     * AwardModel StateFlow 노출 (실시간 업데이트)
+     */
+    override fun observeAwardModel(): StateFlow<net.ib.mn.data.remote.dto.AwardModel?> = _awardModelFlow
+
+    /**
+     * AwardModel 캐시에 저장
+     * awards/current/ API 응답
+     * StateFlow도 함께 업데이트하여 모든 구독자에게 알림
+     */
+    override fun setAwardModel(awardModel: net.ib.mn.data.remote.dto.AwardModel) {
+        cachedAwardModel = awardModel
+        _awardModelFlow.value = awardModel
+    }
+
+    /**
+     * showAwardTab 값 가져오기 (캐시된 ConfigSelf에서)
+     * API는 "Y"/"N" 문자열로 반환
+     */
+    override fun getShowAwardTab(): Boolean {
+        return cachedConfigSelf?.showAwardTab == "Y"
+    }
+
+    /**
+     * Awards Current API 호출 및 캐시 저장
+     * safeApiCall 패턴 적용
+     */
+    override fun loadAwardsCurrent(): kotlinx.coroutines.flow.Flow<net.ib.mn.domain.model.ApiResult<net.ib.mn.data.remote.dto.AwardModel>> =
+        safeApiCall { awardsApi.getCurrent() }
+            .extractObject(
+                extractor = { response ->
+                    response.award?.also { award ->
+                        // 캐시에 저장
+                        setAwardModel(award)
+                        logD("ConfigRepo", "✅ AwardsCurrent loaded via safeApiCall: mainFloatingImgUrl=${award.mainFloatingImgUrl}")
+                    }
+                },
+                errorMessage = "Award data not found"
+            )
 }

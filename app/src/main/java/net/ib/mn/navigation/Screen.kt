@@ -81,4 +81,10 @@ sealed class Screen {
     data class PostDetail(
         val postId: Int
     ) : Screen()
+
+    /**
+     * Awards 화면 - 어워즈
+     */
+    @Serializable
+    data object Awards : Screen()
 }

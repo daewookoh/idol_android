@@ -1,7 +1,12 @@
 package net.ib.mn.presentation.main.ranking
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -47,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
@@ -69,6 +75,8 @@ import net.ib.mn.di.RankingRepositoryEntryPoint
 import net.ib.mn.domain.ranking.GlobalRankingDataSource
 import net.ib.mn.domain.ranking.IdolIdsRankingDataSource
 import net.ib.mn.domain.ranking.MiracleRookieRankingDataSource
+import net.ib.mn.navigation.LocalAppNavigator
+import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.main.MainViewModel
 import net.ib.mn.presentation.main.ranking.idol_subpage.*
 import net.ib.mn.presentation.webview.WebViewScreen
@@ -108,6 +116,10 @@ fun RankingPage(
     // 웰컴 미션 버튼 상태
     val showWelcomeMission by viewModel.showWelcomeMission.collectAsState()
 
+    // 이벤트 버튼 상태
+    val showAwardButton by viewModel.showAwardButton.collectAsState()
+    val awardModel by viewModel.awardModel.collectAsState()
+
     // NEW 뱃지 표시 상태 (하트픽, 원픽)
     val hasNewHeartPick by viewModel.hasNewHeartPick.collectAsState()
     val hasNewOnePick by viewModel.hasNewOnePick.collectAsState()
@@ -127,6 +139,7 @@ fun RankingPage(
     }
 
     val context = LocalContext.current
+    val navigator = LocalAppNavigator.current
     val rankingRepository = remember {
         EntryPointAccessors.fromApplication(context.applicationContext, RankingRepositoryEntryPoint::class.java)
             .rankingRepository()
@@ -257,19 +270,32 @@ fun RankingPage(
                 }
             }
 
-            // 웰컴 미션 버튼
+            // 웰컴 미션/이벤트 버튼
             val welcomeButtonPadding by animateDpAsState(
-                targetValue = if (showMyFavToast && subPagerState.currentPage == 0) 72.dp else 4.dp,
+                targetValue = if (showMyFavToast && subPagerState.currentPage == 0) 82.dp else 14.dp,
                 animationSpec = tween(300),
                 label = "welcomePadding"
             )
+            // 이벤트 버튼이 있으면 이벤트 버튼 표시, 없으면 웰컴 미션 버튼 표시
+            val showFloatingButton = showAwardButton || showWelcomeMission
+            val eventImageUrl = if (showAwardButton) awardModel?.mainFloatingImgUrl else null
+
             androidx.compose.animation.AnimatedVisibility(
-                visible = showWelcomeMission,
+                visible = showFloatingButton,
                 modifier = Modifier.align(Alignment.BottomEnd).padding(end = 8.dp, bottom = welcomeButtonPadding),
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                WelcomeMissionButton { /* TODO: WelcomeMissionFragment로 이동 */ }
+                WelcomeMissionButton(
+                    eventImageUrl = eventImageUrl,
+                    onClick = {
+                        if (showAwardButton) {
+                            navigator.navigate(Screen.Awards)
+                        } else {
+                            // TODO: WelcomeMissionFragment로 이동
+                        }
+                    }
+                )
             }
 
             // 최애 이동 토스트
@@ -454,24 +480,66 @@ private fun extractTypeFromCode(code: String): String {
 }
 
 /**
- * 웰컴 미션 버튼 컴포넌트
- * old 프로젝트의 iv_mission (btn_welcome.xml)과 동일한 UI
+ * 웰컴 미션/이벤트 플로팅 버튼 컴포넌트
+ * old 프로젝트의 iv_mission (btn_welcome.xml) 및 iv_awards 통합
+ *
+ * @param eventImageUrl 이벤트 이미지 URL (null이면 기본 웰컴 미션 아이콘 표시)
+ * @param onClick 클릭 이벤트
  */
 @Composable
 private fun WelcomeMissionButton(
+    eventImageUrl: String? = null,
     onClick: () -> Unit
 ) {
-    Image(
-        painter = painterResource(id = R.drawable.btn_welcome),
-        contentDescription = "Welcome Mission",
-        modifier = Modifier
-            .size(64.dp)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClick
-            )
-    )
+    if (!eventImageUrl.isNullOrEmpty()) {
+        // 이벤트 이미지 + Y축 회전 애니메이션 (old 프로젝트 animateAwardButton)
+        val infiniteTransition = rememberInfiniteTransition(label = "awardRotation")
+        val rotationY by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            animationSpec = infiniteRepeatable(
+                animation = keyframes {
+                    durationMillis = 2600  // 0->180(300ms) + 180->0(300ms) + delay(2000ms)
+                    0f at 0
+                    180f at 300
+                    0f at 600
+                    0f at 2600
+                },
+                repeatMode = RepeatMode.Restart
+            ),
+            label = "rotationY"
+        )
+
+        coil.compose.AsyncImage(
+            model = eventImageUrl,
+            contentDescription = "Event",
+            modifier = Modifier
+                .size(64.dp)
+                .graphicsLayer {
+                    this.rotationY = rotationY
+                    cameraDistance = 12f * density
+                }
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick
+                ),
+            contentScale = androidx.compose.ui.layout.ContentScale.Fit
+        )
+    } else {
+        // 기본 웰컴 미션 아이콘 (애니메이션 없음)
+        Image(
+            painter = painterResource(id = R.drawable.btn_welcome),
+            contentDescription = "Welcome Mission",
+            modifier = Modifier
+                .size(64.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick
+                )
+        )
+    }
 }
 
 /**

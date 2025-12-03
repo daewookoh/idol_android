@@ -123,4 +123,36 @@ interface ConfigRepository {
      * @return Int (기본값 0)
      */
     fun getReportHeart(): Int
+
+    /**
+     * AwardModel StateFlow (실시간 업데이트)
+     * 이벤트 플로팅 버튼 이미지 URL 포함
+     *
+     * @return StateFlow<AwardModel?>
+     */
+    fun observeAwardModel(): StateFlow<net.ib.mn.data.remote.dto.AwardModel?>
+
+    /**
+     * AwardModel 캐시에 저장
+     * awards/current/ API 응답
+     *
+     * @param awardModel AwardModel
+     */
+    fun setAwardModel(awardModel: net.ib.mn.data.remote.dto.AwardModel)
+
+    /**
+     * showAwardTab 값 가져오기 (캐시된 ConfigSelf에서)
+     * 이벤트 탭/버튼 표시 여부
+     *
+     * @return Boolean (기본값 false)
+     */
+    fun getShowAwardTab(): Boolean
+
+    /**
+     * Awards Current API 호출 및 캐시 저장
+     * safeApiCall 패턴 적용
+     *
+     * @return Flow<ApiResult<AwardModel>>
+     */
+    fun loadAwardsCurrent(): Flow<ApiResult<net.ib.mn.data.remote.dto.AwardModel>>
 }

@@ -257,7 +257,8 @@ class StartUpViewModel @Inject constructor(
                 async { loadMessageCoupon() },
                 async { loadTimezone() },
                 async { loadChartsCurrent() },
-                async { fetchChartIdols() }
+                async { fetchChartIdols() },
+                async { loadAwardsCurrent() }
                 // 조건부: loadBlocks() - 첫 사용자만
             )
 
@@ -363,7 +364,7 @@ class StartUpViewModel @Inject constructor(
                     is ApiResult.Loading -> {}
                     is ApiResult.Success -> {
                     val data = result.data
-
+                    logD(TAG, "✅ ConfigSelf loaded: showAwardTab = ${data.showAwardTab}")
 
                     // DataStore에 UDP 설정 저장
                     data.udpBroadcastUrl?.let {
@@ -872,5 +873,19 @@ class StartUpViewModel @Inject constructor(
      */
     private fun formatHeartCount(count: Int): String {
         return NumberFormatUtil.formatWithComma(count)
+    }
+
+    /**
+     * AwardsCurrent API 호출 (safeApiCall 패턴 적용)
+     * showAwardTab이 true일 때만 호출하여 이벤트 플로팅 버튼 이미지 URL을 가져옴
+     */
+    private suspend fun loadAwardsCurrent() {
+        if (!configRepository.getShowAwardTab()) return
+
+        configRepository.loadAwardsCurrent().collect { result ->
+            if (result is ApiResult.Error) {
+                logW(TAG, "AwardsCurrent API error: ${result.error.message}")
+            }
+        }
     }
 }
