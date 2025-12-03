@@ -160,7 +160,7 @@ fun LazyListScope.myFavoriteRankingItems(
                 onVoteSuccess = { idolId, voteCount ->
                     data.viewModel.updateVote(idolId, voteCount)
                 },
-                disableAnimation = true,  // MyFavoritePage에서는 애니메이션 비활성화
+                disableAnimation = false,
                 expandedItemIds = expandedItemIds,
                 onExpandedChange = onExpandedChange
             )

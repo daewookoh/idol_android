@@ -141,7 +141,7 @@ fun UnifiedRankingSubPage(
                     listState = scrollState,
                     onItemClick = { _, _ -> },
                     onVoteSuccess = viewModel::updateVote,
-                    disableAnimation = true,
+                    disableAnimation = false,
                     expandedItemIds = expandedItemIds,
                     onExpandedChange = { itemKey, isExpanded ->
                         expandedItemIds = if (isExpanded) expandedItemIds + itemKey else expandedItemIds - itemKey
