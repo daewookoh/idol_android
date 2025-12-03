@@ -235,6 +235,67 @@ object IdolImageUtil {
     }
 
     /**
+     * Idol 이미지 URL 생성
+     *
+     * sourceApp에 따라 다른 경로 사용:
+     * - "celeb": ${cdnUrl}/c/${idolId}.1_${imageSize}.webp
+     * - 기타: ${cdnUrl}/i/${idolId}.1_${imageSize}.webp
+     *
+     * @param cdnUrl CDN 베이스 URL
+     * @param idolId Idol ID
+     * @param sourceApp 소스 앱 (celeb 등)
+     * @param imageSize 이미지 사이즈 (기본값: 200x200)
+     * @return Idol 이미지 URL
+     */
+    fun getIdolImageUrl(
+        cdnUrl: String,
+        idolId: Int,
+        sourceApp: String? = null,
+        imageSize: String = "200x200"
+    ): String {
+        val prefix = when (sourceApp) {
+            "celeb" -> "/c/"
+            else -> "/i/"
+        }
+        return "$cdnUrl$prefix$idolId.1_$imageSize.webp"
+    }
+
+    /**
+     * Top1 이미지 URL 생성 (어워즈용)
+     *
+     * old 프로젝트의 UtilK.top1ImageUrl() 로직:
+     * ${cdnUrl}/a/${top3Id}.1.${ver}_${imageSize}.webp
+     *
+     * @param cdnUrl CDN 베이스 URL
+     * @param top3 top3 ID 문자열 (쉼표로 구분)
+     * @param top3ImageVer top3 이미지 버전 (쉼표로 구분)
+     * @param imageSize 이미지 사이즈 (기본값: 200x200)
+     * @return Top1 이미지 URL (없으면 null)
+     */
+    fun getTop1ImageUrl(
+        cdnUrl: String,
+        top3: String?,
+        top3ImageVer: String? = null,
+        imageSize: String = "200x200"
+    ): String? {
+        if (top3.isNullOrEmpty()) return null
+
+        val top3Ids = top3.split(",").map { it.trim() }
+        val firstId = top3Ids.firstOrNull()
+
+        if (firstId.isNullOrEmpty() || firstId == "null" || firstId == "0") {
+            return null
+        }
+
+        val ver = top3ImageVer?.split(",")?.firstOrNull()?.trim() ?: ""
+        return if (ver.isNotEmpty()) {
+            "$cdnUrl/a/$firstId.1.${ver}_$imageSize.webp"
+        } else {
+            "$cdnUrl/a/$firstId.1_$imageSize.webp"
+        }
+    }
+
+    /**
      * URL에 쿼리 파라미터 추가/업데이트
      *
      * @param key 파라미터 키

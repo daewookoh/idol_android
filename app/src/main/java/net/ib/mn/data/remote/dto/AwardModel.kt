@@ -19,6 +19,9 @@ data class AwardModel(
     @SerializedName("realtime_title")
     val realtimeTitle: String? = null,
 
+    @SerializedName("realtime_desc")
+    val realtimeDesc: String? = null,
+
     @SerializedName("main_floating_image_url")
     val mainFloatingImgUrl: String? = null,
 
@@ -62,7 +65,34 @@ data class AwardModel(
     val keyword: String? = null,
 
     @SerializedName("result_title")
-    val resultTitle: String? = null
+    val resultTitle: String? = null,
+
+    @SerializedName("charts")
+    val charts: List<AwardChartsModel>? = null
+)
+
+/**
+ * Award Charts Model
+ * 어워즈 카테고리 (남자 솔로, 여자 솔로, 남자 그룹, 여자 그룹 등)
+ */
+data class AwardChartsModel(
+    @SerializedName("code")
+    val code: String? = null,
+
+    @SerializedName("name")
+    val name: String? = null,
+
+    @SerializedName("subname")
+    val subname: String? = null,
+
+    @SerializedName("desc")
+    val desc: String? = null,
+
+    @SerializedName("example_title")
+    val exampleTitle: String? = null,
+
+    @SerializedName("example_desc")
+    val exampleDesc: String? = null
 )
 
 /**

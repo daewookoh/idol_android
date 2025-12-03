@@ -2,6 +2,7 @@ package net.ib.mn.di
 
 import net.ib.mn.data.repository.AdRepositoryImpl
 import net.ib.mn.data.repository.ArticlesRepositoryImpl
+import net.ib.mn.data.repository.AwardsRepositoryImpl
 import net.ib.mn.data.repository.ConfigRepositoryImpl
 import net.ib.mn.data.repository.FavoritesRepositoryImpl
 import net.ib.mn.data.repository.HeartpickRepositoryImpl
@@ -19,6 +20,7 @@ import net.ib.mn.domain.repository.ChatRepository
 import net.ib.mn.domain.repository.ScheduleRepository
 import net.ib.mn.domain.repository.AdRepository
 import net.ib.mn.domain.repository.ArticlesRepository
+import net.ib.mn.domain.repository.AwardsRepository
 import net.ib.mn.domain.repository.ConfigRepository
 import net.ib.mn.domain.repository.FavoritesRepository
 import net.ib.mn.domain.repository.HeartpickRepository
@@ -126,4 +128,10 @@ abstract class RepositoryModule {
     abstract fun bindScheduleRepository(
         impl: ScheduleRepositoryImpl
     ): ScheduleRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAwardsRepository(
+        impl: AwardsRepositoryImpl
+    ): AwardsRepository
 }

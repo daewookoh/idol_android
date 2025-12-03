@@ -71,6 +71,7 @@ object RankingItemType {
     const val HEARTPICK = "HEARTPICK"       // 하트픽 랭킹
     const val HOF_DAILY = "HOF_DAILY"       // 명예의 전당 일일 랭킹
     const val HOF_CUMULATIVE = "HOF_CUMULATIVE" // 명예의 전당 누적 랭킹
+    const val AWARDS_CUMULATIVE = "AWARDS_CUMULATIVE" // 어워즈 누적 랭킹 (우측 화살표 포함)
 }
 
 // ==================== 공통 유틸리티 함수 ====================
@@ -293,6 +294,7 @@ fun LazyListScope.exoRankingItems(
         RankingItemType.MAIN -> mainRankingItems(items, onItemClick, onVoteSuccess, disableAnimation, expandedItemIds, onExpandedChange)
         RankingItemType.DAILY -> dailyRankingItems(items, onItemClick, onVoteSuccess, disableAnimation, expandedItemIds, onExpandedChange)
         RankingItemType.CUMULATIVE, RankingItemType.HOF_CUMULATIVE -> cumulativeRankingItems(items, onItemClick)
+        RankingItemType.AWARDS_CUMULATIVE -> awardsCumulativeRankingItems(items, onItemClick)
         RankingItemType.HEARTPICK -> heartPickRankingItems(items, onItemClick)
         else -> mainRankingItems(items, onItemClick, onVoteSuccess, disableAnimation, expandedItemIds, onExpandedChange)
     }
@@ -555,6 +557,88 @@ fun LazyListScope.cumulativeRankingItems(
                         .padding(end = 20.dp),
                     tint = Color.Unspecified
                 )
+            }
+
+            if (index < items.size - 1) {
+                ItemDivider()
+            }
+        }
+    }
+}
+
+/**
+ * AwardsCumulativeRankingItem - 어워즈 누적 랭킹 아이템 (AWARDS_CUMULATIVE 타입)
+ *
+ * old 프로젝트의 AwardsAggregatedAdapter RankViewHolder 기반
+ * CUMULATIVE 타입과 동일하나 우측에 화살표 아이콘 추가
+ * - 프로필 이미지 (41dp, 테두리 없음)
+ * - 순위 + 이름 + 점수
+ * - 우측 화살표 아이콘
+ * - 투표 버튼 없음
+ * - 프로그레스 바 없음
+ */
+fun LazyListScope.awardsCumulativeRankingItems(
+    items: List<RankingItem>,
+    onItemClick: (Int, RankingItem) -> Unit = { _, _ -> }
+) {
+    itemsIndexed(
+        items = items,
+        key = { _, item -> item.itemKey() }
+    ) { index, item ->
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(ColorPalette.background100)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onItemClick(index, item) }
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // 순위 영역 (왕관 + 텍스트)
+                Column(
+                    modifier = Modifier.width(45.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterVertically)
+                ) {
+                    RankCrownIcon(item.rank)
+                    RankText(item.rank)
+                }
+
+                // 프로필 이미지 (41dp, 테두리 없음) - old 버전과 동일
+                ExoProfileImage(
+                    imageUrl = item.photoUrl,
+                    modifier = Modifier.size(41.dp),
+                    rank = item.rank,
+                    contentDescription = "프로필 이미지"
+                )
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                // 이름 + 점수 영역
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterVertically)
+                ) {
+                    ExoNameWithGroup(fullName = item.name, nameFontSize = 14.sp, groupFontSize = 10.sp)
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        ExoHeartCounter(count = item.heartCount, style = ExoTypo.body11.copy(color = ColorPalette.textGray))
+                        Text(text = "점", style = ExoTypo.body11.copy(color = ColorPalette.textGray))
+                    }
+                }
+
+                // 우측 화살표 아이콘 (old: iv_arrow_go, marginEnd=20dp)
+                Icon(
+                    painter = painterResource(R.drawable.btn_go),
+                    contentDescription = "Go",
+                    modifier = Modifier.size(12.dp),
+                    tint = Color.Unspecified
+                )
+
+                Spacer(modifier = Modifier.width(14.dp))
             }
 
             if (index < items.size - 1) {
