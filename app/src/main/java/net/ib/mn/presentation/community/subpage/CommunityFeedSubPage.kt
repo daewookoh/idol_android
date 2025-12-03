@@ -53,6 +53,7 @@ import net.ib.mn.ui.components.ExoBottomSheetList
 import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
+import net.ib.mn.util.IdolImageUtil.toSecureUrl
 
 /**
  * CommunityFeedSubPage - 커뮤니티 피드 탭
@@ -521,7 +522,7 @@ private fun FeedGridItem(
             .clickable { onClick() }
     ) {
         AsyncImage(
-            model = imageUrl,
+            model = imageUrl.toSecureUrl(),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop // 항상 Crop으로 빈 영역 없이
