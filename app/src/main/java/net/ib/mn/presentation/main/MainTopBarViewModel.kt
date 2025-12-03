@@ -74,19 +74,12 @@ class MainTopBarViewModel @Inject constructor(
     private var aggregatingTime: String? = null
     private var aggregatingTimeFormatOne: String? = null
     private var aggregatingTimeFormatFew: String? = null
-    private var begin: Date? = null
-    private var end: Date? = null
-    
+
     init {
         // 다국어 문자열 로드 (old 프로젝트의 setTimerConfiguration()과 동일)
         aggregatingTime = context.getString(R.string.aggregating_time)
         aggregatingTimeFormatOne = context.getString(R.string.deadline_format_one)
         aggregatingTimeFormatFew = context.getString(R.string.deadline_format_few)
-
-        // 한국시간 기준으로 집계 시간 설정 (23:30-24:00)
-        // TODO: ConfigModel에서 실제 값 가져오기 (inactiveBegin, inactiveEnd)
-        // begin과 end는 매일 업데이트되므로, updateTimer에서 매번 계산하도록 변경
-        // 여기서는 null로 초기화하고, updateTimer에서 동적으로 계산
     }
     
     fun startTimer() {
@@ -110,61 +103,29 @@ class MainTopBarViewModel @Inject constructor(
     }
     
     private fun updateTimer() {
-        // old 프로젝트와 동일한 시간 계산 방식
-        // 한국시간 기준으로 begin과 end 계산 (매일 업데이트)
-        val koreaTimeZone = TimeZone.getTimeZone("Asia/Seoul")
-        val calendar = Calendar.getInstance(koreaTimeZone)
-        
-        // begin: 오늘 23:30
-        calendar.set(Calendar.HOUR_OF_DAY, 23)
-        calendar.set(Calendar.MINUTE, 30)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
-        begin = calendar.time
-        
-        // end: 내일 00:00 (24:00)
-        calendar.add(Calendar.DAY_OF_MONTH, 1)
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
-        end = calendar.time
-        
-        // old 프로젝트의 handleMessage()와 동일한 로직
-        val now = (Date().time + 32400000) % 86400000
-        val beginTime = (begin!!.time + 32400000) % 86400000
-        val endTime = (end!!.time + 32400000) % 86400000
-        
-        val isAggregating = now in beginTime..endTime
-        val strTime: String = if (isAggregating) {
-            // 집계 시간 (23:30-24:00)
+        val now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"))
+        val nowSec = now.get(Calendar.HOUR_OF_DAY) * 3600 + now.get(Calendar.MINUTE) * 60 + now.get(Calendar.SECOND)
+
+        val startSec = 23 * 3600 + 30 * 60
+        val endSec = 23 * 3600 + 59 * 60 + 59
+
+        val isAggregating = nowSec in startSec..endSec
+
+        val strTime = if (isAggregating) {
             aggregatingTime ?: ""
         } else {
-            // 집계 시간이 아닐 때: begin까지 남은 시간 표시
-            val time = if (endTime < now) beginTime + 86400000 else beginTime
-            val deadline = time - now
-
-            // old 프로젝트와 동일한 로직
+            val remainSec = if (nowSec < startSec) startSec - nowSec else 24 * 3600 - nowSec + startSec
+            val remainMs = remainSec * 1000L
             when {
-                // 1분 이하: "마감 1분전" / "Ends in 1 min"
-                deadline <= 60000 -> String.format(aggregatingTimeFormatOne ?: "", 1)
-                // 10분 이하: "마감 X분전" / "Ends in X mins"
-                deadline <= 600000 -> String.format(aggregatingTimeFormatFew ?: "", deadline / 60000 + 1)
-                // 10분 초과: HH:mm:ss 형식
-                else -> {
-                    val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-                    sdf.timeZone = TimeZone.getTimeZone("UTC")
-                    sdf.format(Date(deadline))
-                }
+                remainMs <= 60000 -> String.format(aggregatingTimeFormatOne ?: "", 1)
+                remainMs <= 600000 -> String.format(aggregatingTimeFormatFew ?: "", remainMs / 60000 + 1)
+                else -> SimpleDateFormat("HH:mm:ss", Locale.getDefault()).apply {
+                    timeZone = TimeZone.getTimeZone("UTC")
+                }.format(Date(remainMs))
             }
         }
 
-        // old 프로젝트와 동일: 집계 시간 여부를 PreferencesManager에 저장
-        // 하트박스 표시 여부에 사용됨 (heartBoxViewable && !isAggregatingTime)
-        viewModelScope.launch {
-            preferencesManager.setIsAggregatingTime(isAggregating)
-        }
-
+        viewModelScope.launch { preferencesManager.setIsAggregatingTime(isAggregating) }
         _timerText.value = strTime
     }
     
