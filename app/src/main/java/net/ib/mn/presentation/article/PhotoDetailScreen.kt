@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -59,10 +60,15 @@ import coil.compose.AsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.github.chrisbanes.photoview.PhotoView
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleFile
 import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.ad.AdaptiveBanner
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
@@ -82,6 +88,12 @@ fun PhotoDetailScreen(
     val mediaFiles = article.mediaFiles
 
     val downloadState by viewModel.downloadState.collectAsState()
+    val shouldShowBanner by viewModel.shouldShowBanner.collectAsState()
+    val shouldShowHeartBox by viewModel.shouldShowHeartBox.collectAsState()
+    val isHeartBoxLoading by viewModel.isHeartBoxLoading.collectAsState()
+
+    // 하트박스 보상 다이얼로그 상태
+    var heartBoxReward by remember { mutableStateOf<HeartBoxReward?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.toastEvent.collect { event ->
@@ -94,6 +106,25 @@ fun PhotoDetailScreen(
                 }
             }
         }
+    }
+
+    // 하트박스 보상 이벤트 수신
+    LaunchedEffect(Unit) {
+        viewModel.heartBoxRewardEvent.collect { reward ->
+            heartBoxReward = reward
+        }
+    }
+
+    // 하트박스 보상 다이얼로그
+    heartBoxReward?.let { reward ->
+        HeartBoxRewardDialog(
+            heartBoxReward = reward,
+            showVideoAdButton = true,  // TODO: 비디오 광고 시청 가능 여부 체크
+            onDismiss = { heartBoxReward = null },
+            onWatchVideoAd = {
+                // TODO: 비디오 광고 화면으로 이동
+            }
+        )
     }
 
     val effectiveMediaFiles = if (mediaFiles.isEmpty() && !article.imageUrl.isNullOrEmpty()) {
@@ -143,18 +174,18 @@ fun PhotoDetailScreen(
         }
 
         // 상단 바
-        Row(
+        Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .windowInsetsPadding(WindowInsets.statusBars)
-                .padding(horizontal = 16.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
+                .padding(horizontal = 16.dp, vertical = 10.dp)
         ) {
+            // 왼쪽: 닫기 버튼
             Icon(
                 painter = painterResource(R.drawable.btn_img_closed),
                 contentDescription = "Close",
                 modifier = Modifier
+                    .align(Alignment.CenterStart)
                     .size(40.dp)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
@@ -163,7 +194,39 @@ fun PhotoDetailScreen(
                 tint = Color.Unspecified
             )
 
+            // 중앙: 하트박스 Lottie 애니메이션 (old 프로젝트와 동일: heartBoxViewable && !isAggregatingTime)
+            if (shouldShowHeartBox) {
+                val composition by rememberLottieComposition(LottieCompositionSpec.Asset("heartbox.json"))
+
+                if (isHeartBoxLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .size(40.dp)
+                            .padding(4.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    LottieAnimation(
+                        composition = composition,
+                        iterations = LottieConstants.IterateForever,
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .size(80.dp)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                viewModel.onHeartBoxClick()
+                            }
+                    )
+                }
+            }
+
+            // 오른쪽: 공유, 사운드, 다운로드 버튼
             Row(
+                modifier = Modifier.align(Alignment.CenterEnd),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -246,6 +309,19 @@ fun PhotoDetailScreen(
                 Text(
                     text = "${pagerState.currentPage + 1}/${effectiveMediaFiles.size}",
                     style = ExoTypo.body14.copy(color = Color.White)
+                )
+            }
+        }
+
+        // 하단 배너 광고 (old 프로젝트와 동일: 중국 빌드가 아니고 데일리팩 미구독 시 표시)
+        if (shouldShowBanner) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+            ) {
+                AdaptiveBanner(
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }

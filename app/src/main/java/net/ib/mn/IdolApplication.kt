@@ -19,6 +19,8 @@ import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import coil.util.DebugLogger
 import com.facebook.FacebookSdk
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import com.kakao.sdk.common.KakaoSdk
 import dagger.hilt.android.HiltAndroidApp
 import java.security.MessageDigest
@@ -133,6 +135,12 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
 
         // Line SDK: 별도 초기화 불필요 (사용 시 자동 초기화)
         // Google Sign-In: 별도 초기화 불필요
+
+        // Google Mobile Ads SDK 초기화 (old 프로젝트와 동일)
+        // 중국 빌드에서는 광고를 사용하지 않음
+        if (!Constants.IS_CHINA) {
+            initializeMobileAds()
+        }
 
         // 앱 전체 생명주기 옵저버 등록 (UDP 관리)
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
@@ -318,6 +326,46 @@ class IdolApplication : Application(), ImageLoaderFactory, DefaultLifecycleObser
             }
         } catch (e: Exception) {
             Log.e("FACEBOOK_KEY_HASH", "Error getting Facebook key hash: ${e.message}", e)
+        }
+    }
+
+    /**
+     * Google Mobile Ads SDK 초기화 및 테스트 디바이스 등록
+     *
+     * old 프로젝트와 동일한 방식:
+     * - DEBUG 빌드에서 테스트 디바이스 등록
+     * - 테스트 디바이스에서는 "Test Ad" 라벨이 표시된 테스트 광고가 노출됨
+     *
+     * 테스트 디바이스 ID 확인 방법:
+     * 1. 앱 실행 후 Logcat에서 "Ads" 태그로 필터링
+     * 2. "Use RequestConfiguration.Builder.setTestDeviceIds..." 메시지에서 디바이스 ID 확인
+     * 3. 해당 ID를 TEST_DEVICE_IDS 리스트에 추가
+     */
+    private fun initializeMobileAds() {
+        // DEBUG 빌드에서 테스트 디바이스 등록
+        if (BuildConfig.DEBUG) {
+            val testDeviceIds = listOf<String>(
+                // 에뮬레이터는 자동으로 테스트 디바이스로 인식됨
+                "2999DC7F6F78BAB92DDBB4E3CC09522C"
+            )
+
+            if (testDeviceIds.isNotEmpty()) {
+                MobileAds.setRequestConfiguration(
+                    RequestConfiguration.Builder()
+                        .setTestDeviceIds(testDeviceIds)
+                        .build()
+                )
+                Log.d("MobileAds", "Test devices registered: $testDeviceIds")
+            }
+        }
+
+        // Mobile Ads SDK 초기화
+        MobileAds.initialize(this) { initializationStatus ->
+            val statusMap = initializationStatus.adapterStatusMap
+            for ((adapterClass, status) in statusMap) {
+                Log.d("MobileAds", "Adapter: $adapterClass, Status: ${status.initializationState}")
+            }
+            Log.d("MobileAds", "Mobile Ads SDK initialized successfully")
         }
     }
 }

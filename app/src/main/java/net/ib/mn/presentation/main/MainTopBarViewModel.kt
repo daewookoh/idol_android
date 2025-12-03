@@ -1,11 +1,13 @@
 package net.ib.mn.presentation.main
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -13,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.ib.mn.R
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.domain.repository.MessageRepository
 
@@ -24,6 +27,7 @@ private const val TAG = "MainTopBarViewModel"
  */
 @HiltViewModel
 class MainTopBarViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val messageRepository: MessageRepository,
     private val preferencesManager: PreferencesManager
 ) : ViewModel() {
@@ -73,11 +77,11 @@ class MainTopBarViewModel @Inject constructor(
     private var end: Date? = null
     
     init {
-        // 기본값 설정 (나중에 ConfigModel에서 가져올 수 있음)
-        aggregatingTime = "집계중"
-        aggregatingTimeFormatOne = "%d분 후"
-        aggregatingTimeFormatFew = "%d분 후"
-        
+        // 다국어 문자열 로드 (old 프로젝트의 setTimerConfiguration()과 동일)
+        aggregatingTime = context.getString(R.string.aggregating_time)
+        aggregatingTimeFormatOne = context.getString(R.string.deadline_format_one)
+        aggregatingTimeFormatFew = context.getString(R.string.deadline_format_few)
+
         // 한국시간 기준으로 집계 시간 설정 (23:30-24:00)
         // TODO: ConfigModel에서 실제 값 가져오기 (inactiveBegin, inactiveEnd)
         // begin과 end는 매일 업데이트되므로, updateTimer에서 매번 계산하도록 변경
@@ -130,20 +134,36 @@ class MainTopBarViewModel @Inject constructor(
         val beginTime = (begin!!.time + 32400000) % 86400000
         val endTime = (end!!.time + 32400000) % 86400000
         
-        val strTime: String = if (now in beginTime..endTime) {
+        val isAggregating = now in beginTime..endTime
+        val strTime: String = if (isAggregating) {
             // 집계 시간 (23:30-24:00)
             aggregatingTime ?: ""
         } else {
-            // 집계 시간이 아닐 때: begin까지 남은 시간 표시 (00:00:00 형식)
+            // 집계 시간이 아닐 때: begin까지 남은 시간 표시
             val time = if (endTime < now) beginTime + 86400000 else beginTime
             val deadline = time - now
-            
-            // 항상 00:00:00 형식으로 표시
-            val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-            sdf.timeZone = TimeZone.getTimeZone("UTC")
-            sdf.format(Date(deadline))
+
+            // old 프로젝트와 동일한 로직
+            when {
+                // 1분 이하: "마감 1분전" / "Ends in 1 min"
+                deadline <= 60000 -> String.format(aggregatingTimeFormatOne ?: "", 1)
+                // 10분 이하: "마감 X분전" / "Ends in X mins"
+                deadline <= 600000 -> String.format(aggregatingTimeFormatFew ?: "", deadline / 60000 + 1)
+                // 10분 초과: HH:mm:ss 형식
+                else -> {
+                    val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+                    sdf.timeZone = TimeZone.getTimeZone("UTC")
+                    sdf.format(Date(deadline))
+                }
+            }
         }
-        
+
+        // old 프로젝트와 동일: 집계 시간 여부를 PreferencesManager에 저장
+        // 하트박스 표시 여부에 사용됨 (heartBoxViewable && !isAggregatingTime)
+        viewModelScope.launch {
+            preferencesManager.setIsAggregatingTime(isAggregating)
+        }
+
         _timerText.value = strTime
     }
     

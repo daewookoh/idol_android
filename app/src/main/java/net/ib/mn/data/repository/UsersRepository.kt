@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import net.ib.mn.data.remote.api.UsersApi
 import net.ib.mn.data.remote.dto.BlockUserRequest
+import net.ib.mn.data.remote.dto.ProvideHeartRequest
+import net.ib.mn.data.remote.dto.ProvideHeartResponse
 import net.ib.mn.domain.model.ApiError
 import net.ib.mn.domain.model.ApiResult
 import org.json.JSONObject
@@ -271,6 +273,64 @@ class UsersRepository @Inject constructor(
             BlockResult.Error(message = e.message)
         }
     }
+
+    /**
+     * 하트박스 클릭 시 하트 제공 API
+     *
+     * old 프로젝트: BaseWidePhotoFragment에서 사용
+     * 응답: { "success": true, "viewable": true, "heart": 10, "button": false }
+     *
+     * @param type 제공 타입 ("heartbox")
+     * @return ProvideHeartResult
+     */
+    suspend fun provideHeart(type: String = "heartbox"): ProvideHeartResult {
+        return try {
+            Log.d(TAG, "provideHeart called with type: $type")
+            val request = ProvideHeartRequest(type = type)
+            val response = usersApi.provideHeart(request)
+
+            if (response.isSuccessful) {
+                val jsonString = response.body()?.string() ?: "{}"
+                val jsonObject = JSONObject(jsonString)
+                Log.d(TAG, "provideHeart response: $jsonObject")
+
+                val success = jsonObject.optBoolean("success", false)
+                if (!success) {
+                    Log.d(TAG, "provideHeart: success=false")
+                    return ProvideHeartResult.Error(message = "API returned success=false")
+                }
+
+                val viewable = jsonObject.optBoolean("viewable", true)
+                val heart = jsonObject.optLong("heart", 0)
+                val button = jsonObject.optBoolean("button", false)
+
+                Log.d(TAG, "provideHeart success: viewable=$viewable, heart=$heart, button=$button")
+                ProvideHeartResult.Success(
+                    viewable = viewable,
+                    heart = heart.toInt(),
+                    button = button
+                )
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Unknown error"
+                Log.e(TAG, "provideHeart failed: ${response.code()} - $errorBody")
+                ProvideHeartResult.Error(message = "API Error: ${response.code()}")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "provideHeart exception: ${e.message}", e)
+            ProvideHeartResult.Error(message = e.message)
+        }
+    }
+}
+
+/** 하트박스 결과 */
+sealed interface ProvideHeartResult {
+    data class Success(
+        val viewable: Boolean,
+        val heart: Int,
+        val button: Boolean
+    ) : ProvideHeartResult
+
+    data class Error(val message: String? = null) : ProvideHeartResult
 }
 
 /** 차단 결과 */

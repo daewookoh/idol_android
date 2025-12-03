@@ -127,9 +127,40 @@ data class UserSelfData(
     val giveHeart: Int?,
 
     @SerializedName("most")
-    val most: MostIdol?
+    val most: MostIdol?,
 
-    // NOTE: subscriptions, emoticon 등 복잡한 객체는 필요시 추가
+    @SerializedName("subscriptions")
+    val subscriptions: List<SubscriptionModel>?
+)
+
+/**
+ * 구독 정보 모델
+ * old 프로젝트의 SubscriptionModel과 동일한 구조
+ *
+ * @param familyappId 앱 ID (1: idol, 2: celeb)
+ * @param skuCode 구독 상품 코드 (daily_pack_android, daily_pack_actor_android 등)
+ */
+data class SubscriptionModel(
+    @SerializedName("familyapp_id")
+    val familyappId: Int?,
+
+    @SerializedName("name")
+    val name: String?,
+
+    @SerializedName("order_id")
+    val orderId: String?,
+
+    @SerializedName("package_name")
+    val packageName: String?,
+
+    @SerializedName("sku_code")
+    val skuCode: String?,
+
+    @SerializedName("subscription_created_at")
+    val subscriptionCreatedAt: String?,
+
+    @SerializedName("subscription_expired_at")
+    val subscriptionExpiredAt: String?
 )
 
 /**
@@ -553,6 +584,36 @@ data class BlockUserRequest(
 
     @SerializedName("block")
     val block: String = "Y"  // "Y": 차단, "N": 차단 해제
+)
+
+// ============================================================
+// /users/provide_heart/ - 하트박스 하트 제공
+// ============================================================
+data class ProvideHeartRequest(
+    @SerializedName("type")
+    val type: String  // "heartbox"
+)
+
+/**
+ * 하트박스 응답 모델
+ *
+ * @param success API 성공 여부
+ * @param viewable 하트박스 계속 표시 여부 (false면 숨김, 비디오 광고 시청 후 true로 복구)
+ * @param heart 제공받은 하트 개수
+ * @param button 비디오 광고 버튼 표시 여부 (heart=0이고 button=true면 광고 시청 유도)
+ */
+data class ProvideHeartResponse(
+    @SerializedName("success")
+    val success: Boolean,
+
+    @SerializedName("viewable")
+    val viewable: Boolean,
+
+    @SerializedName("heart")
+    val heart: Long,
+
+    @SerializedName("button")
+    val button: Boolean
 )
 
 // ============================================================

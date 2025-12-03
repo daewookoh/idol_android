@@ -124,6 +124,10 @@ class StartUpViewModel @Inject constructor(
                 // 앱 시작 시 최애 이동 토스트 초기화 (old 프로젝트의 StartupActivity와 동일)
                 preferencesManager.resetMyFavToast()
 
+                // 앱 시작 시 하트박스 표시 가능하도록 초기화 (old 프로젝트의 StartupActivity/MainActivity와 동일)
+                // 하트박스 안나온다는 사람이 많아서 앱 실행 때마다 true로 설정
+                preferencesManager.setHeartBoxViewable(true)
+
                 // Step 0: 저장된 인증 정보 확인 (old 프로젝트의 IdolAccount.getAccount() 역할)
                 // AuthRepository를 통해 인증 정보 유효성 확인
 

@@ -5,6 +5,13 @@
     <application
         tools:replace="android:label"
         android:label="@string/app_name">
+
+        <!-- Google Mobile Ads Application ID (Celeb 앱용) -->
+        <meta-data
+            tools:replace="android:value"
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-4951070488234097~8280455763" />
+
     </application>
 
 </manifest>

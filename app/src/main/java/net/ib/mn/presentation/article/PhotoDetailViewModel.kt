@@ -12,11 +12,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.ib.mn.BuildConfig
+import net.ib.mn.data.local.PreferencesManager
+import net.ib.mn.data.repository.ProvideHeartResult
+import net.ib.mn.data.repository.UsersRepository
 import net.ib.mn.domain.model.ArticleFile
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
@@ -31,15 +38,87 @@ private const val DOWNLOAD_FILE_PREFIX = "IDOLCHAMP_"
 
 /**
  * PhotoDetailViewModel - 사진 상세 화면 ViewModel
+ *
+ * old 프로젝트(BaseWidePhotoViewModel)와 동일한 광고/하트박스 표시 로직 구현
  */
 @HiltViewModel
-class PhotoDetailViewModel @Inject constructor() : ViewModel() {
+class PhotoDetailViewModel @Inject constructor(
+    private val preferencesManager: PreferencesManager,
+    private val usersRepository: UsersRepository
+) : ViewModel() {
 
     private val _downloadState = MutableStateFlow<DownloadState>(DownloadState.Idle)
     val downloadState: StateFlow<DownloadState> = _downloadState.asStateFlow()
 
     private val _toastEvent = MutableSharedFlow<ToastEvent>()
     val toastEvent: SharedFlow<ToastEvent> = _toastEvent.asSharedFlow()
+
+    /**
+     * 하트박스 보상 다이얼로그 이벤트
+     */
+    private val _heartBoxRewardEvent = MutableSharedFlow<HeartBoxReward>()
+    val heartBoxRewardEvent: SharedFlow<HeartBoxReward> = _heartBoxRewardEvent.asSharedFlow()
+
+    /**
+     * 하트박스 로딩 상태
+     */
+    private val _isHeartBoxLoading = MutableStateFlow(false)
+    val isHeartBoxLoading: StateFlow<Boolean> = _isHeartBoxLoading.asStateFlow()
+
+    /**
+     * 배너 광고 표시 여부 (old 프로젝트와 동일 로직)
+     * 조건: 중국 빌드가 아니고 && 데일리팩 미구독
+     */
+    val shouldShowBanner: StateFlow<Boolean> = preferencesManager.hasDailyPack
+        .combine(preferencesManager.isAggregatingTime) { hasDailyPack, _ ->
+            !BuildConfig.CHINA && !hasDailyPack
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), !BuildConfig.CHINA)
+
+    /**
+     * 하트박스 표시 여부 (old 프로젝트와 동일 로직)
+     * 조건: heartBoxViewable && !isAggregatingTime
+     * old 프로젝트: 앱 시작 시 heartBoxViewable = true
+     */
+    val shouldShowHeartBox: StateFlow<Boolean> = combine(
+        preferencesManager.heartBoxViewable,
+        preferencesManager.isAggregatingTime
+    ) { heartBoxViewable, isAggregatingTime ->
+        heartBoxViewable && !isAggregatingTime
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)  // 초기값 true
+
+    /**
+     * 하트박스 클릭 처리
+     * old 프로젝트 BaseWidePhotoFragment.handleMessage()와 동일한 로직
+     */
+    fun onHeartBoxClick() {
+        if (_isHeartBoxLoading.value) return
+
+        viewModelScope.launch {
+            _isHeartBoxLoading.value = true
+
+            when (val result = usersRepository.provideHeart("heartbox")) {
+                is ProvideHeartResult.Success -> {
+                    // heartBoxViewable 상태 업데이트
+                    preferencesManager.setHeartBoxViewable(result.viewable)
+
+                    // 보상 다이얼로그 표시
+                    _heartBoxRewardEvent.emit(
+                        HeartBoxReward(
+                            heart = result.heart,
+                            button = result.button
+                        )
+                    )
+                }
+
+                is ProvideHeartResult.Error -> {
+                    // 에러 시 토스트 표시 (optional)
+                }
+            }
+
+            _isHeartBoxLoading.value = false
+        }
+    }
 
     /**
      * 이미지 다운로드 (DownloadManager 사용)
@@ -172,3 +251,14 @@ sealed interface ToastEvent {
     data object DownloadSuccess : ToastEvent
     data object DownloadError : ToastEvent
 }
+
+/**
+ * 하트박스 보상 데이터
+ *
+ * @param heart 받은 하트 개수
+ * @param button 비디오 광고 버튼 표시 여부 (heart=0일 때 true면 광고 시청 유도)
+ */
+data class HeartBoxReward(
+    val heart: Int,
+    val button: Boolean
+)

@@ -164,6 +164,7 @@ class UserCacheRepository @Inject constructor(
      * 3. 하트 정보 캐싱
      * 4. 최애 아이돌을 로컬 DB에 upsert
      * 5. **SharedPreference에 자동 백업**
+     * 6. 데일리팩 구독 여부 체크 및 저장
      *
      * @param userData UserSelfData
      */
@@ -207,6 +208,21 @@ class UserCacheRepository @Inject constructor(
 
         // **SharedPreference에 자동 백업**
         saveToPreferences(userData)
+
+        // 데일리팩 구독 여부 체크 및 저장 (old 프로젝트와 동일 로직)
+        // 조건: (familyappId == 1 || familyappId == 2) && skuCode == STORE_ITEM_DAILY_PACK
+        val dailyPackSkuCode = if (net.ib.mn.BuildConfig.CELEB) {
+            "daily_pack_actor_android"
+        } else {
+            "daily_pack_android"
+        }
+        val hasDailyPack = userData.subscriptions?.any { subscription ->
+            (subscription.familyappId == 1 || subscription.familyappId == 2) &&
+                subscription.skuCode == dailyPackSkuCode
+        } == true
+
+        preferencesManager.setHasDailyPack(hasDailyPack)
+        Log.d(TAG, "💳 Daily pack subscription: $hasDailyPack (sku=$dailyPackSkuCode)")
     }
 
     /**

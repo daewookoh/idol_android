@@ -2,6 +2,7 @@ package net.ib.mn.data.remote.api
 
 import net.ib.mn.data.remote.dto.BlockUserRequest
 import net.ib.mn.data.remote.dto.CommonResponse
+import net.ib.mn.data.remote.dto.ProvideHeartRequest
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -102,5 +103,19 @@ interface UsersApi {
     @GET("blocks/")
     suspend fun getBlocks(
         @Query("id_only") idOnly: String = "Y"
+    ): Response<ResponseBody>
+
+    /**
+     * 하트박스 클릭 시 하트 제공
+     * POST users/provide_heart/
+     *
+     * old 프로젝트: BaseWidePhotoFragment에서 사용
+     * 응답: { "success": true, "viewable": true, "heart": 10, "button": false }
+     *
+     * @param body ProvideHeartRequest (type: "heartbox")
+     */
+    @POST("users/provide_heart/")
+    suspend fun provideHeart(
+        @Body body: ProvideHeartRequest
     ): Response<ResponseBody>
 }

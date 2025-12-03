@@ -477,6 +477,9 @@ dependencies {
     implementation(libs.rxjava)             // RxJava 2.2.17
     implementation(libs.rxkotlin)           // RxKotlin 2.4.0
 
+    // Google Mobile Ads (AdMob/AdManager)
+    implementation(libs.play.services.ads)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
