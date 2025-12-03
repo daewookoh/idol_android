@@ -196,6 +196,34 @@ class PhotoDetailViewModel @Inject constructor(
     }
 
     /**
+     * Trends 미디어 다운로드 (이붙그램용)
+     *
+     * @param context Context
+     * @param url 다운로드할 URL
+     */
+    fun downloadTrendsMedia(context: Context, url: String) {
+        viewModelScope.launch {
+            try {
+                _downloadState.value = DownloadState.Downloading
+
+                val secureUrl = url.toSecureUrl()
+
+                withContext(Dispatchers.IO) {
+                    downloadWithManager(context, secureUrl)
+                }
+
+                _downloadState.value = DownloadState.Success
+                _toastEvent.emit(ToastEvent.DownloadSuccess)
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _downloadState.value = DownloadState.Error
+                _toastEvent.emit(ToastEvent.DownloadError)
+            }
+        }
+    }
+
+    /**
      * 게시글 공유
      */
     fun shareArticle(context: Context, article: ArticleModel) {

@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -512,6 +514,179 @@ private fun GifDetailImage(
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Fit
             )
+        }
+    }
+}
+
+/**
+ * TrendsModel (이붙그램) 상세 화면
+ * old 프로젝트의 WideBannerFragment 참고
+ * - X 버튼 (닫기)
+ * - 다운로드 버튼 (이미지: 일반 아이콘, mp4: MP4 아이콘)
+ * - 날짜 표시 (refDate 또는 createdAt)
+ * - 사운드 버튼 없음
+ */
+@OptIn(UnstableApi::class)
+@Composable
+fun PhotoDetailScreen(
+    trendsModel: net.ib.mn.domain.model.TrendsModel,
+    onBackClick: () -> Unit = {},
+    viewModel: PhotoDetailViewModel = hiltViewModel()
+) {
+    val context = LocalContext.current
+    val downloadState by viewModel.downloadState.collectAsState()
+
+    BackHandler(onBack = onBackClick)
+
+    val mediaUrl = trendsModel.bannerUrl ?: return
+    val isVideo = trendsModel.isVideo
+
+    // 날짜 표시 (refDate 우선, 없으면 createdAt을 로캘 형식으로 포맷)
+    // old 프로젝트: DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleUtil.getAppLocale(context))
+    val dateString = remember(trendsModel) {
+        if (!trendsModel.refDate.isNullOrEmpty()) {
+            trendsModel.refDate!!
+        } else if (!trendsModel.createdAt.isNullOrEmpty()) {
+            // createdAt은 "2025-12-02T16:01:14" 형식이므로 파싱 후 로캘 형식으로 변환
+            try {
+                val inputFormat = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault())
+                val date = inputFormat.parse(trendsModel.createdAt!!)
+                val outputFormat = java.text.DateFormat.getDateInstance(
+                    java.text.DateFormat.MEDIUM,
+                    net.ib.mn.util.LocaleUtil.getAppLocale(context)
+                )
+                date?.let { outputFormat.format(it) } ?: ""
+            } catch (e: Exception) {
+                trendsModel.createdAt ?: ""
+            }
+        } else {
+            ""
+        }
+    }
+
+    // 다운로드용 URL (mp4면 mp4, gif면 원본 gif)
+    val downloadUrl = if (isVideo) {
+        // mp4는 그대로 다운로드
+        mediaUrl
+    } else if (trendsModel.gifUrl != null) {
+        // gif인 경우 원본 gif URL
+        trendsModel.gifUrl
+    } else {
+        mediaUrl
+    }
+
+    // 다운로드 성공/실패 토스트
+    LaunchedEffect(Unit) {
+        viewModel.toastEvent.collect { event ->
+            when (event) {
+                ToastEvent.DownloadSuccess -> {
+                    Toast.makeText(context, R.string.msg_save_ok, Toast.LENGTH_SHORT).show()
+                }
+                ToastEvent.DownloadError -> {
+                    Toast.makeText(context, R.string.msg_unable_use_download_2, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
+        // 미디어 + 날짜 Column (중앙 정렬, wrap_content)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center),
+            horizontalAlignment = Alignment.End
+        ) {
+            // 미디어 표시
+            if (isVideo) {
+                VideoDetailPlayer(
+                    videoUrl = mediaUrl.toSecureUrl(),
+                    isVisible = true,
+                    isSoundOn = false,  // Trends는 사운드 없음
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else if (mediaUrl.endsWith(".gif", ignoreCase = true) || trendsModel.gifUrl != null) {
+                // GIF 표시
+                GifDetailImage(
+                    gifUrl = (trendsModel.gifUrl ?: mediaUrl).toSecureUrl(),
+                    thumbnailUrl = trendsModel.imageUrl?.toSecureUrl(),
+                    isVisible = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                PhotoViewImage(
+                    imageUrl = mediaUrl.toSecureUrl(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            // 날짜 표시 (미디어 바로 아래, 우측 정렬)
+            if (dateString.isNotEmpty()) {
+                Text(
+                    text = dateString,
+                    style = ExoTypo.body12,
+                    color = ColorPalette.gray300,
+                    modifier = Modifier.padding(end = 13.dp, top = 5.dp)
+                )
+            }
+        }
+
+        // 상단 바: X 버튼, 다운로드 버튼
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(horizontal = 16.dp, vertical = 10.dp)
+        ) {
+            // 왼쪽: 닫기 버튼
+            Icon(
+                painter = painterResource(R.drawable.btn_img_closed),
+                contentDescription = "Close",
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .size(40.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onBackClick() },
+                tint = Color.Unspecified
+            )
+
+            // 오른쪽: 다운로드 버튼 (mp4면 MP4 아이콘, 아니면 일반 다운로드 아이콘)
+            val isDownloading = downloadState is DownloadState.Downloading
+            if (!isDownloading) {
+                Icon(
+                    painter = painterResource(
+                        if (isVideo) R.drawable.btn_img_download_mp4 else R.drawable.btn_img_download
+                    ),
+                    contentDescription = "Download",
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .size(40.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            downloadUrl?.let { url ->
+                                viewModel.downloadTrendsMedia(context, url)
+                            }
+                        },
+                    tint = Color.Unspecified
+                )
+            } else {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .size(40.dp)
+                        .padding(8.dp),
+                    color = Color.White,
+                    strokeWidth = 2.dp
+                )
+            }
         }
     }
 }

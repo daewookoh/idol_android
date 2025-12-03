@@ -142,6 +142,8 @@ fun CommunityScreen(
     var showIdolDialog by remember { mutableStateOf(false) }
     var showChangeMostDialog by remember { mutableStateOf(false) }
     var showVoterTop100Screen by remember { mutableStateOf(false) }
+    var showTrendsScreen by remember { mutableStateOf(false) }
+    var selectedTrendsItem by remember { mutableStateOf<net.ib.mn.domain.model.TrendsModel?>(null) }
     var currentIsMost by remember(initialIsMost) { mutableStateOf(initialIsMost) }
     var currentIsFavorite by remember(initialIsFavorite) { mutableStateOf(initialIsFavorite) }
 
@@ -190,6 +192,8 @@ fun CommunityScreen(
     BackHandler {
         if (selectedUserProfile != null) {
             selectedUserProfile = null
+        } else if (showTrendsScreen) {
+            showTrendsScreen = false
         } else if (showVoterTop100Screen) {
             showVoterTop100Screen = false
         } else if (showWikiWebView) {
@@ -501,9 +505,9 @@ fun CommunityScreen(
                 showIdolDialog = false
                 showVoterTop100Screen = true
             },
-            onGalleryClick = {
+            onTrendsClick = {
                 showIdolDialog = false
-                // TODO: 배너그램 화면으로 이동
+                showTrendsScreen = true
             },
             onRankHistoryClick = {
                 showIdolDialog = false
@@ -622,6 +626,38 @@ fun CommunityScreen(
             groupName = displayGroupName,
             onBackClick = { showVoterTop100Screen = false }
         )
+    }
+
+    // TrendsScreen (이붙그램)
+    AnimatedVisibility(
+        visible = showTrendsScreen,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        TrendsScreen(
+            idolId = idolId ?: 0,
+            idolName = rankingItem.name,
+            onBackClick = { showTrendsScreen = false },
+            onItemClick = { trendsItem ->
+                if (trendsItem.bannerUrl != null) {
+                    selectedTrendsItem = trendsItem
+                }
+            }
+        )
+    }
+
+    // Trends Photo Detail
+    AnimatedVisibility(
+        visible = selectedTrendsItem != null,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        selectedTrendsItem?.let { trendsItem ->
+            PhotoDetailScreen(
+                trendsModel = trendsItem,
+                onBackClick = { selectedTrendsItem = null }
+            )
+        }
     }
 
     // ProfileScreen (전체 화면으로 표시)
@@ -895,7 +931,7 @@ private fun IdolProfile(
  * @param onFavoriteChange 즐겨찾기 변경
  * @param onMostChange 최애 변경
  * @param onVoteRankingClick 하트 투표 랭킹 클릭
- * @param onGalleryClick 배너그램 클릭
+ * @param onTrendsClick 이붙그램 클릭
  * @param onRankHistoryClick 랭킹 변동 클릭
  * @param onShareClick 공유 클릭
  * @param onAllInDayClick 올인데이 설정 클릭
@@ -910,7 +946,7 @@ private fun IdolDialog(
     onFavoriteChange: (Boolean) -> Unit = {},
     onMostChange: (Boolean) -> Unit = {},
     onVoteRankingClick: () -> Unit = {},
-    onGalleryClick: () -> Unit = {},
+    onTrendsClick: () -> Unit = {},
     onRankHistoryClick: () -> Unit = {},
     onShareClick: () -> Unit = {},
     onAllInDayClick: () -> Unit = {}
@@ -1064,7 +1100,7 @@ private fun IdolDialog(
                         IdolDialogMenuItem(
                             iconRes = R.drawable.btn_community_menu_bannergram,
                             title = stringResource(R.string.gallery_title),
-                            onClick = onGalleryClick
+                            onClick = onTrendsClick
                         )
                         IdolDialogMenuItem(
                             iconRes = R.drawable.btn_community_menu_change_rank,

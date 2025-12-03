@@ -14,9 +14,11 @@ import net.ib.mn.data.repository.UserRepositoryImpl
 import net.ib.mn.data.repository.UtilityRepositoryImpl
 import net.ib.mn.data.repository.ChatRepositoryImpl
 import net.ib.mn.data.repository.ScheduleRepositoryImpl
+import net.ib.mn.data.repository.TrendsRepositoryImpl
 import net.ib.mn.data.repository.WikiRepository
 import net.ib.mn.data.repository.WikiRepositoryImpl
 import net.ib.mn.domain.repository.ChatRepository
+import net.ib.mn.domain.repository.TrendsRepository
 import net.ib.mn.domain.repository.ScheduleRepository
 import net.ib.mn.domain.repository.AdRepository
 import net.ib.mn.domain.repository.ArticlesRepository
@@ -134,4 +136,10 @@ abstract class RepositoryModule {
     abstract fun bindAwardsRepository(
         impl: AwardsRepositoryImpl
     ): AwardsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTrendsRepository(
+        impl: TrendsRepositoryImpl
+    ): TrendsRepository
 }

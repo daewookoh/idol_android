@@ -180,4 +180,9 @@ object NetworkModule {
     @Singleton
     fun provideAwardsApi(retrofit: Retrofit): AwardsApi =
         retrofit.create(AwardsApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideTrendsApi(retrofit: Retrofit): TrendsApi =
+        retrofit.create(TrendsApi::class.java)
 }
