@@ -2,6 +2,9 @@ package net.ib.mn.ui.components
 
 import android.net.Uri
 import androidx.annotation.OptIn
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -44,7 +47,8 @@ fun ExoVideoPlayer(
     modifier: Modifier = Modifier,
     isMuted: Boolean = true,
     isLooping: Boolean = true,
-    onFirstFrameRendered: (() -> Unit)? = null
+    onFirstFrameRendered: (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -91,11 +95,25 @@ fun ExoVideoPlayer(
 
     val presentationState = rememberPresentationState(exoPlayer)
 
-    PlayerSurface(
-        player = exoPlayer,
-        surfaceType = SURFACE_TYPE_TEXTURE_VIEW,
-        modifier = modifier
-            .fillMaxSize()
-            .resizeWithContentScale(ContentScale.Crop, presentationState.videoSizeDp)
-    )
+    Box(
+        modifier = modifier.then(
+            if (onClick != null) {
+                Modifier.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick
+                )
+            } else {
+                Modifier
+            }
+        )
+    ) {
+        PlayerSurface(
+            player = exoPlayer,
+            surfaceType = SURFACE_TYPE_TEXTURE_VIEW,
+            modifier = Modifier
+                .fillMaxSize()
+                .resizeWithContentScale(ContentScale.Crop, presentationState.videoSizeDp)
+        )
+    }
 }

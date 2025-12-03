@@ -3,6 +3,8 @@ package net.ib.mn.presentation.community
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
@@ -82,6 +84,7 @@ import net.ib.mn.presentation.community.subpage.CommunityFeedSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFeedViewModel
 import net.ib.mn.presentation.community.subpage.CommunityScheduleSubPage
 import net.ib.mn.presentation.article.ArticleDetailScreen
+import net.ib.mn.presentation.article.PhotoDetailScreen
 import net.ib.mn.presentation.webview.WebViewScreen
 import net.ib.mn.ui.components.*
 import net.ib.mn.ui.theme.ColorPalette
@@ -147,6 +150,9 @@ fun CommunityScreen(
 
     // 게시글 상세 화면 상태
     var selectedArticle by remember { mutableStateOf<net.ib.mn.domain.model.ArticleModel?>(null) }
+
+    // 사진 상세 화면 상태 (article + 시작 인덱스)
+    var selectedPhotoDetail by remember { mutableStateOf<Pair<net.ib.mn.domain.model.ArticleModel, Int>?>(null) }
 
     // 탭 목록 생성 (showChattingTab이 true인 경우에만 채팅 탭 포함)
     val tabs = remember(showChattingTab) {
@@ -318,6 +324,9 @@ fun CommunityScreen(
                             },
                             onNavigateToArticleDetail = { article ->
                                 selectedArticle = article
+                            },
+                            onNavigateToPhotoDetail = { article, mediaIndex ->
+                                selectedPhotoDetail = article to mediaIndex
                             },
                             viewModel = feedViewModel
                         )
@@ -629,7 +638,10 @@ fun CommunityScreen(
                 userLevel = userInfo.level,
                 mostIdolName = userInfo.mostIdolName,
                 isMine = false,  // 타인의 프로필
-                onBackClick = { selectedUserProfile = null }
+                onBackClick = { selectedUserProfile = null },
+                onNavigateToArticleDetail = { article ->
+                    selectedArticle = article
+                }
             )
         }
     }
@@ -666,6 +678,21 @@ fun CommunityScreen(
                         mostIdolName = mostIdolName
                     )
                 }
+            )
+        }
+    }
+
+    // PhotoDetailScreen (전체 화면으로 표시)
+    AnimatedVisibility(
+        visible = selectedPhotoDetail != null,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        selectedPhotoDetail?.let { (article, mediaIndex) ->
+            PhotoDetailScreen(
+                article = article,
+                initialIndex = mediaIndex,
+                onBackClick = { selectedPhotoDetail = null }
             )
         }
     }

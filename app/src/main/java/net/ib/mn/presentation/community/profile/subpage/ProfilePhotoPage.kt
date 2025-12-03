@@ -2,6 +2,7 @@ package net.ib.mn.presentation.community.profile.subpage
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -37,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import net.ib.mn.R
+import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.ui.theme.ColorPalette
 
 /**
@@ -49,6 +51,7 @@ fun ProfilePhotoPage(
     isFeedPrivate: Boolean = false,
     isBlocked: Boolean = false,
     blockStatusChecked: Boolean = true,
+    onNavigateToArticleDetail: (ArticleModel) -> Unit = {},
     viewModel: ProfilePhotoViewModel = hiltViewModel()
 ) {
     // 차단 상태 확인 전에는 로딩 표시
@@ -97,7 +100,12 @@ fun ProfilePhotoPage(
         is ProfilePhotoUiState.Empty -> EmptyContent(stringResource(R.string.feed_no_posts))
         is ProfilePhotoUiState.Private -> PrivateContent()
         is ProfilePhotoUiState.Error -> EmptyContent(state.message)
-        is ProfilePhotoUiState.Success -> PhotoGrid(state.photos, gridState)
+        is ProfilePhotoUiState.Success -> PhotoGrid(
+            photos = state.photos,
+            gridState = gridState,
+            viewModel = viewModel,
+            onNavigateToArticleDetail = onNavigateToArticleDetail
+        )
     }
 }
 
@@ -182,7 +190,9 @@ private fun BlockedContent() {
 @Composable
 private fun PhotoGrid(
     photos: List<ProfilePhotoItem>,
-    gridState: androidx.compose.foundation.lazy.grid.LazyGridState
+    gridState: androidx.compose.foundation.lazy.grid.LazyGridState,
+    viewModel: ProfilePhotoViewModel,
+    onNavigateToArticleDetail: (ArticleModel) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
@@ -193,7 +203,10 @@ private fun PhotoGrid(
     ) {
         items(items = photos, key = { it.id }) { photo ->
             PhotoItem(photo) {
-                // TODO: 사진 상세 화면으로 이동
+                // ArticleDetail 화면으로 이동
+                viewModel.getArticle(photo.id)?.let { article ->
+                    onNavigateToArticleDetail(article)
+                }
             }
         }
     }
@@ -207,7 +220,11 @@ private fun PhotoItem(photo: ProfilePhotoItem, onClick: () -> Unit) {
         modifier = Modifier
             .aspectRatio(1f)
             .background(ColorPalette.gray100)
-            .clickable(onClick = onClick)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            )
     ) {
         AsyncImage(
             model = ImageRequest.Builder(context)

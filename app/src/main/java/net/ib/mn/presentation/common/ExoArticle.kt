@@ -941,7 +941,11 @@ private fun MediaItem(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .clickable(onClick = onMediaClick),
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onMediaClick
+            ),
         contentAlignment = Alignment.Center
     ) {
         var videoDurationMs by remember { mutableLongStateOf(0L) }
@@ -949,7 +953,7 @@ private fun MediaItem(
 
         LaunchedEffect(media.originUrl) {
             if (media.isVideo && videoDurationMs == 0L && !media.originUrl.isNullOrEmpty()) {
-                MediaCacheUtil.getVideoDuration(media.originUrl!!)?.let { duration ->
+                MediaCacheUtil.getVideoDuration(media.originUrl!!.toSecureUrl())?.let { duration ->
                     videoDurationMs = duration
                 }
             }
@@ -977,7 +981,8 @@ private fun MediaItem(
                             delay(100L)
                             isFirstFrameRendered = true
                         }
-                    }
+                    },
+                    onClick = onMediaClick
                 )
                 if (!isFirstFrameRendered) {
                     AsyncImage(

@@ -71,6 +71,7 @@ fun CommunityFeedSubPage(
     onFirstArticleVideoPlaying: (Boolean) -> Unit = {},
     onNavigateToProfile: (userId: Int, nickname: String, imageUrl: String?, level: Int, mostIdolName: String?) -> Unit = { _, _, _, _, _ -> },
     onNavigateToArticleDetail: (ArticleModel) -> Unit = {},
+    onNavigateToPhotoDetail: (ArticleModel, Int) -> Unit = { _, _ -> },
     viewModel: CommunityFeedViewModel = hiltViewModel(),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
@@ -94,7 +95,7 @@ fun CommunityFeedSubPage(
                     onNavigateToArticleDetail(event.article)
                 }
                 is ExoArticleNavigation.MediaDetail -> {
-                    // TODO: 미디어 상세 화면으로 이동
+                    onNavigateToPhotoDetail(event.article, event.mediaIndex)
                 }
                 is ExoArticleNavigation.Community -> {
                     // TODO: 커뮤니티 화면으로 이동
@@ -236,7 +237,7 @@ fun CommunityFeedSubPage(
                             articles = rowArticles,
                             isWallpaperMode = isWallpaperMode,
                             onItemClick = { article ->
-                                // TODO: 이미지 상세 보기
+                                onNavigateToPhotoDetail(article, 0)
                             }
                         )
                     }

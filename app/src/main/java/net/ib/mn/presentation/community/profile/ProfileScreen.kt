@@ -68,6 +68,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.launch
 import net.ib.mn.R
+import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.presentation.community.profile.subpage.ProfileCommentPage
 import net.ib.mn.presentation.community.profile.subpage.ProfilePhotoPage
 import net.ib.mn.presentation.community.profile.subpage.ProfilePostPage
@@ -104,7 +105,8 @@ fun ProfileScreen(
     userLevel: Int = 0,
     mostIdolName: String? = null,
     isMine: Boolean = false,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onNavigateToArticleDetail: (ArticleModel) -> Unit = {}
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -394,7 +396,8 @@ fun ProfileScreen(
                                 isMine = isMine,
                                 isFeedPrivate = state.user.isFeedPrivate,
                                 isBlocked = state.user.isBlocked,
-                                blockStatusChecked = state.user.blockStatusChecked
+                                blockStatusChecked = state.user.blockStatusChecked,
+                                onNavigateToArticleDetail = onNavigateToArticleDetail
                             )
                             ProfileTab.ACTIVITY -> ProfilePostPage(
                                 userId = userId,

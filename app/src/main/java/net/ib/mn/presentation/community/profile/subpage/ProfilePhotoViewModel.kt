@@ -33,6 +33,10 @@ class ProfilePhotoViewModel @Inject constructor(
     private var hasMoreData: Boolean = true
     private var isLoading: Boolean = false
     private val photos = mutableListOf<ProfilePhotoItem>()
+    private val articlesMap = mutableMapOf<String, ArticleModel>()
+
+    /** 게시글 ID로 ArticleModel 조회 */
+    fun getArticle(articleId: String): ArticleModel? = articlesMap[articleId]
 
     fun loadPhotos(userId: Int, isSelf: Boolean = false) {
         if (this.userId == userId && photos.isNotEmpty()) return
@@ -42,6 +46,7 @@ class ProfilePhotoViewModel @Inject constructor(
         currentOffset = 0
         hasMoreData = true
         photos.clear()
+        articlesMap.clear()
         _uiState.value = ProfilePhotoUiState.Loading
         fetchPhotos()
     }
@@ -90,6 +95,8 @@ class ProfilePhotoViewModel @Inject constructor(
                 _uiState.value = ProfilePhotoUiState.Empty
             }
         } else {
+            // ArticleModel 저장 (ArticleDetail 화면 이동용)
+            articles.forEach { articlesMap[it.id] = it }
             photos.addAll(articles.map { it.toPhotoItem() })
             currentOffset += articles.size
             hasMoreData = articles.size >= PAGE_LIMIT

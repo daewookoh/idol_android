@@ -45,6 +45,7 @@ fun ArticleDetailScreen(
     onArticleUpdated: (ArticleModel) -> Unit = {},
     onArticleDeleted: (() -> Unit)? = null,
     onNavigateToProfile: (userId: Int, nickname: String, imageUrl: String?, level: Int, mostIdolName: String?) -> Unit = { _, _, _, _, _ -> },
+    onNavigateToPhotoDetail: (ArticleModel, Int) -> Unit = { _, _ -> },
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -64,14 +65,20 @@ fun ArticleDetailScreen(
     // ExoArticle 네비게이션 이벤트 처리
     LaunchedEffect(Unit) {
         articleViewModel.navigationEvent.collect { event ->
-            if (event is ExoArticleNavigation.Profile) {
-                onNavigateToProfile(
-                    event.userId,
-                    event.nickname,
-                    event.imageUrl,
-                    event.level,
-                    event.mostIdolName
-                )
+            when (event) {
+                is ExoArticleNavigation.Profile -> {
+                    onNavigateToProfile(
+                        event.userId,
+                        event.nickname,
+                        event.imageUrl,
+                        event.level,
+                        event.mostIdolName
+                    )
+                }
+                is ExoArticleNavigation.MediaDetail -> {
+                    onNavigateToPhotoDetail(event.article, event.mediaIndex)
+                }
+                else -> { /* 다른 이벤트는 무시 */ }
             }
         }
     }

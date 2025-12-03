@@ -434,6 +434,11 @@ dependencies {
     // YouTube Player
     implementation(libs.android.youtube.player)
 
+    // PhotoView
+    implementation(libs.photoview) {
+        exclude(group = "com.android.support")
+    }
+
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

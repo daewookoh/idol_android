@@ -28,8 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
+import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.presentation.common.ArticleType
 import net.ib.mn.presentation.common.ExoArticle
+import net.ib.mn.presentation.common.ExoArticleNavigation
 import net.ib.mn.presentation.common.ExoArticleViewModel
 import net.ib.mn.ui.theme.ColorPalette
 
@@ -43,9 +45,21 @@ fun ProfilePostPage(
     isFeedPrivate: Boolean = false,
     isBlocked: Boolean = false,
     blockStatusChecked: Boolean = true,
+    onNavigateToPhotoDetail: (ArticleModel, Int) -> Unit = { _, _ -> },
     viewModel: ProfilePostViewModel = hiltViewModel(),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
+    // ExoArticle 네비게이션 이벤트 처리
+    LaunchedEffect(Unit) {
+        articleViewModel.navigationEvent.collect { event ->
+            when (event) {
+                is ExoArticleNavigation.MediaDetail -> {
+                    onNavigateToPhotoDetail(event.article, event.mediaIndex)
+                }
+                else -> { /* 다른 이벤트는 무시 */ }
+            }
+        }
+    }
     // 차단 상태 확인 전에는 로딩 표시
     if (!blockStatusChecked) {
         LoadingContent()
