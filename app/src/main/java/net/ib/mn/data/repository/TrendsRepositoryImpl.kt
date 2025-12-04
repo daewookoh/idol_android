@@ -7,6 +7,7 @@ import net.ib.mn.data.remote.api.TrendsApi
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.IdolRankingHistoryModel
 import net.ib.mn.domain.model.TrendsModel
+import net.ib.mn.domain.repository.DailyRankingHistoryResponse
 import net.ib.mn.domain.repository.IdolRankingHistoryResponse
 import net.ib.mn.domain.repository.TrendsRepository
 import net.ib.mn.domain.repository.TrendsResponse
@@ -69,10 +70,46 @@ class TrendsRepositoryImpl @Inject constructor(
 
                 val meta = jsonObject.optJSONObject("meta")
                 val totalCount = meta?.optInt("total_count") ?: items.size
+                val chartCode = jsonObject.optString("chart_code", "")
 
                 IdolRankingHistoryResponse(
                     items = items,
-                    totalCount = totalCount
+                    totalCount = totalCount,
+                    chartCode = chartCode
+                )
+            }
+        )
+
+    override fun getDailyRankingHistory(
+        historyParam: String,
+        type: String,
+        category: String,
+        chartCode: String
+    ): Flow<ApiResult<DailyRankingHistoryResponse>> =
+        safeApiCallWithJsonString(
+            apiCall = {
+                trendsApi.getDailyHistory(
+                    type = type.ifEmpty { null },
+                    category = category.ifEmpty { null },
+                    historyParam = historyParam,
+                    chartCode = chartCode.ifEmpty { null }
+                )
+            },
+            parser = { json ->
+                val jsonObject = JSONObject(json)
+                val gson = GsonBuilder()
+                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                    .create()
+                val listType = object : TypeToken<List<net.ib.mn.domain.model.DailyRankingHistoryModel>>() {}.type
+
+                val items: List<net.ib.mn.domain.model.DailyRankingHistoryModel> = gson.fromJson(
+                    jsonObject.optJSONArray("objects")?.toString() ?: "[]",
+                    listType
+                )
+
+                DailyRankingHistoryResponse(
+                    items = items,
+                    totalCount = items.size
                 )
             }
         )

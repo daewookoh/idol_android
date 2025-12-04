@@ -4,7 +4,12 @@ import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +34,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -67,6 +74,7 @@ import java.text.NumberFormat
  *
  * Old 프로젝트의 HallOfFameAggHistoryActivity를 참고하여 Compose로 구현
  * 특정 아이돌의 누적 순위 변동 그래프 및 상세 내역 표시
+ * 아이템 클릭 시 DailyRankingHistoryScreen으로 이동
  *
  * @param idolId 아이돌 ID
  * @param idolName 아이돌 이름 (예: "이름_그룹명")
@@ -79,6 +87,14 @@ fun IdolRankingHistoryScreen(
     onBackClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
+
+    // DailyRankingHistoryScreen 표시 상태
+    var showDailyRankingHistory by remember { mutableStateOf(false) }
+    var selectedHistoryParam by remember { mutableStateOf("") }
+    var selectedDateTitle by remember { mutableStateOf("") }
+    var selectedType by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf("") }
+    var selectedChartCode by remember { mutableStateOf("") }
 
     // 이름 파싱 (이름_그룹명 형식)
     val nameParts = idolName.split("_")
@@ -100,7 +116,13 @@ fun IdolRankingHistoryScreen(
     val appLocale = remember { LocaleUtil.getAppLocale(context) }
     val numberFormat = remember(appLocale) { NumberFormat.getNumberInstance(appLocale) }
 
-    BackHandler { onBackClick() }
+    BackHandler {
+        if (showDailyRankingHistory) {
+            showDailyRankingHistory = false
+        } else {
+            onBackClick()
+        }
+    }
 
     ExoScaffold(
         topBar = {
@@ -195,13 +217,37 @@ fun IdolRankingHistoryScreen(
                         ) { _, item ->
                             IdolRankingHistoryItem(
                                 item = item,
-                                numberFormat = numberFormat
+                                numberFormat = numberFormat,
+                                onClick = {
+                                    selectedHistoryParam = item.refdate
+                                    selectedDateTitle = item.getFormattedRefDate(context)
+                                    selectedType = item.type
+                                    selectedCategory = state.category
+                                    selectedChartCode = state.chartCode
+                                    showDailyRankingHistory = true
+                                }
                             )
                         }
                     }
                 }
             }
         }
+    }
+
+    // DailyRankingHistoryScreen 오버레이
+    AnimatedVisibility(
+        visible = showDailyRankingHistory,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        DailyRankingHistoryScreen(
+            historyParam = selectedHistoryParam,
+            type = selectedType,
+            category = selectedCategory,
+            chartCode = selectedChartCode,
+            dateTitle = selectedDateTitle,
+            onBackClick = { showDailyRankingHistory = false }
+        )
     }
 }
 
@@ -367,11 +413,17 @@ private fun IdolRankingHistoryChart(
 private fun IdolRankingHistoryItem(
     item: IdolRankingHistoryModel,
     numberFormat: NumberFormat,
-    cutLine: Int = 100
+    cutLine: Int = 100,
+    onClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
 
-    Column {
+    Column(
+        modifier = Modifier.clickable(
+            indication = null,
+            interactionSource = remember { MutableInteractionSource() }
+        ) { onClick() }
+    ) {
         // 상단 구분선
         HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),

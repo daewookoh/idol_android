@@ -19,4 +19,16 @@ interface TrendsApi {
         @Query("code") chartCode: String? = null,
         @Query("offset") offset: Int? = null
     ): Response<ResponseBody>
+
+    /**
+     * 일일 순위 히스토리 조회 (특정 날짜의 전체 랭킹)
+     * Old: trends/daily_history/ 엔드포인트
+     */
+    @GET("trends/daily_history/")
+    suspend fun getDailyHistory(
+        @Query("type") type: String? = null,
+        @Query("category") category: String? = null,
+        @Query("history_param") historyParam: String? = null,
+        @Query("code") chartCode: String? = null
+    ): Response<ResponseBody>
 }

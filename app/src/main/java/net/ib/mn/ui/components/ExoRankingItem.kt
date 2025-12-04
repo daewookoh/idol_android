@@ -496,7 +496,10 @@ fun LazyListScope.dailyRankingItems(
  */
 fun LazyListScope.cumulativeRankingItems(
     items: List<RankingItem>,
-    onItemClick: (Int, RankingItem) -> Unit = { _, _ -> }
+    onItemClick: (Int, RankingItem) -> Unit = { _, _ -> },
+    showArrow: Boolean = true,
+    clickEnabled: Boolean = true,
+    countSuffix: String = "점"
 ) {
     itemsIndexed(
         items = items,
@@ -525,13 +528,19 @@ fun LazyListScope.cumulativeRankingItems(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() }
-                        ) {
-                            onItemClick(index, item)
-                            localOnItemClick(item)
-                        }
+                        .then(
+                            if (clickEnabled) {
+                                Modifier.clickable(
+                                    indication = null,
+                                    interactionSource = remember { MutableInteractionSource() }
+                                ) {
+                                    onItemClick(index, item)
+                                    localOnItemClick(item)
+                                }
+                            } else {
+                                Modifier
+                            }
+                        )
                         .background(if (item.suddenIncrease) Color.Transparent else ColorPalette.background100)
                         .padding(10.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -604,7 +613,7 @@ fun LazyListScope.cumulativeRankingItems(
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             ExoHeartCounter(count = item.heartCount, style = ExoTypo.body11.copy(color = ColorPalette.textGray))
-                            Text(text = "점", style = ExoTypo.body11.copy(color = ColorPalette.textGray))
+                            Text(text = countSuffix, style = ExoTypo.body11.copy(color = ColorPalette.textGray))
                         }
                     }
 
@@ -631,14 +640,16 @@ fun LazyListScope.cumulativeRankingItems(
                         Spacer(modifier = Modifier.width(7.dp))
                     }
 
-                    Icon(
-                        painter = painterResource(R.drawable.btn_go),
-                        contentDescription = "Go",
-                        modifier = Modifier.size(12.dp),
-                        tint = Color.Unspecified
-                    )
+                    if (showArrow) {
+                        Icon(
+                            painter = painterResource(R.drawable.btn_go),
+                            contentDescription = "Go",
+                            modifier = Modifier.size(12.dp),
+                            tint = Color.Unspecified
+                        )
 
-                    Spacer(modifier = Modifier.width(if (item.suddenIncrease) 20.dp else 14.dp))
+                        Spacer(modifier = Modifier.width(if (item.suddenIncrease) 20.dp else 14.dp))
+                    }
                 }
             }
 

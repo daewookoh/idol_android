@@ -2,6 +2,7 @@ package net.ib.mn.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.domain.model.DailyRankingHistoryModel
 import net.ib.mn.domain.model.IdolRankingHistoryModel
 import net.ib.mn.domain.model.TrendsModel
 
@@ -30,6 +31,22 @@ interface TrendsRepository {
      * @param idolId 아이돌 ID
      */
     fun getIdolRankingHistory(idolId: Int): Flow<ApiResult<IdolRankingHistoryResponse>>
+
+    /**
+     * 일일 순위 히스토리 조회 (특정 날짜의 전체 랭킹)
+     * Old: HallOfFameTopHistoryActivity의 trendsRepository.dailyHistory() 참고
+     *
+     * @param historyParam 날짜 파라미터 (예: "2024-01-01")
+     * @param type 타입 (예: "S", "G") - CELEB용
+     * @param category 카테고리 (예: "M", "F") - CELEB용
+     * @param chartCode 차트 코드 - 애돌용
+     */
+    fun getDailyRankingHistory(
+        historyParam: String,
+        type: String = "",
+        category: String = "",
+        chartCode: String = ""
+    ): Flow<ApiResult<DailyRankingHistoryResponse>>
 }
 
 /**
@@ -46,5 +63,14 @@ data class TrendsResponse(
  */
 data class IdolRankingHistoryResponse(
     val items: List<IdolRankingHistoryModel>,
+    val totalCount: Int,
+    val chartCode: String = ""  // 애돌용 차트 코드
+)
+
+/**
+ * 일일 순위 히스토리 응답 데이터
+ */
+data class DailyRankingHistoryResponse(
+    val items: List<DailyRankingHistoryModel>,
     val totalCount: Int
 )
