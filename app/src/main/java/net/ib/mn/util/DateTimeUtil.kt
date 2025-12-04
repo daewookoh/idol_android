@@ -1,7 +1,9 @@
 package net.ib.mn.util
 
 import android.text.format.DateUtils
+import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -12,11 +14,11 @@ import java.util.TimeZone
 object DateTimeUtil {
 
     private val serverDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).apply {
-        timeZone = TimeZone.getTimeZone("UTC")
+        timeZone = TimeZone.getTimeZone("Asia/Seoul")
     }
 
     private val serverDateFormatWithZ = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).apply {
-        timeZone = TimeZone.getTimeZone("UTC")
+        timeZone = TimeZone.getTimeZone("Asia/Seoul")
     }
 
     /**
@@ -118,6 +120,39 @@ object DateTimeUtil {
                 timeZone = TimeZone.getTimeZone("Asia/Seoul")
             }
             format.format(date)
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+    /**
+     * KST 기준 오늘이면 시간만, 아니면 날짜만 표시
+     * 게시판 목록에서 사용 (ExoArticleItem)
+     * 날짜 형식: "2025. 11.10.", 시간 형식: "오후 3:30"
+     */
+    fun formatBoardDate(dateString: String?): String {
+        if (dateString.isNullOrEmpty()) return ""
+
+        return try {
+            val date = parseServerDate(dateString) ?: return ""
+            val kstTimeZone = TimeZone.getTimeZone("Asia/Seoul")
+
+            val now = Calendar.getInstance(kstTimeZone)
+            val created = Calendar.getInstance(kstTimeZone).apply { time = date }
+
+            if (now.get(Calendar.YEAR) == created.get(Calendar.YEAR) &&
+                now.get(Calendar.DAY_OF_YEAR) == created.get(Calendar.DAY_OF_YEAR)
+            ) {
+                // 오늘: 시간만 표시 (오후 2:15 형식)
+                SimpleDateFormat("a h:mm", Locale.KOREA).apply {
+                    timeZone = kstTimeZone
+                }.format(date)
+            } else {
+                // 오늘 아님: 날짜만 표시 (2025. 11.10. 형식)
+                SimpleDateFormat("yyyy. M.d.", Locale.KOREA).apply {
+                    timeZone = kstTimeZone
+                }.format(date)
+            }
         } catch (e: Exception) {
             ""
         }

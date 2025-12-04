@@ -150,9 +150,9 @@ fun ExoArticle(
     // 투표 다이얼로그 상태
     var showVoteDialog by remember { mutableStateOf(false) }
 
-    // 시간 표시
+    // 시간 표시: 전체 날짜+시간 (예: "2024.11.27 오후 5:05")
     val createdAt = remember(article.createdAt) {
-        DateTimeUtil.getRelativeTimeSpan(article.createdAt)
+        DateTimeUtil.formatFullDateKorea(article.createdAt)
     }
 
     // YouTube 링크 여부 확인

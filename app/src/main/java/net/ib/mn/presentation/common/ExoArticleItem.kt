@@ -204,9 +204,13 @@ fun ExoArticleItem(
         article.idol?.let { LocaleUtil.getLocalizedIdolName(context, it) }
     }
 
-    // 시간 표시
-    val createdAt = remember(article.createdAt) {
-        DateTimeUtil.getRelativeTimeSpan(article.createdAt)
+    // 시간 표시: FEED는 전체 날짜+시간, 그 외는 KST 기준 오늘이면 시간만/아니면 날짜만
+    val createdAt = remember(article.createdAt, type) {
+        if (type.isFeed) {
+            DateTimeUtil.formatFullDateKorea(article.createdAt)
+        } else {
+            DateTimeUtil.formatBoardDate(article.createdAt)
+        }
     }
 
     // YouTube 링크 여부 확인
@@ -405,6 +409,15 @@ fun ExoArticleItem(
                         Icon(
                             painter = painterResource(R.drawable.icon_popularpost_title),
                             contentDescription = "Popular post",
+                            modifier = Modifier.padding(end = 5.dp),
+                            tint = Color.Unspecified
+                        )
+                    }
+
+                    if (article.isMostOnly == "Y") {
+                        Icon(
+                            painter = painterResource(R.drawable.icon_onlymyidol),
+                            contentDescription = "Only my idol",
                             modifier = Modifier.padding(end = 5.dp),
                             tint = Color.Unspecified
                         )
@@ -1114,7 +1127,7 @@ private fun ArticleItemCompact(
                     .weight(1f)
                     .then(if (thumbnailUrl != null) Modifier.padding(end = 12.dp) else Modifier)
             ) {
-                // 제목 (인기글 아이콘 포함)
+                // 제목 (인기글 아이콘, lock 아이콘 포함)
                 if (!article.title.isNullOrEmpty()) {
                     Row(
                         modifier = Modifier
@@ -1126,6 +1139,14 @@ private fun ArticleItemCompact(
                             Icon(
                                 painter = painterResource(R.drawable.icon_popularpost_title),
                                 contentDescription = "Popular",
+                                modifier = Modifier.padding(end = 5.dp),
+                                tint = Color.Unspecified
+                            )
+                        }
+                        if (article.isMostOnly == "Y") {
+                            Icon(
+                                painter = painterResource(R.drawable.icon_onlymyidol),
+                                contentDescription = "Only my idol",
                                 modifier = Modifier.padding(end = 5.dp),
                                 tint = Color.Unspecified
                             )
@@ -1173,7 +1194,7 @@ private fun ArticleItemCompact(
                         color = ColorPalette.textDimmed
                     )
                     Text(
-                        text = DateTimeUtil.getRelativeTimeSpan(article.createdAt),
+                        text = DateTimeUtil.formatBoardDate(article.createdAt),
                         fontSize = 11.sp,
                         color = ColorPalette.textDimmed
                     )
