@@ -86,6 +86,7 @@ import net.ib.mn.presentation.community.subpage.CommunityScheduleSubPage
 import net.ib.mn.presentation.article.ArticleDetailScreen
 import net.ib.mn.presentation.article.PhotoDetailScreen
 import net.ib.mn.presentation.webview.WebViewScreen
+import net.ib.mn.util.ServerUrl
 import net.ib.mn.ui.components.*
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
@@ -155,6 +156,9 @@ fun CommunityScreen(
     var selectedArticle by remember { mutableStateOf<net.ib.mn.domain.model.ArticleModel?>(null) }
     var isSelectedArticleFromFeed by remember { mutableStateOf(false) } // FeedSubPage에서 진입한 경우 true
     var articleUpdatedCallback by remember { mutableStateOf<((net.ib.mn.domain.model.ArticleModel) -> Unit)?>(null) }
+
+    // Notice 상세 화면 상태
+    var selectedNoticeArticle by remember { mutableStateOf<net.ib.mn.domain.model.ArticleModel?>(null) }
 
     // 사진 상세 화면 상태 (article + 시작 인덱스)
     var selectedPhotoDetail by remember { mutableStateOf<Pair<net.ib.mn.domain.model.ArticleModel, Int>?>(null) }
@@ -337,6 +341,9 @@ fun CommunityScreen(
                             },
                             onNavigateToPhotoDetail = { article, mediaIndex ->
                                 selectedPhotoDetail = article to mediaIndex
+                            },
+                            onNavigateToNoticeDetail = { article ->
+                                selectedNoticeArticle = article
                             },
                             viewModel = feedViewModel
                         )
@@ -741,6 +748,24 @@ fun CommunityScreen(
                         level = level,
                         mostIdolName = mostIdolName
                     )
+                }
+            )
+        }
+    }
+
+    // WebViewScreen (공지사항 상세 화면)
+    AnimatedVisibility(
+        visible = selectedNoticeArticle != null,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        selectedNoticeArticle?.let { article ->
+            WebViewScreen(
+                htmlContent = article.contentHtml ?: article.content,
+                baseUrl = ServerUrl.HOST,
+                title = article.title,
+                onNavigateBack = {
+                    selectedNoticeArticle = null
                 }
             )
         }

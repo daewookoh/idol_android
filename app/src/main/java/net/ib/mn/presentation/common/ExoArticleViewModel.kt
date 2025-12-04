@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.remote.dto.ArticleVoteResponse
 import net.ib.mn.domain.model.ArticleModel
-import net.ib.mn.domain.model.TagModel
 import net.ib.mn.domain.repository.ArticlesRepository
 import org.json.JSONArray
 import javax.inject.Inject
@@ -135,6 +134,42 @@ class ExoArticleViewModel @Inject constructor(
             _navigationEvent.emit(
                 ExoArticleNavigation.Community(idolId = idolId)
             )
+        }
+    }
+
+    /**
+     * 공지사항 상세 화면으로 이동
+     * API에서 상세 내용 (contentHtml)을 가져온 후 네비게이션
+     *
+     * @param article 공지사항 기본 정보
+     * @param isDarkMode 다크모드 여부 (서버에서 다크모드용 HTML 반환)
+     */
+    fun navigateToNoticeDetail(article: ArticleModel, isDarkMode: Boolean = false) {
+        viewModelScope.launch {
+            val noticeId = article.id.toIntOrNull()
+            if (noticeId != null) {
+                articlesRepository.getNotice(noticeId, isDarkMode).collect { result ->
+                    when (result) {
+                        is net.ib.mn.domain.model.ApiResult.Success -> {
+                            _navigationEvent.emit(
+                                ExoArticleNavigation.NoticeDetail(
+                                    article = result.data.toArticleModel()
+                                )
+                            )
+                        }
+                        is net.ib.mn.domain.model.ApiResult.Error -> {
+                            _navigationEvent.emit(
+                                ExoArticleNavigation.NoticeDetail(article = article)
+                            )
+                        }
+                        is net.ib.mn.domain.model.ApiResult.Loading -> { /* 로딩 상태 무시 */ }
+                    }
+                }
+            } else {
+                _navigationEvent.emit(
+                    ExoArticleNavigation.NoticeDetail(article = article)
+                )
+            }
         }
     }
 
@@ -317,6 +352,10 @@ sealed interface ExoArticleNavigation {
 
     data class Community(
         val idolId: Int
+    ) : ExoArticleNavigation
+
+    data class NoticeDetail(
+        val article: ArticleModel
     ) : ExoArticleNavigation
 }
 

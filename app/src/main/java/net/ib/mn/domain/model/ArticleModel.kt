@@ -16,6 +16,9 @@ data class ArticleModel(
     @SerializedName("content")
     val content: String? = null,
 
+    @SerializedName("content_html")
+    val contentHtml: String? = null,
+
     @SerializedName("image_url")
     val imageUrl: String? = null,
 

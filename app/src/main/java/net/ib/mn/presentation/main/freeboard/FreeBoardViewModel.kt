@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.ib.mn.base.BaseViewModel
 import net.ib.mn.data.local.PreferencesManager
+import net.ib.mn.data.repository.UserCacheRepository
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.TagModel
@@ -24,6 +25,7 @@ private const val TAG = "FreeBoardViewModel"
 class FreeBoardViewModel @Inject constructor(
     private val preferencesManager: PreferencesManager,
     private val articlesRepository: ArticlesRepository,
+    private val userCacheRepository: UserCacheRepository,
     private val gson: Gson,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel<FreeBoardContract.State, FreeBoardContract.Intent, FreeBoardContract.Effect>() {
@@ -212,11 +214,26 @@ class FreeBoardViewModel @Inject constructor(
                         logD(TAG, "ApiResult.Success: notices=${response.notices.size}, articles=${response.articles.size}, totalCount=${response.totalCount}, nextUrl=${response.nextUrl}")
                         nextUrl = response.nextUrl
 
-                        val existingArticles = uiState.value.articles
-                        val newArticles = if (isLoadMore) {
-                            existingArticles + response.articles
+                        // 최애 탭인 경우 articles에 idol 정보 주입 (API 응답에 idol이 없음)
+                        val articlesWithIdol = if (selectedTagId == FreeBoardContract.State.TAG_ID_MY_FAVORITE) {
+                            val mostIdol = userCacheRepository.getUserData()?.most
+                            logD(TAG, "Injecting most idol info: ${mostIdol?.name} (id=${mostIdol?.id})")
+                            response.articles.map { article ->
+                                if (article.idol == null && mostIdol != null) {
+                                    article.copy(idol = mostIdol)
+                                } else {
+                                    article
+                                }
+                            }
                         } else {
                             response.articles
+                        }
+
+                        val existingArticles = uiState.value.articles
+                        val newArticles = if (isLoadMore) {
+                            existingArticles + articlesWithIdol
+                        } else {
+                            articlesWithIdol
                         }
 
                         // 공지사항은 첫 로드에만 설정 (loadMore 시에는 유지)

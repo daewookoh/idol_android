@@ -13,7 +13,6 @@ import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.NoticeModel
 import net.ib.mn.domain.repository.ArticlesRepository
 import net.ib.mn.domain.repository.ArticlesResponse
-import net.ib.mn.util.logD
 import net.ib.mn.util.logE
 import org.json.JSONObject
 import javax.inject.Inject
@@ -103,7 +102,6 @@ class ArticlesRepositoryImpl @Inject constructor(
         limit: Int
     ): Flow<ApiResult<ArticlesResponse>> = safeApiCallWithJsonString(
         apiCall = {
-            logD(TAG, "getMyFavoriteArticles: idolId=$idolId, orderBy=$orderBy, keyword=$keyword, locale=$locale")
             articlesApi.getSmallTalkInventory(
                 idolId = idolId,
                 isMost = "Y",
@@ -154,14 +152,12 @@ class ArticlesRepositoryImpl @Inject constructor(
     )
 
     override suspend fun voteArticle(articleId: String, hearts: Long): ArticleVoteResponse {
-        logD(TAG, "voteArticle: articleId=$articleId, hearts=$hearts")
         return articlesApi.voteArticle(
             ArticleVoteRequest(articleId = articleId, hearts = hearts)
         )
     }
 
     override suspend fun likeArticle(articleId: String, like: Boolean): ArticleLikeResponse {
-        logD(TAG, "likeArticle: articleId=$articleId, like=$like")
         return articlesApi.likeArticle(
             ArticleLikeRequest(articleId = articleId, like = like)
         )
@@ -175,7 +171,6 @@ class ArticlesRepositoryImpl @Inject constructor(
         isSelf: Boolean
     ): Flow<ApiResult<ArticlesResponse>> = safeApiCallWithJsonString(
         apiCall = {
-            logD(TAG, "getFeedActivity: userId=$userId, type=$type, offset=$offset, limit=$limit, isSelf=$isSelf")
             articlesApi.getFeedActivity(
                 userId = userId,
                 type = type,
@@ -223,8 +218,6 @@ class ArticlesRepositoryImpl @Inject constructor(
     }
 
     private fun parseArticlesResponse(bodyString: String): ArticlesResponse {
-        logD(TAG, "parseArticlesResponse: bodyString length=${bodyString.length}")
-
         val jsonObject = JSONObject(bodyString)
         val meta = jsonObject.optJSONObject("meta")
         val objectsArray = jsonObject.optJSONArray("objects")
@@ -295,14 +288,38 @@ class ArticlesRepositoryImpl @Inject constructor(
      * 게시글 상세 조회
      */
     override suspend fun getArticle(articleId: Long): ArticleModel {
-        val response = articlesApi.getArticle(articleId)
-        val json = response.string()
-        logD(TAG, "getArticle response keys: ${JSONObject(json).keys().asSequence().toList()}")
-        logD(TAG, "getArticle full response: $json")
+        val json = articlesApi.getArticle(articleId).string()
         val jsonObject = JSONObject(json)
-        // API 응답이 직접 article 객체일 수 있음
-        val articleJson = jsonObject.optJSONObject("article")
-            ?: jsonObject  // article 키가 없으면 전체 객체가 article
+        val articleJson = jsonObject.optJSONObject("article") ?: jsonObject
         return gson.fromJson(articleJson.toString(), ArticleModel::class.java)
+    }
+
+    /**
+     * 공지사항 상세 조회
+     */
+    override fun getNotice(noticeId: Int, isDarkMode: Boolean): Flow<ApiResult<NoticeModel>> =
+        safeApiCallWithJsonString(
+            apiCall = {
+                val mode = if (isDarkMode) "dark" else null
+                articlesApi.getNotice(noticeId, mode)
+            },
+            parser = { json -> parseNoticeResponse(json) }
+        )
+
+    private fun parseNoticeResponse(bodyString: String): NoticeModel {
+        val jsonObject = JSONObject(bodyString)
+        if (!jsonObject.optBoolean("success", false)) {
+            throw Exception(jsonObject.optString("msg", "Failed to get notice"))
+        }
+        val obj = jsonObject.optJSONObject("object")
+            ?: throw Exception("No object in response")
+        return NoticeModel(
+            id = obj.optString("id", ""),
+            title = obj.optString("title", ""),
+            content = obj.optString("content", ""),
+            contentHtml = obj.optString("content_html", ""),
+            createdAt = obj.optLong("created_at", 0L),
+            isOpen = obj.optBoolean("is_open", false)
+        )
     }
 }

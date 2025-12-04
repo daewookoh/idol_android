@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -131,9 +132,10 @@ fun ExoArticleItem(
 ) {
     // ADMIN_NOTICE 타입: 공지사항 UI
     if (type.isAdminNotice) {
+        val isDarkMode = isSystemInDarkTheme()
         ArticleItemNotice(
             article = article,
-            onClick = { viewModel.navigateToArticleDetail(article) },
+            onClick = { viewModel.navigateToNoticeDetail(article, isDarkMode) },
             modifier = modifier
         )
         return
@@ -1098,7 +1100,11 @@ private fun ArticleItemCompact(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onClick)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick
+                )
                 .padding(horizontal = 20.dp, vertical = 17.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

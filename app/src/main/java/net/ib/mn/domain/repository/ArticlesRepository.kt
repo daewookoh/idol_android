@@ -174,6 +174,15 @@ interface ArticlesRepository {
      * @return 게시글 모델
      */
     suspend fun getArticle(articleId: Long): ArticleModel
+
+    /**
+     * 공지사항 상세 조회
+     *
+     * @param noticeId 공지사항 ID
+     * @param isDarkMode 다크모드 여부 (서버에서 다크모드용 HTML 반환)
+     * @return 공지사항 모델 (contentHtml 포함)
+     */
+    fun getNotice(noticeId: Int, isDarkMode: Boolean = false): Flow<ApiResult<NoticeModel>>
 }
 
 /**

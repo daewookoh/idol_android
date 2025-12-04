@@ -303,8 +303,10 @@ fun ExoArticle(
 
             // 2. 태그
             // FREE_BOARD: 아이돌 이름 (팬톡) or 서버에서 받은 태그 이름 (프리톡)
+            val tagFromViewModel = viewModel.getTagName(article.tagId)
+            val tagFromIdol = article.idol?.let { LocaleUtil.getLocalizedIdolName(context, it) }
             val tag = when {
-                type.isFreeBoard -> viewModel.getTagName(article.tagId) ?: article.idol?.let { LocaleUtil.getLocalizedIdolName(context, it)}
+                type.isFreeBoard -> tagFromViewModel ?: tagFromIdol
                 else -> null
             }
             if (!tag.isNullOrEmpty()) {

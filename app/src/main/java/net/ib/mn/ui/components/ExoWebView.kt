@@ -19,27 +19,29 @@ import net.ib.mn.R
 /**
  * 앱 전체에서 사용하는 공통 WebView 컴포넌트
  *
- * 기본 설정:
- * - JavaScript 활성화
- * - DomStorage 활성화
- * - WebViewClient 설정 (앱 내에서 웹페이지 로드)
- * - 로딩 인디케이터 표시
- *
- * @param url 로드할 URL
+ * @param url 로드할 URL (htmlContent가 없을 때 사용)
+ * @param htmlContent 직접 로드할 HTML 콘텐츠 (우선 적용)
+ * @param baseUrl HTML 콘텐츠 로드 시 기본 URL
  * @param modifier Modifier
  */
 @Composable
 fun ExoWebView(
-    url: String,
+    url: String? = null,
+    htmlContent: String? = null,
+    baseUrl: String? = null,
     modifier: Modifier = Modifier
 ) {
     var isLoading by remember { mutableStateOf(true) }
+
+    val wrappedHtml = remember(htmlContent) {
+        if (htmlContent.isNullOrEmpty()) null
+        else wrapHtmlContent(htmlContent)
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         AndroidView(
             factory = { context ->
                 WebView(context).apply {
-                    // WebView 기본 설정
                     settings.apply {
                         javaScriptEnabled = true
                         domStorageEnabled = true
@@ -50,37 +52,42 @@ fun ExoWebView(
                         loadWithOverviewMode = true
                     }
 
-                    // WebViewClient 설정: 앱 내에서 웹페이지 로드
                     webViewClient = object : WebViewClient() {
                         override fun onPageFinished(view: WebView?, url: String?) {
                             super.onPageFinished(view, url)
                             isLoading = false
                         }
 
-                        override fun onPageStarted(
+                        @Deprecated("Deprecated in Java")
+                        override fun onReceivedError(
                             view: WebView?,
-                            url: String?,
-                            favicon: android.graphics.Bitmap?
+                            errorCode: Int,
+                            description: String?,
+                            failingUrl: String?
                         ) {
-                            super.onPageStarted(view, url, favicon)
-                            isLoading = true
+                            super.onReceivedError(view, errorCode, description, failingUrl)
+                            isLoading = false
                         }
                     }
 
-                    // URL 로드
-                    loadUrl(url)
-                }
-            },
-            update = { webView ->
-                // URL이 변경되면 새로운 URL 로드
-                if (webView.url != url) {
-                    webView.loadUrl(url)
+                    setBackgroundColor(android.graphics.Color.WHITE)
+
+                    when {
+                        !wrappedHtml.isNullOrEmpty() -> {
+                            loadDataWithBaseURL(baseUrl, wrappedHtml, "text/html", "UTF-8", null)
+                        }
+                        !url.isNullOrEmpty() -> {
+                            loadUrl(url)
+                        }
+                        else -> {
+                            isLoading = false
+                        }
+                    }
                 }
             },
             modifier = Modifier.fillMaxSize()
         )
 
-        // 로딩 인디케이터
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
@@ -88,4 +95,37 @@ fun ExoWebView(
             )
         }
     }
+}
+
+/**
+ * HTML 콘텐츠를 적절한 CSS 스타일과 함께 래핑
+ */
+private fun wrapHtmlContent(content: String): String {
+    return """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+            <style>
+                * { box-sizing: border-box; }
+                html, body {
+                    margin: 0;
+                    padding: 16px;
+                    background-color: #FFFFFF;
+                    color: #000000;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    font-size: 16px;
+                    line-height: 1.6;
+                    word-wrap: break-word;
+                    overflow-wrap: break-word;
+                }
+                img { max-width: 100%; height: auto; }
+                a { color: #007AFF; }
+                p { margin: 0 0 16px 0; }
+            </style>
+        </head>
+        <body>$content</body>
+        </html>
+    """.trimIndent()
 }

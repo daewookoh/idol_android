@@ -71,6 +71,7 @@ import net.ib.mn.util.BoardLanguage
 fun FreeBoardPage(
     onNavigateToWrite: () -> Unit = {},
     onNavigateToArticleDetail: (ArticleModel, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _ -> },
+    onNavigateToNoticeDetail: (ArticleModel) -> Unit = {},
     viewModel: FreeBoardViewModel = hiltViewModel(),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
@@ -109,6 +110,9 @@ fun FreeBoardPage(
                     onNavigateToArticleDetail(event.article) { updatedArticle ->
                         viewModel.updateArticle(updatedArticle)
                     }
+                }
+                is ExoArticleNavigation.NoticeDetail -> {
+                    onNavigateToNoticeDetail(event.article)
                 }
                 else -> { /* 다른 이벤트는 무시 */ }
             }
@@ -298,6 +302,7 @@ fun FreeBoardContent(
                                 contentType = { "notice" }
                             ) { index ->
                                 val notice = state.notices[index]
+                                android.util.Log.d("FreeBoardPage", "Notice[$index] - id: ${notice.id}, title: ${notice.title}, content: ${notice.content.take(50)}, contentHtml: ${notice.contentHtml.take(50)}")
 
                                 key(notice.id) {
                                     ExoArticleItem(

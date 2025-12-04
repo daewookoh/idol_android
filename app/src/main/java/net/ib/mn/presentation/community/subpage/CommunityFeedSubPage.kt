@@ -71,6 +71,7 @@ fun CommunityFeedSubPage(
     onNavigateToProfile: (userId: Int, nickname: String, imageUrl: String?, level: Int, mostIdolName: String?) -> Unit = { _, _, _, _, _ -> },
     onNavigateToArticleDetail: (ArticleModel, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _ -> },
     onNavigateToPhotoDetail: (ArticleModel, Int) -> Unit = { _, _ -> },
+    onNavigateToNoticeDetail: (ArticleModel) -> Unit = {},
     viewModel: CommunityFeedViewModel = hiltViewModel(),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
@@ -100,6 +101,9 @@ fun CommunityFeedSubPage(
                 }
                 is ExoArticleNavigation.Community -> {
                     // TODO: 커뮤니티 화면으로 이동
+                }
+                is ExoArticleNavigation.NoticeDetail -> {
+                    onNavigateToNoticeDetail(event.article)
                 }
             }
         }

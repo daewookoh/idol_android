@@ -1,6 +1,7 @@
 package net.ib.mn.presentation.main
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -38,6 +39,8 @@ import net.ib.mn.presentation.main.myinfo.MyInfoPage
 import net.ib.mn.presentation.main.ranking.RankingPage
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.presentation.article.ArticleDetailScreen
+import net.ib.mn.presentation.webview.WebViewScreen
+import net.ib.mn.util.ServerUrl
 import net.ib.mn.presentation.community.CommunityScreen
 import net.ib.mn.presentation.community.IdolRankingHistoryScreen
 import net.ib.mn.presentation.community.profile.ProfileScreen
@@ -75,6 +78,9 @@ fun MainScreen(
     // FreeBoard 게시글 상세 화면 상태
     var selectedFreeBoardArticle by remember { mutableStateOf<ArticleModel?>(null) }
     var freeBoardArticleUpdatedCallback by remember { mutableStateOf<((ArticleModel) -> Unit)?>(null) }
+
+    // Notice 상세 화면 상태
+    var selectedNoticeArticle by remember { mutableStateOf<ArticleModel?>(null) }
 
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
@@ -200,6 +206,9 @@ fun MainScreen(
                         onNavigateToArticleDetail = { article, onArticleUpdated ->
                             selectedFreeBoardArticle = article
                             freeBoardArticleUpdatedCallback = onArticleUpdated
+                        },
+                        onNavigateToNoticeDetail = { article ->
+                            selectedNoticeArticle = article
                         }
                     )
                     4 -> MenuPage()
@@ -266,6 +275,28 @@ fun MainScreen(
                     freeBoardArticleUpdatedCallback?.invoke(updatedArticle)
                 }
             )
+        }
+    }
+
+    // Notice 상세 화면
+    AnimatedVisibility(
+        visible = selectedNoticeArticle != null,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it }),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        selectedNoticeArticle?.let { article ->
+            Box(modifier = Modifier.fillMaxSize().background(colorResource(R.color.background_100))) {
+                WebViewScreen(
+                    htmlContent = article.contentHtml ?: article.content,
+                    baseUrl = ServerUrl.HOST,
+                    screenTitle = stringResource(R.string.title_notice),
+                    contentTitle = article.title,
+                    onNavigateBack = {
+                        selectedNoticeArticle = null
+                    }
+                )
+            }
         }
     }
 }

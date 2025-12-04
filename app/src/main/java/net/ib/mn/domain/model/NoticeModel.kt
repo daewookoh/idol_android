@@ -23,6 +23,7 @@ data class NoticeModel(
     fun toArticleModel(): ArticleModel = ArticleModel(
         id = id,
         title = title,
-        content = content
+        content = content,
+        contentHtml = contentHtml
     )
 }

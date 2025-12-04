@@ -159,4 +159,14 @@ interface ArticlesApi {
     suspend fun getArticle(
         @Path("id") id: Long
     ): ResponseBody
+
+    /**
+     * 공지사항 상세 조회
+     * Old 프로젝트: GET "notices/{id}/"
+     */
+    @GET("notices/{id}/")
+    suspend fun getNotice(
+        @Path("id") id: Int,
+        @Query("mode") mode: String? = null
+    ): Response<ResponseBody>
 }
