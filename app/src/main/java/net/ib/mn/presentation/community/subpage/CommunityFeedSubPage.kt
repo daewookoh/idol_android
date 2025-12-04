@@ -154,7 +154,7 @@ fun CommunityFeedSubPage(
                         ExoBoardNoticeItem(
                             notice = notice,
                             onItemClick = {
-                                // TODO: 공지사항 클릭 처리
+                                onNavigateToArticleDetail(notice.toArticleModel())
                             },
                             showDivider = uiState.notices.indexOf(notice) != uiState.notices.lastIndex
                         )

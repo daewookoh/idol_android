@@ -339,7 +339,9 @@ fun CommunityScreen(
                         )
                         CommunityTab.FAN_TALK -> CommunityFanTalkSubPage(
                             rankingItem = rankingItem,
-                            fandomName = fandomName
+                            onNavigateToArticleDetail = { article ->
+                                selectedArticle = article
+                            }
                         )
                         CommunityTab.CHAT -> CommunityChatSubPage(rankingItem = rankingItem)
                         CommunityTab.SCHEDULE -> CommunityScheduleSubPage(rankingItem = rankingItem)

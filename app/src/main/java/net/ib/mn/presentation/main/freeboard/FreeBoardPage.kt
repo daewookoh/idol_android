@@ -51,6 +51,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
 import net.ib.mn.R
+import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.TagModel
 import net.ib.mn.ui.components.ExoBoardItem
 import net.ib.mn.ui.components.ExoBoardItemType
@@ -68,6 +69,7 @@ import net.ib.mn.util.BoardLanguage
 @Composable
 fun FreeBoardPage(
     onNavigateToWrite: () -> Unit = {},
+    onNavigateToArticleDetail: (ArticleModel) -> Unit = {},
     viewModel: FreeBoardViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -99,7 +101,8 @@ fun FreeBoardPage(
 
     FreeBoardContent(
         state = state,
-        onIntent = viewModel::sendIntent
+        onIntent = viewModel::sendIntent,
+        onNavigateToArticleDetail = onNavigateToArticleDetail
     )
 }
 
@@ -108,6 +111,7 @@ fun FreeBoardPage(
  *
  * @param state FreeBoardContract.State
  * @param onIntent Intent 핸들러
+ * @param onNavigateToArticleDetail 게시글 상세 화면 이동 콜백
  * @param isExternalIdolMode 외부에서 idolId를 전달받은 모드 (태그탭 숨김, 글쓰기 버튼 표시)
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -115,6 +119,7 @@ fun FreeBoardPage(
 fun FreeBoardContent(
     state: FreeBoardContract.State,
     onIntent: (FreeBoardContract.Intent) -> Unit,
+    onNavigateToArticleDetail: (ArticleModel) -> Unit = {},
     isExternalIdolMode: Boolean = false
 ) {
     // state.searchKeyword와 동기화되는 검색 텍스트
@@ -282,7 +287,9 @@ fun FreeBoardContent(
                                 key(notice.id) {
                                     ExoBoardNoticeItem(
                                         notice = notice,
-                                        onItemClick = { /* Navigate to notice detail (WebView) */ },
+                                        onItemClick = {
+                                            onNavigateToArticleDetail(notice.toArticleModel())
+                                        },
                                         showDivider = !isLastNotice // 마지막 공지는 구분선 표시 안함
                                     )
                                 }
@@ -299,7 +306,9 @@ fun FreeBoardContent(
                                 key(article.id) {
                                     ExoBoardItem(
                                         article = article,
-                                        onItemClick = { /* Navigate to detail */ },
+                                        onItemClick = {
+                                            onNavigateToArticleDetail(article)
+                                        },
                                         itemType = ExoBoardItemType.MINI,
                                         showPopularIcon = showPopularIcon
                                     )

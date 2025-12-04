@@ -36,6 +36,8 @@ import net.ib.mn.presentation.main.menu.MenuPage
 import net.ib.mn.presentation.main.myfavorite.MyFavoritePage
 import net.ib.mn.presentation.main.myinfo.MyInfoPage
 import net.ib.mn.presentation.main.ranking.RankingPage
+import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.presentation.article.ArticleDetailScreen
 import net.ib.mn.presentation.community.CommunityScreen
 import net.ib.mn.presentation.community.IdolRankingHistoryScreen
 import net.ib.mn.presentation.community.profile.ProfileScreen
@@ -69,6 +71,9 @@ fun MainScreen(
     // MyInfo 프로필 클릭 시 ProfileScreen 표시 상태
     var showMyProfile by remember { mutableStateOf(false) }
     val userData by viewModel.userCacheRepository.userData.collectAsState(initial = null)
+
+    // FreeBoard 게시글 상세 화면 상태
+    var selectedFreeBoardArticle by remember { mutableStateOf<ArticleModel?>(null) }
 
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
@@ -190,7 +195,11 @@ fun MainScreen(
                     2 -> MyInfoPage(
                         onNavigateToProfile = { showMyProfile = true }
                     )
-                    3 -> FreeBoardPage()
+                    3 -> FreeBoardPage(
+                        onNavigateToArticleDetail = { article ->
+                            selectedFreeBoardArticle = article
+                        }
+                    )
                     4 -> MenuPage()
                 }
             }
@@ -234,6 +243,20 @@ fun MainScreen(
                 mostIdolName = user.most?.name,
                 isMine = true,
                 onBackClick = { showMyProfile = false }
+            )
+        }
+    }
+
+    // FreeBoard 게시글 상세 화면
+    AnimatedVisibility(
+        visible = selectedFreeBoardArticle != null,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        selectedFreeBoardArticle?.let { article ->
+            ArticleDetailScreen(
+                article = article,
+                onBackClick = { selectedFreeBoardArticle = null }
             )
         }
     }

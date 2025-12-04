@@ -2,6 +2,7 @@ package net.ib.mn.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -136,7 +138,11 @@ fun ExoBoardNoticeItem(
                 .fillMaxWidth()
                 .height(34.dp)
                 .background(ColorPalette.main100)
-                .clickable(onClick = onItemClick)
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() },
+                    onClick = onItemClick
+                )
                 .padding(horizontal = 20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -189,7 +195,11 @@ private fun ExoBoardItemNormal(
         modifier = modifier
             .fillMaxWidth()
             .background(ColorPalette.background100)
-            .clickable(onClick = onItemClick)
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = onItemClick
+            )
     ) {
         // Header: 프로필 이미지, 닉네임, 날짜, 더보기 버튼
         ArticleHeader(
@@ -287,7 +297,11 @@ private fun ExoBoardItemMini(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onItemClick)
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() },
+                    onClick = onItemClick
+                )
                 .padding(horizontal = 20.dp, vertical = 17.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

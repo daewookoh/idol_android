@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.presentation.main.freeboard.FreeBoardContent
 import net.ib.mn.presentation.main.freeboard.FreeBoardContract
 import net.ib.mn.presentation.main.freeboard.FreeBoardViewModel
@@ -19,7 +20,7 @@ import net.ib.mn.ui.components.RankingItem
 @Composable
 fun CommunityFanTalkSubPage(
     rankingItem: RankingItem,
-    fandomName: String?,
+    onNavigateToArticleDetail: (ArticleModel) -> Unit = {},
     viewModel: FreeBoardViewModel = hiltViewModel(key = "fanTalk_${rankingItem.id}")
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -32,6 +33,7 @@ fun CommunityFanTalkSubPage(
     FreeBoardContent(
         state = state,
         onIntent = viewModel::sendIntent,
+        onNavigateToArticleDetail = onNavigateToArticleDetail,
         isExternalIdolMode = viewModel.isExternalIdolMode
     )
 }

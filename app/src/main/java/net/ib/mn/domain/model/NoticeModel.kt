@@ -15,4 +15,14 @@ data class NoticeModel(
     val contentHtml: String = "",
     val createdAt: Long = 0L, // Timestamp in milliseconds
     val isOpen: Boolean = false
-)
+) {
+    /**
+     * NoticeModel을 ArticleModel로 변환
+     * ArticleDetailScreen에서 사용하기 위함
+     */
+    fun toArticleModel(): ArticleModel = ArticleModel(
+        id = id,
+        title = title,
+        content = content
+    )
+}
