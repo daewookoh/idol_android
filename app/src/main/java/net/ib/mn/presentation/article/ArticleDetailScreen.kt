@@ -41,7 +41,7 @@ import net.ib.mn.util.ServerUrl
 @Composable
 fun ArticleDetailScreen(
     article: ArticleModel,
-    idolName: String? = null, // 커뮤니티에서 전달받은 아이돌 이름 (DETAIL_COMMUNITY에서 태그로 사용)
+    isFeed: Boolean = false, // FeedSubPage에서 진입한 경우 true (하트 투표 표시)
     onBackClick: () -> Unit = {},
     onArticleUpdated: (ArticleModel) -> Unit = {},
     onArticleDeleted: (() -> Unit)? = null,
@@ -103,22 +103,16 @@ fun ArticleDetailScreen(
             )
         }
     ) {
-        // tagId 기준으로 DETAIL 타입 결정
-        // tagId == 1: 피드 → FEED
-        // 그 외: 프리톡 → FREE_BOARD
-        val detailType = remember(article.tagId) {
-            when (article.tagId) {
-                1 -> ArticleType.FEED
-                else -> ArticleType.FREE_BOARD
-            }
-        }
+        // isFeed 파라미터로 타입 결정
+        // FeedSubPage에서 진입: FEED (하트 투표 있음)
+        // 그 외 (FreeBoardPage, FanTalkSubPage 등): FREE_BOARD (하트 투표 없음)
+        val detailType = if (isFeed) ArticleType.FEED else ArticleType.FREE_BOARD
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
                 ExoArticle(
                     article = article,
                     type = detailType,
-                    tagName = idolName,
                     isVisible = true,
                     onArticleUpdated = onArticleUpdated,
                     viewModel = articleViewModel

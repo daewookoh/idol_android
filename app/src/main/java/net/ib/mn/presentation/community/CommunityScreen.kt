@@ -153,6 +153,7 @@ fun CommunityScreen(
 
     // 게시글 상세 화면 상태
     var selectedArticle by remember { mutableStateOf<net.ib.mn.domain.model.ArticleModel?>(null) }
+    var isSelectedArticleFromFeed by remember { mutableStateOf(false) } // FeedSubPage에서 진입한 경우 true
     var articleUpdatedCallback by remember { mutableStateOf<((net.ib.mn.domain.model.ArticleModel) -> Unit)?>(null) }
 
     // 사진 상세 화면 상태 (article + 시작 인덱스)
@@ -332,6 +333,7 @@ fun CommunityScreen(
                             },
                             onNavigateToArticleDetail = { article, _ ->
                                 selectedArticle = article
+                                isSelectedArticleFromFeed = true
                             },
                             onNavigateToPhotoDetail = { article, mediaIndex ->
                                 selectedPhotoDetail = article to mediaIndex
@@ -342,6 +344,7 @@ fun CommunityScreen(
                             rankingItem = rankingItem,
                             onNavigateToArticleDetail = { article, onArticleUpdated ->
                                 selectedArticle = article
+                                isSelectedArticleFromFeed = false
                                 articleUpdatedCallback = onArticleUpdated
                             }
                         )
@@ -711,9 +714,10 @@ fun CommunityScreen(
         selectedArticle?.let { article ->
             ArticleDetailScreen(
                 article = article,
-                idolName = rankingItem.name, // 커뮤니티에서 아이돌 이름 전달
+                isFeed = isSelectedArticleFromFeed, // FeedSubPage에서 진입한 경우 true
                 onBackClick = {
                     selectedArticle = null
+                    isSelectedArticleFromFeed = false
                     articleUpdatedCallback = null
                 },
                 onArticleUpdated = { updatedArticle ->

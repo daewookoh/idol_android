@@ -97,7 +97,6 @@ enum class ArticleType {
  *
  * @param article 게시글 데이터
  * @param type 게시글 타입
- * @param tagName 태그 이름
  * @param isVisible 화면에 보이는지 여부 (GIF/비디오 최적화용)
  * @param showTranslation 번역 버튼 표시 여부
  * @param onArticleUpdated 게시글 업데이트 콜백
@@ -108,7 +107,6 @@ enum class ArticleType {
 fun ExoArticle(
     article: ArticleModel,
     type: ArticleType = ArticleType.FEED,
-    tagName: String? = null,
     isVisible: Boolean = true,
     showTranslation: Boolean = true,
     onArticleUpdated: ((ArticleModel) -> Unit)? = null,
@@ -303,9 +301,10 @@ fun ExoArticle(
                 }
             }
 
-            // 2. 태그 (FREE_BOARD에서 표시)
+            // 2. 태그
+            // FREE_BOARD: 아이돌 이름 (팬톡) or 서버에서 받은 태그 이름 (프리톡)
             val tag = when {
-                type.isFreeBoard -> if(article.tagId ==5) article.idol?.let { LocaleUtil.getLocalizedIdolName(context, it) } else tagName ?: viewModel.getTagName(article.tagId)
+                type.isFreeBoard -> viewModel.getTagName(article.tagId) ?: article.idol?.let { LocaleUtil.getLocalizedIdolName(context, it)}
                 else -> null
             }
             if (!tag.isNullOrEmpty()) {
