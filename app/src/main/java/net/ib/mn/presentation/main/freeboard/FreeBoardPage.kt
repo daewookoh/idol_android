@@ -38,6 +38,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -63,6 +64,7 @@ import net.ib.mn.ui.components.ExoBottomSheetList
 import net.ib.mn.ui.components.ExoSearchBox
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.util.BoardLanguage
+import net.ib.mn.util.LocaleUtil
 
 /**
  * Free Board 페이지 - 프리톡 메뉴 화면
@@ -70,7 +72,7 @@ import net.ib.mn.util.BoardLanguage
 @Composable
 fun FreeBoardPage(
     onNavigateToWrite: () -> Unit = {},
-    onNavigateToArticleDetail: (ArticleModel, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _ -> },
+    onNavigateToArticleDetail: (ArticleModel, externalTabName: String?, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _, _ -> },
     onNavigateToNoticeDetail: (ArticleModel) -> Unit = {},
     viewModel: FreeBoardViewModel = hiltViewModel(),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
@@ -103,11 +105,16 @@ fun FreeBoardPage(
     }
 
     // ExoArticle 네비게이션 이벤트 처리
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         articleViewModel.navigationEvent.collect { event ->
             when (event) {
                 is ExoArticleNavigation.ArticleDetail -> {
-                    onNavigateToArticleDetail(event.article) { updatedArticle ->
+                    // externalIdol이 있으면 다국어 이름 전달
+                    val externalTabName = state.externalIdol?.let {
+                        LocaleUtil.getLocalizedIdolName(context, it)
+                    }
+                    onNavigateToArticleDetail(event.article, externalTabName) { updatedArticle ->
                         viewModel.updateArticle(updatedArticle)
                     }
                 }
@@ -302,8 +309,6 @@ fun FreeBoardContent(
                                 contentType = { "notice" }
                             ) { index ->
                                 val notice = state.notices[index]
-                                android.util.Log.d("FreeBoardPage", "Notice[$index] - id: ${notice.id}, title: ${notice.title}, content: ${notice.content.take(50)}, contentHtml: ${notice.contentHtml.take(50)}")
-
                                 key(notice.id) {
                                     ExoArticleItem(
                                         article = notice.toArticleModel(),

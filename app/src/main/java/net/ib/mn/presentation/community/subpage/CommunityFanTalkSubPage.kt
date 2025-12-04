@@ -3,6 +3,7 @@ package net.ib.mn.presentation.community.subpage
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.ib.mn.domain.model.ArticleModel
@@ -12,6 +13,7 @@ import net.ib.mn.presentation.main.freeboard.FreeBoardContent
 import net.ib.mn.presentation.main.freeboard.FreeBoardContract
 import net.ib.mn.presentation.main.freeboard.FreeBoardViewModel
 import net.ib.mn.ui.components.RankingItem
+import net.ib.mn.util.LocaleUtil
 
 /**
  * CommunityFanTalkSubPage - 커뮤니티 팬톡 탭
@@ -22,11 +24,12 @@ import net.ib.mn.ui.components.RankingItem
 @Composable
 fun CommunityFanTalkSubPage(
     rankingItem: RankingItem,
-    onNavigateToArticleDetail: (ArticleModel, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _ -> },
+    onNavigateToArticleDetail: (ArticleModel, externalTabName: String?, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _, _ -> },
     viewModel: FreeBoardViewModel = hiltViewModel(key = "fanTalk_${rankingItem.id}"),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(rankingItem.id) {
         rankingItem.id.toIntOrNull()?.let { viewModel.setExternalIdolId(it) }
@@ -38,7 +41,11 @@ fun CommunityFanTalkSubPage(
         articleViewModel.navigationEvent.collect { event ->
             when (event) {
                 is ExoArticleNavigation.ArticleDetail -> {
-                    onNavigateToArticleDetail(event.article) { updatedArticle ->
+                    // externalIdol이 있으면 다국어 이름 전달
+                    val externalTabName = state.externalIdol?.let {
+                        LocaleUtil.getLocalizedIdolName(context, it)
+                    }
+                    onNavigateToArticleDetail(event.article, externalTabName) { updatedArticle ->
                         viewModel.updateArticle(updatedArticle)
                     }
                 }

@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.ib.mn.base.BaseViewModel
 import net.ib.mn.data.local.PreferencesManager
-import net.ib.mn.data.repository.UserCacheRepository
 import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.domain.repository.IdolRepository
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.TagModel
 import net.ib.mn.domain.repository.ArticlesRepository
@@ -25,7 +25,7 @@ private const val TAG = "FreeBoardViewModel"
 class FreeBoardViewModel @Inject constructor(
     private val preferencesManager: PreferencesManager,
     private val articlesRepository: ArticlesRepository,
-    private val userCacheRepository: UserCacheRepository,
+    private val idolRepository: IdolRepository,
     private val gson: Gson,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel<FreeBoardContract.State, FreeBoardContract.Intent, FreeBoardContract.Effect>() {
@@ -86,11 +86,15 @@ class FreeBoardViewModel @Inject constructor(
                 // 태그 없이 바로 해당 아이돌의 덕질게시판만 로드
                 if (isExternalIdolMode) {
                     logD(TAG, "loadInitialData: externalIdolMode with idolId=$externalIdolId")
+                    // 로컬 DB에서 아이돌 정보 가져오기 (다국어 이름 포함)
+                    val idolEntity = externalIdolId?.let { idolRepository.getIdolById(it) }
+                    logD(TAG, "loadInitialData: idolEntity=${idolEntity?.name}")
                     setState {
                         copy(
                             tags = emptyList(),
                             selectedTagId = FreeBoardContract.State.TAG_ID_MY_FAVORITE,
-                            hasMostIdol = true
+                            hasMostIdol = true,
+                            externalIdol = idolEntity
                         )
                     }
                     loadArticles()
@@ -113,13 +117,19 @@ class FreeBoardViewModel @Inject constructor(
                     mostIdolId != Constants.SECRET_ROOM_IDOL_ID &&
                     mostIdolId > 0
 
-                logD(TAG, "loadInitialData: savedTagId=$savedTagId, initialTagId=$initialTagId, mostIdolId=$mostIdolId, hasMostIdol=$hasMostIdol")
+                // 최애탭이 선택된 경우 로컬 DB에서 아이돌 정보 가져오기
+                val mostIdolEntity = if (initialTagId == FreeBoardContract.State.TAG_ID_MY_FAVORITE && hasMostIdol) {
+                    mostIdolId?.let { idolRepository.getIdolById(it) }
+                } else null
+
+                logD(TAG, "loadInitialData: savedTagId=$savedTagId, initialTagId=$initialTagId, mostIdolId=$mostIdolId, hasMostIdol=$hasMostIdol, mostIdolEntity=${mostIdolEntity?.name}")
 
                 setState {
                     copy(
                         tags = tags.map { it.copy(selected = it.id == initialTagId) },
                         selectedTagId = initialTagId,
-                        hasMostIdol = hasMostIdol
+                        hasMostIdol = hasMostIdol,
+                        externalIdol = mostIdolEntity
                     )
                 }
 
@@ -214,26 +224,11 @@ class FreeBoardViewModel @Inject constructor(
                         logD(TAG, "ApiResult.Success: notices=${response.notices.size}, articles=${response.articles.size}, totalCount=${response.totalCount}, nextUrl=${response.nextUrl}")
                         nextUrl = response.nextUrl
 
-                        // 최애 탭인 경우 articles에 idol 정보 주입 (API 응답에 idol이 없음)
-                        val articlesWithIdol = if (selectedTagId == FreeBoardContract.State.TAG_ID_MY_FAVORITE) {
-                            val mostIdol = userCacheRepository.getUserData()?.most
-                            logD(TAG, "Injecting most idol info: ${mostIdol?.name} (id=${mostIdol?.id})")
-                            response.articles.map { article ->
-                                if (article.idol == null && mostIdol != null) {
-                                    article.copy(idol = mostIdol)
-                                } else {
-                                    article
-                                }
-                            }
-                        } else {
-                            response.articles
-                        }
-
                         val existingArticles = uiState.value.articles
                         val newArticles = if (isLoadMore) {
-                            existingArticles + articlesWithIdol
+                            existingArticles + response.articles
                         } else {
-                            articlesWithIdol
+                            response.articles
                         }
 
                         // 공지사항은 첫 로드에만 설정 (loadMore 시에는 유지)
@@ -303,15 +298,21 @@ class FreeBoardViewModel @Inject constructor(
             // 선택된 탭 ID 저장
             preferencesManager.setFreeBoardSelectedTagId(tag.id)
             logD(TAG, "onTagSelected: saved tagId=${tag.id}")
-        }
 
-        setState {
-            copy(
-                selectedTagId = tag.id,
-                tags = tags.map { it.copy(selected = it.id == tag.id) }
-            )
+            // 최애탭 선택 시 로컬 DB에서 아이돌 정보 가져오기
+            val mostIdolEntity = if (tag.id == FreeBoardContract.State.TAG_ID_MY_FAVORITE && uiState.value.hasMostIdol) {
+                preferencesManager.getMostIdolId()?.let { idolRepository.getIdolById(it) }
+            } else null
+
+            setState {
+                copy(
+                    selectedTagId = tag.id,
+                    tags = tags.map { it.copy(selected = it.id == tag.id) },
+                    externalIdol = mostIdolEntity
+                )
+            }
+            loadArticles()
         }
-        loadArticles()
     }
 
     private fun refresh() {

@@ -42,6 +42,7 @@ import net.ib.mn.util.ServerUrl
 fun ArticleDetailScreen(
     article: ArticleModel,
     isFeed: Boolean = false, // FeedSubPage에서 진입한 경우 true (하트 투표 표시)
+    externalTabName: String? = null, // 외부에서 전달된 아이돌 이름 (다국어 적용, 태그 표시용)
     onBackClick: () -> Unit = {},
     onArticleUpdated: (ArticleModel) -> Unit = {},
     onArticleDeleted: (() -> Unit)? = null,
@@ -114,6 +115,7 @@ fun ArticleDetailScreen(
                     article = article,
                     type = detailType,
                     isVisible = true,
+                    externalTabName = externalTabName,
                     onArticleUpdated = onArticleUpdated,
                     viewModel = articleViewModel
                 )

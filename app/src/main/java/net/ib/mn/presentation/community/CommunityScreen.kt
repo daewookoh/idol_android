@@ -154,6 +154,7 @@ fun CommunityScreen(
 
     // 게시글 상세 화면 상태
     var selectedArticle by remember { mutableStateOf<net.ib.mn.domain.model.ArticleModel?>(null) }
+    var selectedArticleExternalIdolName by remember { mutableStateOf<String?>(null) }
     var isSelectedArticleFromFeed by remember { mutableStateOf(false) } // FeedSubPage에서 진입한 경우 true
     var articleUpdatedCallback by remember { mutableStateOf<((net.ib.mn.domain.model.ArticleModel) -> Unit)?>(null) }
 
@@ -349,8 +350,9 @@ fun CommunityScreen(
                         )
                         CommunityTab.FAN_TALK -> CommunityFanTalkSubPage(
                             rankingItem = rankingItem,
-                            onNavigateToArticleDetail = { article, onArticleUpdated ->
+                            onNavigateToArticleDetail = { article, externalTabName, onArticleUpdated ->
                                 selectedArticle = article
+                                selectedArticleExternalIdolName = externalTabName
                                 isSelectedArticleFromFeed = false
                                 articleUpdatedCallback = onArticleUpdated
                             }
@@ -722,8 +724,10 @@ fun CommunityScreen(
             ArticleDetailScreen(
                 article = article,
                 isFeed = isSelectedArticleFromFeed, // FeedSubPage에서 진입한 경우 true
+                externalTabName = selectedArticleExternalIdolName,
                 onBackClick = {
                     selectedArticle = null
+                    selectedArticleExternalIdolName = null
                     isSelectedArticleFromFeed = false
                     articleUpdatedCallback = null
                 },

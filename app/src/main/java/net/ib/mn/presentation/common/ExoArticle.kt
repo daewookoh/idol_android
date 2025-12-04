@@ -99,6 +99,7 @@ enum class ArticleType {
  * @param type 게시글 타입
  * @param isVisible 화면에 보이는지 여부 (GIF/비디오 최적화용)
  * @param showTranslation 번역 버튼 표시 여부
+ * @param externalTabName 외부에서 전달된 아이돌 이름 (다국어 적용된 이름, 태그 표시용)
  * @param onArticleUpdated 게시글 업데이트 콜백
  * @param viewModel ExoArticleViewModel
  * @param modifier Modifier
@@ -109,6 +110,7 @@ fun ExoArticle(
     type: ArticleType = ArticleType.FEED,
     isVisible: Boolean = true,
     showTranslation: Boolean = true,
+    externalTabName: String? = null,
     onArticleUpdated: ((ArticleModel) -> Unit)? = null,
     viewModel: ExoArticleViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
@@ -302,9 +304,11 @@ fun ExoArticle(
             }
 
             // 2. 태그
-            // FREE_BOARD: 아이돌 이름 (팬톡) or 서버에서 받은 태그 이름 (프리톡)
+            // FREE_BOARD: 서버에서 받은 태그 이름 (프리톡) -> 아이돌 이름(팬톡) -> 최애이름(최애)
             val tagFromViewModel = viewModel.getTagName(article.tagId)
-            val tagFromIdol = article.idol?.let { LocaleUtil.getLocalizedIdolName(context, it) }
+            // externalTabName 우선, 없으면 article.idol (user의 most idol)
+            val tagFromIdol = externalTabName
+                ?: article.idol?.let { LocaleUtil.getLocalizedIdolName(context, it) }
             val tag = when {
                 type.isFreeBoard -> tagFromViewModel ?: tagFromIdol
                 else -> null

@@ -2,6 +2,7 @@ package net.ib.mn.util
 
 import android.content.Context
 import android.os.Build
+import net.ib.mn.data.local.entity.IdolEntity
 import net.ib.mn.data.remote.dto.MostIdol
 import java.util.Locale
 
@@ -59,17 +60,44 @@ object LocaleUtil {
     /**
      * MostIdol 객체에서 언어에 맞는 아이돌 이름 추출
      */
-    fun getLocalizedIdolName(context: Context, most: MostIdol): String {
-        val lang = getSystemLanguage(context).lowercase()
-        val name = most.name.orEmpty()
-        val nameEn = most.nameEn.orEmpty()
+    fun getLocalizedIdolName(context: Context, most: MostIdol): String =
+        getLocalizedName(
+            context = context,
+            name = most.name.orEmpty(),
+            nameEn = most.nameEn.orEmpty(),
+            nameZh = most.nameZh.orEmpty(),
+            nameZhTw = most.nameZhTw.orEmpty(),
+            nameJp = most.nameJp.orEmpty()
+        )
 
+    /**
+     * IdolEntity 객체에서 언어에 맞는 아이돌 이름 추출
+     */
+    fun getLocalizedIdolName(context: Context, idol: IdolEntity): String =
+        getLocalizedName(
+            context = context,
+            name = idol.name,
+            nameEn = idol.nameEn,
+            nameZh = idol.nameZh,
+            nameZhTw = idol.nameZhTw,
+            nameJp = idol.nameJp
+        )
+
+    private fun getLocalizedName(
+        context: Context,
+        name: String,
+        nameEn: String,
+        nameZh: String,
+        nameZhTw: String,
+        nameJp: String
+    ): String {
+        val lang = getSystemLanguage(context).lowercase()
         return when {
             lang.startsWith("ko") -> name.ifEmpty { nameEn }
             lang.startsWith("en") && nameEn.isNotEmpty() -> nameEn
-            lang.startsWith("zh_tw") && !most.nameZhTw.isNullOrEmpty() -> most.nameZhTw
-            lang.startsWith("zh") && !most.nameZh.isNullOrEmpty() -> most.nameZh
-            lang.startsWith("ja") && !most.nameJp.isNullOrEmpty() -> most.nameJp
+            lang.startsWith("zh_tw") && nameZhTw.isNotEmpty() -> nameZhTw
+            lang.startsWith("zh") && nameZh.isNotEmpty() -> nameZh
+            lang.startsWith("ja") && nameJp.isNotEmpty() -> nameJp
             nameEn.isNotEmpty() -> nameEn
             else -> name.ifEmpty { nameEn }
         }

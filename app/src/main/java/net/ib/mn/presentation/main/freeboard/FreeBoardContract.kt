@@ -3,6 +3,7 @@ package net.ib.mn.presentation.main.freeboard
 import net.ib.mn.base.UiEffect
 import net.ib.mn.base.UiIntent
 import net.ib.mn.base.UiState
+import net.ib.mn.data.local.entity.IdolEntity
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.NoticeModel
 import net.ib.mn.domain.model.TagModel
@@ -29,6 +30,7 @@ class FreeBoardContract {
         val showPopular: Boolean = false,
         val isEmpty: Boolean = false,
         val hasMostIdol: Boolean = true,  // 최애가 설정되어 있는지 여부
+        val externalIdol: IdolEntity? = null,  // 외부에서 전달된 아이돌 정보 (다국어 이름 포함)
         val error: String? = null
     ) : UiState {
         companion object {

@@ -78,6 +78,7 @@ fun MainScreen(
 
     // FreeBoard 게시글 상세 화면 상태
     var selectedFreeBoardArticle by remember { mutableStateOf<ArticleModel?>(null) }
+    var selectedFreeBoardExternalIdolName by remember { mutableStateOf<String?>(null) }
     var freeBoardArticleUpdatedCallback by remember { mutableStateOf<((ArticleModel) -> Unit)?>(null) }
 
     // Notice 상세 화면 상태
@@ -204,8 +205,9 @@ fun MainScreen(
                         onNavigateToProfile = { showMyProfile = true }
                     )
                     3 -> FreeBoardPage(
-                        onNavigateToArticleDetail = { article, onArticleUpdated ->
+                        onNavigateToArticleDetail = { article, externalTabName, onArticleUpdated ->
                             selectedFreeBoardArticle = article
+                            selectedFreeBoardExternalIdolName = externalTabName
                             freeBoardArticleUpdatedCallback = onArticleUpdated
                         },
                         onNavigateToNoticeDetail = { article ->
@@ -268,8 +270,10 @@ fun MainScreen(
         selectedFreeBoardArticle?.let { article ->
             ArticleDetailScreen(
                 article = article,
+                externalTabName = selectedFreeBoardExternalIdolName,
                 onBackClick = {
                     selectedFreeBoardArticle = null
+                    selectedFreeBoardExternalIdolName = null
                     freeBoardArticleUpdatedCallback = null
                 },
                 onArticleUpdated = { updatedArticle ->
