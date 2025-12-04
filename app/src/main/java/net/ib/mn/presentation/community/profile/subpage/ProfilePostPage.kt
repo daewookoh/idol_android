@@ -29,8 +29,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
-import net.ib.mn.presentation.common.ArticleType
-import net.ib.mn.presentation.common.ExoArticle
+import net.ib.mn.presentation.common.ArticleItemType
+import net.ib.mn.presentation.common.ExoArticleItem
 import net.ib.mn.presentation.common.ExoArticleNavigation
 import net.ib.mn.presentation.common.ExoArticleViewModel
 import net.ib.mn.ui.theme.ColorPalette
@@ -45,6 +45,7 @@ fun ProfilePostPage(
     isFeedPrivate: Boolean = false,
     isBlocked: Boolean = false,
     blockStatusChecked: Boolean = true,
+    onNavigateToArticleDetail: (ArticleModel, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _ -> },
     onNavigateToPhotoDetail: (ArticleModel, Int) -> Unit = { _, _ -> },
     viewModel: ProfilePostViewModel = hiltViewModel(),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
@@ -53,6 +54,11 @@ fun ProfilePostPage(
     LaunchedEffect(Unit) {
         articleViewModel.navigationEvent.collect { event ->
             when (event) {
+                is ExoArticleNavigation.ArticleDetail -> {
+                    onNavigateToArticleDetail(event.article) { updatedArticle ->
+                        viewModel.updateArticle(updatedArticle)
+                    }
+                }
                 is ExoArticleNavigation.MediaDetail -> {
                     onNavigateToPhotoDetail(event.article, event.mediaIndex)
                 }
@@ -214,14 +220,17 @@ private fun PostList(
             val visibleItems = listState.layoutInfo.visibleItemsInfo
             val isVisible = visibleItems.any { it.index == index }
 
-            // ExoArticle - COMMUNITY 타입에서는 프로필 클릭 비활성화
-            ExoArticle(
+            // ExoArticleItem - FREE_BOARD 타입 (컴팩트 UI)
+            ExoArticleItem(
                 article = article,
-                type = ArticleType.COMMUNITY,
+                type = ArticleItemType.FREE_BOARD,
                 isVisible = isVisible,
                 showTranslation = true,
                 onDeleted = { deletedArticleId ->
                     postViewModel.removeArticle(deletedArticleId)
+                },
+                onArticleUpdated = { updatedArticle ->
+                    postViewModel.updateArticle(updatedArticle)
                 },
                 viewModel = articleViewModel
             )

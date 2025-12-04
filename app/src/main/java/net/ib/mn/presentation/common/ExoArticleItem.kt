@@ -1,5 +1,7 @@
 package net.ib.mn.presentation.common
 
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,6 +47,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.offset
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.compose.AsyncImage
@@ -58,6 +62,10 @@ import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleFile
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.ui.components.ExoArticleVoteDialog
+import net.ib.mn.ui.components.ExoBottomSheetAction
+import net.ib.mn.ui.components.ExoBottomSheetActionItem
+import net.ib.mn.ui.components.ExoConfirmDialog
+import net.ib.mn.ui.components.ExoErrorDialog
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoVideoPlayer
 import net.ib.mn.ui.components.ExoYouTubePlayer
@@ -69,21 +77,23 @@ import net.ib.mn.util.IdolImageUtil.toSecureUrl
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.MediaCacheUtil
 import net.ib.mn.util.NumberFormatUtil
+import net.ib.mn.util.ServerUrl
 import net.ib.mn.util.YoutubeHelper
 import java.util.concurrent.TimeUnit
 
 /**
- * ExoArticle 타입 (상세 화면용)
+ * ExoArticleItem 타입 (목록용)
  */
-enum class ArticleType {
-    FEED,  // 커뮤니티 피드 상세 - 하트투표, 좋아요, 액션버튼
-    FREE_BOARD,      // 자유게시판 상세 - 좋아요만 (하트투표, 액션버튼 숨김)
-    ADMIN_NOTICE;    // 관리자 공지 상세
+enum class ArticleItemType {
+    FEED,            // 커뮤니티 피드 - 하트투표, 좋아요, 댓글, 번역기능
+    FREE_BOARD,      // 자유게시판/커뮤니티톡 - 좋아요, 댓글 (하트투표 없음)
+    ADMIN_NOTICE;    // 관리자 공지 (핀 아이콘 + 제목)
 
-    /** FREE_BOARD 타입인지 여부 */
+    /** FEED 타입인지 여부 */
     val isFeed: Boolean
         get() = this == FEED
 
+    /** FREE_BOARD 타입인지 여부 */
     val isFreeBoard: Boolean
         get() = this == FREE_BOARD
 
@@ -93,28 +103,55 @@ enum class ArticleType {
 }
 
 /**
- * ExoArticle - 상세 화면용 게시글 아티클 컴포넌트
+ * ExoArticleItem - 목록용 게시글 아티클 컴포넌트
  *
  * @param article 게시글 데이터
- * @param type 게시글 타입
- * @param tagName 태그 이름
+ * @param type 게시글 타입 (FEED: 전체UI, FREE_BOARD: 컴팩트UI, ADMIN_NOTICE: 공지UI)
+ * @param tagName FREE_BOARD 타입에서 표시할 태그 이름
  * @param isVisible 화면에 보이는지 여부 (GIF/비디오 최적화용)
  * @param showTranslation 번역 버튼 표시 여부
+ * @param showPopularIcon 인기글 아이콘 표시 여부
+ * @param onDeleted 삭제 콜백
  * @param onArticleUpdated 게시글 업데이트 콜백
  * @param viewModel ExoArticleViewModel
  * @param modifier Modifier
  */
 @Composable
-fun ExoArticle(
+fun ExoArticleItem(
     article: ArticleModel,
-    type: ArticleType = ArticleType.FEED,
+    type: ArticleItemType = ArticleItemType.FEED,
     tagName: String? = null,
     isVisible: Boolean = true,
     showTranslation: Boolean = true,
+    showPopularIcon: Boolean = false,
+    onDeleted: ((String) -> Unit)? = null,
     onArticleUpdated: ((ArticleModel) -> Unit)? = null,
     viewModel: ExoArticleViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
+    // ADMIN_NOTICE 타입: 공지사항 UI
+    if (type.isAdminNotice) {
+        ArticleItemNotice(
+            article = article,
+            onClick = { viewModel.navigateToArticleDetail(article) },
+            modifier = modifier
+        )
+        return
+    }
+
+    // FREE_BOARD 타입: 컴팩트 UI
+    if (type.isFreeBoard) {
+        ArticleItemCompact(
+            article = article,
+            showPopularIcon = showPopularIcon,
+            onClick = { viewModel.navigateToArticleDetail(article) },
+            modifier = modifier
+        )
+        return
+    }
+
+    // FEED: 전체 UI
+
     val context = LocalContext.current
 
     // 로컬 상태 (즉시 UI 업데이트용)
@@ -147,8 +184,23 @@ fun ExoArticle(
     // 좋아요 클릭 throttling
     var lastLikeClickTime by remember { mutableLongStateOf(0L) }
 
-    // 투표 다이얼로그 상태
+    // 다이얼로그 상태
     var showVoteDialog by remember { mutableStateOf(false) }
+    var showMoreBottomSheet by remember { mutableStateOf(false) }
+    var showReportDialog by remember { mutableStateOf(false) }
+    var showReportErrorDialog by remember { mutableStateOf(false) }
+    var reportErrorMessage by remember { mutableStateOf("") }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    // 작성자 여부 확인
+    val myUserId = viewModel.myUserId
+    val isAdmin = viewModel.isAdmin
+    val isMine = myUserId != null && article.user?.id == myUserId
+
+    // 커뮤니티 이름 (COMMUNITY 타입에서 사용)
+    val communityName = remember(article.idol) {
+        article.idol?.let { LocaleUtil.getLocalizedIdolName(context, it) }
+    }
 
     // 시간 표시
     val createdAt = remember(article.createdAt) {
@@ -301,29 +353,42 @@ fun ExoArticle(
                         }
                     }
                 }
+
+                // 더보기 버튼
+                Icon(
+                    painter = painterResource(R.drawable.icon_view_more),
+                    contentDescription = "More",
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            showMoreBottomSheet = true
+                        },
+                    tint = Color.Unspecified
+                )
             }
 
-            // 2. 태그 (FREE_BOARD에서 표시)
-            val tag = when {
-                type.isFreeBoard -> if(article.tagId ==5) article.idol?.let { LocaleUtil.getLocalizedIdolName(context, it) } else tagName ?: viewModel.getTagName(article.tagId)
-                else -> null
-            }
-            if (!tag.isNullOrEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .padding(start = 20.dp, top = 9.dp, end = 20.dp, bottom = 3.dp)
-                        .background(
-                            color = ColorPalette.main200,
-                            shape = RoundedCornerShape(6.dp)
+            // 2. 태그 (FREE_BOARD에서만 표시)
+            if (type.isFreeBoard) {
+                val tag = tagName ?: viewModel.getTagName(article.tagId)
+                if (!tag.isNullOrEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 20.dp, top = 9.dp, end = 20.dp, bottom = 3.dp)
+                            .background(
+                                color = ColorPalette.main200,
+                                shape = RoundedCornerShape(6.dp)
+                            )
+                            .padding(horizontal = 7.dp, vertical = 3.dp)
+                    ) {
+                        Text(
+                            text = tag,
+                            style = ExoTypo.label13.copy(fontWeight = FontWeight.Medium)
                         )
-                        .padding(horizontal = 7.dp, vertical = 3.dp)
-                ) {
-                    Text(
-                        text = tag,
-                        style = ExoTypo.label13.copy(fontWeight = FontWeight.Medium)
-                    )
+                    }
                 }
-                Spacer(modifier = Modifier.height(3.dp))
             }
 
             // 3. 제목
@@ -403,7 +468,7 @@ fun ExoArticle(
             }
             // 6. 미디어
             else if (article.mediaFiles.isNotEmpty()) {
-                ArticleMediaSection(
+                ArticleItemMediaSection(
                     mediaFiles = article.mediaFiles,
                     isVisible = isVisible,
                     onMediaClick = { mediaIndex ->
@@ -419,66 +484,72 @@ fun ExoArticle(
                     .padding(start = 20.dp, top = 13.dp, end = 16.dp, bottom = 13.dp),
                 horizontalArrangement = Arrangement.spacedBy(18.dp)
             ) {
-                if (type.isFeed) {
-                    ArticleStatItem(
+                // 하트 카운트 (FREE_BOARD에서는 숨김)
+                if (!type.isFreeBoard) {
+                    ArticleItemStatItem(
                         iconRes = R.drawable.icon_community_heart,
                         count = localHeartCount.toInt(),
                         onClick = { showVoteDialog = true }
                     )
                 }
-                // 좋아요
-                ArticleStatItem(
-                    iconRes = if (localIsLiked) R.drawable.icon_board_like_active else R.drawable.icon_board_like,
+                // 좋아요 (FEED에서만 색상 표시)
+                val showLikeColor = type == ArticleItemType.FEED && localIsLiked
+                ArticleItemStatItem(
+                    iconRes = if (showLikeColor) R.drawable.icon_board_like_active else R.drawable.icon_board_like,
                     count = localLikeCount,
-                    tintColor = if (localIsLiked) null else ColorPalette.textDefault,
+                    tintColor = if (showLikeColor) null else ColorPalette.textDefault,
                     onClick = onLikeClick
                 )
-                // 댓글 (클릭 없음 - 상세 화면)
-                ArticleStatItem(
+                // 댓글
+                ArticleItemStatItem(
                     iconRes = R.drawable.icon_community_comment,
                     count = article.commentCount,
-                    tintColor = ColorPalette.textDefault
+                    tintColor = ColorPalette.textDefault,
+                    onClick = { viewModel.navigateToArticleDetail(article) }
                 )
-                // 뷰카운트
-                if (!type.isFeed) {
-                    ArticleStatItem(
-                        iconRes = R.drawable.icon_board_hits,
-                        count = article.viewCount,
-                        tintColor = ColorPalette.textDefault
-                    )
-                }
             }
 
-            // 8. 액션 버튼 (FEED만 표시)
-            if (type.isFeed) {
-                HorizontalDivider(
-                    color = ColorPalette.gray110,
-                    thickness = 0.3.dp
-                )
+            // 8. 액션 버튼
+            HorizontalDivider(
+                color = ColorPalette.gray110,
+                thickness = 0.3.dp
+            )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp)
-                ) {
-                    // 하트투표 버튼
-                    ArticleActionButton(
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+            ) {
+                // 하트투표 버튼 (FREE_BOARD 제외)
+                if (!type.isFreeBoard) {
+                    ArticleItemActionButton(
                         iconRes = R.drawable.icon_community_heart,
                         label = stringResource(R.string.lable_community_heart_vote),
                         onClick = { showVoteDialog = true },
                         modifier = Modifier.weight(1f)
                     )
-                    ArticleVerticalDivider()
-
-                    // 좋아요 버튼
-                    ArticleActionButton(
-                        iconRes = if (localIsLiked) R.drawable.icon_board_like_active else R.drawable.icon_board_like,
-                        label = stringResource(R.string.support_sympathy),
-                        onClick = onLikeClick,
-                        modifier = Modifier.weight(1f),
-                        tintColor = if (localIsLiked) null else ColorPalette.textDefault
-                    )
+                    ArticleItemVerticalDivider()
                 }
+
+                // 좋아요 버튼 (FEED에서만 색상 표시)
+                val showLikeColorBtn = type == ArticleItemType.FEED && localIsLiked
+                ArticleItemActionButton(
+                    iconRes = if (showLikeColorBtn) R.drawable.icon_board_like_active else R.drawable.icon_board_like,
+                    label = stringResource(R.string.support_sympathy),
+                    onClick = onLikeClick,
+                    modifier = Modifier.weight(1f),
+                    tintColor = if (showLikeColorBtn) null else ColorPalette.textDefault
+                )
+
+                // 댓글 버튼
+                ArticleItemVerticalDivider()
+                ArticleItemActionButton(
+                    iconRes = R.drawable.icon_community_comment,
+                    label = stringResource(R.string.lable_community_comment),
+                    onClick = { viewModel.navigateToArticleDetail(article) },
+                    modifier = Modifier.weight(1f),
+                    tintColor = ColorPalette.textDefault
+                )
             }
         }
 
@@ -510,13 +581,151 @@ fun ExoArticle(
             onDismiss = { showVoteDialog = false }
         )
     }
+
+    // 더보기 바텀시트
+    if (showMoreBottomSheet) {
+        val actionItems = buildList {
+            if (isMine || isAdmin) {
+                add(ExoBottomSheetActionItem(R.string.title_edit) {
+                    viewModel.onEditArticle(article)
+                })
+                add(ExoBottomSheetActionItem(R.string.title_remove) {
+                    showMoreBottomSheet = false
+                    showDeleteDialog = true
+                })
+            }
+            if (!isMine) {
+                add(ExoBottomSheetActionItem(R.string.title_report) {
+                    showMoreBottomSheet = false
+                    showReportDialog = true
+                })
+            }
+            add(ExoBottomSheetActionItem(R.string.title_share) {
+                shareArticleItem(context, article)
+            })
+        }
+
+        ExoBottomSheetAction(
+            items = actionItems,
+            onDismissRequest = { showMoreBottomSheet = false }
+        )
+    }
+
+    // 신고 확인 다이얼로그
+    if (showReportDialog) {
+        val reportHeart = viewModel.reportHeart
+        ExoConfirmDialog(
+            title = stringResource(R.string.title_report),
+            message = stringResource(R.string.msg_report_confirm, reportHeart),
+            confirmButtonText = stringResource(R.string.yes),
+            dismissButtonText = stringResource(R.string.no),
+            onConfirm = {
+                showReportDialog = false
+                viewModel.reportArticle(
+                    articleId = article.id,
+                    onSuccess = {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.report_done),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
+                    onError = { gcode ->
+                        reportErrorMessage = when (gcode) {
+                            ExoArticleViewModel.GCODE_ALREADY_REPORTED ->
+                                context.getString(R.string.failed_to_report__already_reported)
+                            ExoArticleViewModel.GCODE_DAILY_LIMIT ->
+                                context.getString(R.string.failed_to_report_2202)
+                            ExoArticleViewModel.GCODE_TIME_LIMIT ->
+                                context.getString(R.string.failed_to_report_2203)
+                            else -> context.getString(R.string.error_abnormal_default)
+                        }
+                        showReportErrorDialog = true
+                    }
+                )
+            },
+            onDismiss = { showReportDialog = false }
+        )
+    }
+
+    // 신고 에러 다이얼로그
+    if (showReportErrorDialog) {
+        ExoErrorDialog(
+            message = reportErrorMessage,
+            onDismiss = { showReportErrorDialog = false }
+        )
+    }
+
+    // 삭제 확인 다이얼로그
+    if (showDeleteDialog) {
+        ExoConfirmDialog(
+            title = stringResource(R.string.title_remove),
+            message = stringResource(R.string.remove_desc),
+            confirmButtonText = stringResource(R.string.yes),
+            dismissButtonText = stringResource(R.string.no),
+            onConfirm = {
+                showDeleteDialog = false
+                viewModel.deleteArticle(
+                    articleId = article.id,
+                    onSuccess = {
+                        onDeleted?.invoke(article.id)
+                    },
+                    onError = {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.error_abnormal_default),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                )
+            },
+            onDismiss = { showDeleteDialog = false }
+        )
+    }
+}
+
+/**
+ * 게시글 공유
+ */
+private fun shareArticleItem(context: android.content.Context, article: ArticleModel) {
+    val locale = LocaleUtil.getWikiLocale(context)
+    val shareUrl = "${ServerUrl.HOST}/articles/${article.id}/?locale=$locale"
+
+    val contentPreview = article.content?.take(30)?.trim() ?: ""
+    val idolName = article.idol?.let { LocaleUtil.getLocalizedIdolName(context, it) } ?: ""
+
+    val shareMsg = buildString {
+        if (contentPreview.isNotEmpty()) {
+            append(contentPreview)
+            if ((article.content?.length ?: 0) > 30) append("...")
+        }
+        if (idolName.isNotEmpty()) {
+            if (isNotEmpty()) append(" - ")
+            append(idolName)
+        }
+    }
+
+    val shareText = if (shareMsg.isNotEmpty()) {
+        "$shareMsg\n$shareUrl"
+    } else {
+        shareUrl
+    }
+
+    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, shareText)
+    }
+
+    context.startActivity(
+        Intent.createChooser(shareIntent, context.getString(R.string.title_share))
+    )
 }
 
 /**
  * 미디어 섹션
  */
 @Composable
-private fun ArticleMediaSection(
+private fun ArticleItemMediaSection(
     mediaFiles: List<ArticleFile>,
     isVisible: Boolean,
     onMediaClick: (Int) -> Unit
@@ -551,7 +760,7 @@ private fun ArticleMediaSection(
             val media = mediaFiles[pageIndex]
             val isCurrentPageVisible = isVisible && pagerState.currentPage == pageIndex
 
-            ArticleMediaItem(
+            ArticleItemMediaItem(
                 media = media,
                 isVisible = isCurrentPageVisible,
                 gifImageLoader = gifImageLoader,
@@ -585,7 +794,7 @@ private fun ArticleMediaSection(
  * 개별 미디어 아이템
  */
 @Composable
-private fun ArticleMediaItem(
+private fun ArticleItemMediaItem(
     media: ArticleFile,
     isVisible: Boolean,
     gifImageLoader: ImageLoader,
@@ -729,7 +938,7 @@ private fun ArticleMediaItem(
 }
 
 @Composable
-private fun ArticleVerticalDivider() {
+private fun ArticleItemVerticalDivider() {
     Box(
         modifier = Modifier
             .width(0.3.dp)
@@ -739,7 +948,7 @@ private fun ArticleVerticalDivider() {
 }
 
 @Composable
-private fun ArticleStatItem(
+private fun ArticleItemStatItem(
     iconRes: Int,
     count: Int,
     tintColor: Color? = null,
@@ -772,7 +981,7 @@ private fun ArticleStatItem(
 }
 
 @Composable
-private fun ArticleActionButton(
+private fun ArticleItemActionButton(
     iconRes: Int,
     label: String,
     onClick: () -> Unit,
@@ -805,6 +1014,239 @@ private fun ArticleActionButton(
                 text = label,
                 style = ExoTypo.body14.copy(color = ColorPalette.textGray)
             )
+        }
+    }
+}
+
+/**
+ * 공지사항 아이템 (ADMIN_NOTICE)
+ */
+@Composable
+private fun ArticleItemNotice(
+    article: ArticleModel,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(34.dp)
+                .background(ColorPalette.main100)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick
+                )
+                .padding(horizontal = 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.icon_community_pin),
+                contentDescription = "Notice",
+                tint = Color.Unspecified
+            )
+            Spacer(modifier = Modifier.width(5.dp))
+            Text(
+                text = article.title ?: "",
+                style = ExoTypo.body12.copy(color = ColorPalette.mainLight),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+        HorizontalDivider(
+            thickness = 0.3.dp,
+            color = ColorPalette.main300
+        )
+    }
+}
+
+/**
+ * 간략 표시 아이템 (FREE_BOARD 타입)
+ * old 프로젝트의 ExoBoardItemMini와 동일한 UI
+ */
+@Composable
+private fun ArticleItemCompact(
+    article: ArticleModel,
+    showPopularIcon: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // 이미지 파일 찾기 - 기존 ExoBoardItemMini와 동일한 우선순위
+    // 1. article.thumbnailUrl 우선
+    // 2. article.imageUrl
+    // 3. files 배열에서 이미지 찾기
+    val imageFiles = article.files.filter { it.fileType == "image" || it.fileUrl?.contains("image") == true }
+    val thumbnailUrl: String? = when {
+        !article.thumbnailUrl.isNullOrEmpty() -> article.thumbnailUrl
+        !article.imageUrl.isNullOrEmpty() -> article.imageUrl
+        else -> imageFiles.firstOrNull()?.let { it.thumbnailUrl ?: it.fileUrl }
+    }
+    val imageCount = if (imageFiles.isNotEmpty()) imageFiles.size else if (thumbnailUrl != null) 1 else 0
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(ColorPalette.background100)
+    ) {
+        // 상단 구분선
+        HorizontalDivider(
+            thickness = 0.3.dp,
+            color = ColorPalette.gray110
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = 20.dp, vertical = 17.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 왼쪽 컨텐츠 영역
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .then(if (thumbnailUrl != null) Modifier.padding(end = 12.dp) else Modifier)
+            ) {
+                // 제목 (인기글 아이콘 포함)
+                if (!article.title.isNullOrEmpty()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 0.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (showPopularIcon && article.isPopular) {
+                            Icon(
+                                painter = painterResource(R.drawable.icon_popularpost_title),
+                                contentDescription = "Popular",
+                                modifier = Modifier.padding(end = 5.dp),
+                                tint = Color.Unspecified
+                            )
+                        }
+                        Text(
+                            text = article.title!!,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorPalette.textDefault,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+
+                // 본문 내용 (한 줄)
+                if (!article.content.isNullOrEmpty()) {
+                    Text(
+                        text = article.content!!,
+                        fontSize = 13.sp,
+                        color = ColorPalette.textGray,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .offset(y = (-3).dp)
+                    )
+                }
+
+                // 작성자, 작성시간
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 0.dp)
+                ) {
+                    Text(
+                        text = article.user?.nickname ?: "",
+                        fontSize = 11.sp,
+                        color = ColorPalette.textDimmed,
+                        maxLines = 1
+                    )
+                    Text(
+                        text = " · ",
+                        fontSize = 11.sp,
+                        color = ColorPalette.textDimmed
+                    )
+                    Text(
+                        text = DateTimeUtil.getRelativeTimeSpan(article.createdAt),
+                        fontSize = 11.sp,
+                        color = ColorPalette.textDimmed
+                    )
+                }
+
+                // 좋아요, 댓글, 조회수
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 0.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.icon_board_like),
+                        contentDescription = "Like",
+                        modifier = Modifier.size(14.dp),
+                        tint = ColorPalette.textGray
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(
+                        text = article.likeCount.toString(),
+                        fontSize = 12.sp,
+                        color = ColorPalette.textGray
+                    )
+
+                    Spacer(modifier = Modifier.width(14.dp))
+
+                    Icon(
+                        painter = painterResource(R.drawable.icon_board_comment),
+                        contentDescription = "Comment",
+                        modifier = Modifier.size(14.dp),
+                        tint = ColorPalette.textGray
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(
+                        text = article.commentCount.toString(),
+                        fontSize = 12.sp,
+                        color = ColorPalette.textGray
+                    )
+
+                    Spacer(modifier = Modifier.width(14.dp))
+
+                    Icon(
+                        painter = painterResource(R.drawable.icon_board_hits),
+                        contentDescription = "Views",
+                        modifier = Modifier.size(14.dp),
+                        tint = ColorPalette.textGray
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(
+                        text = article.viewCount.toString(),
+                        fontSize = 12.sp,
+                        color = ColorPalette.textGray
+                    )
+                }
+            }
+
+            // 오른쪽 썸네일 (이미지가 있을 경우)
+            if (thumbnailUrl != null) {
+                Box {
+                    AsyncImage(
+                        model = thumbnailUrl,
+                        contentDescription = "Thumbnail",
+                        modifier = Modifier
+                            .size(70.dp)
+                            .clip(RoundedCornerShape(10.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                    if (imageCount > 1) {
+                        Text(
+                            text = "+${imageCount - 1}",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorPalette.textLight,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(top = 3.dp, end = 5.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }

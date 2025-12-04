@@ -74,6 +74,7 @@ fun MainScreen(
 
     // FreeBoard 게시글 상세 화면 상태
     var selectedFreeBoardArticle by remember { mutableStateOf<ArticleModel?>(null) }
+    var freeBoardArticleUpdatedCallback by remember { mutableStateOf<((ArticleModel) -> Unit)?>(null) }
 
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
@@ -196,8 +197,9 @@ fun MainScreen(
                         onNavigateToProfile = { showMyProfile = true }
                     )
                     3 -> FreeBoardPage(
-                        onNavigateToArticleDetail = { article ->
+                        onNavigateToArticleDetail = { article, onArticleUpdated ->
                             selectedFreeBoardArticle = article
+                            freeBoardArticleUpdatedCallback = onArticleUpdated
                         }
                     )
                     4 -> MenuPage()
@@ -256,7 +258,13 @@ fun MainScreen(
         selectedFreeBoardArticle?.let { article ->
             ArticleDetailScreen(
                 article = article,
-                onBackClick = { selectedFreeBoardArticle = null }
+                onBackClick = {
+                    selectedFreeBoardArticle = null
+                    freeBoardArticleUpdatedCallback = null
+                },
+                onArticleUpdated = { updatedArticle ->
+                    freeBoardArticleUpdatedCallback?.invoke(updatedArticle)
+                }
             )
         }
     }

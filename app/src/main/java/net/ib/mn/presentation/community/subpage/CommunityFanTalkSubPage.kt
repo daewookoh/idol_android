@@ -6,6 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.presentation.common.ExoArticleNavigation
+import net.ib.mn.presentation.common.ExoArticleViewModel
 import net.ib.mn.presentation.main.freeboard.FreeBoardContent
 import net.ib.mn.presentation.main.freeboard.FreeBoardContract
 import net.ib.mn.presentation.main.freeboard.FreeBoardViewModel
@@ -20,8 +22,9 @@ import net.ib.mn.ui.components.RankingItem
 @Composable
 fun CommunityFanTalkSubPage(
     rankingItem: RankingItem,
-    onNavigateToArticleDetail: (ArticleModel) -> Unit = {},
-    viewModel: FreeBoardViewModel = hiltViewModel(key = "fanTalk_${rankingItem.id}")
+    onNavigateToArticleDetail: (ArticleModel, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _ -> },
+    viewModel: FreeBoardViewModel = hiltViewModel(key = "fanTalk_${rankingItem.id}"),
+    articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -30,10 +33,24 @@ fun CommunityFanTalkSubPage(
         viewModel.sendIntent(FreeBoardContract.Intent.LoadInitialData)
     }
 
+    // ExoArticle 네비게이션 이벤트 처리
+    LaunchedEffect(Unit) {
+        articleViewModel.navigationEvent.collect { event ->
+            when (event) {
+                is ExoArticleNavigation.ArticleDetail -> {
+                    onNavigateToArticleDetail(event.article) { updatedArticle ->
+                        viewModel.updateArticle(updatedArticle)
+                    }
+                }
+                else -> { /* 다른 이벤트는 무시 */ }
+            }
+        }
+    }
+
     FreeBoardContent(
         state = state,
         onIntent = viewModel::sendIntent,
-        onNavigateToArticleDetail = onNavigateToArticleDetail,
-        isExternalIdolMode = viewModel.isExternalIdolMode
+        isExternalIdolMode = viewModel.isExternalIdolMode,
+        articleViewModel = articleViewModel
     )
 }

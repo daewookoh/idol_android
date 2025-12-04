@@ -43,11 +43,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
-import net.ib.mn.presentation.common.ArticleType
-import net.ib.mn.presentation.common.ExoArticle
+import net.ib.mn.presentation.common.ArticleItemType
+import net.ib.mn.presentation.common.ExoArticleItem
 import net.ib.mn.presentation.common.ExoArticleNavigation
 import net.ib.mn.presentation.common.ExoArticleViewModel
-import net.ib.mn.ui.components.ExoBoardNoticeItem
 import net.ib.mn.ui.components.ExoBottomSheetItem
 import net.ib.mn.ui.components.ExoBottomSheetList
 import net.ib.mn.ui.components.RankingItem
@@ -70,7 +69,7 @@ fun CommunityFeedSubPage(
     rankingItem: RankingItem,
     onFirstArticleVideoPlaying: (Boolean) -> Unit = {},
     onNavigateToProfile: (userId: Int, nickname: String, imageUrl: String?, level: Int, mostIdolName: String?) -> Unit = { _, _, _, _, _ -> },
-    onNavigateToArticleDetail: (ArticleModel) -> Unit = {},
+    onNavigateToArticleDetail: (ArticleModel, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _ -> },
     onNavigateToPhotoDetail: (ArticleModel, Int) -> Unit = { _, _ -> },
     viewModel: CommunityFeedViewModel = hiltViewModel(),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
@@ -92,7 +91,9 @@ fun CommunityFeedSubPage(
                     )
                 }
                 is ExoArticleNavigation.ArticleDetail -> {
-                    onNavigateToArticleDetail(event.article)
+                    onNavigateToArticleDetail(event.article) { updatedArticle ->
+                        viewModel.updateArticle(updatedArticle)
+                    }
                 }
                 is ExoArticleNavigation.MediaDetail -> {
                     onNavigateToPhotoDetail(event.article, event.mediaIndex)
@@ -145,18 +146,15 @@ fun CommunityFeedSubPage(
                 state = listState,
                 modifier = Modifier.fillMaxSize()
             ) {
-                // 공지사항 (ExoBoardNoticeItem 사용)
+                // 공지사항 (ExoArticleItem ADMIN_NOTICE 타입)
                 if (uiState.notices.isNotEmpty()) {
                     items(
                         items = uiState.notices,
                         key = { "notice_${it.id}" }
                     ) { notice ->
-                        ExoBoardNoticeItem(
-                            notice = notice,
-                            onItemClick = {
-                                onNavigateToArticleDetail(notice.toArticleModel())
-                            },
-                            showDivider = uiState.notices.indexOf(notice) != uiState.notices.lastIndex
+                        ExoArticleItem(
+                            article = notice.toArticleModel(),
+                            type = ArticleItemType.ADMIN_NOTICE
                         )
                     }
                 }
@@ -207,10 +205,10 @@ fun CommunityFeedSubPage(
                             }
                         }
 
-                        // ExoArticle - 모든 액션은 내부에서 처리
-                        ExoArticle(
+                        // ExoArticleItem - 모든 액션은 내부에서 처리
+                        ExoArticleItem(
                             article = article,
-                            type = ArticleType.FEED,
+                            type = ArticleItemType.FEED,
                             isVisible = isVisible,
                             showTranslation = true,
                             onDeleted = { deletedArticleId ->

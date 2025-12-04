@@ -6,11 +6,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.remote.dto.ArticleVoteResponse
 import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.domain.model.TagModel
 import net.ib.mn.domain.repository.ArticlesRepository
+import org.json.JSONArray
 import javax.inject.Inject
 
 /**
@@ -25,7 +27,8 @@ class ExoArticleViewModel @Inject constructor(
     private val articlesRepository: ArticlesRepository,
     private val userCacheRepository: net.ib.mn.data.repository.UserCacheRepository,
     private val reportRepository: net.ib.mn.data.repository.ReportRepository,
-    private val configRepository: net.ib.mn.domain.repository.ConfigRepository
+    private val configRepository: net.ib.mn.domain.repository.ConfigRepository,
+    private val preferencesManager: PreferencesManager
 ) : ViewModel() {
 
     /**
@@ -45,6 +48,25 @@ class ExoArticleViewModel @Inject constructor(
      */
     val reportHeart: Int
         get() = configRepository.getReportHeart()
+
+    /**
+     * tagId로 태그 이름 찾기 (FREE_BOARD에서 사용)
+     */
+    fun getTagName(tagId: Int): String? {
+        val tagsJson = preferencesManager.getBoardTagsSync() ?: return null
+        return try {
+            val jsonArray = JSONArray(tagsJson)
+            for (i in 0 until jsonArray.length()) {
+                val obj = jsonArray.getJSONObject(i)
+                if (obj.optInt("id") == tagId) {
+                    return obj.optString("name", null)
+                }
+            }
+            null
+        } catch (e: Exception) {
+            null
+        }
+    }
 
     // 네비게이션 이벤트
     private val _navigationEvent = MutableSharedFlow<ExoArticleNavigation>()

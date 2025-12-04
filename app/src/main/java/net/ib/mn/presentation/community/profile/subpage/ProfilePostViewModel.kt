@@ -122,6 +122,20 @@ class ProfilePostViewModel @Inject constructor(
             )
         }
     }
+
+    /**
+     * 게시글 업데이트 (좋아요/하트 등 상태 변경 시)
+     */
+    fun updateArticle(updatedArticle: ArticleModel) {
+        val index = posts.indexOfFirst { it.id == updatedArticle.id }
+        if (index >= 0) {
+            posts[index] = updatedArticle
+            _uiState.value = ProfilePostUiState.Success(
+                posts = posts.toList(),
+                hasMore = hasMoreData
+            )
+        }
+    }
 }
 
 /** UI 상태 */

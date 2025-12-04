@@ -153,6 +153,7 @@ fun CommunityScreen(
 
     // 게시글 상세 화면 상태
     var selectedArticle by remember { mutableStateOf<net.ib.mn.domain.model.ArticleModel?>(null) }
+    var articleUpdatedCallback by remember { mutableStateOf<((net.ib.mn.domain.model.ArticleModel) -> Unit)?>(null) }
 
     // 사진 상세 화면 상태 (article + 시작 인덱스)
     var selectedPhotoDetail by remember { mutableStateOf<Pair<net.ib.mn.domain.model.ArticleModel, Int>?>(null) }
@@ -329,7 +330,7 @@ fun CommunityScreen(
                                     mostIdolName = mostIdolName
                                 )
                             },
-                            onNavigateToArticleDetail = { article ->
+                            onNavigateToArticleDetail = { article, _ ->
                                 selectedArticle = article
                             },
                             onNavigateToPhotoDetail = { article, mediaIndex ->
@@ -339,8 +340,9 @@ fun CommunityScreen(
                         )
                         CommunityTab.FAN_TALK -> CommunityFanTalkSubPage(
                             rankingItem = rankingItem,
-                            onNavigateToArticleDetail = { article ->
+                            onNavigateToArticleDetail = { article, onArticleUpdated ->
                                 selectedArticle = article
+                                articleUpdatedCallback = onArticleUpdated
                             }
                         )
                         CommunityTab.CHAT -> CommunityChatSubPage(rankingItem = rankingItem)
@@ -709,13 +711,17 @@ fun CommunityScreen(
         selectedArticle?.let { article ->
             ArticleDetailScreen(
                 article = article,
+                idolName = rankingItem.name, // 커뮤니티에서 아이돌 이름 전달
                 onBackClick = {
                     selectedArticle = null
+                    articleUpdatedCallback = null
                 },
                 onArticleUpdated = { updatedArticle ->
                     // 실시간으로 ViewModel 직접 업데이트 (리스트 즉시 반영)
                     selectedArticle = updatedArticle
-                    feedViewModel.updateArticle(updatedArticle)
+                    // FAN_TALK 탭에서 온 경우 articleUpdatedCallback 호출
+                    articleUpdatedCallback?.invoke(updatedArticle)
+                        ?: feedViewModel.updateArticle(updatedArticle)
                 },
                 onArticleDeleted = {
                     // 삭제 완료 시: 화면 닫고 리스트에서 제거

@@ -104,4 +104,22 @@ object DateTimeUtil {
             ""
         }
     }
+
+    /**
+     * 날짜를 한국 시간대 기준 full 형식으로 포맷팅 (예: "2024.11.27 오후 5:05")
+     * 게시글에서 사용
+     */
+    fun formatFullDateKorea(dateString: String?): String {
+        if (dateString.isNullOrEmpty()) return ""
+
+        return try {
+            val date = parseServerDate(dateString) ?: return ""
+            val format = SimpleDateFormat("yyyy.M.d a h:mm", Locale.KOREA).apply {
+                timeZone = TimeZone.getTimeZone("Asia/Seoul")
+            }
+            format.format(date)
+        } catch (e: Exception) {
+            ""
+        }
+    }
 }

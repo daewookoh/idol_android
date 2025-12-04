@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import net.ib.mn.base.BaseViewModel
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.TagModel
 import net.ib.mn.domain.repository.ArticlesRepository
 import net.ib.mn.util.Constants
@@ -397,5 +398,17 @@ class FreeBoardViewModel @Inject constructor(
             )
         }
         loadArticles()
+    }
+
+    /**
+     * 게시글 업데이트 (좋아요 등 상태 변경 시 목록 동기화)
+     */
+    fun updateArticle(updatedArticle: ArticleModel) {
+        val currentArticles = uiState.value.articles.toMutableList()
+        val index = currentArticles.indexOfFirst { it.id == updatedArticle.id }
+        if (index >= 0) {
+            currentArticles[index] = updatedArticle
+            setState { copy(articles = currentArticles) }
+        }
     }
 }

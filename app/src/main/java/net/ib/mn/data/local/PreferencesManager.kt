@@ -12,6 +12,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import net.ib.mn.domain.model.MostPicksModel
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -252,7 +253,7 @@ class PreferencesManager @Inject constructor(
         .map { preferences ->
             val userId = preferences[KEY_USER_ID]
             if (userId != null) {
-                val info = UserInfo(
+                UserInfo(
                     id = userId,
                     email = preferences[KEY_USER_EMAIL] ?: "",
                     username = preferences[KEY_USER_USERNAME] ?: "",
@@ -275,24 +276,7 @@ class PreferencesManager @Inject constructor(
                     domain = preferences[KEY_USER_DOMAIN],
                     giveHeart = preferences[KEY_USER_GIVE_HEART]
                 )
-                logD("USER_INFO", "[PreferencesManager] DataStore emitting user info to collectors")
-                logD("USER_INFO", "[PreferencesManager]   - ID: ${info.id}")
-                logD("USER_INFO", "[PreferencesManager]   - Email: ${info.email}")
-                logD("USER_INFO", "[PreferencesManager]   - Username: ${info.username}")
-                logD("USER_INFO", "[PreferencesManager]   - Nickname: ${info.nickname}")
-                logD("USER_INFO", "[PreferencesManager]   - ProfileImage: ${info.profileImage}")
-                logD("USER_INFO", "[PreferencesManager]   - Hearts: ${info.heart}")
-                logD("USER_INFO", "[PreferencesManager]   - Diamond: ${info.diamond}")
-                logD("USER_INFO", "[PreferencesManager]   - StrongHeart: ${info.strongHeart}")
-                logD("USER_INFO", "[PreferencesManager]   - WeakHeart: ${info.weakHeart}")
-                logD("USER_INFO", "[PreferencesManager]   - Level: ${info.level}")
-                logD("USER_INFO", "[PreferencesManager]   - LevelHeart: ${info.levelHeart}")
-                logD("USER_INFO", "[PreferencesManager]   - Power: ${info.power}")
-                logD("USER_INFO", "[PreferencesManager]   - Domain: ${info.domain}")
-                logD("USER_INFO", "[PreferencesManager]   - TS: ${info.ts}")
-                info
             } else {
-                logD("USER_INFO", "[PreferencesManager] DataStore emitting null (no user info)")
                 null
             }
         }
@@ -388,6 +372,10 @@ class PreferencesManager @Inject constructor(
             preferences[KEY_BOARD_TAGS]
         }
 
+    fun getBoardTagsSync(): String? = runBlocking {
+        boardTags.first()
+    }
+
     val defaultCategory: Flow<String> = context.dataStore.data
         .map { preferences ->
             preferences[KEY_DEFAULT_CATEGORY] ?: Constants.TYPE_MALE
@@ -403,14 +391,9 @@ class PreferencesManager @Inject constructor(
     // ============================================================
 
     suspend fun setAccessToken(token: String) {
-        logD("USER_INFO", "[PreferencesManager] Writing access token to DataStore...")
-        logD("USER_INFO", "[PreferencesManager]   - Token preview: ${token.take(20)}...")
-
         context.dataStore.edit { preferences ->
             preferences[KEY_ACCESS_TOKEN] = token
         }
-
-        logD("USER_INFO", "[PreferencesManager] ✓ Access token written to DataStore")
     }
 
     suspend fun setAllIdolUpdate(timestamp: String) {
@@ -466,31 +449,6 @@ class PreferencesManager @Inject constructor(
         domain: String? = null,
         giveHeart: Int? = null
     ) {
-        logD("USER_INFO", "[PreferencesManager] ========================================")
-        logD("USER_INFO", "[PreferencesManager] Writing user info to DataStore...")
-        logD("USER_INFO", "[PreferencesManager]   - ID: $id")
-        logD("USER_INFO", "[PreferencesManager]   - Email: $email")
-        logD("USER_INFO", "[PreferencesManager]   - Username: $username")
-        logD("USER_INFO", "[PreferencesManager]   - Nickname: $nickname")
-        logD("USER_INFO", "[PreferencesManager]   - ProfileImage: $profileImage")
-        logD("USER_INFO", "[PreferencesManager]   - Heart: $heart")
-        logD("USER_INFO", "[PreferencesManager]   - Diamond: $diamond")
-        logD("USER_INFO", "[PreferencesManager]   - StrongHeart: $strongHeart")
-        logD("USER_INFO", "[PreferencesManager]   - WeakHeart: $weakHeart")
-        logD("USER_INFO", "[PreferencesManager]   - Level: $level")
-        logD("USER_INFO", "[PreferencesManager]   - LevelHeart: $levelHeart")
-        logD("USER_INFO", "[PreferencesManager]   - Power: $power")
-        logD("USER_INFO", "[PreferencesManager]   - ResourceUri: $resourceUri")
-        logD("USER_INFO", "[PreferencesManager]   - PushKey: $pushKey")
-        logD("USER_INFO", "[PreferencesManager]   - CreatedAt: $createdAt")
-        logD("USER_INFO", "[PreferencesManager]   - PushFilter: $pushFilter")
-        logD("USER_INFO", "[PreferencesManager]   - StatusMessage: $statusMessage")
-        logD("USER_INFO", "[PreferencesManager]   - TS: $ts")
-        logD("USER_INFO", "[PreferencesManager]   - ItemNo: $itemNo")
-        logD("USER_INFO", "[PreferencesManager]   - Domain: $domain")
-        logD("USER_INFO", "[PreferencesManager]   - GiveHeart: $giveHeart")
-        logD("USER_INFO", "[PreferencesManager] ========================================")
-
         context.dataStore.edit { preferences ->
             preferences[KEY_USER_ID] = id
             preferences[KEY_USER_EMAIL] = email
@@ -516,9 +474,6 @@ class PreferencesManager @Inject constructor(
             if (domain != null) preferences[KEY_USER_DOMAIN] = domain else preferences.remove(KEY_USER_DOMAIN)
             if (giveHeart != null) preferences[KEY_USER_GIVE_HEART] = giveHeart else preferences.remove(KEY_USER_GIVE_HEART)
         }
-
-        logD("USER_INFO", "[PreferencesManager] ✓ User info written to DataStore")
-        logD("USER_INFO", "[PreferencesManager]   - DataStore will now emit new value to all collectors")
     }
 
     suspend fun setTutorialCompleted(completed: Boolean) {
@@ -719,16 +674,10 @@ class PreferencesManager @Inject constructor(
      * 하트 값만 업데이트 (투표 후 사용)
      */
     suspend fun updateUserHearts(strongHeart: Long, weakHeart: Long) {
-        logD("PreferencesManager", "💗 Updating user hearts in DataStore...")
-        logD("PreferencesManager", "  - strongHeart: $strongHeart")
-        logD("PreferencesManager", "  - weakHeart: $weakHeart")
-
         context.dataStore.edit { preferences ->
             preferences[KEY_USER_STRONG_HEART] = strongHeart
             preferences[KEY_USER_WEAK_HEART] = weakHeart
         }
-
-        logD("PreferencesManager", "✅ User hearts updated in DataStore")
     }
 
     /**
@@ -755,18 +704,11 @@ class PreferencesManager @Inject constructor(
      * - SERVER_URL (서버 URL)
      */
     suspend fun clearAllExceptAuth() {
-        logD("PreferencesManager", "🔄 Clearing all data except auth credentials...")
-
         context.dataStore.edit { preferences ->
             // 토큰 및 로그인 정보 백업 (serverUrl은 백업하지 않음 - 서버 변경 시 새 URL로 교체되어야 함)
             val savedToken = preferences[KEY_ACCESS_TOKEN]
             val savedEmail = preferences[KEY_USER_EMAIL]
             val savedDomain = preferences[KEY_LOGIN_DOMAIN]
-
-            logD("PreferencesManager", "  - Backing up auth credentials:")
-            logD("PreferencesManager", "    Token: ${if (savedToken != null) "present" else "null"}")
-            logD("PreferencesManager", "    Email: $savedEmail")
-            logD("PreferencesManager", "    Domain: $savedDomain")
 
             // 모든 데이터 삭제
             preferences.clear()
@@ -775,8 +717,6 @@ class PreferencesManager @Inject constructor(
             savedToken?.let { preferences[KEY_ACCESS_TOKEN] = it }
             savedEmail?.let { preferences[KEY_USER_EMAIL] = it }
             savedDomain?.let { preferences[KEY_LOGIN_DOMAIN] = it }
-
-            logD("PreferencesManager", "✅ All data cleared except auth credentials")
         }
     }
 
@@ -800,7 +740,6 @@ class PreferencesManager @Inject constructor(
                 "GLOBAL" -> preferences[KEY_CHART_GLOBAL_IDS] = idsJson
             }
         }
-        logD("PreferencesManager", "✓ Saved ${idolIds.size} idol IDs for chart: $chartCode")
     }
 
     /**
@@ -853,7 +792,6 @@ class PreferencesManager @Inject constructor(
                 "GLOBAL", "GLOBALS" -> preferences[KEY_CHART_GLOBAL_RANKING] = rankingsJson
             }
         }
-        logD("PreferencesManager", "✓ Saved ${rankings.size} ranking items for chart: $chartCode")
     }
 
     /**
@@ -907,7 +845,6 @@ class PreferencesManager @Inject constructor(
         context.dataStore.edit { preferences ->
             preferences[KEY_USER_SELF_DATA] = json
         }
-        logD("PreferencesManager", "✓ Saved UserSelfData to SharedPreference")
     }
 
     /**
@@ -936,7 +873,6 @@ class PreferencesManager @Inject constructor(
             if (category != null) preferences[KEY_MOST_IDOL_CATEGORY] = category else preferences.remove(KEY_MOST_IDOL_CATEGORY)
             if (chartCode != null) preferences[KEY_MOST_IDOL_CHART_CODE] = chartCode else preferences.remove(KEY_MOST_IDOL_CHART_CODE)
         }
-        logD("PreferencesManager", "✓ Saved most idol info: id=$idolId, category=$category, chartCode=$chartCode")
     }
 
     /**
@@ -968,7 +904,6 @@ class PreferencesManager @Inject constructor(
         context.dataStore.edit { preferences ->
             preferences[KEY_FAVORITE_IDOL_IDS] = json
         }
-        logD("PreferencesManager", "✓ Saved ${idolIds.size} favorite idol IDs")
     }
 
     /**
@@ -1000,7 +935,6 @@ class PreferencesManager @Inject constructor(
                 preferences.remove(KEY_MOST_PICKS_MODEL)
             }
         }
-        logD("PreferencesManager", "✓ Saved most picks model: $model")
     }
 
     /**
@@ -1318,7 +1252,6 @@ class PreferencesManager @Inject constructor(
             // 원픽 또는 테마픽 중 하나라도 true면 원픽 NEW 뱃지 표시
             preferences[KEY_HAS_NEW_ONE_PICK] = onepick || themepick
         }
-        logD("PreferencesManager", "✓ Set new picks: heartpick=$heartpick, onepick=$onepick, themepick=$themepick")
     }
 
     /**

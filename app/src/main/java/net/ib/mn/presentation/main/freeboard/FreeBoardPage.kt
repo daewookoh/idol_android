@@ -53,9 +53,10 @@ import kotlinx.coroutines.flow.collectLatest
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.TagModel
-import net.ib.mn.ui.components.ExoBoardItem
-import net.ib.mn.ui.components.ExoBoardItemType
-import net.ib.mn.ui.components.ExoBoardNoticeItem
+import net.ib.mn.presentation.common.ArticleItemType
+import net.ib.mn.presentation.common.ExoArticleItem
+import net.ib.mn.presentation.common.ExoArticleNavigation
+import net.ib.mn.presentation.common.ExoArticleViewModel
 import net.ib.mn.ui.components.ExoBottomSheet
 import net.ib.mn.ui.components.ExoBottomSheetItem
 import net.ib.mn.ui.components.ExoBottomSheetList
@@ -69,8 +70,9 @@ import net.ib.mn.util.BoardLanguage
 @Composable
 fun FreeBoardPage(
     onNavigateToWrite: () -> Unit = {},
-    onNavigateToArticleDetail: (ArticleModel) -> Unit = {},
-    viewModel: FreeBoardViewModel = hiltViewModel()
+    onNavigateToArticleDetail: (ArticleModel, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _ -> },
+    viewModel: FreeBoardViewModel = hiltViewModel(),
+    articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -99,10 +101,24 @@ fun FreeBoardPage(
         }
     }
 
+    // ExoArticle 네비게이션 이벤트 처리
+    LaunchedEffect(Unit) {
+        articleViewModel.navigationEvent.collect { event ->
+            when (event) {
+                is ExoArticleNavigation.ArticleDetail -> {
+                    onNavigateToArticleDetail(event.article) { updatedArticle ->
+                        viewModel.updateArticle(updatedArticle)
+                    }
+                }
+                else -> { /* 다른 이벤트는 무시 */ }
+            }
+        }
+    }
+
     FreeBoardContent(
         state = state,
         onIntent = viewModel::sendIntent,
-        onNavigateToArticleDetail = onNavigateToArticleDetail
+        articleViewModel = articleViewModel
     )
 }
 
@@ -111,16 +127,16 @@ fun FreeBoardPage(
  *
  * @param state FreeBoardContract.State
  * @param onIntent Intent 핸들러
- * @param onNavigateToArticleDetail 게시글 상세 화면 이동 콜백
  * @param isExternalIdolMode 외부에서 idolId를 전달받은 모드 (태그탭 숨김, 글쓰기 버튼 표시)
+ * @param articleViewModel ExoArticleViewModel
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FreeBoardContent(
     state: FreeBoardContract.State,
     onIntent: (FreeBoardContract.Intent) -> Unit,
-    onNavigateToArticleDetail: (ArticleModel) -> Unit = {},
-    isExternalIdolMode: Boolean = false
+    isExternalIdolMode: Boolean = false,
+    articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
     // state.searchKeyword와 동기화되는 검색 텍스트
     var searchText by remember { mutableStateOf(state.searchKeyword ?: "") }
@@ -282,15 +298,12 @@ fun FreeBoardContent(
                                 contentType = { "notice" }
                             ) { index ->
                                 val notice = state.notices[index]
-                                val isLastNotice = index == state.notices.size - 1
 
                                 key(notice.id) {
-                                    ExoBoardNoticeItem(
-                                        notice = notice,
-                                        onItemClick = {
-                                            onNavigateToArticleDetail(notice.toArticleModel())
-                                        },
-                                        showDivider = !isLastNotice // 마지막 공지는 구분선 표시 안함
+                                    ExoArticleItem(
+                                        article = notice.toArticleModel(),
+                                        type = ArticleItemType.ADMIN_NOTICE,
+                                        viewModel = articleViewModel
                                     )
                                 }
                             }
@@ -304,13 +317,11 @@ fun FreeBoardContent(
                                 val article = state.articles[index]
 
                                 key(article.id) {
-                                    ExoBoardItem(
+                                    ExoArticleItem(
                                         article = article,
-                                        onItemClick = {
-                                            onNavigateToArticleDetail(article)
-                                        },
-                                        itemType = ExoBoardItemType.MINI,
-                                        showPopularIcon = showPopularIcon
+                                        type = ArticleItemType.FREE_BOARD,
+                                        showPopularIcon = showPopularIcon,
+                                        viewModel = articleViewModel
                                     )
                                 }
                             }
