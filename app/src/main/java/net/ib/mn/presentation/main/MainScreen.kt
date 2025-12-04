@@ -48,6 +48,7 @@ import net.ib.mn.ui.components.LocalIdolRankingHistoryClick
 import net.ib.mn.ui.components.LocalRankingItemClick
 import java.util.Locale
 import androidx.compose.animation.AnimatedVisibility
+import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 
@@ -286,7 +287,7 @@ fun MainScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         selectedNoticeArticle?.let { article ->
-            Box(modifier = Modifier.fillMaxSize().background(colorResource(R.color.background_100))) {
+            Box(modifier = Modifier.fillMaxSize().background(ColorPalette.background100)) {
                 WebViewScreen(
                     htmlContent = article.contentHtml ?: article.content,
                     baseUrl = ServerUrl.HOST,

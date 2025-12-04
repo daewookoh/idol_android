@@ -1,5 +1,6 @@
 package net.ib.mn.ui.components
 
+import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.Box
@@ -33,48 +34,31 @@ fun ExoWebView(
 ) {
     var isLoading by remember { mutableStateOf(true) }
 
-    val wrappedHtml = remember(htmlContent) {
-        if (htmlContent.isNullOrEmpty()) null
-        else wrapHtmlContent(htmlContent)
-    }
-
     Box(modifier = modifier.fillMaxSize()) {
         AndroidView(
             factory = { context ->
                 WebView(context).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
                     settings.apply {
                         javaScriptEnabled = true
                         domStorageEnabled = true
                         setSupportZoom(true)
-                        builtInZoomControls = false
+                        builtInZoomControls = true
                         displayZoomControls = false
-                        useWideViewPort = true
-                        loadWithOverviewMode = true
+                        textZoom = 103
                     }
-
                     webViewClient = object : WebViewClient() {
                         override fun onPageFinished(view: WebView?, url: String?) {
                             super.onPageFinished(view, url)
                             isLoading = false
                         }
-
-                        @Deprecated("Deprecated in Java")
-                        override fun onReceivedError(
-                            view: WebView?,
-                            errorCode: Int,
-                            description: String?,
-                            failingUrl: String?
-                        ) {
-                            super.onReceivedError(view, errorCode, description, failingUrl)
-                            isLoading = false
-                        }
                     }
-
-                    setBackgroundColor(android.graphics.Color.WHITE)
-
                     when {
-                        !wrappedHtml.isNullOrEmpty() -> {
-                            loadDataWithBaseURL(baseUrl, wrappedHtml, "text/html", "UTF-8", null)
+                        !htmlContent.isNullOrEmpty() -> {
+                            loadDataWithBaseURL(baseUrl, htmlContent, "text/html; charset=utf-8", "UTF-8", null)
                         }
                         !url.isNullOrEmpty() -> {
                             loadUrl(url)
@@ -95,37 +79,4 @@ fun ExoWebView(
             )
         }
     }
-}
-
-/**
- * HTML 콘텐츠를 적절한 CSS 스타일과 함께 래핑
- */
-private fun wrapHtmlContent(content: String): String {
-    return """
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-            <style>
-                * { box-sizing: border-box; }
-                html, body {
-                    margin: 0;
-                    padding: 16px;
-                    background-color: #FFFFFF;
-                    color: #000000;
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                    font-size: 16px;
-                    line-height: 1.6;
-                    word-wrap: break-word;
-                    overflow-wrap: break-word;
-                }
-                img { max-width: 100%; height: auto; }
-                a { color: #007AFF; }
-                p { margin: 0 0 16px 0; }
-            </style>
-        </head>
-        <body>$content</body>
-        </html>
-    """.trimIndent()
 }
