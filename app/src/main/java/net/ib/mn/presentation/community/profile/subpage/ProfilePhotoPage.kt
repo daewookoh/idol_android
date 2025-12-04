@@ -154,7 +154,7 @@ private fun PrivateContent() {
             )
             Spacer(modifier = Modifier.height(14.dp))
             Text(
-                text = stringResource(R.string.feed_private),
+                text = stringResource(R.string.feed_is_private),
                 color = ColorPalette.textGray,
                 fontSize = 12.sp
             )
