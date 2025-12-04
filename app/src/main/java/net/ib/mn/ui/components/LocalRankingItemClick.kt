@@ -26,3 +26,14 @@ val LocalRankingItemClick = compositionLocalOf<(RankingItem) -> Unit> {
     // 기본값: 아무 동작도 하지 않음
     { _ -> }
 }
+
+/**
+ * IdolRankingHistory 화면으로 이동하기 위한 CompositionLocal
+ *
+ * CUMULATIVE 타입 랭킹 아이템 클릭 시 사용됩니다.
+ * MainScreen에서 제공하고, cumulativeRankingItems에서 소비합니다.
+ */
+val LocalIdolRankingHistoryClick = compositionLocalOf<(RankingItem) -> Unit> {
+    // 기본값: 아무 동작도 하지 않음
+    { _ -> }
+}

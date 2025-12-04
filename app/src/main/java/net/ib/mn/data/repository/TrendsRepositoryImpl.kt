@@ -5,7 +5,9 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
 import net.ib.mn.data.remote.api.TrendsApi
 import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.domain.model.IdolRankingHistoryModel
 import net.ib.mn.domain.model.TrendsModel
+import net.ib.mn.domain.repository.IdolRankingHistoryResponse
 import net.ib.mn.domain.repository.TrendsRepository
 import net.ib.mn.domain.repository.TrendsResponse
 import org.json.JSONObject
@@ -46,6 +48,31 @@ class TrendsRepositoryImpl @Inject constructor(
                     items = items,
                     totalCount = totalCount,
                     hasMore = offset + items.size < totalCount
+                )
+            }
+        )
+
+    override fun getIdolRankingHistory(idolId: Int): Flow<ApiResult<IdolRankingHistoryResponse>> =
+        safeApiCallWithJsonString(
+            apiCall = { trendsApi.getRecent(idolId, null, null) },
+            parser = { json ->
+                val jsonObject = JSONObject(json)
+                val gson = GsonBuilder()
+                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                    .create()
+                val listType = object : TypeToken<List<IdolRankingHistoryModel>>() {}.type
+
+                val items: List<IdolRankingHistoryModel> = gson.fromJson(
+                    jsonObject.optJSONArray("objects")?.toString() ?: "[]",
+                    listType
+                )
+
+                val meta = jsonObject.optJSONObject("meta")
+                val totalCount = meta?.optInt("total_count") ?: items.size
+
+                IdolRankingHistoryResponse(
+                    items = items,
+                    totalCount = totalCount
                 )
             }
         )

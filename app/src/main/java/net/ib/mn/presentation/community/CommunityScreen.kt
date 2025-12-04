@@ -143,6 +143,7 @@ fun CommunityScreen(
     var showChangeMostDialog by remember { mutableStateOf(false) }
     var showVoterTop100Screen by remember { mutableStateOf(false) }
     var showTrendsScreen by remember { mutableStateOf(false) }
+    var showIdolIdolRankingHistoryScreen by remember { mutableStateOf(false) }
     var selectedTrendsItem by remember { mutableStateOf<net.ib.mn.domain.model.TrendsModel?>(null) }
     var currentIsMost by remember(initialIsMost) { mutableStateOf(initialIsMost) }
     var currentIsFavorite by remember(initialIsFavorite) { mutableStateOf(initialIsFavorite) }
@@ -192,6 +193,8 @@ fun CommunityScreen(
     BackHandler {
         if (selectedUserProfile != null) {
             selectedUserProfile = null
+        } else if (showIdolIdolRankingHistoryScreen) {
+            showIdolIdolRankingHistoryScreen = false
         } else if (showTrendsScreen) {
             showTrendsScreen = false
         } else if (showVoterTop100Screen) {
@@ -511,7 +514,7 @@ fun CommunityScreen(
             },
             onRankHistoryClick = {
                 showIdolDialog = false
-                // TODO: 랭킹 변동 화면으로 이동
+                showIdolIdolRankingHistoryScreen = true
             },
             onShareClick = {
                 showIdolDialog = false
@@ -643,6 +646,19 @@ fun CommunityScreen(
                     selectedTrendsItem = trendsItem
                 }
             }
+        )
+    }
+
+    // IdolRankingHistoryScreen (랭킹 변동)
+    AnimatedVisibility(
+        visible = showIdolIdolRankingHistoryScreen,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        IdolRankingHistoryScreen(
+            idolId = idolId ?: 0,
+            idolName = rankingItem.name,
+            onBackClick = { showIdolIdolRankingHistoryScreen = false }
         )
     }
 

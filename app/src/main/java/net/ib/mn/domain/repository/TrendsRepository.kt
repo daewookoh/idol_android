@@ -2,6 +2,7 @@ package net.ib.mn.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.domain.model.IdolRankingHistoryModel
 import net.ib.mn.domain.model.TrendsModel
 
 /**
@@ -21,6 +22,14 @@ interface TrendsRepository {
         offset: Int = 0,
         limit: Int = 30
     ): Flow<ApiResult<TrendsResponse>>
+
+    /**
+     * 랭킹 변동 히스토리 조회
+     * Old: HallOfFameAggHistoryActivity의 trendsRepository.recent() 참고
+     *
+     * @param idolId 아이돌 ID
+     */
+    fun getIdolRankingHistory(idolId: Int): Flow<ApiResult<IdolRankingHistoryResponse>>
 }
 
 /**
@@ -30,4 +39,12 @@ data class TrendsResponse(
     val items: List<TrendsModel>,
     val totalCount: Int,
     val hasMore: Boolean
+)
+
+/**
+ * 랭킹 히스토리 응답 데이터
+ */
+data class IdolRankingHistoryResponse(
+    val items: List<IdolRankingHistoryModel>,
+    val totalCount: Int
 )

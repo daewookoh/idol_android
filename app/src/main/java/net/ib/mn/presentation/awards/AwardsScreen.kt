@@ -1,6 +1,10 @@
 package net.ib.mn.presentation.awards
 
 import android.content.Intent
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,7 +23,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import net.ib.mn.R
+import net.ib.mn.presentation.community.IdolRankingHistoryScreen
 import net.ib.mn.presentation.awards.subpage.AwardsCumulativeSubPage
 import net.ib.mn.presentation.awards.subpage.AwardsDailySubPage
 import net.ib.mn.presentation.awards.subpage.AwardsGuideSubPage
@@ -60,53 +69,84 @@ fun AwardsScreen(
     val pagerState = rememberPagerState(initialPage = 2) { tabs.size }
     val coroutineScope = rememberCoroutineScope()
 
-    ExoScaffold(
-        topBar = {
-            ExoAppBar(
-                title = awardModel?.awardTitle.orEmpty(),
-                onNavigationClick = onNavigateBack,
-                actions = {
-                    IconButton(
-                        onClick = {
-                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                putExtra(Intent.EXTRA_TEXT, viewModel.getShareMessage())
-                                type = "text/plain"
+    // IdolRankingHistoryScreen 상태
+    var showIdolIdolRankingHistoryScreen by remember { mutableStateOf(false) }
+    var selectedIdolId by remember { mutableIntStateOf(0) }
+    var selectedIdolName by remember { mutableStateOf("") }
+
+    // IdolRankingHistoryScreen 백 핸들러
+    BackHandler(enabled = showIdolIdolRankingHistoryScreen) {
+        showIdolIdolRankingHistoryScreen = false
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        ExoScaffold(
+            topBar = {
+                ExoAppBar(
+                    title = awardModel?.awardTitle.orEmpty(),
+                    onNavigationClick = onNavigateBack,
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                    putExtra(Intent.EXTRA_TEXT, viewModel.getShareMessage())
+                                    type = "text/plain"
+                                }
+                                context.startActivity(Intent.createChooser(shareIntent, null))
+                            },
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.btn_navigation_share),
+                                contentDescription = null,
+                                tint = Color.Unspecified
+                            )
+                        }
+                    }
+                )
+            }
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) { page ->
+                    when (page) {
+                        0 -> AwardsGuideSubPage()
+                        1 -> AwardsCumulativeSubPage(
+                            onItemClick = { item ->
+                                selectedIdolId = item.idolId
+                                selectedIdolName = item.idol?.name.orEmpty()
+                                showIdolIdolRankingHistoryScreen = true
                             }
-                            context.startActivity(Intent.createChooser(shareIntent, null))
-                        },
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.btn_navigation_share),
-                            contentDescription = null,
-                            tint = Color.Unspecified
                         )
+                        2 -> AwardsDailySubPage()
                     }
                 }
-            )
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) { page ->
-                when (page) {
-                    0 -> AwardsGuideSubPage()
-                    1 -> AwardsCumulativeSubPage()
-                    2 -> AwardsDailySubPage()
-                }
-            }
 
-            AwardsBottomTabBar(
-                tabs = tabs,
-                pagerState = pagerState,
-                coroutineScope = coroutineScope
+                AwardsBottomTabBar(
+                    tabs = tabs,
+                    pagerState = pagerState,
+                    coroutineScope = coroutineScope
+                )
+            }
+        }
+
+        // IdolRankingHistoryScreen (랭킹 변동)
+        AnimatedVisibility(
+            visible = showIdolIdolRankingHistoryScreen,
+            enter = slideInHorizontally(initialOffsetX = { it }),
+            exit = slideOutHorizontally(targetOffsetX = { it })
+        ) {
+            IdolRankingHistoryScreen(
+                idolId = selectedIdolId,
+                idolName = selectedIdolName,
+                onBackClick = { showIdolIdolRankingHistoryScreen = false }
             )
         }
     }

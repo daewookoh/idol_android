@@ -9,8 +9,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.ib.mn.ui.theme.ColorPalette
@@ -57,6 +55,11 @@ data class RankingItem(
     val resourceUri: String? = null,  // API resource URI (ex: "/api/v1/idols/123/")
     val category: String? = null,  // 카테고리 (M/F)
     val chartCode: String? = null,  // 차트 코드
+
+    // 명예의 전당 누적 순위용 필드
+    val status: String? = null,  // 순위 변동 상태 ("NEW", "INCREASE", "DECREASE", "SAME")
+    val difference: Int = 0,  // 순위 변동 수치
+    val suddenIncrease: Boolean = false,  // 급상승 여부
 ) {
     /**
      * 현재 로케일에 맞는 이름 반환
@@ -114,20 +117,57 @@ data class RankingItem(
         if (top3ImageUrls != other.top3ImageUrls) return false
         if (top3VideoUrls != other.top3VideoUrls) return false
 
+        // 9. 누적순위용 필드 (순위 변동, 급상승)
+        if (status != other.status) return false
+        if (difference != other.difference) return false
+        if (suddenIncrease != other.suddenIncrease) return false
+
         return true
     }
 
     // equals를 override하면 hashCode도 override 필요
     override fun hashCode(): Int {
         var result = id.hashCode()
-        result = 31 * result + (rank ?: 0)
+        result = 31 * result + rank
         result = 31 * result + heartCount.hashCode()
         result = 31 * result + voteCount.hashCode()
         result = 31 * result + miracleCount
         result = 31 * result + fairyCount
         result = 31 * result + angelCount
         result = 31 * result + isFavorite.hashCode()
+        result = 31 * result + (status?.hashCode() ?: 0)
+        result = 31 * result + suddenIncrease.hashCode()
         return result
+    }
+
+    companion object {
+        /**
+         * AggregateRankModel을 RankingItem으로 변환
+         *
+         * @param model AggregateRankModel (API 응답 데이터)
+         * @param cdnUrl CDN 베이스 URL (이미지 URL 생성용)
+         * @return RankingItem
+         */
+        fun fromAggregateRankModel(
+            model: net.ib.mn.data.remote.dto.AggregateRankModel,
+            cdnUrl: String
+        ): RankingItem {
+            val imageUrl = net.ib.mn.util.IdolImageUtil.getTrendImageUrl(
+                cdnUrl = cdnUrl,
+                trendId = model.trendId
+            )
+            return RankingItem(
+                id = model.idolId.toString(),
+                name = model.name,
+                rank = model.scoreRank,
+                voteCount = model.score.toString(),
+                heartCount = model.score.toLong(),
+                photoUrl = imageUrl,
+                status = model.status.ifEmpty { null },
+                difference = model.difference,
+                suddenIncrease = model.suddenIncrease
+            )
+        }
     }
 }
 

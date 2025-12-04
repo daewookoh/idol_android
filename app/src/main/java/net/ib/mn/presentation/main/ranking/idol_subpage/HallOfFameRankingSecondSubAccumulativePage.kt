@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -15,21 +14,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import net.ib.mn.ui.components.ExoTabSwitch
+import net.ib.mn.ui.components.HofAccumulativeTop1RankingItem
+import net.ib.mn.ui.components.RankingItem
+import net.ib.mn.ui.components.cumulativeRankingItems
+import net.ib.mn.ui.theme.ColorPalette
 import java.text.DateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.GregorianCalendar
 import java.util.Locale
-import net.ib.mn.ui.components.ExoTabSwitch
-import net.ib.mn.ui.components.HofAccumulativeRankingItem
-import net.ib.mn.ui.components.HofAccumulativeTop1RankingItem
-import net.ib.mn.ui.theme.ColorPalette
 
 /**
  * 명예전당 - 30일 누적 순위 서브 페이지
@@ -148,6 +147,13 @@ fun HallOfFameRankingSecondSubAccumulativePage(
                         "$fromText ~ $toText"
                     }
 
+                    // 2위 이하 데이터를 RankingItem으로 변환
+                    val rankingItems = remember(rankingData, cdnUrl) {
+                        rankingData.drop(1).map { model ->
+                            RankingItem.fromAggregateRankModel(model, cdnUrl)
+                        }
+                    }
+
                     LazyColumn(
                         state = listState,
                         modifier = Modifier.fillMaxSize()
@@ -168,18 +174,11 @@ fun HallOfFameRankingSecondSubAccumulativePage(
                             }
                         }
 
-                        // 2위 이하
-                        items(
-                            items = rankingData.drop(1),
-                            key = { item -> item.idolId }
-                        ) { item ->
-                            HofAccumulativeRankingItem(
-                                item = item,
-                                cdnUrl = cdnUrl,
-                                onItemClick = {
-                                }
-                            )
-                        }
+                        // 2위 이하 (CUMULATIVE 타입 사용)
+                        cumulativeRankingItems(
+                            items = rankingItems,
+                            onItemClick = { _, _ -> }
+                        )
                     }
                 }
             }

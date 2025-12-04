@@ -147,7 +147,7 @@ fun AwardsCumulativeSubPage(
                         // 5. 랭킹 리스트
                         exoRankingItems(
                             items = rankingItems,
-                            type = RankingItemType.AWARDS_CUMULATIVE,
+                            type = RankingItemType.CUMULATIVE,
                             onItemClick = { index, _ ->
                                 state.rankItems.getOrNull(index)?.let { onItemClick(it) }
                             }

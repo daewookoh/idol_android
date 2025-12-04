@@ -434,6 +434,9 @@ dependencies {
     // YouTube Player
     implementation(libs.android.youtube.player)
 
+    // MPAndroidChart (순위 변동 차트)
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
     // PhotoView
     implementation(libs.photoview) {
         exclude(group = "com.android.support")

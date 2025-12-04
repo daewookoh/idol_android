@@ -37,7 +37,9 @@ import net.ib.mn.presentation.main.myfavorite.MyFavoritePage
 import net.ib.mn.presentation.main.myinfo.MyInfoPage
 import net.ib.mn.presentation.main.ranking.RankingPage
 import net.ib.mn.presentation.community.CommunityScreen
+import net.ib.mn.presentation.community.IdolRankingHistoryScreen
 import net.ib.mn.presentation.community.profile.ProfileScreen
+import net.ib.mn.ui.components.LocalIdolRankingHistoryClick
 import net.ib.mn.ui.components.LocalRankingItemClick
 import java.util.Locale
 import androidx.compose.animation.AnimatedVisibility
@@ -60,6 +62,7 @@ fun MainScreen(
     val timerText by topBarViewModel.timerText.collectAsState()
     val hasNewNotification by topBarViewModel.hasNewNotification.collectAsState()
     val selectedRankingItem by viewModel.selectedRankingItem.collectAsState()
+    val selectedIdolRankingHistoryItem by viewModel.selectedIdolRankingHistoryItem.collectAsState()
     val currentCategory by viewModel.currentCategory.collectAsState()
     val defaultCategory = currentCategory ?: Constants.TYPE_MALE
 
@@ -134,7 +137,10 @@ fun MainScreen(
         painterResource(R.drawable.btn_bottom_nav_menu_off)
     )
 
-    CompositionLocalProvider(LocalRankingItemClick provides viewModel::openCommunity) {
+    CompositionLocalProvider(
+        LocalRankingItemClick provides viewModel::openCommunity,
+        LocalIdolRankingHistoryClick provides viewModel::openIdolRankingHistory
+    ) {
         ExoScaffold(
             topBar = {
                 MainTopBar(
@@ -201,6 +207,15 @@ fun MainScreen(
             showChattingTab = showChattingTab,
             fandomName = rankingItem.fandomName,
             onBackClick = viewModel::closeCommunity
+        )
+    }
+
+    // CUMULATIVE 아이템 클릭 시 IdolRankingHistoryScreen 표시
+    selectedIdolRankingHistoryItem?.let { rankingItem ->
+        IdolRankingHistoryScreen(
+            idolId = rankingItem.id.toIntOrNull() ?: 0,
+            idolName = rankingItem.name,
+            onBackClick = viewModel::closeIdolRankingHistory
         )
     }
 

@@ -52,6 +52,10 @@ class MainViewModel @Inject constructor(
     private val _selectedRankingItem = MutableStateFlow<net.ib.mn.ui.components.RankingItem?>(null)
     val selectedRankingItem: StateFlow<net.ib.mn.ui.components.RankingItem?> = _selectedRankingItem.asStateFlow()
 
+    // IdolRankingHistoryScreen 표시 상태 (CUMULATIVE 아이템 클릭 시 사용)
+    private val _selectedIdolRankingHistoryItem = MutableStateFlow<net.ib.mn.ui.components.RankingItem?>(null)
+    val selectedIdolRankingHistoryItem: StateFlow<net.ib.mn.ui.components.RankingItem?> = _selectedIdolRankingHistoryItem.asStateFlow()
+
     // 즉시 반응하는 로컬 카테고리 상태 (UI 반응성 개선)
     private val _currentCategory = MutableStateFlow<String?>(null)
     val currentCategory: StateFlow<String?> = _currentCategory.asStateFlow()
@@ -90,6 +94,20 @@ class MainViewModel @Inject constructor(
      */
     fun openCommunity(rankingItem: net.ib.mn.ui.components.RankingItem) {
         _selectedRankingItem.value = rankingItem
+    }
+
+    /**
+     * IdolRankingHistoryScreen 열기 (CUMULATIVE 아이템 클릭 시)
+     */
+    fun openIdolRankingHistory(rankingItem: net.ib.mn.ui.components.RankingItem) {
+        _selectedIdolRankingHistoryItem.value = rankingItem
+    }
+
+    /**
+     * IdolRankingHistoryScreen 닫기
+     */
+    fun closeIdolRankingHistory() {
+        _selectedIdolRankingHistoryItem.value = null
     }
 
     /**
