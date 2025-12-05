@@ -893,7 +893,7 @@ Pilih \'Seleb Saya\' sekarang?</string>
     <string name="all_users_are_given">Semua pengguna pertama</string>
     <string name="daily_pack_modifier">Berikan sepenuh hati pada \'Idol Saya\' setiap hari</string>
     <string name="actor_daily_pack_modifier">Berikan sepenuh hati kepada \'Seleb Saya\'  setiap hari</string>
-    <string name="describe_monthly_payment">Setelah %1$d minggu, Anda akan ditagih sebesar %2$s/bulan secara otomatis.\nAnda dapat membatalkan pembayaran kapan pun Anda mau.</string>
+    <string name="describe_monthly_payment">Uji coba %1$d minggu gratis; lalu %2$s/bulan jika tidak dibatalkan.\nBatalkan di Google Play 24 jam sebelum perpanjangan.</string>
     <string name="subscribed">Dibeli</string>
     <string name="month">bulan</string>
     <string name="important">Harus dibaca</string>
@@ -1835,7 +1835,7 @@ Berikan hadiah spesial untuk idola saya di CHOEAEDOL!💖</string>
     <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 Voting akan segera dimulai di CHOEAEDOL Celeb! 🏆\nBersiaplah untuk bersorak agar favoritmu mendapat tempat pertama!\n⏰ Pemungutan suara dimulai: %s\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 Voting sengit sedang berlangsung untuk CHOEAEDOL Celeb 🗳️\nDukung favoritmu dengan hati sekarang! 💖\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 Siapa yang akan menjadi pemenang kemenangan?! 🫣\nLihat di CHOEAEDOL Celeb sekarang!\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
-    <string name="login_desc">Mulailah dalam 5 detik!</string>
+    <string name="login_desc">⚡️Mulai dalam 3 detik\nLihat peringkat idol sekarang!</string>
     <string name="login_email">mulai dengan email</string>
     <string name="hometab_title_rank">Ranking</string>
     <string name="hometab_title_myidol">My Idol</string>
@@ -1940,5 +1940,7 @@ Silakan beralih ke negara atau wilayah lain dan coba lagi.</string>
     <string name="signup_desc2_noreward">Masukkan kode undangan dari teman yang merekomendasikan Anda untuk bertukar Hati sebagai teman.</string>
     <string name="signup_toast_auto_fill_recommender">Kode undangan yang disalin telah dimasukkan secara otomatis.</string>
     <string name="vote_ranking">Sudah voting</string>
-    <string name="heart_arcade_description1">Main mini-game🕹️ dan dapatkan hati🩷</string>
+    <string name="heart_arcade_description1">Main mini-game dan dapatkan hati!</string>
+    <string name="celeb_login_desc">⚡️Mulai dalam 3 detik\nLihat peringkat aktor sekarang!</string>
+    <string name="describe_monthly_payment_ios">Uji coba %1$d minggu gratis; lalu %2$s/bulan jika tidak dibatalkan.\nBatalkan di App Store 24 jam sebelum perpanjangan.</string>
 </resources>

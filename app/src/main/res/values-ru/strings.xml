@@ -176,7 +176,7 @@
     <string name="title_faq">FAQ</string>
     <string name="title_inquiry">FAQ / Запросы</string>
     <string name="title_myinquirylist">Моя история запросов</string>
-    <string name="title_voting_guide">Накопленные голоса</string>
+    <string name="title_voting_guide">Мои накопленные голоса</string>
     <string name="hint_inquiry">Пожалуйста, введите ваш вопрос.</string>
     <string name="title_rename">Изменить ник</string>
     <string name="hint_nickname">Ник</string>
@@ -781,7 +781,7 @@
     <string name="all_users_are_given">Все пользователи даны</string>
     <string name="daily_pack_modifier">Дарите полные сердца своему айдолу каждый день</string>
     <string name="actor_daily_pack_modifier">Дарите всем своим селебрити полные сердца каждый день</string>
-    <string name="describe_monthly_payment">Через %1$d неделю с вас будет автоматически списываться %2$s долларов в месяц.\nВы можете отменить платеж в любое время.</string>
+    <string name="describe_monthly_payment">%1$d неделя бесплатно; далее %2$s/мес, если не отменить.\nОтмените в Google Play за 24 часа до продления.</string>
     <string name="subscribed">Купленный</string>
     <string name="month">месяц</string>
     <string name="important">Важный!</string>
@@ -1707,7 +1707,7 @@
     <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 Скоро начнется голосование на Чоедоле! 🏆\nПриготовьтесь поболеть за своего фаворита, который займет первое место!\n⏰ Начало голосования: %s\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 Идет жестокое голосование за Чоедола 🗳️\nПоддержите любимца сердечками прямо сейчас! 💖\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 Кто станет обладателем славы?! 🫣\nПосмотрите на Choeadol прямо сейчас!\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
-    <string name="login_desc">Начните за 5 секунд!</string>
+    <string name="login_desc">⚡️Начните за 3 секунды\nСмотреть рейтинг айдолов!</string>
     <string name="login_email">начни с электронной почты</string>
     <string name="hometab_title_rank">Ranking</string>
     <string name="hometab_title_myidol">My Idol</string>
@@ -1812,5 +1812,7 @@
     <string name="signup_desc2_noreward">Введите код приглашения от вашего друга, чтобы обменяться сердечками.</string>
     <string name="signup_toast_auto_fill_recommender">Скопированный код приглашения был введен автоматически.</string>
     <string name="vote_ranking">Проголосовано</string>
-    <string name="heart_arcade_description1">Играйте в мини-игры🕹️ и получайте сердечки🩷</string>
+    <string name="heart_arcade_description1">Играйте в мини-игры и получайте сердечки!</string>
+    <string name="celeb_login_desc">⚡️Начните за 3 секунды\nСмотреть рейтинг актёров!</string>
+    <string name="describe_monthly_payment_ios">%1$d неделя бесплатно; далее %2$s/мес, если не отменить.\nОтмените в App Store за 24 часа до продления.</string>
 </resources>

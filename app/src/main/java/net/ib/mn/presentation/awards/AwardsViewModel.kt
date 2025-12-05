@@ -22,6 +22,18 @@ private const val GUIDE_DESC_SEPARATOR = "|"
 private const val GUIDE_DESC_FIELD_COUNT = 11
 
 /**
+ * 투표 상태
+ * - BEFORE: 투표 전 (라인업만 표시)
+ * - RUNNING: 투표 중 (누적, 실시간 탭 표시)
+ * - AFTER: 투표 후 (누적만 표시)
+ */
+enum class VotableState {
+    BEFORE,  // "B"
+    RUNNING, // "Y"
+    AFTER    // "A"
+}
+
+/**
  * AwardsViewModel - 어워즈 화면 ViewModel
  */
 @HiltViewModel
@@ -34,6 +46,15 @@ class AwardsViewModel @Inject constructor(
 
     private val votable: String
         get() = configRepository.getVotable()
+
+    /**
+     * 투표 상태 반환
+     */
+    fun getVotableState(): VotableState = when (votable) {
+        "B" -> VotableState.BEFORE
+        "Y" -> VotableState.RUNNING
+        else -> VotableState.AFTER
+    }
 
     /**
      * 가이드 설명 데이터 파싱 (pipe-delimited)

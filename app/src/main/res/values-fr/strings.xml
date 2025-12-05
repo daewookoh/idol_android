@@ -751,7 +751,7 @@
     <string name="all_users_are_given">Tous les utilisateurs sont donnés</string>
     <string name="daily_pack_modifier">Donnez des coeurs à votre idole chaque jour</string>
     <string name="actor_daily_pack_modifier">Donnez un cœur plein à votre célébrité tous les jours</string>
-    <string name="describe_monthly_payment">Après %1$d semaine, vous serez automatiquement facturé %2$s/mois.\nVous pouvez annuler le paiement quand vous le souhaitez.</string>
+    <string name="describe_monthly_payment">%1$d semaine d’essai, puis %2$s/mois sauf annulation.\nAnnulez dans Google Play 24 h avant le renouvellement.</string>
     <string name="subscribed">Acheté</string>
     <string name="month">mois</string>
     <string name="important">Important!</string>
@@ -1678,7 +1678,7 @@ Offrez un cadeau spécial à mon idole sur CHOEAEDOL !💖</string>
     <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 Les votes vont bientôt commencer sur CHOEAEDOL Celeb ! 🏆\nPréparez-vous à encourager votre favori pour qu\'il remporte la première place !\n⏰ Début du vote : %s\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 Un vote féroce est en cours pour CHOEAEDOL Celeb 🗳️\nSoutenez votre favori avec des cœurs maintenant ! 💖\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 Qui sera le vainqueur de la gloire ?! 🫣\nDécouvrez-le sur CHOEAEDOL Celeb dès maintenant !\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
-    <string name="login_desc">Commencez en 5 secondes !</string>
+    <string name="login_desc">⚡️Commencez en 3 secondes\nVoir le classement des idols !</string>
     <string name="login_email">commencer par le e-mail</string>
     <string name="hometab_title_rank">Ranking</string>
     <string name="hometab_title_myidol">My Idol</string>
@@ -1783,5 +1783,7 @@ Veuillez changer de pays ou de région et réessayer.</string>
     <string name="signup_desc2_noreward">Saisissez le code d’invitation de votre parrain pour échanger des cœurs entre amis.</string>
     <string name="signup_toast_auto_fill_recommender">Le code d\'invitation copié a été saisi automatiquement.</string>
     <string name="vote_ranking">Vote effectué</string>
-    <string name="heart_arcade_description1">Jouez aux mini-jeux🕹️ et gagnez des cœurs🩷</string>
+    <string name="heart_arcade_description1">Jouez aux mini-jeux et gagnez des cœurs!</string>
+    <string name="celeb_login_desc">⚡️Commencez en 3 secondes\nVoir le classement des acteurs !</string>
+    <string name="describe_monthly_payment_ios">%1$d semaine d’essai, puis %2$s/mois sauf annulation.\nAnnulez dans App Store 24 h avant le renouvellement.</string>
 </resources>

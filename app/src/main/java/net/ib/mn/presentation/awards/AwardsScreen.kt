@@ -45,12 +45,35 @@ import net.ib.mn.presentation.community.IdolRankingHistoryScreen
 import net.ib.mn.presentation.awards.subpage.AwardsCumulativeSubPage
 import net.ib.mn.presentation.awards.subpage.AwardsDailySubPage
 import net.ib.mn.presentation.awards.subpage.AwardsGuideSubPage
+import net.ib.mn.presentation.awards.subpage.AwardsLineupSubPage
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.theme.ColorPalette
 
 private const val TAB_HEIGHT = 48
 private const val INDICATOR_HEIGHT = 3
+
+/**
+ * 탭 타입 정의
+ */
+private enum class AwardsTabType {
+    LINEUP,      // 라인업 (투표 전)
+    CUMULATIVE,  // 누적
+    REALTIME,    // 실시간
+    GUIDE        // 가이드
+}
+
+/**
+ * 투표 상태별 탭 구성 (old 프로젝트 기준)
+ * - BEFORE: 안내, 라인업 (안내가 기본)
+ * - RUNNING: 안내, 누적, 실시간 (실시간이 기본)
+ * - AFTER: 누적만 (탭 없음)
+ */
+private fun getTabsForState(votableState: VotableState): List<AwardsTabType> = when (votableState) {
+    VotableState.BEFORE -> listOf(AwardsTabType.GUIDE, AwardsTabType.LINEUP)
+    VotableState.RUNNING -> listOf(AwardsTabType.GUIDE, AwardsTabType.CUMULATIVE, AwardsTabType.REALTIME)
+    VotableState.AFTER -> listOf(AwardsTabType.CUMULATIVE)
+}
 
 @Composable
 fun AwardsScreen(
@@ -59,14 +82,22 @@ fun AwardsScreen(
 ) {
     val context = LocalContext.current
     val awardModel by viewModel.awardModel.collectAsState()
+    val votableState = viewModel.getVotableState()
 
-    val tabs = listOf(
-        stringResource(R.string.award_guide),
-        stringResource(R.string.aggregation),
-        stringResource(R.string.award_realtime)
-    )
+    // 투표 상태에 따른 탭 구성
+    val tabTypes = remember(votableState) { getTabsForState(votableState) }
+    val tabs = tabTypes.map { tabType ->
+        when (tabType) {
+            AwardsTabType.LINEUP -> stringResource(R.string.award_example)
+            AwardsTabType.CUMULATIVE -> stringResource(R.string.aggregation)
+            AwardsTabType.REALTIME -> stringResource(R.string.award_realtime)
+            AwardsTabType.GUIDE -> stringResource(R.string.award_guide)
+        }
+    }
 
-    val pagerState = rememberPagerState(initialPage = 2) { tabs.size }
+    // 투표 중일 때 실시간 탭(index 2)에서 시작, 그 외에는 첫 번째 탭
+    val initialPage = if (votableState == VotableState.RUNNING && tabTypes.size > 2) 2 else 0
+    val pagerState = rememberPagerState(initialPage = initialPage) { tabs.size }
     val coroutineScope = rememberCoroutineScope()
 
     // IdolRankingHistoryScreen 상태
@@ -116,24 +147,29 @@ fun AwardsScreen(
                         .fillMaxWidth()
                         .weight(1f)
                 ) { page ->
-                    when (page) {
-                        0 -> AwardsGuideSubPage()
-                        1 -> AwardsCumulativeSubPage(
+                    val tabType = tabTypes.getOrNull(page) ?: return@HorizontalPager
+                    when (tabType) {
+                        AwardsTabType.LINEUP -> AwardsLineupSubPage()
+                        AwardsTabType.CUMULATIVE -> AwardsCumulativeSubPage(
                             onItemClick = { item ->
                                 selectedIdolId = item.idolId
                                 selectedIdolName = item.idol?.name.orEmpty()
                                 showIdolIdolRankingHistoryScreen = true
                             }
                         )
-                        2 -> AwardsDailySubPage()
+                        AwardsTabType.REALTIME -> AwardsDailySubPage()
+                        AwardsTabType.GUIDE -> AwardsGuideSubPage()
                     }
                 }
 
-                AwardsBottomTabBar(
-                    tabs = tabs,
-                    pagerState = pagerState,
-                    coroutineScope = coroutineScope
-                )
+                // 탭이 1개일 때는 탭바 숨김
+                if (tabs.size > 1) {
+                    AwardsBottomTabBar(
+                        tabs = tabs,
+                        pagerState = pagerState,
+                        coroutineScope = coroutineScope
+                    )
+                }
             }
         }
 

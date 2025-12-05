@@ -548,10 +548,13 @@
     <string name="permission_contact">聯絡人：用於免費愛心加油站；用於谷歌登入。</string>
     <string name="permission_phone">電話：用於免費愛心加油站。</string>
     <string name="permission_storage">儲存空間：用於上傳與保存照片。</string>
-    <string name="permission_desc"></string>
-    <string name="actor_permission_desc"></string>
+    <string name="permission_desc">使用 最愛豆 無需授予任何存取權限。\n\n
+最愛豆 不會收集任何個人資訊。</string>
+    <string name="actor_permission_desc">使用 最愛豆名人 無需授予任何存取權限。\n\n
+最愛豆名人 不會收集任何個人資訊。</string>
     <string name="allow">允許</string>
     <string name="deny">拒絕</string>
+    <string name="label_see_video_for_heartbox">觀看影片廣告，獲得更多心盒。</string>
     <!-- bj app -->
     <string name="format_reg_date" formatted="false">加入於 %s</string>
     <string name="laboratory">實驗室</string>
@@ -824,7 +827,7 @@
     <string name="all_users_are_given">所有新手用戶</string>
     <string name="daily_pack_modifier">每天給您的愛豆獻愛心吧！</string>
     <string name="actor_daily_pack_modifier">每天給您的名人獻愛心吧！</string>
-    <string name="describe_monthly_payment">%1$d 週後，系統將自動向您收取 %2$s/月的費用。\n您可以隨時取消付款。</string>
+    <string name="describe_monthly_payment">%1$d週免費，未取消則%2$s/月自動續訂。\n請於續訂前24小時在 Google Play 取消。</string>
     <string name="subscribed">訂閱購買完成</string>
     <string name="month">月</string>
     <string name="important">請仔細閱讀！</string>
@@ -978,7 +981,7 @@
     <string name="title_notifications">通知欄</string>
     <string name="label_no_notifications">沒有任何通知</string>
     <string name="label_delete_all_notifications">確定要刪除所有通知嗎？</string>
-    <string name="actor_level_heart_guide_desc1">過去30日在榮譽殿堂中獲得的排名分數進行累加統計出的前100名.\n點擊進入各明星的社區可以確認他們的排名變化.\n30我們將會根據過去30天的排名，以获胜的明星的名義進行捐贈!\n\n✅ 滿足條件\n- 條件1 : 30天內平均投票數300萬票以上\n- 條件2 : 當月6號在榮譽殿堂相應組別排名第1或第2名\n- 需同時滿足兩個條件才能被選為慈善天使.\n\n✅ 獎勵\n- 各組別1位\n(1)以明星的名義向Miral福祉財團捐贈50萬元\n(2)弘大入口站地鐵應援廣告\n(3)app內全面橫幅廣告\n(4)app內菜單滑動橫幅廣告 \n- 各組別2位\n(1)以明星的名義向Miral福祉財團捐贈50萬韓元\n(2)弘大入口站地鐵應援廣告\n(3)app內全面橫幅廣告</string>
+    <string name="actor_level_heart_guide_desc1">過去30日在榮譽殿堂中獲得的排名分數進行累加統計出的前100名.\n點擊進入各明星的社區可以確認他們的排名變化.\n我們將會根據過去30天的排名，以獲勝的明星的名義進行捐贈!\n\n✅ 滿足條件\n- 條件1 : 30天內平均投票數300萬票以上\n- 條件2 : 當月6號在榮譽殿堂相應組別排名第1或第2名\n- 需同時滿足兩個條件才能被選為慈善天使.\n\n✅ 獎勵\n- 各組別1位\n(1)以明星的名義向Miral福祉財團捐贈50萬元\n(2)弘大入口站地鐵應援廣告\n(3)app內全面橫幅廣告\n(4)app內菜單滑動橫幅廣告 \n- 各組別2位\n(1)以明星的名義向Miral福祉財團捐贈50萬韓元\n(2)弘大入口站地鐵應援廣告\n(3)app內全面橫幅廣告</string>
     <string name="AAA">AAA</string>
     <string name="award_guide">投票說明</string>
     <string name="award_example">陣容</string>
@@ -1141,7 +1144,7 @@
 添加新廣告集資活動時所使用的寶石都不設退還。詳細請查閱應援活動的注意事項。</string>
     <string name="actor_support_about_info1">不管是不是你的最愛</string>
     <string name="actor_support_about_info2">為任何一位名人開設活動都沒問題</string>
-    <string name="subscription_account_holding">您的订阅存在问题，请转到 Google Play 订阅设置以修正您在 Google Play 上的付款方式。</string>
+    <string name="subscription_account_holding">您的訂閱存在問題，请转到Google Play訂閱設置以修正您在Google Play上的付款方式。</string>
     <string name="popup_no_diamond_title">你的寶石用盡了:(</string>
     <string name="popup_diamond_shop_desc">你可以購買寶石</string>
     <string name="secure_user_id">固有編號</string>
@@ -1236,7 +1239,7 @@
     <string name="chat_room_level_limit" formatted="false">等級%d以上</string>
     <string name="chat_room_create_success">已成功開設聊天室。</string>
     <string name="chat_unknown_user">(未知的使用者)</string>
-    <string name="chat_level_select_limit">不能选择比自己等级更高的等级限制。</string>
+    <string name="chat_level_select_limit">不能選擇比自己等級更高的等級限制。</string>
     <string name="chat_make_tooltip">添加一個新的聊天室吧！</string>
     <string name="chat_deleted_message">此信息已被刪除。</string>
     <string name="chat_photo">照片</string>
@@ -1352,7 +1355,7 @@
     <string name="share_friend_invite_celeb" formatted="false">[最愛豆名人需要你]\n\n實時排名 #%s %d位\n一起為 #%s %s 應援投票吧！\n\n注冊時填上我的暱稱當推薦人～\n推薦人: %s\n\n體驗追星的全部 #最愛豆名人\n%s</string>
     <string name="share_friend_invite_nomost_celeb" formatted="false">[最愛豆名人需要你]\n\n 一起為本命應援投票！\n\n注冊時填上我的暱稱當推薦人～\n推薦人: %s\n\n實時排名第二名： #%s %s\n\n想知道誰是一位嗎？\n進來#最愛豆名人 確認吧！\n%s</string>
     <string name="live_actionbar_title">最愛豆PLAY</string>
-    <string name="live_chat">实时聊天室</string>
+    <string name="live_chat">即時聊天室</string>
     <string name="live_share_title_celeb" formatted="false">#最愛豆名人 #最愛豆PLAY\n\n%s\n\n立即在最愛豆PLAY收看吧！\n</string>
     <string name="themepick_today_voted">今天投票已結束</string>
     <string name="block">封鎖</string>
@@ -1384,7 +1387,7 @@
     <string name="quiz_nothing_review">沒有可以審核的問答題。</string>
     <string name="quiz_ask_finish_review">確定要結束審核嗎？\n結果後會失去一次審核的機會。</string>
     <string name="quiz_start_short">START</string>
-    <string name="quiz_already_report_review">已舉服此問答題。</string>
+    <string name="quiz_already_report_review">已舉報此問答題。</string>
     <string name="another_account_daily_purchase">購買復原失敗。請檢查您是否從其他帳戶進行了訂閱。</string>
     <string name="already_daily_purchase">購買復原失敗。已是訂閱中的帳號。</string>
     <string name="welcome_pack_title">Welcome Package</string>
@@ -1465,8 +1468,8 @@
     <string name="recommender">推薦人(邀請碼)</string>
     <string name="pwd_combination">請輸入8個字以上的英文＋數字。</string>
     <string name="agree_terms">同意個人信息收集及使用。</string>
-    <string name="warning_report_lose_heart" formatted="false">舉報時會消耗%s愛心，並無法再次查閱該帖文。確定要舉服嗎？</string>
-    <string name="warning_report_hide_article">舉報後無法再次查閱該帖文。確定要舉服嗎？</string>
+    <string name="warning_report_lose_heart" formatted="false">舉報時會消耗%s愛心，並無法再次查閱該帖文。確定要舉報嗎？</string>
+    <string name="warning_report_hide_article">舉報後無法再次查閱該帖文。確定要舉報嗎？</string>
     <string name="check_pwd_requirement">請確認設定密碼的條件。</string>
     <string name="inquiry_category">選擇查詢類型</string>
     <string name="inquiry_how_to_use">使用方法</string>
@@ -1494,7 +1497,7 @@
     <string name="select_category_field">選擇分類</string>
     <string name="select_category_toast">請選擇分類。</string>
     <string name="enter_title">請輸入標題。</string>
-    <string name="enter_content">請輪入內容。</string>
+    <string name="enter_content">請輸入內容。</string>
     <string name="idol_board_article">帖文</string>
     <string name="small_talk_empty">目前沒有帖文。\n寫下第一個帖文吧！</string>
     <string name="order_like">按人氣</string>
@@ -1769,7 +1772,7 @@
     <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 最愛豆名人投票即將開始！ 🏆\n準備好為你最喜歡的選手奪得第一而歡呼吧！\n⏰ 投票開始：%s\n\n#最愛豆名人 #최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 最愛豆名人激烈投票正在進行中 🗳️\n現在就用心支持你喜歡的人吧！ 💖\n\n#最愛豆名人 #최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 誰會是榮耀的得獎者？ 🫣\n現在就在最愛豆名人上查看吧！\n\n#最愛豆名人 #최애돌셀럽 #CHOEAEDOL_Celeb</string>
-    <string name="login_desc">5秒開始！</string>
+    <string name="login_desc">⚡️只需3秒\n立即查看愛豆排名！</string>
     <string name="login_email">從電子郵件開始</string>
     <string name="hometab_title_rank">排行</string>
     <string name="hometab_title_myidol">我的愛豆</string>
@@ -1873,5 +1876,7 @@
     <string name="signup_desc2_noreward">輸入推薦人的邀請碼即可與好友交換愛心。</string>
     <string name="signup_toast_auto_fill_recommender">已自動填入複製的邀請碼。</string>
     <string name="vote_ranking">投票完成</string>
-    <string name="heart_arcade_description1">玩小遊戲🕹️，還能賺愛心🩷</string>
+    <string name="heart_arcade_description1">玩小遊戲，還能賺愛心！</string>
+    <string name="celeb_login_desc">⚡️只需3秒\n立即查看演員排名！</string>
+    <string name="describe_monthly_payment_ios">%1$d週免費，未取消則%2$s/月自動續訂。\n請於續訂前24小時在 App Store 取消。</string>
 </resources>

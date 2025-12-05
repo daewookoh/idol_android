@@ -176,7 +176,7 @@
     <string name="title_faq">よくあるご質問（FAQ）</string>
     <string name="title_inquiry">FAQ/質問する</string>
     <string name="title_myinquirylist">自分の質問内容</string>
-    <string name="title_voting_guide">あなたの投票数</string>
+    <string name="title_voting_guide">私の累積投票</string>
     <string name="hint_inquiry">ご質問内容を入力してください。</string>
     <string name="title_rename">ニックネーム変更</string>
     <string name="hint_nickname">ニックネーム</string>
@@ -287,7 +287,7 @@
     <string name="msg_unable_use_capture_2">共有機能が正常に処理されませんでした。デバイスの容量を確認してからもう一度試してください。</string>
     <string name="msg_save_ok">保存されました。</string>
     <string name="msg_unable_use_download_1">ダウンロード機能が使用できません。デバイスの状態を確認してください。</string>
-    <string name="msg_unable_use_download_2">ダウンロードが正常に行われませんでした。バイス空間と状態を確認してからもう一度試してください。デ</string>
+    <string name="msg_unable_use_download_2">ダウンロードが正常に完了しませんでした。端末の空き容量や接続状態をご確認のうえ、もう一度お試しください。</string>
     <string name="msg_no_heart">もらったハートがありません。</string>
     <string name="msg_error_ok">申し訳ありません。エラーが発生しました。 \nもう一度試してください。</string>
     <string name="msg_favorite_guide">お気に入りは推し以外に興味のあるアイドルのコミュニティに直接アクセスできるように提供されているメニューです。\nまた、お気に入りは推し設定で設定が可能で、人数の制限はありません。\n（マイアイドル：ハートアイコン/お気に入り：星形アイコン）</string>
@@ -410,9 +410,9 @@
     <string name="friend_request_format">友達からリクエストが届きました。</string>
     <string name="loading_profile">プロフィールをロード中…</string>
     <string name="title_no_free_heart">デイリーハート消耗</string>
-    <string name="desc_no_free_heart">デイリーハートが0個ですㅜㅜ\nハートをゲットしに行きますか？</string>
+    <string name="desc_no_free_heart">デイリーハートが0個です( ﾉД`)ｼｸｼｸ…\nハートを集めに行きますか？</string>
     <string name="title_no_heart">ハート不足</string>
-    <string name="desc_no_heart">ハートが足りませんㅜㅜ\nハートをゲットしに行きますか？</string>
+    <string name="desc_no_heart">ハートが足りません( ﾉД`)ｼｸｼｸ…\nハートを集めにに行きますか？</string>
     <string name="btn_video_ad">ビデオ広告（ハート5＋5個）</string>
     <string name="btn_free_heart_charge">無料チャージ</string>
     <string name="btn_invite_friends">携帯メールで友達を招待する</string>
@@ -673,7 +673,7 @@
     <string name="quiz_write_help_2_1">（身長などのボディサイズ）</string>
     <string name="quiz_write_help_3">管理者が解答を確認できない場合。</string>
     <string name="quiz_write_content">問題を入力してください。（100文字以内）</string>
-    <string name="quiz_write_image">画像が必要な場合、アプロードしてください。</string>
+    <string name="quiz_write_image">画像が必要な場合、アップロードしてください。</string>
     <string name="quiz_write_choice">内容を入力してください。</string>
     <string name="quiz_write_answer">正解</string>
     <string name="quiz_write_difficulty">難易度</string>
@@ -782,8 +782,8 @@
     <string name="schedule_write_stop">スケジュールの作成をやめますか？</string>
     <string name="setting_menu_push_schedule">スケジュール</string>
     <string name="coming_soon">近日公開</string>
-    <string name="schedule_write_most_actor">私のスターのスケジュールのみ評価することができます。</string>
-    <string name="schedule_eval_most_actor">私のスターのスケジュールのみ作成することができます。</string>
+    <string name="schedule_write_most_actor">私のスターのスケジュールだけ作成できます。</string>
+    <string name="schedule_eval_most_actor">私のスターのスケジュールだけ評価できます。</string>
     <string name="schedule_desp_movie">映画</string>
     <string name="schedule_desp_production">制作発表会</string>
     <string name="schedule_desp_previw">試写会</string>
@@ -836,7 +836,7 @@
     <string name="all_users_are_given">初めて利用される方は誰でも</string>
     <string name="daily_pack_modifier">毎日あなたのアイドルにハートをたくさん！</string>
     <string name="actor_daily_pack_modifier">毎日あなたのスターにハートがたくさん！</string>
-    <string name="describe_monthly_payment">%1$d 週間が経過すると、%2$s/月が自動的に請求されます。\nいつでもお支払いをキャンセルできます。</string>
+    <string name="describe_monthly_payment">%1$d週間無料、未解約なら%2$s/月で自動更新されます。\n更新24時間前までにGoogle Playで解約してください.</string>
     <string name="subscribed">購入済み</string>
     <string name="month">月</string>
     <string name="important">必ずお読みください！</string>
@@ -925,7 +925,7 @@
     <string name="friends_request">友達申請</string>
     <string name="notice_new_friend_request">新しい友達申請がきました。</string>
     <string name="appleid_change_detected">Apple IDが変更され、デイリーパックの特典を受けとることができません。デイリーパックを購入されたApple IDでAppStoreにログインしてください。</string>
-    <string name="quiz_get_heart_title">クイズの報酬</string>
+    <string name="quiz_get_heart_title">クイズの特典</string>
     <string name="darkmode_system">システム設定値</string>
     <string name="darkmode_always">常にON</string>
     <string name="darkmode_never">使用しない</string>
@@ -1338,8 +1338,9 @@ Google Playストアの環境を確認した後、もう一度お試しくださ
     <string name="share_themepick_celeb" formatted="false">#最愛ドルスター #Themed Pick\n\n%s\n%s %s\n%s %s\n%s %s\n\n今すぐ最愛ドルスターで確認してください!\n%s</string>
     <string name="share_in_progress_support_celeb" formatted="false">#最愛ドルスター #サポート #広告 #%s %s\n\n今、最愛ドルスターで  \" %s \"  サポート実施中!\n%s 一緒にプレゼントしましょう~\n%s</string>
     <string name="share_success_support_celeb" formatted="false">#最愛ドルスター #サポート #広告 #%s %s\n\n最愛ドルスターで \" %s \" サポートが成功しました!\n%s 掲載された画像一緒に見ましょう:)\n%s</string>
-    <string name="share_friend_invite_celeb" formatted="false">[最愛ドルスター招待状💌]\n#%s現在ランキング%d位\n一緒に#%s %s投票して推し活しましょう！\n\n招待コードを入力して会員登録するとハートがもらえます！\n招待コード: %s\n\nファンダムと交流する推し活コニュニティ #最愛ドルスター\n%s</string>
-    <string name="share_friend_invite_nomost_celeb" formatted="false">[最愛ドルスター招待状💌]\n一緒に投票して推し活しましょう！\n招待コードを入力して会員東特すると、ハートをプレゼントします！\n招待コード: %s\n\n現在2位: #%s %s\n\n1位が気になるなら？\n#最愛ドルスター でチェックしてください。\n%s</string>
+    <string name="share_friend_invite_celeb" formatted="false">**[最愛ドルスター招待状💌]#%s 現在ランキング%d位！一緒に #%s %s に投票して推し活しましょう！\n\n招待コードを入力して会員登録すると、ハートがもらえます！
+\n\n招待コード：%sファン同士で交流できる推し活コミュニティ #最愛ドルスター%s*</string>
+    <string name="share_friend_invite_nomost_celeb" formatted="false">[最愛ドルスター招待状💌]\n一緒に投票して推し活しましょう！\n招待コードを入力して会員登録すると、ハートをプレゼントします！\n招待コード: %s\n\n現在2位: #%s %s\n\n1位が気になるなら？\n#最愛ドルスター でチェックしてください。\n%s</string>
     <string name="live_actionbar_title">最愛ドルPLAY</string>
     <string name="live_chat">チャット</string>
     <string name="live_share_title_celeb" formatted="false">#最愛ドルスター #最愛ドルPLAY\n\n%s\n\n最愛ドルPLAYで今すぐ視聴してみてください!\n</string>
@@ -1725,7 +1726,7 @@ Google Playストアの環境を確認した後、もう一度お試しくださ
     <string name="menu_sub_record">最愛ドルオタク活動の歴史を一目で</string>
     <string name="menu_sub_quiz">最大500ハートがもらえる！</string>
     <string name="menu_sub_face_matching">私に似たアイドルは誰？</string>
-    <string name="welcome_mission_desc">ミッションをクリアするたびに報酬を受け取れます！\nすべてのミッションをクリアすると、より大きな報酬がらえます。</string>
+    <string name="welcome_mission_desc">ミッションをクリアするたびに特典を受け取れます！\nすべてのミッションをクリアすると、さらに大きな特典がもらえます。</string>
     <string name="welcome_mission_sign_up_title">会員登録</string>
     <string name="welcome_mission_sign_up_desc">いらっしゃいませ！ミッションの最後まで頑張ってください！</string>
     <string name="welcome_mission_set_most_title">推し設定</string>
@@ -1742,8 +1743,8 @@ Google Playストアの環境を確認した後、もう一度お試しくださ
     <string name="welcome_mission_complete">ミッション完クリア</string>
     <string name="impossible_write_message">推し設定が必要です</string>
     <string name="impossible_all_clear">全てのミッションをクリアすると受け取れます</string>
-    <string name="retry_all_clear">すでに報酬は支給されています</string>
-    <string name="welcome_mission_all_clear_reward_title">ミッション完了報酬</string>
+    <string name="retry_all_clear">すでに特典は支給されています</string>
+    <string name="welcome_mission_all_clear_reward_title">ミッション完了特典</string>
     <string name="welcome_mission_title">ウェルカムミッション💝</string>
     <string name="hof_cumulative_tab">30日累積順位</string>
     <string name="hof_daily_tab">毎日順位</string>
@@ -1758,7 +1759,7 @@ Google Playストアの環境を確認した後、もう一度お試しくださ
     <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 最愛ドルスターへの投票が間もなく開始されます! 🏆\nあなたのスターが1位になれるように応援しましょう!\n⏰ 投票開始: %s\n\n#最愛ドルスター#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 最愛ドルスターへの熱い投票が進行中です 🗳️\n今すぐハートであなたのスターを応援してください! 💖\n\n#最愛ドルスター #최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 栄光を勝ち取るのは誰だ?! 🫣\n今すぐ最愛ドルスターでチェックしてみてください！\n\n#最愛ドルスター #최애돌셀럽 #CHOEAEDOL_Celeb</string>
-    <string name="login_desc">5秒で始めましょう！</string>
+    <string name="login_desc">⚡️3秒で始めて\nアイドル順位を今すぐチェック！</string>
     <string name="login_email">メールアドレスでログイン</string>
     <string name="hometab_title_rank">ランキング</string>
     <string name="hometab_title_myidol">私の推し</string>
@@ -1852,7 +1853,7 @@ Google Playストアの環境を確認した後、もう一度お試しくださ
     <string name="menu_minigame">ハートゲームセンター</string>
     <string name="popup_game_start_title">ゲームスタート</string>
     <string name="popup_game_start_desc" formatted="false">ゲームで得たスコアに応じて\n❤️エバーハートをプレゼントします！\n\nゲーム開始時にハートを%s個消費します。\nゲームを開始しますか？</string>
-    <string name="reward_game_result">ゲーム結果の報酬</string>
+    <string name="reward_game_result">ゲーム結果の特典</string>
     <string name="menu_invite_friend">友達招待</string>
     <string name="friend_tooltip_invite_friend">最大110,000ハートをゲットしましょう！</string>
     <string name="friend_bnr_invite_friend_title">友達を招待して\nハートをもらう</string>
@@ -1862,5 +1863,7 @@ Google Playストアの環境を確認した後、もう一度お試しくださ
     <string name="signup_desc2_noreward">推薦者の招待コードを入力すると、友達としてハートを交換できます。</string>
     <string name="signup_toast_auto_fill_recommender">コピーした招待コードを自動入力しました。</string>
     <string name="vote_ranking">投票済み</string>
-    <string name="heart_arcade_description1">ミニゲーム🕹️でハート🩷をゲットしよう！</string>
+    <string name="heart_arcade_description1">ミニゲームでハートをゲットしよう！</string>
+    <string name="celeb_login_desc">⚡️3秒で始めて\n俳優の順位を今すぐチェック！</string>
+    <string name="describe_monthly_payment_ios">%1$d週間無料、未解約なら%2$s/月で自動更新されます。\n更新24時間前までにApp Storeで解約してください.</string>
 </resources>

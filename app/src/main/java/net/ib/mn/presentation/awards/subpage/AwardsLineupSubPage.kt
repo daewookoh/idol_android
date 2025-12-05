@@ -3,9 +3,7 @@ package net.ib.mn.presentation.awards.subpage
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -20,7 +18,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.data.remote.dto.AwardIdolItem
 import net.ib.mn.ui.components.RankingItem
@@ -31,15 +28,15 @@ import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
 
 /**
- * AwardsDailySubPage - 어워즈 실시간 순위 탭
+ * AwardsLineupSubPage - 어워즈 라인업 탭 (투표 전)
  *
- * 기능:
- * 1. 입장 시 모든 차트의 데이터 로드 (ViewModel에서 처리)
- * 2. AwardsRankingManager가 2초마다 DB 기준 랭킹 정렬
- * 3. Flow를 통해 자동으로 UI 업데이트
+ * 투표 전(votable = "B")에 표시되는 라인업 화면
+ * - 배너 이미지 + 카테고리 탭 (AwardsHeader)
+ * - 라인업 헤더 정보 (타이틀, "지금은 투표 기간이 아닙니다!", 설명)
+ * - 랭킹 리스트
  */
 @Composable
-fun AwardsDailySubPage(
+fun AwardsLineupSubPage(
     viewModel: AwardsDailyViewModel = hiltViewModel(),
     onItemClick: (AwardIdolItem) -> Unit = {}
 ) {
@@ -77,50 +74,35 @@ fun AwardsDailySubPage(
             .background(ColorPalette.background100)
     ) {
         // 공용 헤더 (배너 이미지 + 카테고리 탭)
-        if (viewModel.votable == "Y") {
-            AwardsHeader(
-                awardModel = awardModel,
-                charts = charts,
-                selectedChartIndex = selectedChartIndex,
-                onChartSelected = { viewModel.selectChart(it) }
-            )
-        }
+        AwardsHeader(
+            awardModel = awardModel,
+            charts = charts,
+            selectedChartIndex = selectedChartIndex,
+            onChartSelected = { viewModel.selectChart(it) }
+        )
 
         // 스크롤 영역
         when (val state = uiState) {
             is AwardsDailyUiState.Loading -> {
-                DailyLoadingContent()
+                LineupLoadingContent()
             }
 
             is AwardsDailyUiState.Success -> {
-                // 2초마다 랭킹이 업데이트되므로 remember 사용하지 않음
-                // maxHeart 계산 (투표 바 길이 비율 계산용)
                 val maxHeart = state.rankItems.maxOfOrNull { it.heart } ?: 0L
                 val minHeart = state.rankItems.minOfOrNull { it.heart } ?: 0L
                 val rankingItems = state.rankItems.map { item ->
-                    item.toRankingItem(maxHeart, minHeart)
+                    item.toLineupRankingItem(maxHeart, minHeart)
                 }
 
-                // 탭 변경시 LazyColumn 새로 생성하여 스크롤 맨 위로 리셋
                 key(selectedChartIndex) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        // 헤더 정보 (타이틀 + 기간 + 설명)
-                        if (viewModel.votable == "Y") {
-                            item {
-                                AwardsHeaderInfo(
-                                    title = awardModel?.realtimeTitle.orEmpty(),
-                                    period = viewModel.getVotingPeriodText(),
-                                    description = selectedChart?.desc.orEmpty()
-                                )
-                            }
-                        }
-
-                        // 집계 기간 바
+                        // 라인업 헤더 정보 (타이틀, 기간, 설명)
                         item {
-                            AwardsAggregationBar(
-                                periodText = viewModel.getAggregationPeriodText()
+                            AwardsLineupHeaderInfo(
+                                exampleTitle = selectedChart?.exampleTitle.orEmpty(),
+                                exampleDesc = selectedChart?.exampleDesc.orEmpty()
                             )
                         }
 
@@ -146,7 +128,7 @@ fun AwardsDailySubPage(
                     is AwardsDailyUiState.Error -> state.message
                     else -> ""
                 }
-                DailyMessageContent(message = message)
+                LineupMessageContent(message = message)
             }
         }
     }
@@ -156,7 +138,7 @@ fun AwardsDailySubPage(
  * 로딩 상태
  */
 @Composable
-private fun DailyLoadingContent() {
+private fun LineupLoadingContent() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -169,7 +151,7 @@ private fun DailyLoadingContent() {
  * 빈/에러 상태 공통 메시지
  */
 @Composable
-private fun DailyMessageContent(message: String) {
+private fun LineupMessageContent(message: String) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -184,12 +166,8 @@ private fun DailyMessageContent(message: String) {
 
 /**
  * AwardIdolItem을 RankingItem으로 변환
- * rank는 AwardsRankingManager에서 이미 계산됨 (0-indexed)
- *
- * @param maxHeart 리스트 내 최대 하트 수 (투표 바 길이 계산용)
- * @param minHeart 리스트 내 최소 하트 수 (투표 바 길이 계산용)
  */
-private fun AwardIdolItem.toRankingItem(maxHeart: Long, minHeart: Long): RankingItem {
+private fun AwardIdolItem.toLineupRankingItem(maxHeart: Long, minHeart: Long): RankingItem {
     val displayRank = rank + 1
     val idolName = idol?.name.orEmpty()
     val groupName = idol?.group.orEmpty()

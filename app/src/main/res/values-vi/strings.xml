@@ -866,7 +866,7 @@
     <string name="all_users_are_given">Áp dụng cho tất cả người tham gia lần đầu</string>
     <string name="daily_pack_modifier">Dành trọn trái tim cho thần tượng của bạn mỗi ngày</string>
     <string name="actor_daily_pack_modifier">Dành trọn trái tim cho người nổi tiếng của bạn mỗi ngày.</string>
-    <string name="describe_monthly_payment">Sau %1$d tuần, bạn sẽ tự động bị tính phí %2$s/tháng.\nBạn có thể hủy thanh toán bất cứ khi nào bạn muốn.</string>
+    <string name="describe_monthly_payment">Dùng thử %1$d tuần miễn phí; sau đó %2$s/tháng trừ khi hủy.\nHãy hủy trên Google Play trước 24 giờ gia hạn.</string>
     <string name="subscribed">Đã đăng ký</string>
     <string name="month">Tháng</string>
     <string name="important">Quan trọng!</string>
@@ -1792,7 +1792,7 @@ Tặng một món quà đặc biệt cho thần tượng của tôi trên CHOEAE
     <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 Việc bình chọn sẽ sớm bắt đầu trên CHOEAEDOL Celeb! 🏆\nHãy sẵn sàng cổ vũ cho đội bạn yêu thích giành vị trí đầu tiên nhé!\n⏰ Bắt đầu bình chọn: %s\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 Cuộc bỏ phiếu khốc liệt dành cho CHOEAEDOL Celeb đang được tiến hành 🗳️\nHãy ủng hộ nhân vật yêu thích của bạn bằng trái tim ngay bây giờ! 💖\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 Ai sẽ là người chiến thắng vinh quang?! 🫣\nHãy xem trên CHOEAEDOL Celeb ngay bây giờ!\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
-    <string name="login_desc">Bắt đầu sau 5 giây!</string>
+    <string name="login_desc">⚡️Bắt đầu trong 3 giây\nXem thứ hạng idol ngay!</string>
     <string name="login_email">bắt đầu với email</string>
     <string name="hometab_title_rank">Ranking</string>
     <string name="hometab_title_myidol">My Idol</string>
@@ -1896,5 +1896,7 @@ Tặng một món quà đặc biệt cho thần tượng của tôi trên CHOEAE
     <string name="signup_desc2_noreward">Nhập mã mời của người giới thiệu để trao đổi Trái tim với tư cách là bạn bè.</string>
     <string name="signup_toast_auto_fill_recommender">Mã mời đã sao chép đã được nhập tự động.</string>
     <string name="vote_ranking">Đã bình chọn</string>
-    <string name="heart_arcade_description1">玩小游戏🕹️，还能赚爱心🩷</string>
+    <string name="heart_arcade_description1">Chơi trò chơi nhỏ và kiếm trái tim!</string>
+    <string name="celeb_login_desc">⚡️Bắt đầu trong 3 giây\nXem thứ hạng diễn viên ngay!</string>
+    <string name="describe_monthly_payment_ios">Dùng thử %1$d tuần miễn phí; sau đó %2$s/tháng trừ khi hủy.\nHãy hủy trên App Store trước 24 giờ gia hạn.</string>
 </resources>

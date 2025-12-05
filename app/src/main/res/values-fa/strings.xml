@@ -176,7 +176,7 @@
     <string name="title_faq">سؤالات متداول</string>
     <string name="title_inquiry">FAQ / سوالات</string>
     <string name="title_myinquirylist">سابقه استعلام من</string>
-    <string name="title_voting_guide">آراء جمع شده</string>
+    <string name="title_voting_guide">آرای انباشته من</string>
     <string name="hint_inquiry">لطفا سوال خود را وارد کنید</string>
     <string name="title_rename">تغییر نام مستعار</string>
     <string name="hint_nickname">نام مستعار</string>
@@ -866,7 +866,7 @@
     <string name="all_users_are_given">به همه کاربران داده می شود</string>
     <string name="daily_pack_modifier">هر روز قلب های کامل به بت خود بدهید</string>
     <string name="actor_daily_pack_modifier">هر روز قلبهای کاملی را به صیدان خود بدهید</string>
-    <string name="describe_monthly_payment">پس از %1$d هفته، به طور خودکار %2$s در ماه از شما کسر می شود.\nهر زمان که بخواهید می توانید پرداخت را لغو کنید.</string>
+    <string name="describe_monthly_payment">%1$d هفته رایگان؛ سپس %2$s/ماه مگر اینکه لغو کنید.\nحداقل ۲۴ ساعت قبل از تمدید در Google Play لغو کنید.</string>
     <string name="subscribed">مشترک شد</string>
     <string name="month">ماه</string>
     <string name="important">مهم!</string>
@@ -1800,7 +1800,7 @@
     <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 رای گیری به زودی در CHOEAEDOL Celeb آغاز می شود! 🏆\nبرای تشویق مورد علاقه خود برای کسب مقام اول آماده شوید!\n⏰ شروع رأی گیری: %s\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 رای گیری شدید برای CHOEAEDOL Celeb در حال انجام است 🗳️\nهم اکنون با قلب از مورد علاقه خود حمایت کنید! 💖\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 برنده جلال کیست؟! 🫣\nهمین الان در CHOEAEDOL Celeb آن را بررسی کنید!\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
-    <string name="login_desc">در 5 ثانیه شروع کنید!</string>
+    <string name="login_desc">⚡️در ۳ ثانیه شروع کن\nرتبه‌بندی آیدول‌ها را ببین!</string>
     <string name="login_email">با ایمیل شروع کنید</string>
     <string name="hometab_title_rank">Ranking</string>
     <string name="hometab_title_myidol">My Idol</string>
@@ -1905,5 +1905,7 @@
     <string name="signup_desc2_noreward">برای تبادل قلب‌ها به عنوان دوست، کد دعوت معرف خود را وارد کنید.</string>
     <string name="signup_toast_auto_fill_recommender">کد دعوت کپی شده به صورت خودکار وارد شده است.</string>
     <string name="vote_ranking">رأی داده شد</string>
-    <string name="heart_arcade_description1">Jogue minijogos🕹️ e ganhe corações🩷</string>
+    <string name="heart_arcade_description1">مینی‌گیم‌ها را بازی کنید و قلب جمع کنید!</string>
+    <string name="celeb_login_desc">⚡️در ۳ ثانیه شروع کن\nرتبه‌بندی بازیگران را ببین!</string>
+    <string name="describe_monthly_payment_ios">%1$d هفته رایگان؛ سپس %2$s/ماه مگر اینکه لغو کنید.\nحداقل ۲۴ ساعت قبل از تمدید در App Store لغو کنید.</string>
 </resources>

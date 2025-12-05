@@ -553,8 +553,10 @@
     <string name="permission_contact">Contactos: Requerido para la estación de recarga gratuita de corazones. Requerido para iniciar sesión con Google.</string>
     <string name="permission_phone">Teléfono: Requerido para la estación de recarga gratuita de corazones.</string>
     <string name="permission_storage">Almacenamiento: Requerido para cargar y guardar fotos.</string>
-    <string name="permission_desc"></string>
-    <string name="actor_permission_desc"></string>
+    <string name="permission_desc">No necesitas otorgar permisos de acceso para usar CHOEAEDOL.\n\n
+CHOEAEDOL no recopila ninguna información personal.</string>
+    <string name="actor_permission_desc">No necesitas otorgar permisos de acceso para usar CHOEAEDOL Celeb.\n\n
+CHOEAEDOL Celeb no recopila ninguna información personal.</string>
     <string name="allow">Permitir</string>
     <string name="deny">Negar</string>
     <string name="label_see_video_for_heartbox">Ver anuncio para recibir más Cajas de Corazones</string>
@@ -790,7 +792,7 @@
     <string name="all_users_are_given">Todo los usuarios reciben</string>
     <string name="daily_pack_modifier">Entrega corazones completos a tu Idol cada día</string>
     <string name="actor_daily_pack_modifier">Entrega corazones completos a tu Idol cada día</string>
-    <string name="describe_monthly_payment">Después de %1$d semana, se te cobrará automáticamente %2$s al mes.\nPuedes cancelar el pago cuando quieras.</string>
+    <string name="describe_monthly_payment">%1$d semana gratis; luego %2$s/mes salvo cancelación.\nCancela en Google Play 24 h antes de la renovación.</string>
     <string name="subscribed">Suscrito</string>
     <string name="month">mes</string>
     <string name="important">¡Importante!</string>
@@ -1718,7 +1720,7 @@
     <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 ¡La votación comenzará pronto en CHOEAEDOL Celeb! 🏆\n¡Prepárate para apoyar a tu celebridad favorita y obtener el primer lugar!\n⏰ La votación comienza: %s\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 Se está llevando a cabo una feroz votación en CHOEAEDOL Celeb 🗳️\n¡Apoya a tu celebridad favorita con corazones ahora! 💖\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 ¡¿Quién será el ganador de la gloria?! 🫣\n¡Descúbrelo ahora en CHOEAEDOL Celeb!\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
-    <string name="login_desc">¡Comienza en 5 segundos!</string>
+    <string name="login_desc">⚡️Empieza en 3 segundos\n¡Ver ranking de idols ahora!</string>
     <string name="login_email">Inicia sesión con tu correo</string>
     <string name="hometab_title_rank">Ranking</string>
     <string name="hometab_title_myidol">Mi Idol</string>
@@ -1822,5 +1824,7 @@
     <string name="signup_desc2_noreward">Ingresa el código de invitación de tu referente para intercambiar Corazones como amigos.</string>
     <string name="signup_toast_auto_fill_recommender">El código de invitación copiado se ha introducido automáticamente.</string>
     <string name="vote_ranking">VOTADO</string>
-    <string name="heart_arcade_description1">Play mini-games🕹️ and earn hearts🩷</string>
+    <string name="heart_arcade_description1">Play mini-games and earn hearts!</string>
+    <string name="celeb_login_desc">⚡️Empieza en 3 segundos\n¡Ver ranking de actores ahora!</string>
+    <string name="describe_monthly_payment_ios">%1$d semana gratis; luego %2$s/mes salvo cancelación.\nCancela en App Store 24 h antes de la renovación.</string>
 </resources>

@@ -176,7 +176,7 @@
     <string name="title_faq">الأسئلة المتكررة</string>
     <string name="title_inquiry">FAQ / استفسارات</string>
     <string name="title_myinquirylist">تاريخ استفساراتي</string>
-    <string name="title_voting_guide">الأصوات المتراكمة</string>
+    <string name="title_voting_guide">أصواتي المتراكمة</string>
     <string name="hint_inquiry">يرجى إدخال سؤالك.</string>
     <string name="title_rename">تغيير اللقب</string>
     <string name="hint_nickname">اللقب</string>
@@ -866,7 +866,7 @@
     <string name="all_users_are_given">يُمنح جميع المستخدمين</string>
     <string name="daily_pack_modifier">امنح قلوبك الكاملة إلى idol الخاص بك كل يوم</string>
     <string name="actor_daily_pack_modifier">امنح القلوب الكاملة إلى celeb الخاص بك كل يوم</string>
-    <string name="describe_monthly_payment">بعد %1$d أسبوع، سيتم محاسبتك بمبلغ %2$s شهريًا تلقائيًا.\nيمكنك إلغاء الدفع وقتما تشاء.</string>
+    <string name="describe_monthly_payment">تجربة مجانية لمدة %1$d أسبوع، ثم %2$s شهريًا ما لم تُلغ.\nألغِ الاشتراك في Google Play قبل ٢٤ ساعة من التجديد.</string>
     <string name="subscribed">تم الاشتراك</string>
     <string name="month">شهر</string>
     <string name="important">مهم!</string>
@@ -1800,7 +1800,7 @@
     <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 سيبدأ التصويت قريبًا على CHOEAEDOL Celeb! 🏆\nاستعد لتشجيع مفضلتك لتحتل المركز الأول!\n⏰ يبدأ التصويت: %s\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 يجري الآن تصويت شرس لـ CHOEAEDOL Celeb 🗳️\nادعم مفضلتك بالقلوب الآن! 💖\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 من سيكون الفائز بالمجد؟! 🫣\nتحقق من ذلك على CHOEAEDOL Celeb الآن!\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
-    <string name="login_desc">ابدأ في 5 ثواني!</string>
+    <string name="login_desc">⚡️ابدأ خلال 3 ثوانٍ\nشاهد تصنيف الآيدول الآن!</string>
     <string name="login_email">ابدأ بالبريد الإلكتروني</string>
     <string name="hometab_title_rank">Ranking</string>
     <string name="hometab_title_myidol">My Idol</string>
@@ -1905,5 +1905,7 @@
     <string name="signup_desc2_noreward">أدخل رمز دعوة الشخص الذي أوصى بك لتبادل القلوب كأصدقاء.</string>
     <string name="signup_toast_auto_fill_recommender">تم إدخال رمز الدعوة المنسوخ تلقائيًا.</string>
     <string name="vote_ranking">تم التصويت</string>
-    <string name="heart_arcade_description1">العب الميني-جيمز🕹️ واربح قلوبًا🩷</string>
+    <string name="heart_arcade_description1">العب الميني-جيمز واربح قلوبًا!</string>
+    <string name="celeb_login_desc">⚡️ابدأ خلال 3 ثوانٍ\nشاهد تصنيف الممثلين الآن!</string>
+    <string name="describe_monthly_payment_ios">تجربة مجانية لمدة %1$d أسبوع، ثم %2$s شهريًا ما لم تُلغ.\nألغِ الاشتراك في App Store قبل ٢٤ ساعة من التجديد.</string>
 </resources>

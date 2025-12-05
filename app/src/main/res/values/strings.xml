@@ -206,7 +206,7 @@
     <string name="title_faq">FAQ</string>
     <string name="title_inquiry">FAQ / Inquiries</string>
     <string name="title_myinquirylist">My inquiry history</string>
-    <string name="title_voting_guide">Accumulated Votes</string>
+    <string name="title_voting_guide">My Cumulative Votes</string>
     <string name="hint_inquiry">Please enter your question.</string>
     <string name="title_rename">Change nickname</string>
     <string name="hint_nickname">Nickname</string>
@@ -916,7 +916,7 @@
     <string name="all_users_are_given">All users are given</string>
     <string name="daily_pack_modifier">Give full hearts to your idol every day</string>
     <string name="actor_daily_pack_modifier">Give full hearts to your celeb every day</string>
-    <string name="describe_monthly_payment">After %1$d week, you will be charged %2$s/month automatically.\nYou can cancel the payment whenever you want.</string>
+    <string name="describe_monthly_payment">%1$d-week free trial, then %2$s/month unless canceled.\nCancel at least 24 hours before renewal in Google Play.</string>
     <string name="subscribed">Subscribed</string>
     <string name="month">Month</string>
     <string name="important">Please read carefully!</string>
@@ -1230,8 +1230,7 @@ Hang a Subway billboard ad, in-app banner, etc for your Celeb!</string>
     <string name="actor_diamond_store_disclaimer">Diamonds cannot be used for voting. Please purchase Hearts from the Store when voting for your celeb on the Ranking.\nUsed diamonds are non-refundable.\nThe diamonds will be returned automatically as diamonds if the Support Event fundraising fails. Please refer to [Support - Important].</string>
     <string name="actor_support_about_info1">Whether it’s your bias or not,</string>
     <string name="actor_support_about_info2">All celebrities are available</string>
-    <string name="subscription_account_holding">There is a problem with your subscription. Click here to go to the
-Google Play subscription settings to fix your payment method.</string>
+    <string name="subscription_account_holding">There is a problem with your subscription. Click here to go to the Google Play subscription settings to fix your payment method.</string>
     <string name="popup_no_diamond_title">You have run out of diamonds :(</string>
     <string name="popup_diamond_shop_desc">You can buy diamonds</string>
     <string name="secure_user_id">User\'s code</string>
@@ -1420,7 +1419,7 @@ Google Play subscription settings to fix your payment method.</string>
     <string name="live_coming_soon_list">Coming soon</string>
     <string name="live_level_limit" formatted="false">Sorry.\nOnly users in level %d or above can access this video.</string>
     <string name="live_end">This live stream has ended.</string>
-    <string name="live_disclaimer">- ▶️ Views, ❤️ Like, 👁 Real Time Concurrent View Count and 📈 Peak Concurrent View Counts.\n- Live stream availability dpends on user levels.\n- You may be changed by your carrier when using cellular data.</string>
+    <string name="live_disclaimer">- ▶️ Views, ❤️ Like, 👁 Real Time Concurrent View Count and 📈 Peak Concurrent View Counts.\n- Live stream availability depends on user level.\n- You may be changed by your carrier when using cellular data.</string>
     <string name="live_empty">No scheduled stream yet</string>
     <string name="live_stalled">The stream is buffering</string>
     <string name="live_quality">Video Quality</string>
@@ -1826,7 +1825,7 @@ Give a special gift to my idol on CHOEAEDOL!💖</string>
     <string name="menu_sub_board">Free talk community</string>
     <string name="menu_sub_store">Buy hearts and diamonds</string>
     <string name="menu_sub_notice">Important notifications</string>
-    <string name="menu_sub_record">Idol Achievment records</string>
+    <string name="menu_sub_record">Idol Achievement records</string>
     <string name="menu_sub_quiz">Get until 500 hearts</string>
     <string name="menu_sub_face_matching">Which idol looks like me</string>
     <string name="welcome_mission_desc">You will receive a reward each time a mission is completed!\nIf you complete all the missions we´ll give you a bigger reward.</string>
@@ -1859,10 +1858,10 @@ Give a special gift to my idol on CHOEAEDOL!💖</string>
     <string name="share_awards_ready" formatted="false">[%s]\n🚀 Voting will start soon on CHOEAEDOL! 🏆\nGet ready to cheer for your favorite to take first place!\n⏰ Voting starts: %s(KST)\n\n#최애돌 #CHOEAEDOL</string>
     <string name="share_awards_run" formatted="false">[%s]\n🔥 Fierce voting is underway for CHOEAEDOL 🗳️\nSupport your favorite with hearts now! 💖\n\n#최애돌 #CHOEAEDOL</string>
     <string name="share_awards_result" formatted="false">[%s]\n🏆 Who will be the winner of glory?! 🫣\nCheck it out on CHOEAEDOL right now!\n\n#최애돌 #CHOEAEDOL</string>
-    <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 Voting will start soon on CHOEAEDOL Celeb! 🏆\nGet ready to cheer for your favorite celeb to win the firtst place!\n⏰ Voting starts: %s\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
+    <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 Voting will start soon on CHOEAEDOL Celeb! 🏆\nGet ready to cheer for your favorite celeb to win the first place!\n⏰ Voting starts: %s\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 Fierce voting is underway for CHOEAEDOL Celeb 🗳️\nSupport your favorite celeb with your hearts now! 💖\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 Who will be the winner of glory?! 🫣\nCheck it out on CHOEAEDOL Celeb right now!\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
-    <string name="login_desc">Get started in 5 seconds!</string>
+    <string name="login_desc">⚡️Start in 3 seconds\nCheck idol rankings now!</string>
     <string name="login_email">Log in with email</string>
     <string name="hometab_title_rank">Ranking</string>
     <string name="hometab_title_myidol">My Idol</string>
@@ -1966,5 +1965,7 @@ Give a special gift to my idol on CHOEAEDOL!💖</string>
     <string name="signup_desc2_noreward">Enter your recommender’s invitation code to exchange Hearts as friends.</string>
     <string name="signup_toast_auto_fill_recommender">The copied invitation code has been entered automatically.</string>
     <string name="vote_ranking">VOTED</string>
-    <string name="heart_arcade_description1">Play mini-games🕹️ and earn hearts🩷</string>
+    <string name="heart_arcade_description1">Play mini-games and earn hearts!</string>
+    <string name="celeb_login_desc">⚡️Start in 3 seconds\nSee actor rankings now!</string>
+    <string name="describe_monthly_payment_ios">%1$d-week free trial, then %2$s/month unless canceled.\nCancel at least 24 hours before renewal in App Store</string>
 </resources>

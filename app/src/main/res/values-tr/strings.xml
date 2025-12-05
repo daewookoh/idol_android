@@ -781,7 +781,7 @@
     <string name="all_users_are_given">Tüm kullanıcılar verilir</string>
     <string name="daily_pack_modifier">Her gün idolünüze tam kalpler verin</string>
     <string name="actor_daily_pack_modifier">Ünlülerinize her gün tam kalpler verin</string>
-    <string name="describe_monthly_payment">%1$d haftadan sonra sizden otomatik olarak ayda %2$s tutarında ücret alınacaktır.\nİstediğiniz zaman ödemeyi iptal edebilirsiniz.</string>
+    <string name="describe_monthly_payment">%1$d haftalık ücretsiz deneme; sonra %2$s/ay otomatik yenilenir.\nYenilemeden 24 saat önce Google Play’den iptal edin.</string>
     <string name="subscribed">Satın alınan</string>
     <string name="month">ay</string>
     <string name="important">Önemli!</string>
@@ -1707,7 +1707,7 @@ CHOEAEDOL\'daki idolüme özel bir hediye ver!💖</string>
     <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 CHOEAEDOL Celeb\'da oylama yakında başlayacak! 🏆\nEn sevdiğiniz kişinin birinci olması için tezahürat yapmaya hazır olun!\n⏰ Oylama başlangıcı: %s\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 CHOEAEDOL Celeb için şiddetli oylama sürüyor 🗳️\nEn sevdiğiniz kişiyi şimdi kalplerle destekleyin! 💖\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 Zaferin kazananı kim olacak?! 🫣\nHemen CHOEAEDOL Celeb\'a göz atın!\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
-    <string name="login_desc">5 saniyede başlayın!</string>
+    <string name="login_desc">⚡️3 saniyede başla\nİdollerin sıralamasını gör!</string>
     <string name="login_email">e-postayla başla</string>
     <string name="hometab_title_rank">Ranking</string>
     <string name="hometab_title_myidol">My Idol</string>
@@ -1811,5 +1811,7 @@ CHOEAEDOL\'daki idolüme özel bir hediye ver!💖</string>
     <string name="signup_desc2_noreward">Arkadaş olarak Kalpleri paylaşmak için kod davetini girin.</string>
     <string name="signup_toast_auto_fill_recommender">Kopyalanan davet kodu otomatik olarak girilmiştir.</string>
     <string name="vote_ranking">Oy verildi</string>
-    <string name="heart_arcade_description1">Mini oyunlar oynayın🕹️ ve kalpler kazanın🩷</string>
+    <string name="heart_arcade_description1">Mini oyunlar oynayın ve kalpler kazanın!</string>
+    <string name="celeb_login_desc">⚡️3 saniyede başla\nOyuncu sıralamasını gör!</string>
+    <string name="describe_monthly_payment_ios">%1$d haftalık ücretsiz deneme; sonra %2$s/ay otomatik yenilenir.\nYenilemeden 24 saat önce App Store’den iptal edin.</string>
 </resources>

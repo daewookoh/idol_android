@@ -176,7 +176,7 @@
     <string name="title_faq">FAQ</string>
     <string name="title_inquiry">FAQ / Anfragen</string>
     <string name="title_myinquirylist">Mein Anfrage-Verlauf</string>
-    <string name="title_voting_guide">Kumulierte Abstimmung</string>
+    <string name="title_voting_guide">Meine kumulierten Stimmen</string>
     <string name="hint_inquiry">Bitte geben Sie Ihre Frage ein.</string>
     <string name="title_rename">Spitznamen ändern</string>
     <string name="hint_nickname">Spitzname</string>
@@ -866,7 +866,7 @@
     <string name="all_users_are_given">Alle Benutzer sind angegeben</string>
     <string name="daily_pack_modifier">Geben Sie Ihrem Idol jeden Tag volle Herzen</string>
     <string name="actor_daily_pack_modifier">Geben Sie Ihrem Promi jeden Tag volle Herzen</string>
-    <string name="describe_monthly_payment">Nach %1$d Woche werden Ihnen automatisch %2$s/Monat berechnet.\nSie können die Zahlung jederzeit stornieren.</string>
+    <string name="describe_monthly_payment">%1$d Woche gratis; dann %2$s/Monat, sofern nicht gekündigt.\nKündigen Sie 24 Std. vor Verlängerung in Google Play.</string>
     <string name="subscribed">Abonniert</string>
     <string name="month">Monat</string>
     <string name="important">Wichtig!</string>
@@ -1800,7 +1800,7 @@ Schenken Sie meinem Idol auf CHOEAEDOL ein besonderes Geschenk!💖</string>
     <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 Die Abstimmung auf CHOEAEDOL Celeb beginnt bald! 🏆\nMachen Sie sich bereit, Ihrem Favoriten zuzujubeln, der den ersten Platz belegt!\n⏰ Die Abstimmung beginnt: %s\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 Es gibt eine heftige Abstimmung für CHOEAEDOL Celeb 🗳️\nUnterstützen Sie jetzt Ihren Favoriten mit Herzen! 💖\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 Wer wird der Gewinner des Ruhms sein?! 🫣\nSchau es dir jetzt auf CHOEAEDOL Celeb an!\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
-    <string name="login_desc">In 5 Sekunden loslegen!</string>
+    <string name="login_desc">⚡️Starte in 3 Sekunden\nIdol-Ranking jetzt ansehen!</string>
     <string name="login_email">Beginnen Sie mit der E-Mail</string>
     <string name="hometab_title_rank">Ranking</string>
     <string name="hometab_title_myidol">My Idol</string>
@@ -1905,5 +1905,7 @@ Bitte wechseln Sie zu einem anderen Land oder einer anderen Region und versuchen
     <string name="signup_desc2_noreward">Geben Sie den Einladungscode Ihres Freundes ein, um Herzen auszutauschen.</string>
     <string name="signup_toast_auto_fill_recommender">Der kopierte Einladungscode wurde automatisch eingetragen.</string>
     <string name="vote_ranking">ABGESTIMMT</string>
-    <string name="heart_arcade_description1">Spiel Minispiele🕹️ und sammle Herzen🩷</string>
+    <string name="heart_arcade_description1">Spiel Minispiele und sammle Herzen</string>
+    <string name="celeb_login_desc">⚡️Starte in 3 Sekunden\nSchauspieler-Ranking ansehen!</string>
+    <string name="describe_monthly_payment_ios">%1$d Woche gratis; dann %2$s/Monat, sofern nicht gekündigt.\nKündigen Sie 24 Std. vor Verlängerung in App Store.</string>
 </resources>

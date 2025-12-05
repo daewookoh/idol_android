@@ -241,8 +241,8 @@
     <string name="lable_final_result">최종결과</string>
     <string name="lable_review_ok">따뜻하게 별 다섯개</string>
     <string name="lable_review_no">냉정하게 무시하기</string>
-    <string name="lable_review_info1">최애에게 응원의 메세지를 남겨주세요.</string>
-    <string name="actor_lable_review_info1">최애에게 응원의 메세지를 남겨주세요.</string>
+    <string name="lable_review_info1">최애에게 응원의 메시지를 남겨주세요.</string>
+    <string name="actor_lable_review_info1">최애에게 응원의 메시지를 남겨주세요.</string>
     <string name="lable_review_info2">최애돌! 별 다섯개 받을만 하죠?</string>
     <string name="actor_lable_review_info2">최애돌 셀럽! 별 다섯개 받을만 하죠?</string>
     <string name="lable_get_info">데이터를 가져오는 중...</string>
@@ -379,7 +379,7 @@
     <string name="level_heart_guide_title3">명예전당 - 누적순위</string>
     <string name="level_heart_guide_title4">유의사항</string>
     <string name="level_heart_guide_desc1">최근 30일 간 일별 투표 순위 집계로 얻은 점수를 합산한 순위예요. 상위 100위까지 노출돼요.\n각 개인, 그룹 이름을 클릭하면 순위 변화 그래프를 볼 수 있어요.\n30일간의 누적 순위 1위로 선정된 아이돌과 그 팬덤의 이름으로 뜻깊은 곳에 기부를 보내고 있어요!\n\n✅ 집계 방법\n- 개인 : 매달 10일을 포함한 이전 30일간의 누적점수 1위 (11일 발표)\n- 그룹 : 매달 15일을 포함한 이전 30일간의 누적점수 1위 (16일 발표)\n- 그 외 카테고리 : 진행시 별도 공지\n\n✅ 보상\n- 아이돌&amp;팬덤 명의로 복지단체 50만원 기부\n- 서울 지하철 역 내 전광판 광고 게시</string>
-    <string name="level_heart_guide_desc3">매달 개인 11일, 그룹 16일에 리그 변경 기준에 따라 리그별 맴버가 결정됩니다.\n리그가 변경된 경우 명예전당 누적순위 점수는 0점으로 시작 합니다.</string>
+    <string name="level_heart_guide_desc3">매달 개인 11일, 그룹 16일에 리그 변경 기준에 따라 리그별 멤버가 결정됩니다.\n리그가 변경된 경우 명예전당 누적순위 점수는 0점으로 시작 합니다.</string>
     <string name="level_heart_guide_desc4">- 개인, 그룹의 리그 넘버는 별도 입니다. (그룹이 S리그여도 개인은 A리그일 수 있습니다.)\n- 동점자가 발생할 경우 동점자가 모두 리그 배정 규칙에 맞게 배정되며, 그 다음 달 기존 인원수에 맞게 재배정 됩니다.\n ex) A리그 동점자가 3명 발생하여 3명이 S리그로 이동(S 리그 정원 13명으로 변경), 그 다음 달 12명에 맞게 총 3명이 A리그로 이동\n- 신규 추가된 아이돌은 A리그에서 시작합니다.\n- 명예전당 내 리그제 도입 이전 순위 이력은 ‘ALL’로 표기 합니다.</string>
     <string name="title_heart_vote_ranking__format" formatted="false">%s 투표 Top 100</string>
     <string name="empty_heart_vote_ranking">하트 투표에 참여한 회원이 없습니다.</string>
@@ -867,7 +867,7 @@
     <string name="all_users_are_given">첫 사용자 누구나</string>
     <string name="daily_pack_modifier">매일매일 최애에게 하트가득</string>
     <string name="actor_daily_pack_modifier">매일매일 최애에게 하트가득</string>
-    <string name="describe_monthly_payment">%1$d주일 이후 %2$s 정기결제 예정이며, 언제든 해지 가능합니다.</string>
+    <string name="describe_monthly_payment">%1$d주 무료 체험 종료 후 %2$s/월로 자동 결제되며, 원치 않는 경우 체험 종료 24시간 전까지 Google Play에서 구독을 취소해주세요.</string>
     <string name="subscribed">정기결제 중</string>
     <string name="month">월</string>
     <string name="important">꼭 읽어보세요!</string>
@@ -1559,7 +1559,7 @@
     <string name="award_4th_gen_female_aggregated">4세대 핫 아이콘 여자 그룹 누적 순위</string>
     <string name="award_4th_gen_male_realtime">4세대 핫 아이콘 남자 그룹 실시간 순위</string>
     <string name="award_4th_gen_female_realtime">4세대 핫 아이콘 여자 그룹 실시간 순위</string>
-    <string name="award_4th_gen_realtime_example">4세대 그룹 후보의 개인(맴버) 투표 수와 그룹 투표 수를 합산한 실시간 순위 예시입니다.</string>
+    <string name="award_4th_gen_realtime_example">4세대 그룹 후보의 개인(멤버) 투표 수와 그룹 투표 수를 합산한 실시간 순위 예시입니다.</string>
     <string name="award_4th_gen_aggregated_info">4세대 그룹 후보의 개인(멤버) 투표 수와 그룹 투표 수를 합산한 누적 순위 현황입니다.</string>
     <string name="award_4th_gen_realtime_info">4세대 그룹 후보의 개인(멤버) 투표 수와 그룹 투표 수를 합산한 실시간 순위 현황입니다.</string>
     <string name="award_solo_final" formatted="false">%s\n 솔로 아티스트 인기상 최종 결과</string>
@@ -1794,7 +1794,7 @@
     <string name="hof_daily_tab">일일 순위</string>
     <string name="celeb_welcome_mission_set_most_title">최애 설정하기</string>
     <string name="celeb_welcome_mission_set_most_desc">나의 최애를 설정해보세요</string>
-    <string name="celeb_welcome_mission_vote_desc">최에에게 하트를 보내주세요</string>
+    <string name="celeb_welcome_mission_vote_desc">최애에게 하트를 보내주세요</string>
     <string name="celeb_welcome_mission_community_desc">같은 최애 친구들과 함께 소통해보세요</string>
     <string name="celeb_impossible_write_message">최애 설정이 필요해요</string>
     <string name="share_awards_ready" formatted="false">[%s]\n🚀 최애돌에서 곧 투표가 시작돼요! 🏆\n최애가 1위에 오를 수 있도록 응원 준비 완료!\n⏰ 투표 시작 : %s(KST)\n\n#최애돌 #CHOEAEDOL</string>
@@ -1803,7 +1803,7 @@
     <string name="celeb_share_awards_ready" formatted="false">[%s]\n🚀 최애돌셀럽에서 곧 투표가 시작돼요! 🏆\n최애가 1위에 오를 수 있도록 응원 준비 완료!\n⏰ 투표 시작 : %s\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_run" formatted="false">[%s]\n🔥 최애돌셀럽에서 불꽃 튀는 투표 진행 중 🗳️\n지금 하트로 최애를 응원해 주세요! 💖\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
     <string name="celeb_share_awards_result" formatted="false">[%s]\n🏆 영광의 1위 주인공은 누구?! 🫣\n지금 최애돌셀럽에서 확인해보세요!\n\n#최애돌셀럽 #CHOEAEDOL_Celeb</string>
-    <string name="login_desc">5초만에 시작하기!</string>
+    <string name="login_desc">⚡️3초만에 시작하고\n아이돌 순위 바로 보기!</string>
     <string name="login_email">이메일로 시작</string>
     <string name="hometab_title_rank">랭킹</string>
     <string name="hometab_title_myidol">나의 최애</string>
@@ -1907,5 +1907,7 @@
     <string name="signup_desc2_noreward">추천인의 초대코드를 입력하면 친구가 되어 하트를 주고받을 수 있어요.</string>
     <string name="signup_toast_auto_fill_recommender">복사한 초대코드를 자동으로 입력했어요.</string>
     <string name="vote_ranking">투표 완료</string>
-    <string name="heart_arcade_description1">미니게임 하고🕹️ 하트도 벌어요🩷</string>
+    <string name="heart_arcade_description1">미니게임 하고 하트도 벌어요!</string>
+    <string name="celeb_login_desc">⚡️3초만에 시작하고\n트로트&amp;배우 순위 바로 보기!</string>
+    <string name="describe_monthly_payment_ios">%1$d주 무료 체험 종료 후 %2$s/월로 자동 결제되며, 원치 않는 경우 체험 종료 24시간 전까지 App Store에서 구독을 취소해주세요.</string>
 </resources>
