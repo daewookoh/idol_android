@@ -1,5 +1,6 @@
 package net.ib.mn.presentation.community
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -93,6 +94,7 @@ import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.Constants
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.NumberFormatUtil
+import net.ib.mn.util.link.LinkUtil
 
 /**
  * CommunityTab - 커뮤니티 탭 타입
@@ -534,7 +536,26 @@ fun CommunityScreen(
             },
             onShareClick = {
                 showIdolDialog = false
-                // TODO: 공유하기
+                // 공유 URL 생성 (old 프로젝트와 동일)
+                val params = listOf("community")
+                val queries = listOf(
+                    "idol" to rankingItem.id,
+                    "group" to (rankingItem.groupId?.toString() ?: rankingItem.id)
+                )
+                val shareUrl = LinkUtil.getAppLinkUrl(context, params, queries)
+
+                // 공유 메시지 생성 (아이돌 이름 포함)
+                val idolDisplayName = rankingItem.name.split("_").firstOrNull() ?: rankingItem.name
+                val shareMessage = context.getString(R.string.community_main_share_msg, idolDisplayName)
+
+                // 공유 Intent
+                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, "$shareMessage\n$shareUrl")
+                }
+                context.startActivity(
+                    Intent.createChooser(shareIntent, context.getString(R.string.title_share))
+                )
             },
             onAllInDayClick = {
                 showIdolDialog = false
