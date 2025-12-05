@@ -1,6 +1,7 @@
 package net.ib.mn.ui.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,6 +21,7 @@ import net.ib.mn.R
  *
  * @param modifier Scaffold에 적용할 Modifier
  * @param useFullScreen true일 경우 위쪽 패딩 없이 화면 사용 (기본: false)
+ * @param excludeBottomPadding true일 경우 하단 패딩 제외 (키보드/IME 직접 처리 시 사용)
  * @param topBar 상단 앱바
  * @param bottomBar 하단 네비게이션 바
  * @param snackbarHost 스낵바 호스트
@@ -33,6 +35,7 @@ import net.ib.mn.R
 fun ExoScaffold(
     modifier: Modifier = Modifier,
     useFullScreen: Boolean = false,
+    excludeBottomPadding: Boolean = false,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     snackbarHost: @Composable () -> Unit = {},
@@ -49,7 +52,7 @@ fun ExoScaffold(
     }
 
     Scaffold(
-        modifier = modifier.fillMaxSize(), // Scaffold는 항상 전체 화면 차지
+        modifier = modifier.fillMaxSize(),
         topBar = topBar,
         bottomBar = bottomBar,
         snackbarHost = snackbarHost,
@@ -59,11 +62,18 @@ fun ExoScaffold(
         contentColor = contentColor,
         contentWindowInsets = windowInsets,
         content = { paddingValues ->
-            // SafeArea 패딩을 자동으로 적용
+            val effectivePadding = if (excludeBottomPadding) {
+                PaddingValues(
+                    top = paddingValues.calculateTopPadding(),
+                    bottom = 0.dp
+                )
+            } else {
+                paddingValues
+            }
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
+                    .padding(effectivePadding)
             ) {
                 content()
             }

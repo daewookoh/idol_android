@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -177,6 +178,11 @@ fun CommentSection(
         }
     }
 
+    // CommentInput 높이: 약 56dp
+    val commentInputHeight = 56.dp
+    // ExoEmoticonPanel 높이: 280dp (visible일 때)
+    val emoticonPanelHeight = if (showEmoticonPanel) 280.dp else 0.dp
+
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -226,7 +232,6 @@ fun CommentSection(
                 },
                 isEmoticonPanelOpen = showEmoticonPanel,
                 selectedEmoticonUrl = selectedEmoticonUrl,
-                onEmoticonClear = { viewModel.clearEmoticon() },
                 focusRequester = commentFocusRequester,
                 onInputFocused = {
                     // 입력창 포커스 시 이모티콘 패널 닫기
@@ -252,6 +257,18 @@ fun CommentSection(
                     viewModel.selectEmoticon(emoticon.id, url)
                     viewModel.submitComment(articleId)
                 }
+            )
+        }
+
+        // 이모티콘 프리뷰 (old: cl_preview - CommentInput 바로 위에 겹쳐서 표시)
+        // 댓글 목록 위에 overlay로 표시되어 뒤가 투명하게 보임
+        selectedEmoticonUrl?.takeIf { it.isNotEmpty() }?.let { url ->
+            EmoticonPreview(
+                emoticonUrl = url,
+                onClose = { viewModel.clearEmoticon() },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = commentInputHeight + emoticonPanelHeight)
             )
         }
 

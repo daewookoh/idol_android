@@ -8,10 +8,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
@@ -51,6 +57,7 @@ import net.ib.mn.ui.components.ExoBottomSheetAction
 import net.ib.mn.ui.components.ExoBottomSheetActionItem
 import net.ib.mn.presentation.common.CommentInput
 import net.ib.mn.presentation.common.CommentSectionViewModel
+import net.ib.mn.presentation.common.EmoticonPreview
 import net.ib.mn.presentation.common.commentItems
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.components.ExoEmoticonPanel
@@ -164,6 +171,9 @@ fun ArticleDetailScreen(
     var commentReportErrorMessage by remember { mutableStateOf("") }
     var commentToReport by remember { mutableStateOf<CommentModel?>(null) }
 
+    // 댓글 길이 validation 상태
+    var showCommentLengthDialog by remember { mutableStateOf(false) }
+
     // 작성자 여부 확인
     val myUserId = articleViewModel.myUserId
     val isAdmin = articleViewModel.isAdmin
@@ -193,6 +203,7 @@ fun ArticleDetailScreen(
     BackHandler(onBack = onBackClick)
 
     ExoScaffold(
+        excludeBottomPadding = true,
         topBar = {
             ExoAppBar(
                 title = stringResource(R.string.post_detail),
@@ -214,6 +225,9 @@ fun ArticleDetailScreen(
         // 그 외 (FreeBoardPage, FanTalkSubPage 등): FREE_BOARD (하트 투표 없음)
         val detailType = if (isFeed) ArticleType.FEED else ArticleType.FREE_BOARD
 
+        // Navigation bar 높이
+        val navigationBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -223,8 +237,8 @@ fun ArticleDetailScreen(
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
-                // 하단에 CommentInput 높이(약 56dp) + 여유 공간만큼 패딩
-                contentPadding = PaddingValues(bottom = 60.dp)
+                // 하단에 CommentInput 높이(약 56dp) + navigation bar 높이 + 여유 공간
+                contentPadding = PaddingValues(bottom = 60.dp + navigationBarHeight)
             ) {
                 // 게시글
                 item(key = "article") {
@@ -287,14 +301,27 @@ fun ArticleDetailScreen(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .then(if (!showEmoticonPanel) Modifier.imePadding() else Modifier)
             ) {
+                // 이모티콘 프리뷰 (CommentInput 위에 표시)
+                selectedEmoticonUrl?.takeIf { it.isNotEmpty() }?.let { url ->
+                    EmoticonPreview(
+                        emoticonUrl = url,
+                        onClose = { commentViewModel.clearEmoticon() }
+                    )
+                }
+
                 // 댓글 입력창
                 CommentInput(
                     value = commentText,
                     onValueChange = commentViewModel::setCommentText,
                     onSubmit = {
                         val articleIdLong = article.id.toLongOrNull() ?: return@CommentInput
+                        // 이모티콘 없이 텍스트만 있는 경우 5글자 이상 필요
+                        val hasEmoticon = !selectedEmoticonUrl.isNullOrEmpty()
+                        if (!hasEmoticon && commentText.trim().length < 5) {
+                            showCommentLengthDialog = true
+                            return@CommentInput
+                        }
                         commentViewModel.submitComment(articleIdLong)
                     },
                     onEmoticonClick = {
@@ -305,7 +332,6 @@ fun ArticleDetailScreen(
                     },
                     isEmoticonPanelOpen = showEmoticonPanel,
                     selectedEmoticonUrl = selectedEmoticonUrl,
-                    onEmoticonClear = { commentViewModel.clearEmoticon() },
                     focusRequester = commentFocusRequester,
                     onInputFocused = {
                         // 입력창 포커스 시 이모티콘 패널 닫기
@@ -323,6 +349,19 @@ fun ArticleDetailScreen(
                         commentViewModel.hideEmoticonPanel()
                         commentFocusRequester.requestFocus()
                     }
+                )
+
+                // Navigation bar + IME 영역 (배경색 적용)
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(ColorPalette.background100)
+                        .windowInsetsBottomHeight(
+                            if (!showEmoticonPanel)
+                                WindowInsets.navigationBars.union(WindowInsets.ime)
+                            else
+                                WindowInsets.navigationBars
+                        )
                 )
             }
 
@@ -550,6 +589,14 @@ fun ArticleDetailScreen(
         ExoErrorDialog(
             message = commentReportErrorMessage,
             onDismiss = { showCommentReportErrorDialog = false }
+        )
+    }
+
+    // 댓글 길이 부족 다이얼로그
+    if (showCommentLengthDialog) {
+        ExoErrorDialog(
+            message = stringResource(R.string.comment_minimum_characters, 5),
+            onDismiss = { showCommentLengthDialog = false }
         )
     }
 }
