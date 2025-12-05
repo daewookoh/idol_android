@@ -125,5 +125,12 @@ data class ConfigSelfResponse(
     val awardBegin: String? = null,  // 투표 시작일 (ISO 8601 format)
 
     @SerializedName("award_end")
-    val awardEnd: String? = null  // 투표 종료일 (ISO 8601 format)
+    val awardEnd: String? = null,  // 투표 종료일 (ISO 8601 format)
+
+    // 번역 설정
+    @SerializedName("show_translation")
+    val showTranslation: String? = null,  // "Y" = 번역 기능 활성화
+
+    @SerializedName("translation_locales")
+    val translationLocales: List<String>? = null  // 번역 지원 언어 목록 (예: ["ko", "ja", "zh", "en", "es"])
 )

@@ -3,23 +3,45 @@ package net.ib.mn.presentation.article
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.domain.model.CommentModel
 import net.ib.mn.presentation.common.ArticleType
 import net.ib.mn.presentation.common.ExoArticle
 import net.ib.mn.presentation.common.ExoArticleNavigation
@@ -27,7 +49,11 @@ import net.ib.mn.presentation.common.ExoArticleViewModel
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoBottomSheetAction
 import net.ib.mn.ui.components.ExoBottomSheetActionItem
+import net.ib.mn.presentation.common.CommentInput
+import net.ib.mn.presentation.common.CommentSectionViewModel
+import net.ib.mn.presentation.common.commentItems
 import net.ib.mn.ui.components.ExoConfirmDialog
+import net.ib.mn.ui.components.ExoEmoticonPanel
 import net.ib.mn.ui.components.ExoErrorDialog
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.theme.ColorPalette
@@ -48,9 +74,78 @@ fun ArticleDetailScreen(
     onArticleDeleted: (() -> Unit)? = null,
     onNavigateToProfile: (userId: Int, nickname: String, imageUrl: String?, level: Int, mostIdolName: String?) -> Unit = { _, _, _, _, _ -> },
     onNavigateToPhotoDetail: (ArticleModel, Int) -> Unit = { _, _ -> },
-    articleViewModel: ExoArticleViewModel = hiltViewModel()
+    articleViewModel: ExoArticleViewModel = hiltViewModel(),
+    commentViewModel: CommentSectionViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val commentFocusRequester = remember { FocusRequester() }
+
+    // 게시글 상태 (로컬에서 관리하여 댓글 수 등 업데이트 반영)
+    var currentArticle by remember { mutableStateOf(article) }
+
+    // 댓글 상태
+    val commentUiState by commentViewModel.uiState.collectAsState()
+    val commentText by commentViewModel.commentText.collectAsState()
+    val isFullScreenLoading by commentViewModel.isFullScreenLoading.collectAsState()
+    val scrollToTopEvent by commentViewModel.scrollToTopEvent.collectAsState()
+    val commentCountDelta by commentViewModel.commentCountDelta.collectAsState()
+    val showEmoticonPanel by commentViewModel.showEmoticonPanel.collectAsState()
+    val selectedEmoticonId by commentViewModel.selectedEmoticonId.collectAsState()
+    val selectedEmoticonUrl by commentViewModel.selectedEmoticonUrl.collectAsState()
+    val cdnUrl by commentViewModel.cdnUrl.collectAsState()
+    val listState = rememberLazyListState()
+
+    // 화면 진입 시 최신 article 데이터 로드 및 댓글 초기 로드
+    LaunchedEffect(article.id) {
+        val articleIdLong = article.id.toLongOrNull() ?: return@LaunchedEffect
+
+        // 최신 article 데이터 로드
+        articleViewModel.loadArticle(
+            articleId = articleIdLong,
+            onSuccess = { latestArticle ->
+                currentArticle = latestArticle
+                onArticleUpdated(latestArticle)
+            }
+        )
+
+        // 댓글 초기 로드
+        commentViewModel.loadComments(articleIdLong)
+    }
+
+    // 댓글 수 변경 시 게시글 업데이트 및 백스택 동기화
+    LaunchedEffect(commentCountDelta) {
+        if (commentCountDelta != 0) {
+            val newCommentCount = (currentArticle.commentCount + commentCountDelta).coerceAtLeast(0)
+            currentArticle = currentArticle.copy(commentCount = newCommentCount)
+            onArticleUpdated(currentArticle)
+            commentViewModel.consumeCommentCountDelta()
+        }
+    }
+
+    // 댓글 더 불러오기 (스크롤 끝 감지)
+    val shouldLoadMoreComments by remember {
+        derivedStateOf {
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val totalItems = listState.layoutInfo.totalItemsCount
+            lastVisibleItem >= totalItems - 3 && commentUiState.hasMore && !commentUiState.isLoading
+        }
+    }
+
+    LaunchedEffect(shouldLoadMoreComments) {
+        if (shouldLoadMoreComments) {
+            commentViewModel.loadMoreComments()
+        }
+    }
+
+    // 댓글 작성 완료 후 첫 댓글로 스크롤 (index 0은 게시글, index 1이 첫 댓글)
+    LaunchedEffect(scrollToTopEvent) {
+        if (scrollToTopEvent) {
+            listState.animateScrollToItem(1) // 첫 번째 댓글 위치
+            commentViewModel.consumeScrollToTopEvent()
+        }
+    }
 
     // 메뉴 관련 상태
     var showMoreBottomSheet by remember { mutableStateOf(false) }
@@ -58,6 +153,16 @@ fun ArticleDetailScreen(
     var showReportErrorDialog by remember { mutableStateOf(false) }
     var reportErrorMessage by remember { mutableStateOf("") }
     var showDeleteDialog by remember { mutableStateOf(false) }
+
+    // 댓글 삭제 관련 상태
+    var showCommentDeleteDialog by remember { mutableStateOf(false) }
+    var commentToDelete by remember { mutableStateOf<CommentModel?>(null) }
+
+    // 댓글 신고 관련 상태
+    var showCommentReportDialog by remember { mutableStateOf(false) }
+    var showCommentReportErrorDialog by remember { mutableStateOf(false) }
+    var commentReportErrorMessage by remember { mutableStateOf("") }
+    var commentToReport by remember { mutableStateOf<CommentModel?>(null) }
 
     // 작성자 여부 확인
     val myUserId = articleViewModel.myUserId
@@ -109,18 +214,132 @@ fun ArticleDetailScreen(
         // 그 외 (FreeBoardPage, FanTalkSubPage 등): FREE_BOARD (하트 투표 없음)
         val detailType = if (isFeed) ArticleType.FEED else ArticleType.FREE_BOARD
 
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            item {
-                ExoArticle(
-                    article = article,
-                    type = detailType,
-                    isVisible = true,
-                    externalTabName = externalTabName,
-                    onArticleUpdated = onArticleUpdated,
-                    viewModel = articleViewModel
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(ColorPalette.background100)
+        ) {
+            // 스크롤 가능한 콘텐츠 (게시글 + 댓글 목록) - 키보드에 영향받지 않음
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize(),
+                // 하단에 CommentInput 높이(약 56dp) + 여유 공간만큼 패딩
+                contentPadding = PaddingValues(bottom = 60.dp)
+            ) {
+                // 게시글
+                item(key = "article") {
+                    ExoArticle(
+                        article = currentArticle,
+                        type = detailType,
+                        isVisible = true,
+                        externalTabName = externalTabName,
+                        onArticleUpdated = { updatedArticle ->
+                            currentArticle = updatedArticle
+                            onArticleUpdated(updatedArticle)
+                        },
+                        viewModel = articleViewModel
+                    )
+                }
+
+                // 댓글 목록
+                commentItems(
+                    comments = commentUiState.comments,
+                    isLoading = commentUiState.isLoading,
+                    isEmpty = commentUiState.comments.isEmpty() && !commentUiState.isLoading,
+                    hasMore = commentUiState.hasMore,
+                    currentUserId = myUserId ?: 0,
+                    currentUserLevel = if (isAdmin) Constants.LEVEL_ADMIN else 0,
+                    articleAuthorId = currentArticle.user?.id ?: 0,
+                    cdnUrl = cdnUrl,
+                    useTranslation = commentViewModel.useTranslation,
+                    translationLocales = commentViewModel.translationLocales,
+                    onLoadMore = { commentViewModel.loadMoreComments() },
+                    onProfileClick = { comment ->
+                        comment.user?.let { user ->
+                            onNavigateToProfile(
+                                user.id,
+                                user.nickname ?: "",
+                                user.imageUrlCommunity,
+                                user.level,
+                                null
+                            )
+                        }
+                    },
+                    onReportClick = { comment ->
+                        commentToReport = comment
+                        showCommentReportDialog = true
+                    },
+                    onDeleteClick = { comment ->
+                        commentToDelete = comment
+                        showCommentDeleteDialog = true
+                    },
+                    onTranslateClick = { comment ->
+                        commentViewModel.translateComment(comment.id)
+                    },
+                    onTranslatableChecked = { commentId, isTranslatable ->
+                        commentViewModel.updateCommentTranslatable(commentId, isTranslatable)
+                    }
                 )
             }
-            // TODO: 댓글 목록
+
+            // 하단 입력 영역 - 키보드와 함께 움직임
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .then(if (!showEmoticonPanel) Modifier.imePadding() else Modifier)
+            ) {
+                // 댓글 입력창
+                CommentInput(
+                    value = commentText,
+                    onValueChange = commentViewModel::setCommentText,
+                    onSubmit = {
+                        val articleIdLong = article.id.toLongOrNull() ?: return@CommentInput
+                        commentViewModel.submitComment(articleIdLong)
+                    },
+                    onEmoticonClick = {
+                        // 이모티콘 버튼 클릭 시 키보드 내리고 패널 토글
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                        commentViewModel.toggleEmoticonPanel()
+                    },
+                    isEmoticonPanelOpen = showEmoticonPanel,
+                    selectedEmoticonUrl = selectedEmoticonUrl,
+                    onEmoticonClear = { commentViewModel.clearEmoticon() },
+                    focusRequester = commentFocusRequester,
+                    onInputFocused = {
+                        // 입력창 포커스 시 이모티콘 패널 닫기
+                        commentViewModel.hideEmoticonPanel()
+                    }
+                )
+
+                // 이모티콘 패널 (댓글 입력창 아래에 표시)
+                ExoEmoticonPanel(
+                    visible = showEmoticonPanel,
+                    onEmoticonSelected = { emoticon ->
+                        val url = emoticon.imageUrl.ifEmpty { emoticon.thumbnail }
+                        commentViewModel.selectEmoticon(emoticon.id, url)
+                        // 이모티콘 선택 후 패널 닫고 댓글창 포커스
+                        commentViewModel.hideEmoticonPanel()
+                        commentFocusRequester.requestFocus()
+                    }
+                )
+            }
+
+            // 전체 화면 로딩 오버레이 (댓글 작성 중)
+            if (isFullScreenLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(ColorPalette.textDefault.copy(alpha = 0.3f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = ColorPalette.main,
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
+            }
         }
     }
 
@@ -159,9 +378,24 @@ fun ArticleDetailScreen(
     // 신고 확인 다이얼로그
     if (showReportDialog) {
         val reportHeart = articleViewModel.reportHeart
+        // 하트 숫자를 빨간색으로 표시
+        val reportMessage = buildAnnotatedString {
+            val fullText = stringResource(R.string.msg_report_confirm, reportHeart)
+            val heartText = reportHeart.toString()
+            val startIndex = fullText.indexOf(heartText)
+            if (startIndex >= 0) {
+                append(fullText.substring(0, startIndex))
+                withStyle(SpanStyle(color = ColorPalette.main)) {
+                    append(heartText)
+                }
+                append(fullText.substring(startIndex + heartText.length))
+            } else {
+                append(fullText)
+            }
+        }
         ExoConfirmDialog(
             title = stringResource(R.string.title_report),
-            message = stringResource(R.string.msg_report_confirm, reportHeart),
+            message = reportMessage,
             confirmButtonText = stringResource(R.string.yes),
             dismissButtonText = stringResource(R.string.no),
             onConfirm = {
@@ -183,6 +417,8 @@ fun ArticleDetailScreen(
                                 context.getString(R.string.failed_to_report_2202)
                             ExoArticleViewModel.GCODE_TIME_LIMIT ->
                                 context.getString(R.string.failed_to_report_2203)
+                            ExoArticleViewModel.GCODE_NOT_ENOUGH_HEART ->
+                                context.getString(R.string.not_enough_heart)
                             else -> context.getString(R.string.error_abnormal_default)
                         }
                         showReportErrorDialog = true
@@ -225,6 +461,95 @@ fun ArticleDetailScreen(
                 )
             },
             onDismiss = { showDeleteDialog = false }
+        )
+    }
+
+    // 댓글 삭제 확인 다이얼로그
+    if (showCommentDeleteDialog && commentToDelete != null) {
+        ExoConfirmDialog(
+            title = stringResource(R.string.title_remove),
+            message = stringResource(R.string.remove_desc),
+            confirmButtonText = stringResource(R.string.yes),
+            dismissButtonText = stringResource(R.string.no),
+            onConfirm = {
+                showCommentDeleteDialog = false
+                commentToDelete?.let { comment ->
+                    commentViewModel.deleteComment(comment.id)
+                }
+                commentToDelete = null
+            },
+            onDismiss = {
+                showCommentDeleteDialog = false
+                commentToDelete = null
+            }
+        )
+    }
+
+    // 댓글 신고 확인 다이얼로그
+    if (showCommentReportDialog && commentToReport != null) {
+        val commentReportHeart = commentViewModel.reportHeart
+        // 하트 숫자를 빨간색으로 표시
+        val commentReportMessage = buildAnnotatedString {
+            val fullText = stringResource(R.string.msg_report_confirm, commentReportHeart)
+            val heartText = commentReportHeart.toString()
+            val startIndex = fullText.indexOf(heartText)
+            if (startIndex >= 0) {
+                append(fullText.substring(0, startIndex))
+                withStyle(SpanStyle(color = ColorPalette.main)) {
+                    append(heartText)
+                }
+                append(fullText.substring(startIndex + heartText.length))
+            } else {
+                append(fullText)
+            }
+        }
+        ExoConfirmDialog(
+            title = stringResource(R.string.title_report),
+            message = commentReportMessage,
+            confirmButtonText = stringResource(R.string.yes),
+            dismissButtonText = stringResource(R.string.no),
+            onConfirm = {
+                showCommentReportDialog = false
+                commentToReport?.let { comment ->
+                    commentViewModel.reportComment(
+                        commentId = comment.id,
+                        onSuccess = {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.report_done),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        },
+                        onError = { gcode ->
+                            commentReportErrorMessage = when (gcode) {
+                                CommentSectionViewModel.GCODE_ALREADY_REPORTED ->
+                                    context.getString(R.string.comment_report_error_2501)
+                                CommentSectionViewModel.GCODE_DAILY_LIMIT ->
+                                    context.getString(R.string.failed_to_report_2202)
+                                CommentSectionViewModel.GCODE_TIME_LIMIT ->
+                                    context.getString(R.string.failed_to_report_2203)
+                                CommentSectionViewModel.GCODE_NOT_ENOUGH_HEART ->
+                                    context.getString(R.string.not_enough_heart)
+                                else -> context.getString(R.string.error_abnormal_default)
+                            }
+                            showCommentReportErrorDialog = true
+                        }
+                    )
+                }
+                commentToReport = null
+            },
+            onDismiss = {
+                showCommentReportDialog = false
+                commentToReport = null
+            }
+        )
+    }
+
+    // 댓글 신고 에러 다이얼로그
+    if (showCommentReportErrorDialog) {
+        ExoErrorDialog(
+            message = commentReportErrorMessage,
+            onDismiss = { showCommentReportErrorDialog = false }
         )
     }
 }

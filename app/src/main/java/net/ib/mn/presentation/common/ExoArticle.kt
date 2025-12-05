@@ -382,9 +382,17 @@ fun ExoArticle(
                 }
             }
 
-            // 번역 버튼 (FREE_BOARD에서는 숨김)
-            val hasTranslatableContent = content.isNotEmpty() && !isYoutubeLink
-            if (!type.isFreeBoard && showTranslation && hasTranslatableContent) {
+            // 번역 버튼 (FREE_BOARD에서는 숨김 - old 프로젝트 TranslateUiHelper와 동일)
+            val systemLanguage = remember { LocaleUtil.getSystemLanguage(context).lowercase() }
+            val isTranslatable = remember(content, article.nation, showTranslation) {
+                showTranslation &&
+                    content.isNotEmpty() &&
+                    !isYoutubeLink &&
+                    !article.nation.isNullOrEmpty() &&
+                    !systemLanguage.startsWith(article.nation!!.lowercase()) &&
+                    LocaleUtil.extractTranslatable(content).isNotEmpty()
+            }
+            if (!type.isFreeBoard && isTranslatable) {
                 Text(
                     text = stringResource(R.string.see_translate),
                     style = ExoTypo.body12.copy(color = ColorPalette.textGray),

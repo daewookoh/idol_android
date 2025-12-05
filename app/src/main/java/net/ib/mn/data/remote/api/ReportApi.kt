@@ -26,6 +26,14 @@ interface ReportApi {
     ): Response<ResponseBody>
 
     /**
+     * 댓글 신고하기
+     */
+    @POST("reports/")
+    suspend fun reportComment(
+        @Body body: ReportCommentRequest
+    ): Response<ResponseBody>
+
+    /**
      * 신고 가능 여부 확인
      */
     @GET("reports/possible/user/")
@@ -41,4 +49,8 @@ data class ReportUserRequest(
 
 data class ReportArticleRequest(
     val article_id: Long
+)
+
+data class ReportCommentRequest(
+    val comment_id: Int
 )

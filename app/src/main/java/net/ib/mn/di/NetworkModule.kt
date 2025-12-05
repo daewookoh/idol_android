@@ -190,4 +190,14 @@ object NetworkModule {
     @Singleton
     fun provideMarketApi(retrofit: Retrofit): MarketApi =
         retrofit.create(MarketApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideCommentsApi(retrofit: Retrofit): CommentsApi =
+        retrofit.create(CommentsApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideEmoticonApi(retrofit: Retrofit): EmoticonApi =
+        retrofit.create(EmoticonApi::class.java)
 }

@@ -102,4 +102,30 @@ object LocaleUtil {
             else -> name.ifEmpty { nameEn }
         }
     }
+
+    /**
+     * 번역 가능한 텍스트 추출 (URL, 해시태그, 이모지, 멘션 제거)
+     * old 프로젝트의 UtilK.extractTranslatable과 동일
+     */
+    fun extractTranslatable(input: String): String {
+        // URL 패턴
+        val urlPattern = "(http|https)://(([\\w\\!\\@\\#\\$\\%\\^\\&\\*\\(\\)\\-\\+\\=\\(\\)\\{\\}\\?\\<\\>])*)+([\\.|/](([\\w\\!\\@\\#\\$\\%\\^\\&\\*\\(\\)\\-\\+\\=\\(\\)\\{\\}\\?\\<\\>])*))+"
+
+        // 해시태그 패턴
+        val hashtagPattern = "#(\\p{L}|_|[0-9])+"
+
+        // 이모지 패턴 (문자/숫자/기호 이외의 문자를 제거)
+        val emojiPattern = "[^\\p{L}\\p{N}\\p{P}\\p{Z}]"
+
+        // 멘션 패턴
+        val mentionPattern = "@\\{\\d+:[^}]+\\}"
+
+        // 패턴을 통합
+        val combinedPattern = "$urlPattern|$hashtagPattern|$emojiPattern|$mentionPattern"
+
+        // Regex를 이용해 매칭되는 부분을 제거
+        return Regex(combinedPattern).replace(input, "")
+            .replace("\\s+".toRegex(), " ")  // 여러 공백을 하나로
+            .trim()
+    }
 }

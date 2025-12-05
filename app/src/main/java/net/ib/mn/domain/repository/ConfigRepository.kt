@@ -179,4 +179,21 @@ interface ConfigRepository {
      * @return String? (ISO 8601 format)
      */
     fun getAwardEnd(): String?
+
+    /**
+     * 번역 기능 사용 여부 (캐시된 ConfigSelf에서)
+     * Old: configModel.showTranslation
+     *
+     * @return Boolean (기본값 false)
+     */
+    fun getShowTranslation(): Boolean
+
+    /**
+     * 번역 지원 언어 목록 (캐시된 ConfigSelf에서)
+     * Old: configModel.translationLocales
+     * 예: ["ko", "ja", "zh", "en", "es"]
+     *
+     * @return List<String> (기본값 빈 리스트)
+     */
+    fun getTranslationLocales(): List<String>
 }

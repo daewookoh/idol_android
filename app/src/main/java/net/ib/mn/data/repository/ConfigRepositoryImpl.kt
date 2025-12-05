@@ -177,61 +177,36 @@ class ConfigRepositoryImpl @Inject constructor(
      * startup에서 호출되어 캐시된 경우 API 호출하지 않음
      */
     override fun getTypeList(forceRefresh: Boolean): Flow<List<TypeListModel>> = flow {
-        logD("API_RESPONSE", "========================================")
-        logD("API_RESPONSE", "[ConfigRepository] getTypeList called")
-        logD("API_RESPONSE", "  - forceRefresh: $forceRefresh")
-        logD("API_RESPONSE", "  - cachedTypeList: ${cachedTypeList?.size ?: 0} items")
-
         // 캐시가 있고 forceRefresh가 false면 캐시 반환
         if (!forceRefresh && cachedTypeList != null) {
-            logD("API_RESPONSE", "✓ Returning cached typeList (${cachedTypeList!!.size} items)")
-            logD("API_RESPONSE", "========================================")
             emit(cachedTypeList!!)
             return@flow
         }
 
         // API 호출
-        logD("API_RESPONSE", "Calling TypeList API: GET configs/typelist/")
         try {
             val response = configsApi.getTypeList()
-
-            logD("API_RESPONSE", "Response Code: ${response.code()}")
-            logD("API_RESPONSE", "Response Success: ${response.isSuccessful}")
 
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
 
                 if (body.success) {
                     val typeListData = body.objects
-
-                    logD("API_RESPONSE", "TypeList API Response:")
-                    logD("API_RESPONSE", "Success: ${body.success}")
-                    logD("API_RESPONSE", "Total types: ${typeListData.size}")
-
-                    typeListData.forEachIndexed { index, type ->
-                        logD("API_RESPONSE", "  [$index] id=${type.id}, name=${type.name}, type=${type.type}, isDivided=${type.isDivided}, isFemale=${type.isFemale}")
-                    }
-
-                    // 캐시 저장
                     cachedTypeList = typeListData
-                    logD("API_RESPONSE", "✓ TypeList cached successfully")
-
+                    logD("ConfigRepo", "TypeList loaded: ${typeListData.size} items")
                     emit(typeListData)
                 } else {
-                    logE("API_RESPONSE", "Error: API returned success=false")
+                    logE("ConfigRepo", "TypeList API returned success=false")
                     emit(emptyList())
                 }
             } else {
-                logE("API_RESPONSE", "Error: HTTP ${response.code()}")
-                logE("API_RESPONSE", "Error body: ${response.errorBody()?.string()}")
+                logE("ConfigRepo", "TypeList API error: HTTP ${response.code()}")
                 emit(emptyList())
             }
         } catch (e: Exception) {
-            logE("API_RESPONSE", "Exception: ${e.message}", e)
+            logE("ConfigRepo", "TypeList exception: ${e.message}", e)
             emit(emptyList())
         }
-
-        logD("API_RESPONSE", "========================================")
     }
 
     /**
@@ -245,15 +220,8 @@ class ConfigRepositoryImpl @Inject constructor(
      * StateFlow도 함께 업데이트하여 모든 구독자에게 알림
      */
     override fun setTypeListCache(typeList: List<TypeListModel>) {
-        logD("API_RESPONSE", "========================================")
-        logD("API_RESPONSE", "[ConfigRepository] setTypeListCache called")
-        logD("API_RESPONSE", "  - typeList size: ${typeList.size}")
-
         cachedTypeList = typeList
-        _typeListFlow.value = typeList // StateFlow 업데이트 -> 모든 구독자에게 자동 알림
-
-        logD("API_RESPONSE", "✓ TypeList cache & StateFlow updated")
-        logD("API_RESPONSE", "========================================")
+        _typeListFlow.value = typeList
     }
 
     /**
@@ -267,16 +235,8 @@ class ConfigRepositoryImpl @Inject constructor(
      * StateFlow도 함께 업데이트하여 모든 구독자에게 알림
      */
     override fun setMainChartModel(mainChartModel: net.ib.mn.data.remote.dto.MainChartModel) {
-        logD("API_RESPONSE", "========================================")
-        logD("API_RESPONSE", "[ConfigRepository] setMainChartModel called")
-        logD("API_RESPONSE", "  - males: ${mainChartModel.males?.size ?: 0}")
-        logD("API_RESPONSE", "  - females: ${mainChartModel.females?.size ?: 0}")
-
         cachedMainChartModel = mainChartModel
-        _mainChartModelFlow.value = mainChartModel // StateFlow 업데이트
-
-        logD("API_RESPONSE", "✓ MainChartModel cache & StateFlow updated")
-        logD("API_RESPONSE", "========================================")
+        _mainChartModelFlow.value = mainChartModel
     }
 
     /**
@@ -297,15 +257,8 @@ class ConfigRepositoryImpl @Inject constructor(
      * StateFlow도 함께 업데이트하여 모든 구독자에게 알림
      */
     override fun setChartObjects(chartObjects: List<net.ib.mn.data.remote.dto.ChartModel>) {
-        logD("API_RESPONSE", "========================================")
-        logD("API_RESPONSE", "[ConfigRepository] setChartObjects called")
-        logD("API_RESPONSE", "  - objects size: ${chartObjects.size}")
-
         cachedChartObjects = chartObjects
-        _chartObjectsFlow.value = chartObjects // StateFlow 업데이트
-
-        logD("API_RESPONSE", "✓ ChartObjects cache & StateFlow updated")
-        logD("API_RESPONSE", "========================================")
+        _chartObjectsFlow.value = chartObjects
     }
 
     /**
@@ -327,10 +280,6 @@ class ConfigRepositoryImpl @Inject constructor(
      * 메모리 캐시와 StateFlow를 모두 초기화
      */
     override fun clearAllCache() {
-        logD("ConfigRepo", "========================================")
-        logD("ConfigRepo", "🗑️ Clearing all cache data")
-        logD("ConfigRepo", "========================================")
-
         // 메모리 캐시 초기화
         cachedTypeList = null
         cachedMainChartModel = null
@@ -344,7 +293,7 @@ class ConfigRepositoryImpl @Inject constructor(
         _chartObjectsFlow.value = emptyList()
         _awardModelFlow.value = null
 
-        logD("ConfigRepo", "✅ All cache cleared")
+        logD("ConfigRepo", "All cache cleared")
     }
 
     /**
@@ -409,5 +358,21 @@ class ConfigRepositoryImpl @Inject constructor(
      */
     override fun getAwardEnd(): String? {
         return cachedConfigSelf?.awardEnd
+    }
+
+    /**
+     * 번역 기능 사용 여부 (캐시된 ConfigSelf에서)
+     * Old: configModel.showTranslation
+     */
+    override fun getShowTranslation(): Boolean {
+        return cachedConfigSelf?.showTranslation == "Y"
+    }
+
+    /**
+     * 번역 지원 언어 목록 (캐시된 ConfigSelf에서)
+     * Old: configModel.translationLocales
+     */
+    override fun getTranslationLocales(): List<String> {
+        return cachedConfigSelf?.translationLocales ?: emptyList()
     }
 }

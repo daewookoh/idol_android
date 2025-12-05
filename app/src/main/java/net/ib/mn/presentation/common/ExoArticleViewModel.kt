@@ -235,6 +235,24 @@ class ExoArticleViewModel @Inject constructor(
     }
 
     /**
+     * 게시글 상세 정보 조회 (최신 데이터)
+     */
+    fun loadArticle(
+        articleId: Long,
+        onSuccess: (ArticleModel) -> Unit,
+        onError: (() -> Unit)? = null
+    ) {
+        viewModelScope.launch {
+            try {
+                val article = articlesRepository.getArticle(articleId)
+                onSuccess(article)
+            } catch (e: Exception) {
+                onError?.invoke()
+            }
+        }
+    }
+
+    /**
      * 좋아요 API 호출
      */
     fun postLike(articleId: String, like: Boolean) {
@@ -322,9 +340,11 @@ class ExoArticleViewModel @Inject constructor(
     }
 
     companion object {
+        // 게시글 신고 gcode
         const val GCODE_ALREADY_REPORTED = 2201
         const val GCODE_DAILY_LIMIT = 2202
         const val GCODE_TIME_LIMIT = 2203
+        const val GCODE_NOT_ENOUGH_HEART = 2204
     }
 }
 
