@@ -53,7 +53,7 @@ data class IdolInfo(
     val groupId: Int? = null,
 
     @SerializedName("anniversary")
-    val anniversary: String? = null,  // "Y" (생일), "E" (데뷔), "C" (컴백), "D" (기념일)
+    val anniversary: String? = null,  // Y=생일, E=데뷔, C=컴백, D=기념일, B=몰빵일
 
     @SerializedName("anniversary_days")
     val anniversaryDays: Int? = null,

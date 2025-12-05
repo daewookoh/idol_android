@@ -147,6 +147,7 @@ fun CommunityScreen(
     var showVoterTop100Screen by remember { mutableStateOf(false) }
     var showTrendsScreen by remember { mutableStateOf(false) }
     var showIdolIdolRankingHistoryScreen by remember { mutableStateOf(false) }
+    var showBurningDayDialog by remember { mutableStateOf(false) }
     var selectedTrendsItem by remember { mutableStateOf<net.ib.mn.domain.model.TrendsModel?>(null) }
     var currentIsMost by remember(initialIsMost) { mutableStateOf(initialIsMost) }
     var currentIsFavorite by remember(initialIsFavorite) { mutableStateOf(initialIsFavorite) }
@@ -559,7 +560,7 @@ fun CommunityScreen(
             },
             onAllInDayClick = {
                 showIdolDialog = false
-                // TODO: 올인데이 설정
+                showBurningDayDialog = true
             }
         )
     }
@@ -647,6 +648,18 @@ fun CommunityScreen(
         ) {
             CircularProgressIndicator(color = ColorPalette.main)
         }
+    }
+
+    // 올인데이 설정 다이얼로그
+    if (showBurningDayDialog) {
+        BurningDayDialog(
+            onDismiss = { showBurningDayDialog = false },
+            onSuccess = { burningDay ->
+                // 올인데이 설정 성공 시 처리
+                // old 프로젝트와 동일하게 처리: 아이돌의 burningDay 업데이트
+                // ViewModel을 통해 아이돌 정보 갱신 필요 시 추가 구현
+            }
+        )
     }
 
     // VoterTop100 화면 (전체 화면으로 표시)

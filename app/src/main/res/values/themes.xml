@@ -29,4 +29,9 @@
         <item name="android:background">@drawable/bg_bottom_sheet_dialog_fragment</item>
         <item name="android:elevation">16dp</item>
     </style>
+
+    <!-- NumberPicker 스타일 (올인데이 설정용) -->
+    <style name="Theme.Idol.NumberPicker" parent="@android:style/Theme.Holo.Light">
+        <item name="android:textColorPrimary">@color/text_gray</item>
+    </style>
 </resources>

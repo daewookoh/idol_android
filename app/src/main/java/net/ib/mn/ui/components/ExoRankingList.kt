@@ -34,7 +34,7 @@ data class RankingItem(
     val id: String = "",  // 고유 ID로 사용 (변경 추적에 중요)
 
     // 추가 필드 (old 프로젝트 기반)
-    val anniversary: String? = null,  // 기념일 타입 ("BIRTH", "DEBUT", "COMEBACK", "MEMORIAL_DAY", "ALL_IN_DAY")
+    val anniversary: String? = null,  // 기념일 타입 (Y=생일, E=데뷔, C=컴백, D=기념일, B=몰빵일)
     val anniversaryDays: Int = 0,  // 몰빵일 일수
     val miracleCount: Int = 0,  // 미라클 배지 수
     val fairyCount: Int = 0,  // 요정 배지 수

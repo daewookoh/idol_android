@@ -17,6 +17,7 @@ import net.ib.mn.data.repository.ScheduleRepositoryImpl
 import net.ib.mn.data.repository.TrendsRepositoryImpl
 import net.ib.mn.data.repository.WikiRepository
 import net.ib.mn.data.repository.WikiRepositoryImpl
+import net.ib.mn.data.repository.ItemShopRepositoryImpl
 import net.ib.mn.domain.repository.ChatRepository
 import net.ib.mn.domain.repository.TrendsRepository
 import net.ib.mn.domain.repository.ScheduleRepository
@@ -32,6 +33,7 @@ import net.ib.mn.domain.repository.OnepickRepository
 import net.ib.mn.domain.repository.ThemepickRepository
 import net.ib.mn.domain.repository.UserRepository
 import net.ib.mn.domain.repository.UtilityRepository
+import net.ib.mn.domain.repository.ItemShopRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -142,4 +144,10 @@ abstract class RepositoryModule {
     abstract fun bindTrendsRepository(
         impl: TrendsRepositoryImpl
     ): TrendsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindItemShopRepository(
+        impl: ItemShopRepositoryImpl
+    ): ItemShopRepository
 }

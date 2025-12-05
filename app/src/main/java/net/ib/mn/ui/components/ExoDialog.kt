@@ -2,6 +2,9 @@ package net.ib.mn.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -495,6 +499,228 @@ fun ExoConfirmDialog(
                     thickness = 1.dp,
                     color = colorResource(id = R.color.gray100)
                 )
+
+                // 취소 버튼 (오른쪽)
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    shape = RoundedCornerShape(bottomEnd = 6.dp),
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = colorResource(id = R.color.gray580)
+                    )
+                ) {
+                    Text(
+                        text = dismissButtonText,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * NumberPicker를 사용한 날짜 선택 컴포넌트
+ * API 29+ 에서 selectionDividerHeight = 0 으로 구분선 제거
+ * ContextThemeWrapper로 테마 적용하여 텍스트 크기/색상 설정
+ *
+ * @param items 선택 가능한 항목 목록
+ * @param selectedIndex 현재 선택된 인덱스
+ * @param onIndexChange 선택 변경 콜백
+ */
+@Composable
+private fun ExoNumberPicker(
+    items: List<String>,
+    selectedIndex: Int,
+    onIndexChange: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    androidx.compose.ui.viewinterop.AndroidView(
+        factory = { context ->
+            // ContextThemeWrapper로 테마 적용
+            val themedContext = android.view.ContextThemeWrapper(context, R.style.Theme_Idol_NumberPicker)
+            android.widget.NumberPicker(themedContext).apply {
+                minValue = 0
+                maxValue = (items.size - 1).coerceAtLeast(0)
+                displayedValues = items.toTypedArray()
+                value = selectedIndex
+                wrapSelectorWheel = false
+
+                // API 29+ 에서 구분선 높이를 0으로 설정
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    selectionDividerHeight = 0
+                }
+
+                setOnValueChangedListener { _, _, newVal ->
+                    onIndexChange(newVal)
+                }
+            }
+        },
+        update = { picker ->
+            if (picker.maxValue != (items.size - 1).coerceAtLeast(0)) {
+                picker.displayedValues = null
+                picker.maxValue = (items.size - 1).coerceAtLeast(0)
+                picker.displayedValues = items.toTypedArray()
+            }
+            if (picker.value != selectedIndex) {
+                picker.value = selectedIndex
+            }
+        },
+        modifier = modifier
+    )
+}
+
+/**
+ * 올인데이 설정 다이얼로그
+ *
+ * old 프로젝트의 BurningDayPurchaseDialogFragment를 Compose로 구현
+ * NumberPicker가 포함된 커스텀 다이얼로그
+ *
+ * @param title 다이얼로그 타이틀
+ * @param guideText1 첫 번째 안내 텍스트 (레벨 조건)
+ * @param guideText2 두 번째 안내 텍스트 (다이아 비용)
+ * @param displayDays 표시할 날짜 목록
+ * @param selectedIndex 현재 선택된 날짜 인덱스
+ * @param onIndexChange 날짜 선택 변경 콜백
+ * @param onConfirm 등록 버튼 클릭 콜백
+ * @param onDismiss 취소 버튼 클릭 콜백
+ * @param confirmButtonText 등록 버튼 텍스트
+ * @param dismissButtonText 취소 버튼 텍스트
+ * @param isLoading 로딩 상태
+ */
+@Composable
+fun ExoBurningDayDialog(
+    title: String,
+    guideText1: String,
+    guideText2: String,
+    displayDays: List<String>,
+    selectedIndex: Int,
+    onIndexChange: (Int) -> Unit,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    confirmButtonText: String = stringResource(R.string.register),
+    dismissButtonText: String = stringResource(R.string.btn_cancel),
+    isLoading: Boolean = false,
+    isEnabled: Boolean = true
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .width(290.dp)
+                .background(
+                    color = colorResource(id = R.color.text_white_black),
+                    shape = RoundedCornerShape(6.dp)
+                )
+                .border(
+                    width = 1.dp,
+                    color = colorResource(id = R.color.gray150),
+                    shape = RoundedCornerShape(6.dp)
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // 타이틀
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+                color = colorResource(id = R.color.main),
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 20.dp)
+            )
+
+            if (isLoading) {
+                // 로딩 중
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    androidx.compose.material3.CircularProgressIndicator(
+                        color = colorResource(id = R.color.main)
+                    )
+                }
+            } else {
+                // 가이드 텍스트 1 (레벨 조건)
+                Text(
+                    text = guideText1,
+                    fontSize = 13.sp,
+                    lineHeight = 15.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = colorResource(id = R.color.text_gray),
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 25.dp, vertical = 10.dp)
+                )
+
+                // 날짜 선택 (NumberPicker)
+                if (displayDays.isNotEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(130.dp)
+                            .clipToBounds()
+                    ) {
+                        ExoNumberPicker(
+                            items = displayDays,
+                            selectedIndex = selectedIndex,
+                            onIndexChange = onIndexChange,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
+
+                // 가이드 텍스트 2 (다이아 비용)
+                Text(
+                    text = guideText2,
+                    fontSize = 12.sp,
+                    lineHeight = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = colorResource(id = R.color.gray900),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp)
+                )
+            }
+
+            // 버튼 Row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(44.dp)
+            ) {
+                // 등록 버튼 (왼쪽)
+                TextButton(
+                    onClick = onConfirm,
+                    enabled = isEnabled && !isLoading,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    shape = RoundedCornerShape(bottomStart = 6.dp),
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = colorResource(id = R.color.gray580),
+                        disabledContentColor = colorResource(id = R.color.gray300)
+                    )
+                ) {
+                    Text(
+                        text = confirmButtonText,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
 
                 // 취소 버튼 (오른쪽)
                 TextButton(

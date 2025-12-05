@@ -82,7 +82,7 @@ private data class AnniversaryBadgeConfig(
  * @param contentScale ContentScale (기본값: Crop)
  * @param useCircleClip 원형 클립 사용 여부 (기본값: true)
  * @param useGrayBackground 회색 배경 사용 여부 (기본값: true)
- * @param anniversary 기념일 코드 (Y/E/C/D/N, 기본값: "N" = 표시 안함)
+ * @param anniversary 기념일 코드 (Y=생일, E=데뷔, C=컴백, D=기념일, B=몰빵일, N=없음)
  * @param anniversaryDays 기념일 일수 (D 코드일 때 사용, 기본값: 0)
  * @param idolType 아이돌 타입 ("S"=솔로, "G"=그룹, 기본값: "S")
  * @param miracleCount 미라클 카운트 (MAIN 타입 테두리용, 기본값: 0)
@@ -347,6 +347,18 @@ private fun BoxScope.AnniversaryBadge(
                     )
                 )
             }
+        }
+        "B" -> {  // 몰빵일 (All-In Day / Burning Day)
+            Icon(
+                painter = painterResource(R.drawable.icon_anniversary_allinday_medium),
+                contentDescription = "몰빵일",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .size(birthDebutSize)
+                    .align(Alignment.TopStart)
+                    .offset(x = badgeOffsetX, y = badgeOffsetY)
+                    .padding(top = badgePaddingTop)
+            )
         }
     }
 }

@@ -185,4 +185,9 @@ object NetworkModule {
     @Singleton
     fun provideTrendsApi(retrofit: Retrofit): TrendsApi =
         retrofit.create(TrendsApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideMarketApi(retrofit: Retrofit): MarketApi =
+        retrofit.create(MarketApi::class.java)
 }
