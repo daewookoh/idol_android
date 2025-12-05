@@ -176,6 +176,15 @@ interface ArticlesRepository {
     suspend fun getArticle(articleId: Long): ArticleModel
 
     /**
+     * 게시글 번역
+     * Old 프로젝트의 ITranslation.translateArticle과 동일
+     *
+     * @param articleId 게시글 ID
+     * @return 번역된 게시글
+     */
+    fun translateArticle(articleId: Long): Flow<ApiResult<ArticleModel>>
+
+    /**
      * 공지사항 상세 조회
      *
      * @param noticeId 공지사항 ID

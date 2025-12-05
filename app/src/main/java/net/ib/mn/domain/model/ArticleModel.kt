@@ -4,6 +4,16 @@ import com.google.gson.annotations.SerializedName
 import net.ib.mn.data.remote.dto.MostIdol
 
 /**
+ * 게시글 번역 상태
+ * Old 프로젝트의 ArticleModel.TranslateState와 동일
+ */
+enum class ArticleTranslateState {
+    ORIGINAL,    // 번역 전 (원문)
+    TRANSLATING, // 번역 중
+    TRANSLATED   // 번역 완료
+}
+
+/**
  * 게시글 모델
  */
 data class ArticleModel(
@@ -90,7 +100,17 @@ data class ArticleModel(
 
     // Files
     @SerializedName("files")
-    val files: List<ArticleFile> = emptyList()
+    val files: List<ArticleFile> = emptyList(),
+
+    // 번역 관련 (로컬 상태 - API 응답에 포함되지 않음)
+    @Transient
+    var translateState: ArticleTranslateState = ArticleTranslateState.ORIGINAL,
+    @Transient
+    var originalContent: String? = null,  // 번역 전 본문
+    @Transient
+    var originalTitle: String? = null,    // 번역 전 제목 (덕게)
+    @Transient
+    var isTranslatable: Boolean? = null   // 번역 가능 여부 캐시
 ) {
     /**
      * 미디어 파일 목록 반환

@@ -154,10 +154,14 @@ interface ArticlesApi {
     /**
      * 게시글 상세 조회
      * Old 프로젝트: GET "articles/{id}/"
+     *
+     * @param id 게시글 ID
+     * @param translate 번역 언어 ("auto" 등), null이면 번역 안함
      */
     @GET("articles/{id}/")
     suspend fun getArticle(
-        @Path("id") id: Long
+        @Path("id") id: Long,
+        @Query("translate") translate: String? = null
     ): ResponseBody
 
     /**

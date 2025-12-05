@@ -9,8 +9,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.remote.dto.ArticleVoteResponse
+import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.domain.model.ArticleTranslateState
 import net.ib.mn.domain.repository.ArticlesRepository
+import net.ib.mn.util.logD
+import net.ib.mn.util.logE
 import org.json.JSONArray
 import javax.inject.Inject
 
@@ -221,16 +225,58 @@ class ExoArticleViewModel @Inject constructor(
     }
 
     /**
-     * 번역 처리
+     * 게시글 번역
+     * Old 프로젝트의 ITranslation.translateArticle과 동일한 로직
+     *
+     * @param article 번역할 게시글
+     * @param onArticleUpdated 번역 완료 후 업데이트된 게시글 콜백
      */
-    fun translateContent(content: String, nation: String?) {
-        viewModelScope.launch {
-            _dialogEvent.emit(
-                ExoArticleDialog.Translation(
-                    content = content,
-                    nation = nation
-                )
-            )
+    fun translateArticle(article: ArticleModel, onArticleUpdated: (ArticleModel) -> Unit) {
+        val articleId = article.id.toLongOrNull() ?: return
+
+        if (article.translateState == ArticleTranslateState.ORIGINAL) {
+            // 번역 시작 - TRANSLATING 상태로 변경
+            article.originalContent = article.content
+            article.originalTitle = article.title
+            article.translateState = ArticleTranslateState.TRANSLATING
+            onArticleUpdated(article)
+
+            viewModelScope.launch {
+                articlesRepository.translateArticle(articleId).collect { result ->
+                    when (result) {
+                        is ApiResult.Success -> {
+                            val translatedArticle = result.data
+                            // 번역된 내용을 현재 article에 적용
+                            article.translateState = ArticleTranslateState.TRANSLATED
+                            // 주의: data class의 val 필드는 직접 수정 불가하므로 copy를 사용하거나
+                            // 번역된 content를 다이얼로그로 보여주는 방식 사용
+                            // 여기서는 이벤트로 번역된 article 전달
+                            onArticleUpdated(article.copy(
+                                content = translatedArticle.content,
+                                title = translatedArticle.title,
+                                translateState = ArticleTranslateState.TRANSLATED,
+                                originalContent = article.originalContent,
+                                originalTitle = article.originalTitle
+                            ))
+                            logD("ExoArticleViewModel", "Article translated: $articleId")
+                        }
+                        is ApiResult.Error -> {
+                            // 번역 실패 - 원래 상태로 복원
+                            article.translateState = ArticleTranslateState.ORIGINAL
+                            onArticleUpdated(article)
+                            logE("ExoArticleViewModel", "Failed to translate article: ${result.error.message}")
+                        }
+                        else -> { /* skip */ }
+                    }
+                }
+            }
+        } else {
+            // 이미 번역된 상태 - 원문으로 복원
+            onArticleUpdated(article.copy(
+                content = article.originalContent,
+                title = article.originalTitle,
+                translateState = ArticleTranslateState.ORIGINAL
+            ))
         }
     }
 

@@ -295,6 +295,23 @@ class ArticlesRepositoryImpl @Inject constructor(
     }
 
     /**
+     * 게시글 번역
+     * Old 프로젝트의 ITranslation.translateArticle과 동일
+     *
+     * @param articleId 게시글 ID
+     * @return 번역된 게시글
+     */
+    override fun translateArticle(articleId: Long): Flow<ApiResult<ArticleModel>> =
+        safeApiCallWithJsonString(
+            apiCall = { articlesApi.getArticle(articleId, translate = "auto") },
+            parser = { json ->
+                val jsonObject = JSONObject(json)
+                val articleJson = jsonObject.optJSONObject("article") ?: jsonObject
+                gson.fromJson(articleJson.toString(), ArticleModel::class.java)
+            }
+        )
+
+    /**
      * 공지사항 상세 조회
      */
     override fun getNotice(noticeId: Int, isDarkMode: Boolean): Flow<ApiResult<NoticeModel>> =
