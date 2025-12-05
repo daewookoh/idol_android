@@ -107,12 +107,14 @@ sealed class MyFavoriteRankingData {
  * @param data 랭킹 데이터
  * @param expandedItemIds 확장된 아이템 ID 목록
  * @param onExpandedChange 확장 상태 변경 콜백
+ * @param disableAnimation 아이템 이동 애니메이션 비활성화 (Top3 펼침/접힘 시 true)
  */
 fun LazyListScope.myFavoriteRankingItems(
     chartCode: String,
     data: MyFavoriteRankingData,
     expandedItemIds: Set<String> = emptySet(),
-    onExpandedChange: (String, Boolean) -> Unit = { _, _ -> }
+    onExpandedChange: (String, Boolean) -> Unit = { _, _ -> },
+    disableAnimation: Boolean = false
 ) {
     when (data) {
         is MyFavoriteRankingData.Empty -> {
@@ -160,7 +162,8 @@ fun LazyListScope.myFavoriteRankingItems(
                 onVoteSuccess = { idolId, voteCount ->
                     data.viewModel.updateVote(idolId, voteCount)
                 },
-                disableAnimation = false,
+                // 순위 변경 시에는 애니메이션 적용, Top3 펼침/접힘 시에만 비활성화
+                disableAnimation = disableAnimation,
                 expandedItemIds = expandedItemIds,
                 onExpandedChange = onExpandedChange
             )

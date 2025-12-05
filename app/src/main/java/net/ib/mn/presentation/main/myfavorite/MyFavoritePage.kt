@@ -183,6 +183,17 @@ private fun MyFavoriteContent(
                 // Top3 펼침 상태 관리
                 var expandedItemIds by remember { mutableStateOf(emptySet<String>()) }
 
+                // Top3 펼침/접힘 시 애니메이션 비활성화 플래그
+                var disableAnimationForExpand by remember { mutableStateOf(false) }
+
+                // 펼침/접힘 후 애니메이션 다시 활성화 (순위 변경 애니메이션을 위해)
+                LaunchedEffect(disableAnimationForExpand) {
+                    if (disableAnimationForExpand) {
+                        kotlinx.coroutines.delay(300) // 펼침/접힘 애니메이션 완료 대기
+                        disableAnimationForExpand = false
+                    }
+                }
+
                 // LazyColumn으로 전체 스크롤 가능하게 (wrapContent 형식)
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
@@ -225,12 +236,15 @@ private fun MyFavoriteContent(
                             data = rankingData,
                             expandedItemIds = expandedItemIds,
                             onExpandedChange = { itemKey, isExpanded ->
+                                // Top3 펼침/접힘 시 애니메이션 비활성화
+                                disableAnimationForExpand = true
                                 expandedItemIds = if (isExpanded) {
                                     expandedItemIds + setOf(itemKey)
                                 } else {
                                     expandedItemIds - setOf(itemKey)
                                 }
-                            }
+                            },
+                            disableAnimation = disableAnimationForExpand
                         )
                     }
                 }
