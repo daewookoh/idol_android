@@ -238,6 +238,7 @@ fun HallOfFameRankingSecondSubDailyPage(
                             net.ib.mn.ui.components.HofDailyRankingItem(
                                 item = item,
                                 cdnUrl = cdnUrl,
+                                chartCode = currentChartCode,
                                 onItemClick = {
                                 }
                             )

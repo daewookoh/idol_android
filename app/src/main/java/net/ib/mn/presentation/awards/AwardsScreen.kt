@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -41,6 +42,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import net.ib.mn.R
+import net.ib.mn.presentation.community.CommunityScreen
 import net.ib.mn.presentation.community.IdolRankingHistoryScreen
 import net.ib.mn.presentation.awards.subpage.AwardsCumulativeSubPage
 import net.ib.mn.presentation.awards.subpage.AwardsDailySubPage
@@ -48,6 +50,8 @@ import net.ib.mn.presentation.awards.subpage.AwardsGuideSubPage
 import net.ib.mn.presentation.awards.subpage.AwardsLineupSubPage
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoScaffold
+import net.ib.mn.ui.components.LocalRankingItemClick
+import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.theme.ColorPalette
 
 private const val TAB_HEIGHT = 48
@@ -105,70 +109,84 @@ fun AwardsScreen(
     var selectedIdolId by remember { mutableIntStateOf(0) }
     var selectedIdolName by remember { mutableStateOf("") }
 
+    // CommunityScreen 상태 (실시간 랭킹 아이템 클릭 시)
+    var selectedCommunityRankingItem by remember { mutableStateOf<RankingItem?>(null) }
+
+    // CommunityScreen 백 핸들러
+    BackHandler(enabled = selectedCommunityRankingItem != null) {
+        selectedCommunityRankingItem = null
+    }
+
     // IdolRankingHistoryScreen 백 핸들러
     BackHandler(enabled = showIdolIdolRankingHistoryScreen) {
         showIdolIdolRankingHistoryScreen = false
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        ExoScaffold(
-            topBar = {
-                ExoAppBar(
-                    title = awardModel?.awardTitle.orEmpty(),
-                    onNavigationClick = onNavigateBack,
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                    putExtra(Intent.EXTRA_TEXT, viewModel.getShareMessage())
-                                    type = "text/plain"
-                                }
-                                context.startActivity(Intent.createChooser(shareIntent, null))
-                            },
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.btn_navigation_share),
-                                contentDescription = null,
-                                tint = Color.Unspecified
-                            )
-                        }
-                    }
-                )
+        CompositionLocalProvider(
+            LocalRankingItemClick provides { item ->
+                selectedCommunityRankingItem = item
             }
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-            ) {
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                ) { page ->
-                    val tabType = tabTypes.getOrNull(page) ?: return@HorizontalPager
-                    when (tabType) {
-                        AwardsTabType.LINEUP -> AwardsLineupSubPage()
-                        AwardsTabType.CUMULATIVE -> AwardsCumulativeSubPage(
-                            onItemClick = { item ->
-                                selectedIdolId = item.idolId
-                                selectedIdolName = item.idol?.name.orEmpty()
-                                showIdolIdolRankingHistoryScreen = true
+            ExoScaffold(
+                topBar = {
+                    ExoAppBar(
+                        title = awardModel?.awardTitle.orEmpty(),
+                        onNavigationClick = onNavigateBack,
+                        actions = {
+                            IconButton(
+                                onClick = {
+                                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                        putExtra(Intent.EXTRA_TEXT, viewModel.getShareMessage())
+                                        type = "text/plain"
+                                    }
+                                    context.startActivity(Intent.createChooser(shareIntent, null))
+                                },
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.btn_navigation_share),
+                                    contentDescription = null,
+                                    tint = Color.Unspecified
+                                )
                             }
-                        )
-                        AwardsTabType.REALTIME -> AwardsDailySubPage()
-                        AwardsTabType.GUIDE -> AwardsGuideSubPage()
-                    }
-                }
-
-                // 탭이 1개일 때는 탭바 숨김
-                if (tabs.size > 1) {
-                    AwardsBottomTabBar(
-                        tabs = tabs,
-                        pagerState = pagerState,
-                        coroutineScope = coroutineScope
+                        }
                     )
+                }
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) { page ->
+                        val tabType = tabTypes.getOrNull(page) ?: return@HorizontalPager
+                        when (tabType) {
+                            AwardsTabType.LINEUP -> AwardsLineupSubPage()
+                            AwardsTabType.CUMULATIVE -> AwardsCumulativeSubPage(
+                                onItemClick = { item ->
+                                    selectedIdolId = item.idolId
+                                    selectedIdolName = item.idol?.name.orEmpty()
+                                    showIdolIdolRankingHistoryScreen = true
+                                }
+                            )
+                            AwardsTabType.REALTIME -> AwardsDailySubPage()
+                            AwardsTabType.GUIDE -> AwardsGuideSubPage()
+                        }
+                    }
+
+                    // 탭이 1개일 때는 탭바 숨김
+                    if (tabs.size > 1) {
+                        AwardsBottomTabBar(
+                            tabs = tabs,
+                            pagerState = pagerState,
+                            coroutineScope = coroutineScope
+                        )
+                    }
                 }
             }
         }
@@ -184,6 +202,22 @@ fun AwardsScreen(
                 idolName = selectedIdolName,
                 onBackClick = { showIdolIdolRankingHistoryScreen = false }
             )
+        }
+
+        // CommunityScreen (실시간 랭킹 아이템 클릭 시)
+        AnimatedVisibility(
+            visible = selectedCommunityRankingItem != null,
+            enter = slideInHorizontally(initialOffsetX = { it }),
+            exit = slideOutHorizontally(targetOffsetX = { it })
+        ) {
+            selectedCommunityRankingItem?.let { rankingItem ->
+                CommunityScreen(
+                    rankingItem = rankingItem,
+                    showChattingTab = false,
+                    fandomName = rankingItem.fandomName,
+                    onBackClick = { selectedCommunityRankingItem = null }
+                )
+            }
         }
     }
 }

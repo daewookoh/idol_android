@@ -247,7 +247,7 @@ fun MainScreen(
     }
 
     // HofDailyRankingItem 클릭 시 DailyRankingHistoryScreen 표시
-    selectedHofDailyItem?.let { dailyRankModel ->
+    selectedHofDailyItem?.let { (dailyRankModel, chartCode) ->
         // createdAt 형식: "2024-01-01T00:00:00" -> 날짜 부분만 추출
         val historyParam = remember(dailyRankModel.createdAt) {
             dailyRankModel.createdAt.substringBefore("T")
@@ -268,6 +268,7 @@ fun MainScreen(
         DailyRankingHistoryScreen(
             historyParam = historyParam,
             type = dailyRankModel.idol?.type ?: "",
+            chartCode = chartCode,
             dateTitle = dateTitle,
             onBackClick = viewModel::closeDailyRankingHistory
         )

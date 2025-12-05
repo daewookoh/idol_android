@@ -57,8 +57,8 @@ class MainViewModel @Inject constructor(
     val selectedIdolRankingHistoryItem: StateFlow<net.ib.mn.ui.components.RankingItem?> = _selectedIdolRankingHistoryItem.asStateFlow()
 
     // DailyRankingHistoryScreen 표시 상태 (HofDailyRankingItem 클릭 시 사용)
-    private val _selectedHofDailyItem = MutableStateFlow<net.ib.mn.data.remote.dto.DailyRankModel?>(null)
-    val selectedHofDailyItem: StateFlow<net.ib.mn.data.remote.dto.DailyRankModel?> = _selectedHofDailyItem.asStateFlow()
+    private val _selectedHofDailyItem = MutableStateFlow<Pair<net.ib.mn.data.remote.dto.DailyRankModel, String>?>(null)
+    val selectedHofDailyItem: StateFlow<Pair<net.ib.mn.data.remote.dto.DailyRankModel, String>?> = _selectedHofDailyItem.asStateFlow()
 
     // 즉시 반응하는 로컬 카테고리 상태 (UI 반응성 개선)
     private val _currentCategory = MutableStateFlow<String?>(null)
@@ -101,6 +101,35 @@ class MainViewModel @Inject constructor(
     }
 
     /**
+     * CommunityScreen 열기 (idol ID로)
+     * ExoTop3 클릭 시 사용
+     */
+    fun openCommunityByIdolId(idolId: Int) {
+        viewModelScope.launch {
+            val idol = idolRepository.getIdolById(idolId)
+            if (idol != null) {
+                val rankingItem = net.ib.mn.ui.components.RankingItem(
+                    id = idol.id.toString(),
+                    rank = 1,
+                    name = idol.name,
+                    nameEn = idol.nameEn,
+                    voteCount = idol.heart.toString(),
+                    photoUrl = idol.imageUrl,
+                    fandomName = idol.fdName,
+                    groupId = idol.groupId,
+                    category = idol.category,
+                    miracleCount = idol.miracleCount,
+                    fairyCount = idol.fairyCount,
+                    angelCount = idol.angelCount,
+                    anniversary = idol.anniversary,
+                    anniversaryDays = idol.anniversaryDays ?: 0
+                )
+                _selectedRankingItem.value = rankingItem
+            }
+        }
+    }
+
+    /**
      * IdolRankingHistoryScreen 열기 (CUMULATIVE 아이템 클릭 시)
      */
     fun openIdolRankingHistory(rankingItem: net.ib.mn.ui.components.RankingItem) {
@@ -116,9 +145,12 @@ class MainViewModel @Inject constructor(
 
     /**
      * DailyRankingHistoryScreen 열기 (HofDailyRankingItem 클릭 시)
+     *
+     * @param dailyRankModel 일일 랭킹 모델
+     * @param chartCode 차트 코드 (app 플레이버에서 필요)
      */
-    fun openDailyRankingHistory(dailyRankModel: net.ib.mn.data.remote.dto.DailyRankModel) {
-        _selectedHofDailyItem.value = dailyRankModel
+    fun openDailyRankingHistory(dailyRankModel: net.ib.mn.data.remote.dto.DailyRankModel, chartCode: String) {
+        _selectedHofDailyItem.value = Pair(dailyRankModel, chartCode)
     }
 
     /**

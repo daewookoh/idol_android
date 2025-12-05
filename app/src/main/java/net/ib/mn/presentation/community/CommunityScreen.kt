@@ -963,7 +963,10 @@ private fun IdolProfile(
                     type = ProfileImageType.MEDIUM_CIRCLE,
                     rank = 0,
                     anniversary = rankingItem.anniversary ?: "N",
-                    anniversaryDays = rankingItem.anniversaryDays
+                    anniversaryDays = rankingItem.anniversaryDays,
+                    miracleCount = rankingItem.miracleCount,
+                    fairyCount = rankingItem.fairyCount,
+                    angelCount = rankingItem.angelCount
                 )
             }
 

@@ -50,6 +50,10 @@ object ProfileImageType {
 
 /**
  * 기념일 배지 설정 데이터 클래스
+ *
+ * old 프로젝트 아이콘 크기:
+ * - birth/debut (medium): 126px = 42dp
+ * - allinday (medium): 72px = 24dp (모든 프로필에서 동일)
  */
 private data class AnniversaryBadgeConfig(
     val birthDebutSize: Dp,
@@ -58,7 +62,10 @@ private data class AnniversaryBadgeConfig(
     val badgePaddingTop: Dp,
     val memorialDayPadding: Modifier,
     val memorialDayOffsetX: Dp,
-    val memorialDayOffsetY: Dp
+    val memorialDayOffsetY: Dp,
+    // 몰빵일 전용 offset (old 프로젝트 위치와 동일하게)
+    val allInDayOffsetX: Dp,
+    val allInDayOffsetY: Dp
 )
 
 /**
@@ -265,13 +272,56 @@ private fun BoxScope.AnniversaryBadge(
     type: String
 ) {
     // 타입별 배지 크기 및 위치
-    // memorialDayOffset: (offsetX, offsetY) - MEDIUM_CIRCLE은 우측 15dp, 아래 5dp
+    // old 프로젝트 몰빵 위치:
+    // - s_ranking_item (LARGE): marginStart=14dp, marginTop=10dp
+    // - ranking_item (MEDIUM): marginStart=15dp, marginTop=5dp
+    // - community_header (SMALL): marginStart=15dp, marginTop=7dp
     val badgeConfig = remember(type) {
         when (type) {
-            ProfileImageType.LARGE_CIRCLE -> AnniversaryBadgeConfig(48.dp, (-7).dp, 0.dp, 7.dp, Modifier, (-10).dp, (-10).dp)
-            ProfileImageType.MEDIUM_CIRCLE -> AnniversaryBadgeConfig(40.dp, (-14).dp, 0.dp, 0.dp, Modifier, 15.dp, 5.dp)
-            ProfileImageType.SMALL_CIRCLE, ProfileImageType.SMALL -> AnniversaryBadgeConfig(36.dp, (-7).dp, 0.dp, 7.dp, Modifier.padding(end = 7.dp, bottom = 11.dp), (-10).dp, (-10).dp)
-            else -> AnniversaryBadgeConfig(48.dp, (-7).dp, 0.dp, 7.dp, Modifier, (-10).dp, (-10).dp)
+            ProfileImageType.LARGE_CIRCLE -> AnniversaryBadgeConfig(
+                birthDebutSize = 48.dp,
+                badgeOffsetX = (-7).dp,
+                badgeOffsetY = 0.dp,
+                badgePaddingTop = 7.dp,
+                memorialDayPadding = Modifier,
+                memorialDayOffsetX = (-10).dp,
+                memorialDayOffsetY = (-10).dp,
+                allInDayOffsetX = 2.dp,
+                allInDayOffsetY = 5.dp
+            )
+            ProfileImageType.MEDIUM_CIRCLE -> AnniversaryBadgeConfig(
+                birthDebutSize = 40.dp,
+                badgeOffsetX = (-14).dp,
+                badgeOffsetY = 0.dp,
+                badgePaddingTop = 0.dp,
+                memorialDayPadding = Modifier,
+                memorialDayOffsetX = 15.dp,
+                memorialDayOffsetY = 5.dp,
+                allInDayOffsetX = (-6).dp,
+                allInDayOffsetY = 3.dp
+            )
+            ProfileImageType.SMALL_CIRCLE, ProfileImageType.SMALL -> AnniversaryBadgeConfig(
+                birthDebutSize = 36.dp,
+                badgeOffsetX = (-7).dp,
+                badgeOffsetY = 0.dp,
+                badgePaddingTop = 7.dp,
+                memorialDayPadding = Modifier.padding(end = 7.dp, bottom = 11.dp),
+                memorialDayOffsetX = (-10).dp,
+                memorialDayOffsetY = (-10).dp,
+                allInDayOffsetX = 0.dp,
+                allInDayOffsetY = 2.dp
+            )
+            else -> AnniversaryBadgeConfig(
+                birthDebutSize = 48.dp,
+                badgeOffsetX = (-7).dp,
+                badgeOffsetY = 0.dp,
+                badgePaddingTop = 7.dp,
+                memorialDayPadding = Modifier,
+                memorialDayOffsetX = (-10).dp,
+                memorialDayOffsetY = (-10).dp,
+                allInDayOffsetX = 0.dp,
+                allInDayOffsetY = 5.dp
+            )
         }
     }
 
@@ -282,6 +332,8 @@ private fun BoxScope.AnniversaryBadge(
     val memorialDayPadding = badgeConfig.memorialDayPadding
     val memorialDayOffsetX = badgeConfig.memorialDayOffsetX
     val memorialDayOffsetY = badgeConfig.memorialDayOffsetY
+    val allInDayOffsetX = badgeConfig.allInDayOffsetX
+    val allInDayOffsetY = badgeConfig.allInDayOffsetY
 
     val comebackWidth = 66.dp
     val comebackHeight = 56.dp
@@ -349,15 +401,15 @@ private fun BoxScope.AnniversaryBadge(
             }
         }
         "B" -> {  // 몰빵일 (All-In Day / Burning Day)
+            // 모든 프로필 이미지 사이즈에서 24dp로 통일
             Icon(
                 painter = painterResource(R.drawable.icon_anniversary_allinday_medium),
                 contentDescription = "몰빵일",
                 tint = Color.Unspecified,
                 modifier = Modifier
-                    .size(birthDebutSize)
+                    .size(24.dp)
                     .align(Alignment.TopStart)
-                    .offset(x = badgeOffsetX, y = badgeOffsetY)
-                    .padding(top = badgePaddingTop)
+                    .offset(x = allInDayOffsetX, y = allInDayOffsetY)
             )
         }
     }

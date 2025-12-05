@@ -14,10 +14,11 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -239,50 +240,48 @@ fun MiracleRookieRankingSubPage(
             )
         }
 
-        // 2. 탭 (누적 랭킹 / 실시간 랭킹)
-        TabRow(
+        // 2. 탭 (누적 랭킹 / 실시간 랭킹) - HallOfFameRankingSubPage와 동일한 스타일
+        SecondaryTabRow(
             selectedTabIndex = selectedTabIndex,
+            modifier = Modifier.fillMaxWidth(),
             containerColor = ColorPalette.background100,
-            contentColor = ColorPalette.main,
-            indicator = { tabPositions ->
+            indicator = @Composable {
                 TabRowDefaults.SecondaryIndicator(
-                    Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                    color = ColorPalette.main
+                    modifier = Modifier.tabIndicatorOffset(selectedTabIndex).height(2.dp),
+                    color = ColorPalette.textDefault
+                )
+            },
+            divider = {
+                HorizontalDivider(
+                    thickness = 1.dp,
+                    color = ColorPalette.gray100
                 )
             }
         ) {
-                Tab(
-                    selected = selectedTabIndex == 0,
-                    onClick = { viewModel.setSelectedTabIndex(0) },
-                    text = {
-                        Text(
-                            text = stringResource(R.string.cumulative_rankings),
-                            fontSize = 15.sp,
-                            color = if (selectedTabIndex == 0) {
-                                ColorPalette.textDefault
-                            } else {
-                                ColorPalette.textDimmed
-                            }
-                        )
-                    },
-                    modifier = Modifier.height(42.dp)
+            Tab(
+                selected = selectedTabIndex == 0,
+                onClick = { viewModel.setSelectedTabIndex(0) },
+                modifier = Modifier.height(48.dp),
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
+                Text(
+                    text = stringResource(R.string.cumulative_rankings),
+                    fontSize = 15.sp,
+                    color = if (selectedTabIndex == 0) ColorPalette.textDefault else ColorPalette.textDimmed
                 )
-                Tab(
-                    selected = selectedTabIndex == 1,
-                    onClick = { viewModel.setSelectedTabIndex(1) },
-                    text = {
-                        Text(
-                            text = stringResource(R.string.award_realtime),
-                            fontSize = 15.sp,
-                            color = if (selectedTabIndex == 1) {
-                                ColorPalette.textDefault
-                            } else {
-                                ColorPalette.textDimmed
-                            }
-                        )
-                    },
-                    modifier = Modifier.height(42.dp)
+            }
+            Tab(
+                selected = selectedTabIndex == 1,
+                onClick = { viewModel.setSelectedTabIndex(1) },
+                modifier = Modifier.height(48.dp),
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
+                Text(
+                    text = stringResource(R.string.award_realtime),
+                    fontSize = 15.sp,
+                    color = if (selectedTabIndex == 1) ColorPalette.textDefault else ColorPalette.textDimmed
                 )
+            }
         }
 
         // 3. 랭킹 리스트

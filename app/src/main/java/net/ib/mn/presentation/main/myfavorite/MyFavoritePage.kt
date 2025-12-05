@@ -293,13 +293,13 @@ private fun MostFavoriteIdolHeader(
             .fillMaxWidth()
             .background(ColorPalette.background100)
     ) {
-        // ExoTop3 - 상단 배너 (이미지/동영상)
+        // ExoTop3 - 상단 배너 (이미지/동영상) - 클릭 시 CommunityScreen으로 이동
         ExoTop3(
             id = "most_favorite_${mostFavoriteIdol.idolId}",
             imageUrls = mostFavoriteIdol.top3ImageUrls,
             videoUrls = mostFavoriteIdol.top3VideoUrls,
             isVisible = true,
-            onItemClick = { onIdolClick() }
+            onClick = { onIdolClick() }
         )
 
         // Info Bar - 순위, 이름, 하트 수, 투표 버튼

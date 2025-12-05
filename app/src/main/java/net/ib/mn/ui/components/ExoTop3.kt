@@ -2,6 +2,7 @@ package net.ib.mn.ui.components
 
 import android.view.ViewGroup
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
@@ -34,12 +35,14 @@ import coil.size.Scale
 import dagger.hilt.android.UnstableApi
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.util.IdolImageUtil.toSecureUrl
 
 /**
  * ExoTop3 - 랭킹 리스트 상단 TOP3 배너 (IdolEntity 버전)
  *
  * @param idol 1위 아이돌 엔티티 (이미지/동영상 URL 포함)
  * @param isVisible 현재 화면에 표시 여부
+ * @param onClick 전체 영역 클릭 콜백 (Community로 이동 등) - idol ID 전달
  * @param onItemClick 아이템 클릭 콜백
  */
 @androidx.annotation.OptIn(UnstableApi::class)
@@ -47,6 +50,7 @@ import net.ib.mn.ui.theme.ColorPalette
 fun ExoTop3(
     idol: net.ib.mn.data.local.entity.IdolEntity,
     isVisible: Boolean = true,
+    onClick: ((Int) -> Unit)? = null,
     onItemClick: (Int) -> Unit = {}
 ) {
     // idol 변경 시에만 URL 재계산 (recomposition 시 무한 호출 방지)
@@ -59,9 +63,11 @@ fun ExoTop3(
 
     ExoTop3Internal(
         id = "exo_top3_${idol.id}",
+        idolId = idol.id,
         imageUrls = imageUrls,
         videoUrls = videoUrls,
         isVisible = isVisible,
+        onClick = onClick,
         onItemClick = onItemClick
     )
 }
@@ -71,6 +77,7 @@ fun ExoTop3(
  *
  * @param rankingItemData 랭킹 아이템 데이터
  * @param isVisible 현재 화면에 표시 여부
+ * @param onClick 전체 영역 클릭 콜백 (Community로 이동 등) - idol ID 전달
  * @param onItemClick 아이템 클릭 콜백
  */
 @androidx.annotation.OptIn(UnstableApi::class)
@@ -78,13 +85,16 @@ fun ExoTop3(
 fun ExoTop3(
     rankingItemData: net.ib.mn.ui.components.RankingItem,
     isVisible: Boolean = true,
+    onClick: ((Int) -> Unit)? = null,
     onItemClick: (Int) -> Unit = {}
 ) {
     ExoTop3Internal(
         id = "exo_top3_${rankingItemData.id}",
+        idolId = rankingItemData.id.toIntOrNull() ?: 0,
         imageUrls = rankingItemData.top3ImageUrls,
         videoUrls = rankingItemData.top3VideoUrls,
         isVisible = isVisible,
+        onClick = onClick,
         onItemClick = onItemClick
     )
 }
@@ -93,25 +103,31 @@ fun ExoTop3(
  * ExoTop3 - 랭킹 아이템 확장 시 표시용 (URL 직접 전달 버전)
  *
  * @param id 고유 ID
+ * @param idolId 아이돌 ID (Community 이동용)
  * @param imageUrls 이미지 URL 리스트 (3개)
  * @param videoUrls 동영상 URL 리스트 (3개)
  * @param isVisible 현재 화면에 표시 여부
+ * @param onClick 전체 영역 클릭 콜백 (Community로 이동 등) - idol ID 전달
  * @param onItemClick 아이템 클릭 콜백
  */
 @androidx.annotation.OptIn(UnstableApi::class)
 @Composable
 fun ExoTop3(
     id: String,
+    idolId: Int = 0,
     imageUrls: List<String?>,
     videoUrls: List<String?>,
     isVisible: Boolean = true,
+    onClick: ((Int) -> Unit)? = null,
     onItemClick: (Int) -> Unit = {}
 ) {
     ExoTop3Internal(
         id = id,
+        idolId = idolId,
         imageUrls = imageUrls,
         videoUrls = videoUrls,
         isVisible = isVisible,
+        onClick = onClick,
         onItemClick = onItemClick
     )
 }
@@ -132,9 +148,11 @@ fun ExoTop3(
 @Composable
 private fun ExoTop3Internal(
     id: String,
+    idolId: Int = 0,
     imageUrls: List<String?>,
     videoUrls: List<String?>,
     isVisible: Boolean = true,
+    onClick: ((Int) -> Unit)? = null,
     onItemClick: (Int) -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -170,6 +188,10 @@ private fun ExoTop3Internal(
         modifier = Modifier
             .fillMaxWidth()
             .background(ColorPalette.fixTop3Bg)
+            .then(
+                if (onClick != null) Modifier.clickable { onClick(idolId) }
+                else Modifier
+            )
     ) {
         val screenWidth = with(LocalDensity.current) { maxWidth.toPx() }
         val itemWidth = screenWidth / 3
@@ -189,8 +211,8 @@ private fun ExoTop3Internal(
 
                 ) {
                     // Layer1: 스틸 이미지
-                    val stillImageUrl = images[index]
-                    val videoUrl = videos[index]
+                    val stillImageUrl = images[index].toSecureUrl()
+                    val videoUrl = videos[index].toSecureUrl()
 
                     var isVideoReady by remember { mutableStateOf(false) }
 

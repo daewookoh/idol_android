@@ -94,6 +94,7 @@ import net.ib.mn.util.ServerUrl
  *    - 기타: Swiper + PrimaryScrollableTabRow 사용
  * 2. old 프로젝트의 SummaryMainFragment와 RankingPageFragment 구조 참고
  * 3. TypeListModel을 통한 동적 타입 처리
+ *
  */
 @Composable
 fun RankingPage(

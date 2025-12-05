@@ -206,6 +206,7 @@ fun ExoRankingList(
     expandedItemIds: Set<String> = emptySet(),
     onExpandedChange: (String, Boolean) -> Unit = { _, _ -> }
 ) {
+    val onRankingItemClick = LocalRankingItemClick.current
     LazyColumn(
         state = listState,
         modifier = Modifier
@@ -214,12 +215,13 @@ fun ExoRankingList(
         contentPadding = PaddingValues(bottom = 16.dp),
         verticalArrangement = Arrangement.Top
     ) {
-        // ExoTop3 배너 (첫 번째 아이템)
+        // ExoTop3 배너 (첫 번째 아이템) - 클릭 시 Community로 이동
         if (topIdol != null) {
             item(key = "exo_top3_${topIdol.id}") {
                 ExoTop3(
                     rankingItemData = topIdol,
-                    isVisible = isVisible
+                    isVisible = isVisible,
+                    onClick = { _ -> onRankingItemClick(topIdol) }
                 )
             }
         }

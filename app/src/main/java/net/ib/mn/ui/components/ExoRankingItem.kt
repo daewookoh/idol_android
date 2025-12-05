@@ -188,20 +188,24 @@ private fun RankAndNameRow(
 
 /**
  * 펼치기 영역 (ExoTop3)
+ * 클릭 시 해당 아이돌의 CommunityScreen으로 이동
  */
 @Composable
 private fun ExpandableTop3(
     isExpanded: Boolean,
-    rank: Int,
+    item: RankingItem,
     imageUrls: List<String?>,
     videoUrls: List<String?>
 ) {
+    val onItemClick = LocalRankingItemClick.current
     AnimatedVisibility(visible = isExpanded, enter = expandVertically(), exit = shrinkVertically()) {
         ExoTop3(
-            id = remember(rank) { "ranking_item_${rank}" },
+            id = remember(item.rank) { "ranking_item_${item.rank}" },
+            idolId = item.id.toIntOrNull() ?: 0,
             imageUrls = imageUrls,
             videoUrls = videoUrls,
-            isVisible = isExpanded
+            isVisible = isExpanded,
+            onClick = { _ -> onItemClick(item) }
         )
     }
 }
@@ -344,7 +348,10 @@ fun LazyListScope.mainRankingItems(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 79.dp)
-                    .clickable {
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
                         // 외부에서 전달된 onItemClick 호출 후 LocalRankingItemClick도 호출
                         onItemClick(index, item)
                         localOnItemClick(item)
@@ -358,7 +365,10 @@ fun LazyListScope.mainRankingItems(
                     type = ProfileImageType.LARGE_CIRCLE,
                     rank = item.rank,
                     contentDescription = "프로필 이미지",
-                    modifier = Modifier.clickable { onExpandedChange(itemKey, !isExpanded) },
+                    modifier = Modifier.clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) { onExpandedChange(itemKey, !isExpanded) },
                     anniversary = item.anniversary ?: "N",
                     anniversaryDays = item.anniversaryDays,
                     miracleCount = item.miracleCount,
@@ -386,7 +396,7 @@ fun LazyListScope.mainRankingItems(
                 )
             }
 
-            ExpandableTop3(isExpanded, item.rank, item.top3ImageUrls, item.top3VideoUrls)
+            ExpandableTop3(isExpanded, item, item.top3ImageUrls, item.top3VideoUrls)
 
             if (index < items.size - 1) {
                 ItemDivider()
@@ -458,7 +468,12 @@ fun LazyListScope.dailyRankingItems(
                     type = ProfileImageType.MEDIUM_CIRCLE,
                     rank = item.rank,
                     contentDescription = "프로필 이미지",
-                    modifier = Modifier.padding(horizontal = 6.dp).clickable { onExpandedChange(itemKey, !isExpanded) },
+                    modifier = Modifier
+                        .padding(horizontal = 6.dp)
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) { localOnItemClick(item) },
                     anniversary = item.anniversary ?: "N",
                     anniversaryDays = item.anniversaryDays,
                     miracleCount = item.miracleCount,
@@ -486,7 +501,7 @@ fun LazyListScope.dailyRankingItems(
                 )
             }
 
-            ExpandableTop3(isExpanded, item.rank, item.top3ImageUrls, item.top3VideoUrls)
+            ExpandableTop3(isExpanded, item, item.top3ImageUrls, item.top3VideoUrls)
 
             if (index < items.size - 1) {
                 ItemDivider()
@@ -1326,6 +1341,7 @@ fun HeartPickRankingItem(
 fun HofDailyRankingItem(
     item: net.ib.mn.data.remote.dto.DailyRankModel,
     cdnUrl: String,
+    chartCode: String = "",
     onItemClick: () -> Unit = {}
 ) {
     // LocalHofDailyItemClick 사용
@@ -1344,7 +1360,7 @@ fun HofDailyRankingItem(
                     interactionSource = remember { MutableInteractionSource() }
                 ) {
                     onItemClick()
-                    localOnItemClick(item)
+                    localOnItemClick(item, chartCode)
                 },
             verticalAlignment = Alignment.CenterVertically
         ) {
