@@ -646,8 +646,32 @@ class UserRepositoryImpl @Inject constructor(
                             val category = userData.most?.category
 
                             userData.most?.let { most ->
-                                val idolEntity = most.toEntity()
-                                idolDao.upsert(idolEntity)
+                                // 기존 idol 데이터가 있으면 필요한 필드만 업데이트
+                                // fairyCount, anniversary, burningDay 등 badge 관련 필드는 기존 값 유지
+                                val existingIdol = idolDao.getIdolById(most.id)
+                                if (existingIdol != null) {
+                                    val updatedIdol = existingIdol.copy(
+                                        heart = most.heart ?: existingIdol.heart,
+                                        imageUrl = most.imageUrl ?: existingIdol.imageUrl,
+                                        imageUrl2 = most.imageUrl2 ?: existingIdol.imageUrl2,
+                                        imageUrl3 = most.imageUrl3 ?: existingIdol.imageUrl3,
+                                        name = most.name ?: existingIdol.name,
+                                        nameEn = most.nameEn ?: existingIdol.nameEn,
+                                        nameJp = most.nameJp ?: existingIdol.nameJp,
+                                        nameZh = most.nameZh ?: existingIdol.nameZh,
+                                        nameZhTw = most.nameZhTw ?: existingIdol.nameZhTw,
+                                        type = most.type ?: existingIdol.type,
+                                        category = most.category ?: existingIdol.category,
+                                        groupId = most.groupId ?: existingIdol.groupId,
+                                        resourceUri = most.resourceUri ?: existingIdol.resourceUri
+                                        // fairyCount, angelCount, miracleCount, rookieCount,
+                                        // anniversary, anniversaryDays, burningDay 등은 기존 값 유지
+                                    )
+                                    idolDao.upsert(updatedIdol)
+                                } else {
+                                    // 기존 데이터가 없으면 새로 생성
+                                    idolDao.upsert(most.toEntity())
+                                }
                             }
 
                             // 최초 로드 시에만 최애의 성별로 defaultCategory 설정
