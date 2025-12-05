@@ -21,6 +21,7 @@ import net.ib.mn.domain.model.TranslateState
 import net.ib.mn.domain.repository.ConfigRepository
 import net.ib.mn.util.logD
 import net.ib.mn.util.logE
+import android.net.Uri
 import javax.inject.Inject
 
 /**
@@ -96,6 +97,16 @@ class CommentSectionViewModel @Inject constructor(
 
     private val _showEmoticonPanel = MutableStateFlow(false)
     val showEmoticonPanel: StateFlow<Boolean> = _showEmoticonPanel.asStateFlow()
+
+    // 첨부 이미지 관련 상태 (old: binImage, isExistImage, isExistUmjjal)
+    private val _selectedImageUri = MutableStateFlow<Uri?>(null)
+    val selectedImageUri: StateFlow<Uri?> = _selectedImageUri.asStateFlow()
+
+    private val _selectedImageBytes = MutableStateFlow<ByteArray?>(null)
+    val selectedImageBytes: StateFlow<ByteArray?> = _selectedImageBytes.asStateFlow()
+
+    private val _isGifImage = MutableStateFlow(false)
+    val isGifImage: StateFlow<Boolean> = _isGifImage.asStateFlow()
 
     private var currentArticleId: Long = 0
     private var nextCursor: String? = null
@@ -214,30 +225,54 @@ class CommentSectionViewModel @Inject constructor(
     }
 
     /**
+     * 이미지 선택 (old: onArticlePhotoSelected / cropArticlePhoto)
+     */
+    fun selectImage(uri: Uri, bytes: ByteArray, isGif: Boolean) {
+        _selectedImageUri.value = uri
+        _selectedImageBytes.value = bytes
+        _isGifImage.value = isGif
+        logD(TAG, "Image selected: isGif=$isGif, size=${bytes.size}")
+    }
+
+    /**
+     * 이미지 선택 해제 (old: iv_preview_close 클릭)
+     */
+    fun clearImage() {
+        _selectedImageUri.value = null
+        _selectedImageBytes.value = null
+        _isGifImage.value = false
+    }
+
+    /**
      * 댓글 작성
      * old 프로젝트와 동일하게 mirror DB 반영을 위해 1초 대기 후 새로고침
      * 전체 화면 로딩 표시 후 완료 시 첫 댓글로 스크롤
      * - 텍스트만 있는 경우
      * - 이모티콘만 있는 경우
-     * - 둘 다 있는 경우
+     * - 이미지만 있는 경우
+     * - 조합된 경우
      */
     fun submitComment(articleId: Long) {
         val content = _commentText.value.trim()
         val emoticonId = _selectedEmoticonId.value
-        // old 프로젝트와 동일: 텍스트나 이모티콘 중 하나는 있어야 함
-        if (content.isEmpty() && emoticonId == null) return
+        val imageBytes = _selectedImageBytes.value
+        // old 프로젝트와 동일: 텍스트, 이모티콘, 이미지 중 하나는 있어야 함
+        if (content.isEmpty() && emoticonId == null && imageBytes == null) return
         if (_isSubmitting.value) return
 
         _isSubmitting.value = true
         _isFullScreenLoading.value = true  // 전체 화면 로딩 시작
 
-        // API 호출 시작 시 이모티콘 관련 데이터 모두 숨김
+        // API 호출 시작 시 이모티콘/이미지 관련 데이터 모두 숨김
         _showEmoticonPanel.value = false
         _selectedEmoticonId.value = null
         _selectedEmoticonUrl.value = null
+        _selectedImageUri.value = null
+        _selectedImageBytes.value = null
+        _isGifImage.value = false
 
         viewModelScope.launch {
-            commentsRepository.writeComment(articleId, content, emoticonId).collect { result ->
+            commentsRepository.writeComment(articleId, content, emoticonId, imageBytes).collect { result ->
                 when (result) {
                     is ApiResult.Loading -> { /* skip */ }
                     is ApiResult.Success -> {
@@ -334,6 +369,20 @@ class CommentSectionViewModel @Inject constructor(
     fun refresh() {
         nextCursor = null
         loadComments(currentArticleId)
+    }
+
+    /**
+     * 댓글 입력 영역 초기화 (화면 진입 시)
+     * - 텍스트, 이모티콘, 이미지, 패널 상태 모두 초기화
+     */
+    fun resetInputState() {
+        _commentText.value = ""
+        _selectedEmoticonId.value = null
+        _selectedEmoticonUrl.value = null
+        _selectedImageUri.value = null
+        _selectedImageBytes.value = null
+        _isGifImage.value = false
+        _showEmoticonPanel.value = false
     }
 
     /**

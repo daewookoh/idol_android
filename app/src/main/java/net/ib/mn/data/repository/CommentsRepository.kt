@@ -11,6 +11,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.RequestBody
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -42,24 +43,43 @@ class CommentsRepository @Inject constructor(
     )
 
     /**
-     * 댓글 작성 (텍스트만)
+     * 댓글 작성 (텍스트/이모티콘/이미지 조합)
+     * old 프로젝트의 writeCommentMultipart와 동일
      *
      * @param articleId 게시글 ID
      * @param content 댓글 내용
      * @param emoticonId 이모티콘 ID (없으면 null)
+     * @param imageBytes 이미지 바이트 배열 (없으면 null)
      * @return 작성된 댓글
      */
     fun writeComment(
         articleId: Long,
         content: String,
-        emoticonId: Int? = null
+        emoticonId: Int? = null,
+        imageBytes: ByteArray? = null
     ): Flow<ApiResult<CommentModel>> = safeApiCallWithJsonString(
         apiCall = {
-            commentsApi.writeComment(
-                articleId = createPart("article", articleId.toString()),
-                content = createPart("content", content),
-                emoticon = emoticonId?.let { createPart("emoticon", it.toString()) }
-            )
+            if (imageBytes != null) {
+                // 이미지가 있는 경우 (old 프로젝트와 동일한 파라미터명 사용)
+                val imagePart = MultipartBody.Part.createFormData(
+                    "imagebin",
+                    "image.jpg",
+                    imageBytes.toRequestBody("image/*".toMediaTypeOrNull())
+                )
+                commentsApi.writeCommentWithImage(
+                    articleId = createPart("article_id", articleId.toString()),
+                    content = createPart("content", content),
+                    image = imagePart,
+                    emoticon = emoticonId?.let { createPart("emoticon", it.toString()) }
+                )
+            } else {
+                // 이미지가 없는 경우
+                commentsApi.writeComment(
+                    articleId = createPart("article_id", articleId.toString()),
+                    content = createPart("content", content),
+                    emoticon = emoticonId?.let { createPart("emoticon", it.toString()) }
+                )
+            }
         },
         parser = { json -> gson.fromJson(json, CommentModel::class.java) }
     )
@@ -79,12 +99,12 @@ class CommentsRepository @Inject constructor(
     ): Flow<ApiResult<CommentModel>> = safeApiCallWithJsonString(
         apiCall = {
             val imagePart = MultipartBody.Part.createFormData(
-                "image",
+                "imagebin",
                 imageFile.name,
                 imageFile.asRequestBody("image/*".toMediaTypeOrNull())
             )
             commentsApi.writeCommentWithImage(
-                articleId = createPart("article", articleId.toString()),
+                articleId = createPart("article_id", articleId.toString()),
                 content = createPart("content", content),
                 image = imagePart
             )

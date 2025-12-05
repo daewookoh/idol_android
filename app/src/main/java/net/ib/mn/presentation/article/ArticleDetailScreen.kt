@@ -1,8 +1,16 @@
 package net.ib.mn.presentation.article
 
+import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import com.theartofdev.edmodo.cropper.CropImage
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,6 +66,7 @@ import net.ib.mn.ui.components.ExoBottomSheetActionItem
 import net.ib.mn.presentation.common.CommentInput
 import net.ib.mn.presentation.common.CommentSectionViewModel
 import net.ib.mn.presentation.common.EmoticonPreview
+import net.ib.mn.presentation.common.ImagePreview
 import net.ib.mn.presentation.common.commentItems
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.components.ExoEmoticonPanel
@@ -101,12 +110,84 @@ fun ArticleDetailScreen(
     val showEmoticonPanel by commentViewModel.showEmoticonPanel.collectAsState()
     val selectedEmoticonId by commentViewModel.selectedEmoticonId.collectAsState()
     val selectedEmoticonUrl by commentViewModel.selectedEmoticonUrl.collectAsState()
+    val selectedImageUri by commentViewModel.selectedImageUri.collectAsState()
+    val isGifImage by commentViewModel.isGifImage.collectAsState()
     val cdnUrl by commentViewModel.cdnUrl.collectAsState()
     val listState = rememberLazyListState()
+
+    // 선택된 원본 이미지 URI (크롭용)
+    var pendingCropUri by remember { mutableStateOf<Uri?>(null) }
+
+    // CropImage 결과 launcher (old: CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE)
+    val cropImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val cropResult = CropImage.getActivityResult(result.data)
+            cropResult?.uri?.let { croppedUri ->
+                try {
+                    // 크롭된 이미지 바이트 읽기
+                    val inputStream = context.contentResolver.openInputStream(croppedUri)
+                    val bytes = inputStream?.readBytes()
+                    inputStream?.close()
+
+                    if (bytes != null) {
+                        // 리사이즈 (old: onArticlePhotoSelected)
+                        val resizedBytes = resizeImage(bytes, 1080)
+                        commentViewModel.selectImage(croppedUri, resizedBytes, false)
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(context, R.string.image_permission_error, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    // 이미지 피커 launcher (old: btnGallery 클릭 -> UtilK.getPhoto)
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { selectedUri ->
+            try {
+                // 이미지 바이트 읽기
+                val inputStream = context.contentResolver.openInputStream(selectedUri)
+                val bytes = inputStream?.readBytes()
+                inputStream?.close()
+
+                if (bytes != null) {
+                    // GIF 여부 확인 (old: cropArticlePhoto에서 GIF 헤더 검사)
+                    val header = bytes.take(6).toByteArray()
+                    val gif87a = "GIF87a".toByteArray()
+                    val gif89a = "GIF89a".toByteArray()
+                    val isGif = header.contentEquals(gif87a) || header.contentEquals(gif89a)
+
+                    if (isGif) {
+                        // GIF는 크롭 없이 그대로 사용
+                        commentViewModel.selectImage(selectedUri, bytes, true)
+                    } else {
+                        // 일반 이미지는 CropImage로 크롭 (old: chooseInternalEditor)
+                        pendingCropUri = selectedUri
+                        val cropIntent = CropImage.activity(selectedUri)
+                            .setAllowFlipping(false)
+                            .setAllowRotation(false)
+                            .setAllowCounterRotation(false)
+                            .setInitialCropWindowPaddingRatio(0f)
+                            .getIntent(context)
+                        cropImageLauncher.launch(cropIntent)
+                    }
+                }
+            } catch (e: Exception) {
+                Toast.makeText(context, R.string.image_permission_error, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     // 화면 진입 시 최신 article 데이터 로드 및 댓글 초기 로드
     LaunchedEffect(article.id) {
         val articleIdLong = article.id.toLongOrNull() ?: return@LaunchedEffect
+
+        // 댓글 입력 영역 초기화 (이전 상태 클리어)
+        commentViewModel.resetInputState()
 
         // 최신 article 데이터 로드
         articleViewModel.loadArticle(
@@ -200,7 +281,21 @@ fun ArticleDetailScreen(
         }
     }
 
-    BackHandler(onBack = onBackClick)
+    // 백버튼 처리: 키보드/포커스/이모티콘 패널이 열려있으면 먼저 닫기
+    BackHandler {
+        when {
+            showEmoticonPanel -> {
+                // 이모티콘 패널이 열려있으면 먼저 닫기
+                commentViewModel.hideEmoticonPanel()
+            }
+            else -> {
+                // 키보드 내리고 포커스 해제 후 백버튼 처리
+                keyboardController?.hide()
+                focusManager.clearFocus()
+                onBackClick()
+            }
+        }
+    }
 
     ExoScaffold(
         excludeBottomPadding = true,
@@ -302,6 +397,15 @@ fun ArticleDetailScreen(
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
             ) {
+                // 이미지 프리뷰 (CommentInput 위에 표시) - old: cl_preview
+                selectedImageUri?.let { uri ->
+                    ImagePreview(
+                        imageUri = uri,
+                        isGif = isGifImage,
+                        onClose = { commentViewModel.clearImage() }
+                    )
+                }
+
                 // 이모티콘 프리뷰 (CommentInput 위에 표시)
                 selectedEmoticonUrl?.takeIf { it.isNotEmpty() }?.let { url ->
                     EmoticonPreview(
@@ -316,13 +420,18 @@ fun ArticleDetailScreen(
                     onValueChange = commentViewModel::setCommentText,
                     onSubmit = {
                         val articleIdLong = article.id.toLongOrNull() ?: return@CommentInput
-                        // 이모티콘 없이 텍스트만 있는 경우 5글자 이상 필요
+                        // 이모티콘/이미지 없이 텍스트만 있는 경우 5글자 이상 필요
                         val hasEmoticon = !selectedEmoticonUrl.isNullOrEmpty()
-                        if (!hasEmoticon && commentText.trim().length < 5) {
+                        val hasImage = selectedImageUri != null
+                        if (!hasEmoticon && !hasImage && commentText.trim().length < 5) {
                             showCommentLengthDialog = true
                             return@CommentInput
                         }
                         commentViewModel.submitComment(articleIdLong)
+                    },
+                    onAttachClick = {
+                        // 첨부 버튼 클릭 시 이미지 피커 열기 (old: btnGallery)
+                        imagePickerLauncher.launch("image/*")
                     },
                     onEmoticonClick = {
                         // 이모티콘 버튼 클릭 시 키보드 내리고 패널 토글
@@ -332,6 +441,7 @@ fun ArticleDetailScreen(
                     },
                     isEmoticonPanelOpen = showEmoticonPanel,
                     selectedEmoticonUrl = selectedEmoticonUrl,
+                    selectedImageUri = selectedImageUri,
                     focusRequester = commentFocusRequester,
                     onInputFocused = {
                         // 입력창 포커스 시 이모티콘 패널 닫기
@@ -637,4 +747,61 @@ private fun shareArticle(context: android.content.Context, article: ArticleModel
     context.startActivity(
         Intent.createChooser(shareIntent, context.getString(R.string.title_share))
     )
+}
+
+/**
+ * 이미지 리사이즈 (old: onArticlePhotoSelected와 유사)
+ * 최대 크기를 넘지 않도록 비율 유지하며 리사이즈
+ */
+private fun resizeImage(bytes: ByteArray, maxSize: Int): ByteArray {
+    return try {
+        val options = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
+        }
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
+
+        val width = options.outWidth
+        val height = options.outHeight
+
+        // 리사이즈가 필요 없으면 원본 반환
+        if (width <= maxSize && height <= maxSize) {
+            return bytes
+        }
+
+        // 샘플 사이즈 계산
+        var sampleSize = 1
+        while (width / sampleSize > maxSize || height / sampleSize > maxSize) {
+            sampleSize *= 2
+        }
+
+        val decodeOptions = BitmapFactory.Options().apply {
+            inSampleSize = sampleSize
+        }
+        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, decodeOptions)
+            ?: return bytes
+
+        // 정확한 크기로 리사이즈
+        val scaleFactor = minOf(maxSize.toFloat() / bitmap.width, maxSize.toFloat() / bitmap.height)
+        val newWidth = (bitmap.width * scaleFactor).toInt()
+        val newHeight = (bitmap.height * scaleFactor).toInt()
+
+        val resizedBitmap = if (scaleFactor < 1f) {
+            Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+        } else {
+            bitmap
+        }
+
+        // JPEG로 압축
+        val outputStream = java.io.ByteArrayOutputStream()
+        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream)
+
+        if (resizedBitmap != bitmap) {
+            resizedBitmap.recycle()
+        }
+        bitmap.recycle()
+
+        outputStream.toByteArray()
+    } catch (e: Exception) {
+        bytes // 에러 시 원본 반환
+    }
 }

@@ -63,6 +63,7 @@ fun CommentInput(
     onEmoticonClick: (() -> Unit)? = null,
     isEmoticonPanelOpen: Boolean = false,
     selectedEmoticonUrl: String? = null,
+    selectedImageUri: android.net.Uri? = null,
     focusRequester: FocusRequester = remember { FocusRequester() },
     onInputFocused: (() -> Unit)? = null,
     isLoading: Boolean = false,
@@ -71,8 +72,8 @@ fun CommentInput(
 ) {
     val focusManager = LocalFocusManager.current
 
-    // 텍스트가 있거나 이모티콘이 선택되어 있으면 전송 가능
-    val canSubmit = (value.isNotBlank() || !selectedEmoticonUrl.isNullOrEmpty()) && !isLoading && enabled
+    // 텍스트가 있거나 이모티콘 또는 이미지가 선택되어 있으면 전송 가능
+    val canSubmit = (value.isNotBlank() || !selectedEmoticonUrl.isNullOrEmpty() || selectedImageUri != null) && !isLoading && enabled
 
     Row(
         modifier = modifier
@@ -260,6 +261,52 @@ fun EmoticonPreview(
         AsyncImage(
             model = emoticonUrl.toSecureUrl(),
             contentDescription = "Selected emoticon",
+            modifier = Modifier
+                .size(136.dp)
+                .align(Alignment.Center),
+            contentScale = ContentScale.Fit
+        )
+    }
+}
+
+/**
+ * 이미지 프리뷰 컴포넌트 (old: cl_preview - 이미지용)
+ * - 댓글 입력창 위에 dimmed 배경으로 표시
+ * - X 버튼: 우측 상단
+ * - 이미지: 중앙, 136dp x 136dp
+ */
+@Composable
+fun ImagePreview(
+    imageUri: android.net.Uri,
+    isGif: Boolean = false,
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color.Black.copy(alpha = 0.3f))
+            .padding(vertical = 2.dp)
+    ) {
+        // X 버튼 - 우측 상단
+        Icon(
+            painter = painterResource(R.drawable.btn_close_w),
+            contentDescription = "Close",
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 18.dp, end = 18.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClose
+                ),
+            tint = Color.Unspecified
+        )
+
+        // 이미지 - 중앙, 136dp x 136dp
+        AsyncImage(
+            model = imageUri,
+            contentDescription = "Selected image",
             modifier = Modifier
                 .size(136.dp)
                 .align(Alignment.Center),

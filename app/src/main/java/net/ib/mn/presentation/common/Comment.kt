@@ -199,10 +199,22 @@ fun ExoCommentItem(
                             modifier = Modifier.padding(end = 2.dp)
                         )
 
-                        // 닉네임
+                        // 몰빵일 뱃지 (레벨 아이콘 우측)
+                        if (comment.user?.hasAllInDayBadge == true) {
+                            Image(
+                                painter = painterResource(R.drawable.allinbadge_level_icon),
+                                contentDescription = "All-in Day Badge",
+                                modifier = Modifier.padding(end = 2.dp)
+                            )
+                        }
+
+                        // 닉네임 (textDefault + bold)
                         Text(
                             text = comment.user?.nickname ?: "",
-                            style = ExoTypo.body14Main,
+                            style = ExoTypo.body14.copy(
+                                color = ColorPalette.textDefault,
+                                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                            ),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

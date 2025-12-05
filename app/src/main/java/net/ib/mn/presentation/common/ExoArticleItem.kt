@@ -313,6 +313,15 @@ fun ExoArticleItem(
                             modifier = Modifier.padding(top = 4.dp, end = 2.dp)
                         )
 
+                        // 몰빵일 뱃지 (레벨 아이콘 우측)
+                        if (article.user?.hasAllInDayBadge == true) {
+                            Image(
+                                painter = painterResource(R.drawable.allinbadge_level_icon),
+                                contentDescription = "All-in Day Badge",
+                                modifier = Modifier.padding(top = 4.dp, end = 2.dp)
+                            )
+                        }
+
                         Text(
                             text = article.user?.nickname ?: "",
                             style = ExoTypo.body14Main,

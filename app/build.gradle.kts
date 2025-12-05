@@ -383,6 +383,9 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation("androidx.appcompat:appcompat:1.7.0")
 
+    // Image Cropper (old 프로젝트와 동일)
+    implementation(files("libs/cropper-release.aar"))
+
     // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)

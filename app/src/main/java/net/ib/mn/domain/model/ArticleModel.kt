@@ -143,10 +143,21 @@ data class ArticleUser(
 
     // 최애 아이돌 (Old 프로젝트의 UserModel.most와 동일)
     @SerializedName("most")
-    val most: MostIdol? = null
+    val most: MostIdol? = null,
+
+    // 구매한 뱃지 아이템 정보
+    // - 0x01: 보안관 (deprecated - 더 이상 사용 안함)
+    // - 0x02: 메신저 (deprecated - 더 이상 사용 안함)
+    // - 0x04: 몰빵일 (사용중)
+    @SerializedName("item_no")
+    val itemNo: Int = 0
 ) {
     val imageUrlCommunity: String
         get() = imageUrl?.replace("/profile/", "/profile_community/") ?: ""
+
+    /** 몰빵일 뱃지 구매 여부 */
+    val hasAllInDayBadge: Boolean
+        get() = (itemNo and 0x04) == 0x04
 }
 
 /**
