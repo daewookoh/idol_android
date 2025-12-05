@@ -37,3 +37,14 @@ val LocalIdolRankingHistoryClick = compositionLocalOf<(RankingItem) -> Unit> {
     // 기본값: 아무 동작도 하지 않음
     { _ -> }
 }
+
+/**
+ * DailyRankingHistory 화면으로 이동하기 위한 CompositionLocal
+ *
+ * 명예의 전당 일일 랭킹 아이템 클릭 시 사용됩니다.
+ * MainScreen에서 제공하고, HofDailyRankingItem에서 소비합니다.
+ */
+val LocalHofDailyItemClick = compositionLocalOf<(net.ib.mn.data.remote.dto.DailyRankModel) -> Unit> {
+    // 기본값: 아무 동작도 하지 않음
+    { _ -> }
+}

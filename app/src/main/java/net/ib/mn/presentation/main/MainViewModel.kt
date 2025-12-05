@@ -56,6 +56,10 @@ class MainViewModel @Inject constructor(
     private val _selectedIdolRankingHistoryItem = MutableStateFlow<net.ib.mn.ui.components.RankingItem?>(null)
     val selectedIdolRankingHistoryItem: StateFlow<net.ib.mn.ui.components.RankingItem?> = _selectedIdolRankingHistoryItem.asStateFlow()
 
+    // DailyRankingHistoryScreen 표시 상태 (HofDailyRankingItem 클릭 시 사용)
+    private val _selectedHofDailyItem = MutableStateFlow<net.ib.mn.data.remote.dto.DailyRankModel?>(null)
+    val selectedHofDailyItem: StateFlow<net.ib.mn.data.remote.dto.DailyRankModel?> = _selectedHofDailyItem.asStateFlow()
+
     // 즉시 반응하는 로컬 카테고리 상태 (UI 반응성 개선)
     private val _currentCategory = MutableStateFlow<String?>(null)
     val currentCategory: StateFlow<String?> = _currentCategory.asStateFlow()
@@ -108,6 +112,20 @@ class MainViewModel @Inject constructor(
      */
     fun closeIdolRankingHistory() {
         _selectedIdolRankingHistoryItem.value = null
+    }
+
+    /**
+     * DailyRankingHistoryScreen 열기 (HofDailyRankingItem 클릭 시)
+     */
+    fun openDailyRankingHistory(dailyRankModel: net.ib.mn.data.remote.dto.DailyRankModel) {
+        _selectedHofDailyItem.value = dailyRankModel
+    }
+
+    /**
+     * DailyRankingHistoryScreen 닫기
+     */
+    fun closeDailyRankingHistory() {
+        _selectedHofDailyItem.value = null
     }
 
     /**

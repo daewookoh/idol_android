@@ -416,6 +416,9 @@ fun LazyListScope.dailyRankingItems(
         items = items,
         key = { _, item -> item.itemKey() }
     ) { index, item ->
+        // LocalRankingItemClick 사용 (Composable 컨텍스트 내부)
+        val localOnItemClick = LocalRankingItemClick.current
+
         val itemKey = item.itemKey()
         val isExpanded = expandedItemIds.contains(itemKey)
         val backgroundColor = if (item.isFavorite) ColorPalette.main100 else ColorPalette.background100
@@ -438,7 +441,14 @@ fun LazyListScope.dailyRankingItems(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 67.dp)
-                    .clickable { onItemClick(index, item) },
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        // 외부에서 전달된 onItemClick 호출 후 LocalRankingItemClick도 호출
+                        onItemClick(index, item)
+                        localOnItemClick(item)
+                    },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Spacer(modifier = Modifier.width(10.dp))
@@ -1318,6 +1328,9 @@ fun HofDailyRankingItem(
     cdnUrl: String,
     onItemClick: () -> Unit = {}
 ) {
+    // LocalHofDailyItemClick 사용
+    val localOnItemClick = LocalHofDailyItemClick.current
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -1326,7 +1339,13 @@ fun HofDailyRankingItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onItemClick() },
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    onItemClick()
+                    localOnItemClick(item)
+                },
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 프로필 영역 (old: ConstraintLayout, 70dp width, height는 40dp + margin 15dp * 2)

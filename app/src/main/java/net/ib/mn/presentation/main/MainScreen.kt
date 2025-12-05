@@ -44,8 +44,10 @@ import net.ib.mn.util.ServerUrl
 import net.ib.mn.presentation.community.CommunityScreen
 import net.ib.mn.presentation.community.IdolRankingHistoryScreen
 import net.ib.mn.presentation.community.profile.ProfileScreen
+import net.ib.mn.ui.components.LocalHofDailyItemClick
 import net.ib.mn.ui.components.LocalIdolRankingHistoryClick
 import net.ib.mn.ui.components.LocalRankingItemClick
+import net.ib.mn.presentation.community.DailyRankingHistoryScreen
 import java.util.Locale
 import androidx.compose.animation.AnimatedVisibility
 import net.ib.mn.ui.theme.ColorPalette
@@ -69,6 +71,7 @@ fun MainScreen(
     val hasNewNotification by topBarViewModel.hasNewNotification.collectAsState()
     val selectedRankingItem by viewModel.selectedRankingItem.collectAsState()
     val selectedIdolRankingHistoryItem by viewModel.selectedIdolRankingHistoryItem.collectAsState()
+    val selectedHofDailyItem by viewModel.selectedHofDailyItem.collectAsState()
     val currentCategory by viewModel.currentCategory.collectAsState()
     val defaultCategory = currentCategory ?: Constants.TYPE_MALE
 
@@ -153,7 +156,8 @@ fun MainScreen(
 
     CompositionLocalProvider(
         LocalRankingItemClick provides viewModel::openCommunity,
-        LocalIdolRankingHistoryClick provides viewModel::openIdolRankingHistory
+        LocalIdolRankingHistoryClick provides viewModel::openIdolRankingHistory,
+        LocalHofDailyItemClick provides viewModel::openDailyRankingHistory
     ) {
         ExoScaffold(
             topBar = {
@@ -239,6 +243,33 @@ fun MainScreen(
             idolId = rankingItem.id.toIntOrNull() ?: 0,
             idolName = rankingItem.name,
             onBackClick = viewModel::closeIdolRankingHistory
+        )
+    }
+
+    // HofDailyRankingItem 클릭 시 DailyRankingHistoryScreen 표시
+    selectedHofDailyItem?.let { dailyRankModel ->
+        // createdAt 형식: "2024-01-01T00:00:00" -> 날짜 부분만 추출
+        val historyParam = remember(dailyRankModel.createdAt) {
+            dailyRankModel.createdAt.substringBefore("T")
+        }
+        // 날짜 타이틀 포맷: "2024-01-01" -> "2024년 1월 1일"
+        val dateTitle = remember(historyParam) {
+            try {
+                val parts = historyParam.split("-")
+                if (parts.size == 3) {
+                    "${parts[0]}년 ${parts[1].toInt()}월 ${parts[2].toInt()}일"
+                } else {
+                    historyParam
+                }
+            } catch (e: Exception) {
+                historyParam
+            }
+        }
+        DailyRankingHistoryScreen(
+            historyParam = historyParam,
+            type = dailyRankModel.idol?.type ?: "",
+            dateTitle = dateTitle,
+            onBackClick = viewModel::closeDailyRankingHistory
         )
     }
 

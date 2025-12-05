@@ -91,7 +91,13 @@ class CommunityFeedViewModel @Inject constructor(
      * 실제 피드 로드 (내부용)
      */
     private suspend fun loadFeedInternal() {
-        _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+        // 새 아이돌 로드 시 기존 데이터 초기화하여 로딩바가 표시되도록 함
+        _uiState.value = _uiState.value.copy(
+            isLoading = true,
+            articles = emptyList(),
+            notices = emptyList(),
+            error = null
+        )
 
         val orderBy = _uiState.value.orderBy
         val (imageOnly, primaryFileType) = getFilterParams()
