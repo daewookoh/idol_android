@@ -225,6 +225,18 @@ class ExoArticleViewModel @Inject constructor(
     }
 
     /**
+     * 콘텐츠 번역 다이얼로그 표시
+     *
+     * @param content 번역할 콘텐츠
+     * @param nation 원본 언어 국가 코드
+     */
+    fun translateContent(content: String, nation: String?) {
+        viewModelScope.launch {
+            _dialogEvent.emit(ExoArticleDialog.Translation(content = content, nation = nation))
+        }
+    }
+
+    /**
      * 게시글 번역
      * Old 프로젝트의 ITranslation.translateArticle과 동일한 로직
      *

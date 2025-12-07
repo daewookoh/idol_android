@@ -3,16 +3,21 @@ package net.ib.mn.data.repository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import net.ib.mn.data.remote.api.ArticlesApi
 import net.ib.mn.data.remote.dto.ArticleLikeRequest
 import net.ib.mn.data.remote.dto.ArticleLikeResponse
 import net.ib.mn.data.remote.dto.ArticleVoteRequest
 import net.ib.mn.data.remote.dto.ArticleVoteResponse
+import net.ib.mn.data.remote.dto.CreateArticleRequest
+import net.ib.mn.data.remote.dto.InsertArticleRequest
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.NoticeModel
 import net.ib.mn.domain.repository.ArticlesRepository
 import net.ib.mn.domain.repository.ArticlesResponse
+import net.ib.mn.domain.repository.CreateArticleResult
 import net.ib.mn.util.logE
 import org.json.JSONObject
 import javax.inject.Inject
@@ -288,7 +293,8 @@ class ArticlesRepositoryImpl @Inject constructor(
      * 게시글 상세 조회
      */
     override suspend fun getArticle(articleId: Long): ArticleModel {
-        val json = articlesApi.getArticle(articleId).string()
+        val response = articlesApi.getArticle(articleId)
+        val json = response.body()?.string() ?: throw Exception("Response body is null")
         val jsonObject = JSONObject(json)
         val articleJson = jsonObject.optJSONObject("article") ?: jsonObject
         return gson.fromJson(articleJson.toString(), ArticleModel::class.java)
@@ -338,5 +344,112 @@ class ArticlesRepositoryImpl @Inject constructor(
             createdAt = obj.optLong("created_at", 0L),
             isOpen = obj.optBoolean("is_open", false)
         )
+    }
+
+    /**
+     * 게시글 작성
+     * Old 프로젝트의 createArticle과 동일
+     */
+    override fun createArticle(
+        idolId: Int,
+        content: String,
+        title: String,
+        tagId: String,
+        show: String,
+        linkTitle: String,
+        linkDesc: String,
+        linkUrl: String
+    ): Flow<ApiResult<CreateArticleResult>> = flow {
+        emit(ApiResult.Loading)
+        try {
+            val request = CreateArticleRequest(
+                title = title,
+                content = content,
+                idolId = idolId.toString(),
+                linkTitle = linkTitle,
+                linkDesc = linkDesc,
+                linkUrl = linkUrl,
+                show = show,
+                files = emptyList(),
+                tagId = tagId
+            )
+            val response = articlesApi.createArticle(request)
+            if (response.success) {
+                emit(ApiResult.Success(CreateArticleResult(
+                    gcode = response.gcode,
+                    provide = response.provide,
+                    articleId = response.articleId
+                )))
+            } else {
+                emit(ApiResult.Error.create(
+                    exception = Exception(response.msg ?: "게시글 작성에 실패했습니다."),
+                    message = response.msg ?: "게시글 작성에 실패했습니다."
+                ))
+            }
+        } catch (e: Exception) {
+            logE(TAG, "createArticle", e)
+            emit(ApiResult.Error.create(
+                exception = e,
+                message = e.message ?: "게시글 작성에 실패했습니다."
+            ))
+        }
+    }.catch { e ->
+        emit(ApiResult.Error.create(
+            exception = e as? Exception ?: Exception(e.message),
+            message = e.message ?: "게시글 작성에 실패했습니다."
+        ))
+    }
+
+    /**
+     * 게시글 작성 (덕질게시판/팬톡)
+     * Old 프로젝트의 insertArticle과 동일
+     * API: POST articles/insert/
+     */
+    override fun insertArticle(
+        idolId: Int,
+        content: String,
+        title: String,
+        showScope: String,
+        linkTitle: String,
+        linkDesc: String,
+        linkUrl: String
+    ): Flow<ApiResult<CreateArticleResult>> = flow {
+        emit(ApiResult.Loading)
+        try {
+            val request = InsertArticleRequest(
+                title = title,
+                content = content,
+                idolId = idolId.toString(),
+                linkTitle = linkTitle,
+                linkDesc = linkDesc,
+                linkUrl = linkUrl,
+                showScope = showScope,
+                files = emptyList()
+            )
+            val response = articlesApi.insertArticle(request)
+            if (response.success) {
+                emit(ApiResult.Success(CreateArticleResult(
+                    gcode = response.gcode,
+                    provide = response.provide,
+                    articleId = response.articleId
+                )))
+            } else {
+                emit(ApiResult.Error.create(
+                    exception = Exception(response.msg ?: "게시글 작성에 실패했습니다."),
+                    message = response.msg ?: "게시글 작성에 실패했습니다."
+                ))
+            }
+        } catch (e: Exception) {
+            logE(TAG, "insertArticle", e)
+            emit(ApiResult.Error.create(
+                exception = e,
+                message = e.message ?: "게시글 작성에 실패했습니다."
+            ))
+        }
+    }.catch { e ->
+        emit(ApiResult.Error.create(
+            exception = e as? Exception ?: Exception(e.message),
+            message = e.message ?: "게시글 작성에 실패했습니다."
+        ))
     }
 }

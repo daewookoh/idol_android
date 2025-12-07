@@ -4,6 +4,9 @@ import net.ib.mn.data.remote.dto.ArticleLikeRequest
 import net.ib.mn.data.remote.dto.ArticleLikeResponse
 import net.ib.mn.data.remote.dto.ArticleVoteRequest
 import net.ib.mn.data.remote.dto.ArticleVoteResponse
+import net.ib.mn.data.remote.dto.CreateArticleRequest
+import net.ib.mn.data.remote.dto.CreateArticleResponse
+import net.ib.mn.data.remote.dto.InsertArticleRequest
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -162,7 +165,7 @@ interface ArticlesApi {
     suspend fun getArticle(
         @Path("id") id: Long,
         @Query("translate") translate: String? = null
-    ): ResponseBody
+    ): Response<ResponseBody>
 
     /**
      * 공지사항 상세 조회
@@ -173,4 +176,22 @@ interface ArticlesApi {
         @Path("id") id: Int,
         @Query("mode") mode: String? = null
     ): Response<ResponseBody>
+
+    /**
+     * 피드/자유게시판 게시글 작성
+     * Old 프로젝트: POST "articles/create/"
+     */
+    @POST("articles/create/")
+    suspend fun createArticle(
+        @Body request: CreateArticleRequest
+    ): CreateArticleResponse
+
+    /**
+     * 덕질게시판(팬톡) 게시글 작성
+     * Old 프로젝트: POST "articles/insert/"
+     */
+    @POST("articles/insert/")
+    suspend fun insertArticle(
+        @Body request: InsertArticleRequest
+    ): CreateArticleResponse
 }

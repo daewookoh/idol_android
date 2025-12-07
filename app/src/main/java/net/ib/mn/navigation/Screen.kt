@@ -58,9 +58,18 @@ sealed class Screen {
 
     /**
      * Main 화면 - 메인 앱 컨테이너
+     * @param initialTab 초기 탭 인덱스 (0: 홈, 1: 차트, 2: 커뮤니티, 3: 자유게시판, 4: 마이)
+     * @param initialIdolId 초기 아이돌 ID (푸시 알림에서 커뮤니티로 이동 시)
+     * @param initialCommunityTab 초기 커뮤니티 탭 (0: FEED, 1: FAN_TALK)
+     * @param initialFreeBoardTagId 초기 자유게시판 태그 ID (푸시 알림에서 해당 카테고리로 이동 시)
      */
     @Serializable
-    data object Main : Screen()
+    data class Main(
+        val initialTab: Int = 0,
+        val initialIdolId: Int? = null,
+        val initialCommunityTab: Int? = null,
+        val initialFreeBoardTagId: Int? = null
+    ) : Screen()
 
     /**
      * WebView 화면 - 웹 콘텐츠 표시
@@ -87,4 +96,19 @@ sealed class Screen {
      */
     @Serializable
     data object Awards : Screen()
+
+    /**
+     * ArticleWrite 화면 - 게시글 작성/수정
+     * @param writeType 글쓰기 타입 (FEED, FREE_BOARD, FAN_TALK)
+     * @param idolId 아이돌 ID (커뮤니티에서 진입 시)
+     * @param editingArticleId 수정할 게시글 ID (수정 모드)
+     * @param tagId 선택된 태그 ID (자유게시판에서 진입 시)
+     */
+    @Serializable
+    data class ArticleWrite(
+        val writeType: String = "FEED", // ArticleWriteType.name
+        val idolId: Int? = null,
+        val editingArticleId: String? = null,
+        val tagId: Int? = null
+    ) : Screen()
 }

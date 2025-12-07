@@ -41,6 +41,7 @@ import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -83,6 +84,7 @@ import net.ib.mn.presentation.community.subpage.CommunityChatSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFanTalkSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFeedSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFeedViewModel
+import net.ib.mn.presentation.community.subpage.OrderByType
 import net.ib.mn.presentation.community.subpage.CommunityScheduleSubPage
 import net.ib.mn.presentation.article.ArticleDetailScreen
 import net.ib.mn.presentation.article.PhotoDetailScreen
@@ -112,16 +114,22 @@ enum class CommunityTab {
  * @param rankingItem 선택된 랭킹 아이템 데이터
  * @param showChattingTab 채팅 탭 표시 여부 (최애이거나, 최애의 그룹이거나, 관리자일 경우 true)
  * @param fandomName 팬덤 이름
+ * @param initialTab 초기 탭 인덱스 (0: FEED, 1: FAN_TALK) - 푸시 알림에서 온 경우
+ * @param forceLatestOrder 푸시 알림에서 온 경우 최신순 정렬 강제 적용
  * @param onBackClick 뒤로가기 클릭 이벤트
  * @param onMostChanged 최애 변경 콜백
+ * @param onNavigateToArticleWrite 글쓰기 화면 이동 콜백 (writeType, idolId)
  */
 @Composable
 fun CommunityScreen(
     rankingItem: RankingItem,
     showChattingTab: Boolean = false,
     fandomName: String? = null,
+    initialTab: Int? = null,
+    forceLatestOrder: Boolean = false,
     onBackClick: () -> Unit = {},
     onMostChanged: (Boolean) -> Unit = {},
+    onNavigateToArticleWrite: (writeType: String, idolId: Int?) -> Unit = { _, _ -> },
     viewModel: CommunityViewModel = hiltViewModel(),
     feedViewModel: CommunityFeedViewModel = hiltViewModel()
 ) {
@@ -179,7 +187,17 @@ fun CommunityScreen(
         }
     }
 
-    val pagerState = rememberPagerState(pageCount = { tabs.size })
+    val pagerState = rememberPagerState(
+        initialPage = initialTab?.coerceIn(0, tabs.size - 1) ?: 0,
+        pageCount = { tabs.size }
+    )
+
+    // 푸시 알림에서 온 경우 최신순 정렬 적용
+    LaunchedEffect(forceLatestOrder) {
+        if (forceLatestOrder) {
+            feedViewModel.setOrderBy(OrderByType.TIME)
+        }
+    }
 
     // 탭 제목 생성
     val tabTitles = remember(fandomName, showChattingTab) {
@@ -431,13 +449,16 @@ fun CommunityScreen(
                     .align(Alignment.BottomEnd)
                     .padding(end = 16.dp, bottom = 16.dp)
                     .size(53.dp)
-                    .clickable {
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
                         when (currentTab) {
                             CommunityTab.FEED -> {
-                                // TODO: 피드 글쓰기
+                                onNavigateToArticleWrite("FEED", idolId)
                             }
                             CommunityTab.FAN_TALK -> {
-                                // TODO: 팬톡 글쓰기
+                                onNavigateToArticleWrite("FAN_TALK", idolId)
                             }
                             CommunityTab.CHAT -> {
                                 // TODO: 채팅방 만들기

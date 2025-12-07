@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -68,10 +69,12 @@ import net.ib.mn.util.LocaleUtil
 
 /**
  * Free Board 페이지 - 프리톡 메뉴 화면
+ * @param initialTagId 초기 태그 ID (푸시 알림에서 해당 카테고리로 이동 시)
  */
 @Composable
 fun FreeBoardPage(
-    onNavigateToWrite: () -> Unit = {},
+    initialTagId: Int? = null,
+    onNavigateToWrite: (tagId: Int?) -> Unit = {},
     onNavigateToArticleDetail: (ArticleModel, externalTabName: String?, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _, _ -> },
     onNavigateToNoticeDetail: (ArticleModel) -> Unit = {},
     viewModel: FreeBoardViewModel = hiltViewModel(),
@@ -79,9 +82,23 @@ fun FreeBoardPage(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
+    // 초기 태그 적용 여부 (한 번만 실행)
+    var initialTagApplied by remember { mutableStateOf(false) }
+
     // Load initial data
     LaunchedEffect(Unit) {
         viewModel.sendIntent(FreeBoardContract.Intent.LoadInitialData)
+    }
+
+    // 초기 태그 선택 (푸시 알림에서 온 경우, 한 번만 실행)
+    LaunchedEffect(state.tags) {
+        if (!initialTagApplied && initialTagId != null && state.tags.isNotEmpty()) {
+            val targetTag = state.tags.find { it.id == initialTagId }
+            if (targetTag != null) {
+                viewModel.sendIntent(FreeBoardContract.Intent.OnTagSelected(targetTag))
+            }
+            initialTagApplied = true
+        }
     }
 
     // Handle effects
@@ -89,7 +106,7 @@ fun FreeBoardPage(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is FreeBoardContract.Effect.NavigateToWrite -> {
-                    onNavigateToWrite()
+                    onNavigateToWrite(effect.tagId)
                 }
                 is FreeBoardContract.Effect.ShowLanguageFilterDialog -> {
                     // Show language filter dialog
@@ -355,7 +372,10 @@ fun FreeBoardContent(
                     .align(Alignment.BottomEnd)
                     .padding(end = 16.dp, bottom = 16.dp)
                     .size(53.dp)
-                    .clickable { onIntent(FreeBoardContract.Intent.OnWriteClick) },
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onIntent(FreeBoardContract.Intent.OnWriteClick) },
                 tint = androidx.compose.ui.graphics.Color.Unspecified
             )
         }

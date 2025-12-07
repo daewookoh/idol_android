@@ -1,6 +1,8 @@
 package net.ib.mn.presentation.main
 
+import android.app.Activity
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -53,6 +56,8 @@ import androidx.compose.animation.AnimatedVisibility
 import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import net.ib.mn.navigation.LocalAppNavigator
+import net.ib.mn.navigation.Screen
 
 /**
  * 메인 화면.
@@ -61,11 +66,18 @@ import androidx.compose.animation.slideOutVertically
  */
 @Composable
 fun MainScreen(
+    initialTab: Int = 0,
+    initialIdolId: Int? = null,
+    initialCommunityTab: Int? = null,
+    initialFreeBoardTagId: Int? = null,
     viewModel: MainViewModel = hiltViewModel(),
     topBarViewModel: MainTopBarViewModel = hiltViewModel(),
     onLogout: () -> Unit = {}
 ) {
-    var selectedTab by remember { mutableIntStateOf(0) }
+    var selectedTab by rememberSaveable { mutableIntStateOf(initialTab) }
+
+    // 푸시 알림에서 아이돌 커뮤니티로 이동 시 자동으로 커뮤니티 열기
+    var pendingCommunityTab by remember { mutableStateOf(initialCommunityTab) }
     val logoutCompleted by viewModel.logoutCompleted.collectAsState()
     val timerText by topBarViewModel.timerText.collectAsState()
     val hasNewNotification by topBarViewModel.hasNewNotification.collectAsState()
@@ -90,12 +102,28 @@ fun MainScreen(
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val navigator = LocalAppNavigator.current
+
+    // 백버튼 처리: 탭이 0이 아니면 탭 0으로 이동, 탭이 0이면 앱 종료
+    BackHandler {
+        if (selectedTab != 0) {
+            selectedTab = 0
+            viewModel.onTabSelected(0)
+        } else {
+            (context as? Activity)?.finish()
+        }
+    }
 
     LaunchedEffect(Unit) {
         topBarViewModel.startTimer()
         topBarViewModel.checkNewNotification()
         viewModel.checkEvent()
         viewModel.onTabSelected(selectedTab)
+
+        // 푸시 알림에서 아이돌 커뮤니티로 이동 시 자동으로 열기
+        initialIdolId?.let { idolId ->
+            viewModel.openCommunityByIdolId(idolId)
+        }
     }
 
     LaunchedEffect(logoutCompleted) {
@@ -209,6 +237,13 @@ fun MainScreen(
                         onNavigateToProfile = { showMyProfile = true }
                     )
                     3 -> FreeBoardPage(
+                        initialTagId = initialFreeBoardTagId,
+                        onNavigateToWrite = { tagId ->
+                            navigator.navigate(Screen.ArticleWrite(
+                                writeType = "FREE_BOARD",
+                                tagId = tagId
+                            ))
+                        },
                         onNavigateToArticleDetail = { article, externalTabName, onArticleUpdated ->
                             selectedFreeBoardArticle = article
                             selectedFreeBoardExternalIdolName = externalTabName
@@ -229,11 +264,27 @@ fun MainScreen(
         LaunchedEffect(rankingItem) {
             showChattingTab = viewModel.shouldShowChattingTab(rankingItem)
         }
+
+        // 푸시 알림에서 온 경우 초기 탭 및 최신순 정렬 설정 (한 번만 적용)
+        val communityInitialTab = pendingCommunityTab
+        val shouldForceLatestOrder = pendingCommunityTab != null
+        LaunchedEffect(rankingItem) {
+            pendingCommunityTab = null // 한 번 사용 후 초기화
+        }
+
         CommunityScreen(
             rankingItem = rankingItem,
             showChattingTab = showChattingTab,
             fandomName = rankingItem.fandomName,
-            onBackClick = viewModel::closeCommunity
+            initialTab = communityInitialTab,
+            forceLatestOrder = shouldForceLatestOrder,
+            onBackClick = viewModel::closeCommunity,
+            onNavigateToArticleWrite = { writeType, idolId ->
+                navigator.navigate(Screen.ArticleWrite(
+                    writeType = writeType,
+                    idolId = idolId
+                ))
+            }
         )
     }
 

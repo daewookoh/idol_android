@@ -192,7 +192,66 @@ interface ArticlesRepository {
      * @return 공지사항 모델 (contentHtml 포함)
      */
     fun getNotice(noticeId: Int, isDarkMode: Boolean = false): Flow<ApiResult<NoticeModel>>
+
+    /**
+     * 게시글 작성 (피드/자유게시판)
+     * Old 프로젝트의 createArticle과 동일
+     * API: POST articles/create/
+     *
+     * @param idolId 아이돌 ID
+     * @param content 내용
+     * @param title 제목
+     * @param tagId 태그 ID (기본값: "1" = 자유)
+     * @param show 공개 범위 ("A" = 전체공개, "M" = 최애공개)
+     * @param linkTitle 링크 제목
+     * @param linkDesc 링크 설명
+     * @param linkUrl 링크 URL
+     * @return 작성 결과 (gcode, provide 포함)
+     */
+    fun createArticle(
+        idolId: Int,
+        content: String,
+        title: String = "",
+        tagId: String = "1",
+        show: String = "A",
+        linkTitle: String = "",
+        linkDesc: String = "",
+        linkUrl: String = ""
+    ): Flow<ApiResult<CreateArticleResult>>
+
+    /**
+     * 게시글 작성 (덕질게시판/팬톡)
+     * Old 프로젝트의 insertArticle과 동일
+     * API: POST articles/insert/
+     *
+     * @param idolId 아이돌 ID
+     * @param content 내용
+     * @param title 제목
+     * @param showScope 공개 범위 ("A" = 전체공개, "M" = 최애공개)
+     * @param linkTitle 링크 제목
+     * @param linkDesc 링크 설명
+     * @param linkUrl 링크 URL
+     * @return 작성 결과 (gcode, provide 포함)
+     */
+    fun insertArticle(
+        idolId: Int,
+        content: String,
+        title: String = "",
+        showScope: String = "A",
+        linkTitle: String = "",
+        linkDesc: String = "",
+        linkUrl: String = ""
+    ): Flow<ApiResult<CreateArticleResult>>
 }
+
+/**
+ * 게시글 작성 결과
+ */
+data class CreateArticleResult(
+    val gcode: Int,
+    val provide: Long = 0,  // 하트 보상
+    val articleId: Long? = null
+)
 
 /**
  * 게시글 목록 응답 모델

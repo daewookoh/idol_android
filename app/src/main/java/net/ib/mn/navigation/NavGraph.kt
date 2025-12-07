@@ -5,6 +5,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
+import net.ib.mn.presentation.article.write.ArticleWriteScreen
+import net.ib.mn.presentation.article.write.ArticleWriteType
 import net.ib.mn.presentation.awards.AwardsScreen
 import net.ib.mn.presentation.login.EmailLoginScreen
 import net.ib.mn.presentation.login.LoginScreen
@@ -47,7 +49,7 @@ fun NavGraph(
                     is Screen.StartUp -> NavEntry(screen) {
                         StartUpScreen(
                             onNavigateToMain = {
-                                navigator.navigateAndClearStack(Screen.Main)
+                                navigator.navigateAndClearStack(Screen.Main())
                             },
                             onNavigateToLogin = {
                                 // 이메일 회원가입 후인 경우 EmailLogin으로 이동
@@ -138,6 +140,10 @@ fun NavGraph(
                     // Main 화면
                     is Screen.Main -> NavEntry(screen) {
                         MainScreen(
+                            initialTab = screen.initialTab,
+                            initialIdolId = screen.initialIdolId,
+                            initialCommunityTab = screen.initialCommunityTab,
+                            initialFreeBoardTagId = screen.initialFreeBoardTagId,
                             onLogout = {
                                 // 로그아웃 시 StartUp으로 이동 (모든 네비게이션 스택 제거)
                                 navigator.navigateAndClearStack(Screen.StartUp())
@@ -166,6 +172,28 @@ fun NavGraph(
                         AwardsScreen(
                             onNavigateBack = {
                                 navigator.popBackStack()
+                            }
+                        )
+                    }
+
+                    // ArticleWrite 화면
+                    is Screen.ArticleWrite -> NavEntry(screen) {
+                        val writeType = try {
+                            ArticleWriteType.valueOf(screen.writeType)
+                        } catch (e: Exception) {
+                            ArticleWriteType.FEED
+                        }
+                        ArticleWriteScreen(
+                            writeType = writeType,
+                            idolId = screen.idolId,
+                            editingArticleId = screen.editingArticleId,
+                            tagId = screen.tagId,
+                            onNavigateBack = {
+                                navigator.popBackStack()
+                            },
+                            onNavigateBackWithResult = { isEdited ->
+                                navigator.popBackStack()
+                                // TODO: 결과를 이전 화면에 전달하는 로직 추가 (필요시)
                             }
                         )
                     }

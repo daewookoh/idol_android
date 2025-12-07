@@ -62,7 +62,7 @@ class FreeBoardContract {
     }
 
     sealed class Effect : UiEffect {
-        data object NavigateToWrite : Effect()
+        data class NavigateToWrite(val tagId: Int?) : Effect()
         data object ShowLanguageFilterDialog : Effect()
         data class ShowError(val message: String) : Effect()
         data class ShowToast(val message: String) : Effect()

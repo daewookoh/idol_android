@@ -380,7 +380,14 @@ class FreeBoardViewModel @Inject constructor(
     }
 
     private fun onWriteClick() {
-        setEffect { FreeBoardContract.Effect.NavigateToWrite }
+        val currentTagId = uiState.value.selectedTagId
+        // HOT(0), ALL(9898), 최애(999) 탭이 아닌 경우에만 tagId 전달
+        val tagId = if (currentTagId > 0 && currentTagId != FreeBoardContract.State.TAG_ID_ALL && currentTagId != FreeBoardContract.State.TAG_ID_MY_FAVORITE) {
+            currentTagId
+        } else {
+            null
+        }
+        setEffect { FreeBoardContract.Effect.NavigateToWrite(tagId) }
     }
 
     private fun onFilterLatest() {

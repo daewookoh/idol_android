@@ -12,9 +12,11 @@ import androidx.lifecycle.lifecycleScope
 import com.facebook.CallbackManager
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.navigation.NavGraph
+import net.ib.mn.navigation.Screen
 import net.ib.mn.navigation.rememberAppNavigator
 import net.ib.mn.ui.theme.ExodusTheme
 import net.ib.mn.util.Constants
+import net.ib.mn.util.NotificationUtil
 import net.ib.mn.util.logD
 import net.ib.mn.util.logE
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,9 +41,17 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    // Facebook CallbackManager를 static으로 저장하여 LoginScreen에서 접근 가능하도록
     companion object {
+        // Facebook CallbackManager를 static으로 저장하여 LoginScreen에서 접근 가능하도록
         var callbackManager: CallbackManager? = null
+
+        // MainScreen 탭 인덱스 상수
+        private const val TAB_HOME = 0
+        private const val TAB_FREE_BOARD = 3
+
+        // CommunityScreen 탭 인덱스 상수
+        private const val COMMUNITY_TAB_FEED = 0
+        private const val COMMUNITY_TAB_FAN_TALK = 1
     }
 
     @Inject
@@ -79,6 +89,9 @@ class MainActivity : ComponentActivity() {
         // UDP 연결은 IdolApplication에서 앱 전체 생명주기에 맞춰 관리됨
         // ProcessLifecycleOwner를 사용하여 포그라운드/백그라운드 진입 시 자동으로 시작/중지
 
+        // 푸시 알림 클릭 시 네비게이션 정보 추출 (Navigation 3)
+        val notificationNav = getNavigationFromIntent(intent)
+
         setContent {
             // PreferencesManager에서 테마 설정 구독
             val themeString by preferencesManager.theme.collectAsState(initial = null)
@@ -99,8 +112,18 @@ class MainActivity : ComponentActivity() {
                     net.ib.mn.ui.components.LocalExoTop3Manager provides
                         net.ib.mn.ui.components.ExoTop3Manager(cacheDataSourceFactory)
                 ) {
-                    // Navigation 3 사용
-                    val navigator = rememberAppNavigator()
+                    // Navigation 3 사용 - 푸시 알림에서 온 경우 해당 화면으로 시작
+                    val startDestination = if (notificationNav != null) {
+                        Screen.Main(
+                            initialTab = notificationNav.tab,
+                            initialIdolId = notificationNav.idolId,
+                            initialCommunityTab = notificationNav.communityTab,
+                            initialFreeBoardTagId = notificationNav.freeBoardTagId
+                        )
+                    } else {
+                        Screen.StartUp()
+                    }
+                    val navigator = rememberAppNavigator(startDestination = startDestination)
                     NavGraph(navigator = navigator)
                 }
             }
@@ -236,5 +259,46 @@ class MainActivity : ComponentActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         callbackManager?.onActivityResult(requestCode, resultCode, data)
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    /**
+     * 푸시 알림 클릭 시 네비게이션 정보
+     */
+    private data class NotificationNavigation(
+        val tab: Int,
+        val idolId: Int? = null,
+        val communityTab: Int? = null,
+        val freeBoardTagId: Int? = null
+    )
+
+    /**
+     * Intent에서 네비게이션 정보 추출 (푸시 알림 클릭 처리)
+     * @return NotificationNavigation (null이면 일반 시작)
+     */
+    private fun getNavigationFromIntent(intent: Intent?): NotificationNavigation? {
+        val navigateTo = intent?.getStringExtra(NotificationUtil.EXTRA_NAVIGATE_TO) ?: return null
+        val idolId = intent.getIntExtra(NotificationUtil.EXTRA_IDOL_ID, -1).takeIf { it > 0 }
+        val tagId = intent.getIntExtra(NotificationUtil.EXTRA_TAG_ID, -1).takeIf { it > 0 }
+
+        return when (navigateTo) {
+            // 자유게시판: 탭 3으로 이동 + 해당 카테고리 태그
+            NotificationUtil.NAVIGATE_TO_FREE_BOARD -> NotificationNavigation(
+                tab = TAB_FREE_BOARD,
+                freeBoardTagId = tagId
+            )
+            // FEED 글: 홈 탭(0) + 아이돌 커뮤니티 FEED 탭(0)
+            NotificationUtil.NAVIGATE_TO_COMMUNITY_FEED -> NotificationNavigation(
+                tab = TAB_HOME,
+                idolId = idolId,
+                communityTab = COMMUNITY_TAB_FEED
+            )
+            // 팬톡 글: 홈 탭(0) + 아이돌 커뮤니티 팬톡 탭(1)
+            NotificationUtil.NAVIGATE_TO_COMMUNITY_FAN_TALK -> NotificationNavigation(
+                tab = TAB_HOME,
+                idolId = idolId,
+                communityTab = COMMUNITY_TAB_FAN_TALK
+            )
+            else -> null
+        }
     }
 }

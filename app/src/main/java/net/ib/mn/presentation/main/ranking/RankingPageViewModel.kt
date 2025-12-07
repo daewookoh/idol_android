@@ -1,10 +1,10 @@
 package net.ib.mn.presentation.main.ranking
 
-import net.ib.mn.util.logW
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,6 +14,7 @@ import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.model.TypeListModel
 import net.ib.mn.data.remote.dto.MainChartModel
 import net.ib.mn.domain.repository.ConfigRepository
+import net.ib.mn.util.logW
 import javax.inject.Inject
 
 /**
@@ -132,10 +133,13 @@ class RankingPageViewModel @Inject constructor(
                     !award?.mainFloatingImgUrl.isNullOrEmpty()
             }
         }
-        // 프로세스 복원 시 데이터가 없으면 재로드
+        // 프로세스 복원 시 데이터가 없으면 재로드 (1초 지연)
         if (!BuildConfig.CELEB && configRepository.getMainChartModel() == null) {
-            logW("RankingViewModel", "MainChartModel is null (process restored) - reloading data")
-            reloadChartData()
+            logW("RankingViewModel", "MainChartModel is null (process restored) - reloading data after 1s delay")
+            viewModelScope.launch {
+                delay(1000L)
+                reloadChartData()
+            }
         }
     }
 
