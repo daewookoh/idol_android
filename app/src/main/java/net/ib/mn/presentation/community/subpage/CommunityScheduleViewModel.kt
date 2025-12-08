@@ -46,6 +46,7 @@ class CommunityScheduleViewModel @Inject constructor(
             is CommunityScheduleContract.Intent.DeleteSchedule -> deleteSchedule(intent.scheduleId, intent.idolId)
             is CommunityScheduleContract.Intent.EditSchedule -> editSchedule(intent.schedule)
             is CommunityScheduleContract.Intent.ViewScheduleDetail -> viewScheduleDetail(intent.schedule)
+            is CommunityScheduleContract.Intent.ViewMonthSchedules -> viewMonthSchedules(intent.schedule)
         }
     }
 
@@ -62,6 +63,17 @@ class CommunityScheduleViewModel @Inject constructor(
 
     private fun editSchedule(schedule: ScheduleModel) {
         setEffect { CommunityScheduleContract.Effect.NavigateToScheduleEdit(schedule) }
+    }
+
+    private fun viewMonthSchedules(schedule: ScheduleModel) {
+        val state = uiState.value
+        setEffect {
+            CommunityScheduleContract.Effect.NavigateToMonthScheduleDetail(
+                schedule = schedule,
+                yearMonth = state.yearMonth,
+                locale = state.locale
+            )
+        }
     }
 
     private fun loadInitialData(idolId: Int) {

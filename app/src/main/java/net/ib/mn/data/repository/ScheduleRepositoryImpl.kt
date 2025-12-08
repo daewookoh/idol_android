@@ -117,6 +117,22 @@ class ScheduleRepositoryImpl @Inject constructor(
             parser = { json -> parseScheduleResponse(json) }
         )
 
+    override fun getMonthSchedules(
+        idolId: Int,
+        yearMonth: String,
+        locale: String
+    ): Flow<ApiResult<List<ScheduleModel>>> = safeApiCallWithJsonString(
+        apiCall = {
+            scheduleApi.getSchedules(
+                idolId = idolId,
+                yearMonth = yearMonth,
+                includeVotes = 1,
+                locale = locale
+            )
+        },
+        parser = { json -> parseDaySchedules(json) }
+    )
+
     // ============================================================
     // Private Parsers
     // ============================================================

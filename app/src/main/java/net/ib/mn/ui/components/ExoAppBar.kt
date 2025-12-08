@@ -66,6 +66,7 @@ fun ExoAppBar(
  * @param actions AppBar 우측 액션 버튼들
  * @param colors AppBar 색상
  */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun ExoAppBar(
     title: @Composable () -> Unit,

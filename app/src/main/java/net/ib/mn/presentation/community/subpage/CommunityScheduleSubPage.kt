@@ -19,10 +19,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,6 +49,7 @@ import net.ib.mn.ui.components.ExoBottomSheetItem
 import net.ib.mn.ui.components.ExoBottomSheetList
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.components.RankingItem
+import net.ib.mn.ui.components.ScheduleVoteAndComment
 import java.text.DateFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -59,12 +58,12 @@ import java.util.TimeZone
 
 private val KST: TimeZone = TimeZone.getTimeZone("Asia/Seoul")
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityScheduleSubPage(
     rankingItem: RankingItem,
     onNavigateToScheduleEdit: (ScheduleModel) -> Unit = {},
     onNavigateToScheduleDetail: (ScheduleModel, String, String) -> Unit = { _, _, _ -> },
+    onNavigateToMonthScheduleDetail: (ScheduleModel, String, String) -> Unit = { _, _, _ -> },
     viewModel: CommunityScheduleViewModel = hiltViewModel(key = "schedule_${rankingItem.id}")
 ) {
     val context = LocalContext.current
@@ -93,6 +92,8 @@ fun CommunityScheduleSubPage(
                     onNavigateToScheduleEdit(effect.schedule)
                 is CommunityScheduleContract.Effect.NavigateToScheduleDetail ->
                     onNavigateToScheduleDetail(effect.schedule, effect.yearMonthDay, effect.locale)
+                is CommunityScheduleContract.Effect.NavigateToMonthScheduleDetail ->
+                    onNavigateToMonthScheduleDetail(effect.schedule, effect.yearMonth, effect.locale)
             }
         }
     }
@@ -132,103 +133,97 @@ fun CommunityScheduleSubPage(
         )
     }
 
-    PullToRefreshBox(
-        isRefreshing = state.isRefreshing,
-        onRefresh = { viewModel.sendIntent(CommunityScheduleContract.Intent.Refresh(idolId)) },
-        modifier = Modifier.fillMaxSize()
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorResource(R.color.gray80))
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(colorResource(R.color.gray80))
-        ) {
-            item(key = "calendar_header") {
-                CalendarHeader(
-                    year = state.currentYear,
-                    month = state.currentMonth,
-                    localeText = state.localeText,
-                    onPreviousClick = { viewModel.sendIntent(CommunityScheduleContract.Intent.PreviousMonth(idolId)) },
-                    onNextClick = { viewModel.sendIntent(CommunityScheduleContract.Intent.NextMonth(idolId)) },
-                    onLanguageClick = { showLanguageSheet = true }
-                )
-            }
+        item(key = "calendar_header") {
+            CalendarHeader(
+                year = state.currentYear,
+                month = state.currentMonth,
+                localeText = state.localeText,
+                onPreviousClick = { viewModel.sendIntent(CommunityScheduleContract.Intent.PreviousMonth(idolId)) },
+                onNextClick = { viewModel.sendIntent(CommunityScheduleContract.Intent.NextMonth(idolId)) },
+                onLanguageClick = { showLanguageSheet = true }
+            )
+        }
 
-            item(key = "weekday_header") {
-                WeekdayHeader()
-            }
+        item(key = "weekday_header") {
+            WeekdayHeader()
+        }
 
-            item(key = "calendar_grid") {
-                CalendarGrid(
-                    state = state,
-                    onDayClick = { day ->
-                        viewModel.sendIntent(CommunityScheduleContract.Intent.SelectDay(day, idolId))
-                    }
-                )
-            }
+        item(key = "calendar_grid") {
+            CalendarGrid(
+                state = state,
+                onDayClick = { day ->
+                    viewModel.sendIntent(CommunityScheduleContract.Intent.SelectDay(day, idolId))
+                }
+            )
+        }
 
-            when {
-                state.isLoading && state.daySchedules.isEmpty() -> {
-                    item(key = "loading") {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .background(colorResource(R.color.background_100)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = colorResource(R.color.main))
-                        }
+        when {
+            state.isLoading && state.daySchedules.isEmpty() -> {
+                item(key = "loading") {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .background(colorResource(R.color.background_100)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = colorResource(R.color.main))
                     }
                 }
-                state.daySchedules.isEmpty() -> {
-                    item(key = "empty") {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(colorResource(R.color.background_100))
-                                .padding(vertical = 30.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = stringResource(R.string.schedule_empty),
-                                fontSize = 14.sp,
-                                color = colorResource(R.color.text_dimmed)
-                            )
-                        }
-                    }
-                }
-                else -> {
-                    items(items = state.daySchedules, key = { "schedule_${it.id}" }) { schedule ->
-                        ScheduleItem(
-                            schedule = schedule,
-                            onDetailClick = {
-                                viewModel.sendIntent(CommunityScheduleContract.Intent.ViewScheduleDetail(schedule))
-                            },
-                            onCommentClick = {
-                                viewModel.sendIntent(CommunityScheduleContract.Intent.ViewScheduleDetail(schedule))
-                            },
-                            onVoteYes = {
-                                if (!schedule.isVoted) {
-                                    viewModel.sendIntent(CommunityScheduleContract.Intent.VoteSchedule(schedule.id, "Y", idolId))
-                                }
-                            },
-                            onVoteNo = {
-                                if (!schedule.isVoted) {
-                                    viewModel.sendIntent(CommunityScheduleContract.Intent.VoteSchedule(schedule.id, "N", idolId))
-                                }
-                            },
-                            onEditClick = {
-                                viewModel.sendIntent(CommunityScheduleContract.Intent.EditSchedule(schedule))
-                            },
-                            onDeleteClick = { showDeleteDialog = schedule.id }
+            }
+            state.daySchedules.isEmpty() -> {
+                item(key = "empty") {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(colorResource(R.color.background_100))
+                            .padding(vertical = 30.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.schedule_empty),
+                            fontSize = 14.sp,
+                            color = colorResource(R.color.text_dimmed)
                         )
                     }
                 }
             }
-
-            item(key = "bottom_spacer") {
-                Spacer(modifier = Modifier.height(50.dp))
+            else -> {
+                items(items = state.daySchedules, key = { "schedule_${it.id}" }) { schedule ->
+                    ScheduleItem(
+                        schedule = schedule,
+                        onDetailClick = {
+                            viewModel.sendIntent(CommunityScheduleContract.Intent.ViewMonthSchedules(schedule))
+                        },
+                        onCommentClick = {
+                            viewModel.sendIntent(CommunityScheduleContract.Intent.ViewScheduleDetail(schedule))
+                        },
+                        onVoteYes = {
+                            if (!schedule.isVoted) {
+                                viewModel.sendIntent(CommunityScheduleContract.Intent.VoteSchedule(schedule.id, "Y", idolId))
+                            }
+                        },
+                        onVoteNo = {
+                            if (!schedule.isVoted) {
+                                viewModel.sendIntent(CommunityScheduleContract.Intent.VoteSchedule(schedule.id, "N", idolId))
+                            }
+                        },
+                        onEditClick = {
+                            viewModel.sendIntent(CommunityScheduleContract.Intent.EditSchedule(schedule))
+                        },
+                        onDeleteClick = { showDeleteDialog = schedule.id }
+                    )
+                }
             }
+        }
+
+        item(key = "bottom_spacer") {
+            Spacer(modifier = Modifier.height(50.dp))
         }
     }
 }
@@ -468,9 +463,6 @@ private fun ScheduleItem(
     val timeFormat = remember(appLocale) {
         SimpleDateFormat("a h:mm", appLocale).apply { timeZone = KST }
     }
-    val borderColor = colorResource(R.color.gray110)
-    val gray300 = colorResource(R.color.gray300)
-    val mainColor = colorResource(R.color.main)
 
     Column(
         modifier = Modifier
@@ -546,91 +538,15 @@ private fun ScheduleItem(
             }
         }
 
-        Row(modifier = Modifier.fillMaxWidth().height(33.dp)) {
-            // Comment button
-            ScheduleActionButton(
-                iconRes = R.drawable.icon_community_comment,
-                text = schedule.numComments.toString(),
-                isActive = false,
-                borderColor = borderColor,
-                activeColor = mainColor,
-                inactiveColor = gray300,
-                showEndBorder = true,
-                onClick = onCommentClick,
-                modifier = Modifier.weight(1f)
-            )
-
-            // Vote Yes button
-            ScheduleActionButton(
-                iconRes = if (schedule.isVotedYes) R.drawable.btn_schedule_yes_on else R.drawable.btn_schedule_yes_off,
-                text = schedule.numYes.toString(),
-                isActive = schedule.isVotedYes,
-                borderColor = borderColor,
-                activeColor = mainColor,
-                inactiveColor = gray300,
-                showEndBorder = true,
-                onClick = onVoteYes,
-                modifier = Modifier.weight(1f)
-            )
-
-            // Vote No button
-            ScheduleActionButton(
-                iconRes = if (schedule.isVotedNo) R.drawable.btn_schedule_no_on else R.drawable.btn_schedule_no_off,
-                text = schedule.numNo.toString(),
-                isActive = schedule.isVotedNo,
-                borderColor = borderColor,
-                activeColor = mainColor,
-                inactiveColor = gray300,
-                showEndBorder = false,
-                onClick = onVoteNo,
-                modifier = Modifier.weight(1f)
-            )
-        }
-    }
-}
-
-@Composable
-private fun ScheduleActionButton(
-    iconRes: Int,
-    text: String,
-    isActive: Boolean,
-    borderColor: Color,
-    activeColor: Color,
-    inactiveColor: Color,
-    showEndBorder: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val color = if (isActive) activeColor else inactiveColor
-
-    Row(
-        modifier = modifier
-            .fillMaxSize()
-            .background(colorResource(R.color.background_200))
-            .drawBehind {
-                drawLine(borderColor, Offset(0f, 0f), Offset(size.width, 0f), 1.dp.toPx())
-                if (showEndBorder) {
-                    drawLine(borderColor, Offset(size.width, 0f), Offset(size.width, size.height), 1.dp.toPx())
-                }
-            }
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) { onClick() },
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = painterResource(iconRes),
-            contentDescription = null,
-            tint = color,
-            modifier = Modifier.size(14.dp)
+        // 하단 댓글/투표 버튼 영역
+        ScheduleVoteAndComment(
+            schedule = schedule,
+            onCommentClick = onCommentClick,
+            onVoteYes = onVoteYes,
+            onVoteNo = onVoteNo
         )
-        Spacer(modifier = Modifier.width(5.dp))
-        Text(text = text, fontSize = 11.sp, color = color)
     }
 }
-
 
 @Composable
 private fun getAppLocale(): Locale {

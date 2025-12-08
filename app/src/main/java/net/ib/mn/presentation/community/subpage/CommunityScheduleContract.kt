@@ -66,12 +66,14 @@ class CommunityScheduleContract {
         data class DeleteSchedule(val scheduleId: Int, val idolId: Int) : Intent()
         data class EditSchedule(val schedule: ScheduleModel) : Intent()
         data class ViewScheduleDetail(val schedule: ScheduleModel) : Intent()
+        data class ViewMonthSchedules(val schedule: ScheduleModel) : Intent()
     }
 
     sealed class Effect : UiEffect {
         data class ShowError(val message: String) : Effect()
         data class ShowToast(val message: String) : Effect()
         data class NavigateToScheduleDetail(val schedule: ScheduleModel, val yearMonthDay: String, val locale: String) : Effect()
+        data class NavigateToMonthScheduleDetail(val schedule: ScheduleModel, val yearMonth: String, val locale: String) : Effect()
         object ShowLanguageSelector : Effect()
         data class ShowDeleteConfirm(val scheduleId: Int) : Effect()
         data class NavigateToScheduleEdit(val schedule: ScheduleModel) : Effect()

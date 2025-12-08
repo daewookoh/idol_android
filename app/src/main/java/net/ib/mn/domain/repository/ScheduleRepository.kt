@@ -54,4 +54,10 @@ interface ScheduleRepository {
         scheduleId: Int,
         request: ScheduleWriteRequest
     ): Flow<ApiResult<ScheduleModel>>
+
+    fun getMonthSchedules(
+        idolId: Int,
+        yearMonth: String,
+        locale: String
+    ): Flow<ApiResult<List<ScheduleModel>>>
 }

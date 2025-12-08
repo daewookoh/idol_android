@@ -92,6 +92,7 @@ import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.ScheduleModel
 import net.ib.mn.presentation.article.ArticleDetailScreen
 import net.ib.mn.presentation.article.PhotoDetailScreen
+import net.ib.mn.presentation.community.schedule.ScheduleDetailScreen
 import net.ib.mn.presentation.community.schedule.ScheduleWriteScreen
 import net.ib.mn.presentation.webview.WebViewScreen
 import java.util.Date
@@ -187,8 +188,11 @@ fun CommunityScreen(
     var scheduleWriteInitialDate by remember { mutableStateOf<Date?>(null) }
     var editingSchedule by remember { mutableStateOf<ScheduleModel?>(null) }
 
-    // 스케줄 상세 화면 상태
+    // 스케줄 상세 화면 상태 (댓글 화면용)
     var selectedScheduleDetail by remember { mutableStateOf<Triple<ScheduleModel, String, String>?>(null) }
+
+    // 월간 스케줄 상세 화면 상태 (스케줄 목록 화면용)
+    var selectedMonthScheduleDetail by remember { mutableStateOf<Triple<ScheduleModel, String, String>?>(null) }
 
     // 탭 목록 생성 (showChattingTab이 true인 경우에만 채팅 탭 포함)
     val tabs = remember(showChattingTab) {
@@ -238,6 +242,8 @@ fun CommunityScreen(
             showScheduleWriteScreen = false
             scheduleWriteInitialDate = null
             editingSchedule = null
+        } else if (selectedMonthScheduleDetail != null) {
+            selectedMonthScheduleDetail = null
         } else if (selectedUserProfile != null) {
             selectedUserProfile = null
         } else if (showIdolIdolRankingHistoryScreen) {
@@ -406,6 +412,9 @@ fun CommunityScreen(
                             },
                             onNavigateToScheduleDetail = { schedule, yearMonthDay, locale ->
                                 selectedScheduleDetail = Triple(schedule, yearMonthDay, locale)
+                            },
+                            onNavigateToMonthScheduleDetail = { schedule, yearMonth, locale ->
+                                selectedMonthScheduleDetail = Triple(schedule, yearMonth, locale)
                             },
                             viewModel = scheduleViewModel
                         )
@@ -874,7 +883,34 @@ fun CommunityScreen(
         }
     }
 
-    // Schedule Detail (ArticleDetailScreen with schedule mode)
+    // Month Schedule Detail (ScheduleDetailScreen - 월간 스케줄 목록)
+    AnimatedVisibility(
+        visible = selectedMonthScheduleDetail != null,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        selectedMonthScheduleDetail?.let { (schedule, yearMonth, locale) ->
+            ScheduleDetailScreen(
+                idolId = idolId ?: 0,
+                yearMonth = yearMonth,
+                locale = locale,
+                initialScheduleId = null,
+                onNavigateBack = {
+                    selectedMonthScheduleDetail = null
+                },
+                onNavigateToScheduleEdit = { scheduleToEdit ->
+                    editingSchedule = scheduleToEdit
+                    showScheduleWriteScreen = true
+                },
+                onNavigateToComments = { scheduleForComments ->
+                    // 댓글 화면으로 이동
+                    selectedScheduleDetail = Triple(scheduleForComments, yearMonth, locale)
+                }
+            )
+        }
+    }
+
+    // Schedule Detail (ArticleDetailScreen with schedule mode - 댓글 화면)
     AnimatedVisibility(
         visible = selectedScheduleDetail != null,
         enter = slideInVertically(initialOffsetY = { it }),
