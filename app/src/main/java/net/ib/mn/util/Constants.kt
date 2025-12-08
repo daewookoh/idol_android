@@ -214,4 +214,17 @@ object Constants {
     // ============================================================
     const val LEVEL_ADMIN: Int = 10  // 관리자 레벨
     const val LEVEL_MANAGER: Int = 5 // 매니저 레벨
+
+    // ============================================================
+    // Image Configuration (old Const.kt)
+    // ============================================================
+    const val MAX_IMAGE_WIDTH: Int = 1500  // 이미지 최대 너비
+    const val IMAGE_QUALITY: Int = 80      // JPEG 압축 품질 (0-100)
+    // NCloud 버킷명 (Flavor에 따라 다름)
+    val NCLOUD_ARTICLES_BUCKET: String =
+        if (BuildConfig.CELEB) "ncloud_actor_articles" else "ncloud_idol_articles"
+
+    // File Type for presigned URL
+    const val FILE_TYPE_IMAGE: String = "st"   // 이미지
+    const val FILE_TYPE_VIDEO: String = "mv"   // 동영상/GIF
 }

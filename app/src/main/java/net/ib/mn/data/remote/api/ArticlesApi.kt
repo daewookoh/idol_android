@@ -194,4 +194,17 @@ interface ArticlesApi {
     suspend fun insertArticle(
         @Body request: InsertArticleRequest
     ): CreateArticleResponse
+
+    /**
+     * 게시글 이미지 처리 완료 확인
+     * Old 프로젝트: GET "articles/check_ready/"
+     *
+     * 게시글 작성 후 이미지 처리가 완료되었는지 확인
+     * - success=true: 처리 완료
+     * - success=false, gcode=3902: 처리 실패
+     */
+    @GET("articles/check_ready/")
+    suspend fun checkReady(
+        @Query("article_id") articleId: Long
+    ): Response<ResponseBody>
 }

@@ -1,8 +1,10 @@
 package net.ib.mn.presentation.article.write
 
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -18,10 +20,18 @@ import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.TagModel
 import net.ib.mn.domain.repository.ArticlesRepository
+import net.ib.mn.domain.repository.FileUploadData
+import net.ib.mn.domain.repository.FilesRepository
 import net.ib.mn.domain.repository.IdolRepository
+import net.ib.mn.domain.repository.CheckReadyResult
+import net.ib.mn.domain.repository.PresignedUrlResult
 import net.ib.mn.presentation.article.write.ArticleWriteContract.*
+import net.ib.mn.domain.model.UploadVideoSpecModel
 import net.ib.mn.util.Constants
+import net.ib.mn.util.ImageUtil
 import net.ib.mn.util.LinkParser
+import net.ib.mn.util.VideoProcessor
+import net.ib.mn.util.logD
 import net.ib.mn.util.logE
 import javax.inject.Inject
 
@@ -32,9 +42,11 @@ private const val TAG = "ArticleWriteViewModel"
  */
 @HiltViewModel
 class ArticleWriteViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val preferencesManager: PreferencesManager,
     private val idolRepository: IdolRepository,
     private val articlesRepository: ArticlesRepository,
+    private val filesRepository: FilesRepository,
     private val gson: Gson
 ) : BaseViewModel<State, Intent, Effect>() {
 
@@ -60,6 +72,7 @@ class ArticleWriteViewModel @Inject constructor(
             is Intent.OnSubmitClick -> onSubmitClick()
             is Intent.OnBackClick -> onBackClick()
             is Intent.DismissDialog -> { /* Dialog dismissed by UI */ }
+            is Intent.OnConfirmBack -> onConfirmBack()
         }
     }
 
@@ -118,9 +131,7 @@ class ArticleWriteViewModel @Inject constructor(
                 }
 
                 // 수정 모드에서 기존 미디어 파일 로드
-                if (isEditMode && editingArticle != null) {
-                    loadExistingMedia(editingArticle)
-                }
+                editingArticle?.let { loadExistingMedia(it) }
 
             } catch (e: Exception) {
                 setState { copy(isLoading = false, error = e.message) }
@@ -130,20 +141,11 @@ class ArticleWriteViewModel @Inject constructor(
     }
 
     private fun onTitleChanged(title: String) {
-        val trimmedTitle = if (title.length > State.MAX_TITLE_LENGTH) {
-            title.take(State.MAX_TITLE_LENGTH)
-        } else {
-            title
-        }
-        setState { copy(title = trimmedTitle) }
+        setState { copy(title = title.take(State.MAX_TITLE_LENGTH)) }
     }
 
     private fun onContentChanged(content: String) {
-        val trimmedContent = if (content.length > State.MAX_CONTENT_LENGTH) {
-            content.take(State.MAX_CONTENT_LENGTH)
-        } else {
-            content
-        }
+        val trimmedContent = content.take(State.MAX_CONTENT_LENGTH)
         setState { copy(content = trimmedContent) }
 
         // URL 감지 및 링크 프리뷰 로드
@@ -231,37 +233,99 @@ class ArticleWriteViewModel @Inject constructor(
     }
 
     private fun onImageRatioSelected(isSquare: Boolean) {
-        // 비율 선택 후 사진 피커 열기
+        // 비율 저장 후 사진 피커 열기
+        setState { copy(useSquareImage = isSquare) }
         setEffect { Effect.RequestPhotoPermission }
     }
 
     private fun onMediaSelected(uris: List<Uri>, type: MediaType) {
-        val currentMedia = currentState.attachedMedia.toMutableList()
-        val availableSlots = currentState.maxMediaCount - currentMedia.size
+        viewModelScope.launch {
+            val currentMedia = currentState.attachedMedia.toMutableList()
+            val availableSlots = currentState.maxMediaCount - currentMedia.size
 
-        // 동영상은 1개만 가능
-        if (type == MediaType.VIDEO) {
-            currentMedia.clear()
-            if (uris.isNotEmpty()) {
-                currentMedia.add(AttachedMedia(uri = uris.first(), type = MediaType.VIDEO))
+            // 동영상은 1개만 가능
+            if (type == MediaType.VIDEO) {
+                currentMedia.clear()
+                if (uris.isNotEmpty()) {
+                    val videoUri = uris.first()
+
+                    // 동영상 인코딩 시작 알림
+                    setState { copy(isLoading = true) }
+                    setEffect { Effect.ShowToast("동영상을 처리하는 중...") }
+
+                    // VideoProcessor로 동영상 인코딩
+                    val result = VideoProcessor.processVideo(
+                        context = context,
+                        sourceUri = videoUri,
+                        spec = UploadVideoSpecModel(),
+                        onProgress = { progress ->
+                            logD(TAG, "Video processing: ${(progress * 100).toInt()}%")
+                        }
+                    )
+
+                    result.fold(
+                        onSuccess = { processedVideo ->
+                            currentMedia.add(
+                                AttachedMedia(
+                                    uri = videoUri,
+                                    type = MediaType.VIDEO,
+                                    optimizedData = processedVideo.byteArray,
+                                    width = processedVideo.width,
+                                    height = processedVideo.height,
+                                    hash = processedVideo.hash,
+                                    mimeType = "video/mp4"
+                                )
+                            )
+                            // 임시 파일 삭제는 업로드 후에
+                            setState { copy(isLoading = false) }
+                        },
+                        onFailure = { error ->
+                            logE(TAG, "Video processing failed: ${error.message}")
+                            setState { copy(isLoading = false) }
+                            setEffect { Effect.ShowError(error.message ?: "동영상 처리에 실패했습니다.") }
+                            return@launch
+                        }
+                    )
+                }
+            } else {
+                // 이미지는 최대 개수까지 추가 + 최적화
+                uris.take(availableSlots).forEach { uri ->
+                    // 이미지 최적화 수행 (백그라운드 스레드)
+                    val optimizedImage = withContext(Dispatchers.IO) {
+                        ImageUtil.optimizeImage(context, uri)
+                    }
+
+                    if (optimizedImage != null) {
+                        currentMedia.add(
+                            AttachedMedia(
+                                uri = uri,
+                                type = MediaType.IMAGE,
+                                optimizedData = optimizedImage.byteArray,
+                                width = optimizedImage.width,
+                                height = optimizedImage.height,
+                                hash = optimizedImage.hash,
+                                mimeType = optimizedImage.mimeType
+                            )
+                        )
+                    } else {
+                        // 최적화 실패 시에도 Uri만 저장 (fallback)
+                        currentMedia.add(AttachedMedia(uri = uri, type = MediaType.IMAGE))
+                        logE(TAG, "Image optimization failed for: $uri")
+                    }
+                }
             }
-        } else {
-            // 이미지는 최대 개수까지 추가
-            uris.take(availableSlots).forEach { uri ->
-                currentMedia.add(AttachedMedia(uri = uri, type = MediaType.IMAGE))
+
+            // 버튼 상태 업데이트
+            val hasVideo = currentMedia.any { it.type == MediaType.VIDEO }
+            val isFull = currentMedia.size >= currentState.maxMediaCount
+
+            setState {
+                copy(
+                    attachedMedia = currentMedia,
+                    isPhotoEnabled = !hasVideo && !isFull,
+                    isVideoEnabled = currentMedia.isEmpty()
+                )
             }
-        }
-
-        // 버튼 상태 업데이트
-        val hasVideo = currentMedia.any { it.type == MediaType.VIDEO }
-        val isFull = currentMedia.size >= currentState.maxMediaCount
-
-        setState {
-            copy(
-                attachedMedia = currentMedia,
-                isPhotoEnabled = !hasVideo && !isFull,
-                isVideoEnabled = currentMedia.isEmpty()
-            )
         }
     }
 
@@ -362,10 +426,24 @@ class ArticleWriteViewModel @Inject constructor(
     private suspend fun createArticle() {
         val state = currentState
 
-        // 공개 범위: 최애공개면 "M", 전체공개면 "A"
-        val showScope = if (state.isPrivateToFavorite) "M" else "A"
+        // 공개 범위: 최애공개면 "private", 전체공개면 "public" (old 프로젝트 Const.SHOW_PRIVATE/SHOW_PUBLIC)
+        val showScope = if (state.isPrivateToFavorite) "private" else "public"
 
-        // writeType에 따라 다른 API 호출
+        // 1. 첨부 미디어가 있으면 먼저 S3에 업로드
+        val uploadedFiles = if (state.attachedMedia.isNotEmpty()) {
+            val files = uploadMediaFiles(state.attachedMedia)
+            if (files == null) {
+                // 업로드 실패
+                setState { copy(isSaving = false) }
+                setEffect { Effect.ShowError("파일 업로드에 실패했습니다.") }
+                return
+            }
+            files
+        } else {
+            emptyList()
+        }
+
+        // 2. writeType에 따라 다른 API 호출
         // Old 프로젝트 WriteArticleActivity.kt:297-300 참조:
         // - FREE_BOARD: idol_id = FREE_BOARD_IDOL_ID (99990)
         // - FEED/FAN_TALK: idol_id = 실제 아이돌 ID
@@ -382,7 +460,8 @@ class ArticleWriteViewModel @Inject constructor(
                     idolId = idolId,
                     content = state.content,
                     title = state.title,
-                    showScope = showScope
+                    showScope = showScope,
+                    files = uploadedFiles
                 )
             }
             ArticleWriteType.FREE_BOARD -> {
@@ -392,7 +471,8 @@ class ArticleWriteViewModel @Inject constructor(
                     content = state.content,
                     title = state.title,
                     tagId = state.selectedTag?.id?.toString() ?: "1",
-                    show = showScope
+                    show = showScope,
+                    files = uploadedFiles
                 )
             }
             ArticleWriteType.FEED -> {
@@ -408,7 +488,8 @@ class ArticleWriteViewModel @Inject constructor(
                     content = state.content,
                     title = state.title,
                     tagId = state.selectedTag?.id?.toString() ?: "1",
-                    show = showScope
+                    show = showScope,
+                    files = uploadedFiles
                 )
             }
         }
@@ -417,13 +498,24 @@ class ArticleWriteViewModel @Inject constructor(
             when (result) {
                 is ApiResult.Success -> {
                     val data = result.data
-                    setState { copy(isSaving = false) }
 
                     // GCode에 따른 처리 (old 프로젝트와 동일)
                     val currentState = uiState.value
                     val writeType = currentState.writeType
                     val idolId = currentState.idol?.id
                     val tagId = currentState.selectedTag?.id
+
+                    // 이미지가 첨부된 경우 checkReady로 처리 완료 대기
+                    if (uploadedFiles.isNotEmpty() && data.articleId != null) {
+                        val checkResult = waitForCheckReady(data.articleId)
+                        if (!checkResult.success) {
+                            if (checkResult.gcode == CheckReadyResult.GCODE_UPLOAD_FAILED) {
+                                setState { copy(isSaving = false) }
+                                setEffect { Effect.ShowError("이미지 업로드에 실패했습니다.") }
+                                return@collectLatest
+                            }
+                        }
+                    }
 
                     when (data.gcode) {
                         GCODE_SUCCESS -> {
@@ -458,6 +550,10 @@ class ArticleWriteViewModel @Inject constructor(
                             }
                         }
                     }
+
+                    // 작성 내용 초기화 후 나가기
+                    clearContent()
+                    setState { copy(isSaving = false) }
                     setEffect { Effect.NavigateBackWithResult(isEdited = false) }
                 }
                 is ApiResult.Error -> {
@@ -476,6 +572,158 @@ class ArticleWriteViewModel @Inject constructor(
         setEffect { Effect.NavigateBackWithResult(isEdited = true) }
     }
 
+    /**
+     * 이미지 처리 완료 대기
+     * Old 프로젝트의 PresignedUrlService.articlesCheckReady() 참고
+     *
+     * - 1초 딜레이 후 시작
+     * - 2초마다 checkReady 호출
+     * - 최대 30번 시도 (1분)
+     * - success=true면 완료
+     * - gcode=3902면 업로드 실패
+     */
+    private suspend fun waitForCheckReady(articleId: Long): CheckReadyResult {
+        return withContext(Dispatchers.IO) {
+            // 1초 딜레이 후 시작
+            delay(1000)
+
+            var attempts = 0
+            val maxAttempts = 30
+
+            while (attempts < maxAttempts) {
+                val result = articlesRepository.checkReady(articleId)
+                logD(TAG, "checkReady attempt ${attempts + 1}: success=${result.success}, gcode=${result.gcode}")
+
+                if (result.success) {
+                    return@withContext result
+                }
+
+                // 업로드 실패 (gcode 3902)
+                if (result.gcode == CheckReadyResult.GCODE_UPLOAD_FAILED) {
+                    return@withContext result
+                }
+
+                // 2초 대기 후 재시도
+                delay(2000)
+                attempts++
+            }
+
+            // 최대 시도 횟수 초과
+            logE(TAG, "checkReady timeout: exceeded $maxAttempts attempts")
+            CheckReadyResult(success = true)  // 타임아웃이어도 성공으로 처리 (old 프로젝트와 동일)
+        }
+    }
+
+    /**
+     * 미디어 파일들을 S3에 업로드
+     * Old 프로젝트의 PresignedUrlService.startPresignedAndCreate() 참고
+     *
+     * @param mediaList 업로드할 미디어 리스트
+     * @return 업로드된 파일 정보 리스트, 실패 시 null
+     */
+    private suspend fun uploadMediaFiles(mediaList: List<AttachedMedia>): List<FileUploadData>? {
+        return withContext(Dispatchers.IO) {
+            val uploadedFiles = mutableListOf<FileUploadData>()
+
+            for ((index, media) in mediaList.withIndex()) {
+                try {
+                    // 이미지 데이터 준비
+                    val byteArray = media.optimizedData ?: run {
+                        // optimizedData가 없으면 원본 Uri에서 읽기
+                        val inputStream = context.contentResolver.openInputStream(media.uri)
+                        inputStream?.readBytes() ?: run {
+                            logE(TAG, "Failed to read file: ${media.uri}")
+                            return@withContext null
+                        }
+                    }
+
+                    val width = media.width
+                    val height = media.height
+                    val hash = media.hash.orEmpty()
+                    val mimeType = media.mimeType
+
+                    // 파일명 생성 (확장자 포함)
+                    val extension = when {
+                        mimeType.contains("png") -> ".png"
+                        mimeType.contains("webp") -> ".webp"
+                        mimeType.contains("mp4") || media.type == MediaType.VIDEO -> ".mp4"
+                        else -> ".jpg"
+                    }
+                    val filename = "${System.currentTimeMillis()}_$index$extension"
+
+                    // 파일 타입 결정 (Old 프로젝트와 동일: "st" = 이미지, "mv" = 동영상/GIF)
+                    val fileType = if (media.type == MediaType.VIDEO || mimeType.contains("gif")) {
+                        Constants.FILE_TYPE_VIDEO
+                    } else {
+                        Constants.FILE_TYPE_IMAGE
+                    }
+
+                    // 1. Presigned URL 요청
+                    val presignedResult = filesRepository.getPresignedUrl(
+                        bucket = Constants.NCLOUD_ARTICLES_BUCKET,
+                        filename = filename,
+                        width = width,
+                        height = height,
+                        imageHash = hash,
+                        fileType = fileType
+                    )
+
+                    if (!presignedResult.success) {
+                        logE(TAG, "Failed to get presigned URL for: $filename")
+                        return@withContext null
+                    }
+
+                    // 이미 존재하는 이미지인 경우 (gcode = 3900)
+                    if (presignedResult.gcode == PresignedUrlResult.GCODE_ALREADY_EXISTS) {
+                        uploadedFiles.add(
+                            FileUploadData(
+                                seq = index + 1,
+                                size = byteArray.size.toLong(),
+                                savedFilename = presignedResult.savedFilename,
+                                originName = filename
+                            )
+                        )
+                        continue
+                    }
+
+                    // 2. S3에 파일 업로드
+                    val uploadSuccess = filesRepository.writeCdn(
+                        url = presignedResult.url,
+                        awsAccessKeyId = presignedResult.awsAccessKeyId,
+                        acl = presignedResult.acl,
+                        key = presignedResult.key,
+                        policy = presignedResult.policy,
+                        signature = presignedResult.signature,
+                        file = byteArray,
+                        filename = presignedResult.savedFilename,
+                        mimeType = mimeType
+                    )
+
+                    if (!uploadSuccess) {
+                        logE(TAG, "Failed to upload file to CDN: $filename")
+                        return@withContext null
+                    }
+
+                    // 3. 업로드 성공 - 파일 정보 저장
+                    uploadedFiles.add(
+                        FileUploadData(
+                            seq = index + 1,
+                            size = byteArray.size.toLong(),
+                            savedFilename = presignedResult.savedFilename,
+                            originName = filename
+                        )
+                    )
+
+                } catch (e: Exception) {
+                    logE(TAG, "Error uploading media: ${media.uri}", e)
+                    return@withContext null
+                }
+            }
+
+            uploadedFiles
+        }
+    }
+
     private fun onBackClick() {
         val state = currentState
 
@@ -490,6 +738,34 @@ class ArticleWriteViewModel @Inject constructor(
             setEffect { Effect.ShowBackConfirmDialog }
         } else {
             setEffect { Effect.NavigateBack }
+        }
+    }
+
+    /**
+     * 작성 취소 확인 - 내용 clear 후 나가기
+     */
+    private fun onConfirmBack() {
+        clearContent()
+        setEffect { Effect.NavigateBack }
+    }
+
+    /**
+     * 작성 중인 내용 초기화
+     */
+    private fun clearContent() {
+        linkParseJob?.cancel()
+        setState {
+            copy(
+                title = "",
+                content = "",
+                attachedMedia = emptyList(),
+                linkPreview = null,
+                selectedTag = null,
+                isPrivateToFavorite = false,
+                isPhotoEnabled = true,
+                isVideoEnabled = true,
+                useSquareImage = true
+            )
         }
     }
 

@@ -31,8 +31,47 @@ enum class MediaType {
 data class AttachedMedia(
     val uri: Uri,
     val type: MediaType,
-    val thumbnailUri: Uri? = null // 비디오의 경우 썸네일
-)
+    val thumbnailUri: Uri? = null, // 비디오의 경우 썸네일
+    // 이미지 최적화 데이터 (업로드용)
+    val optimizedData: ByteArray? = null,
+    val width: Int = 0,
+    val height: Int = 0,
+    val hash: String? = null,
+    val mimeType: String = "image/jpeg"
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as AttachedMedia
+
+        if (uri != other.uri) return false
+        if (type != other.type) return false
+        if (thumbnailUri != other.thumbnailUri) return false
+        if (optimizedData != null) {
+            if (other.optimizedData == null) return false
+            if (!optimizedData.contentEquals(other.optimizedData)) return false
+        } else if (other.optimizedData != null) return false
+        if (width != other.width) return false
+        if (height != other.height) return false
+        if (hash != other.hash) return false
+        if (mimeType != other.mimeType) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = uri.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + (thumbnailUri?.hashCode() ?: 0)
+        result = 31 * result + (optimizedData?.contentHashCode() ?: 0)
+        result = 31 * result + width
+        result = 31 * result + height
+        result = 31 * result + (hash?.hashCode() ?: 0)
+        result = 31 * result + mimeType.hashCode()
+        return result
+    }
+}
 
 /**
  * 링크 프리뷰 데이터
@@ -89,6 +128,9 @@ class ArticleWriteContract {
         // 버튼 상태
         val isPhotoEnabled: Boolean = true,
         val isVideoEnabled: Boolean = true,
+
+        // 이미지 비율 설정 (정사각형 크롭 여부)
+        val useSquareImage: Boolean = true,
 
         // 유효성 검사
         val error: String? = null
@@ -191,6 +233,9 @@ class ArticleWriteContract {
 
         // 다이얼로그 닫기
         data object DismissDialog : Intent()
+
+        // 작성 취소 확인 (내용 clear 후 나가기)
+        data object OnConfirmBack : Intent()
     }
 
     sealed class Effect : UiEffect {
@@ -205,6 +250,9 @@ class ArticleWriteContract {
         // 미디어 피커 열기
         data object OpenPhotoPicker : Effect()
         data object OpenVideoPicker : Effect()
+
+        // 이미지 크롭 화면 열기
+        data class OpenImageCropper(val uri: Uri, val isSquare: Boolean) : Effect()
 
         // 이미지 비율 선택 다이얼로그
         data object ShowImageRatioDialog : Effect()

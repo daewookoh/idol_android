@@ -445,6 +445,9 @@ dependencies {
         exclude(group = "com.android.support")
     }
 
+    // Video Transcoder
+    implementation(libs.transcoder.android)
+
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

@@ -15,10 +15,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,10 +43,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.theartofdev.edmodo.cropper.CropImage
 import net.ib.mn.R
 import net.ib.mn.presentation.article.write.ArticleWriteContract.*
+import net.ib.mn.ui.components.ExoBottomSheet
+import net.ib.mn.ui.components.ExoBottomSheetType
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.NotificationUtil
 
 /**
@@ -80,9 +83,43 @@ fun ArticleWriteScreen(
     var showBackConfirmDialog by remember { mutableStateOf(false) }
     var showTagSelectorSheet by remember { mutableStateOf(false) }
     var showSettingSheet by remember { mutableStateOf(false) }
-    var showImageRatioDialog by remember { mutableStateOf(false) }
+    var showImageRatioBottomSheet by remember { mutableStateOf(false) }
+    var showPhotoPermissionDialog by remember { mutableStateOf(false) }
+    var pendingMediaType by remember { mutableStateOf<MediaType?>(null) }
 
-    // PhotoPicker launcher (다중 이미지 선택)
+    // 크롭 대기 중인 이미지 URI
+    var pendingCropUri by remember { mutableStateOf<Uri?>(null) }
+
+    // CropImage launcher (크롭 결과 받기)
+    val cropImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val cropResult = CropImage.getActivityResult(result.data)
+            cropResult?.uri?.let { croppedUri ->
+                viewModel.sendIntent(Intent.OnMediaSelected(listOf(croppedUri), MediaType.IMAGE))
+            }
+        }
+        pendingCropUri = null
+    }
+
+    // 이미지 크롭 화면 열기 함수
+    fun openCropImage(uri: Uri, isSquare: Boolean) {
+        val intent = CropImage.activity(uri)
+            .setAllowFlipping(false)
+            .setAllowRotation(false)
+            .setAllowCounterRotation(false)
+            .setInitialCropWindowPaddingRatio(0f)
+            .apply {
+                if (isSquare) {
+                    setAspectRatio(1, 1)
+                }
+            }
+            .getIntent(context)
+        cropImageLauncher.launch(intent)
+    }
+
+    // PhotoPicker launcher (다중 이미지 선택) - 자유 비율용
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(
             maxItems = state.maxMediaCount - state.attachedMedia.size
@@ -90,6 +127,20 @@ fun ArticleWriteScreen(
     ) { uris: List<Uri> ->
         if (uris.isNotEmpty()) {
             viewModel.sendIntent(Intent.OnMediaSelected(uris, MediaType.IMAGE))
+        }
+    }
+
+    // SinglePhotoPicker launcher (단일 이미지 선택) - 정사각형 크롭용
+    val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
+        uri?.let {
+            // 정사각형이면 크롭 화면으로, 아니면 바로 첨부
+            if (state.useSquareImage) {
+                openCropImage(it, true)
+            } else {
+                viewModel.sendIntent(Intent.OnMediaSelected(listOf(it), MediaType.IMAGE))
+            }
         }
     }
 
@@ -108,11 +159,18 @@ fun ArticleWriteScreen(
     ) { permissions ->
         val allGranted = permissions.values.all { it }
         if (allGranted) {
-            // 권한 승인 시 PhotoPicker 열기
-            photoPickerLauncher.launch(
-                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-            )
-        } else { Toast.makeText(context, R.string.image_permission_error, Toast.LENGTH_SHORT).show()
+            // 권한 승인 시 PhotoPicker 열기 (정사각형 비율에 따라 분기)
+            if (state.useSquareImage) {
+                singlePhotoPickerLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            } else {
+                photoPickerLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            }
+        } else {
+            Toast.makeText(context, R.string.image_permission_error, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -129,30 +187,40 @@ fun ArticleWriteScreen(
         }
     }
 
+    // 권한이 필요한지 확인
+    fun needsPhotoPermission(): Boolean {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+    }
+
+    // 사진 피커 실행 (정사각형 비율이면 단일 선택 + 크롭, 자유 비율이면 다중 선택)
+    fun launchPhotoPicker() {
+        if (state.useSquareImage) {
+            // 정사각형: 단일 선택 후 크롭
+            singlePhotoPickerLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+        } else {
+            // 자유 비율: 다중 선택
+            photoPickerLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+        }
+    }
+
     // 권한 체크 함수
     fun checkAndRequestPhotoPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             // Android 13+ : PhotoPicker 사용 (권한 불필요)
-            photoPickerLauncher.launch(
-                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-            )
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // Android 10-12 : READ_EXTERNAL_STORAGE
-            val permission = Manifest.permission.READ_EXTERNAL_STORAGE
-            if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
-                photoPickerLauncher.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                )
-            } else {
-                permissionLauncher.launch(arrayOf(permission))
-            }
+            launchPhotoPicker()
         } else {
-            // Android 9 이하
+            // Android 12 이하: READ_EXTERNAL_STORAGE 필요
             val permission = Manifest.permission.READ_EXTERNAL_STORAGE
             if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
-                photoPickerLauncher.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                )
+                launchPhotoPicker()
             } else {
                 permissionLauncher.launch(arrayOf(permission))
             }
@@ -160,18 +228,29 @@ fun ArticleWriteScreen(
     }
 
     fun checkAndRequestVideoPermission() {
+        val videoRequest = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            videoPickerLauncher.launch(
-                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)
-            )
+            videoPickerLauncher.launch(videoRequest)
         } else {
             val permission = Manifest.permission.READ_EXTERNAL_STORAGE
             if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
-                videoPickerLauncher.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)
-                )
+                videoPickerLauncher.launch(videoRequest)
             } else {
                 videoPermissionLauncher.launch(arrayOf(permission))
+            }
+        }
+    }
+
+    // 선택적 접근권한 다이얼로그 표시 후 권한 처리
+    fun showPermissionDialogAndRequest(mediaType: MediaType) {
+        if (needsPhotoPermission()) {
+            pendingMediaType = mediaType
+            showPhotoPermissionDialog = true
+        } else {
+            // 권한이 필요없거나 이미 허용된 경우 바로 진행
+            when (mediaType) {
+                MediaType.IMAGE -> checkAndRequestPhotoPermission()
+                MediaType.VIDEO -> checkAndRequestVideoPermission()
             }
         }
     }
@@ -197,7 +276,7 @@ fun ArticleWriteScreen(
                 is Effect.ShowBackConfirmDialog -> showBackConfirmDialog = true
                 is Effect.ShowTagSelector -> showTagSelectorSheet = true
                 is Effect.ShowSettingBottomSheet -> showSettingSheet = true
-                is Effect.ShowImageRatioDialog -> showImageRatioDialog = true
+                is Effect.ShowImageRatioDialog -> showImageRatioBottomSheet = true
                 is Effect.HideKeyboard -> {
                     keyboardController?.hide()
                     focusManager.clearFocus()
@@ -226,10 +305,10 @@ fun ArticleWriteScreen(
                     )
                 }
                 is Effect.RequestPhotoPermission -> {
-                    checkAndRequestPhotoPermission()
+                    showPermissionDialogAndRequest(MediaType.IMAGE)
                 }
                 is Effect.RequestVideoPermission -> {
-                    checkAndRequestVideoPermission()
+                    showPermissionDialogAndRequest(MediaType.VIDEO)
                 }
                 is Effect.OpenPhotoPicker -> {
                     photoPickerLauncher.launch(
@@ -241,12 +320,15 @@ fun ArticleWriteScreen(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)
                     )
                 }
+                is Effect.OpenImageCropper -> {
+                    openCropImage(effect.uri, effect.isSquare)
+                }
             }
         }
     }
 
-    // 백버튼 처리
-    BackHandler {
+    // 백버튼 처리 (취소 확인 다이얼로그가 열려있을 때는 무시)
+    BackHandler(enabled = !showBackConfirmDialog) {
         viewModel.sendIntent(Intent.OnBackClick)
     }
 
@@ -256,7 +338,7 @@ fun ArticleWriteScreen(
             .imePadding(), // 키보드가 올라올 때 전체 레이아웃이 위로 밀리도록
         topBar = {
             ArticleWriteTopBar(
-                title = getTitle(state.writeType, state.isEditMode),
+                title = getTitle(state.isEditMode),
                 isSubmitEnabled = state.isSubmitEnabled,
                 isSaving = state.isSaving,
                 onBackClick = { viewModel.sendIntent(Intent.OnBackClick) },
@@ -358,7 +440,7 @@ fun ArticleWriteScreen(
             dismissButtonText = stringResource(R.string.btn_cancel),
             onConfirm = {
                 showBackConfirmDialog = false
-                onNavigateBack()
+                viewModel.sendIntent(Intent.OnConfirmBack)
             },
             onDismiss = { showBackConfirmDialog = false }
         )
@@ -389,18 +471,43 @@ fun ArticleWriteScreen(
         )
     }
 
-    // 이미지 비율 선택 다이얼로그
-    if (showImageRatioDialog) {
-        ImageRatioDialog(
+    // 이미지 비율 선택 바텀시트 (old 프로젝트와 동일)
+    if (showImageRatioBottomSheet) {
+        ImageRatioBottomSheet(
             onSquareSelected = {
-                viewModel.sendIntent(Intent.OnImageRatioSelected(true))
-                showImageRatioDialog = false
+                showImageRatioBottomSheet = false
+                viewModel.sendIntent(ArticleWriteContract.Intent.OnImageRatioSelected(true))
             },
-            onFreeRatioSelected = {
-                viewModel.sendIntent(Intent.OnImageRatioSelected(false))
-                showImageRatioDialog = false
+            onFreeSelected = {
+                showImageRatioBottomSheet = false
+                viewModel.sendIntent(ArticleWriteContract.Intent.OnImageRatioSelected(false))
             },
-            onDismiss = { showImageRatioDialog = false }
+            onDismissRequest = { showImageRatioBottomSheet = false }
+        )
+    }
+
+    // 선택적 접근권한 안내 다이얼로그
+    if (showPhotoPermissionDialog) {
+        ExoConfirmDialog(
+            title = stringResource(R.string.permission_optional),
+            message = stringResource(R.string.limited_photo_permission_desc),
+            confirmButtonText = stringResource(R.string.set_photo_permission),
+            dismissButtonText = stringResource(R.string.btn_cancel),
+            onConfirm = {
+                showPhotoPermissionDialog = false
+                // 권한 요청 진행
+                pendingMediaType?.let { mediaType ->
+                    when (mediaType) {
+                        MediaType.IMAGE -> checkAndRequestPhotoPermission()
+                        MediaType.VIDEO -> checkAndRequestVideoPermission()
+                    }
+                }
+                pendingMediaType = null
+            },
+            onDismiss = {
+                showPhotoPermissionDialog = false
+                pendingMediaType = null
+            }
         )
     }
 
@@ -418,16 +525,8 @@ fun ArticleWriteScreen(
 }
 
 @Composable
-private fun getTitle(writeType: ArticleWriteType, isEditMode: Boolean): String {
-    return if (isEditMode) {
-        stringResource(R.string.title_edit)
-    } else {
-        when (writeType) {
-            ArticleWriteType.FEED -> stringResource(R.string.title_write)
-            ArticleWriteType.FREE_BOARD -> stringResource(R.string.title_write)
-            ArticleWriteType.FAN_TALK -> stringResource(R.string.title_write)
-        }
-    }
+private fun getTitle(isEditMode: Boolean): String {
+    return stringResource(if (isEditMode) R.string.title_edit else R.string.title_write)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -777,7 +876,7 @@ private fun AttachedMediaItem(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                painter = painterResource(R.drawable.btn_media_del),
+                painter = painterResource(R.drawable.btn_media_del_nor),
                 contentDescription = "삭제",
                 modifier = Modifier.size(22.dp),
                 tint = Color.Unspecified
@@ -887,7 +986,7 @@ private fun LinkPreviewCard(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.btn_media_del),
+                    painter = painterResource(R.drawable.btn_media_del_nor),
                     contentDescription = "삭제",
                     modifier = Modifier.size(22.dp),
                     tint = Color.Unspecified
@@ -897,6 +996,9 @@ private fun LinkPreviewCard(
     }
 }
 
+/**
+ * 태그 선택 바텀시트
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TagSelectorBottomSheet(
@@ -905,8 +1007,9 @@ private fun TagSelectorBottomSheet(
     onTagSelected: (net.ib.mn.domain.model.TagModel) -> Unit,
     onDismiss: () -> Unit
 ) {
-    ModalBottomSheet(
+    ExoBottomSheet(
         onDismissRequest = onDismiss,
+        type = ExoBottomSheetType.LIST,
         containerColor = ColorPalette.background200
     ) {
         Column(
@@ -953,6 +1056,9 @@ private fun TagSelectorBottomSheet(
     }
 }
 
+/**
+ * 설정 바텀시트 (최애공개)
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SettingBottomSheet(
@@ -961,67 +1067,127 @@ private fun SettingBottomSheet(
     onPrivateChanged: (Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
-    ModalBottomSheet(
+    ExoBottomSheet(
         onDismissRequest = onDismiss,
+        type = ExoBottomSheetType.LIST,
         containerColor = ColorPalette.background200
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
-                .padding(horizontal = 20.dp)
                 .padding(bottom = 16.dp)
         ) {
+            // 타이틀
             Text(
                 text = stringResource(R.string.article_setting),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = ColorPalette.textDefault,
-                modifier = Modifier.padding(vertical = 16.dp)
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
             )
 
+            // 최애만 공개 Row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(51.dp)
                     .clickable { onPrivateChanged(!isPrivate) }
-                    .padding(vertical = 12.dp),
+                    .padding(horizontal = 20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Checkbox(
-                    checked = isPrivate,
-                    onCheckedChange = { onPrivateChanged(it) },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = ColorPalette.main,
-                        uncheckedColor = ColorPalette.gray300
-                    )
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
+                // 텍스트 (왼쪽)
                 Text(
                     text = stringResource(R.string.lable_show_private),
-                    fontSize = 14.sp,
-                    color = ColorPalette.textDefault
+                    fontSize = 15.sp,
+                    color = ColorPalette.textDefault,
+                    modifier = Modifier.weight(1f)
+                )
+
+                // 토글 스위치 (오른쪽)
+                Switch(
+                    checked = isPrivate,
+                    onCheckedChange = { onPrivateChanged(it) },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = ColorPalette.main,
+                        uncheckedThumbColor = Color.White,
+                        uncheckedTrackColor = ColorPalette.gray300,
+                        uncheckedBorderColor = Color.Transparent,
+                        checkedBorderColor = Color.Transparent
+                    )
                 )
             }
         }
     }
 }
 
+/**
+ * 이미지 비율 선택 바텀시트
+ * old 프로젝트의 bottom_sheet_photo_ratio.xml과 동일한 UI
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ImageRatioDialog(
+private fun ImageRatioBottomSheet(
     onSquareSelected: () -> Unit,
-    onFreeRatioSelected: () -> Unit,
-    onDismiss: () -> Unit
+    onFreeSelected: () -> Unit,
+    onDismissRequest: () -> Unit
 ) {
-    ExoConfirmDialog(
-        title = stringResource(R.string.label_image_option_title),
-        message = stringResource(R.string.label_image_option),
-        confirmButtonText = "1:1",
-        dismissButtonText = stringResource(R.string.label_image_option_free),
-        onConfirm = onSquareSelected,
-        onDismiss = {
-            onFreeRatioSelected()
+    ExoBottomSheet(
+        onDismissRequest = onDismissRequest,
+        type = ExoBottomSheetType.LIST
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+        ) {
+            // 타이틀 (old: "사진 비율") - 회색 (#8f8f8f)
+            Text(
+                text = stringResource(R.string.label_image_option),
+                style = ExoTypo.body15.copy(fontWeight = FontWeight.Bold),
+                color = Color(0xFF8F8F8F),
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 42.dp)
+                    .wrapContentHeight(Alignment.CenterVertically)
+            )
+
+            // 정사각형 옵션 (old: "정사각형(프로필&이붙)") - 좌측 정렬
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .clickable { onSquareSelected() }
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Text(
+                    text = stringResource(R.string.label_image_option_square),
+                    style = ExoTypo.body15.copy(fontWeight = FontWeight.Bold),
+                    color = ColorPalette.gray900
+                )
+            }
+
+            // Free / 원본 옵션 - 좌측 정렬
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .clickable { onFreeSelected() }
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Text(
+                    text = stringResource(R.string.label_image_option_free),
+                    style = ExoTypo.body15.copy(fontWeight = FontWeight.Bold),
+                    color = ColorPalette.gray900
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
-    )
+    }
 }
+

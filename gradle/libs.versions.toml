@@ -28,6 +28,7 @@ media3 = "1.6.1"
 lottie = "6.1.0"
 androidYoutubePlayer = "13.0.0"
 photoview = "2.0.0"
+transcoderAndroid = "0.11.1"
 
 # Firebase (old 프로젝트와 동일한 버전)
 googleServices = "4.4.3"
@@ -153,6 +154,9 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 
 # Google Mobile Ads (AdMob/AdManager)
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "playServicesAds" }
+
+# Video Transcoder
+transcoder-android = { group = "io.deepmedia.community", name = "transcoder-android", version.ref = "transcoderAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

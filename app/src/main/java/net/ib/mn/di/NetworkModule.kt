@@ -200,4 +200,9 @@ object NetworkModule {
     @Singleton
     fun provideEmoticonApi(retrofit: Retrofit): EmoticonApi =
         retrofit.create(EmoticonApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideFilesApi(retrofit: Retrofit): FilesApi =
+        retrofit.create(FilesApi::class.java)
 }

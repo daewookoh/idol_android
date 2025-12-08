@@ -203,6 +203,7 @@ interface ArticlesRepository {
      * @param title 제목
      * @param tagId 태그 ID (기본값: "1" = 자유)
      * @param show 공개 범위 ("A" = 전체공개, "M" = 최애공개)
+     * @param files 첨부 파일 목록 (이미지/동영상)
      * @param linkTitle 링크 제목
      * @param linkDesc 링크 설명
      * @param linkUrl 링크 URL
@@ -214,6 +215,7 @@ interface ArticlesRepository {
         title: String = "",
         tagId: String = "1",
         show: String = "A",
+        files: List<FileUploadData> = emptyList(),
         linkTitle: String = "",
         linkDesc: String = "",
         linkUrl: String = ""
@@ -228,6 +230,7 @@ interface ArticlesRepository {
      * @param content 내용
      * @param title 제목
      * @param showScope 공개 범위 ("A" = 전체공개, "M" = 최애공개)
+     * @param files 첨부 파일 목록 (이미지/동영상)
      * @param linkTitle 링크 제목
      * @param linkDesc 링크 설명
      * @param linkUrl 링크 URL
@@ -238,11 +241,35 @@ interface ArticlesRepository {
         content: String,
         title: String = "",
         showScope: String = "A",
+        files: List<FileUploadData> = emptyList(),
         linkTitle: String = "",
         linkDesc: String = "",
         linkUrl: String = ""
     ): Flow<ApiResult<CreateArticleResult>>
+
+    /**
+     * 게시글 이미지 처리 완료 확인
+     * Old 프로젝트의 checkReady와 동일
+     * API: GET articles/check_ready/
+     *
+     * 이미지가 포함된 게시글 작성 후 호출하여 처리 완료 대기
+     *
+     * @param articleId 게시글 ID
+     * @return 처리 결과 (success, reward 포함)
+     */
+    suspend fun checkReady(articleId: Long): CheckReadyResult
 }
+
+/**
+ * 파일 업로드 데이터
+ * 이미지/동영상을 S3에 업로드 후 받은 정보
+ */
+data class FileUploadData(
+    val seq: Int,
+    val size: Long,
+    val savedFilename: String,
+    val originName: String
+)
 
 /**
  * 게시글 작성 결과
@@ -252,6 +279,20 @@ data class CreateArticleResult(
     val provide: Long = 0,  // 하트 보상
     val articleId: Long? = null
 )
+
+/**
+ * 이미지 처리 완료 확인 결과
+ */
+data class CheckReadyResult(
+    val success: Boolean,
+    val gcode: Int = 0,
+    val reward: Int = 0,
+    val msg: String? = null
+) {
+    companion object {
+        const val GCODE_UPLOAD_FAILED = 3902  // 업로드 실패
+    }
+}
 
 /**
  * 게시글 목록 응답 모델

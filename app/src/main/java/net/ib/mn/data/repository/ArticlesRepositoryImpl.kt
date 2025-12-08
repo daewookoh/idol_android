@@ -11,13 +11,16 @@ import net.ib.mn.data.remote.dto.ArticleLikeResponse
 import net.ib.mn.data.remote.dto.ArticleVoteRequest
 import net.ib.mn.data.remote.dto.ArticleVoteResponse
 import net.ib.mn.data.remote.dto.CreateArticleRequest
+import net.ib.mn.data.remote.dto.FileData
 import net.ib.mn.data.remote.dto.InsertArticleRequest
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.NoticeModel
 import net.ib.mn.domain.repository.ArticlesRepository
 import net.ib.mn.domain.repository.ArticlesResponse
+import net.ib.mn.domain.repository.CheckReadyResult
 import net.ib.mn.domain.repository.CreateArticleResult
+import net.ib.mn.domain.repository.FileUploadData
 import net.ib.mn.util.logE
 import org.json.JSONObject
 import javax.inject.Inject
@@ -356,6 +359,7 @@ class ArticlesRepositoryImpl @Inject constructor(
         title: String,
         tagId: String,
         show: String,
+        files: List<FileUploadData>,
         linkTitle: String,
         linkDesc: String,
         linkUrl: String
@@ -370,7 +374,7 @@ class ArticlesRepositoryImpl @Inject constructor(
                 linkDesc = linkDesc,
                 linkUrl = linkUrl,
                 show = show,
-                files = emptyList(),
+                files = files.map { FileData(seq = it.seq, size = it.size, savedFilename = it.savedFilename, originName = it.originName) },
                 tagId = tagId
             )
             val response = articlesApi.createArticle(request)
@@ -410,6 +414,7 @@ class ArticlesRepositoryImpl @Inject constructor(
         content: String,
         title: String,
         showScope: String,
+        files: List<FileUploadData>,
         linkTitle: String,
         linkDesc: String,
         linkUrl: String
@@ -424,7 +429,7 @@ class ArticlesRepositoryImpl @Inject constructor(
                 linkDesc = linkDesc,
                 linkUrl = linkUrl,
                 showScope = showScope,
-                files = emptyList()
+                files = files.map { FileData(seq = it.seq, size = it.size, savedFilename = it.savedFilename, originName = it.originName) }
             )
             val response = articlesApi.insertArticle(request)
             if (response.success) {
@@ -451,5 +456,30 @@ class ArticlesRepositoryImpl @Inject constructor(
             exception = e as? Exception ?: Exception(e.message),
             message = e.message ?: "게시글 작성에 실패했습니다."
         ))
+    }
+
+    /**
+     * 게시글 이미지 처리 완료 확인
+     */
+    override suspend fun checkReady(articleId: Long): CheckReadyResult {
+        return try {
+            val response = articlesApi.checkReady(articleId)
+            val bodyString = response.body()?.string()
+
+            if (bodyString.isNullOrEmpty()) {
+                return CheckReadyResult(success = false)
+            }
+
+            val jsonObject = JSONObject(bodyString)
+            CheckReadyResult(
+                success = jsonObject.optBoolean("success", false),
+                gcode = jsonObject.optInt("gcode", 0),
+                reward = jsonObject.optInt("reward", 0),
+                msg = jsonObject.optString("msg", null)
+            )
+        } catch (e: Exception) {
+            logE(TAG, "checkReady", e)
+            CheckReadyResult(success = false)
+        }
     }
 }
