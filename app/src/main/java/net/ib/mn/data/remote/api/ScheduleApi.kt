@@ -29,6 +29,42 @@ interface ScheduleApi {
         @Field("vote") vote: String
     ): Response<ResponseBody>
 
+    @FormUrlEncoded
+    @POST("schedules/")
+    suspend fun writeSchedule(
+        @Field("idol_id") idolId: Int,
+        @Field("idol_ids") idolIds: String?,
+        @Field("title") title: String,
+        @Field("category") category: String,
+        @Field("location") location: String?,
+        @Field("lat") lat: String?,
+        @Field("lng") lng: String?,
+        @Field("url") url: String?,
+        @Field("dtstart") dtstart: String,
+        @Field("duration") duration: Int,
+        @Field("allday") allday: Int,
+        @Field("extra") extra: String?,
+        @Field("locale") locale: String
+    ): Response<ResponseBody>
+
+    @FormUrlEncoded
+    @POST("schedules/{id}/")
+    suspend fun editSchedule(
+        @Path("id") scheduleId: Int,
+        @Field("idol_id") idolId: Int,
+        @Field("idol_ids") idolIds: String?,
+        @Field("title") title: String,
+        @Field("category") category: String,
+        @Field("location") location: String?,
+        @Field("lat") lat: String?,
+        @Field("lng") lng: String?,
+        @Field("url") url: String?,
+        @Field("dtstart") dtstart: String,
+        @Field("duration") duration: Int,
+        @Field("allday") allday: Int,
+        @Field("extra") extra: String?
+    ): Response<ResponseBody>
+
     @DELETE("schedules/{id}/")
     suspend fun deleteSchedule(
         @Path("id") scheduleId: Int

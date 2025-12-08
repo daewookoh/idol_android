@@ -161,6 +161,11 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-4951070488234097~3652536966" />
 
+        <!-- Google Maps API Key -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDf-sQ7EbpbXKx1u8faHZaztFKPDZa-M0c" />
+
         <!-- Facebook Login Activity -->
         <activity
             android:name="com.facebook.FacebookActivity"

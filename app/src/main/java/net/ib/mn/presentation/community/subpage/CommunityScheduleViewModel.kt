@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import net.ib.mn.base.BaseViewModel
 import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.domain.model.ScheduleModel
 import net.ib.mn.domain.repository.ScheduleRepository
 import net.ib.mn.util.LocaleUtil
 import java.util.Calendar
@@ -43,7 +44,12 @@ class CommunityScheduleViewModel @Inject constructor(
             is CommunityScheduleContract.Intent.ChangeLocale -> changeLocale(intent.locale, intent.localeText, intent.idolId)
             is CommunityScheduleContract.Intent.VoteSchedule -> voteSchedule(intent.scheduleId, intent.vote, intent.idolId)
             is CommunityScheduleContract.Intent.DeleteSchedule -> deleteSchedule(intent.scheduleId, intent.idolId)
+            is CommunityScheduleContract.Intent.EditSchedule -> editSchedule(intent.schedule)
         }
+    }
+
+    private fun editSchedule(schedule: ScheduleModel) {
+        setEffect { CommunityScheduleContract.Effect.NavigateToScheduleEdit(schedule) }
     }
 
     private fun loadInitialData(idolId: Int) {

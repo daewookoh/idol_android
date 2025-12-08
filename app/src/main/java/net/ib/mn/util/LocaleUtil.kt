@@ -58,6 +58,23 @@ object LocaleUtil {
     }
 
     /**
+     * 스케줄용 로케일 코드 반환
+     * Old 프로젝트의 IdolSchedule.scheduleLocaleString과 동일
+     */
+    fun getScheduleLocale(context: Context): String {
+        val lang = getDeviceLocale(context).language
+        return when {
+            lang.startsWith("ko") -> "ko"
+            lang.startsWith("ja") -> "ja"
+            lang.startsWith("zh") -> {
+                val country = getDeviceLocale(context).country
+                if (country == "TW" || country == "HK") "zh-tw" else "zh-cn"
+            }
+            else -> "en"
+        }
+    }
+
+    /**
      * MostIdol 객체에서 언어에 맞는 아이돌 이름 추출
      */
     fun getLocalizedIdolName(context: Context, most: MostIdol): String =

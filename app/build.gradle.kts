@@ -489,6 +489,11 @@ dependencies {
     // Google Mobile Ads (AdMob/AdManager)
     implementation(libs.play.services.ads)
 
+    // Google Maps
+    implementation(libs.play.services.maps)
+    implementation(libs.maps.compose)
+    implementation(libs.places)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

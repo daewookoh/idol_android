@@ -12,6 +12,12 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-4951070488234097~8280455763" />
 
+        <!-- Google Maps API Key (Celeb 앱용) -->
+        <meta-data
+            tools:replace="android:value"
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBMRQ4qVV6O0VFXt81wIIrOoGszyb5W2xI" />
+
     </application>
 
 </manifest>

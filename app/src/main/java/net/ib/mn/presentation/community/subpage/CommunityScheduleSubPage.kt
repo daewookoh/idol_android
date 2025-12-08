@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,7 +38,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,8 +50,6 @@ import net.ib.mn.ui.components.ExoBottomSheetItem
 import net.ib.mn.ui.components.ExoBottomSheetList
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.components.RankingItem
-import net.ib.mn.ui.theme.ColorPalette
-import net.ib.mn.ui.theme.ExoTypo
 import java.text.DateFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -66,6 +62,7 @@ private val KST: TimeZone = TimeZone.getTimeZone("Asia/Seoul")
 @Composable
 fun CommunityScheduleSubPage(
     rankingItem: RankingItem,
+    onNavigateToScheduleEdit: (ScheduleModel) -> Unit = {},
     viewModel: CommunityScheduleViewModel = hiltViewModel(key = "schedule_${rankingItem.id}")
 ) {
     val context = LocalContext.current
@@ -90,6 +87,8 @@ fun CommunityScheduleSubPage(
                     showLanguageSheet = true
                 is CommunityScheduleContract.Effect.ShowDeleteConfirm ->
                     showDeleteDialog = effect.scheduleId
+                is CommunityScheduleContract.Effect.NavigateToScheduleEdit ->
+                    onNavigateToScheduleEdit(effect.schedule)
                 else -> Unit
             }
         }
@@ -211,7 +210,9 @@ fun CommunityScheduleSubPage(
                                     viewModel.sendIntent(CommunityScheduleContract.Intent.VoteSchedule(schedule.id, "N", idolId))
                                 }
                             },
-                            onEditClick = { },
+                            onEditClick = {
+                                viewModel.sendIntent(CommunityScheduleContract.Intent.EditSchedule(schedule))
+                            },
                             onDeleteClick = { showDeleteDialog = schedule.id }
                         )
                     }

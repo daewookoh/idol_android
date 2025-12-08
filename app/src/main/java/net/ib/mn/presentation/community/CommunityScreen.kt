@@ -86,9 +86,14 @@ import net.ib.mn.presentation.community.subpage.CommunityFeedSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFeedViewModel
 import net.ib.mn.presentation.community.subpage.OrderByType
 import net.ib.mn.presentation.community.subpage.CommunityScheduleSubPage
+import net.ib.mn.presentation.community.subpage.CommunityScheduleContract
+import net.ib.mn.presentation.community.subpage.CommunityScheduleViewModel
+import net.ib.mn.domain.model.ScheduleModel
 import net.ib.mn.presentation.article.ArticleDetailScreen
 import net.ib.mn.presentation.article.PhotoDetailScreen
+import net.ib.mn.presentation.community.schedule.ScheduleWriteScreen
 import net.ib.mn.presentation.webview.WebViewScreen
+import java.util.Date
 import net.ib.mn.util.ServerUrl
 import net.ib.mn.ui.components.*
 import net.ib.mn.ui.theme.ColorPalette
@@ -131,7 +136,8 @@ fun CommunityScreen(
     onMostChanged: (Boolean) -> Unit = {},
     onNavigateToArticleWrite: (writeType: String, idolId: Int?) -> Unit = { _, _ -> },
     viewModel: CommunityViewModel = hiltViewModel(),
-    feedViewModel: CommunityFeedViewModel = hiltViewModel()
+    feedViewModel: CommunityFeedViewModel = hiltViewModel(),
+    scheduleViewModel: CommunityScheduleViewModel = hiltViewModel(key = "schedule_${rankingItem.id}")
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -174,6 +180,11 @@ fun CommunityScreen(
 
     // 사진 상세 화면 상태 (article + 시작 인덱스)
     var selectedPhotoDetail by remember { mutableStateOf<Pair<net.ib.mn.domain.model.ArticleModel, Int>?>(null) }
+
+    // 스케줄 작성 화면 상태
+    var showScheduleWriteScreen by remember { mutableStateOf(false) }
+    var scheduleWriteInitialDate by remember { mutableStateOf<Date?>(null) }
+    var editingSchedule by remember { mutableStateOf<ScheduleModel?>(null) }
 
     // 탭 목록 생성 (showChattingTab이 true인 경우에만 채팅 탭 포함)
     val tabs = remember(showChattingTab) {
@@ -219,7 +230,11 @@ fun CommunityScreen(
     }
 
     BackHandler {
-        if (selectedUserProfile != null) {
+        if (showScheduleWriteScreen) {
+            showScheduleWriteScreen = false
+            scheduleWriteInitialDate = null
+            editingSchedule = null
+        } else if (selectedUserProfile != null) {
             selectedUserProfile = null
         } else if (showIdolIdolRankingHistoryScreen) {
             showIdolIdolRankingHistoryScreen = false
@@ -379,7 +394,14 @@ fun CommunityScreen(
                             }
                         )
                         CommunityTab.CHAT -> CommunityChatSubPage(rankingItem = rankingItem)
-                        CommunityTab.SCHEDULE -> CommunityScheduleSubPage(rankingItem = rankingItem)
+                        CommunityTab.SCHEDULE -> CommunityScheduleSubPage(
+                            rankingItem = rankingItem,
+                            onNavigateToScheduleEdit = { schedule ->
+                                editingSchedule = schedule
+                                showScheduleWriteScreen = true
+                            },
+                            viewModel = scheduleViewModel
+                        )
                     }
                 }
             }
@@ -464,7 +486,7 @@ fun CommunityScreen(
                                 // TODO: 채팅방 만들기
                             }
                             CommunityTab.SCHEDULE -> {
-                                // TODO: 스케줄 작성
+                                showScheduleWriteScreen = true
                             }
                             else -> {}
                         }
@@ -843,6 +865,33 @@ fun CommunityScreen(
                 onBackClick = { selectedPhotoDetail = null }
             )
         }
+    }
+
+    // ScheduleWriteScreen (전체 화면으로 표시)
+    AnimatedVisibility(
+        visible = showScheduleWriteScreen,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        ScheduleWriteScreen(
+            idolId = idolId,
+            initialDate = scheduleWriteInitialDate,
+            editingSchedule = editingSchedule,
+            onNavigateBack = {
+                showScheduleWriteScreen = false
+                scheduleWriteInitialDate = null
+                editingSchedule = null
+            },
+            onNavigateBackWithResult = { schedule ->
+                showScheduleWriteScreen = false
+                scheduleWriteInitialDate = null
+                editingSchedule = null
+                // 스케줄 목록 새로고침
+                scheduleViewModel.sendIntent(
+                    CommunityScheduleContract.Intent.Refresh(idolId ?: 0)
+                )
+            }
+        )
     }
 }
 

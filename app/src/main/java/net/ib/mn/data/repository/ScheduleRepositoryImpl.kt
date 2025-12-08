@@ -8,6 +8,7 @@ import net.ib.mn.data.remote.dto.ScheduleDto
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ScheduleModel
 import net.ib.mn.domain.repository.ScheduleRepository
+import net.ib.mn.domain.repository.ScheduleWriteRequest
 import org.json.JSONObject
 import java.util.Date
 import javax.inject.Inject
@@ -69,6 +70,53 @@ class ScheduleRepositoryImpl @Inject constructor(
             parser = { json -> JSONObject(json).optBoolean("success", false) }
         )
 
+    override fun writeSchedule(request: ScheduleWriteRequest): Flow<ApiResult<ScheduleModel>> =
+        safeApiCallWithJsonString(
+            apiCall = {
+                scheduleApi.writeSchedule(
+                    idolId = request.idolId,
+                    idolIds = request.idolIds,
+                    title = request.title,
+                    category = request.category,
+                    location = request.location,
+                    lat = request.lat,
+                    lng = request.lng,
+                    url = request.url,
+                    dtstart = request.dtstart,
+                    duration = request.duration,
+                    allday = request.allday,
+                    extra = request.extra,
+                    locale = request.locale
+                )
+            },
+            parser = { json -> parseScheduleResponse(json) }
+        )
+
+    override fun editSchedule(
+        scheduleId: Int,
+        request: ScheduleWriteRequest
+    ): Flow<ApiResult<ScheduleModel>> =
+        safeApiCallWithJsonString(
+            apiCall = {
+                scheduleApi.editSchedule(
+                    scheduleId = scheduleId,
+                    idolId = request.idolId,
+                    idolIds = request.idolIds,
+                    title = request.title,
+                    category = request.category,
+                    location = request.location,
+                    lat = request.lat,
+                    lng = request.lng,
+                    url = request.url,
+                    dtstart = request.dtstart,
+                    duration = request.duration,
+                    allday = request.allday,
+                    extra = request.extra
+                )
+            },
+            parser = { json -> parseScheduleResponse(json) }
+        )
+
     // ============================================================
     // Private Parsers
     // ============================================================
@@ -106,6 +154,25 @@ class ScheduleRepositoryImpl @Inject constructor(
         val dtoList: List<ScheduleDto> = gson.fromJson(objectsArray.toString(), listType)
 
         return dtoList.map { it.toModel() }.sortedBy { it.dtstart }
+    }
+
+    private fun parseScheduleResponse(json: String): ScheduleModel {
+        val jsonObject = JSONObject(json)
+        if (!jsonObject.optBoolean("success", false)) {
+            throw Exception(jsonObject.optString("msg", "스케줄 저장에 실패했습니다."))
+        }
+
+        val objectsArray = jsonObject.optJSONArray("objects")
+            ?: throw Exception("스케줄 응답 데이터가 없습니다.")
+
+        if (objectsArray.length() == 0) {
+            throw Exception("스케줄 응답 데이터가 비어있습니다.")
+        }
+
+        val listType = object : TypeToken<List<ScheduleDto>>() {}.type
+        val dtoList: List<ScheduleDto> = gson.fromJson(objectsArray.toString(), listType)
+
+        return dtoList.first().toModel()
     }
 
     private fun ScheduleDto.toModel() = ScheduleModel(

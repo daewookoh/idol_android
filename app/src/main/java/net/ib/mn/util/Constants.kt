@@ -227,4 +227,16 @@ object Constants {
     // File Type for presigned URL
     const val FILE_TYPE_IMAGE: String = "st"   // 이미지
     const val FILE_TYPE_VIDEO: String = "mv"   // 동영상/GIF
+
+    // ============================================================
+    // Google Places SDK (스케줄 맵 검색창)
+    // ============================================================
+    const val GOOGLE_PLACE_KEY: String = "QUl6YVN5Q0pZdFd0NktkRjVWMVlaSnE4cEJTLXZFOEpqNDNIdlI0"
+
+    /**
+     * Base64 인코딩된 API 키를 디코딩
+     */
+    fun getDecodedKey(encodedKey: String): String {
+        return String(android.util.Base64.decode(encodedKey, android.util.Base64.DEFAULT))
+    }
 }

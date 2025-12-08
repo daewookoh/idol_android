@@ -379,6 +379,11 @@ class PreferencesManager @Inject constructor(
         boardTags.first()
     }
 
+    val badWords: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_BAD_WORDS]
+        }
+
     val freeBoardPlaceholder: Flow<String?> = context.dataStore.data
         .map { preferences ->
             preferences[KEY_FREE_BOARD_PLACEHOLDER]

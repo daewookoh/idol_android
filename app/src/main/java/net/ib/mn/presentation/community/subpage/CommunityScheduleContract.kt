@@ -64,6 +64,7 @@ class CommunityScheduleContract {
         data class ChangeLocale(val locale: String, val localeText: String, val idolId: Int) : Intent()
         data class VoteSchedule(val scheduleId: Int, val vote: String, val idolId: Int) : Intent()
         data class DeleteSchedule(val scheduleId: Int, val idolId: Int) : Intent()
+        data class EditSchedule(val schedule: ScheduleModel) : Intent()
     }
 
     sealed class Effect : UiEffect {
@@ -73,5 +74,6 @@ class CommunityScheduleContract {
         data class NavigateToComment(val articleId: Int, val scheduleId: Int) : Effect()
         object ShowLanguageSelector : Effect()
         data class ShowDeleteConfirm(val scheduleId: Int) : Effect()
+        data class NavigateToScheduleEdit(val schedule: ScheduleModel) : Effect()
     }
 }
