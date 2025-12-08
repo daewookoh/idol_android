@@ -20,6 +20,8 @@ data class ScheduleModel(
     val isViewable: Boolean,
     val isReadonly: Boolean,
     val userId: Int,
+    val userName: String?,
+    val userLevel: Int,
     val createdAt: Date?,
     val updatedAt: Date?
 ) {

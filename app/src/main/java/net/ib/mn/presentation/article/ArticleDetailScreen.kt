@@ -17,8 +17,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -38,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
@@ -53,6 +58,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.CommentModel
+import net.ib.mn.domain.model.ScheduleModel
 import net.ib.mn.presentation.common.ArticleType
 import net.ib.mn.presentation.common.ExoArticle
 import net.ib.mn.presentation.common.ExoArticleNavigation
@@ -81,6 +87,18 @@ fun ArticleDetailScreen(
     article: ArticleModel,
     isFeed: Boolean = false, // FeedSubPage에서 진입한 경우 true (하트 투표 표시)
     externalTabName: String? = null, // 외부에서 전달된 아이돌 이름 (다국어 적용, 태그 표시용)
+    // 스케줄 상세 모드 파라미터
+    schedule: ScheduleModel? = null, // null이 아니면 스케줄 상세 모드
+    scheduleIdolId: Int = 0, // 스케줄 투표에 필요한 아이돌 ID
+    scheduleYearMonthDay: String = "", // 스케줄 로드에 필요한 날짜
+    scheduleLocale: String = "ko", // 스케줄 로드에 필요한 로케일
+    scheduleIdolName: String = "", // 스케줄에 연결된 아이돌 이름
+    scheduleUserName: String = "", // 스케줄 작성자 이름
+    scheduleUserLevel: Int = 0, // 스케줄 작성자 레벨
+    scheduleUserId: Int = 0, // 스케줄 작성자 ID
+    onScheduleUpdated: (ScheduleModel) -> Unit = {},
+    onScheduleDeleted: (Int) -> Unit = {},
+    onNavigateToScheduleEdit: (ScheduleModel) -> Unit = {},
     onBackClick: () -> Unit = {},
     onArticleUpdated: (ArticleModel) -> Unit = {},
     onArticleDeleted: (() -> Unit)? = null,
@@ -89,6 +107,8 @@ fun ArticleDetailScreen(
     articleViewModel: ExoArticleViewModel = hiltViewModel(),
     commentViewModel: CommentSectionViewModel = hiltViewModel()
 ) {
+    // 스케줄 모드 여부
+    val isScheduleMode = schedule != null
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -96,6 +116,9 @@ fun ArticleDetailScreen(
 
     // 게시글 상태 (로컬에서 관리하여 댓글 수 등 업데이트 반영)
     var currentArticle by remember { mutableStateOf(article) }
+
+    // 스케줄 상태 (스케줄 모드일 때 사용)
+    var currentSchedule by remember { mutableStateOf(schedule) }
 
     // 댓글 상태
     val commentUiState by commentViewModel.uiState.collectAsState()
@@ -198,12 +221,20 @@ fun ArticleDetailScreen(
         commentViewModel.loadComments(articleIdLong)
     }
 
-    // 댓글 수 변경 시 게시글 업데이트 및 백스택 동기화
+    // 댓글 수 변경 시 게시글/스케줄 업데이트 및 백스택 동기화
     LaunchedEffect(commentCountDelta) {
         if (commentCountDelta != 0) {
-            val newCommentCount = (currentArticle.commentCount + commentCountDelta).coerceAtLeast(0)
-            currentArticle = currentArticle.copy(commentCount = newCommentCount)
-            onArticleUpdated(currentArticle)
+            if (isScheduleMode && currentSchedule != null) {
+                // 스케줄 모드: numComments 업데이트
+                val newCommentCount = (currentSchedule!!.numComments + commentCountDelta).coerceAtLeast(0)
+                currentSchedule = currentSchedule!!.copy(numComments = newCommentCount)
+                onScheduleUpdated(currentSchedule!!)
+            } else {
+                // 게시글 모드: commentCount 업데이트
+                val newCommentCount = (currentArticle.commentCount + commentCountDelta).coerceAtLeast(0)
+                currentArticle = currentArticle.copy(commentCount = newCommentCount)
+                onArticleUpdated(currentArticle)
+            }
             commentViewModel.consumeCommentCountDelta()
         }
     }
@@ -308,13 +339,17 @@ fun ArticleDetailScreen(
                 title = stringResource(R.string.post_detail),
                 onNavigationClick = onBackClick,
                 actions = {
-                    IconButton(onClick = { showMoreBottomSheet = true }) {
-                        Icon(
-                            painter = painterResource(R.drawable.icon_view_more),
-                            contentDescription = "Menu",
-                            tint = ColorPalette.textDefault
-                        )
+                    if (!isScheduleMode) {
+                        // 게시글 모드에서만 메뉴 버튼 표시
+                        IconButton(onClick = { showMoreBottomSheet = true }) {
+                            Icon(
+                                painter = painterResource(R.drawable.icon_view_more),
+                                contentDescription = "Menu",
+                                tint = ColorPalette.textDefault
+                            )
+                        }
                     }
+                    // 스케줄 모드에서는 메뉴 버튼 없음
                 }
             )
         },
@@ -386,19 +421,41 @@ fun ArticleDetailScreen(
                 state = listState,
                 modifier = Modifier.fillMaxSize()
             ) {
-                // 게시글
-                item(key = "article") {
-                    ExoArticle(
-                        article = currentArticle,
-                        type = detailType,
-                        isVisible = true,
-                        externalTabName = externalTabName,
-                        onArticleUpdated = { updatedArticle ->
-                            currentArticle = updatedArticle
-                            onArticleUpdated(updatedArticle)
-                        },
-                        viewModel = articleViewModel
-                    )
+                // 게시글 또는 스케줄 정보
+                item(key = if (isScheduleMode) "schedule" else "article") {
+                    if (isScheduleMode && currentSchedule != null) {
+                        // 스케줄 정보 섹션
+                        ScheduleInfoSection(
+                            schedule = currentSchedule!!,
+                            idolName = scheduleIdolName,
+                            userName = scheduleUserName,
+                            userLevel = scheduleUserLevel,
+                            onUserClick = {
+                                if (scheduleUserId > 0) {
+                                    onNavigateToProfile(
+                                        scheduleUserId,
+                                        scheduleUserName,
+                                        null,
+                                        scheduleUserLevel,
+                                        null
+                                    )
+                                }
+                            }
+                        )
+                    } else {
+                        // 게시글 표시
+                        ExoArticle(
+                            article = currentArticle,
+                            type = detailType,
+                            isVisible = true,
+                            externalTabName = externalTabName,
+                            onArticleUpdated = { updatedArticle ->
+                                currentArticle = updatedArticle
+                                onArticleUpdated(updatedArticle)
+                            },
+                            viewModel = articleViewModel
+                        )
+                    }
                 }
 
                 // 댓글 목록
@@ -800,4 +857,238 @@ private fun resizeImage(bytes: ByteArray, maxSize: Int): ByteArray {
     } catch (e: Exception) {
         bytes // 에러 시 원본 반환
     }
+}
+
+// ====== 스케줄 관련 컴포저블 ======
+
+private val KST = java.util.TimeZone.getTimeZone("Asia/Seoul")
+
+/**
+ * 스케줄 정보 섹션 (스크린샷 기준 레이아웃)
+ * - 시간 + 카테고리 아이콘 + 제목 행
+ * - 아이돌 이름 행 (person 아이콘)
+ * - 지도 섹션 (location)
+ * - 하단 정보: 댓글 수 (좌측) | 레벨 아이콘 + 사용자 이름 (우측)
+ */
+@Composable
+private fun ScheduleInfoSection(
+    schedule: ScheduleModel,
+    idolName: String = "",
+    userName: String = "",
+    userLevel: Int = 0,
+    onUserClick: () -> Unit = {}
+) {
+    val context = LocalContext.current
+    val appLocale = remember { java.util.Locale.getDefault() }
+
+    // 시간 포맷: 오후 3:25
+    val timeFormat = remember(appLocale) {
+        java.text.SimpleDateFormat("a h:mm", appLocale).apply { timeZone = KST }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(ColorPalette.background100)
+    ) {
+        // 시간 + 카테고리 아이콘 + 제목 행
+        androidx.compose.foundation.layout.Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, top = 20.dp, end = 16.dp, bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 시간 (종일이 아닌 경우만 표시)
+            if (schedule.allday != 1) {
+                androidx.compose.material3.Text(
+                    text = timeFormat.format(schedule.dtstart),
+                    fontSize = 14.sp,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    color = ColorPalette.textDefault
+                )
+                androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(12.dp))
+            }
+
+            // 카테고리 아이콘
+            Icon(
+                painter = painterResource(getScheduleIcon(schedule.category)),
+                contentDescription = null,
+                tint = Color.Unspecified,
+                modifier = Modifier.size(24.dp)
+            )
+            androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(8.dp))
+
+            // 제목
+            androidx.compose.material3.Text(
+                text = schedule.title,
+                fontSize = 14.sp,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                color = ColorPalette.textDefault,
+                maxLines = 2,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        // 아이돌 이름 행 (person 아이콘)
+        if (idolName.isNotEmpty()) {
+            androidx.compose.foundation.layout.Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.icon_schedule_person),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(16.dp)
+                )
+                androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(8.dp))
+                androidx.compose.material3.Text(
+                    text = idolName,
+                    fontSize = 13.sp,
+                    color = ColorPalette.textGray
+                )
+            }
+        }
+
+        // 지도 섹션 (location 있는 경우)
+        if (!schedule.location.isNullOrEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .height(100.dp)
+                    .clickable {
+                        // 지도 앱으로 열기
+                        try {
+                            val geoUri = android.net.Uri.parse("geo:0,0?q=${android.net.Uri.encode(schedule.location)}")
+                            val mapIntent = android.content.Intent(android.content.Intent.ACTION_VIEW, geoUri)
+                            context.startActivity(mapIntent)
+                        } catch (e: Exception) {
+                            // 지도 열기 실패
+                        }
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                // 배경 이미지
+                androidx.compose.foundation.Image(
+                    painter = painterResource(R.drawable.bg_map),
+                    contentDescription = null,
+                    contentScale = androidx.compose.ui.layout.ContentScale.FillBounds,
+                    modifier = Modifier.fillMaxSize()
+                )
+
+                // 지도 아이콘 + 위치 텍스트
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.icon_schedule_map),
+                        contentDescription = null,
+                        tint = Color.Unspecified,
+                        modifier = Modifier.padding(bottom = 5.dp)
+                    )
+                    androidx.compose.material3.Text(
+                        text = schedule.location,
+                        fontSize = 10.sp,
+                        color = ColorPalette.gray580,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(horizontal = 10.dp)
+                    )
+                }
+            }
+        }
+
+        // 하단 정보 행: 댓글 수 (좌측) | 레벨 아이콘 + 사용자 이름 (우측)
+        androidx.compose.foundation.layout.Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 댓글 아이콘 + 댓글 수 (좌측)
+            Icon(
+                painter = painterResource(R.drawable.icon_community_comment),
+                contentDescription = null,
+                tint = ColorPalette.gray300,
+                modifier = Modifier.size(16.dp)
+            )
+            androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(4.dp))
+            androidx.compose.material3.Text(
+                text = schedule.numComments.toString(),
+                fontSize = 13.sp,
+                color = ColorPalette.textGray
+            )
+
+            androidx.compose.foundation.layout.Spacer(modifier = Modifier.weight(1f))
+
+            // 레벨 아이콘 + 사용자 이름 (우측)
+            if (userName.isNotEmpty()) {
+                androidx.compose.foundation.layout.Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { onUserClick() }
+                ) {
+                    // 레벨 아이콘
+                    val levelIconRes = getLevelIcon(userLevel)
+                    Icon(
+                        painter = painterResource(levelIconRes),
+                        contentDescription = null,
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(4.dp))
+                    androidx.compose.material3.Text(
+                        text = userName,
+                        fontSize = 13.sp,
+                        color = ColorPalette.textGray
+                    )
+                }
+            }
+        }
+
+        // 구분선
+        androidx.compose.material3.HorizontalDivider(
+            color = ColorPalette.gray110,
+            thickness = 1.dp
+        )
+    }
+}
+
+/**
+ * 레벨에 따른 아이콘 리소스 반환
+ */
+private fun getLevelIcon(level: Int): Int {
+    return when {
+        level >= 40 -> R.drawable.icon_level_40
+        level >= 35 -> R.drawable.icon_level_35
+        level >= 30 -> R.drawable.icon_level_30
+        level >= 25 -> R.drawable.icon_level_25
+        level >= 20 -> R.drawable.icon_level_20
+        level >= 15 -> R.drawable.icon_level_15
+        level >= 10 -> R.drawable.icon_level_10
+        level >= 5 -> R.drawable.icon_level_5
+        level >= 1 -> R.drawable.icon_level_1
+        else -> R.drawable.icon_level_0
+    }
+}
+
+private fun getScheduleIcon(category: String?): Int = when (category) {
+    "anniversary" -> R.drawable.schedule_category_01
+    "albumday" -> R.drawable.schedule_category_02
+    "movie" -> R.drawable.schedule_category_20
+    "production" -> R.drawable.schedule_category_21
+    "concert" -> R.drawable.schedule_category_03
+    "event" -> R.drawable.schedule_category_04
+    "sign" -> R.drawable.schedule_category_05
+    "tv" -> R.drawable.schedule_category_06
+    "radio" -> R.drawable.schedule_category_07
+    "live" -> R.drawable.schedule_category_08
+    "award" -> R.drawable.schedule_category_09
+    "ticketing" -> R.drawable.schedule_category_11
+    "preview" -> R.drawable.schedule_category_22
+    else -> R.drawable.schedule_category_10
 }

@@ -193,6 +193,8 @@ class ScheduleRepositoryImpl @Inject constructor(
         isViewable = isViewable == "Y",
         isReadonly = isReadonly == "Y",
         userId = user?.id ?: 0,
+        userName = user?.nickname,
+        userLevel = user?.level ?: 0,
         createdAt = createdAt,
         updatedAt = updatedAt
     )

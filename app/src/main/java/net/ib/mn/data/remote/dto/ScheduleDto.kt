@@ -27,7 +27,9 @@ data class ScheduleDto(
     @SerializedName("updated_at") val updatedAtStr: String?
 ) {
     data class UserDto(
-        @SerializedName("id") val id: Int?
+        @SerializedName("id") val id: Int?,
+        @SerializedName("nickname") val nickname: String?,
+        @SerializedName("level") val level: Int?
     )
 
     companion object {

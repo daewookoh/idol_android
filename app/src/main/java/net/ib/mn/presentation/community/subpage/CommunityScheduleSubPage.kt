@@ -3,6 +3,7 @@ package net.ib.mn.presentation.community.subpage
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,6 +64,7 @@ private val KST: TimeZone = TimeZone.getTimeZone("Asia/Seoul")
 fun CommunityScheduleSubPage(
     rankingItem: RankingItem,
     onNavigateToScheduleEdit: (ScheduleModel) -> Unit = {},
+    onNavigateToScheduleDetail: (ScheduleModel, String, String) -> Unit = { _, _, _ -> },
     viewModel: CommunityScheduleViewModel = hiltViewModel(key = "schedule_${rankingItem.id}")
 ) {
     val context = LocalContext.current
@@ -89,7 +91,8 @@ fun CommunityScheduleSubPage(
                     showDeleteDialog = effect.scheduleId
                 is CommunityScheduleContract.Effect.NavigateToScheduleEdit ->
                     onNavigateToScheduleEdit(effect.schedule)
-                else -> Unit
+                is CommunityScheduleContract.Effect.NavigateToScheduleDetail ->
+                    onNavigateToScheduleDetail(effect.schedule, effect.yearMonthDay, effect.locale)
             }
         }
     }
@@ -198,8 +201,12 @@ fun CommunityScheduleSubPage(
                     items(items = state.daySchedules, key = { "schedule_${it.id}" }) { schedule ->
                         ScheduleItem(
                             schedule = schedule,
-                            onDetailClick = { },
-                            onCommentClick = { },
+                            onDetailClick = {
+                                viewModel.sendIntent(CommunityScheduleContract.Intent.ViewScheduleDetail(schedule))
+                            },
+                            onCommentClick = {
+                                viewModel.sendIntent(CommunityScheduleContract.Intent.ViewScheduleDetail(schedule))
+                            },
                             onVoteYes = {
                                 if (!schedule.isVoted) {
                                     viewModel.sendIntent(CommunityScheduleContract.Intent.VoteSchedule(schedule.id, "Y", idolId))
@@ -475,7 +482,10 @@ private fun ScheduleItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .defaultMinSize(minHeight = 60.dp)
-                .clickable { onDetailClick() }
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) { onDetailClick() }
                 .padding(start = 20.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -515,7 +525,10 @@ private fun ScheduleItem(
                     tint = Color.Unspecified,
                     modifier = Modifier
                         .size(25.dp)
-                        .clickable { onEditClick() }
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) { onEditClick() }
                         .padding(5.dp)
                 )
                 Icon(
@@ -524,7 +537,10 @@ private fun ScheduleItem(
                     tint = Color.Unspecified,
                     modifier = Modifier
                         .size(25.dp)
-                        .clickable { onDeleteClick() }
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) { onDeleteClick() }
                         .padding(5.dp)
                 )
             }
@@ -597,7 +613,10 @@ private fun ScheduleActionButton(
                     drawLine(borderColor, Offset(size.width, 0f), Offset(size.width, size.height), 1.dp.toPx())
                 }
             }
-            .clickable { onClick() },
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { onClick() },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {

@@ -45,6 +45,18 @@ class CommunityScheduleViewModel @Inject constructor(
             is CommunityScheduleContract.Intent.VoteSchedule -> voteSchedule(intent.scheduleId, intent.vote, intent.idolId)
             is CommunityScheduleContract.Intent.DeleteSchedule -> deleteSchedule(intent.scheduleId, intent.idolId)
             is CommunityScheduleContract.Intent.EditSchedule -> editSchedule(intent.schedule)
+            is CommunityScheduleContract.Intent.ViewScheduleDetail -> viewScheduleDetail(intent.schedule)
+        }
+    }
+
+    private fun viewScheduleDetail(schedule: ScheduleModel) {
+        val state = uiState.value
+        setEffect {
+            CommunityScheduleContract.Effect.NavigateToScheduleDetail(
+                schedule = schedule,
+                yearMonthDay = state.yearMonthDay,
+                locale = state.locale
+            )
         }
     }
 
@@ -235,5 +247,20 @@ class CommunityScheduleViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * 스케줄 업데이트 (상세화면에서 댓글 수 변경 시 동기화)
+     */
+    fun updateSchedule(updatedSchedule: ScheduleModel) {
+        val currentSchedules = uiState.value.daySchedules
+        val updatedSchedules = currentSchedules.map { schedule ->
+            if (schedule.id == updatedSchedule.id) {
+                schedule.copy(numComments = updatedSchedule.numComments)
+            } else {
+                schedule
+            }
+        }
+        setState { copy(daySchedules = updatedSchedules) }
     }
 }

@@ -88,6 +88,7 @@ import net.ib.mn.presentation.community.subpage.OrderByType
 import net.ib.mn.presentation.community.subpage.CommunityScheduleSubPage
 import net.ib.mn.presentation.community.subpage.CommunityScheduleContract
 import net.ib.mn.presentation.community.subpage.CommunityScheduleViewModel
+import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.ScheduleModel
 import net.ib.mn.presentation.article.ArticleDetailScreen
 import net.ib.mn.presentation.article.PhotoDetailScreen
@@ -185,6 +186,9 @@ fun CommunityScreen(
     var showScheduleWriteScreen by remember { mutableStateOf(false) }
     var scheduleWriteInitialDate by remember { mutableStateOf<Date?>(null) }
     var editingSchedule by remember { mutableStateOf<ScheduleModel?>(null) }
+
+    // 스케줄 상세 화면 상태
+    var selectedScheduleDetail by remember { mutableStateOf<Triple<ScheduleModel, String, String>?>(null) }
 
     // 탭 목록 생성 (showChattingTab이 true인 경우에만 채팅 탭 포함)
     val tabs = remember(showChattingTab) {
@@ -399,6 +403,9 @@ fun CommunityScreen(
                             onNavigateToScheduleEdit = { schedule ->
                                 editingSchedule = schedule
                                 showScheduleWriteScreen = true
+                            },
+                            onNavigateToScheduleDetail = { schedule, yearMonthDay, locale ->
+                                selectedScheduleDetail = Triple(schedule, yearMonthDay, locale)
                             },
                             viewModel = scheduleViewModel
                         )
@@ -863,6 +870,49 @@ fun CommunityScreen(
                 article = article,
                 initialIndex = mediaIndex,
                 onBackClick = { selectedPhotoDetail = null }
+            )
+        }
+    }
+
+    // Schedule Detail (ArticleDetailScreen with schedule mode)
+    AnimatedVisibility(
+        visible = selectedScheduleDetail != null,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        selectedScheduleDetail?.let { (schedule, yearMonthDay, locale) ->
+            ArticleDetailScreen(
+                article = ArticleModel(id = schedule.articleId.toString()),
+                schedule = schedule,
+                scheduleIdolId = idolId ?: 0,
+                scheduleYearMonthDay = yearMonthDay,
+                scheduleLocale = locale,
+                scheduleIdolName = displayIdolName,
+                scheduleUserName = schedule.userName ?: "",
+                scheduleUserLevel = schedule.userLevel,
+                scheduleUserId = schedule.userId,
+                onBackClick = {
+                    selectedScheduleDetail = null
+                },
+                onScheduleUpdated = { updatedSchedule ->
+                    // 스케줄 목록에서 해당 스케줄 업데이트 (댓글 수 등 실시간 반영)
+                    scheduleViewModel.updateSchedule(updatedSchedule)
+                },
+                onScheduleDeleted = { scheduleId ->
+                    selectedScheduleDetail = null
+                    // 스케줄 목록 새로고침
+                    scheduleViewModel.sendIntent(
+                        CommunityScheduleContract.Intent.Refresh(idolId ?: 0)
+                    )
+                },
+                onNavigateToScheduleEdit = { scheduleToEdit ->
+                    selectedScheduleDetail = null
+                    editingSchedule = scheduleToEdit
+                    showScheduleWriteScreen = true
+                },
+                onNavigateToProfile = { userId, nickname, imageUrl, level, mostIdolName ->
+                    selectedUserProfile = UserProfileInfo(userId, nickname, imageUrl, level, mostIdolName)
+                }
             )
         }
     }
