@@ -329,6 +329,11 @@ class StartUpViewModel @Inject constructor(
                             )
                         }
 
+                        // Free Board Placeholder (자유게시판 글쓰기 placeholder)
+                        configData.helpInfos?.freeBoardPlaceHolder?.let { placeholder ->
+                            preferencesManager.setFreeBoardPlaceholder(placeholder)
+                        }
+
                     }
                     // NOTE: 메모리 캐싱이 필요한 경우 구현 방법:
                     // 1. Application 클래스에 ConfigCache 싱글톤 생성

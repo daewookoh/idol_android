@@ -110,6 +110,23 @@ class ArticleWriteViewModel @Inject constructor(
                 val editingArticle = intent.editingArticle
                 val isEditMode = editingArticle != null
 
+                // FREE_BOARD용 placeholder 설정 (old 프로젝트와 동일)
+                val titlePlaceholder: String?
+                val contentPlaceholder: String?
+
+                if (intent.writeType == ArticleWriteType.FREE_BOARD) {
+                    // 제목: "제목(최대 30자)" 형식 (old: title_char_limit_placeholder)
+                    titlePlaceholder = context.getString(
+                        net.ib.mn.R.string.title_char_limit_placeholder,
+                        State.MAX_TITLE_LENGTH.toString()
+                    )
+                    // 내용: 서버에서 받은 freeBoardPlaceholder 사용 (old: helpInfoModel.freeBoardPlaceHolder)
+                    contentPlaceholder = preferencesManager.freeBoardPlaceholder.first()
+                } else {
+                    titlePlaceholder = null
+                    contentPlaceholder = null
+                }
+
                 setState {
                     copy(
                         isLoading = false,
@@ -120,6 +137,8 @@ class ArticleWriteViewModel @Inject constructor(
                         idolName = idol?.name ?: "",
                         title = editingArticle?.title ?: "",
                         content = editingArticle?.content ?: "",
+                        titlePlaceholder = titlePlaceholder,
+                        contentPlaceholder = contentPlaceholder,
                         tags = tags,
                         selectedTag = selectedTag,
                         showPrivateSetting = showPrivateSetting,

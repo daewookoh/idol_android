@@ -75,6 +75,7 @@ enum class ExoBottomSheetType {
  * @param sheetState 바텀시트 상태
  * @param containerColor 바텀시트 배경색 (LIST: gray100, DESIGN: Transparent)
  * @param shape 바텀시트 모양
+ * @param title LIST/ACTION 타입에서 핸들바 아래에 표시할 타이틀 (옵셔널)
  * @param hasCloseButton DESIGN 타입에서 우측 상단에 닫기 버튼 표시 여부 (기본값: false)
  * @param content 바텀시트 콘텐츠
  */
@@ -92,6 +93,7 @@ fun ExoBottomSheet(
         ExoBottomSheetType.DESIGN -> Color.Transparent
     },
     shape: Shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+    title: String? = null,
     hasCloseButton: Boolean = false,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -102,7 +104,29 @@ fun ExoBottomSheet(
         containerColor = containerColor,
         shape = shape,
         dragHandle = when (type) {
-            ExoBottomSheetType.LIST, ExoBottomSheetType.ACTION -> { { ExoBottomSheetDragHandle() } }
+            ExoBottomSheetType.LIST, ExoBottomSheetType.ACTION -> {
+                {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        ExoBottomSheetDragHandle()
+                        // LIST/ACTION 타입에서 타이틀이 있으면 핸들바 아래에 표시
+                        if (title != null) {
+                            Text(
+                                text = title,
+                                style = ExoTypo.body15.copy(fontWeight = FontWeight.Bold),
+                                color = ColorPalette.gray150,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp)
+                                    .heightIn(min = 42.dp)
+                            )
+                        }
+                    }
+                }
+            }
             ExoBottomSheetType.DESIGN -> null
         },
         sheetMaxWidth = BottomSheetDefaults.SheetMaxWidth

@@ -109,6 +109,10 @@ class ArticleWriteContract {
         val title: String = "",
         val content: String = "",
 
+        // Placeholder (FREE_BOARD용 커스텀 placeholder)
+        val titlePlaceholder: String? = null,
+        val contentPlaceholder: String? = null,
+
         // 태그 (자유게시판용)
         val tags: List<TagModel> = emptyList(),
         val selectedTag: TagModel? = null,

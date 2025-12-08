@@ -384,6 +384,7 @@ fun ArticleWriteScreen(
                 TitleInputField(
                     title = state.title,
                     maxLength = State.MAX_TITLE_LENGTH,
+                    placeholder = state.titlePlaceholder,
                     onTitleChange = { viewModel.sendIntent(Intent.OnTitleChanged(it)) }
                 )
                 HorizontalDivider(
@@ -424,6 +425,7 @@ fun ArticleWriteScreen(
                 ContentInputField(
                     content = state.content,
                     maxLength = State.MAX_CONTENT_LENGTH,
+                    placeholder = state.contentPlaceholder,
                     onContentChange = { viewModel.sendIntent(Intent.OnContentChanged(it)) },
                     focusRequester = contentFocusRequester
                 )
@@ -713,31 +715,23 @@ private fun TagSelectorRow(
                 indication = null,
                 onClick = onClick
             )
-            .padding(horizontal = 20.dp),
+            .padding(start = 20.dp, end = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // 카테고리 선택 텍스트 (old: tv_tag_option)
         Text(
-            text = stringResource(R.string.schedule_category),
+            text = selectedTag?.name ?: stringResource(R.string.select_category_field),
             fontSize = 14.sp,
-            color = ColorPalette.textGray
+            color = ColorPalette.textDefault,
+            modifier = Modifier.weight(1f)
         )
 
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Text(
-            text = selectedTag?.name ?: stringResource(R.string.label_button_select),
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = if (selectedTag != null) ColorPalette.textDefault else ColorPalette.textDimmed
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
+        // 화살표 아이콘
         Icon(
-            painter = painterResource(R.drawable.ic_arrow_right),
+            painter = painterResource(R.drawable.icon_arrow_drop_down),
             contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = ColorPalette.gray300
+            modifier = Modifier.size(24.dp),
+            tint = ColorPalette.textDefault
         )
     }
 }
@@ -746,6 +740,7 @@ private fun TagSelectorRow(
 private fun TitleInputField(
     title: String,
     maxLength: Int,
+    placeholder: String? = null,
     onTitleChange: (String) -> Unit
 ) {
     BasicTextField(
@@ -764,7 +759,7 @@ private fun TitleInputField(
             Box {
                 if (title.isEmpty()) {
                     Text(
-                        text = stringResource(R.string.enter_title),
+                        text = placeholder ?: stringResource(R.string.enter_title),
                         fontSize = 15.sp,
                         color = ColorPalette.textDimmed
                     )
@@ -779,6 +774,7 @@ private fun TitleInputField(
 private fun ContentInputField(
     content: String,
     maxLength: Int,
+    placeholder: String? = null,
     onContentChange: (String) -> Unit,
     focusRequester: FocusRequester
 ) {
@@ -799,7 +795,7 @@ private fun ContentInputField(
             Box(modifier = Modifier.fillMaxSize()) {
                 if (content.isEmpty()) {
                     Text(
-                        text = stringResource(R.string.write_content),
+                        text = placeholder ?: stringResource(R.string.write_content),
                         fontSize = 15.sp,
                         color = ColorPalette.textDimmed
                     )
@@ -1010,7 +1006,8 @@ private fun TagSelectorBottomSheet(
     ExoBottomSheet(
         onDismissRequest = onDismiss,
         type = ExoBottomSheetType.LIST,
-        containerColor = ColorPalette.background200
+        containerColor = ColorPalette.background200,
+        title = stringResource(R.string.select_category_field)
     ) {
         Column(
             modifier = Modifier
@@ -1018,38 +1015,18 @@ private fun TagSelectorBottomSheet(
                 .navigationBarsPadding()
                 .padding(bottom = 16.dp)
         ) {
-            Text(
-                text = stringResource(R.string.select_category_field),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = ColorPalette.textDefault,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
-            )
-
             tags.forEach { tag ->
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onTagSelected(tag) }
-                        .padding(horizontal = 20.dp, vertical = 14.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(horizontal = 20.dp, vertical = 14.dp)
                 ) {
                     Text(
                         text = tag.name,
                         fontSize = 15.sp,
-                        color = if (tag.id == selectedTag?.id) ColorPalette.main else ColorPalette.textDefault
+                        color = ColorPalette.textDefault
                     )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    if (tag.id == selectedTag?.id) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_check),
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp),
-                            tint = ColorPalette.main
-                        )
-                    }
                 }
             }
         }
@@ -1070,7 +1047,8 @@ private fun SettingBottomSheet(
     ExoBottomSheet(
         onDismissRequest = onDismiss,
         type = ExoBottomSheetType.LIST,
-        containerColor = ColorPalette.background200
+        containerColor = ColorPalette.background200,
+        title = stringResource(R.string.article_setting)
     ) {
         Column(
             modifier = Modifier
@@ -1078,15 +1056,6 @@ private fun SettingBottomSheet(
                 .navigationBarsPadding()
                 .padding(bottom = 16.dp)
         ) {
-            // 타이틀
-            Text(
-                text = stringResource(R.string.article_setting),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = ColorPalette.textDefault,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
-            )
-
             // 최애만 공개 Row
             Row(
                 modifier = Modifier
@@ -1135,25 +1104,14 @@ private fun ImageRatioBottomSheet(
 ) {
     ExoBottomSheet(
         onDismissRequest = onDismissRequest,
-        type = ExoBottomSheetType.LIST
+        type = ExoBottomSheetType.LIST,
+        title = stringResource(R.string.label_image_option)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
         ) {
-            // 타이틀 (old: "사진 비율") - 회색 (#8f8f8f)
-            Text(
-                text = stringResource(R.string.label_image_option),
-                style = ExoTypo.body15.copy(fontWeight = FontWeight.Bold),
-                color = Color(0xFF8F8F8F),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 42.dp)
-                    .wrapContentHeight(Alignment.CenterVertically)
-            )
-
             // 정사각형 옵션 (old: "정사각형(프로필&이붙)") - 좌측 정렬
             Box(
                 modifier = Modifier

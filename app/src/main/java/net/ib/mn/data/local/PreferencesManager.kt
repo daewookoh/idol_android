@@ -198,6 +198,9 @@ class PreferencesManager @Inject constructor(
         // New Picks (하트픽, 원픽 NEW 뱃지)
         val KEY_HAS_NEW_HEART_PICK = booleanPreferencesKey("has_new_heart_pick")  // 하트픽 NEW 뱃지
         val KEY_HAS_NEW_ONE_PICK = booleanPreferencesKey("has_new_one_pick")  // 원픽 NEW 뱃지
+
+        // Free Board Placeholder (자유게시판 글쓰기 placeholder)
+        val KEY_FREE_BOARD_PLACEHOLDER = stringPreferencesKey("free_board_placeholder")
     }
 
     // ============================================================
@@ -376,6 +379,11 @@ class PreferencesManager @Inject constructor(
         boardTags.first()
     }
 
+    val freeBoardPlaceholder: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_FREE_BOARD_PLACEHOLDER]
+        }
+
     val defaultCategory: Flow<String> = context.dataStore.data
         .map { preferences ->
             preferences[KEY_DEFAULT_CATEGORY] ?: Constants.TYPE_MALE
@@ -497,6 +505,16 @@ class PreferencesManager @Inject constructor(
     suspend fun setBoardTags(tags: Any) {
         context.dataStore.edit { preferences ->
             preferences[KEY_BOARD_TAGS] = gson.toJson(tags)
+        }
+    }
+
+    suspend fun setFreeBoardPlaceholder(placeholder: String?) {
+        context.dataStore.edit { preferences ->
+            if (placeholder != null) {
+                preferences[KEY_FREE_BOARD_PLACEHOLDER] = placeholder
+            } else {
+                preferences.remove(KEY_FREE_BOARD_PLACEHOLDER)
+            }
         }
     }
 
