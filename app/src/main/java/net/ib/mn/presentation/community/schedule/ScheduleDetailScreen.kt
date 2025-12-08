@@ -126,14 +126,17 @@ fun ScheduleDetailScreen(
                     showDeleteDialog = effect.scheduleId
                 }
                 is ScheduleDetailContract.Effect.ScrollToSchedule -> {
-                    // 해당 스케줄 key가 visible 할 때까지 스크롤
-                    val targetKey = "schedule_${effect.scheduleId}"
-                    while (true) {
-                        val visibleKeys = listState.layoutInfo.visibleItemsInfo.map { it.key }
-                        if (visibleKeys.contains(targetKey)) break
-                        val lastVisibleIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-                        listState.scrollToItem(lastVisibleIndex + 1)
+                    var targetIndex = 0
+                    for ((_, schedules) in state.groupedSchedules) {
+                        targetIndex++ // date header
+                        val found = schedules.indexOfFirst { it.id == effect.scheduleId }
+                        if (found >= 0) {
+                            targetIndex += found
+                            break
+                        }
+                        targetIndex += schedules.size
                     }
+                    listState.scrollToItem(targetIndex)
                 }
             }
         }

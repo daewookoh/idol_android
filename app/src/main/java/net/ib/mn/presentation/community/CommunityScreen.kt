@@ -894,7 +894,7 @@ fun CommunityScreen(
                 idolId = idolId ?: 0,
                 yearMonth = yearMonth,
                 locale = locale,
-                initialScheduleId = null,
+                initialScheduleId = schedule.id,
                 onNavigateBack = {
                     selectedMonthScheduleDetail = null
                 },
