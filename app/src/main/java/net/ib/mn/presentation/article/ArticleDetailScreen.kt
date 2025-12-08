@@ -16,21 +16,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.union
-import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -71,7 +68,6 @@ import net.ib.mn.presentation.common.commentItems
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.components.ExoEmoticonPanel
 import net.ib.mn.ui.components.ExoErrorDialog
-import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.util.Constants
 import net.ib.mn.util.LocaleUtil
@@ -297,8 +293,16 @@ fun ArticleDetailScreen(
         }
     }
 
-    ExoScaffold(
-        excludeBottomPadding = true,
+    // isFeed 파라미터로 타입 결정
+    // FeedSubPage에서 진입: FEED (하트 투표 있음)
+    // 그 외 (FreeBoardPage, FanTalkSubPage 등): FREE_BOARD (하트 투표 없음)
+    val detailType = if (isFeed) ArticleType.FEED else ArticleType.FREE_BOARD
+
+    // Scaffold 사용 - imePadding으로 키보드 대응
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
         topBar = {
             ExoAppBar(
                 title = stringResource(R.string.post_detail),
@@ -313,27 +317,74 @@ fun ArticleDetailScreen(
                     }
                 }
             )
-        }
-    ) {
-        // isFeed 파라미터로 타입 결정
-        // FeedSubPage에서 진입: FEED (하트 투표 있음)
-        // 그 외 (FreeBoardPage, FanTalkSubPage 등): FREE_BOARD (하트 투표 없음)
-        val detailType = if (isFeed) ArticleType.FEED else ArticleType.FREE_BOARD
+        },
+        bottomBar = {
+            // 하단 입력 영역 - 키보드와 함께 움직임
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+            ) {
+                // 댓글 입력창
+                CommentInput(
+                    value = commentText,
+                    onValueChange = commentViewModel::setCommentText,
+                    onSubmit = {
+                        val articleIdLong = article.id.toLongOrNull() ?: return@CommentInput
+                        // 이모티콘/이미지 없이 텍스트만 있는 경우 5글자 이상 필요
+                        val hasEmoticon = !selectedEmoticonUrl.isNullOrEmpty()
+                        val hasImage = selectedImageUri != null
+                        if (!hasEmoticon && !hasImage && commentText.trim().length < 5) {
+                            showCommentLengthDialog = true
+                            return@CommentInput
+                        }
+                        commentViewModel.submitComment(articleIdLong)
+                    },
+                    onAttachClick = {
+                        // 첨부 버튼 클릭 시 이미지 피커 열기
+                        imagePickerLauncher.launch("image/*")
+                    },
+                    onEmoticonClick = {
+                        // 이모티콘 버튼 클릭 시 키보드 내리고 패널 토글
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                        commentViewModel.toggleEmoticonPanel()
+                    },
+                    isEmoticonPanelOpen = showEmoticonPanel,
+                    selectedEmoticonUrl = selectedEmoticonUrl,
+                    selectedImageUri = selectedImageUri,
+                    focusRequester = commentFocusRequester,
+                    onInputFocused = {
+                        // 입력창 포커스 시 이모티콘 패널 닫기
+                        commentViewModel.hideEmoticonPanel()
+                    }
+                )
 
-        // Navigation bar 높이
-        val navigationBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-
+                // 이모티콘 패널 (댓글 입력창 아래에 표시)
+                ExoEmoticonPanel(
+                    visible = showEmoticonPanel,
+                    onEmoticonSelected = { emoticon ->
+                        val url = emoticon.imageUrl.ifEmpty { emoticon.thumbnail }
+                        commentViewModel.selectEmoticon(emoticon.id, url)
+                        // 이모티콘 선택 후 패널 닫고 댓글창 포커스
+                        commentViewModel.hideEmoticonPanel()
+                        commentFocusRequester.requestFocus()
+                    }
+                )
+            }
+        },
+        containerColor = ColorPalette.background100,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+    ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(ColorPalette.background100)
+                .padding(innerPadding)
         ) {
-            // 스크롤 가능한 콘텐츠 (게시글 + 댓글 목록) - 키보드에 영향받지 않음
+            // 스크롤 가능한 콘텐츠 (게시글 + 댓글 목록)
             LazyColumn(
                 state = listState,
-                modifier = Modifier.fillMaxSize(),
-                // 하단에 CommentInput 높이(약 56dp) + navigation bar 높이 + 여유 공간
-                contentPadding = PaddingValues(bottom = 60.dp + navigationBarHeight)
+                modifier = Modifier.fillMaxSize()
             ) {
                 // 게시글
                 item(key = "article") {
@@ -391,88 +442,33 @@ fun ArticleDetailScreen(
                 )
             }
 
-            // 하단 입력 영역 - 키보드와 함께 움직임
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-            ) {
-                // 이미지 프리뷰 (CommentInput 위에 표시) - old: cl_preview
-                selectedImageUri?.let { uri ->
+            // 이미지 프리뷰 오버레이 (하단에 딤드 배경으로 표시)
+            selectedImageUri?.let { uri ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                ) {
                     ImagePreview(
                         imageUri = uri,
                         isGif = isGifImage,
                         onClose = { commentViewModel.clearImage() }
                     )
                 }
+            }
 
-                // 이모티콘 프리뷰 (CommentInput 위에 표시)
-                selectedEmoticonUrl?.takeIf { it.isNotEmpty() }?.let { url ->
+            // 이모티콘 프리뷰 오버레이 (하단에 딤드 배경으로 표시)
+            selectedEmoticonUrl?.takeIf { it.isNotEmpty() }?.let { url ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                ) {
                     EmoticonPreview(
                         emoticonUrl = url,
                         onClose = { commentViewModel.clearEmoticon() }
                     )
                 }
-
-                // 댓글 입력창
-                CommentInput(
-                    value = commentText,
-                    onValueChange = commentViewModel::setCommentText,
-                    onSubmit = {
-                        val articleIdLong = article.id.toLongOrNull() ?: return@CommentInput
-                        // 이모티콘/이미지 없이 텍스트만 있는 경우 5글자 이상 필요
-                        val hasEmoticon = !selectedEmoticonUrl.isNullOrEmpty()
-                        val hasImage = selectedImageUri != null
-                        if (!hasEmoticon && !hasImage && commentText.trim().length < 5) {
-                            showCommentLengthDialog = true
-                            return@CommentInput
-                        }
-                        commentViewModel.submitComment(articleIdLong)
-                    },
-                    onAttachClick = {
-                        // 첨부 버튼 클릭 시 이미지 피커 열기 (old: btnGallery)
-                        imagePickerLauncher.launch("image/*")
-                    },
-                    onEmoticonClick = {
-                        // 이모티콘 버튼 클릭 시 키보드 내리고 패널 토글
-                        keyboardController?.hide()
-                        focusManager.clearFocus()
-                        commentViewModel.toggleEmoticonPanel()
-                    },
-                    isEmoticonPanelOpen = showEmoticonPanel,
-                    selectedEmoticonUrl = selectedEmoticonUrl,
-                    selectedImageUri = selectedImageUri,
-                    focusRequester = commentFocusRequester,
-                    onInputFocused = {
-                        // 입력창 포커스 시 이모티콘 패널 닫기
-                        commentViewModel.hideEmoticonPanel()
-                    }
-                )
-
-                // 이모티콘 패널 (댓글 입력창 아래에 표시)
-                ExoEmoticonPanel(
-                    visible = showEmoticonPanel,
-                    onEmoticonSelected = { emoticon ->
-                        val url = emoticon.imageUrl.ifEmpty { emoticon.thumbnail }
-                        commentViewModel.selectEmoticon(emoticon.id, url)
-                        // 이모티콘 선택 후 패널 닫고 댓글창 포커스
-                        commentViewModel.hideEmoticonPanel()
-                        commentFocusRequester.requestFocus()
-                    }
-                )
-
-                // Navigation bar + IME 영역 (배경색 적용)
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(ColorPalette.background100)
-                        .windowInsetsBottomHeight(
-                            if (!showEmoticonPanel)
-                                WindowInsets.navigationBars.union(WindowInsets.ime)
-                            else
-                                WindowInsets.navigationBars
-                        )
-                )
             }
 
             // 전체 화면 로딩 오버레이 (댓글 작성 중)

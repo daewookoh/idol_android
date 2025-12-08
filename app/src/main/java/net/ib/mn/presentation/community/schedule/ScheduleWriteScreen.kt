@@ -6,19 +6,27 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -29,11 +37,11 @@ import net.ib.mn.domain.model.ScheduleCategory
 import net.ib.mn.domain.model.ScheduleModel
 import net.ib.mn.presentation.community.schedule.ScheduleWriteContract.Effect
 import net.ib.mn.presentation.community.schedule.ScheduleWriteContract.Intent
-import net.ib.mn.presentation.community.schedule.ScheduleWriteContract.State
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoBottomSheet
 import net.ib.mn.ui.components.ExoBottomSheetType
 import net.ib.mn.ui.components.ExoConfirmDialog
+import net.ib.mn.ui.components.ExoDialog
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.util.LocaleUtil
 import java.text.DateFormat
@@ -41,7 +49,7 @@ import java.util.Date
 
 /**
  * 스케줄 작성/수정 화면
- * Old 프로젝트의 ScheduleWriteActivity를 Compose로 구현
+ * 표준 Scaffold + bottomBar 패턴 사용
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,12 +63,19 @@ fun ScheduleWriteScreen(
 ) {
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
 
     // 다이얼로그 상태
     var showBackConfirmDialog by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    var savedSchedule by remember { mutableStateOf<ScheduleModel?>(null) }
     var showCategorySheet by remember { mutableStateOf(false) }
     var showDateTimePicker by remember { mutableStateOf(false) }
     var showLocationPicker by remember { mutableStateOf(false) }
+
+    // 포커스 관리
+    val urlFocusRequester = remember { FocusRequester() }
+    val extraFocusRequester = remember { FocusRequester() }
 
     // 초기화
     LaunchedEffect(Unit) {
@@ -73,15 +88,14 @@ fun ScheduleWriteScreen(
             when (effect) {
                 is Effect.NavigateBack -> onNavigateBack()
                 is Effect.NavigateBackWithResult -> onNavigateBackWithResult(effect.schedule)
-                is Effect.ShowToast -> Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                is Effect.ShowSuccessDialog -> {
+                    savedSchedule = effect.schedule
+                    showSuccessDialog = true
+                }
                 is Effect.ShowCategorySelector -> showCategorySheet = true
                 is Effect.ShowDateTimePicker -> showDateTimePicker = true
-                is Effect.ShowIdolSelector -> {
-                    // TODO: 아이돌 선택 화면 구현
-                }
-                is Effect.ShowLocationSelector -> {
-                    showLocationPicker = true
-                }
+                is Effect.ShowIdolSelector -> { /* TODO */ }
+                is Effect.ShowLocationSelector -> showLocationPicker = true
                 is Effect.ShowBackConfirmDialog -> showBackConfirmDialog = true
                 is Effect.ShowError -> Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
             }
@@ -93,140 +107,170 @@ fun ScheduleWriteScreen(
         viewModel.sendIntent(Intent.OnBackPressed)
     }
 
+    // Scaffold 사용 - contentWindowInsets를 0으로 설정하여 직접 제어
     Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(), // 전체 Scaffold에 imePadding 적용
         topBar = {
             ExoAppBar(
                 title = stringResource(R.string.schedule_write),
                 onNavigationClick = { viewModel.sendIntent(Intent.OnBackPressed) }
             )
         },
-        containerColor = ColorPalette.background100
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // 스크롤 가능한 컨텐츠
+        bottomBar = {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(bottom = 80.dp) // 하단 버튼 공간 확보
-            ) {
-                // 제목 입력 (필수)
-                ScheduleInputRow(
-                    isRequired = true,
-                    value = state.title,
-                    hint = stringResource(R.string.schedule_title),
-                    onValueChange = { viewModel.sendIntent(Intent.OnTitleChanged(it)) }
-                )
-
-                // 카테고리 선택 (필수)
-                ScheduleSelectRow(
-                    isRequired = true,
-                    label = if (state.category != null) stringResource(R.string.schedule_category) else null,
-                    hint = stringResource(R.string.schedule_category),
-                    value = state.category?.let { stringResource(it.labelResId) },
-                    leadingIcon = state.category?.iconResId,
-                    onClick = { viewModel.sendIntent(Intent.OnShowCategorySelector) }
-                )
-
-                // 아이돌 선택 (필수, CELEB이 아닌 경우만)
-                if (!BuildConfig.CELEB) {
-                    ScheduleSelectRow(
-                        isRequired = true,
-                        label = if (state.selectedIdols.isNotEmpty()) {
-                            if (BuildConfig.CELEB) stringResource(R.string.actor) else stringResource(R.string.stats_idol)
-                        } else null,
-                        hint = if (BuildConfig.CELEB) stringResource(R.string.actor) else stringResource(R.string.stats_idol),
-                        value = state.idolDisplayName.ifEmpty { null },
-                        showArrow = state.canSelectIdol,
-                        onClick = if (state.canSelectIdol) {
-                            { viewModel.sendIntent(Intent.OnShowIdolSelector) }
-                        } else null
-                    )
-                }
-
-                // 하루종일 체크박스
-                ScheduleCheckboxRow(
-                    label = stringResource(R.string.schedule_allday),
-                    isChecked = state.isAllDay,
-                    enabled = state.category?.isAllDayOnly != true,
-                    onCheckedChange = { viewModel.sendIntent(Intent.OnAllDayChanged(it)) }
-                )
-
-                // 날짜/시간 선택 (필수)
-                ScheduleSelectRow(
-                    isRequired = true,
-                    label = stringResource(R.string.schedule_time),
-                    hint = stringResource(R.string.schedule_time),
-                    value = formatDateTime(context, state.selectedDate, state.isAllDay),
-                    onClick = { viewModel.sendIntent(Intent.OnShowDateTimePicker) }
-                )
-
-                // 위치 선택 (선택사항, 중국 버전 제외)
-                if (!BuildConfig.CHINA) {
-                    ScheduleLocationRow(
-                        label = if (state.location.isNotEmpty()) stringResource(R.string.schedule_location) else null,
-                        hint = stringResource(R.string.schedule_location),
-                        value = state.location.ifEmpty { null },
-                        onLocationClick = { viewModel.sendIntent(Intent.OnShowLocationSelector) },
-                        onClearClick = if (state.location.isNotEmpty()) {
-                            { viewModel.sendIntent(Intent.OnLocationCleared) }
-                        } else null
-                    )
-                }
-
-                // URL 입력 (선택사항)
-                ScheduleInputRow(
-                    isRequired = false,
-                    value = state.url,
-                    hint = "URL",
-                    onValueChange = { viewModel.sendIntent(Intent.OnUrlChanged(it)) }
-                )
-
-                // 추가 정보 입력 (선택사항)
-                ScheduleMultiLineInputRow(
-                    hint = stringResource(R.string.schedule_info),
-                    value = state.extra,
-                    onValueChange = { viewModel.sendIntent(Intent.OnExtraChanged(it)) }
-                )
-            }
-
-            // 플로팅 저장 버튼 (키보드와 함께 올라옴)
-            Button(
-                onClick = { viewModel.sendIntent(Intent.OnSubmit) },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .imePadding()
-                    .padding(10.dp)
-                    .height(50.dp),
-                enabled = state.canSubmit,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = ColorPalette.main,
-                    disabledContainerColor = ColorPalette.gray200
-                )
+                    .background(ColorPalette.background100)
+                    .navigationBarsPadding()
             ) {
-                if (state.isSaving) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = Color.White,
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(
-                        text = stringResource(R.string.lable_save),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                Button(
+                    onClick = {
+                        focusManager.clearFocus()
+                        viewModel.sendIntent(Intent.OnSubmit)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                        .height(50.dp),
+                    enabled = state.canSubmit && !state.isSaving,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ColorPalette.main,
+                        disabledContainerColor = ColorPalette.gray200
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    if (state.isSaving) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.lable_save),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
+        },
+        containerColor = ColorPalette.background100,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0) // 모든 inset 직접 제어
+    ) { innerPadding ->
+        // 스크롤 가능한 콘텐츠 - innerPadding으로 정확한 영역 계산
+        val scrollState = rememberScrollState()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(scrollState)
+        ) {
+            // 제목 입력 (필수)
+            InputRow(
+                isRequired = true,
+                value = state.title,
+                hint = stringResource(R.string.schedule_title),
+                onValueChange = { viewModel.sendIntent(Intent.OnTitleChanged(it)) },
+                imeAction = ImeAction.Next,
+                onImeAction = { urlFocusRequester.requestFocus() }
+            )
+
+            // 카테고리 선택 (필수)
+            SelectRow(
+                isRequired = true,
+                label = state.category?.let { stringResource(R.string.schedule_category) },
+                hint = stringResource(R.string.schedule_category),
+                value = state.category?.let { stringResource(it.labelResId) },
+                leadingIcon = state.category?.iconResId,
+                onClick = {
+                    focusManager.clearFocus()
+                    viewModel.sendIntent(Intent.OnShowCategorySelector)
+                }
+            )
+
+            // 아이돌 선택
+            if (!BuildConfig.CELEB) {
+                SelectRow(
+                    isRequired = true,
+                    label = if (state.selectedIdols.isNotEmpty()) stringResource(R.string.stats_idol) else null,
+                    hint = stringResource(R.string.stats_idol),
+                    value = state.idolDisplayName.ifEmpty { null },
+                    showArrow = state.canSelectIdol,
+                    onClick = if (state.canSelectIdol) {
+                        {
+                            focusManager.clearFocus()
+                            viewModel.sendIntent(Intent.OnShowIdolSelector)
+                        }
+                    } else null
+                )
+            }
+
+            // 하루종일 체크박스
+            CheckboxRow(
+                label = stringResource(R.string.schedule_allday),
+                isChecked = state.isAllDay,
+                enabled = state.category?.isAllDayOnly != true,
+                onCheckedChange = {
+                    focusManager.clearFocus()
+                    viewModel.sendIntent(Intent.OnAllDayChanged(it))
+                }
+            )
+
+            // 날짜/시간 선택 (필수)
+            SelectRow(
+                isRequired = true,
+                label = stringResource(R.string.schedule_time),
+                hint = stringResource(R.string.schedule_time),
+                value = formatDateTime(context, state.selectedDate, state.isAllDay),
+                onClick = {
+                    focusManager.clearFocus()
+                    viewModel.sendIntent(Intent.OnShowDateTimePicker)
+                }
+            )
+
+            // 위치 선택
+            if (!BuildConfig.CHINA) {
+                LocationRow(
+                    label = if (state.location.isNotEmpty()) stringResource(R.string.schedule_location) else null,
+                    hint = stringResource(R.string.schedule_location),
+                    value = state.location.ifEmpty { null },
+                    onLocationClick = {
+                        focusManager.clearFocus()
+                        viewModel.sendIntent(Intent.OnShowLocationSelector)
+                    },
+                    onClearClick = if (state.location.isNotEmpty()) {
+                        { viewModel.sendIntent(Intent.OnLocationCleared) }
+                    } else null
+                )
+            }
+
+            // URL 입력
+            InputRow(
+                isRequired = false,
+                value = state.url,
+                hint = "URL",
+                onValueChange = { viewModel.sendIntent(Intent.OnUrlChanged(it)) },
+                focusRequester = urlFocusRequester,
+                keyboardType = KeyboardType.Uri,
+                imeAction = ImeAction.Next,
+                onImeAction = { extraFocusRequester.requestFocus() }
+            )
+
+            // 추가 정보 입력
+            MultiLineInputRow(
+                hint = stringResource(R.string.schedule_info),
+                value = state.extra,
+                onValueChange = { viewModel.sendIntent(Intent.OnExtraChanged(it)) },
+                focusRequester = extraFocusRequester,
+                onImeAction = { focusManager.clearFocus() }
+            )
         }
     }
 
-    // 뒤로가기 확인 다이얼로그
+    // 다이얼로그들
     if (showBackConfirmDialog) {
         ExoConfirmDialog(
             title = "",
@@ -241,9 +285,8 @@ fun ScheduleWriteScreen(
         )
     }
 
-    // 카테고리 선택 바텀시트
     if (showCategorySheet) {
-        CategorySelectorBottomSheet(
+        CategoryBottomSheet(
             onCategorySelected = { category ->
                 viewModel.sendIntent(Intent.OnCategorySelected(category))
                 showCategorySheet = false
@@ -252,9 +295,8 @@ fun ScheduleWriteScreen(
         )
     }
 
-    // 날짜/시간 선택 다이얼로그
     if (showDateTimePicker) {
-        ScheduleDateTimePickerDialog(
+        DateTimePickerDialog(
             initialDate = state.selectedDate,
             isAllDay = state.isAllDay,
             onDateSelected = { date ->
@@ -265,78 +307,92 @@ fun ScheduleWriteScreen(
         )
     }
 
-    // 위치 선택 화면
     if (showLocationPicker) {
         ScheduleLocationScreen(
             initialLatitude = state.latitude.toDoubleOrNull() ?: 37.5192336,
             initialLongitude = state.longitude.toDoubleOrNull() ?: 127.1250279,
-            onLocationSelected = { address, latitude, longitude ->
-                viewModel.sendIntent(Intent.OnLocationSelected(address, latitude, longitude))
+            onLocationSelected = { address, lat, lng ->
+                viewModel.sendIntent(Intent.OnLocationSelected(address, lat, lng))
                 showLocationPicker = false
             },
             onNavigateBack = { showLocationPicker = false }
         )
     }
+
+    // 저장 완료 다이얼로그
+    if (showSuccessDialog && savedSchedule != null) {
+        ExoDialog(
+            message = "스케줄이 저장되었습니다.",
+            onDismiss = { },
+            confirmButtonText = stringResource(R.string.confirm),
+            onConfirm = {
+                showSuccessDialog = false
+                savedSchedule?.let { onNavigateBackWithResult(it) }
+            },
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false
+        )
+    }
 }
 
 // ============================================================
-// Input Row Components
+// 입력 컴포넌트
 // ============================================================
 
 @Composable
-private fun ScheduleInputRow(
+private fun InputRow(
     isRequired: Boolean,
     value: String,
     hint: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    focusRequester: FocusRequester? = null,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Default,
+    onImeAction: (() -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp)
-            .background(ColorPalette.background100)
             .padding(horizontal = 17.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (isRequired) {
-            Text(
-                text = "*",
-                fontSize = 14.sp,
-                color = ColorPalette.main,
-                modifier = Modifier.width(8.5.dp)
-            )
-        } else {
-            Spacer(modifier = Modifier.width(8.5.dp))
-        }
+        Text(
+            text = if (isRequired) "*" else "",
+            fontSize = 14.sp,
+            color = ColorPalette.main,
+            modifier = Modifier.width(10.dp)
+        )
+
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = Modifier.weight(1f),
-            textStyle = TextStyle(
-                fontSize = 14.sp,
-                color = ColorPalette.textDefault
-            ),
-            cursorBrush = SolidColor(ColorPalette.textDefault),
+            modifier = Modifier
+                .weight(1f)
+                .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier),
+            textStyle = TextStyle(fontSize = 14.sp, color = ColorPalette.textDefault),
+            cursorBrush = SolidColor(ColorPalette.main),
             singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
+            keyboardActions = KeyboardActions(
+                onNext = { onImeAction?.invoke() },
+                onDone = { onImeAction?.invoke() }
+            ),
             decorationBox = { innerTextField ->
                 Box {
                     if (value.isEmpty()) {
-                        Text(
-                            text = hint,
-                            fontSize = 14.sp,
-                            color = ColorPalette.textDimmed
-                        )
+                        Text(text = hint, fontSize = 14.sp, color = ColorPalette.textDimmed)
                     }
                     innerTextField()
                 }
             }
         )
     }
-    HorizontalDivider(thickness = 1.dp, color = ColorPalette.gray110)
+    HorizontalDivider(color = ColorPalette.gray110)
 }
 
 @Composable
-private fun ScheduleSelectRow(
+private fun SelectRow(
     isRequired: Boolean,
     label: String?,
     hint: String,
@@ -349,21 +405,16 @@ private fun ScheduleSelectRow(
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp)
-            .background(ColorPalette.background100)
             .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
             .padding(horizontal = 17.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (isRequired) {
-            Text(
-                text = "*",
-                fontSize = 14.sp,
-                color = ColorPalette.main,
-                modifier = Modifier.width(8.5.dp)
-            )
-        } else {
-            Spacer(modifier = Modifier.width(8.5.dp))
-        }
+        Text(
+            text = if (isRequired) "*" else "",
+            fontSize = 14.sp,
+            color = ColorPalette.main,
+            modifier = Modifier.width(10.dp)
+        )
 
         Text(
             text = label ?: hint,
@@ -373,9 +424,9 @@ private fun ScheduleSelectRow(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        leadingIcon?.let { iconRes ->
+        leadingIcon?.let {
             Icon(
-                painter = painterResource(iconRes),
+                painter = painterResource(it),
                 contentDescription = null,
                 modifier = Modifier.size(20.dp),
                 tint = Color.Unspecified
@@ -383,13 +434,9 @@ private fun ScheduleSelectRow(
             Spacer(modifier = Modifier.width(10.dp))
         }
 
-        value?.let { text ->
-            Text(
-                text = text,
-                fontSize = 12.sp,
-                color = ColorPalette.textDefault,
-                modifier = Modifier.padding(end = 14.dp)
-            )
+        value?.let {
+            Text(text = it, fontSize = 12.sp, color = ColorPalette.textDefault)
+            Spacer(modifier = Modifier.width(14.dp))
         }
 
         if (showArrow && onClick != null) {
@@ -401,11 +448,11 @@ private fun ScheduleSelectRow(
             )
         }
     }
-    HorizontalDivider(thickness = 1.dp, color = ColorPalette.gray110)
+    HorizontalDivider(color = ColorPalette.gray110)
 }
 
 @Composable
-private fun ScheduleCheckboxRow(
+private fun CheckboxRow(
     label: String,
     isChecked: Boolean,
     enabled: Boolean = true,
@@ -415,27 +462,16 @@ private fun ScheduleCheckboxRow(
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp)
-            .background(ColorPalette.background100)
             .clickable(enabled = enabled) { onCheckedChange(!isChecked) }
             .padding(horizontal = 26.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = if (isChecked) label else "",
+            text = label,
             fontSize = 14.sp,
             color = if (isChecked) ColorPalette.textDefault else ColorPalette.textDimmed
         )
-
-        if (!isChecked) {
-            Text(
-                text = label,
-                fontSize = 14.sp,
-                color = ColorPalette.textDimmed
-            )
-        }
-
         Spacer(modifier = Modifier.weight(1f))
-
         Checkbox(
             checked = isChecked,
             onCheckedChange = if (enabled) onCheckedChange else null,
@@ -445,11 +481,11 @@ private fun ScheduleCheckboxRow(
             )
         )
     }
-    HorizontalDivider(thickness = 1.dp, color = ColorPalette.gray110)
+    HorizontalDivider(color = ColorPalette.gray110)
 }
 
 @Composable
-private fun ScheduleLocationRow(
+private fun LocationRow(
     label: String?,
     hint: String,
     value: String?,
@@ -460,7 +496,6 @@ private fun ScheduleLocationRow(
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp)
-            .background(ColorPalette.background100)
             .clickable { onLocationClick() }
             .padding(horizontal = 26.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -470,14 +505,10 @@ private fun ScheduleLocationRow(
             fontSize = 14.sp,
             color = if (label != null) ColorPalette.textDefault else ColorPalette.textDimmed
         )
-
         Spacer(modifier = Modifier.weight(1f))
 
-        onClearClick?.let { clearAction ->
-            IconButton(
-                onClick = clearAction,
-                modifier = Modifier.size(24.dp)
-            ) {
+        onClearClick?.let {
+            IconButton(onClick = it, modifier = Modifier.size(24.dp)) {
                 Icon(
                     painter = painterResource(R.drawable.btn_cancel_schedule_place),
                     contentDescription = "Clear",
@@ -487,13 +518,9 @@ private fun ScheduleLocationRow(
             }
         }
 
-        value?.let { text ->
-            Text(
-                text = text,
-                fontSize = 12.sp,
-                color = ColorPalette.textDefault,
-                modifier = Modifier.padding(end = 14.dp)
-            )
+        value?.let {
+            Text(text = it, fontSize = 12.sp, color = ColorPalette.textDefault)
+            Spacer(modifier = Modifier.width(14.dp))
         }
 
         Icon(
@@ -503,55 +530,53 @@ private fun ScheduleLocationRow(
             tint = ColorPalette.gray300
         )
     }
-    HorizontalDivider(thickness = 1.dp, color = ColorPalette.gray110)
+    HorizontalDivider(color = ColorPalette.gray110)
 }
 
 @Composable
-private fun ScheduleMultiLineInputRow(
+private fun MultiLineInputRow(
     hint: String,
     value: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    focusRequester: FocusRequester? = null,
+    onImeAction: (() -> Unit)? = null
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
-            .background(ColorPalette.background100)
             .padding(horizontal = 26.dp, vertical = 15.dp)
     ) {
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = Modifier.fillMaxSize(),
-            textStyle = TextStyle(
-                fontSize = 14.sp,
-                color = ColorPalette.textDefault
-            ),
-            cursorBrush = SolidColor(ColorPalette.textDefault),
+            modifier = Modifier
+                .fillMaxSize()
+                .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier),
+            textStyle = TextStyle(fontSize = 14.sp, color = ColorPalette.textDefault),
+            cursorBrush = SolidColor(ColorPalette.main),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { onImeAction?.invoke() }),
             decorationBox = { innerTextField ->
                 Box {
                     if (value.isEmpty()) {
-                        Text(
-                            text = hint,
-                            fontSize = 14.sp,
-                            color = ColorPalette.textDimmed
-                        )
+                        Text(text = hint, fontSize = 14.sp, color = ColorPalette.textDimmed)
                     }
                     innerTextField()
                 }
             }
         )
     }
-    HorizontalDivider(thickness = 1.dp, color = ColorPalette.gray110)
+    HorizontalDivider(color = ColorPalette.gray110)
 }
 
 // ============================================================
-// Bottom Sheet & Dialog Components
+// 바텀시트 & 다이얼로그
 // ============================================================
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CategorySelectorBottomSheet(
+private fun CategoryBottomSheet(
     onCategorySelected: (ScheduleCategory) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -595,16 +620,14 @@ private fun CategorySelectorBottomSheet(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ScheduleDateTimePickerDialog(
+private fun DateTimePickerDialog(
     initialDate: Date,
     isAllDay: Boolean,
     onDateSelected: (Date) -> Unit,
     onDismiss: () -> Unit
 ) {
-    // 단계: 0 = 날짜 선택, 1 = 시간 선택
     var step by remember { mutableIntStateOf(0) }
     var selectedDateMillis by remember { mutableLongStateOf(initialDate.time) }
-
     val calendar = remember { java.util.Calendar.getInstance() }
 
     @Suppress("DEPRECATION")
@@ -613,41 +636,27 @@ private fun ScheduleDateTimePickerDialog(
     val initialMinute = remember { initialDate.minutes }
 
     if (step == 0) {
-        // 날짜 선택
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = selectedDateMillis
-        )
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = selectedDateMillis)
 
         DatePickerDialog(
             onDismissRequest = onDismiss,
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        datePickerState.selectedDateMillis?.let { millis ->
-                            selectedDateMillis = millis
-                            if (isAllDay) {
-                                // 종일인 경우 바로 완료
-                                onDateSelected(Date(millis))
-                            } else {
-                                // 시간 선택으로 이동
-                                step = 1
-                            }
-                        }
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        selectedDateMillis = millis
+                        if (isAllDay) onDateSelected(Date(millis)) else step = 1
                     }
-                ) {
+                }) {
                     Text(stringResource(if (isAllDay) R.string.confirm else R.string.btn_next))
                 }
             },
             dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.btn_cancel))
-                }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.btn_cancel)) }
             }
         ) {
             DatePicker(state = datePickerState)
         }
     } else {
-        // 시간 선택
         val timePickerState = rememberTimePickerState(
             initialHour = initialHour,
             initialMinute = initialMinute,
@@ -657,34 +666,22 @@ private fun ScheduleDateTimePickerDialog(
         AlertDialog(
             onDismissRequest = onDismiss,
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        calendar.timeInMillis = selectedDateMillis
-                        calendar.set(java.util.Calendar.HOUR_OF_DAY, timePickerState.hour)
-                        calendar.set(java.util.Calendar.MINUTE, timePickerState.minute)
-                        calendar.set(java.util.Calendar.SECOND, 0)
-                        onDateSelected(calendar.time)
-                    }
-                ) {
+                TextButton(onClick = {
+                    calendar.timeInMillis = selectedDateMillis
+                    calendar.set(java.util.Calendar.HOUR_OF_DAY, timePickerState.hour)
+                    calendar.set(java.util.Calendar.MINUTE, timePickerState.minute)
+                    calendar.set(java.util.Calendar.SECOND, 0)
+                    onDateSelected(calendar.time)
+                }) {
                     Text(stringResource(R.string.confirm))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { step = 0 }) {
-                    Text(stringResource(R.string.btn_cancel))
-                }
+                TextButton(onClick = { step = 0 }) { Text(stringResource(R.string.btn_cancel)) }
             },
-            title = {
-                Text(
-                    text = stringResource(R.string.schedule_time),
-                    fontWeight = FontWeight.Bold
-                )
-            },
+            title = { Text(stringResource(R.string.schedule_time), fontWeight = FontWeight.Bold) },
             text = {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     TimePicker(state = timePickerState)
                 }
             }
@@ -693,7 +690,7 @@ private fun ScheduleDateTimePickerDialog(
 }
 
 // ============================================================
-// Utility Functions
+// 유틸리티
 // ============================================================
 
 private fun formatDateTime(context: android.content.Context, date: Date, isAllDay: Boolean): String {

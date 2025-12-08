@@ -234,12 +234,13 @@ fun CommentInput(
 fun EmoticonPreview(
     emoticonUrl: String,
     onClose: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = Color.Black.copy(alpha = 0.3f)
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color.Black.copy(alpha = 0.3f))
+            .background(backgroundColor)
             .padding(vertical = 2.dp)
     ) {
         // X 버튼 - 우측 상단
@@ -280,12 +281,13 @@ fun ImagePreview(
     imageUri: android.net.Uri,
     isGif: Boolean = false,
     onClose: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = Color.Black.copy(alpha = 0.3f)
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color.Black.copy(alpha = 0.3f))
+            .background(backgroundColor)
             .padding(vertical = 2.dp)
     ) {
         // X 버튼 - 우측 상단

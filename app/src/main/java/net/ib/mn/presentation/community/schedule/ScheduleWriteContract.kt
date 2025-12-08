@@ -91,7 +91,7 @@ class ScheduleWriteContract {
     sealed class Effect : UiEffect {
         data object NavigateBack : Effect()
         data class NavigateBackWithResult(val schedule: ScheduleModel) : Effect()
-        data class ShowToast(val message: String) : Effect()
+        data class ShowSuccessDialog(val schedule: ScheduleModel) : Effect()
         data object ShowCategorySelector : Effect()
         data object ShowDateTimePicker : Effect()
         data object ShowIdolSelector : Effect()

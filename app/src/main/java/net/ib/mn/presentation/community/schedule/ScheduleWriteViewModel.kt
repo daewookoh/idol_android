@@ -259,8 +259,7 @@ class ScheduleWriteViewModel @Inject constructor(
                         is ApiResult.Success -> {
                             logD(TAG, "Schedule saved successfully: ${result.data.id}")
                             setState { copy(isSaving = false) }
-                            setEffect { Effect.ShowToast("스케줄이 저장되었습니다.") }
-                            setEffect { Effect.NavigateBackWithResult(result.data) }
+                            setEffect { Effect.ShowSuccessDialog(result.data) }
                         }
                         is ApiResult.Error -> {
                             logE(TAG, "Schedule save failed: ${result.error.message}")
