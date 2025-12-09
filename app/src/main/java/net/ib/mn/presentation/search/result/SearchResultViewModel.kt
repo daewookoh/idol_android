@@ -14,6 +14,8 @@ import net.ib.mn.domain.model.SearchSupportModel
 import net.ib.mn.domain.model.SearchWallpaperModel
 import net.ib.mn.domain.repository.FavoritesRepository
 import net.ib.mn.domain.repository.SearchRepository
+import net.ib.mn.data.repository.UserCacheRepository
+import net.ib.mn.data.repository.UsersRepository
 import javax.inject.Inject
 
 /**
@@ -32,7 +34,9 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchResultViewModel @Inject constructor(
     private val searchRepository: SearchRepository,
-    private val favoritesRepository: FavoritesRepository
+    private val favoritesRepository: FavoritesRepository,
+    private val usersRepository: UsersRepository,
+    private val userCacheRepository: UserCacheRepository
 ) : BaseViewModel<SearchResultContract.State, SearchResultContract.Intent, SearchResultContract.Effect>() {
 
     companion object {
@@ -45,6 +49,7 @@ class SearchResultViewModel @Inject constructor(
     override fun handleIntent(intent: SearchResultContract.Intent) {
         when (intent) {
             is SearchResultContract.Intent.Search -> search(intent.keyword)
+            is SearchResultContract.Intent.UpdateSearchQuery -> updateSearchQuery(intent.query)
             is SearchResultContract.Intent.NewSearch -> newSearch(intent.keyword)
             is SearchResultContract.Intent.ShowAllIdols -> showAllIdols()
             is SearchResultContract.Intent.ShowAllSupports -> showAllSupports()
@@ -52,6 +57,7 @@ class SearchResultViewModel @Inject constructor(
             is SearchResultContract.Intent.LoadMoreArticles -> loadMoreArticles()
             is SearchResultContract.Intent.ToggleFavorite -> toggleFavorite(intent.idol)
             is SearchResultContract.Intent.SetMost -> handleSetMost(intent.idol)
+            is SearchResultContract.Intent.ConfirmSetMost -> confirmSetMost(intent.idol)
             is SearchResultContract.Intent.ClickIdol -> handleIdolClick(intent.idol)
             is SearchResultContract.Intent.ClickIdolCommunity -> handleIdolCommunityClick(intent.idol)
             is SearchResultContract.Intent.ClickIdolSmallTalk -> handleIdolSmallTalkClick(intent.idol)
@@ -61,6 +67,13 @@ class SearchResultViewModel @Inject constructor(
             is SearchResultContract.Intent.ClickArticle -> handleArticleClick(intent.article)
             is SearchResultContract.Intent.NavigateBack -> setEffect { SearchResultContract.Effect.NavigateBack }
         }
+    }
+
+    /**
+     * 검색어 업데이트 (UI 상태만 변경)
+     */
+    private fun updateSearchQuery(query: String) {
+        setState { copy(keyword = query) }
     }
 
     /**
@@ -95,10 +108,20 @@ class SearchResultViewModel @Inject constructor(
                                 data.smallTalks.isEmpty() &&
                                 data.articles.isEmpty()
 
+                        // 즐겨찾기/최애 상태 적용
+                        val favoriteIds = userCacheRepository.getFavoriteIdolIds()
+                        val mostIdolId = userCacheRepository.getMostIdolId()
+                        val idolsWithState = data.idols.map { idol ->
+                            idol.copy(
+                                isFavorite = favoriteIds.contains(idol.id),
+                                isMost = idol.id == mostIdolId
+                            )
+                        }
+
                         setState {
                             copy(
                                 isLoading = false,
-                                idols = data.idols,
+                                idols = idolsWithState,
                                 supports = data.supports,
                                 wallpapers = data.wallpapers,
                                 smallTalks = data.smallTalks,
@@ -251,8 +274,14 @@ class SearchResultViewModel @Inject constructor(
 
     /**
      * 즐겨찾기 토글
+     * 최애인 경우 즐겨찾기 해제 불가 (Old 프로젝트와 동일)
      */
     private fun toggleFavorite(idol: SearchIdolModel) {
+        // 최애인 경우 즐겨찾기 해제 불가
+        if (idol.isMost && idol.isFavorite) {
+            return
+        }
+
         viewModelScope.launch {
             try {
                 val newFavoriteState = !idol.isFavorite
@@ -285,10 +314,85 @@ class SearchResultViewModel @Inject constructor(
     }
 
     /**
-     * 최애 설정 처리
+     * 최애 설정 처리 (다이얼로그 표시)
      */
     private fun handleSetMost(idol: SearchIdolModel) {
         setEffect { SearchResultContract.Effect.ShowSetMostDialog(idol) }
+    }
+
+    /**
+     * 최애 설정 확정 (다이얼로그에서 확인 버튼 클릭 시)
+     */
+    private fun confirmSetMost(idol: SearchIdolModel) {
+        viewModelScope.launch {
+            try {
+                val userResourceUri = userCacheRepository.getUserResourceUri()
+                if (userResourceUri == null) {
+                    setEffect { SearchResultContract.Effect.ShowToast("로그인이 필요합니다.") }
+                    return@launch
+                }
+
+                val currentIsMost = idol.isMost
+                val idolResourceUri = if (currentIsMost) {
+                    null // 최애 해제
+                } else {
+                    idol.resourceUri ?: "/api/v1/idols/${idol.id}/"
+                }
+
+                val result = usersRepository.updateMost(userResourceUri, idolResourceUri)
+                result.onSuccess {
+                    val newIsMost = !currentIsMost
+
+                    // UI 상태 업데이트
+                    updateIdolMostState(idol.id, newIsMost)
+
+                    // 최애 설정 시 즐겨찾기도 자동으로 on
+                    if (newIsMost) {
+                        updateIdolFavoriteState(idol.id, true)
+                    }
+
+                    // 로컬 캐시 업데이트
+                    if (newIsMost) {
+                        userCacheRepository.updateMostIdolCache(
+                            idolId = idol.id,
+                            idolCategory = idol.category,
+                            idolChartCode = idol.chartCodes?.firstOrNull()
+                        )
+                        // 최애 설정 시 즐겨찾기 캐시에도 추가
+                        if (!userCacheRepository.getFavoriteIdolIds().contains(idol.id)) {
+                            userCacheRepository.addFavoriteToCache(idol.id, -1)
+                        }
+                    } else {
+                        userCacheRepository.updateMostIdolCache(
+                            idolId = null,
+                            idolCategory = null,
+                            idolChartCode = null
+                        )
+                    }
+                }.onFailure { e ->
+                    setEffect { SearchResultContract.Effect.ShowToast(e.message ?: "최애 설정에 실패했습니다.") }
+                }
+            } catch (e: Exception) {
+                setEffect { SearchResultContract.Effect.ShowToast(e.message ?: "최애 설정에 실패했습니다.") }
+            }
+        }
+    }
+
+    private fun updateIdolMostState(idolId: Int, isMost: Boolean) {
+        setState {
+            copy(
+                idols = idols.map {
+                    // 새로운 최애가 설정되면 기존 최애 해제
+                    if (isMost && it.isMost && it.id != idolId) {
+                        it.copy(isMost = false)
+                    } else if (it.id == idolId) {
+                        it.copy(isMost = isMost)
+                    } else {
+                        it
+                    }
+                }
+            )
+        }
     }
 
     /**

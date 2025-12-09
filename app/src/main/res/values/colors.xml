@@ -114,6 +114,10 @@
     <!-- 애돌/셀럽 투표수 색상 -->
     <color name="text_heart_votes">#ffffff</color>
 
+    <!-- 검색 결과 프로그레스바 색상 -->
+    <color name="progressbar_bg">#eeeeee</color>
+    <color name="progressbar_fill">#ff4444</color>
+
     <color name="text_default_opacity_60">#99333333</color>
 
     <color name="gray1000_opacity_60">#99000000</color>

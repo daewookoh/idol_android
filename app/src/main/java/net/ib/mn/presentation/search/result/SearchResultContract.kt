@@ -111,6 +111,11 @@ class SearchResultContract {
         data class Search(val keyword: String) : Intent()
 
         /**
+         * 검색어 업데이트
+         */
+        data class UpdateSearchQuery(val query: String) : Intent()
+
+        /**
          * 새 검색 (SearchScreen에서 재검색)
          */
         data class NewSearch(val keyword: String) : Intent()
@@ -141,9 +146,14 @@ class SearchResultContract {
         data class ToggleFavorite(val idol: SearchIdolModel) : Intent()
 
         /**
-         * 최애 설정
+         * 최애 설정 (다이얼로그 표시)
          */
         data class SetMost(val idol: SearchIdolModel) : Intent()
+
+        /**
+         * 최애 설정 확정 (다이얼로그 확인 후)
+         */
+        data class ConfirmSetMost(val idol: SearchIdolModel) : Intent()
 
         /**
          * 아이돌 클릭
