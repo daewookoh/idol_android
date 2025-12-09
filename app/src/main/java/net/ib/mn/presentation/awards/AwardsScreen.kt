@@ -1,7 +1,7 @@
 package net.ib.mn.presentation.awards
 
-import android.content.Intent
 import androidx.activity.compose.BackHandler
+import net.ib.mn.util.IntentUtil
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -136,11 +136,7 @@ fun AwardsScreen(
                         actions = {
                             IconButton(
                                 onClick = {
-                                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                        putExtra(Intent.EXTRA_TEXT, viewModel.getShareMessage())
-                                        type = "text/plain"
-                                    }
-                                    context.startActivity(Intent.createChooser(shareIntent, null))
+                                    IntentUtil.shareText(context, viewModel.getShareMessage())
                                 },
                             ) {
                                 Icon(
@@ -212,10 +208,10 @@ fun AwardsScreen(
             exit = slideOutHorizontally(targetOffsetX = { it })
         ) {
             selectedCommunityRankingItem?.let { rankingItem ->
+                val idolId = rankingItem.id.toIntOrNull() ?: return@let
                 CommunityScreen(
-                    rankingItem = rankingItem,
+                    idolId = idolId,
                     showChattingTab = false,
-                    fandomName = rankingItem.fandomName,
                     onBackClick = { selectedCommunityRankingItem = null }
                 )
             }

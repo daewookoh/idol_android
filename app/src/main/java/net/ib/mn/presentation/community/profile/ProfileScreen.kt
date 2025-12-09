@@ -1,8 +1,8 @@
 package net.ib.mn.presentation.community.profile
 
-import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.BackHandler
+import net.ib.mn.util.IntentUtil
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -1131,16 +1131,7 @@ private fun ClickableStatusMessage(
                 annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
                     .firstOrNull()?.let { annotation ->
                         // URL 열기
-                        var url = annotation.item
-                        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                            url = "https://$url"
-                        }
-                        try {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                            context.startActivity(intent)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
+                        IntentUtil.openUrl(context, annotation.item)
                     }
             },
             style = TextStyle(

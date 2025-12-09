@@ -1,7 +1,7 @@
 package net.ib.mn.presentation.community.schedule
 
-import android.content.Intent
 import android.widget.Toast
+import net.ib.mn.util.IntentUtil
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -100,27 +100,10 @@ fun ScheduleDetailScreen(
                     onNavigateToComments(effect.schedule)
                 }
                 is ScheduleDetailContract.Effect.OpenMapIntent -> {
-                    try {
-                        val intent = Intent(
-                            Intent.ACTION_VIEW,
-                            "geo:0,0?q=${effect.location}".toUri()
-                        )
-                        intent.setClassName(
-                            "com.google.android.apps.maps",
-                            "com.google.android.maps.MapsActivity"
-                        )
-                        context.startActivity(intent)
-                    } catch (e: Exception) {
-                        Toast.makeText(context, R.string.msg_error_ok, Toast.LENGTH_SHORT).show()
-                    }
+                    IntentUtil.openMap(context, effect.location)
                 }
                 is ScheduleDetailContract.Effect.OpenUrlIntent -> {
-                    try {
-                        val intent = Intent(Intent.ACTION_VIEW, effect.url.toUri())
-                        context.startActivity(intent)
-                    } catch (e: Exception) {
-                        Toast.makeText(context, R.string.msg_error_ok, Toast.LENGTH_SHORT).show()
-                    }
+                    IntentUtil.openUrl(context, effect.url)
                 }
                 is ScheduleDetailContract.Effect.ShowDeleteConfirm -> {
                     showDeleteDialog = effect.scheduleId

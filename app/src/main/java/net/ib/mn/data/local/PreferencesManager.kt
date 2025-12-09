@@ -146,6 +146,7 @@ class PreferencesManager @Inject constructor(
         val KEY_SHOW_FREE_CHARGE_MARKER = stringPreferencesKey("show_free_charge_marker")
         val KEY_SHOW_LIVE_STREAMING_TAB = booleanPreferencesKey("show_live_streaming_tab")
         val KEY_IN_APP_BANNER_MENU = stringPreferencesKey("in_app_banner_menu")  // JSON 문자열
+        val KEY_IN_APP_BANNER_SEARCH = stringPreferencesKey("in_app_banner_search")  // JSON 문자열 (검색 화면용)
 
         // Category
         val KEY_DEFAULT_CATEGORY = stringPreferencesKey(Constants.PREF_DEFAULT_CATEGORY)
@@ -206,6 +207,9 @@ class PreferencesManager @Inject constructor(
 
         // Chat Room Create Instruction (채팅방 개설 안내 팝업)
         val KEY_SHOW_CREATE_CHAT_ROOM_INSTRUCTION = booleanPreferencesKey("show_create_chat_room_instruction")
+
+        // Search History (최근 검색어)
+        val KEY_RECENT_SEARCHES = stringPreferencesKey("recent_searches_json")
     }
 
     // ============================================================
@@ -383,6 +387,11 @@ class PreferencesManager @Inject constructor(
     val inAppBannerMenu: Flow<String?> = context.dataStore.data
         .map { preferences ->
             preferences[KEY_IN_APP_BANNER_MENU]
+        }
+
+    val inAppBannerSearch: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_IN_APP_BANNER_SEARCH]
         }
 
     val boardTags: Flow<String?> = context.dataStore.data
@@ -726,6 +735,16 @@ class PreferencesManager @Inject constructor(
                 preferences[KEY_IN_APP_BANNER_MENU] = bannerListJson
             } else {
                 preferences.remove(KEY_IN_APP_BANNER_MENU)
+            }
+        }
+    }
+
+    suspend fun setInAppBannerSearch(bannerListJson: String?) {
+        context.dataStore.edit { preferences ->
+            if (bannerListJson != null) {
+                preferences[KEY_IN_APP_BANNER_SEARCH] = bannerListJson
+            } else {
+                preferences.remove(KEY_IN_APP_BANNER_SEARCH)
             }
         }
     }
@@ -1409,6 +1428,66 @@ class PreferencesManager @Inject constructor(
     fun getUserIdSync(): Int {
         return runBlocking {
             context.dataStore.data.first()[KEY_USER_ID] ?: 0
+        }
+    }
+
+    // ============================================================
+    // Search History (최근 검색어)
+    // ============================================================
+
+    /**
+     * 최근 검색어 리스트 Flow
+     * old 프로젝트의 SearchHistoryActivity + SharedPreferences 로직을 DataStore로 대체
+     */
+    val recentSearches: Flow<List<String>> = context.dataStore.data
+        .map { preferences ->
+            val json = preferences[KEY_RECENT_SEARCHES]
+            if (json != null) {
+                try {
+                    gson.fromJson(json, Array<String>::class.java).toList()
+                } catch (e: Exception) {
+                    logE("PreferencesManager", "Failed to parse recent searches", e)
+                    emptyList()
+                }
+            } else {
+                emptyList()
+            }
+        }
+
+    /**
+     * 최근 검색어 리스트 저장
+     * @param searches 검색어 리스트 (최대 10개)
+     */
+    suspend fun saveRecentSearches(searches: List<String>) {
+        val json = gson.toJson(searches)
+        context.dataStore.edit { preferences ->
+            preferences[KEY_RECENT_SEARCHES] = json
+        }
+    }
+
+    /**
+     * 최근 검색어 리스트 가져오기 (일회성)
+     */
+    suspend fun getRecentSearches(): List<String> {
+        val json = context.dataStore.data.first()[KEY_RECENT_SEARCHES]
+        return if (json != null) {
+            try {
+                gson.fromJson(json, Array<String>::class.java).toList()
+            } catch (e: Exception) {
+                logE("PreferencesManager", "Failed to parse recent searches", e)
+                emptyList()
+            }
+        } else {
+            emptyList()
+        }
+    }
+
+    /**
+     * 최근 검색어 전체 삭제
+     */
+    suspend fun clearRecentSearches() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(KEY_RECENT_SEARCHES)
         }
     }
 }

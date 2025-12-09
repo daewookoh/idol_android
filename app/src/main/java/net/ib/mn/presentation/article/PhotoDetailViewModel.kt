@@ -2,8 +2,8 @@ package net.ib.mn.presentation.article
 
 import android.app.DownloadManager
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
+import net.ib.mn.util.IntentUtil
 import android.os.Environment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -245,20 +245,7 @@ class PhotoDetailViewModel @Inject constructor(
             }
         }
 
-        val shareText = if (shareMsg.isNotEmpty()) {
-            "$shareMsg\n$shareUrl"
-        } else {
-            shareUrl
-        }
-
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, shareText)
-        }
-
-        context.startActivity(
-            Intent.createChooser(shareIntent, null)
-        )
+        IntentUtil.shareTextWithUrl(context, shareMsg, shareUrl)
     }
 }
 

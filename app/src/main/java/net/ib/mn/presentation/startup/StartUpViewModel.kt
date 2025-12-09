@@ -300,15 +300,6 @@ class StartUpViewModel @Inject constructor(
                         isSuccess = true
                         val data = result.data.data
 
-                    data?.badWords?.take(3)?.forEach { badWord ->
-                    }
-                    data?.boardTags?.take(3)?.forEach { tag ->
-                    }
-                    data?.snsChannels?.forEach { channel ->
-                    }
-                    data?.familyAppList?.forEach { app ->
-                    }
-
                     // DataStore에 저장
                     data?.let { configData ->
                         // BadWords는 List<BadWord>를 word 필드만 추출하여 List<String>으로 변환
@@ -446,10 +437,8 @@ class StartUpViewModel @Inject constructor(
                         // section별로 그룹화
                         val bannersBySection = bannerList.groupBy { it.section }
 
-                        // 메뉴 섹션 배너만 추출
+                        // 메뉴 섹션 배너 (M)
                         val menuBanners = bannersBySection["M"] ?: emptyList()
-
-                        // JSON으로 변환하여 저장
                         if (menuBanners.isNotEmpty()) {
                             val menuBannersJson = Gson().toJson(menuBanners.map { dto ->
                                 net.ib.mn.domain.model.InAppBanner(
@@ -463,8 +452,25 @@ class StartUpViewModel @Inject constructor(
                         } else {
                             preferencesManager.setInAppBannerMenu(null)
                         }
+
+                        // 검색 섹션 배너 (S)
+                        val searchBanners = bannersBySection["S"] ?: emptyList()
+                        if (searchBanners.isNotEmpty()) {
+                            val searchBannersJson = Gson().toJson(searchBanners.map { dto ->
+                                net.ib.mn.domain.model.InAppBanner(
+                                    id = dto.id,
+                                    imageUrl = dto.imageUrl,
+                                    link = dto.link,
+                                    section = dto.section
+                                )
+                            })
+                            preferencesManager.setInAppBannerSearch(searchBannersJson)
+                        } else {
+                            preferencesManager.setInAppBannerSearch(null)
+                        }
                     } else {
                         preferencesManager.setInAppBannerMenu(null)
+                        preferencesManager.setInAppBannerSearch(null)
                     }
                 } else {
                 }
@@ -486,32 +492,11 @@ class StartUpViewModel @Inject constructor(
                     val data = result.data.data
 
 
-                    // DataStore에 저장 및 기존 플래그와 비교
+                    // DataStore에 저장
                     data?.let { updateData ->
-                        // 기존 플래그 가져오기
-                        val oldAllIdolUpdate = preferencesManager.allIdolUpdate.first()
-                        val oldDailyIdolUpdate = preferencesManager.dailyIdolUpdate.first()
-                        val oldSnsChannelUpdate = preferencesManager.snsChannelUpdate.first()
-
-                        // 플래그 비교 및 동기화 필요 여부 로그
-                        updateData.allIdolUpdate?.let { newFlag ->
-                            if (oldAllIdolUpdate != newFlag) {
-                            }
-                            preferencesManager.setAllIdolUpdate(newFlag)
-                        }
-
-                        updateData.dailyIdolUpdate?.let { newFlag ->
-                            if (oldDailyIdolUpdate != newFlag) {
-                            }
-                            preferencesManager.setDailyIdolUpdate(newFlag)
-                        }
-
-                        updateData.snsChannelUpdate?.let { newFlag ->
-                            if (oldSnsChannelUpdate != newFlag) {
-                            }
-                            preferencesManager.setSnsChannelUpdate(newFlag)
-                        }
-
+                        updateData.allIdolUpdate?.let { preferencesManager.setAllIdolUpdate(it) }
+                        updateData.dailyIdolUpdate?.let { preferencesManager.setDailyIdolUpdate(it) }
+                        updateData.snsChannelUpdate?.let { preferencesManager.setSnsChannelUpdate(it) }
                     }
                 }
                 is ApiResult.Error -> {
@@ -582,10 +567,6 @@ class StartUpViewModel @Inject constructor(
             when (result) {
                 is ApiResult.Loading -> {}
                 is ApiResult.Success -> {
-                    val data = result.data.data
-
-                    data?.forEach { adType ->
-                    }
                 }
                 is ApiResult.Error -> {
                 }
@@ -601,10 +582,6 @@ class StartUpViewModel @Inject constructor(
             when (result) {
                 is ApiResult.Loading -> {}
                 is ApiResult.Success -> {
-                    val data = result.data.data
-
-                    data?.forEach { coupon ->
-                    }
                 }
                 is ApiResult.Error -> {
                 }
@@ -644,16 +621,8 @@ class StartUpViewModel @Inject constructor(
 
                     // Room Database에 저장
                     data?.let { idolList ->
-                        // Top3 데이터 로깅 (디버깅용 - 첫 5개만)
-                        idolList.take(5).forEach { idol ->
-                        }
-
                         val entities = idolList.map { it.toEntity() }
-                        idolDao.insert(entities)  // old 프로젝트와 동일한 메서드명
-
-                        // 저장된 데이터 검증 (디버깅용 - 첫 5개만)
-                        entities.take(5).forEach { entity ->
-                        }
+                        idolDao.insert(entities)
                     }
                 }
                 is ApiResult.Error -> {
@@ -718,8 +687,6 @@ class StartUpViewModel @Inject constructor(
                 // ConfigRepository 캐시에 처리된 typeList 저장
                 configRepository.setTypeListCache(arrayTypeList)
 
-                arrayTypeList.forEachIndexed { index, type ->
-                }
 
             }
         } catch (e: Exception) {
@@ -804,11 +771,7 @@ class StartUpViewModel @Inject constructor(
                     // ConfigRepository 캐시에 처리된 typeList 저장
                     configRepository.setTypeListCache(typeListData)
 
-                    typeListData.forEachIndexed { index, type ->
-                    }
-                } else {
                 }
-            } else {
             }
         } catch (e: Exception) {
         }

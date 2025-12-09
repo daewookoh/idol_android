@@ -8,6 +8,9 @@ import androidx.navigation3.ui.NavDisplay
 import net.ib.mn.presentation.article.write.ArticleWriteScreen
 import net.ib.mn.presentation.article.write.ArticleWriteType
 import net.ib.mn.presentation.awards.AwardsScreen
+import net.ib.mn.presentation.community.CommunityScreen
+import net.ib.mn.presentation.search.SearchScreen
+import net.ib.mn.presentation.search.result.SearchResultScreen
 import net.ib.mn.presentation.login.EmailLoginScreen
 import net.ib.mn.presentation.login.LoginScreen
 import net.ib.mn.presentation.login.PasswordResetScreen
@@ -195,6 +198,27 @@ fun NavGraph(
                                 navigator.popBackStack()
                                 // TODO: 결과를 이전 화면에 전달하는 로직 추가 (필요시)
                             }
+                        )
+                    }
+
+                    // Search 화면 (검색 입력)
+                    // Navigation 3: LocalAppNavigator를 통해 Screen에서 직접 네비게이션 처리
+                    is Screen.Search -> NavEntry(screen) {
+                        SearchScreen()
+                    }
+
+                    // SearchResult 화면 (검색 결과)
+                    // Navigation 3: LocalAppNavigator를 통해 Screen에서 직접 네비게이션 처리
+                    is Screen.SearchResult -> NavEntry(screen) {
+                        SearchResultScreen(keyword = screen.keyword)
+                    }
+
+                    // Community 화면 (독립적인 커뮤니티 화면)
+                    // 배너 클릭, 검색 결과에서 아이돌 클릭 등으로 진입
+                    is Screen.Community -> NavEntry(screen) {
+                        CommunityScreen(
+                            idolId = screen.idolId,
+                            initialTab = screen.initialTab
                         )
                     }
                 }

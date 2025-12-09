@@ -1,8 +1,8 @@
 package net.ib.mn.presentation.article
 
 import android.app.Activity
-import android.content.Intent
 import android.graphics.Bitmap
+import net.ib.mn.util.IntentUtil
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
@@ -786,19 +786,11 @@ private fun shareArticle(context: android.content.Context, article: ArticleModel
         }
     }
 
-    val shareText = if (shareMsg.isNotEmpty()) {
-        "$shareMsg\n$shareUrl"
-    } else {
-        shareUrl
-    }
-
-    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-        type = "text/plain"
-        putExtra(Intent.EXTRA_TEXT, shareText)
-    }
-
-    context.startActivity(
-        Intent.createChooser(shareIntent, context.getString(R.string.title_share))
+    IntentUtil.shareTextWithUrl(
+        context = context,
+        message = shareMsg,
+        url = shareUrl,
+        chooserTitle = context.getString(R.string.title_share)
     )
 }
 
@@ -962,13 +954,7 @@ private fun ScheduleInfoSection(
                     .height(100.dp)
                     .clickable {
                         // 지도 앱으로 열기
-                        try {
-                            val geoUri = android.net.Uri.parse("geo:0,0?q=${android.net.Uri.encode(schedule.location)}")
-                            val mapIntent = android.content.Intent(android.content.Intent.ACTION_VIEW, geoUri)
-                            context.startActivity(mapIntent)
-                        } catch (e: Exception) {
-                            // 지도 열기 실패
-                        }
+                        IntentUtil.openMap(context, schedule.location)
                     },
                 contentAlignment = Alignment.Center
             ) {

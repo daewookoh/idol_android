@@ -1,7 +1,7 @@
 package net.ib.mn.presentation.community
 
-import android.content.Intent
 import android.widget.Toast
+import net.ib.mn.util.IntentUtil
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -106,6 +106,16 @@ import net.ib.mn.util.Constants
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.NumberFormatUtil
 import net.ib.mn.util.link.LinkUtil
+import net.ib.mn.domain.repository.IdolRepository
+import net.ib.mn.navigation.LocalAppNavigator
+import net.ib.mn.navigation.Screen
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 /**
  * CommunityTab - 커뮤니티 탭 타입
@@ -118,7 +128,122 @@ enum class CommunityTab {
 }
 
 /**
+ * Standalone CommunityScreen용 ViewModel
+ * idolId로 아이돌 정보를 로드하여 RankingItem으로 변환
+ */
+@HiltViewModel
+class StandaloneCommunityViewModel @Inject constructor(
+    private val idolRepository: IdolRepository
+) : ViewModel() {
+
+    data class State(
+        val isLoading: Boolean = true,
+        val rankingItem: RankingItem? = null,
+        val error: String? = null
+    )
+
+    private val _state = MutableStateFlow(State())
+    val state: StateFlow<State> = _state.asStateFlow()
+
+    fun loadIdol(idolId: Int) {
+        viewModelScope.launch {
+            _state.value = State(isLoading = true)
+            try {
+                val idol = idolRepository.getIdolById(idolId)
+                if (idol != null) {
+                    val rankingItem = RankingItem(
+                        id = idol.id.toString(),
+                        rank = 1,
+                        name = idol.name,
+                        nameEn = idol.nameEn,
+                        voteCount = idol.heart.toString(),
+                        photoUrl = idol.imageUrl,
+                        fandomName = idol.fdName,
+                        groupId = idol.groupId,
+                        category = idol.category,
+                        miracleCount = idol.miracleCount,
+                        fairyCount = idol.fairyCount,
+                        angelCount = idol.angelCount,
+                        anniversary = idol.anniversary,
+                        anniversaryDays = idol.anniversaryDays ?: 0
+                    )
+                    _state.value = State(isLoading = false, rankingItem = rankingItem)
+                } else {
+                    _state.value = State(isLoading = false, error = "Idol not found")
+                }
+            } catch (e: Exception) {
+                _state.value = State(isLoading = false, error = e.message)
+            }
+        }
+    }
+}
+
+/**
  * CommunityScreen - 커뮤니티 화면
+ *
+ * idolId로 아이돌 정보를 로드하여 커뮤니티 화면을 표시합니다.
+ *
+ * @param idolId 아이돌 ID
+ * @param showChattingTab 채팅 탭 표시 여부
+ * @param initialTab 초기 탭 (0: FEED, 1: FAN_TALK)
+ * @param forceLatestOrder 최신순 정렬 강제 적용
+ * @param onBackClick 뒤로가기 클릭 콜백
+ * @param onMostChanged 최애 변경 콜백
+ * @param onNavigateToArticleWrite 글쓰기 화면 이동 콜백
+ */
+@Composable
+fun CommunityScreen(
+    idolId: Int,
+    showChattingTab: Boolean = true,
+    initialTab: Int = 0,
+    forceLatestOrder: Boolean = false,
+    onBackClick: (() -> Unit)? = null,
+    onMostChanged: (Boolean) -> Unit = {},
+    onNavigateToArticleWrite: ((writeType: String, idolId: Int?) -> Unit)? = null,
+    standaloneViewModel: StandaloneCommunityViewModel = hiltViewModel()
+) {
+    val navigator = LocalAppNavigator.current
+    val state by standaloneViewModel.state.collectAsState()
+
+    LaunchedEffect(idolId) {
+        standaloneViewModel.loadIdol(idolId)
+    }
+
+    when {
+        state.isLoading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(ColorPalette.background100),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = ColorPalette.main)
+            }
+        }
+        state.rankingItem != null -> {
+            CommunityScreenContent(
+                rankingItem = state.rankingItem!!,
+                showChattingTab = showChattingTab,
+                fandomName = state.rankingItem!!.fandomName,
+                initialTab = initialTab,
+                forceLatestOrder = forceLatestOrder,
+                onBackClick = onBackClick ?: { navigator.popBackStack(); Unit },
+                onMostChanged = onMostChanged,
+                onNavigateToArticleWrite = onNavigateToArticleWrite ?: { writeType, idolIdParam ->
+                    navigator.navigate(Screen.ArticleWrite(writeType = writeType, idolId = idolIdParam))
+                }
+            )
+        }
+        state.error != null -> {
+            LaunchedEffect(state.error) {
+                navigator.popBackStack()
+            }
+        }
+    }
+}
+
+/**
+ * CommunityScreenContent - 커뮤니티 화면 내부 구현
  *
  * @param rankingItem 선택된 랭킹 아이템 데이터
  * @param showChattingTab 채팅 탭 표시 여부 (최애이거나, 최애의 그룹이거나, 관리자일 경우 true)
@@ -130,7 +255,7 @@ enum class CommunityTab {
  * @param onNavigateToArticleWrite 글쓰기 화면 이동 콜백 (writeType, idolId)
  */
 @Composable
-fun CommunityScreen(
+private fun CommunityScreenContent(
     rankingItem: RankingItem,
     showChattingTab: Boolean = false,
     fandomName: String? = null,
@@ -639,12 +764,11 @@ fun CommunityScreen(
                 val shareMessage = context.getString(R.string.community_main_share_msg, idolDisplayName)
 
                 // 공유 Intent
-                val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT, "$shareMessage\n$shareUrl")
-                }
-                context.startActivity(
-                    Intent.createChooser(shareIntent, context.getString(R.string.title_share))
+                IntentUtil.shareTextWithUrl(
+                    context = context,
+                    message = shareMessage,
+                    url = shareUrl,
+                    chooserTitle = context.getString(R.string.title_share)
                 )
             },
             onAllInDayClick = {

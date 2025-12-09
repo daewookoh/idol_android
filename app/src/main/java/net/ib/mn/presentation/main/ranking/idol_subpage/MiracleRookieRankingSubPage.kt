@@ -42,6 +42,7 @@ import net.ib.mn.ui.components.ExoRankingList
 import net.ib.mn.ui.components.RankingItemType
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
+import net.ib.mn.util.IntentUtil
 
 /**
  * 통합 Miracle/Rookie 랭킹 SubPage
@@ -217,23 +218,12 @@ fun MiracleRookieRankingSubPage(
                             else -> ""
                         }
 
-                        // 메시지와 URL 결합
-                        val textToShare = if (shareMessage.isNotEmpty()) {
-                            "$shareMessage\n$shareUrl"
-                        } else {
-                            shareUrl
-                        }
-
                         // Android 공유 시트 열기
-                        val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                            type = "text/plain"
-                            putExtra(android.content.Intent.EXTRA_TEXT, textToShare)
-                        }
-                        context.startActivity(
-                            android.content.Intent.createChooser(
-                                shareIntent,
-                                context.getString(R.string.title_share)
-                            )
+                        IntentUtil.shareTextWithUrl(
+                            context = context,
+                            message = shareMessage,
+                            url = shareUrl,
+                            chooserTitle = context.getString(R.string.title_share)
                         )
                     },
                 tint = Color.Unspecified

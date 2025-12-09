@@ -148,27 +148,35 @@ private fun MainToolbarMenu(
     // 검색 버튼 (old: marginEnd="12dp")
     Box(
         modifier = Modifier
-            .clickable { onSearchClick?.invoke() }
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { onSearchClick?.invoke() }
             .padding(5.dp)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.btn_navigation_search),
             contentDescription = "검색",
-            modifier = Modifier.size(22.dp)
+            modifier = Modifier.size(22.dp),
+            tint = Color.Unspecified
         )
     }
 
     // 친구 버튼 (old: marginEnd="16dp")
     Box(
         modifier = Modifier
-            .clickable { onFriendsClick?.invoke() }
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { onFriendsClick?.invoke() }
             .padding(5.dp)
             .padding(end = 12.dp)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.btn_navigation_friend),
             contentDescription = "친구",
-            modifier = Modifier.size(22.dp)
+            modifier = Modifier.size(22.dp),
+            tint = Color.Unspecified
         )
     }
 }
@@ -209,7 +217,8 @@ private fun MyInfoToolbarMenu(
         Icon(
             painter = painterResource(id = R.drawable.btn_navigation_bell),
             contentDescription = "알림",
-            modifier = Modifier.size(22.dp)
+            modifier = Modifier.size(22.dp),
+            tint = Color.Unspecified
         )
 
         // 새 알림 빨간점 표시
@@ -234,7 +243,8 @@ private fun MyInfoToolbarMenu(
         Icon(
             painter = painterResource(id = R.drawable.btn_navigation_setting),
             contentDescription = "설정",
-            modifier = Modifier.size(22.dp)
+            modifier = Modifier.size(22.dp),
+            tint = Color.Unspecified
         )
     }
 }

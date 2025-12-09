@@ -111,4 +111,33 @@ sealed class Screen {
         val editingArticleId: String? = null,
         val tagId: Int? = null
     ) : Screen()
+
+    /**
+     * Search 화면 - 검색 입력 화면
+     * old 프로젝트의 SearchHistoryActivity에 해당
+     */
+    @Serializable
+    data object Search : Screen()
+
+    /**
+     * SearchResult 화면 - 검색 결과 화면
+     * old 프로젝트의 SearchResultActivity에 해당
+     * @param keyword 검색 키워드
+     */
+    @Serializable
+    data class SearchResult(
+        val keyword: String
+    ) : Screen()
+
+    /**
+     * Community 화면 - 아이돌 커뮤니티 화면
+     * 배너 클릭, 검색 결과에서 아이돌 클릭 등으로 진입
+     * @param idolId 아이돌 ID
+     * @param initialTab 초기 탭 (0: FEED, 1: FAN_TALK)
+     */
+    @Serializable
+    data class Community(
+        val idolId: Int,
+        val initialTab: Int = 0
+    ) : Screen()
 }

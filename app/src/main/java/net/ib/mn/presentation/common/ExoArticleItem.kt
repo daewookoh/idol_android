@@ -1,7 +1,7 @@
 package net.ib.mn.presentation.common
 
-import android.content.Intent
 import android.widget.Toast
+import net.ib.mn.util.IntentUtil
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -729,19 +729,11 @@ private fun shareArticleItem(context: android.content.Context, article: ArticleM
         }
     }
 
-    val shareText = if (shareMsg.isNotEmpty()) {
-        "$shareMsg\n$shareUrl"
-    } else {
-        shareUrl
-    }
-
-    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-        type = "text/plain"
-        putExtra(Intent.EXTRA_TEXT, shareText)
-    }
-
-    context.startActivity(
-        Intent.createChooser(shareIntent, context.getString(R.string.title_share))
+    IntentUtil.shareTextWithUrl(
+        context = context,
+        message = shareMsg,
+        url = shareUrl,
+        chooserTitle = context.getString(R.string.title_share)
     )
 }
 

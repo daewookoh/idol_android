@@ -2,7 +2,34 @@ package net.ib.mn.di
 
 import android.content.Context
 import net.ib.mn.data.repository.AuthRepository
-import net.ib.mn.data.remote.api.*
+import net.ib.mn.data.remote.api.AdApi
+import net.ib.mn.data.remote.api.ArticlesApi
+import net.ib.mn.data.remote.api.AwardsApi
+import net.ib.mn.data.remote.api.ChartsApi
+import net.ib.mn.data.remote.api.ChatApi
+import net.ib.mn.data.remote.api.CommentsApi
+import net.ib.mn.data.remote.api.ConfigsApi
+import net.ib.mn.data.remote.api.EmoticonApi
+import net.ib.mn.data.remote.api.FavoritesApi
+import net.ib.mn.data.remote.api.FilesApi
+import net.ib.mn.data.remote.api.FriendsApi
+import net.ib.mn.data.remote.api.HeartpickApi
+import net.ib.mn.data.remote.api.IdolApi
+import net.ib.mn.data.remote.api.ImagesApi
+import net.ib.mn.data.remote.api.MarketApi
+import net.ib.mn.data.remote.api.MessageApi
+import net.ib.mn.data.remote.api.MiscApi
+import net.ib.mn.data.remote.api.OnepickApi
+import net.ib.mn.data.remote.api.ReportApi
+import net.ib.mn.data.remote.api.ScheduleApi
+import net.ib.mn.data.remote.api.SearchApi
+import net.ib.mn.data.remote.api.StampsApi
+import net.ib.mn.data.remote.api.ThemepickApi
+import net.ib.mn.data.remote.api.TrendsApi
+import net.ib.mn.data.remote.api.UserApi
+import net.ib.mn.data.remote.api.UsersApi
+import net.ib.mn.data.remote.api.UtilityApi
+import net.ib.mn.data.remote.api.WikiApi
 import net.ib.mn.data.remote.interceptor.AuthInterceptor
 import net.ib.mn.data.remote.interceptor.GcodeInterceptor
 import net.ib.mn.util.Constants
@@ -210,4 +237,9 @@ object NetworkModule {
     @Singleton
     fun provideImagesApi(retrofit: Retrofit): ImagesApi =
         retrofit.create(ImagesApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideSearchApi(retrofit: Retrofit): SearchApi =
+        retrofit.create(SearchApi::class.java)
 }
