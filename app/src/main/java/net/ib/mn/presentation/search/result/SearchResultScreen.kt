@@ -211,17 +211,13 @@ fun SearchResultScreen(
         onShowAllSupports = { viewModel.sendIntent(SearchResultContract.Intent.ShowAllSupports) },
         onLoadMoreSmallTalks = { viewModel.sendIntent(SearchResultContract.Intent.LoadMoreSmallTalks) },
         onLoadMoreArticles = { viewModel.sendIntent(SearchResultContract.Intent.LoadMoreArticles) },
-        onIdolClick = { idol ->
-            // TODO: 커뮤니티 화면으로 이동
-        },
-        onIdolCommunityClick = { idol ->
-            // TODO: 커뮤니티 화면으로 이동
-        },
-        onIdolSmallTalkClick = { idol ->
-            // TODO: 잡담 화면으로 이동
-        },
-        onIdolScheduleClick = { idol ->
-            // TODO: 스케줄 화면으로 이동
+        onIdolClick = { idol, initialTab ->
+            navigator.navigate(
+                net.ib.mn.navigation.Screen.Community(
+                    idolId = idol.id,
+                    initialTab = initialTab
+                )
+            )
         },
         onToggleFavorite = { viewModel.sendIntent(SearchResultContract.Intent.ToggleFavorite(it)) },
         onSetMost = { viewModel.sendIntent(SearchResultContract.Intent.SetMost(it)) },
@@ -249,10 +245,7 @@ private fun SearchResultContent(
     onShowAllSupports: () -> Unit = {},
     onLoadMoreSmallTalks: () -> Unit = {},
     onLoadMoreArticles: () -> Unit = {},
-    onIdolClick: (SearchIdolModel) -> Unit = {},
-    onIdolCommunityClick: (SearchIdolModel) -> Unit = {},
-    onIdolSmallTalkClick: (SearchIdolModel) -> Unit = {},
-    onIdolScheduleClick: (SearchIdolModel) -> Unit = {},
+    onIdolClick: (SearchIdolModel, Int) -> Unit = { _, _ -> },
     onToggleFavorite: (SearchIdolModel) -> Unit = {},
     onSetMost: (SearchIdolModel) -> Unit = {},
     onSupportClick: (SearchSupportModel) -> Unit = {},
@@ -334,10 +327,7 @@ private fun SearchResultContent(
                         SearchIdolItem(
                             idol = idol,
                             maxHeart = maxHeart,
-                            onClick = { onIdolClick(idol) },
-                            onCommunityClick = { onIdolCommunityClick(idol) },
-                            onSmallTalkClick = { onIdolSmallTalkClick(idol) },
-                            onScheduleClick = { onIdolScheduleClick(idol) },
+                            onIdolClick = { initialTab -> onIdolClick(idol, initialTab) },
                             onFavoriteClick = { onToggleFavorite(idol) },
                             onMostClick = { onSetMost(idol) }
                         )
@@ -560,10 +550,7 @@ private fun calculateProgressPercent(heartCount: Long, maxHeartCount: Long): Flo
 private fun SearchIdolItem(
     idol: SearchIdolModel,
     maxHeart: Long,
-    onClick: () -> Unit,
-    onCommunityClick: () -> Unit,
-    onSmallTalkClick: () -> Unit,
-    onScheduleClick: () -> Unit,
+    onIdolClick: (initialTab: Int) -> Unit,
     onFavoriteClick: () -> Unit,
     onMostClick: () -> Unit
 ) {
@@ -576,7 +563,10 @@ private fun SearchIdolItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onClick() }
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { onIdolClick(0) }
                 .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -714,12 +704,15 @@ private fun SearchIdolItem(
                     shape = RoundedCornerShape(0.dp)
                 )
         ) {
-            // 커뮤니티 입장
+            // 커뮤니티 입장 (initialTab = 0: FEED)
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .clickable { onCommunityClick() },
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onIdolClick(0) },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -738,12 +731,15 @@ private fun SearchIdolItem(
                     .background(colorResource(id = R.color.gray100))
             )
 
-            // 채팅
+            // 채팅 (initialTab = 2: CHAT)
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .clickable { onSmallTalkClick() },
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onIdolClick(2) },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -762,12 +758,15 @@ private fun SearchIdolItem(
                     .background(colorResource(id = R.color.gray100))
             )
 
-            // 스케줄 보기
+            // 스케줄 보기 (initialTab = 3: SCHEDULE)
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .clickable { onScheduleClick() },
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onIdolClick(3) },
                 contentAlignment = Alignment.Center
             ) {
                 Text(

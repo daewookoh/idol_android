@@ -132,6 +132,12 @@ fun SearchScreen(
         onNavigateBack = { navigator.popBackStack() },
         onFocusChange = { focused ->
             viewModel.sendIntent(SearchContract.Intent.SetSearchFocused(focused))
+        },
+        onCancel = {
+            // 포커스 안된 상태(TRENDS 모드)에서 취소 버튼 클릭 시 화면 닫기
+            if (state.displayMode == SearchContract.DisplayMode.TRENDS) {
+                navigator.popBackStack()
+            }
         }
     )
 }
