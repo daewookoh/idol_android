@@ -38,6 +38,10 @@ class IdolRepositoryImpl @Inject constructor(
         return idolDao.getIdolById(id)
     }
 
+    override fun observeIdolById(id: Int): Flow<IdolEntity?> {
+        return idolDao.observeIdolById(id)
+    }
+
     override suspend fun getIdolsByTypeAndCategory(type: String, category: String): List<IdolEntity> {
         return idolDao.getIdolByTypeAndCategory(type, category)
     }

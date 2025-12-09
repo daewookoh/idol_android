@@ -90,6 +90,7 @@ import net.ib.mn.presentation.community.subpage.CommunityScheduleContract
 import net.ib.mn.presentation.community.subpage.CommunityScheduleViewModel
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.ScheduleModel
+import net.ib.mn.domain.model.TrendsModel
 import net.ib.mn.presentation.article.ArticleDetailScreen
 import net.ib.mn.presentation.article.PhotoDetailScreen
 import net.ib.mn.presentation.community.schedule.ScheduleDetailScreen
@@ -106,16 +107,8 @@ import net.ib.mn.util.Constants
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.NumberFormatUtil
 import net.ib.mn.util.link.LinkUtil
-import net.ib.mn.domain.repository.IdolRepository
 import net.ib.mn.navigation.LocalAppNavigator
 import net.ib.mn.navigation.Screen
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 
 /**
  * CommunityTab - 커뮤니티 탭 타입
@@ -128,64 +121,14 @@ enum class CommunityTab {
 }
 
 /**
- * Standalone CommunityScreen용 ViewModel
- * idolId로 아이돌 정보를 로드하여 RankingItem으로 변환
- */
-@HiltViewModel
-class StandaloneCommunityViewModel @Inject constructor(
-    private val idolRepository: IdolRepository
-) : ViewModel() {
-
-    data class State(
-        val isLoading: Boolean = true,
-        val rankingItem: RankingItem? = null,
-        val error: String? = null
-    )
-
-    private val _state = MutableStateFlow(State())
-    val state: StateFlow<State> = _state.asStateFlow()
-
-    fun loadIdol(idolId: Int) {
-        viewModelScope.launch {
-            _state.value = State(isLoading = true)
-            try {
-                val idol = idolRepository.getIdolById(idolId)
-                if (idol != null) {
-                    val rankingItem = RankingItem(
-                        id = idol.id.toString(),
-                        rank = 1,
-                        name = idol.name,
-                        nameEn = idol.nameEn,
-                        voteCount = idol.heart.toString(),
-                        photoUrl = idol.imageUrl,
-                        fandomName = idol.fdName,
-                        groupId = idol.groupId,
-                        category = idol.category,
-                        miracleCount = idol.miracleCount,
-                        fairyCount = idol.fairyCount,
-                        angelCount = idol.angelCount,
-                        anniversary = idol.anniversary,
-                        anniversaryDays = idol.anniversaryDays ?: 0
-                    )
-                    _state.value = State(isLoading = false, rankingItem = rankingItem)
-                } else {
-                    _state.value = State(isLoading = false, error = "Idol not found")
-                }
-            } catch (e: Exception) {
-                _state.value = State(isLoading = false, error = e.message)
-            }
-        }
-    }
-}
-
-/**
  * CommunityScreen - 커뮤니티 화면
  *
- * idolId로 아이돌 정보를 로드하여 커뮤니티 화면을 표시합니다.
+ * idolId로 로컬 DB에서 아이돌 정보를 Flow로 관찰하여 커뮤니티 화면을 표시합니다.
+ * top3 이미지, 구독수 등이 실시간으로 업데이트됩니다.
  *
  * @param idolId 아이돌 ID
  * @param showChattingTab 채팅 탭 표시 여부
- * @param initialTab 초기 탭 (0: FEED, 1: FAN_TALK)
+ * @param initialTab 초기 탭 (0: FEED, 1: FAN_TALK, 2: CHAT, 3: SCHEDULE)
  * @param forceLatestOrder 최신순 정렬 강제 적용
  * @param onBackClick 뒤로가기 클릭 콜백
  * @param onMostChanged 최애 변경 콜백
@@ -200,79 +143,73 @@ fun CommunityScreen(
     onBackClick: (() -> Unit)? = null,
     onMostChanged: (Boolean) -> Unit = {},
     onNavigateToArticleWrite: ((writeType: String, idolId: Int?) -> Unit)? = null,
-    standaloneViewModel: StandaloneCommunityViewModel = hiltViewModel()
+    viewModel: CommunityViewModel = hiltViewModel()
 ) {
     val navigator = LocalAppNavigator.current
-    val state by standaloneViewModel.state.collectAsState()
+    val idolData by viewModel.idolDataFlow.collectAsState()
 
+    // idolId 설정하여 Flow 관찰 시작
     LaunchedEffect(idolId) {
-        standaloneViewModel.loadIdol(idolId)
+        viewModel.setIdolId(idolId)
     }
 
-    when {
-        state.isLoading -> {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(ColorPalette.background100),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = ColorPalette.main)
-            }
+    // 데이터 로딩 중
+    if (idolData == null) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(ColorPalette.background100),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = ColorPalette.main)
         }
-        state.rankingItem != null -> {
-            CommunityScreenContent(
-                rankingItem = state.rankingItem!!,
-                showChattingTab = showChattingTab,
-                fandomName = state.rankingItem!!.fandomName,
-                initialTab = initialTab,
-                forceLatestOrder = forceLatestOrder,
-                onBackClick = onBackClick ?: { navigator.popBackStack(); Unit },
-                onMostChanged = onMostChanged,
-                onNavigateToArticleWrite = onNavigateToArticleWrite ?: { writeType, idolIdParam ->
-                    navigator.navigate(Screen.ArticleWrite(writeType = writeType, idolId = idolIdParam))
-                }
-            )
-        }
-        state.error != null -> {
-            LaunchedEffect(state.error) {
-                navigator.popBackStack()
-            }
-        }
+        return
     }
+
+    CommunityScreenContent(
+        idolData = idolData!!,
+        showChattingTab = showChattingTab,
+        initialTab = initialTab,
+        forceLatestOrder = forceLatestOrder,
+        onBackClick = onBackClick ?: { navigator.popBackStack(); Unit },
+        onMostChanged = onMostChanged,
+        onNavigateToArticleWrite = onNavigateToArticleWrite ?: { writeType, idolIdParam ->
+            navigator.navigate(Screen.ArticleWrite(writeType = writeType, idolId = idolIdParam))
+        },
+        viewModel = viewModel
+    )
 }
 
 /**
  * CommunityScreenContent - 커뮤니티 화면 내부 구현
  *
- * @param rankingItem 선택된 랭킹 아이템 데이터
+ * @param idolData 아이돌 실시간 데이터 (Flow로 실시간 업데이트됨)
  * @param showChattingTab 채팅 탭 표시 여부 (최애이거나, 최애의 그룹이거나, 관리자일 경우 true)
- * @param fandomName 팬덤 이름
- * @param initialTab 초기 탭 인덱스 (0: FEED, 1: FAN_TALK) - 푸시 알림에서 온 경우
+ * @param initialTab 초기 탭 인덱스 (0: FEED, 1: FAN_TALK, 2: CHAT, 3: SCHEDULE) - 푸시 알림에서 온 경우
  * @param forceLatestOrder 푸시 알림에서 온 경우 최신순 정렬 강제 적용
  * @param onBackClick 뒤로가기 클릭 이벤트
  * @param onMostChanged 최애 변경 콜백
  * @param onNavigateToArticleWrite 글쓰기 화면 이동 콜백 (writeType, idolId)
+ * @param viewModel CommunityViewModel (외부에서 주입받아 Flow 상태 공유)
  */
 @Composable
 private fun CommunityScreenContent(
-    rankingItem: RankingItem,
+    idolData: CommunityViewModel.IdolData,
     showChattingTab: Boolean = false,
-    fandomName: String? = null,
     initialTab: Int? = null,
     forceLatestOrder: Boolean = false,
     onBackClick: () -> Unit = {},
     onMostChanged: (Boolean) -> Unit = {},
     onNavigateToArticleWrite: (writeType: String, idolId: Int?) -> Unit = { _, _ -> },
-    viewModel: CommunityViewModel = hiltViewModel(),
-    feedViewModel: CommunityFeedViewModel = hiltViewModel(),
-    scheduleViewModel: CommunityScheduleViewModel = hiltViewModel(key = "schedule_${rankingItem.id}")
+    viewModel: CommunityViewModel,
+    feedViewModel: CommunityFeedViewModel = hiltViewModel(key = "feed_${idolData.id}"),
+    scheduleViewModel: CommunityScheduleViewModel = hiltViewModel(key = "schedule_${idolData.id}")
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
     // 아이돌 ID
-    val idolId = rankingItem.id.toIntOrNull()
+    val idolId = idolData.id.toIntOrNull()
 
     // ViewModel에서 최애/즐겨찾기 상태 확인
     val initialIsMost = remember(idolId) { viewModel.isMostIdol(idolId) }
@@ -291,7 +228,7 @@ private fun CommunityScreenContent(
     var showTrendsScreen by remember { mutableStateOf(false) }
     var showIdolIdolRankingHistoryScreen by remember { mutableStateOf(false) }
     var showBurningDayDialog by remember { mutableStateOf(false) }
-    var selectedTrendsItem by remember { mutableStateOf<net.ib.mn.domain.model.TrendsModel?>(null) }
+    var selectedTrendsItem by remember { mutableStateOf<TrendsModel?>(null) }
     var currentIsMost by remember(initialIsMost) { mutableStateOf(initialIsMost) }
     var currentIsFavorite by remember(initialIsFavorite) { mutableStateOf(initialIsFavorite) }
 
@@ -299,16 +236,16 @@ private fun CommunityScreenContent(
     var selectedUserProfile by remember { mutableStateOf<UserProfileInfo?>(null) }
 
     // 게시글 상세 화면 상태
-    var selectedArticle by remember { mutableStateOf<net.ib.mn.domain.model.ArticleModel?>(null) }
+    var selectedArticle by remember { mutableStateOf<ArticleModel?>(null) }
     var selectedArticleExternalIdolName by remember { mutableStateOf<String?>(null) }
     var isSelectedArticleFromFeed by remember { mutableStateOf(false) } // FeedSubPage에서 진입한 경우 true
-    var articleUpdatedCallback by remember { mutableStateOf<((net.ib.mn.domain.model.ArticleModel) -> Unit)?>(null) }
+    var articleUpdatedCallback by remember { mutableStateOf<((ArticleModel) -> Unit)?>(null) }
 
     // Notice 상세 화면 상태
-    var selectedNoticeArticle by remember { mutableStateOf<net.ib.mn.domain.model.ArticleModel?>(null) }
+    var selectedNoticeArticle by remember { mutableStateOf<ArticleModel?>(null) }
 
     // 사진 상세 화면 상태 (article + 시작 인덱스)
-    var selectedPhotoDetail by remember { mutableStateOf<Pair<net.ib.mn.domain.model.ArticleModel, Int>?>(null) }
+    var selectedPhotoDetail by remember { mutableStateOf<Pair<ArticleModel, Int>?>(null) }
 
     // 스케줄 작성 화면 상태
     var showScheduleWriteScreen by remember { mutableStateOf(false) }
@@ -353,15 +290,15 @@ private fun CommunityScreenContent(
     }
 
     // 탭 제목 생성
-    val tabTitles = remember(fandomName, showChattingTab) {
+    val tabTitles = remember(idolData.fandomName, showChattingTab) {
         buildList {
             add(context.getString(R.string.community_feed))
             // 팬덤 이름이 있으면 "%s Talk" 형식, 없으면 "Fan Talk"
             add(
-                if (fandomName.isNullOrEmpty()) {
+                if (idolData.fandomName.isNullOrEmpty()) {
                     context.getString(R.string.community_board)
                 } else {
-                    context.getString(R.string.community_board2, fandomName)
+                    context.getString(R.string.community_board2, idolData.fandomName)
                 }
             )
             if (showChattingTab) {
@@ -462,10 +399,10 @@ private fun CommunityScreenContent(
                 ) {
                     // 프로필 영역
                     IdolProfile(
-                        rankingItem = rankingItem,
+                        idolData = idolData,
                         isCollapsed = isCollapsed,
                         onProfileImageClick = {
-                            val wikiIdolId = rankingItem.id.toIntOrNull() ?: return@IdolProfile
+                            val wikiIdolId = idolData.id.toIntOrNull() ?: return@IdolProfile
                             if (wikiIdolId <= 0) return@IdolProfile
 
                             coroutineScope.launch {
@@ -507,7 +444,7 @@ private fun CommunityScreenContent(
                 ) { page ->
                     when (tabs[page]) {
                         CommunityTab.FEED -> CommunityFeedSubPage(
-                            rankingItem = rankingItem,
+                            idolData = idolData,
                             onFirstArticleVideoPlaying = { isPlaying ->
                                 isFirstArticleVideoPlaying = isPlaying
                             },
@@ -533,7 +470,7 @@ private fun CommunityScreenContent(
                             viewModel = feedViewModel
                         )
                         CommunityTab.FAN_TALK -> CommunityFanTalkSubPage(
-                            rankingItem = rankingItem,
+                            idolData = idolData,
                             onNavigateToArticleDetail = { article, externalTabName, onArticleUpdated ->
                                 selectedArticle = article
                                 selectedArticleExternalIdolName = externalTabName
@@ -542,7 +479,7 @@ private fun CommunityScreenContent(
                             }
                         )
                         CommunityTab.CHAT -> CommunityChatSubPage(
-                            rankingItem = rankingItem,
+                            idolData = idolData,
                             shouldRefresh = shouldRefreshChatList,
                             onRefreshConsumed = { shouldRefreshChatList = false },
                             onNavigateToChatRoom = { roomId, nickname, userId, role, isAnonymity, title ->
@@ -560,7 +497,7 @@ private fun CommunityScreenContent(
                             }
                         )
                         CommunityTab.SCHEDULE -> CommunityScheduleSubPage(
-                            rankingItem = rankingItem,
+                            idolData = idolData,
                             onNavigateToScheduleEdit = { schedule ->
                                 editingSchedule = schedule
                                 showScheduleWriteScreen = true
@@ -594,7 +531,11 @@ private fun CommunityScreenContent(
                     )
             ) {
                 ExoTop3(
-                    rankingItemData = rankingItem,
+                    id = "community_top3_${idolData.id}",
+                    idolId = idolId ?: 0,
+                    // Flow에서 관찰된 top3 이미지/비디오 사용 (실시간 업데이트)
+                    imageUrls = idolData.top3ImageUrls,
+                    videoUrls = idolData.top3VideoUrls,
                     // Top3 비디오 정지 조건: 완전히 숨겨졌거나, 첫 번째 아티클 비디오가 재생 중일 때
                     isVisible = !isCollapsed && !isFirstArticleVideoPlaying,
                     onItemClick = { /* TODO */ }
@@ -700,7 +641,7 @@ private fun CommunityScreenContent(
     // 아이돌 다이얼로그
     if (showIdolDialog) {
         IdolDialog(
-            rankingItem = rankingItem,
+            idolData = idolData,
             isFavorite = currentIsFavorite,
             isMost = currentIsMost,
             isFavoriteEnabled = !isUpdatingFavorite,  // 업데이트 중에는 비활성화
@@ -754,13 +695,13 @@ private fun CommunityScreenContent(
                 // 공유 URL 생성 (old 프로젝트와 동일)
                 val params = listOf("community")
                 val queries = listOf(
-                    "idol" to rankingItem.id,
-                    "group" to (rankingItem.groupId?.toString() ?: rankingItem.id)
+                    "idol" to idolData.id,
+                    "group" to (idolData.groupId?.toString() ?: idolData.id)
                 )
                 val shareUrl = LinkUtil.getAppLinkUrl(context, params, queries)
 
                 // 공유 메시지 생성 (아이돌 이름 포함)
-                val idolDisplayName = rankingItem.name.split("_").firstOrNull() ?: rankingItem.name
+                val idolDisplayName = idolData.name.split("_").firstOrNull() ?: idolData.name
                 val shareMessage = context.getString(R.string.community_main_share_msg, idolDisplayName)
 
                 // 공유 Intent
@@ -780,7 +721,7 @@ private fun CommunityScreenContent(
 
     // 최애 변경 확인 다이얼로그 (Old 프로젝트의 showChangeMostDialog 구현)
     if (showChangeMostDialog) {
-        val idolName = rankingItem.name  // 이름_그룹명 전체
+        val idolName = idolData.name  // 이름_그룹명 전체
         val message = if (currentIsMost) {
             // 최애 해제 시
             // 기존 문구: "최애 재설정은 48시간이 지난 이후에 가능합니다.\n등록된 최애를 해제하시겠습니까?"
@@ -825,7 +766,7 @@ private fun CommunityScreenContent(
                 // ViewModel의 updateMostIdol 호출
                 coroutineScope.launch {
                     viewModel.updateMostIdol(
-                        rankingItem = rankingItem,
+                        idolData = idolData,
                         currentIsMost = currentIsMost,
                         onSuccess = { newIsMost ->
                             currentIsMost = newIsMost
@@ -877,8 +818,8 @@ private fun CommunityScreenContent(
 
     // VoterTop100 화면 (전체 화면으로 표시)
     // name은 "이름_그룹명" 형식 (예: "Leeseo_IVE")
-    val nameParts = rankingItem.name.split("_")
-    val displayIdolName = nameParts.getOrElse(0) { rankingItem.name }
+    val nameParts = idolData.name.split("_")
+    val displayIdolName = nameParts.getOrElse(0) { idolData.name }
     val displayGroupName = nameParts.getOrElse(1) { "" }
 
     AnimatedVisibility(
@@ -902,7 +843,7 @@ private fun CommunityScreenContent(
     ) {
         TrendsScreen(
             idolId = idolId ?: 0,
-            idolName = rankingItem.name,
+            idolName = idolData.name,
             onBackClick = { showTrendsScreen = false },
             onItemClick = { trendsItem ->
                 if (trendsItem.bannerUrl != null) {
@@ -920,7 +861,7 @@ private fun CommunityScreenContent(
     ) {
         IdolRankingHistoryScreen(
             idolId = idolId ?: 0,
-            idolName = rankingItem.name,
+            idolName = idolData.name,
             onBackClick = { showIdolIdolRankingHistoryScreen = false }
         )
     }
@@ -1273,12 +1214,13 @@ private fun CommunityTabRow(
 /**
  * IdolProfile - 아이돌 프로필 컴포넌트
  *
+ * @param idolData 아이돌 실시간 데이터 (Flow에서 실시간 업데이트)
  * @param isCollapsed Top3가 숨겨졌을 때 true - 간소화된 툴바 형태로 표시
  * @param onBackClick Collapsed 상태에서 뒤로가기 버튼 클릭
  */
 @Composable
 private fun IdolProfile(
-    rankingItem: RankingItem,
+    idolData: CommunityViewModel.IdolData,
     isCollapsed: Boolean = false,
     onProfileImageClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
@@ -1316,7 +1258,7 @@ private fun IdolProfile(
 
             // 이름 + 그룹명만 표시
             ExoNameWithGroup(
-                fullName = rankingItem.name,
+                fullName = idolData.name,
                 nameFontSize = 16.sp,
                 groupFontSize = 11.sp,
                 modifier = Modifier.weight(1f)
@@ -1333,14 +1275,14 @@ private fun IdolProfile(
                 ) { onProfileImageClick() }
             ) {
                 ExoProfileImage(
-                    imageUrl = rankingItem.photoUrl ?: "",
+                    imageUrl = idolData.photoUrl ?: "",
                     type = ProfileImageType.MEDIUM_CIRCLE,
                     rank = 0,
-                    anniversary = rankingItem.anniversary ?: "N",
-                    anniversaryDays = rankingItem.anniversaryDays,
-                    miracleCount = rankingItem.miracleCount,
-                    fairyCount = rankingItem.fairyCount,
-                    angelCount = rankingItem.angelCount
+                    anniversary = idolData.anniversary ?: "N",
+                    anniversaryDays = idolData.anniversaryDays,
+                    miracleCount = idolData.miracleCount,
+                    fairyCount = idolData.fairyCount,
+                    angelCount = idolData.angelCount
                 )
             }
 
@@ -1349,7 +1291,7 @@ private fun IdolProfile(
             // 이름 + 그룹명 + 팔로워
             Column(modifier = Modifier.weight(1f)) {
                 ExoNameWithGroup(
-                    fullName = rankingItem.name,
+                    fullName = idolData.name,
                     nameFontSize = 16.sp,
                     groupFontSize = 11.sp
                 )
@@ -1363,7 +1305,7 @@ private fun IdolProfile(
                     )
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(
-                        text = NumberFormatUtil.formatFollowerCount(rankingItem.mostCount),
+                        text = NumberFormatUtil.formatFollowerCount(idolData.mostCount),
                         fontSize = 12.sp,
                         lineHeight = 12.sp,
                         color = ColorPalette.textDimmed
@@ -1391,7 +1333,7 @@ private fun IdolProfile(
  * IdolDialog - 아이돌 정보 다이얼로그
  * Old 프로젝트의 IdolCommunityDialogFragment를 Compose로 구현
  *
- * @param rankingItem 아이돌 정보
+ * @param idolData 아이돌 실시간 데이터
  * @param isFavorite 즐겨찾기 여부
  * @param isMost 최애 여부
  * @param isFavoriteEnabled 즐겨찾기 버튼 활성화 여부 (디바운스용)
@@ -1406,7 +1348,7 @@ private fun IdolProfile(
  */
 @Composable
 private fun IdolDialog(
-    rankingItem: RankingItem,
+    idolData: CommunityViewModel.IdolData,
     isFavorite: Boolean = false,
     isMost: Boolean = false,
     isFavoriteEnabled: Boolean = true,
@@ -1448,7 +1390,7 @@ private fun IdolDialog(
             ) {
                 // 상단 최애/즐겨찾기 버튼 영역 (Old: marginTop="15dp", marginEnd="14dp")
                 // 비밀의 방 아이돌인 경우 숨김
-                val isSecretRoom = rankingItem.id.toIntOrNull() == Constants.SECRET_ROOM_IDOL_ID
+                val isSecretRoom = idolData.id.toIntOrNull() == Constants.SECRET_ROOM_IDOL_ID
                 if (!isSecretRoom) {
                     Row(
                         modifier = Modifier
@@ -1513,7 +1455,7 @@ private fun IdolDialog(
                     // 다이얼로그 내에서는 뱃지 표기 없음
                     Spacer(modifier = Modifier.height(20.dp))
                     ExoProfileImage(
-                        imageUrl = rankingItem.photoUrl ?: "",
+                        imageUrl = idolData.photoUrl ?: "",
                         type = ProfileImageType.XLARGE,
                         rank = 0,
                         anniversary = "N",
@@ -1526,13 +1468,13 @@ private fun IdolDialog(
                     // 이름 + 그룹명 (Old: marginTop="10dp", name=17sp bold, group=15sp bold marginStart=5dp)
                     Spacer(modifier = Modifier.height(10.dp))
                     ExoNameWithGroup(
-                        fullName = rankingItem.name,
+                        fullName = idolData.name,
                         nameFontSize = 17.sp,
                         groupFontSize = 15.sp
                     )
 
                     // 생일 (Old: birthday와 most_count는 붙어 있음)
-                    rankingItem.birthday?.let { birthday ->
+                    idolData.birthday?.let { birthday ->
                         if (birthday.isNotEmpty()) {
                             Text(
                                 text = birthday,
@@ -1546,7 +1488,7 @@ private fun IdolDialog(
                     // 최애 수 (Old: 10sp, text_gray)
                     Text(
                         text = stringResource(R.string.most_favorite) + " : " +
-                                NumberFormatUtil.formatFollowerCount(rankingItem.mostCount),
+                                NumberFormatUtil.formatFollowerCount(idolData.mostCount),
                         fontSize = 10.sp,
                         lineHeight = 14.sp,
                         color = ColorPalette.textGray
@@ -1614,7 +1556,7 @@ private fun IdolDialog(
                 horizontalArrangement = Arrangement.spacedBy(3.dp)
             ) {
                 // Angel 배지 (Old: 30dp x 35dp, paddingTop="12dp", textSize="10sp")
-                if (rankingItem.angelCount > 0) {
+                if (idolData.angelCount > 0) {
                     Box(
                         modifier = Modifier.size(30.dp, 35.dp),
                         contentAlignment = Alignment.TopCenter
@@ -1626,7 +1568,7 @@ private fun IdolDialog(
                             tint = Color.Unspecified
                         )
                         Text(
-                            text = rankingItem.angelCount.toString(),
+                            text = idolData.angelCount.toString(),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = ColorPalette.textAngel,
@@ -1635,7 +1577,7 @@ private fun IdolDialog(
                     }
                 }
                 // Fairy 배지
-                if (rankingItem.fairyCount > 0) {
+                if (idolData.fairyCount > 0) {
                     Box(
                         modifier = Modifier.size(30.dp, 35.dp),
                         contentAlignment = Alignment.TopCenter
@@ -1647,7 +1589,7 @@ private fun IdolDialog(
                             tint = Color.Unspecified
                         )
                         Text(
-                            text = rankingItem.fairyCount.toString(),
+                            text = idolData.fairyCount.toString(),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = ColorPalette.textFairy,
@@ -1656,7 +1598,7 @@ private fun IdolDialog(
                     }
                 }
                 // Miracle 배지
-                if (rankingItem.miracleCount > 0) {
+                if (idolData.miracleCount > 0) {
                     Box(
                         modifier = Modifier.size(30.dp, 35.dp),
                         contentAlignment = Alignment.TopCenter
@@ -1668,7 +1610,7 @@ private fun IdolDialog(
                             tint = Color.Unspecified
                         )
                         Text(
-                            text = rankingItem.miracleCount.toString(),
+                            text = idolData.miracleCount.toString(),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = ColorPalette.textMiracle,
@@ -1677,8 +1619,8 @@ private fun IdolDialog(
                     }
                 }
                 // Rookie 배지
-                if (rankingItem.rookieCount > 0) {
-                    val isSuper = rankingItem.rookieCount >= 3
+                if (idolData.rookieCount > 0) {
+                    val isSuper = idolData.rookieCount >= 3
                     Box(
                         modifier = Modifier.size(30.dp, 35.dp),
                         contentAlignment = Alignment.TopCenter
@@ -1693,7 +1635,7 @@ private fun IdolDialog(
                             tint = Color.Unspecified
                         )
                         Text(
-                            text = if (isSuper) "S" else rankingItem.rookieCount.toString(),
+                            text = if (isSuper) "S" else idolData.rookieCount.toString(),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (isSuper) ColorPalette.textSuperRookie else ColorPalette.textRookie,

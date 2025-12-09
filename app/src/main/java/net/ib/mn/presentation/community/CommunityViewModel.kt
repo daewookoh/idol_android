@@ -1,27 +1,40 @@
 package net.ib.mn.presentation.community
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import net.ib.mn.data.repository.ReportRepository
 import net.ib.mn.data.repository.UserCacheRepository
 import net.ib.mn.data.repository.UsersRepository
 import net.ib.mn.data.repository.WikiRepository
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.FavoritesRepository
-import net.ib.mn.ui.components.RankingItem
+import net.ib.mn.domain.repository.IdolRepository
+import net.ib.mn.util.IdolImageUtil
+import net.ib.mn.util.RankingUtil
 import javax.inject.Inject
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CommunityViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     val usersRepository: UsersRepository,
     val userCacheRepository: UserCacheRepository,
     val reportRepository: ReportRepository,
     private val favoritesRepository: FavoritesRepository,
     private val chartRankingRepository: net.ib.mn.data.repository.ChartRankingRepository,
-    val wikiRepository: WikiRepository
+    val wikiRepository: WikiRepository,
+    private val idolRepository: IdolRepository
 ) : ViewModel() {
 
     private val _isUpdatingMost = MutableStateFlow(false)
@@ -29,6 +42,87 @@ class CommunityViewModel @Inject constructor(
 
     private val _isUpdatingFavorite = MutableStateFlow(false)
     val isUpdatingFavorite: StateFlow<Boolean> = _isUpdatingFavorite.asStateFlow()
+
+    // 현재 관찰 중인 idolId
+    private val _currentIdolId = MutableStateFlow<Int?>(null)
+
+    /**
+     * 아이돌 실시간 데이터 클래스
+     * 로컬 DB에서 Flow로 관찰되며, 필드 추가 시 확장 가능
+     */
+    data class IdolData(
+        val id: String = "",
+        val name: String = "",
+        val nameEn: String? = null,
+        val photoUrl: String? = null,
+        val fandomName: String? = null,
+        val groupId: Int? = null,
+        val category: String? = null,
+        val miracleCount: Int = 0,
+        val fairyCount: Int = 0,
+        val angelCount: Int = 0,
+        val rookieCount: Int = 0,
+        val anniversary: String? = null,
+        val anniversaryDays: Int = 0,
+        val top3ImageUrls: List<String?> = listOf(null, null, null),
+        val top3VideoUrls: List<String?> = listOf(null, null, null),
+        val mostCount: Int = 0,
+        val heartCount: Long = 0,
+        val birthday: String? = null,
+        val resourceUri: String? = null,
+        val sourceApp: String? = null
+    )
+
+    /**
+     * 아이돌 실시간 데이터를 Flow로 관찰
+     * idol 데이터가 변경되면 자동으로 업데이트됩니다.
+     */
+    val idolDataFlow: StateFlow<IdolData?> = _currentIdolId
+        .flatMapLatest { idolId ->
+            if (idolId == null || idolId <= 0) {
+                flowOf(null)
+            } else {
+                idolRepository.observeIdolById(idolId).map { idol ->
+                    idol?.let {
+                        IdolData(
+                            id = it.id.toString(),
+                            name = RankingUtil.getLocalizedName(it, context),
+                            nameEn = it.nameEn,
+                            photoUrl = it.imageUrl,
+                            fandomName = RankingUtil.getLocalizedFandomName(it, context),
+                            groupId = it.groupId,
+                            category = it.category,
+                            miracleCount = it.miracleCount,
+                            fairyCount = it.fairyCount,
+                            angelCount = it.angelCount,
+                            rookieCount = it.rookieCount,
+                            anniversary = it.anniversary.takeIf { ann -> ann != "N" },
+                            anniversaryDays = it.anniversaryDays ?: 0,
+                            top3ImageUrls = IdolImageUtil.getTop3ImageUrls(it),
+                            top3VideoUrls = IdolImageUtil.getTop3VideoUrls(it),
+                            mostCount = it.mostCount,
+                            heartCount = it.heart,
+                            birthday = RankingUtil.formatBirthday(it.birthDay, it.isLunarBirthday, context),
+                            resourceUri = it.resourceUri,
+                            sourceApp = it.sourceApp
+                        )
+                    }
+                }
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
+    /**
+     * 관찰할 아이돌 ID 설정
+     * CommunityScreen에서 idolId가 변경될 때 호출됩니다.
+     */
+    fun setIdolId(idolId: Int) {
+        _currentIdolId.value = idolId
+    }
 
     /**
      * 해당 아이돌이 사용자의 최애인지 확인
@@ -54,13 +148,13 @@ class CommunityViewModel @Inject constructor(
     /**
      * 최애 아이돌 변경 API 호출
      *
-     * @param rankingItem 아이돌 정보
+     * @param idolData 아이돌 실시간 데이터
      * @param currentIsMost 현재 최애 상태
      * @param onSuccess 성공 시 콜백 (새 최애 상태 전달)
      * @param onError 에러 시 콜백 (에러 메시지 전달)
      */
     suspend fun updateMostIdol(
-        rankingItem: RankingItem,
+        idolData: IdolData,
         currentIsMost: Boolean,
         onSuccess: (newIsMost: Boolean) -> Unit,
         onError: (message: String?) -> Unit
@@ -77,7 +171,7 @@ class CommunityViewModel @Inject constructor(
         val idolResourceUri = if (currentIsMost) {
             null // 최애 해제
         } else {
-            rankingItem.resourceUri ?: "/api/v1/idols/${rankingItem.id}/"
+            idolData.resourceUri ?: "/api/v1/idols/${idolData.id}/"
         }
 
         val result = usersRepository.updateMost(userResourceUri, idolResourceUri)
@@ -89,11 +183,11 @@ class CommunityViewModel @Inject constructor(
             val newMostIdolChartCode: String?
 
             if (newIsMost) {
-                newMostIdolId = rankingItem.id.toIntOrNull()
-                newMostIdolChartCode = rankingItem.chartCode
+                newMostIdolId = idolData.id.toIntOrNull()
+                newMostIdolChartCode = idolData.sourceApp
                 userCacheRepository.updateMostIdolCache(
                     idolId = newMostIdolId,
-                    idolCategory = rankingItem.category,
+                    idolCategory = idolData.category,
                     idolChartCode = newMostIdolChartCode
                 )
                 // 최애 설정 시 즐겨찾기 캐시에도 추가 (Old 프로젝트와 동일 - 서버에서 자동 처리됨)

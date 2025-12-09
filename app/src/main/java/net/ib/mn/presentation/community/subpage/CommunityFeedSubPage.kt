@@ -47,9 +47,9 @@ import net.ib.mn.presentation.common.ArticleItemType
 import net.ib.mn.presentation.common.ExoArticleItem
 import net.ib.mn.presentation.common.ExoArticleNavigation
 import net.ib.mn.presentation.common.ExoArticleViewModel
+import net.ib.mn.presentation.community.CommunityViewModel
 import net.ib.mn.ui.components.ExoBottomSheetItem
 import net.ib.mn.ui.components.ExoBottomSheetList
-import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
@@ -57,7 +57,7 @@ import net.ib.mn.util.IdolImageUtil.toSecureUrl
 /**
  * CommunityFeedSubPage - 커뮤니티 피드 탭
  *
- * @param rankingItem 선택된 아이돌 정보
+ * @param idolData 아이돌 실시간 데이터 (Flow에서 관찰됨)
  * @param onFirstArticleVideoPlaying 첫 번째 아티클의 비디오/움짤 재생 상태 콜백 (Top3 비디오 제어용)
  * @param onNavigateToProfile 프로필 화면 이동 콜백
  * @param onNavigateToArticleDetail 게시글 상세 화면 이동 콜백
@@ -66,17 +66,18 @@ import net.ib.mn.util.IdolImageUtil.toSecureUrl
  */
 @Composable
 fun CommunityFeedSubPage(
-    rankingItem: RankingItem,
+    idolData: CommunityViewModel.IdolData,
     onFirstArticleVideoPlaying: (Boolean) -> Unit = {},
     onNavigateToProfile: (userId: Int, nickname: String, imageUrl: String?, level: Int, mostIdolName: String?) -> Unit = { _, _, _, _, _ -> },
     onNavigateToArticleDetail: (ArticleModel, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _ -> },
     onNavigateToPhotoDetail: (ArticleModel, Int) -> Unit = { _, _ -> },
     onNavigateToNoticeDetail: (ArticleModel) -> Unit = {},
-    viewModel: CommunityFeedViewModel = hiltViewModel(),
+    viewModel: CommunityFeedViewModel = hiltViewModel(key = "feed_${idolData.id}"),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
+    val idolId = idolData.id.toIntOrNull() ?: 0
 
     // ExoArticle 네비게이션 이벤트 처리
     LaunchedEffect(Unit) {
@@ -110,8 +111,7 @@ fun CommunityFeedSubPage(
     }
 
     // 초기 로드 (isMost는 ViewModel에서 PreferencesManager를 통해 직접 확인)
-    LaunchedEffect(rankingItem.id) {
-        val idolId = rankingItem.id.toIntOrNull() ?: 0
+    LaunchedEffect(idolId) {
         if (idolId > 0) {
             viewModel.loadFeed(idolId)
         }
@@ -132,150 +132,150 @@ fun CommunityFeedSubPage(
         }
     }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(ColorPalette.background100)
     ) {
-        if (uiState.isLoading && uiState.articles.isEmpty()) {
-            // 초기 로딩
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = ColorPalette.main)
-            }
-        } else {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                // 공지사항 (ExoArticleItem ADMIN_NOTICE 타입)
-                if (uiState.notices.isNotEmpty()) {
-                    items(
-                        items = uiState.notices,
-                        key = { "notice_${it.id}" }
-                    ) { notice ->
-                        ExoArticleItem(
-                            article = notice.toArticleModel(),
-                            type = ArticleItemType.ADMIN_NOTICE
-                        )
-                    }
+        // 필터 헤더 - LazyColumn 밖에 배치하여 리컴포지션 격리
+        FeedFilterHeader(
+            viewType = uiState.viewType,
+            orderBy = uiState.orderBy,
+            onViewTypeChange = { viewModel.setViewType(it) },
+            onOrderByChange = { viewModel.setOrderBy(it) }
+        )
+
+        Box(modifier = Modifier.weight(1f)) {
+            if (uiState.isLoading && uiState.articles.isEmpty()) {
+                // 초기 로딩
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = ColorPalette.main)
                 }
-
-                // 필터 헤더
-                item(key = "header") {
-                    FeedFilterHeader(
-                        viewType = uiState.viewType,
-                        orderBy = uiState.orderBy,
-                        onViewTypeChange = { viewModel.setViewType(it) },
-                        onOrderByChange = { viewModel.setOrderBy(it) }
-                    )
-                }
-
-                // ViewType에 따라 목록 또는 그리드 표시
-                if (uiState.viewType == ViewType.LIST) {
-                    // 목록 보기 - 기존 ExoArticle 사용
-                    itemsIndexed(
-                        items = uiState.articles,
-                        key = { _, article -> article.id }
-                    ) { index, article ->
-                        // 80% 이상 보일 때만 비디오 재생
-                        val actualIndex = index + uiState.notices.size + 1
-                        val isVisible by remember {
-                            derivedStateOf {
-                                val layoutInfo = listState.layoutInfo
-                                val itemInfo = layoutInfo.visibleItemsInfo.find { it.index == actualIndex }
-                                if (itemInfo == null) {
-                                    false
-                                } else {
-                                    val itemTop = itemInfo.offset
-                                    val itemBottom = itemInfo.offset + itemInfo.size
-                                    val visibleTop = maxOf(itemTop, layoutInfo.viewportStartOffset)
-                                    val visibleBottom = minOf(itemBottom, layoutInfo.viewportEndOffset)
-                                    val visibleHeight = (visibleBottom - visibleTop).coerceAtLeast(0)
-                                    val visibilityRatio = if (itemInfo.size > 0) visibleHeight.toFloat() / itemInfo.size else 0f
-                                    visibilityRatio >= 0.8f
-                                }
-                            }
-                        }
-
-                        // 첫 번째 아티클이 비디오/움짤이고 visible일 때 Top3 비디오 정지
-                        val firstMedia = article.mediaFiles.firstOrNull()
-                        val hasPlayableMedia = firstMedia != null && (firstMedia.isVideo || firstMedia.isGif)
-                        if (index == 0 && hasPlayableMedia) {
-                            LaunchedEffect(isVisible) {
-                                onFirstArticleVideoPlaying(isVisible)
-                            }
-                        }
-
-                        // ExoArticleItem - 모든 액션은 내부에서 처리
-                        ExoArticleItem(
-                            article = article,
-                            type = ArticleItemType.FEED,
-                            isVisible = isVisible,
-                            showTranslation = true,
-                            onDeleted = { deletedArticleId ->
-                                viewModel.removeArticle(deletedArticleId)
-                            },
-                            onArticleUpdated = { updatedArticle ->
-                                // ViewModel 직접 업데이트
-                                viewModel.updateArticle(updatedArticle)
-                            },
-                            viewModel = articleViewModel
-                        )
-                    }
-                } else {
-                    // 그리드 보기 (GRID / WALLPAPER) - 3열 그리드
-                    // Old 프로젝트처럼 articles를 3개씩 묶어서 한 행에 표시
-                    val chunkedArticles = uiState.articles.chunked(3)
-                    val isWallpaperMode = uiState.viewType == ViewType.WALLPAPER
-
-                    items(
-                        items = chunkedArticles,
-                        key = { rowArticles -> "grid_row_${rowArticles.firstOrNull()?.id ?: ""}" }
-                    ) { rowArticles ->
-                        FeedGridRow(
-                            articles = rowArticles,
-                            isWallpaperMode = isWallpaperMode,
-                            onItemClick = { article ->
-                                onNavigateToPhotoDetail(article, 0)
-                            }
-                        )
-                    }
-                }
-
-                // 다음 페이지 로딩 인디케이터
-                if (uiState.isLoadingMore) {
-                    item(key = "loading_more") {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                color = ColorPalette.main,
-                                modifier = Modifier.size(24.dp)
+            } else {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    // 공지사항 (ExoArticleItem ADMIN_NOTICE 타입)
+                    if (uiState.notices.isNotEmpty()) {
+                        items(
+                            items = uiState.notices,
+                            key = { "notice_${it.id}" }
+                        ) { notice ->
+                            ExoArticleItem(
+                                article = notice.toArticleModel(),
+                                type = ArticleItemType.ADMIN_NOTICE
                             )
                         }
                     }
+
+                    // ViewType에 따라 목록 또는 그리드 표시
+                    if (uiState.viewType == ViewType.LIST) {
+                        // 목록 보기 - 기존 ExoArticle 사용
+                        itemsIndexed(
+                            items = uiState.articles,
+                            key = { _, article -> article.id }
+                        ) { index, article ->
+                            // 80% 이상 보일 때만 비디오 재생
+                            val actualIndex = index + uiState.notices.size
+                            val isVisible by remember {
+                                derivedStateOf {
+                                    val layoutInfo = listState.layoutInfo
+                                    val itemInfo = layoutInfo.visibleItemsInfo.find { it.index == actualIndex }
+                                    if (itemInfo == null) {
+                                        false
+                                    } else {
+                                        val itemTop = itemInfo.offset
+                                        val itemBottom = itemInfo.offset + itemInfo.size
+                                        val visibleTop = maxOf(itemTop, layoutInfo.viewportStartOffset)
+                                        val visibleBottom = minOf(itemBottom, layoutInfo.viewportEndOffset)
+                                        val visibleHeight = (visibleBottom - visibleTop).coerceAtLeast(0)
+                                        val visibilityRatio = if (itemInfo.size > 0) visibleHeight.toFloat() / itemInfo.size else 0f
+                                        visibilityRatio >= 0.8f
+                                    }
+                                }
+                            }
+
+                            // 첫 번째 아티클이 비디오/움짤이고 visible일 때 Top3 비디오 정지
+                            val firstMedia = article.mediaFiles.firstOrNull()
+                            val hasPlayableMedia = firstMedia != null && (firstMedia.isVideo || firstMedia.isGif)
+                            if (index == 0 && hasPlayableMedia) {
+                                LaunchedEffect(isVisible) {
+                                    onFirstArticleVideoPlaying(isVisible)
+                                }
+                            }
+
+                            // ExoArticleItem - 모든 액션은 내부에서 처리
+                            ExoArticleItem(
+                                article = article,
+                                type = ArticleItemType.FEED,
+                                isVisible = isVisible,
+                                showTranslation = true,
+                                onDeleted = { deletedArticleId ->
+                                    viewModel.removeArticle(deletedArticleId)
+                                },
+                                onArticleUpdated = { updatedArticle ->
+                                    // ViewModel 직접 업데이트
+                                    viewModel.updateArticle(updatedArticle)
+                                },
+                                viewModel = articleViewModel
+                            )
+                        }
+                    } else {
+                        // 그리드 보기 (GRID / WALLPAPER) - 3열 그리드
+                        // Old 프로젝트처럼 articles를 3개씩 묶어서 한 행에 표시
+                        val chunkedArticles = uiState.articles.chunked(3)
+                        val isWallpaperMode = uiState.viewType == ViewType.WALLPAPER
+
+                        items(
+                            items = chunkedArticles,
+                            key = { rowArticles -> "grid_row_${rowArticles.firstOrNull()?.id ?: ""}" }
+                        ) { rowArticles ->
+                            FeedGridRow(
+                                articles = rowArticles,
+                                isWallpaperMode = isWallpaperMode,
+                                onItemClick = { article ->
+                                    onNavigateToPhotoDetail(article, 0)
+                                }
+                            )
+                        }
+                    }
+
+                    // 다음 페이지 로딩 인디케이터
+                    if (uiState.isLoadingMore) {
+                        item(key = "loading_more") {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    color = ColorPalette.main,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
+                    }
                 }
             }
-        }
 
-        // 에러 메시지
-        uiState.error?.let { error ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = error,
-                    style = ExoTypo.body14.copy(color = ColorPalette.textDimmed)
-                )
+            // 에러 메시지
+            uiState.error?.let { error ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = error,
+                        style = ExoTypo.body14.copy(color = ColorPalette.textDimmed)
+                    )
+                }
             }
         }
     }

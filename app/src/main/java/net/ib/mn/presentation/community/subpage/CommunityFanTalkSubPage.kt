@@ -9,31 +9,34 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.presentation.common.ExoArticleNavigation
 import net.ib.mn.presentation.common.ExoArticleViewModel
+import net.ib.mn.presentation.community.CommunityViewModel
 import net.ib.mn.presentation.main.freeboard.FreeBoardContent
 import net.ib.mn.presentation.main.freeboard.FreeBoardContract
 import net.ib.mn.presentation.main.freeboard.FreeBoardViewModel
-import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.util.LocaleUtil
 
 /**
  * CommunityFanTalkSubPage - 커뮤니티 팬톡 탭
  *
  * FreeBoardPage의 최애 탭과 동일한 UI를 재사용하며,
- * 선택된 아이돌(rankingItem.id)의 덕질게시판을 표시합니다.
+ * 선택된 아이돌(idolData.id)의 덕질게시판을 표시합니다.
  */
 @Composable
 fun CommunityFanTalkSubPage(
-    rankingItem: RankingItem,
+    idolData: CommunityViewModel.IdolData,
     onNavigateToArticleDetail: (ArticleModel, externalTabName: String?, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _, _ -> },
-    viewModel: FreeBoardViewModel = hiltViewModel(key = "fanTalk_${rankingItem.id}"),
+    viewModel: FreeBoardViewModel = hiltViewModel(key = "fanTalk_${idolData.id}"),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val idolId = idolData.id.toIntOrNull() ?: 0
 
-    LaunchedEffect(rankingItem.id) {
-        rankingItem.id.toIntOrNull()?.let { viewModel.setExternalIdolId(it) }
-        viewModel.sendIntent(FreeBoardContract.Intent.LoadInitialData)
+    LaunchedEffect(idolId) {
+        if (idolId > 0) {
+            viewModel.setExternalIdolId(idolId)
+            viewModel.sendIntent(FreeBoardContract.Intent.LoadInitialData)
+        }
     }
 
     // ExoArticle 네비게이션 이벤트 처리

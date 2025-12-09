@@ -87,4 +87,13 @@ interface IdolDao {
      */
     @Query("SELECT SUM(heart) FROM idols")
     fun observeTotalHearts(): Flow<Long?>
+
+    /**
+     * 특정 ID의 idol을 Flow로 관찰
+     *
+     * idol 데이터가 변경될 때마다 새로운 값을 emit합니다.
+     * CommunityScreen에서 실시간 top3 이미지, 구독수 업데이트에 사용됩니다.
+     */
+    @Query("SELECT * FROM idols WHERE id=:id LIMIT 1")
+    fun observeIdolById(id: Int): Flow<IdolEntity?>
 }

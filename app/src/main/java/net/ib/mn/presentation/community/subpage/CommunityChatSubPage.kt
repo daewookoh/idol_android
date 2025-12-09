@@ -48,26 +48,26 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
 import net.ib.mn.R
 import net.ib.mn.domain.model.ChatRoomModel
+import net.ib.mn.presentation.community.CommunityViewModel
 import net.ib.mn.ui.components.ExoBottomSheetItem
 import net.ib.mn.ui.components.ExoBottomSheetList
 import net.ib.mn.ui.components.ExoConfirmDialog
-import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityChatSubPage(
-    rankingItem: RankingItem,
+    idolData: CommunityViewModel.IdolData,
     shouldRefresh: Boolean = false,
     onRefreshConsumed: () -> Unit = {},
     onNavigateToChatRoom: (roomId: Int, nickname: String?, userId: Int?, role: String?, isAnonymity: Boolean, title: String) -> Unit = { _, _, _, _, _, _ -> },
     onNavigateToCreateRoom: () -> Unit = {},
-    viewModel: CommunityChatViewModel = hiltViewModel(key = "chat_${rankingItem.id}")
+    viewModel: CommunityChatViewModel = hiltViewModel(key = "chat_${idolData.id}")
 ) {
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val idolId = rankingItem.id.toIntOrNull() ?: 0
+    val idolId = idolData.id.toIntOrNull() ?: 0
 
     var showLeaveDialog by remember { mutableStateOf(false) }
     var leaveDialogRoom by remember { mutableStateOf<ChatRoomModel?>(null) }

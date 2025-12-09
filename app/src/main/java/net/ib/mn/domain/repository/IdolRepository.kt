@@ -50,6 +50,17 @@ interface IdolRepository {
     suspend fun getIdolById(id: Int): IdolEntity?
 
     /**
+     * ID로 특정 Idol을 Flow로 관찰 (로컬 DB)
+     *
+     * idol 데이터가 변경될 때마다 새로운 값을 emit합니다.
+     * CommunityScreen에서 실시간 top3 이미지, 구독수 업데이트에 사용됩니다.
+     *
+     * @param id Idol ID
+     * @return Flow<IdolEntity?> 아이돌 엔티티 Flow
+     */
+    fun observeIdolById(id: Int): Flow<IdolEntity?>
+
+    /**
      * Type과 Category로 Idol 리스트 조회 (로컬 DB)
      *
      * @param type Idol type ("S" or "G")

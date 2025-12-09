@@ -45,10 +45,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
 import net.ib.mn.R
 import net.ib.mn.domain.model.ScheduleModel
+import net.ib.mn.presentation.community.CommunityViewModel
 import net.ib.mn.ui.components.ExoBottomSheetItem
 import net.ib.mn.ui.components.ExoBottomSheetList
 import net.ib.mn.ui.components.ExoConfirmDialog
-import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.components.ScheduleVoteAndComment
 import java.text.DateFormatSymbols
 import java.text.SimpleDateFormat
@@ -60,15 +60,15 @@ private val KST: TimeZone = TimeZone.getTimeZone("Asia/Seoul")
 
 @Composable
 fun CommunityScheduleSubPage(
-    rankingItem: RankingItem,
+    idolData: CommunityViewModel.IdolData,
     onNavigateToScheduleEdit: (ScheduleModel) -> Unit = {},
     onNavigateToScheduleDetail: (ScheduleModel, String, String) -> Unit = { _, _, _ -> },
     onNavigateToMonthScheduleDetail: (ScheduleModel, String, String) -> Unit = { _, _, _ -> },
-    viewModel: CommunityScheduleViewModel = hiltViewModel(key = "schedule_${rankingItem.id}")
+    viewModel: CommunityScheduleViewModel = hiltViewModel(key = "schedule_${idolData.id}")
 ) {
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val idolId = rankingItem.id.toIntOrNull() ?: 0
+    val idolId = idolData.id.toIntOrNull() ?: 0
 
     var showLanguageSheet by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf<Int?>(null) }
