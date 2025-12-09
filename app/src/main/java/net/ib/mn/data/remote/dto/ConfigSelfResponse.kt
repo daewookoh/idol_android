@@ -85,6 +85,9 @@ data class ConfigSelfResponse(
     @SerializedName("video_heart")
     val videoHeart: Int = 0,
 
+    @SerializedName("chatroom_diamond")
+    val chatroomDiamond: Int = 50,  // 채팅방 개설 다이아 비용 (기본값 50)
+
     @SerializedName("schedule_add_level")
     val scheduleAddLevel: Int = 0,
 

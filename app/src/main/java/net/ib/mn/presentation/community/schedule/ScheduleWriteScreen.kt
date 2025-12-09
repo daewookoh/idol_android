@@ -322,7 +322,7 @@ fun ScheduleWriteScreen(
     // 저장 완료 다이얼로그
     if (showSuccessDialog && savedSchedule != null) {
         ExoDialog(
-            message = "스케줄이 저장되었습니다.",
+            message = stringResource(R.string.schedule_save),
             onDismiss = { },
             confirmButtonText = stringResource(R.string.confirm),
             onConfirm = {

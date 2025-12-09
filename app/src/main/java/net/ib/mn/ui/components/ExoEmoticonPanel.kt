@@ -149,12 +149,12 @@ fun ExoEmoticonPanel(
                     contentPadding = PaddingValues(horizontal = 12.dp)
                 ) {
                     itemsIndexed(uiState.emoticonSets) { index, emoticonSet ->
-                        // 탭 아이콘: emojiUrl이 비어있으면 첫 번째 이모티콘의 thumbnail 사용
+                        // 탭 아이콘: emojiUrl이 비어있으면 첫 번째 이모티콘의 CDN URL 사용
                         val tabIconUrl = emoticonSet.emojiUrl.ifEmpty {
                             uiState.emoticonDetails[emoticonSet.id]?.firstOrNull()?.let { firstEmoticon ->
-                                firstEmoticon.imageUrl.ifEmpty { firstEmoticon.thumbnail }
+                                viewModel.getEmoticonUrl(firstEmoticon.id)
                             } ?: ""
-                        }
+                        }.toSecureUrl()
                         EmoticonTabItem(
                             emojiUrl = tabIconUrl,
                             title = emoticonSet.title,
@@ -206,8 +206,11 @@ fun ExoEmoticonPanel(
                             verticalArrangement = Arrangement.Top
                         ) {
                             items(emoticons) { emoticon ->
+                                // CDN URL 기반으로 이모티콘 이미지 URL 생성
+                                val emoticonUrl = viewModel.getEmoticonUrl(emoticon.id)
                                 EmoticonPanelItem(
                                     emoticon = emoticon,
+                                    emoticonUrl = emoticonUrl,
                                     onClick = {
                                         val currentTime = SystemClock.elapsedRealtime()
 
@@ -277,10 +280,15 @@ private fun EmoticonTabItem(
 
 /**
  * 개별 이모티콘 아이템 (old: emoticon_item.xml과 동일 - 60dp x 60dp)
+ *
+ * @param emoticon 이모티콘 상세 모델
+ * @param emoticonUrl CDN URL 기반 이모티콘 이미지 URL
+ * @param onClick 클릭 콜백
  */
 @Composable
 private fun EmoticonPanelItem(
     emoticon: EmoticonDetailModel,
+    emoticonUrl: String,
     onClick: () -> Unit
 ) {
     Box(
@@ -296,7 +304,7 @@ private fun EmoticonPanelItem(
         contentAlignment = Alignment.Center
     ) {
         AsyncImage(
-            model = emoticon.imageUrl.ifEmpty { emoticon.thumbnail }.toSecureUrl(),
+            model = emoticonUrl,
             contentDescription = emoticon.title,
             modifier = Modifier
                 .size(60.dp)

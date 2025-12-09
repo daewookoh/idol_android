@@ -135,6 +135,8 @@ class PreferencesManager @Inject constructor(
         val KEY_UDP_STAGE = intPreferencesKey("udp_stage")
         val KEY_CDN_URL = stringPreferencesKey("cdn_url")
         val KEY_VIDEO_HEART = intPreferencesKey("video_heart")  // 비디오 광고 하트 보상
+        val KEY_CHATROOM_DIAMOND = intPreferencesKey("chatroom_diamond")  // 채팅방 개설 다이아 비용
+        val KEY_CHAT_URL = stringPreferencesKey("chat_url")  // 채팅 소켓 URL
 
         // Menu Config (from /configs/self/ API)
         val KEY_MENU_NOTICE_MAIN = stringPreferencesKey("menu_notice_main")
@@ -201,6 +203,9 @@ class PreferencesManager @Inject constructor(
 
         // Free Board Placeholder (자유게시판 글쓰기 placeholder)
         val KEY_FREE_BOARD_PLACEHOLDER = stringPreferencesKey("free_board_placeholder")
+
+        // Chat Room Create Instruction (채팅방 개설 안내 팝업)
+        val KEY_SHOW_CREATE_CHAT_ROOM_INSTRUCTION = booleanPreferencesKey("show_create_chat_room_instruction")
     }
 
     // ============================================================
@@ -333,6 +338,16 @@ class PreferencesManager @Inject constructor(
     val videoHeart: Flow<Int> = context.dataStore.data
         .map { preferences ->
             preferences[KEY_VIDEO_HEART] ?: 0
+        }
+
+    val chatRoomDiamond: Flow<Int> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_CHATROOM_DIAMOND] ?: 50
+        }
+
+    val chatUrl: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_CHAT_URL]
         }
 
     val menuNoticeMain: Flow<String?> = context.dataStore.data
@@ -611,6 +626,40 @@ class PreferencesManager @Inject constructor(
     suspend fun setVideoHeart(videoHeart: Int) {
         context.dataStore.edit { preferences ->
             preferences[KEY_VIDEO_HEART] = videoHeart
+        }
+    }
+
+    suspend fun setChatRoomDiamond(diamond: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_CHATROOM_DIAMOND] = diamond
+        }
+    }
+
+    suspend fun setChatUrl(url: String?) {
+        context.dataStore.edit { preferences ->
+            if (url != null) {
+                preferences[KEY_CHAT_URL] = url
+            } else {
+                preferences.remove(KEY_CHAT_URL)
+            }
+        }
+    }
+
+    /**
+     * Chat URL 동기적으로 가져오기 (ChatSocketManager용)
+     */
+    fun getChatUrlSync(): String? {
+        return runBlocking {
+            context.dataStore.data.first()[KEY_CHAT_URL]
+        }
+    }
+
+    /**
+     * CDN URL 동기적으로 가져오기 (이모티콘 URL 생성용)
+     */
+    fun getCdnUrlSync(): String? {
+        return runBlocking {
+            context.dataStore.data.first()[KEY_CDN_URL]
         }
     }
 
@@ -1300,5 +1349,66 @@ class PreferencesManager @Inject constructor(
      */
     suspend fun getUserLevel(): Int {
         return context.dataStore.data.first()[KEY_USER_LEVEL] ?: 0
+    }
+
+    // ============================================================
+    // Chat Room Create Instruction (채팅방 개설 안내 팝업)
+    // ============================================================
+
+    /**
+     * 채팅방 개설 안내 팝업 표시 여부 가져오기
+     * 기본값 true (처음에는 팝업 표시)
+     */
+    suspend fun shouldShowChatRoomCreateInstruction(): Boolean {
+        return context.dataStore.data.first()[KEY_SHOW_CREATE_CHAT_ROOM_INSTRUCTION] ?: true
+    }
+
+    /**
+     * 채팅방 개설 안내 팝업 다시 보지 않기 설정
+     */
+    suspend fun setShowChatRoomCreateInstruction(show: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_SHOW_CREATE_CHAT_ROOM_INSTRUCTION] = show
+        }
+    }
+
+    // ============================================================
+    // Socket Authentication (Synchronous - for ChatSocketManager)
+    // ============================================================
+
+    /**
+     * 유저 이메일 가져오기 (동기)
+     */
+    fun getUserEmail(): String {
+        return runBlocking {
+            context.dataStore.data.first()[KEY_USER_EMAIL] ?: ""
+        }
+    }
+
+    /**
+     * 유저 도메인 가져오기 (동기)
+     */
+    fun getUserDomain(): String {
+        return runBlocking {
+            context.dataStore.data.first()[KEY_LOGIN_DOMAIN] ?: ""
+        }
+    }
+
+    /**
+     * 유저 토큰 가져오기 (동기)
+     */
+    fun getUserToken(): String {
+        return runBlocking {
+            context.dataStore.data.first()[KEY_ACCESS_TOKEN] ?: ""
+        }
+    }
+
+    /**
+     * 유저 ID 가져오기 (동기)
+     */
+    fun getUserIdSync(): Int {
+        return runBlocking {
+            context.dataStore.data.first()[KEY_USER_ID] ?: 0
+        }
     }
 }

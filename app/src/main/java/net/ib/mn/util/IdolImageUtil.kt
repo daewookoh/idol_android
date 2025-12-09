@@ -195,6 +195,26 @@ object IdolImageUtil {
     }
 
     /**
+     * 이모티콘 이미지 URL 생성
+     *
+     * old 프로젝트의 UtilK.fileImageUrl() 로직:
+     * ${cdnUrl}/e/${emoticonId}.t.webp
+     *
+     * 서버에서 받아온 imageUrl/thumbnail을 무시하고,
+     * emoticonId를 기반으로 CDN URL을 직접 생성
+     *
+     * @param cdnUrl CDN 베이스 URL
+     * @param emoticonId Emoticon ID
+     * @return 이모티콘 이미지 URL
+     */
+    fun getEmoticonImageUrl(
+        cdnUrl: String,
+        emoticonId: Int
+    ): String {
+        return "$cdnUrl/e/$emoticonId.t.webp"
+    }
+
+    /**
      * Trend 이미지 URL 생성
      *
      * old 프로젝트의 UtilK.trendImageUrl() 로직:

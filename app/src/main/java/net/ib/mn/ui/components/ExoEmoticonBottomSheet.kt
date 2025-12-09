@@ -49,8 +49,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.repository.EmoticonRepository
+import net.ib.mn.util.IdolImageUtil
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.EmoticonDetailModel
 import net.ib.mn.domain.model.EmoticonModel
@@ -67,7 +70,8 @@ data class EmoticonBottomSheetUiState(
     val emoticonSets: List<EmoticonModel> = emptyList(),
     val emoticonDetails: Map<Int, List<EmoticonDetailModel>> = emptyMap(),
     val isLoading: Boolean = false,
-    val selectedTabIndex: Int = 0
+    val selectedTabIndex: Int = 0,
+    val cdnUrl: String = ""
 )
 
 /**
@@ -75,7 +79,8 @@ data class EmoticonBottomSheetUiState(
  */
 @HiltViewModel
 class EmoticonBottomSheetViewModel @Inject constructor(
-    private val emoticonRepository: EmoticonRepository
+    private val emoticonRepository: EmoticonRepository,
+    private val preferencesManager: PreferencesManager
 ) : ViewModel() {
 
     companion object {
@@ -86,7 +91,32 @@ class EmoticonBottomSheetViewModel @Inject constructor(
     val uiState: StateFlow<EmoticonBottomSheetUiState> = _uiState.asStateFlow()
 
     init {
+        loadCdnUrl()
         loadEmoticonSets()
+    }
+
+    /**
+     * CDN URL 로드
+     */
+    private fun loadCdnUrl() {
+        viewModelScope.launch {
+            val cdnUrl = preferencesManager.cdnUrl.first() ?: ""
+            _uiState.value = _uiState.value.copy(cdnUrl = cdnUrl)
+            logD(TAG, "CDN URL loaded: $cdnUrl")
+        }
+    }
+
+    /**
+     * 이모티콘 ID로 올바른 URL 생성
+     * old 프로젝트의 UtilK.fileImageUrl() 로직과 동일
+     */
+    fun getEmoticonUrl(emoticonId: Int): String {
+        val cdnUrl = _uiState.value.cdnUrl
+        return if (cdnUrl.isNotEmpty()) {
+            IdolImageUtil.getEmoticonImageUrl(cdnUrl, emoticonId).toSecureUrl()
+        } else {
+            "" // cdnUrl이 없으면 빈 문자열 반환
+        }
     }
 
     /**
@@ -255,12 +285,12 @@ fun ExoEmoticonBottomSheet(
                     contentPadding = PaddingValues(horizontal = 12.dp)
                 ) {
                     itemsIndexed(uiState.emoticonSets) { index, emoticonSet ->
-                        // 탭 아이콘: emojiUrl이 비어있으면 첫 번째 이모티콘의 thumbnail 사용
+                        // 탭 아이콘: emojiUrl이 비어있으면 첫 번째 이모티콘의 CDN URL 사용
                         val tabIconUrl = emoticonSet.emojiUrl.ifEmpty {
                             uiState.emoticonDetails[emoticonSet.id]?.firstOrNull()?.let { firstEmoticon ->
-                                firstEmoticon.imageUrl.ifEmpty { firstEmoticon.thumbnail }
+                                viewModel.getEmoticonUrl(firstEmoticon.id)
                             } ?: ""
-                        }
+                        }.toSecureUrl()
                         EmoticonBottomSheetTabItem(
                             emojiUrl = tabIconUrl,
                             title = emoticonSet.title,
@@ -311,8 +341,11 @@ fun ExoEmoticonBottomSheet(
                             verticalArrangement = Arrangement.spacedBy(0.dp)
                         ) {
                             items(emoticons) { emoticon ->
+                                // CDN URL 기반으로 이모티콘 이미지 URL 생성
+                                val emoticonUrl = viewModel.getEmoticonUrl(emoticon.id)
                                 EmoticonBottomSheetItem(
                                     emoticon = emoticon,
+                                    emoticonUrl = emoticonUrl,
                                     onClick = {
                                         val currentTime = SystemClock.elapsedRealtime()
 
@@ -385,10 +418,15 @@ private fun EmoticonBottomSheetTabItem(
 
 /**
  * 개별 이모티콘 아이템 (old: emoticon_item.xml과 동일 - 60dp x 60dp)
+ *
+ * @param emoticon 이모티콘 상세 모델
+ * @param emoticonUrl CDN URL 기반 이모티콘 이미지 URL
+ * @param onClick 클릭 콜백
  */
 @Composable
 private fun EmoticonBottomSheetItem(
     emoticon: EmoticonDetailModel,
+    emoticonUrl: String,
     onClick: () -> Unit
 ) {
     Box(
@@ -404,7 +442,7 @@ private fun EmoticonBottomSheetItem(
         contentAlignment = Alignment.Center
     ) {
         AsyncImage(
-            model = emoticon.imageUrl.ifEmpty { emoticon.thumbnail }.toSecureUrl(),
+            model = emoticonUrl,
             contentDescription = emoticon.title,
             modifier = Modifier
                 .size(60.dp)

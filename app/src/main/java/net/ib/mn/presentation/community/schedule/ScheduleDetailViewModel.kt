@@ -1,8 +1,11 @@
 package net.ib.mn.presentation.community.schedule
 
+import android.content.Context
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
+import net.ib.mn.R
 import net.ib.mn.base.BaseViewModel
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ScheduleModel
@@ -13,6 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ScheduleDetailViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val scheduleRepository: ScheduleRepository
 ) : BaseViewModel<ScheduleDetailContract.State, ScheduleDetailContract.Intent, ScheduleDetailContract.Effect>() {
 
@@ -92,7 +96,7 @@ class ScheduleDetailViewModel @Inject constructor(
                             )
                         }
                         setEffect {
-                            ScheduleDetailContract.Effect.ShowError(result.message ?: "스케줄을 불러오는데 실패했습니다.")
+                            ScheduleDetailContract.Effect.ShowError(result.message ?: context.getString(R.string.failed_to_load))
                         }
                     }
                 }
@@ -132,7 +136,7 @@ class ScheduleDetailViewModel @Inject constructor(
                     }
                     is ApiResult.Error -> {
                         setEffect {
-                            ScheduleDetailContract.Effect.ShowError(result.message ?: "투표에 실패했습니다.")
+                            ScheduleDetailContract.Effect.ShowError(result.message ?: context.getString(R.string.msg_error_ok))
                         }
                     }
                 }
@@ -148,7 +152,7 @@ class ScheduleDetailViewModel @Inject constructor(
                     is ApiResult.Success -> {
                         setState { copy(isLoading = false) }
                         if (result.data) {
-                            setEffect { ScheduleDetailContract.Effect.ShowToast("삭제되었습니다.") }
+                            setEffect { ScheduleDetailContract.Effect.ShowToast(context.getString(R.string.tiele_friend_delete_result)) }
                             val state = uiState.value
                             loadSchedules(state.idolId, state.yearMonth, state.locale, null)
                         }
@@ -156,7 +160,7 @@ class ScheduleDetailViewModel @Inject constructor(
                     is ApiResult.Error -> {
                         setState { copy(isLoading = false) }
                         setEffect {
-                            ScheduleDetailContract.Effect.ShowError(result.message ?: "삭제에 실패했습니다.")
+                            ScheduleDetailContract.Effect.ShowError(result.message ?: context.getString(R.string.msg_error_ok))
                         }
                     }
                 }

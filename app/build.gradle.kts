@@ -448,6 +448,11 @@ dependencies {
     // Video Transcoder
     implementation(libs.transcoder.android)
 
+    // Socket.IO
+    implementation(libs.socket.io.client) {
+        exclude(group = "org.json", module = "json")
+    }
+
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

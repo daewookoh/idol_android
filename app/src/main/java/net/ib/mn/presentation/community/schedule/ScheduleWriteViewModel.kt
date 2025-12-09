@@ -7,6 +7,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import net.ib.mn.BuildConfig
+import net.ib.mn.R
 import net.ib.mn.base.BaseViewModel
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.local.entity.IdolEntity
@@ -122,7 +123,7 @@ class ScheduleWriteViewModel @Inject constructor(
             } catch (e: Exception) {
                 logE(TAG, "initialize error", e)
                 setState { copy(isLoading = false) }
-                setEffect { Effect.ShowError("초기화에 실패했습니다.") }
+                setEffect { Effect.ShowError(context.getString(R.string.msg_error_ok)) }
             }
         }
     }
@@ -207,7 +208,7 @@ class ScheduleWriteViewModel @Inject constructor(
             try {
                 val state = currentState
                 val idol = state.idol ?: run {
-                    setEffect { Effect.ShowError("아이돌 정보가 없습니다.") }
+                    setEffect { Effect.ShowError(context.getString(R.string.msg_error_ok)) }
                     setState { copy(isSaving = false) }
                     return@launch
                 }
@@ -264,14 +265,14 @@ class ScheduleWriteViewModel @Inject constructor(
                         is ApiResult.Error -> {
                             logE(TAG, "Schedule save failed: ${result.error.message}")
                             setState { copy(isSaving = false) }
-                            setEffect { Effect.ShowError(result.error.message ?: "저장에 실패했습니다.") }
+                            setEffect { Effect.ShowError(result.error.message ?: context.getString(R.string.msg_error_ok)) }
                         }
                     }
                 }
             } catch (e: Exception) {
                 logE(TAG, "onSubmit error", e)
                 setState { copy(isSaving = false) }
-                setEffect { Effect.ShowError("저장 중 오류가 발생했습니다.") }
+                setEffect { Effect.ShowError(context.getString(R.string.msg_error_ok)) }
             }
         }
     }

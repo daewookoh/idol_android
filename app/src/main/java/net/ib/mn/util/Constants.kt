@@ -239,4 +239,35 @@ object Constants {
     fun getDecodedKey(encodedKey: String): String {
         return String(android.util.Base64.decode(encodedKey, android.util.Base64.DEFAULT))
     }
+
+    // ============================================================
+    // Chat Socket Events (old Const.kt)
+    // ============================================================
+    const val CHAT_AUTH = "auth"
+    const val CHAT_AUTH_COMPLETE = "authComplete"
+    const val CHAT_AUTH_FAILED = "authFailed"
+    const val CHAT_REQUEST_MESSAGES = "requestMessages"
+    const val CHAT_RECEIVE_MESSAGES = "receiveMessages"
+    const val CHAT_SYSTEM_COMMAND = "systemCommand"
+    const val CHAT_SEND_MESSAGE = "sendMessage"
+    const val CHAT_SYSTEM_MESSAGE = "systemMessage"
+    const val CHAT_REQUEST_DELETE = "requestDelete"
+    const val CHAT_DELETE_MESSAGE = "deleteMessage"
+    const val CHAT_REPORT_MESSAGE = "reportMessage"
+    const val CHAT_CHANGE_STATE = "changeState"
+
+    // Chat Content Types (old MessageModel.kt)
+    const val CHAT_TYPE_IMAGE = "text/vnd.exodus.image"
+    const val CHAT_TYPE_TEXT = "text/plain"
+    const val CHAT_TYPE_VIDEO = "text/vnd.exodus.video"
+    const val CHAT_TYPE_TOAST = "text/vnd.exodus.toast"
+    const val CHAT_TYPE_FATAL = "text/vnd.exodus.fatal"
+    const val CHAT_TYPE_LINK = "text/vnd.exodus.link"
+
+    // Chat Notification
+    const val NOTIFICATION_GROUP_ID_CHAT_MSG = 111111
+
+    // Chat State
+    var CHATTING_IS_BACKGROUND = false
+    var CHATTING_IS_PAUSE = false
 }

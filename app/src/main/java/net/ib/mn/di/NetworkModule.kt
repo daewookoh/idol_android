@@ -205,4 +205,9 @@ object NetworkModule {
     @Singleton
     fun provideFilesApi(retrofit: Retrofit): FilesApi =
         retrofit.create(FilesApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideImagesApi(retrofit: Retrofit): ImagesApi =
+        retrofit.create(ImagesApi::class.java)
 }

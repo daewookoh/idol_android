@@ -3,9 +3,14 @@ package net.ib.mn.presentation.community.subpage
 import android.app.Application
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.ib.mn.base.BaseViewModel
+import net.ib.mn.data.local.ChatDatabase
 import net.ib.mn.data.local.PreferencesManager
+import net.ib.mn.data.local.dao.ChatRoomDao
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ChatRoomModel
 import net.ib.mn.domain.repository.ChatRepository
@@ -17,7 +22,7 @@ private const val PAGE_SIZE = 30
 
 @HiltViewModel
 class CommunityChatViewModel @Inject constructor(
-    application: Application,
+    private val application: Application,
     private val chatRepository: ChatRepository,
     private val preferencesManager: PreferencesManager
 ) : BaseViewModel<CommunityChatContract.State, CommunityChatContract.Intent, CommunityChatContract.Effect>() {
@@ -27,7 +32,19 @@ class CommunityChatViewModel @Inject constructor(
     private var currentIdolId = 0
     private val locale = LocaleUtil.getSystemLanguage(application).split("_")[0]
 
+    private var chatRoomDao: ChatRoomDao? = null
+
     override fun createInitialState() = CommunityChatContract.State()
+
+    private suspend fun getChatRoomDao(): ChatRoomDao {
+        if (chatRoomDao == null) {
+            val accountId = preferencesManager.getUserIdSync()
+            if (accountId > 0) {
+                chatRoomDao = ChatDatabase.getInstance(application, accountId).chatRoomDao()
+            }
+        }
+        return chatRoomDao!!
+    }
 
     override fun handleIntent(intent: CommunityChatContract.Intent) {
         when (intent) {
@@ -48,6 +65,27 @@ class CommunityChatViewModel @Inject constructor(
         resetOffsets()
         viewModelScope.launch {
             setState { copy(isLoading = true, error = null) }
+
+            // 로컬 DB에서 먼저 로드 (빠른 표시)
+            try {
+                val dao = getChatRoomDao()
+                val cachedJoinedRooms = withContext(Dispatchers.IO) {
+                    dao.getJoinedRoomsByIdolId(idolId)
+                }
+                if (cachedJoinedRooms.isNotEmpty()) {
+                    setState {
+                        copy(
+                            joinedRooms = cachedJoinedRooms,
+                            joinedTotalCount = cachedJoinedRooms.size,
+                            isLoading = false
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                // 로컬 DB 오류는 무시하고 API에서 로드
+            }
+
+            // API에서 최신 데이터 로드
             loadJoinedRooms(idolId, isInitial = true)
         }
     }
@@ -81,6 +119,9 @@ class CommunityChatViewModel @Inject constructor(
                         val response = result.data
                         val newRooms = if (isInitial) response.rooms else uiState.value.joinedRooms + response.rooms
 
+                        // 로컬 DB에 캐싱
+                        cacheRoomsToLocalDb(response.rooms, isJoinedList = true)
+
                         setState {
                             copy(
                                 joinedRooms = newRooms,
@@ -103,6 +144,17 @@ class CommunityChatViewModel @Inject constructor(
         }
     }
 
+    private fun cacheRoomsToLocalDb(rooms: List<ChatRoomModel>, isJoinedList: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val dao = getChatRoomDao()
+                dao.upsertRooms(rooms, isJoinedList)
+            } catch (e: Exception) {
+                // 캐싱 오류는 무시
+            }
+        }
+    }
+
     private fun loadAllRooms(idolId: Int, isInitial: Boolean) {
         viewModelScope.launch {
             chatRepository.getAllChatRooms(
@@ -118,6 +170,9 @@ class CommunityChatViewModel @Inject constructor(
                         val response = result.data
                         val newRooms = if (isInitial) response.rooms else uiState.value.allRooms + response.rooms
                         val isEmpty = uiState.value.joinedRooms.isEmpty() && newRooms.isEmpty()
+
+                        // 로컬 DB에 캐싱 (전체 채팅방은 isJoinedList = false)
+                        cacheRoomsToLocalDb(response.rooms, isJoinedList = false)
 
                         setState {
                             copy(
@@ -155,6 +210,8 @@ class CommunityChatViewModel @Inject constructor(
     }
 
     private fun joinRoom(roomId: Int, room: ChatRoomModel) {
+        // 익명방이든 일반방이든 join API를 호출해서 userId를 받아야 함
+        // (이미 참여한 방이라도 userId 응답을 받을 수 있음)
         viewModelScope.launch {
             chatRepository.joinChatRoom(roomId).collect { result ->
                 when (result) {
@@ -162,20 +219,30 @@ class CommunityChatViewModel @Inject constructor(
                     is ApiResult.Success -> {
                         setState { copy(isLoading = false) }
                         val response = result.data
+
+                        // userId 결정: API 응답에서 받은 값 > room에 저장된 값 > null
+                        // (old 프로젝트: 이미 참여한 방은 chatRoomListModel.userId 사용)
+                        val effectiveUserId = when {
+                            response.userId != null && response.userId != 0 -> response.userId
+                            room.userId != 0 -> room.userId
+                            else -> null
+                        }
+
                         if (response.success) {
-                            setEffect {
-                                CommunityChatContract.Effect.NavigateToChatRoom(
-                                    roomId = roomId,
-                                    nickname = response.nickname,
-                                    userId = response.userId,
-                                    role = room.role,
-                                    isAnonymity = room.isAnonymity,
-                                    title = room.title
-                                )
-                            }
-                        } else {
-                            setEffect { CommunityChatContract.Effect.ShowError(response.message ?: "Failed to join") }
-                            refresh(currentIdolId)
+                            // 로컬 DB에서 joined 상태로 표시
+                            markRoomAsJoinedInLocalDb(roomId)
+                        }
+
+                        // success 여부와 관계없이 입장 허용 (이미 참여한 채팅방일 수 있음)
+                        setEffect {
+                            CommunityChatContract.Effect.NavigateToChatRoom(
+                                roomId = roomId,
+                                nickname = response.nickname ?: room.nickName,
+                                userId = effectiveUserId,
+                                role = room.role,
+                                isAnonymity = room.isAnonymousRoom,
+                                title = room.title
+                            )
                         }
                     }
                     is ApiResult.Error -> {
@@ -183,6 +250,17 @@ class CommunityChatViewModel @Inject constructor(
                         setEffect { CommunityChatContract.Effect.ShowError(result.message ?: "Failed to join") }
                     }
                 }
+            }
+        }
+    }
+
+    private fun markRoomAsJoinedInLocalDb(roomId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val dao = getChatRoomDao()
+                dao.markAsJoined(roomId)
+            } catch (e: Exception) {
+                // 오류 무시
             }
         }
     }
@@ -199,6 +277,9 @@ class CommunityChatViewModel @Inject constructor(
                     is ApiResult.Success -> {
                         setState { copy(isLoading = false) }
                         if (result.data.success) {
+                            // 로컬 DB에서 left 상태로 표시
+                            markRoomAsLeftInLocalDb(roomId)
+
                             setEffect { CommunityChatContract.Effect.ShowToast("채팅방을 나갔습니다.") }
                             refresh(currentIdolId)
                         } else {
@@ -210,6 +291,17 @@ class CommunityChatViewModel @Inject constructor(
                         setEffect { CommunityChatContract.Effect.ShowError(result.message ?: "Failed to leave") }
                     }
                 }
+            }
+        }
+    }
+
+    private fun markRoomAsLeftInLocalDb(roomId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val dao = getChatRoomDao()
+                dao.markAsLeft(roomId)
+            } catch (e: Exception) {
+                // 오류 무시
             }
         }
     }

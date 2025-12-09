@@ -94,6 +94,8 @@ import net.ib.mn.presentation.article.ArticleDetailScreen
 import net.ib.mn.presentation.article.PhotoDetailScreen
 import net.ib.mn.presentation.community.schedule.ScheduleDetailScreen
 import net.ib.mn.presentation.community.schedule.ScheduleWriteScreen
+import net.ib.mn.presentation.community.chat.create.ChatRoomCreateScreen
+import net.ib.mn.presentation.community.chat.room.ChatRoomScreen
 import net.ib.mn.presentation.webview.WebViewScreen
 import java.util.Date
 import net.ib.mn.util.ServerUrl
@@ -188,6 +190,13 @@ fun CommunityScreen(
     var scheduleWriteInitialDate by remember { mutableStateOf<Date?>(null) }
     var editingSchedule by remember { mutableStateOf<ScheduleModel?>(null) }
 
+    // 채팅방 생성 화면 상태
+    var showChatRoomCreateScreen by remember { mutableStateOf(false) }
+
+    // 채팅방 화면 상태
+    var selectedChatRoom by remember { mutableStateOf<ChatRoomInfo?>(null) }
+    var shouldRefreshChatList by remember { mutableStateOf(false) }
+
     // 스케줄 상세 화면 상태 (댓글 화면용)
     var selectedScheduleDetail by remember { mutableStateOf<Triple<ScheduleModel, String, String>?>(null) }
 
@@ -238,7 +247,11 @@ fun CommunityScreen(
     }
 
     BackHandler {
-        if (showScheduleWriteScreen) {
+        if (selectedChatRoom != null) {
+            selectedChatRoom = null
+        } else if (showChatRoomCreateScreen) {
+            showChatRoomCreateScreen = false
+        } else if (showScheduleWriteScreen) {
             showScheduleWriteScreen = false
             scheduleWriteInitialDate = null
             editingSchedule = null
@@ -403,7 +416,24 @@ fun CommunityScreen(
                                 articleUpdatedCallback = onArticleUpdated
                             }
                         )
-                        CommunityTab.CHAT -> CommunityChatSubPage(rankingItem = rankingItem)
+                        CommunityTab.CHAT -> CommunityChatSubPage(
+                            rankingItem = rankingItem,
+                            shouldRefresh = shouldRefreshChatList,
+                            onRefreshConsumed = { shouldRefreshChatList = false },
+                            onNavigateToChatRoom = { roomId, nickname, userId, role, isAnonymity, title ->
+                                selectedChatRoom = ChatRoomInfo(
+                                    roomId = roomId,
+                                    nickname = nickname,
+                                    userId = userId,
+                                    role = role,
+                                    isAnonymity = isAnonymity,
+                                    title = title
+                                )
+                            },
+                            onNavigateToCreateRoom = {
+                                showChatRoomCreateScreen = true
+                            }
+                        )
                         CommunityTab.SCHEDULE -> CommunityScheduleSubPage(
                             rankingItem = rankingItem,
                             onNavigateToScheduleEdit = { schedule ->
@@ -499,7 +529,7 @@ fun CommunityScreen(
                                 onNavigateToArticleWrite("FAN_TALK", idolId)
                             }
                             CommunityTab.CHAT -> {
-                                // TODO: 채팅방 만들기
+                                showChatRoomCreateScreen = true
                             }
                             CommunityTab.SCHEDULE -> {
                                 showScheduleWriteScreen = true
@@ -979,6 +1009,58 @@ fun CommunityScreen(
             }
         )
     }
+
+    // ChatRoomCreateScreen (전체 화면으로 표시)
+    AnimatedVisibility(
+        visible = showChatRoomCreateScreen,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        ChatRoomCreateScreen(
+            idolId = idolId ?: 0,
+            onNavigateBack = {
+                showChatRoomCreateScreen = false
+            },
+            onRoomCreated = { roomId, nickname, userId, isAnonymity, title ->
+                showChatRoomCreateScreen = false
+                // 생성된 채팅방으로 이동
+                selectedChatRoom = ChatRoomInfo(
+                    roomId = roomId,
+                    nickname = nickname,
+                    userId = userId,
+                    role = "O", // Owner
+                    isAnonymity = isAnonymity,
+                    title = title
+                )
+            }
+        )
+    }
+
+    // ChatRoomScreen (전체 화면으로 표시)
+    AnimatedVisibility(
+        visible = selectedChatRoom != null,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        selectedChatRoom?.let { chatRoom ->
+            ChatRoomScreen(
+                roomId = chatRoom.roomId,
+                nickname = chatRoom.nickname,
+                userId = chatRoom.userId,
+                role = chatRoom.role,
+                isAnonymity = chatRoom.isAnonymity,
+                title = chatRoom.title,
+                onNavigateBack = {
+                    selectedChatRoom = null
+                    shouldRefreshChatList = true  // 채팅방에서 나올 때 항상 refresh
+                },
+                onNavigateBackWithRefresh = {
+                    selectedChatRoom = null
+                    shouldRefreshChatList = true
+                }
+            )
+        }
+    }
 }
 
 /**
@@ -990,6 +1072,18 @@ data class UserProfileInfo(
     val imageUrl: String?,
     val level: Int,
     val mostIdolName: String? = null
+)
+
+/**
+ * 채팅방 정보 데이터 클래스
+ */
+data class ChatRoomInfo(
+    val roomId: Int,
+    val nickname: String?,
+    val userId: Int?,
+    val role: String?,
+    val isAnonymity: Boolean,
+    val title: String
 )
 
 /**

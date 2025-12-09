@@ -386,6 +386,13 @@ class StartUpViewModel @Inject constructor(
                     // Video Heart 저장
                     preferencesManager.setVideoHeart(data.videoHeart)
 
+                    // ChatRoom Diamond 저장
+                    preferencesManager.setChatRoomDiamond(data.chatroomDiamond)
+
+                    // Chat URL 저장
+                    logD(TAG, "💬 Chat URL: ${data.chatUrl}")
+                    preferencesManager.setChatUrl(data.chatUrl)
+
                     // Menu Config 저장
                     preferencesManager.setMenuNoticeMain(data.menuNoticeMain)
                     preferencesManager.setMenuStoreMain(data.menuStoreMain)

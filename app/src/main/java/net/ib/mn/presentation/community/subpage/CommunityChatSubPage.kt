@@ -59,6 +59,10 @@ import net.ib.mn.ui.theme.ExoTypo
 @Composable
 fun CommunityChatSubPage(
     rankingItem: RankingItem,
+    shouldRefresh: Boolean = false,
+    onRefreshConsumed: () -> Unit = {},
+    onNavigateToChatRoom: (roomId: Int, nickname: String?, userId: Int?, role: String?, isAnonymity: Boolean, title: String) -> Unit = { _, _, _, _, _, _ -> },
+    onNavigateToCreateRoom: () -> Unit = {},
     viewModel: CommunityChatViewModel = hiltViewModel(key = "chat_${rankingItem.id}")
 ) {
     val context = LocalContext.current
@@ -71,6 +75,14 @@ fun CommunityChatSubPage(
 
     LaunchedEffect(idolId) {
         viewModel.sendIntent(CommunityChatContract.Intent.LoadInitialData(idolId))
+    }
+
+    // 외부에서 새로고침 요청 시 처리
+    LaunchedEffect(shouldRefresh) {
+        if (shouldRefresh) {
+            viewModel.sendIntent(CommunityChatContract.Intent.Refresh(idolId))
+            onRefreshConsumed()
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -86,12 +98,17 @@ fun CommunityChatSubPage(
                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                 }
                 is CommunityChatContract.Effect.NavigateToChatRoom -> {
-                    // TODO: 채팅방 화면으로 이동
-                    Toast.makeText(context, "채팅방 입장: ${effect.title}", Toast.LENGTH_SHORT).show()
+                    onNavigateToChatRoom(
+                        effect.roomId,
+                        effect.nickname,
+                        effect.userId,
+                        effect.role,
+                        effect.isAnonymity,
+                        effect.title
+                    )
                 }
                 is CommunityChatContract.Effect.NavigateToCreateRoom -> {
-                    // TODO: 채팅방 생성 화면으로 이동
-                    Toast.makeText(context, "채팅방 생성", Toast.LENGTH_SHORT).show()
+                    onNavigateToCreateRoom()
                 }
                 is CommunityChatContract.Effect.ShowLeaveConfirmDialog -> {
                     leaveDialogRoom = effect.room
@@ -246,6 +263,7 @@ private fun ChatRoomList(
                 ChatRoomSectionHeader(
                     title = stringResource(R.string.chat_list_all, state.filteredAllTotalCount),
                     currentFilter = state.allOrderBy,
+                    showTopLine = state.joinedRooms.isNotEmpty(), // 참여 중이 있을 때만 상단 라인 표시
                     onFilterClick = { showFilterSheet = 2 }
                 )
             }
@@ -265,29 +283,69 @@ private fun ChatRoomList(
     }
 }
 
+/**
+ * 채팅방 섹션 헤더
+ * old 프로젝트: item_header_chatting_room_list_join.xml, item_header_chatting_room_list_entire.xml
+ *
+ * @param title 섹션 제목 (참여 중 N개, 전체 N개)
+ * @param currentFilter 현재 필터 값
+ * @param showTopLine 상단 라인 표시 여부 (전체 섹션에서만 true)
+ * @param onFilterClick 필터 클릭 콜백
+ */
 @Composable
-private fun ChatRoomSectionHeader(title: String, currentFilter: Int, onFilterClick: () -> Unit) {
+private fun ChatRoomSectionHeader(
+    title: String,
+    currentFilter: Int,
+    showTopLine: Boolean = false,
+    onFilterClick: () -> Unit
+) {
     val filterText = when (currentFilter) {
         CommunityChatContract.State.ORDER_BY_TALK_COUNT -> stringResource(R.string.chat_many_talk_at)
         else -> stringResource(R.string.freeboard_order_newest)
     }
 
-    Row(
-        modifier = Modifier.fillMaxWidth().background(ColorPalette.background200).padding(horizontal = 15.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(ColorPalette.background100)
     ) {
-        Text(text = title, style = ExoTypo.body14, color = ColorPalette.textDefault)
+        // 전체 섹션 상단 라인 (old: gray_110_solid_white_border_bottom 배경)
+        if (showTopLine) {
+            HorizontalDivider(thickness = 0.5.dp, color = ColorPalette.gray100)
+        }
 
-        Row(modifier = Modifier.clickable { onFilterClick() }, verticalAlignment = Alignment.CenterVertically) {
-            Text(text = filterText, style = ExoTypo.body12, color = ColorPalette.textDimmed)
-            Spacer(modifier = Modifier.width(4.dp))
-            Icon(
-                painter = painterResource(R.drawable.icon_arrow_drop_down),
-                contentDescription = null,
-                tint = ColorPalette.textDimmed,
-                modifier = Modifier.size(16.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 15.dp, end = 20.dp, top = 15.dp, bottom = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // old: 12sp, text_dimmed
+            Text(
+                text = title,
+                style = ExoTypo.body12,
+                color = ColorPalette.textDimmed
             )
+
+            Row(
+                modifier = Modifier.clickable { onFilterClick() },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // old: 12sp, text_gray
+                Text(
+                    text = filterText,
+                    style = ExoTypo.body12,
+                    color = ColorPalette.textGray
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+                Icon(
+                    painter = painterResource(R.drawable.icon_arrow_drop_down),
+                    contentDescription = null,
+                    tint = ColorPalette.textGray,
+                    modifier = Modifier.size(width = 8.dp, height = 5.dp)
+                )
+            }
         }
     }
 }
@@ -301,11 +359,16 @@ private fun ChatRoomItem(room: ChatRoomModel, onClick: () -> Unit, onLongClick: 
             modifier = Modifier
                 .fillMaxWidth()
                 .pointerInput(Unit) { detectTapGestures(onTap = { onClick() }, onLongPress = { onLongClick() }) }
-                .padding(start = 15.dp, end = 0.dp, top = 15.dp, bottom = 15.dp),
+                .padding(start = 15.dp, end = 15.dp, top = 12.dp, bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                if (room.levelLimit > 0 || room.isAnonymity) {
+                // 상단: 태그 + 시간
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (room.levelLimit > 0) {
                             Text(
@@ -318,7 +381,7 @@ private fun ChatRoomItem(room: ChatRoomModel, onClick: () -> Unit, onLongClick: 
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                         }
-                        if (room.isAnonymity) {
+                        if (room.isAnonymousRoom) {
                             Text(
                                 text = stringResource(R.string.chat_anonymous),
                                 style = ExoTypo.caption10.copy(fontSize = 10.sp),
@@ -326,9 +389,20 @@ private fun ChatRoomItem(room: ChatRoomModel, onClick: () -> Unit, onLongClick: 
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(2.dp))
+
+                    // 마지막 메시지 시간
+                    if (!room.lastMessageTime.isNullOrEmpty()) {
+                        Text(
+                            text = formatChatTime(room.lastMessageTime),
+                            style = ExoTypo.caption10,
+                            color = ColorPalette.textDimmed
+                        )
+                    }
                 }
 
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // 제목
                 Text(
                     text = room.title,
                     style = ExoTypo.body14,
@@ -337,6 +411,7 @@ private fun ChatRoomItem(room: ChatRoomModel, onClick: () -> Unit, onLongClick: 
                     overflow = TextOverflow.Ellipsis
                 )
 
+                // 채팅방 설명 (desc만 표시, 마지막 메시지는 표시 안함)
                 if (!room.desc.isNullOrEmpty()) {
                     Spacer(modifier = Modifier.height(3.dp))
                     Text(
@@ -349,12 +424,64 @@ private fun ChatRoomItem(room: ChatRoomModel, onClick: () -> Unit, onLongClick: 
                 }
             }
 
-            Icon(
-                painter = painterResource(R.drawable.icon_arrow_right),
-                contentDescription = null,
-                tint = ColorPalette.gray200,
-                modifier = Modifier.padding(start = 20.dp, end = 15.dp).size(24.dp)
-            )
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // 읽지 않은 메시지 개수 배지 또는 화살표
+            if (room.unreadCount > 0 && room.isJoinedRoom) {
+                Box(
+                    modifier = Modifier
+                        .background(ColorPalette.main, RoundedCornerShape(10.dp))
+                        .padding(horizontal = 8.dp, vertical = 2.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (room.unreadCount > 99) "99+" else room.unreadCount.toString(),
+                        style = ExoTypo.caption10,
+                        color = ColorPalette.gray50
+                    )
+                }
+            } else {
+                Icon(
+                    painter = painterResource(R.drawable.icon_arrow_right),
+                    contentDescription = null,
+                    tint = ColorPalette.gray200,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
+    }
+}
+
+/**
+ * 채팅 시간 포맷팅
+ * - 오늘: 시간만 표시 (HH:mm)
+ * - 어제: "어제"
+ * - 올해: 월/일 (MM/dd)
+ * - 이전 연도: 년/월/일 (yy/MM/dd)
+ */
+private fun formatChatTime(timeString: String): String {
+    return try {
+        val inputFormat = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault())
+        val date = inputFormat.parse(timeString) ?: return timeString
+
+        val now = java.util.Calendar.getInstance()
+        val messageTime = java.util.Calendar.getInstance().apply { time = date }
+
+        val isToday = now.get(java.util.Calendar.YEAR) == messageTime.get(java.util.Calendar.YEAR) &&
+                now.get(java.util.Calendar.DAY_OF_YEAR) == messageTime.get(java.util.Calendar.DAY_OF_YEAR)
+
+        val isYesterday = now.get(java.util.Calendar.YEAR) == messageTime.get(java.util.Calendar.YEAR) &&
+                now.get(java.util.Calendar.DAY_OF_YEAR) - messageTime.get(java.util.Calendar.DAY_OF_YEAR) == 1
+
+        val isThisYear = now.get(java.util.Calendar.YEAR) == messageTime.get(java.util.Calendar.YEAR)
+
+        when {
+            isToday -> java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(date)
+            isYesterday -> "Yesterday"
+            isThisYear -> java.text.SimpleDateFormat("MM/dd", java.util.Locale.getDefault()).format(date)
+            else -> java.text.SimpleDateFormat("yy/MM/dd", java.util.Locale.getDefault()).format(date)
+        }
+    } catch (e: Exception) {
+        timeString
     }
 }
