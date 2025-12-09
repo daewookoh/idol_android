@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -47,6 +48,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.activity.compose.BackHandler
 import androidx.compose.ui.Alignment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -103,9 +107,37 @@ fun ChatRoomScreen(
 ) {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+
+    // Lifecycle 관리: ON_STOP에서 disconnect, ON_START에서 reconnect
+    // - ON_PAUSE/ON_RESUME은 무시 (다이얼로그 등에서도 연결 유지)
+    // - ON_STOP: 앱이 완전히 백그라운드로 갈 때만 연결 해제
+    // - ON_START: 앱이 포그라운드로 돌아올 때 재연결
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_STOP -> {
+                    // 앱이 완전히 백그라운드로 갈 때 소켓 연결 해제
+                    viewModel.sendIntent(ChatRoomContract.Intent.Disconnect)
+                }
+                Lifecycle.Event.ON_START -> {
+                    // 앱이 포그라운드로 돌아올 때 재연결
+                    // 단, 처음 시작할 때는 Initialize에서 연결하므로 이미 연결된 상태면 스킵
+                    if (state.connectionState == ChatSocketManager.ConnectionState.DISCONNECTED) {
+                        viewModel.sendIntent(ChatRoomContract.Intent.Reconnect)
+                    }
+                }
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     // 다이얼로그 상태
     var showDeleteRoomDialog by remember { mutableStateOf(false) }
