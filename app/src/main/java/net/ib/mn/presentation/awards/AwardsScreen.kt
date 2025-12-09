@@ -162,7 +162,8 @@ fun AwardsScreen(
                         state = pagerState,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f)
+                            .weight(1f),
+                        userScrollEnabled = false
                     ) { page ->
                         val tabType = tabTypes.getOrNull(page) ?: return@HorizontalPager
                         when (tabType) {
