@@ -317,7 +317,15 @@ class ArticlesRepositoryImpl @Inject constructor(
             apiCall = { articlesApi.getArticle(articleId, translate = "auto") },
             parser = { json ->
                 val jsonObject = JSONObject(json)
-                val articleJson = jsonObject.optJSONObject("article") ?: jsonObject
+
+                // 서버 응답의 success 필드 확인
+                val success = jsonObject.optBoolean("success", true)
+                if (!success) {
+                    val msg = jsonObject.optString("msg", "Translation failed")
+                    throw Exception(msg)
+                }
+
+                val articleJson = jsonObject.optJSONObject("article") ?: jsonObject.optJSONObject("object") ?: jsonObject
                 gson.fromJson(articleJson.toString(), ArticleModel::class.java)
             }
         )

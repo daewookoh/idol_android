@@ -248,35 +248,40 @@ class ExoArticleViewModel @Inject constructor(
         val articleId = article.id.toLongOrNull() ?: return
 
         if (article.translateState == ArticleTranslateState.ORIGINAL) {
+            // 원본 내용 저장
+            val originalContent = article.content
+            val originalTitle = article.title
+
             // 번역 시작 - TRANSLATING 상태로 변경
-            article.originalContent = article.content
-            article.originalTitle = article.title
-            article.translateState = ArticleTranslateState.TRANSLATING
-            onArticleUpdated(article)
+            onArticleUpdated(article.copy(
+                translateState = ArticleTranslateState.TRANSLATING,
+                originalContent = originalContent,
+                originalTitle = originalTitle
+            ))
 
             viewModelScope.launch {
+                logD("ExoArticleViewModel", "Translating article: $articleId, original: ${originalContent?.take(50)}")
                 articlesRepository.translateArticle(articleId).collect { result ->
+                    logD("ExoArticleViewModel", "Translation result: $result")
                     when (result) {
                         is ApiResult.Success -> {
                             val translatedArticle = result.data
-                            // 번역된 내용을 현재 article에 적용
-                            article.translateState = ArticleTranslateState.TRANSLATED
-                            // 주의: data class의 val 필드는 직접 수정 불가하므로 copy를 사용하거나
-                            // 번역된 content를 다이얼로그로 보여주는 방식 사용
-                            // 여기서는 이벤트로 번역된 article 전달
+                            logD("ExoArticleViewModel", "Translated content: ${translatedArticle.content?.take(100)}")
+                            // 번역된 내용 적용
                             onArticleUpdated(article.copy(
                                 content = translatedArticle.content,
                                 title = translatedArticle.title,
                                 translateState = ArticleTranslateState.TRANSLATED,
-                                originalContent = article.originalContent,
-                                originalTitle = article.originalTitle
+                                originalContent = originalContent,
+                                originalTitle = originalTitle
                             ))
                             logD("ExoArticleViewModel", "Article translated: $articleId")
                         }
                         is ApiResult.Error -> {
                             // 번역 실패 - 원래 상태로 복원
-                            article.translateState = ArticleTranslateState.ORIGINAL
-                            onArticleUpdated(article)
+                            onArticleUpdated(article.copy(
+                                translateState = ArticleTranslateState.ORIGINAL
+                            ))
                             logE("ExoArticleViewModel", "Failed to translate article: ${result.error.message}")
                         }
                         else -> { /* skip */ }
@@ -286,8 +291,8 @@ class ExoArticleViewModel @Inject constructor(
         } else {
             // 이미 번역된 상태 - 원문으로 복원
             onArticleUpdated(article.copy(
-                content = article.originalContent,
-                title = article.originalTitle,
+                content = article.originalContent ?: article.content,
+                title = article.originalTitle ?: article.title,
                 translateState = ArticleTranslateState.ORIGINAL
             ))
         }
