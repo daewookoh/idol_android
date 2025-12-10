@@ -4,8 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -198,7 +198,7 @@ private fun ExpandableTop3(
     videoUrls: List<String?>
 ) {
     val onItemClick = LocalRankingItemClick.current
-    AnimatedVisibility(visible = isExpanded, enter = expandVertically(), exit = shrinkVertically()) {
+    AnimatedVisibility(visible = isExpanded, enter = fadeIn(), exit = fadeOut()) {
         ExoTop3(
             id = remember(item.rank) { "ranking_item_${item.rank}" },
             idolId = item.id.toIntOrNull() ?: 0,

@@ -6,8 +6,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -84,6 +82,7 @@ import net.ib.mn.presentation.community.subpage.CommunityChatSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFanTalkSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFeedSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFeedViewModel
+import net.ib.mn.presentation.main.freeboard.FreeBoardViewModel
 import net.ib.mn.presentation.community.subpage.OrderByType
 import net.ib.mn.presentation.community.subpage.CommunityScheduleSubPage
 import net.ib.mn.presentation.community.subpage.CommunityScheduleContract
@@ -91,13 +90,15 @@ import net.ib.mn.presentation.community.subpage.CommunityScheduleViewModel
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.ScheduleModel
 import net.ib.mn.domain.model.TrendsModel
-import net.ib.mn.presentation.article.ArticleDetailScreen
-import net.ib.mn.presentation.article.PhotoDetailScreen
+import net.ib.mn.presentation.overlay.articledetail.ArticleDetailScreen
+import net.ib.mn.presentation.overlay.photodetail.PhotoDetailScreen
 import net.ib.mn.presentation.community.schedule.ScheduleDetailScreen
 import net.ib.mn.presentation.community.schedule.ScheduleWriteScreen
 import net.ib.mn.presentation.community.chat.create.ChatRoomCreateScreen
 import net.ib.mn.presentation.community.chat.room.ChatRoomScreen
 import net.ib.mn.presentation.webview.WebViewScreen
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
 import java.util.Date
 import net.ib.mn.util.ServerUrl
 import net.ib.mn.ui.components.*
@@ -132,7 +133,6 @@ enum class CommunityTab {
  * @param sortLatest 최신순 정렬 강제 적용
  * @param onBackClick 뒤로가기 클릭 콜백
  * @param onMostChanged 최애 변경 콜백
- * @param onNavigateToArticleWrite 글쓰기 화면 이동 콜백
  */
 @Composable
 fun CommunityScreen(
@@ -142,7 +142,6 @@ fun CommunityScreen(
     sortLatest: Boolean = false,
     onBackClick: (() -> Unit)? = null,
     onMostChanged: (Boolean) -> Unit = {},
-    onNavigateToArticleWrite: ((writeType: String, idolId: Int?) -> Unit)? = null,
     viewModel: CommunityViewModel = hiltViewModel()
 ) {
     val navigator = LocalAppNavigator.current
@@ -173,9 +172,6 @@ fun CommunityScreen(
         sortLatest = sortLatest,
         onBackClick = onBackClick ?: { navigator.popBackStack(); Unit },
         onMostChanged = onMostChanged,
-        onNavigateToArticleWrite = onNavigateToArticleWrite ?: { writeType, idolIdParam ->
-            navigator.navigate(Screen.ArticleWrite(writeType = writeType, idolId = idolIdParam))
-        },
         viewModel = viewModel
     )
 }
@@ -189,7 +185,6 @@ fun CommunityScreen(
  * @param sortLatest 푸시 알림에서 온 경우 최신순 정렬 강제 적용
  * @param onBackClick 뒤로가기 클릭 이벤트
  * @param onMostChanged 최애 변경 콜백
- * @param onNavigateToArticleWrite 글쓰기 화면 이동 콜백 (writeType, idolId)
  * @param viewModel CommunityViewModel (외부에서 주입받아 Flow 상태 공유)
  */
 @Composable
@@ -200,9 +195,9 @@ private fun CommunityScreenContent(
     sortLatest: Boolean = false,
     onBackClick: () -> Unit = {},
     onMostChanged: (Boolean) -> Unit = {},
-    onNavigateToArticleWrite: (writeType: String, idolId: Int?) -> Unit = { _, _ -> },
     viewModel: CommunityViewModel,
     feedViewModel: CommunityFeedViewModel = hiltViewModel(key = "feed_${idolData.id}"),
+    fanTalkViewModel: FreeBoardViewModel = hiltViewModel(key = "fanTalk_${idolData.id}"),
     scheduleViewModel: CommunityScheduleViewModel = hiltViewModel(key = "schedule_${idolData.id}")
 ) {
     val context = LocalContext.current
@@ -261,6 +256,11 @@ private fun CommunityScreenContent(
 
     // 스케줄 상세 화면 상태 (댓글 화면용)
     var selectedScheduleDetail by remember { mutableStateOf<Triple<ScheduleModel, String, String>?>(null) }
+
+    // 글쓰기 화면 상태 (오버레이)
+    var showArticleWriteScreen by remember { mutableStateOf(false) }
+    var articleWriteType by remember { mutableStateOf(ArticleWriteType.FEED) }
+    var editingArticle by remember { mutableStateOf<ArticleModel?>(null) }
 
     // 월간 스케줄 상세 화면 상태 (스케줄 목록 화면용)
     var selectedMonthScheduleDetail by remember { mutableStateOf<Triple<ScheduleModel, String, String>?>(null) }
@@ -467,6 +467,11 @@ private fun CommunityScreenContent(
                             onNavigateToNoticeDetail = { article ->
                                 selectedNoticeArticle = article
                             },
+                            onNavigateToArticleEdit = { article ->
+                                editingArticle = article
+                                articleWriteType = ArticleWriteType.FEED
+                                showArticleWriteScreen = true
+                            },
                             viewModel = feedViewModel
                         )
                         CommunityTab.FAN_TALK -> CommunityFanTalkSubPage(
@@ -476,7 +481,13 @@ private fun CommunityScreenContent(
                                 selectedArticleExternalIdolName = externalTabName
                                 isSelectedArticleFromFeed = false
                                 articleUpdatedCallback = onArticleUpdated
-                            }
+                            },
+                            onNavigateToArticleEdit = { article ->
+                                editingArticle = article
+                                articleWriteType = ArticleWriteType.FAN_TALK
+                                showArticleWriteScreen = true
+                            },
+                            viewModel = fanTalkViewModel
                         )
                         CommunityTab.CHAT -> CommunityChatSubPage(
                             idolData = idolData,
@@ -589,10 +600,12 @@ private fun CommunityScreenContent(
                     ) {
                         when (currentTab) {
                             CommunityTab.FEED -> {
-                                onNavigateToArticleWrite("FEED", idolId)
+                                articleWriteType = ArticleWriteType.FEED
+                                showArticleWriteScreen = true
                             }
                             CommunityTab.FAN_TALK -> {
-                                onNavigateToArticleWrite("FAN_TALK", idolId)
+                                articleWriteType = ArticleWriteType.FAN_TALK
+                                showArticleWriteScreen = true
                             }
                             CommunityTab.CHAT -> {
                                 showChatRoomCreateScreen = true
@@ -608,11 +621,11 @@ private fun CommunityScreenContent(
         }
     }
 
-    // 위키 웹뷰 (아래에서 올라오는 애니메이션) - ExoScaffold 위에 표시
+    // 위키 웹뷰 - ExoScaffold 위에 표시
     AnimatedVisibility(
         visible = showWikiWebView && wikiUrl != null,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         wikiUrl?.let { url ->
             WebViewScreen(
@@ -824,8 +837,8 @@ private fun CommunityScreenContent(
 
     AnimatedVisibility(
         visible = showVoterTop100Screen,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         VoterTop100Screen(
             idolId = idolId ?: 0,
@@ -838,8 +851,8 @@ private fun CommunityScreenContent(
     // TrendsScreen (이붙그램)
     AnimatedVisibility(
         visible = showTrendsScreen,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         TrendsScreen(
             idolId = idolId ?: 0,
@@ -856,8 +869,8 @@ private fun CommunityScreenContent(
     // IdolRankingHistoryScreen (랭킹 변동)
     AnimatedVisibility(
         visible = showIdolIdolRankingHistoryScreen,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         IdolRankingHistoryScreen(
             idolId = idolId ?: 0,
@@ -883,8 +896,8 @@ private fun CommunityScreenContent(
     // ProfileScreen (전체 화면으로 표시)
     AnimatedVisibility(
         visible = selectedUserProfile != null,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         selectedUserProfile?.let { userInfo ->
             ProfileScreen(
@@ -897,6 +910,11 @@ private fun CommunityScreenContent(
                 onBackClick = { selectedUserProfile = null },
                 onNavigateToArticleDetail = { article ->
                     selectedArticle = article
+                },
+                onNavigateToArticleEdit = { article ->
+                    editingArticle = article
+                    articleWriteType = ArticleWriteType.FEED
+                    showArticleWriteScreen = true
                 }
             )
         }
@@ -905,8 +923,8 @@ private fun CommunityScreenContent(
     // ArticleDetailScreen (전체 화면으로 표시)
     AnimatedVisibility(
         visible = selectedArticle != null,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         selectedArticle?.let { article ->
             ArticleDetailScreen(
@@ -948,8 +966,8 @@ private fun CommunityScreenContent(
     // WebViewScreen (공지사항 상세 화면)
     AnimatedVisibility(
         visible = selectedNoticeArticle != null,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         selectedNoticeArticle?.let { article ->
             WebViewScreen(
@@ -981,8 +999,8 @@ private fun CommunityScreenContent(
     // Month Schedule Detail (ScheduleDetailScreen - 월간 스케줄 목록)
     AnimatedVisibility(
         visible = selectedMonthScheduleDetail != null,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         selectedMonthScheduleDetail?.let { (schedule, yearMonth, locale) ->
             ScheduleDetailScreen(
@@ -1008,8 +1026,8 @@ private fun CommunityScreenContent(
     // Schedule Detail (ArticleDetailScreen with schedule mode - 댓글 화면)
     AnimatedVisibility(
         visible = selectedScheduleDetail != null,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         selectedScheduleDetail?.let { (schedule, yearMonthDay, locale) ->
             ArticleDetailScreen(
@@ -1051,8 +1069,8 @@ private fun CommunityScreenContent(
     // ScheduleWriteScreen (전체 화면으로 표시)
     AnimatedVisibility(
         visible = showScheduleWriteScreen,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         ScheduleWriteScreen(
             idolId = idolId,
@@ -1078,8 +1096,8 @@ private fun CommunityScreenContent(
     // ChatRoomCreateScreen (전체 화면으로 표시)
     AnimatedVisibility(
         visible = showChatRoomCreateScreen,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         ChatRoomCreateScreen(
             idolId = idolId ?: 0,
@@ -1104,8 +1122,8 @@ private fun CommunityScreenContent(
     // ChatRoomScreen (전체 화면으로 표시)
     AnimatedVisibility(
         visible = selectedChatRoom != null,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         selectedChatRoom?.let { chatRoom ->
             ChatRoomScreen(
@@ -1125,6 +1143,35 @@ private fun CommunityScreenContent(
                 }
             )
         }
+    }
+
+    // ArticleWriteScreen (전체 화면으로 표시)
+    AnimatedVisibility(
+        visible = showArticleWriteScreen,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        ArticleWriteScreen(
+            writeType = articleWriteType,
+            idolId = editingArticle?.idol?.id ?: idolId,
+            editingArticleId = editingArticle?.id,
+            onNavigateBack = {
+                showArticleWriteScreen = false
+                editingArticle = null
+            },
+            onNavigateBackWithResult = { updatedArticle ->
+                showArticleWriteScreen = false
+                editingArticle = null
+                // 수정 완료 시 리스트의 해당 아이템 업데이트
+                updatedArticle?.let { article ->
+                    when (articleWriteType) {
+                        ArticleWriteType.FEED -> feedViewModel.updateArticle(article)
+                        ArticleWriteType.FAN_TALK -> fanTalkViewModel.updateArticle(article)
+                        else -> { /* FREE_BOARD 등은 CommunityScreen에서 처리하지 않음 */ }
+                    }
+                }
+            }
+        )
     }
 }
 

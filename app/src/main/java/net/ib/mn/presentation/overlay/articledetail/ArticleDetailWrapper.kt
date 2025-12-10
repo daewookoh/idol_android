@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.article
+package net.ib.mn.presentation.overlay.articledetail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -17,9 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import net.ib.mn.domain.model.ArticleModel
-import net.ib.mn.navigation.LocalAppNavigator
-import net.ib.mn.navigation.Screen
-import net.ib.mn.presentation.common.ExoArticleNavigation
 import net.ib.mn.presentation.common.ExoArticleViewModel
 import net.ib.mn.ui.theme.ColorPalette
 
@@ -35,7 +32,6 @@ fun ArticleDetailWrapper(
     viewModel: ExoArticleViewModel = hiltViewModel(),
     wrapperViewModel: ArticleDetailWrapperViewModel = hiltViewModel()
 ) {
-    val navigator = LocalAppNavigator.current
     val scope = rememberCoroutineScope()
 
     var article by remember { mutableStateOf<ArticleModel?>(null) }
@@ -63,39 +59,7 @@ fun ArticleDetailWrapper(
         }
     }
 
-    // ExoArticleViewModel의 네비게이션 이벤트 처리
-    LaunchedEffect(Unit) {
-        viewModel.navigationEvent.collect { event ->
-            when (event) {
-                is ExoArticleNavigation.Profile -> {
-                    // TODO: 프로필 화면으로 이동
-                }
-                is ExoArticleNavigation.MediaDetail -> {
-                    // PhotoDetail로 이동
-                    val imageUrls = event.article.mediaFiles.mapNotNull { it.originUrl }
-                    val selectedUrl = imageUrls.getOrNull(event.mediaIndex) ?: imageUrls.firstOrNull()
-                    if (selectedUrl != null) {
-                        navigator.navigate(
-                            Screen.PhotoDetail(imageUrl = selectedUrl)
-                        )
-                    }
-                }
-                is ExoArticleNavigation.Community -> {
-                    navigator.navigate(Screen.Community(idolId = event.idolId))
-                }
-                is ExoArticleNavigation.EditArticle -> {
-                    navigator.navigate(
-                        Screen.ArticleWrite(
-                            writeType = if (isFeed) "FEED" else "FREE_BOARD",
-                            idolId = event.article.idol?.id,
-                            editingArticleId = event.article.id
-                        )
-                    )
-                }
-                else -> { /* 다른 이벤트 무시 */ }
-            }
-        }
-    }
+    // 네비게이션 이벤트는 ArticleDetailScreen에서 처리 (중복 방지)
 
     when {
         isLoading -> {
@@ -142,15 +106,6 @@ fun ArticleDetailWrapper(
                 },
                 onNavigateToProfile = { userId, nickname, imageUrl, level, mostIdolName ->
                     // TODO: 프로필 화면으로 이동
-                },
-                onNavigateToPhotoDetail = { photoArticle, mediaIndex ->
-                    val imageUrls = photoArticle.mediaFiles.mapNotNull { it.originUrl }
-                    val selectedUrl = imageUrls.getOrNull(mediaIndex) ?: imageUrls.firstOrNull()
-                    if (selectedUrl != null) {
-                        navigator.navigate(
-                            Screen.PhotoDetail(imageUrl = selectedUrl)
-                        )
-                    }
                 }
             )
         }

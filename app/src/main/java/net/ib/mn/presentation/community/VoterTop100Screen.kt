@@ -2,8 +2,8 @@ package net.ib.mn.presentation.community
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -52,7 +52,10 @@ import java.text.NumberFormat
 import net.ib.mn.R
 import net.ib.mn.R.color.main
 import net.ib.mn.data.remote.dto.VoterTop100Model
+import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.presentation.community.profile.ProfileScreen
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold
@@ -109,6 +112,10 @@ fun VoterTop100Screen(
 
     // 선택된 유저 프로필 화면 표시 상태
     var selectedUser by remember { mutableStateOf<VoterTop100Model?>(null) }
+
+    // ArticleWriteScreen 오버레이 상태
+    var showArticleWriteScreen by remember { mutableStateOf(false) }
+    var editingArticle by remember { mutableStateOf<ArticleModel?>(null) }
 
     BackHandler {
         if (selectedUser != null) {
@@ -222,8 +229,8 @@ fun VoterTop100Screen(
     // ProfileScreen (전체 화면으로 표시)
     AnimatedVisibility(
         visible = selectedUser != null,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         selectedUser?.let { user ->
             // most에서 언어별 이름 추출
@@ -237,9 +244,34 @@ fun VoterTop100Screen(
                 userLevel = user.level,
                 mostIdolName = mostIdolName,
                 isMine = false,  // 타인의 프로필
-                onBackClick = { selectedUser = null }
+                onBackClick = { selectedUser = null },
+                onNavigateToArticleEdit = { article ->
+                    editingArticle = article
+                    showArticleWriteScreen = true
+                }
             )
         }
+    }
+
+    // ArticleWriteScreen 오버레이
+    AnimatedVisibility(
+        visible = showArticleWriteScreen,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        ArticleWriteScreen(
+            writeType = ArticleWriteType.FEED,
+            idolId = editingArticle?.idol?.id,
+            editingArticleId = editingArticle?.id,
+            onNavigateBack = {
+                showArticleWriteScreen = false
+                editingArticle = null
+            },
+            onNavigateBackWithResult = { _ ->
+                showArticleWriteScreen = false
+                editingArticle = null
+            }
+        )
     }
 }
 

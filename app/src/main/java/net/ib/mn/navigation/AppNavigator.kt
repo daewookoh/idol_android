@@ -5,6 +5,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import net.ib.mn.util.logD
 
 /**
  * Navigation 3 네비게이터.
@@ -41,10 +42,13 @@ class AppNavigator(
      * @return 돌아갈 수 있으면 true, 아니면 false
      */
     fun popBackStack(): Boolean {
+        logD("AppNavigator", "popBackStack() called, backStack.size=${backStack.size}, backStack=${backStack.map { it::class.simpleName }}")
         return if (backStack.size > 1) {
-            backStack.removeAt(backStack.lastIndex)
+            val removed = backStack.removeAt(backStack.lastIndex)
+            logD("AppNavigator", "popBackStack() removed: ${removed::class.simpleName}, new size=${backStack.size}")
             true
         } else {
+            logD("AppNavigator", "popBackStack() failed - backStack.size <= 1")
             false
         }
     }

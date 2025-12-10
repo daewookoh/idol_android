@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.article
+package net.ib.mn.presentation.overlay.photodetail
 
 import android.app.DownloadManager
 import android.content.Context
@@ -29,11 +29,13 @@ import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.ServerUrl
+import net.ib.mn.util.logE
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
+private const val TAG = "PhotoDetailVM"
 private const val DOWNLOAD_FILE_PREFIX = "IDOLCHAMP_"
 
 /**
@@ -162,7 +164,7 @@ class PhotoDetailViewModel @Inject constructor(
                 _toastEvent.emit(ToastEvent.DownloadSuccess)
 
             } catch (e: Exception) {
-                e.printStackTrace()
+                logE(TAG, "downloadMedia", e)
                 _downloadState.value = DownloadState.Error
                 _toastEvent.emit(ToastEvent.DownloadError)
             }
@@ -216,7 +218,7 @@ class PhotoDetailViewModel @Inject constructor(
                 _toastEvent.emit(ToastEvent.DownloadSuccess)
 
             } catch (e: Exception) {
-                e.printStackTrace()
+                logE(TAG, "downloadTrendsMedia", e)
                 _downloadState.value = DownloadState.Error
                 _toastEvent.emit(ToastEvent.DownloadError)
             }

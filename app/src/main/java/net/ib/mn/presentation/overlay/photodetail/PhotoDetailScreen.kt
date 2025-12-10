@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.article
+package net.ib.mn.presentation.overlay.photodetail
 
 import android.os.Build
 import android.widget.ImageView

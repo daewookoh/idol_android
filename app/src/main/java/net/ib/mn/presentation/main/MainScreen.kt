@@ -41,7 +41,7 @@ import net.ib.mn.presentation.main.myfavorite.MyFavoritePage
 import net.ib.mn.presentation.main.myinfo.MyInfoPage
 import net.ib.mn.presentation.main.ranking.RankingPage
 import net.ib.mn.domain.model.ArticleModel
-import net.ib.mn.presentation.article.ArticleDetailScreen
+import net.ib.mn.presentation.overlay.articledetail.ArticleDetailScreen
 import net.ib.mn.presentation.webview.WebViewScreen
 import net.ib.mn.util.ServerUrl
 import net.ib.mn.presentation.community.CommunityScreen
@@ -56,10 +56,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import net.ib.mn.ui.theme.ColorPalette
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import net.ib.mn.navigation.LocalAppNavigator
 import net.ib.mn.navigation.Screen
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
+import net.ib.mn.presentation.main.freeboard.FreeBoardViewModel
 
 /**
  * 메인 화면.
@@ -100,6 +101,16 @@ fun MainScreen(
 
     // Notice 상세 화면 상태
     var selectedNoticeArticle by remember { mutableStateOf<ArticleModel?>(null) }
+
+    // ArticleWrite 오버레이 상태
+    var showArticleWriteScreen by remember { mutableStateOf(false) }
+    var articleWriteType by remember { mutableStateOf(ArticleWriteType.FREE_BOARD) }
+    var articleWriteIdolId by remember { mutableStateOf<Int?>(null) }
+    var articleWriteTagId by remember { mutableStateOf<Int?>(null) }
+    var editingArticle by remember { mutableStateOf<ArticleModel?>(null) }
+
+    // FreeBoardViewModel (MainScreen과 FreeBoardPage에서 공유)
+    val freeBoardViewModel: FreeBoardViewModel = hiltViewModel()
 
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
@@ -241,10 +252,11 @@ fun MainScreen(
                     3 -> FreeBoardPage(
                         initialTagId = initialFreeBoardTagId,
                         onNavigateToWrite = { tagId ->
-                            navigator.navigate(Screen.ArticleWrite(
-                                writeType = "FREE_BOARD",
-                                tagId = tagId
-                            ))
+                            articleWriteType = ArticleWriteType.FREE_BOARD
+                            articleWriteIdolId = null
+                            articleWriteTagId = tagId
+                            editingArticle = null
+                            showArticleWriteScreen = true
                         },
                         onNavigateToArticleDetail = { article, externalTabName, onArticleUpdated ->
                             selectedFreeBoardArticle = article
@@ -253,7 +265,15 @@ fun MainScreen(
                         },
                         onNavigateToNoticeDetail = { article ->
                             selectedNoticeArticle = article
-                        }
+                        },
+                        onNavigateToArticleEdit = { article ->
+                            editingArticle = article
+                            articleWriteType = ArticleWriteType.FREE_BOARD
+                            articleWriteIdolId = article.idol?.id
+                            articleWriteTagId = article.tagId.takeIf { it > 0 }
+                            showArticleWriteScreen = true
+                        },
+                        viewModel = freeBoardViewModel
                     )
                     4 -> MenuPage()
                 }
@@ -287,13 +307,7 @@ fun MainScreen(
                 showChattingTab = showChattingTab,
                 initialTab = communityInitialTab,
                 sortLatest = sortLatest,
-                onBackClick = viewModel::closeCommunity,
-                onNavigateToArticleWrite = { writeType, idolIdParam ->
-                    navigator.navigate(Screen.ArticleWrite(
-                        writeType = writeType,
-                        idolId = idolIdParam
-                    ))
-                }
+                onBackClick = viewModel::closeCommunity
             )
         }
     }
@@ -338,8 +352,8 @@ fun MainScreen(
     // MyInfo 프로필 클릭 시 ProfileScreen 표시
     AnimatedVisibility(
         visible = showMyProfile && userData != null,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         userData?.let { user ->
             ProfileScreen(
@@ -349,7 +363,14 @@ fun MainScreen(
                 userLevel = user.level ?: 0,
                 mostIdolName = user.most?.name,
                 isMine = true,
-                onBackClick = { showMyProfile = false }
+                onBackClick = { showMyProfile = false },
+                onNavigateToArticleEdit = { article ->
+                    editingArticle = article
+                    articleWriteType = ArticleWriteType.FEED
+                    articleWriteIdolId = article.idol?.id
+                    articleWriteTagId = null
+                    showArticleWriteScreen = true
+                }
             )
         }
     }
@@ -357,8 +378,8 @@ fun MainScreen(
     // FreeBoard 게시글 상세 화면
     AnimatedVisibility(
         visible = selectedFreeBoardArticle != null,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         selectedFreeBoardArticle?.let { article ->
             ArticleDetailScreen(
@@ -379,8 +400,8 @@ fun MainScreen(
     // Notice 상세 화면
     AnimatedVisibility(
         visible = selectedNoticeArticle != null,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it }),
+        enter = fadeIn(),
+        exit = fadeOut(),
         modifier = Modifier.fillMaxSize()
     ) {
         selectedNoticeArticle?.let { article ->
@@ -396,6 +417,36 @@ fun MainScreen(
                 )
             }
         }
+    }
+
+    // ArticleWriteScreen 오버레이
+    AnimatedVisibility(
+        visible = showArticleWriteScreen,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        ArticleWriteScreen(
+            writeType = articleWriteType,
+            idolId = editingArticle?.idol?.id ?: articleWriteIdolId,
+            tagId = articleWriteTagId,
+            editingArticleId = editingArticle?.id,
+            onNavigateBack = {
+                showArticleWriteScreen = false
+                editingArticle = null
+                articleWriteIdolId = null
+                articleWriteTagId = null
+            },
+            onNavigateBackWithResult = { updatedArticle ->
+                showArticleWriteScreen = false
+                editingArticle = null
+                articleWriteIdolId = null
+                articleWriteTagId = null
+                // 수정 완료 시 FreeBoardPage 리스트 업데이트
+                updatedArticle?.let { article ->
+                    freeBoardViewModel.updateArticle(article)
+                }
+            }
+        )
     }
 }
 

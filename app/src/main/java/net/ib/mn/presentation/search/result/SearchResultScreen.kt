@@ -82,6 +82,13 @@ import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.NumberFormatUtil
 import net.ib.mn.util.getAdDatePeriod
+import net.ib.mn.domain.model.ArticleFile
+import net.ib.mn.presentation.overlay.photodetail.PhotoDetailScreen
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 
 /**
  * 검색 결과 화면
@@ -113,6 +120,16 @@ fun SearchResultScreen(
     // 최애 설정 다이얼로그 상태
     var showSetMostDialog by remember { mutableStateOf<SearchIdolModel?>(null) }
 
+    // 사진 상세 화면 상태
+    var showPhotoDetailScreen by remember { mutableStateOf(false) }
+    var photoDetailArticle by remember { mutableStateOf<ArticleModel?>(null) }
+    var photoDetailMediaIndex by remember { mutableStateOf(0) }
+    var photoDetailShowShareButton by remember { mutableStateOf(true) }
+
+    // ArticleWriteScreen 오버레이 상태
+    var showArticleWriteScreen by remember { mutableStateOf(false) }
+    var editingArticle by remember { mutableStateOf<ArticleModel?>(null) }
+
     // keyword를 ViewModel에 전달 (최초 진입 시에만 검색 실행)
     LaunchedEffect(Unit) {
         if (keyword.isNotBlank() && state.keyword.isEmpty()) {
@@ -136,25 +153,18 @@ fun SearchResultScreen(
                     // TODO: 프로필 화면으로 이동
                 }
                 is ExoArticleNavigation.MediaDetail -> {
-                    val imageUrls = event.article.mediaFiles.mapNotNull { it.originUrl }
-                    val selectedUrl = imageUrls.getOrNull(event.mediaIndex) ?: imageUrls.firstOrNull()
-                    if (selectedUrl != null) {
-                        navigator.navigate(
-                            Screen.PhotoDetail(imageUrl = selectedUrl)
-                        )
-                    }
+                    // 오버레이로 PhotoDetailScreen 표시
+                    photoDetailArticle = event.article
+                    photoDetailMediaIndex = event.mediaIndex
+                    photoDetailShowShareButton = true
+                    showPhotoDetailScreen = true
                 }
                 is ExoArticleNavigation.Community -> {
                     navigator.navigate(Screen.Community(idolId = event.idolId))
                 }
                 is ExoArticleNavigation.EditArticle -> {
-                    navigator.navigate(
-                        Screen.ArticleWrite(
-                            writeType = "FEED",
-                            idolId = event.article.idol?.id,
-                            editingArticleId = event.article.id
-                        )
-                    )
+                    editingArticle = event.article
+                    showArticleWriteScreen = true
                 }
                 else -> { /* 다른 이벤트 무시 */ }
             }
@@ -277,10 +287,54 @@ fun SearchResultScreen(
             // TODO: 배경화면 상세 화면으로 이동 (더보기 클릭 시)
         },
         onWallpaperImageClick = { imageUrl ->
-            // 배경화면은 공유 버튼 숨김
-            navigator.navigate(Screen.PhotoDetail(imageUrl = imageUrl, showShareButton = false))
+            // 배경화면은 공유 버튼 숨김 - 오버레이로 PhotoDetailScreen 표시
+            val article = ArticleModel(
+                id = "0",
+                imageUrl = imageUrl
+            )
+            photoDetailArticle = article
+            photoDetailMediaIndex = 0
+            photoDetailShowShareButton = false
+            showPhotoDetailScreen = true
         }
     )
+
+    // 사진 상세 화면 (오버레이)
+    if (showPhotoDetailScreen && photoDetailArticle != null) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black)
+        ) {
+            PhotoDetailScreen(
+                article = photoDetailArticle!!,
+                initialIndex = photoDetailMediaIndex,
+                showShareButton = photoDetailShowShareButton,
+                onBackClick = { showPhotoDetailScreen = false }
+            )
+        }
+    }
+
+    // ArticleWriteScreen 오버레이
+    AnimatedVisibility(
+        visible = showArticleWriteScreen,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        ArticleWriteScreen(
+            writeType = ArticleWriteType.FEED,
+            idolId = editingArticle?.idol?.id,
+            editingArticleId = editingArticle?.id,
+            onNavigateBack = {
+                showArticleWriteScreen = false
+                editingArticle = null
+            },
+            onNavigateBackWithResult = { _ ->
+                showArticleWriteScreen = false
+                editingArticle = null
+            }
+        )
+    }
 }
 
 @Composable

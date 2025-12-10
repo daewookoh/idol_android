@@ -10,8 +10,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -226,6 +224,16 @@ fun RankingPage(
             )
         }
 
+        // 웰컴 미션/이벤트 버튼
+        val welcomeButtonPadding by animateDpAsState(
+            targetValue = if (showMyFavToast && subPagerState.currentPage == 0) 82.dp else 14.dp,
+            animationSpec = tween(300),
+            label = "welcomePadding"
+        )
+        // 이벤트 버튼이 있으면 이벤트 버튼 표시, 없으면 웰컴 미션 버튼 표시
+        val showFloatingButton = showAwardButton || showWelcomeMission
+        val eventImageUrl = if (showAwardButton) awardModel?.mainFloatingImgUrl else null
+
         Box(modifier = Modifier.fillMaxSize()) {
             HorizontalPager(
                 state = subPagerState,
@@ -271,23 +279,9 @@ fun RankingPage(
                 }
             }
 
-            // 웰컴 미션/이벤트 버튼
-            val welcomeButtonPadding by animateDpAsState(
-                targetValue = if (showMyFavToast && subPagerState.currentPage == 0) 82.dp else 14.dp,
-                animationSpec = tween(300),
-                label = "welcomePadding"
-            )
-            // 이벤트 버튼이 있으면 이벤트 버튼 표시, 없으면 웰컴 미션 버튼 표시
-            val showFloatingButton = showAwardButton || showWelcomeMission
-            val eventImageUrl = if (showAwardButton) awardModel?.mainFloatingImgUrl else null
-
-            androidx.compose.animation.AnimatedVisibility(
-                visible = showFloatingButton,
-                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 8.dp, bottom = welcomeButtonPadding),
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
+            if (showFloatingButton) {
                 WelcomeMissionButton(
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(end = 8.dp, bottom = welcomeButtonPadding),
                     eventImageUrl = eventImageUrl,
                     onClick = {
                         if (showAwardButton) {
@@ -299,14 +293,10 @@ fun RankingPage(
                 )
             }
 
-            // 최애 이동 토스트
-            androidx.compose.animation.AnimatedVisibility(
-                visible = showMyFavToast && subPagerState.currentPage == 0,
-                modifier = Modifier.align(Alignment.BottomCenter),
-                enter = slideInVertically { it } + fadeIn(),
-                exit = slideOutVertically { it } + fadeOut()
-            ) {
-                ShowMyFavToast {
+            if (showMyFavToast && subPagerState.currentPage == 0) {
+                ShowMyFavToast(
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                ) {
                     coroutineScope.launch {
                         if (myFavIdolPosition >= 0) firstTabListState.animateScrollToItem((myFavIdolPosition - 2).coerceAtLeast(0))
                         viewModel.onMyFavToastClick()
@@ -489,6 +479,7 @@ private fun extractTypeFromCode(code: String): String {
  */
 @Composable
 private fun WelcomeMissionButton(
+    modifier: Modifier = Modifier,
     eventImageUrl: String? = null,
     onClick: () -> Unit
 ) {
@@ -514,7 +505,7 @@ private fun WelcomeMissionButton(
         coil.compose.AsyncImage(
             model = eventImageUrl,
             contentDescription = "Event",
-            modifier = Modifier
+            modifier = modifier
                 .size(64.dp)
                 .graphicsLayer {
                     this.rotationY = rotationY
@@ -532,7 +523,7 @@ private fun WelcomeMissionButton(
         Image(
             painter = painterResource(id = R.drawable.btn_welcome),
             contentDescription = "Welcome Mission",
-            modifier = Modifier
+            modifier = modifier
                 .size(64.dp)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -549,10 +540,11 @@ private fun WelcomeMissionButton(
  */
 @Composable
 private fun ShowMyFavToast(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
             .fillMaxWidth()
             .background(

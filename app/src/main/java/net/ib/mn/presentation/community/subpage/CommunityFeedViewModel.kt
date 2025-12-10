@@ -301,23 +301,28 @@ class CommunityFeedViewModel @Inject constructor(
 
     /**
      * 게시글 업데이트 (상세화면에서 돌아올 때 동기화)
-     * 투표수, 좋아요수, 댓글수 업데이트
+     * 투표수, 좋아요수, 댓글수, 제목, 내용 등 전체 업데이트
      */
     fun updateArticle(updatedArticle: ArticleModel) {
         val currentArticles = _uiState.value.articles
         val updatedArticles = currentArticles.map { article ->
             if (article.id == updatedArticle.id) {
+                // 기존 article의 모든 필드를 업데이트된 값으로 교체
+                // 수정 화면에서 변경된 title, content 등도 반영
                 article.copy(
+                    title = updatedArticle.title,
+                    content = updatedArticle.content,
                     heart = updatedArticle.heart,
                     likeCount = updatedArticle.likeCount,
                     isUserLike = updatedArticle.isUserLike,
-                    commentCount = updatedArticle.commentCount
+                    commentCount = updatedArticle.commentCount,
+                    isMostOnly = updatedArticle.isMostOnly
                 )
             } else {
                 article
             }
         }
         _uiState.value = _uiState.value.copy(articles = updatedArticles)
-        logD(TAG, "updateArticle: articleId=${updatedArticle.id}, heart=${updatedArticle.heart}, likeCount=${updatedArticle.likeCount}, comments=${updatedArticle.commentCount}")
+        logD(TAG, "updateArticle: articleId=${updatedArticle.id}, title=${updatedArticle.title}, heart=${updatedArticle.heart}, likeCount=${updatedArticle.likeCount}, comments=${updatedArticle.commentCount}")
     }
 }

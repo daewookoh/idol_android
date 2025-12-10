@@ -106,7 +106,8 @@ fun ProfileScreen(
     mostIdolName: String? = null,
     isMine: Boolean = false,
     onBackClick: () -> Unit = {},
-    onNavigateToArticleDetail: (ArticleModel) -> Unit = {}
+    onNavigateToArticleDetail: (ArticleModel) -> Unit = {},
+    onNavigateToArticleEdit: (ArticleModel) -> Unit = {}
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -404,7 +405,8 @@ fun ProfileScreen(
                                 isMine = isMine,
                                 isFeedPrivate = state.user.isFeedPrivate,
                                 isBlocked = state.user.isBlocked,
-                                blockStatusChecked = state.user.blockStatusChecked
+                                blockStatusChecked = state.user.blockStatusChecked,
+                                onNavigateToArticleEdit = onNavigateToArticleEdit
                             )
                             ProfileTab.COMMENT -> ProfileCommentPage(userId = userId)
                         }

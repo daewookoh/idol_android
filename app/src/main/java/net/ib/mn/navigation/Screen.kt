@@ -98,21 +98,6 @@ sealed class Screen {
     data object Awards : Screen()
 
     /**
-     * ArticleWrite 화면 - 게시글 작성/수정
-     * @param writeType 글쓰기 타입 (FEED, FREE_BOARD, FAN_TALK)
-     * @param idolId 아이돌 ID (커뮤니티에서 진입 시)
-     * @param editingArticleId 수정할 게시글 ID (수정 모드)
-     * @param tagId 선택된 태그 ID (자유게시판에서 진입 시)
-     */
-    @Serializable
-    data class ArticleWrite(
-        val writeType: String = "FEED", // ArticleWriteType.name
-        val idolId: Int? = null,
-        val editingArticleId: String? = null,
-        val tagId: Int? = null
-    ) : Screen()
-
-    /**
      * Search 화면 - 검색 입력 화면
      * old 프로젝트의 SearchHistoryActivity에 해당
      */
@@ -143,17 +128,6 @@ sealed class Screen {
         val idolId: Int,
         val initialTab: Int = 0,
         val sortLatest: Boolean = false
-    ) : Screen()
-
-    /**
-     * PhotoDetail 화면 - 사진/미디어 상세 보기
-     * @param imageUrl 이미지 URL
-     * @param showShareButton 공유 버튼 표시 여부 (배경화면 등에서는 false)
-     */
-    @Serializable
-    data class PhotoDetail(
-        val imageUrl: String,
-        val showShareButton: Boolean = true
     ) : Screen()
 
     /**

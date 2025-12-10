@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.article.write
+package net.ib.mn.presentation.overlay.articlewrite
 
 import android.content.Context
 import android.net.Uri
@@ -25,7 +25,7 @@ import net.ib.mn.domain.repository.FilesRepository
 import net.ib.mn.domain.repository.IdolRepository
 import net.ib.mn.domain.repository.CheckReadyResult
 import net.ib.mn.domain.repository.PresignedUrlResult
-import net.ib.mn.presentation.article.write.ArticleWriteContract.*
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteContract.*
 import net.ib.mn.domain.model.UploadVideoSpecModel
 import net.ib.mn.util.Constants
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
@@ -33,11 +33,10 @@ import net.ib.mn.util.ImageUtil
 import net.ib.mn.util.LinkParser
 import net.ib.mn.util.NotificationUtil
 import net.ib.mn.util.VideoProcessor
-import net.ib.mn.util.logD
 import net.ib.mn.util.logE
 import javax.inject.Inject
 
-private const val TAG = "ArticleWriteViewModel"
+private const val TAG = "ArticleWriteVM"
 
 /**
  * 게시글 작성/수정 ViewModel
@@ -80,6 +79,8 @@ class ArticleWriteViewModel @Inject constructor(
 
     private fun initialize(intent: Intent.Initialize) {
         viewModelScope.launch {
+            // 작성 모드 진입 시 모든 내용 초기화
+            clearContent()
             setState { copy(isLoading = true) }
 
             try {
@@ -300,10 +301,7 @@ class ArticleWriteViewModel @Inject constructor(
                     val result = VideoProcessor.processVideo(
                         context = context,
                         sourceUri = videoUri,
-                        spec = UploadVideoSpecModel(),
-                        onProgress = { progress ->
-                            logD(TAG, "Video processing: ${(progress * 100).toInt()}%")
-                        }
+                        spec = UploadVideoSpecModel()
                     )
 
                     result.fold(
@@ -415,26 +413,35 @@ class ArticleWriteViewModel @Inject constructor(
 
         val isEditMode = currentState.isEditMode
 
-        // 업로드 중 알림 표시 후 바로 화면 닫기 (old 프로젝트와 동일)
-        setEffect { Effect.ShowUploadingNotification }
-
-        // 백그라운드에서 업로드 진행
-        viewModelScope.launch {
-            try {
-                if (isEditMode) {
+        if (isEditMode) {
+            // 수정 모드: 로딩 표시하고 완료될 때까지 화면 유지
+            viewModelScope.launch {
+                try {
                     updateArticle()
-                } else {
-                    createArticle()
+                } catch (e: Exception) {
+                    logE(TAG, "onSubmitClick - edit mode", e)
+                    setState { copy(isSaving = false) }
+                    setEffect { Effect.ShowError(e.message ?: "수정에 실패했습니다.") }
                 }
-            } catch (e: Exception) {
-                logE(TAG, "onSubmitClick", e)
-                // 에러 발생 시 알림으로 표시
-                NotificationUtil.showArticleUploadFailedNotification(context, e.message ?: "저장에 실패했습니다.")
             }
-        }
+        } else {
+            // 새 글 작성: 업로드 중 알림 표시 후 바로 화면 닫기 (old 프로젝트와 동일)
+            setEffect { Effect.ShowUploadingNotification }
 
-        // 화면 닫기
-        setEffect { Effect.NavigateBackWithResult(isEdited = isEditMode) }
+            // 백그라운드에서 업로드 진행
+            viewModelScope.launch {
+                try {
+                    createArticle()
+                } catch (e: Exception) {
+                    logE(TAG, "onSubmitClick", e)
+                    // 에러 발생 시 알림으로 표시
+                    NotificationUtil.showArticleUploadFailedNotification(context, e.message ?: "저장에 실패했습니다.")
+                }
+            }
+
+            // 화면 닫기
+            setEffect { Effect.NavigateBackWithResult(updatedArticle = null) }
+        }
     }
 
     private fun validateInput(): Boolean {
@@ -652,55 +659,30 @@ class ArticleWriteViewModel @Inject constructor(
                     val idolId = state.idol?.id
                     val currentTagId = state.selectedTag?.id
 
-                    when (data.gcode) {
-                        GCODE_UPDATE_SUCCESS -> {
-                            setEffect {
-                                Effect.ShowSuccess(
-                                    message = "수정이 완료되었습니다.",
-                                    writeType = writeType,
-                                    idolId = idolId,
-                                    tagId = currentTagId
-                                )
-                            }
-                        }
-                        GCODE_SUCCESS -> {
-                            setEffect {
-                                Effect.ShowSuccess(
-                                    message = "수정이 완료되었습니다.",
-                                    writeType = writeType,
-                                    idolId = idolId,
-                                    tagId = currentTagId
-                                )
-                            }
-                        }
-                        GCODE_SUCCESS_WITH_HEART -> {
-                            setEffect {
-                                Effect.ShowSuccess(
-                                    message = "수정이 완료되었습니다.\n하트 ${data.provide.toInt()}개가 지급되었습니다.",
-                                    heartReward = data.provide.toInt(),
-                                    writeType = writeType,
-                                    idolId = idolId,
-                                    tagId = currentTagId
-                                )
-                            }
-                        }
-                        else -> {
-                            setEffect {
-                                Effect.ShowSuccess(
-                                    message = "수정이 완료되었습니다.",
-                                    writeType = writeType,
-                                    idolId = idolId,
-                                    tagId = currentTagId
-                                )
-                            }
-                        }
+                    // 로딩 종료
+                    setState { copy(isSaving = false) }
+
+                    val message = if (data.gcode == GCODE_SUCCESS_WITH_HEART) {
+                        "수정이 완료되었습니다.\n하트 ${data.provide.toInt()}개가 지급되었습니다."
+                    } else {
+                        "수정이 완료되었습니다."
                     }
 
+                    setEffect {
+                        Effect.ShowSuccess(
+                            message = message,
+                            heartReward = if (data.gcode == GCODE_SUCCESS_WITH_HEART) data.provide.toInt() else null,
+                            writeType = writeType,
+                            idolId = idolId,
+                            tagId = currentTagId,
+                            isEditMode = true
+                        )
+                    }
                 }
                 is ApiResult.Error -> {
                     logE(TAG, "updateArticle - ${result.message}")
-                    // 에러 알림 표시 (화면은 이미 닫힘)
-                    NotificationUtil.showArticleUploadFailedNotification(context, result.message ?: "수정에 실패했습니다.")
+                    setState { copy(isSaving = false) }
+                    setEffect { Effect.ShowError(result.message ?: "수정에 실패했습니다.") }
                 }
                 is ApiResult.Loading -> { /* Loading state handled by isSaving */ }
             }
@@ -727,7 +709,6 @@ class ArticleWriteViewModel @Inject constructor(
 
             while (attempts < maxAttempts) {
                 val result = articlesRepository.checkReady(articleId)
-                logD(TAG, "checkReady attempt ${attempts + 1}: success=${result.success}, gcode=${result.gcode}")
 
                 if (result.success) {
                     return@withContext result

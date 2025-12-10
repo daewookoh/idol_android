@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.article
+package net.ib.mn.presentation.overlay.articledetail
 
 import android.app.Activity
 import android.graphics.Bitmap
@@ -59,8 +59,6 @@ import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.CommentModel
 import net.ib.mn.domain.model.ScheduleModel
-import net.ib.mn.navigation.LocalAppNavigator
-import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.common.ArticleType
 import net.ib.mn.presentation.common.ExoArticle
 import net.ib.mn.presentation.common.ExoArticleNavigation
@@ -80,6 +78,9 @@ import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.util.Constants
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.ServerUrl
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
+import net.ib.mn.presentation.overlay.photodetail.PhotoDetailScreen
 
 /**
  * ArticleDetailScreen - 게시글 상세 화면
@@ -105,13 +106,11 @@ fun ArticleDetailScreen(
     onArticleUpdated: (ArticleModel) -> Unit = {},
     onArticleDeleted: (() -> Unit)? = null,
     onNavigateToProfile: (userId: Int, nickname: String, imageUrl: String?, level: Int, mostIdolName: String?) -> Unit = { _, _, _, _, _ -> },
-    onNavigateToPhotoDetail: (ArticleModel, Int) -> Unit = { _, _ -> },
-    articleViewModel: ExoArticleViewModel = hiltViewModel(),
+    articleViewModel: ExoArticleViewModel = hiltViewModel(key = "articleDetail_${article.id}"),
     commentViewModel: CommentSectionViewModel = hiltViewModel()
 ) {
     // 스케줄 모드 여부
     val isScheduleMode = schedule != null
-    val navigator = LocalAppNavigator.current
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -285,6 +284,14 @@ fun ArticleDetailScreen(
     // 댓글 길이 validation 상태
     var showCommentLengthDialog by remember { mutableStateOf(false) }
 
+    // 게시글 수정 화면 상태
+    var showArticleWriteScreen by remember { mutableStateOf(false) }
+
+    // 사진 상세 화면 상태
+    var showPhotoDetailScreen by remember { mutableStateOf(false) }
+    var photoDetailArticle by remember { mutableStateOf<ArticleModel?>(null) }
+    var photoDetailMediaIndex by remember { mutableStateOf(0) }
+
     // 작성자 여부 확인
     val myUserId = articleViewModel.myUserId
     val isAdmin = articleViewModel.isAdmin
@@ -304,16 +311,14 @@ fun ArticleDetailScreen(
                     )
                 }
                 is ExoArticleNavigation.MediaDetail -> {
-                    onNavigateToPhotoDetail(event.article, event.mediaIndex)
+                    // 오버레이로 PhotoDetailScreen 표시 (Navigation 대신)
+                    photoDetailArticle = event.article
+                    photoDetailMediaIndex = event.mediaIndex
+                    showPhotoDetailScreen = true
                 }
                 is ExoArticleNavigation.EditArticle -> {
-                    navigator.navigate(
-                        Screen.ArticleWrite(
-                            writeType = if (isFeed) "FEED" else "FREE_BOARD",
-                            idolId = event.article.idol?.id,
-                            editingArticleId = event.article.id
-                        )
-                    )
+                    // 오버레이로 ArticleWriteScreen 표시 (Navigation 대신)
+                    showArticleWriteScreen = true
                 }
                 else -> { /* 다른 이벤트는 무시 */ }
             }
@@ -773,6 +778,46 @@ fun ArticleDetailScreen(
             message = stringResource(R.string.comment_minimum_characters, 5),
             onDismiss = { showCommentLengthDialog = false }
         )
+    }
+
+    // 게시글 수정 화면 (오버레이)
+    if (showArticleWriteScreen) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(ColorPalette.background100)
+        ) {
+            ArticleWriteScreen(
+                writeType = if (isFeed) ArticleWriteType.FEED else ArticleWriteType.FREE_BOARD,
+                idolId = currentArticle.idol?.id,
+                editingArticleId = currentArticle.id,
+                onNavigateBack = { showArticleWriteScreen = false },
+                onNavigateBackWithResult = { updatedArticle ->
+                    showArticleWriteScreen = false
+                    // 수정된 게시글 업데이트
+                    updatedArticle?.let { article ->
+                        currentArticle = article
+                        onArticleUpdated(article)
+                    }
+                }
+            )
+        }
+    }
+
+    // 사진 상세 화면 (오버레이)
+    if (showPhotoDetailScreen && photoDetailArticle != null) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black)
+        ) {
+            PhotoDetailScreen(
+                article = photoDetailArticle!!,
+                initialIndex = photoDetailMediaIndex,
+                showShareButton = true,
+                onBackClick = { showPhotoDetailScreen = false }
+            )
+        }
     }
 }
 

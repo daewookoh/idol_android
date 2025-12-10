@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.article
+package net.ib.mn.presentation.overlay.articledetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

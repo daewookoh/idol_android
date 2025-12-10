@@ -7,8 +7,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.ib.mn.domain.model.ArticleModel
-import net.ib.mn.navigation.LocalAppNavigator
-import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.common.ExoArticleNavigation
 import net.ib.mn.presentation.common.ExoArticleViewModel
 import net.ib.mn.presentation.community.CommunityViewModel
@@ -27,10 +25,10 @@ import net.ib.mn.util.LocaleUtil
 fun CommunityFanTalkSubPage(
     idolData: CommunityViewModel.IdolData,
     onNavigateToArticleDetail: (ArticleModel, externalTabName: String?, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _, _ -> },
+    onNavigateToArticleEdit: (ArticleModel) -> Unit = {},
     viewModel: FreeBoardViewModel = hiltViewModel(key = "fanTalk_${idolData.id}"),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
-    val navigator = LocalAppNavigator.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val idolId = idolData.id.toIntOrNull() ?: 0
@@ -56,13 +54,7 @@ fun CommunityFanTalkSubPage(
                     }
                 }
                 is ExoArticleNavigation.EditArticle -> {
-                    navigator.navigate(
-                        Screen.ArticleWrite(
-                            writeType = "FAN_TALK",
-                            idolId = event.article.idol?.id ?: idolId,
-                            editingArticleId = event.article.id
-                        )
-                    )
+                    onNavigateToArticleEdit(event.article)
                 }
                 else -> { /* 다른 이벤트는 무시 */ }
             }

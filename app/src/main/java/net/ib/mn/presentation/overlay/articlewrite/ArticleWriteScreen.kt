@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.article.write
+package net.ib.mn.presentation.overlay.articlewrite
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,14 +47,16 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.theartofdev.edmodo.cropper.CropImage
 import net.ib.mn.R
-import net.ib.mn.presentation.article.write.ArticleWriteContract.*
+import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteContract.*
 import net.ib.mn.ui.components.ExoBottomSheet
 import net.ib.mn.ui.components.ExoBottomSheetType
 import net.ib.mn.ui.components.ExoConfirmDialog
+import net.ib.mn.ui.components.ExoDialog
+import net.ib.mn.ui.components.ExoLoading
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.NotificationUtil
-import net.ib.mn.util.logD
 
 /**
  * 게시글 작성/수정 화면
@@ -62,7 +66,7 @@ import net.ib.mn.util.logD
  * @param editingArticleId 수정할 게시글 ID (수정 모드)
  * @param tagId 선택된 태그 ID (자유게시판에서 진입 시)
  * @param onNavigateBack 뒤로가기 콜백
- * @param onNavigateBackWithResult 결과와 함께 뒤로가기 콜백
+ * @param onNavigateBackWithResult 수정 완료 후 콜백 (수정된 ArticleModel 전달, null이면 새 글 작성 완료)
  */
 @Composable
 fun ArticleWriteScreen(
@@ -71,7 +75,7 @@ fun ArticleWriteScreen(
     editingArticleId: String? = null,
     tagId: Int? = null,
     onNavigateBack: () -> Unit,
-    onNavigateBackWithResult: (isEdited: Boolean) -> Unit = {},
+    onNavigateBackWithResult: (updatedArticle: ArticleModel?) -> Unit = {},
     viewModel: ArticleWriteViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -87,6 +91,8 @@ fun ArticleWriteScreen(
     var showImageRatioBottomSheet by remember { mutableStateOf(false) }
     var showPhotoPermissionDialog by remember { mutableStateOf(false) }
     var pendingMediaType by remember { mutableStateOf<MediaType?>(null) }
+    var showEditCompleteDialog by remember { mutableStateOf(false) }
+    var editCompleteMessage by remember { mutableStateOf("") }
 
     // 크롭 대기 중인 이미지 URI
     var pendingCropUri by remember { mutableStateOf<Uri?>(null) }
@@ -272,14 +278,8 @@ fun ArticleWriteScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is Effect.NavigateBack -> {
-                    logD("ArticleWriteScreen", "Effect.NavigateBack received")
-                    onNavigateBack()
-                }
-                is Effect.NavigateBackWithResult -> {
-                    logD("ArticleWriteScreen", "Effect.NavigateBackWithResult received, isEdited=${effect.isEdited}")
-                    onNavigateBackWithResult(effect.isEdited)
-                }
+                is Effect.NavigateBack -> onNavigateBack()
+                is Effect.NavigateBackWithResult -> onNavigateBackWithResult(effect.updatedArticle)
                 is Effect.ShowBackConfirmDialog -> showBackConfirmDialog = true
                 is Effect.ShowTagSelector -> showTagSelectorSheet = true
                 is Effect.ShowSettingBottomSheet -> showSettingSheet = true
@@ -298,18 +298,25 @@ fun ArticleWriteScreen(
                     NotificationUtil.showArticleUploadingNotification(context)
                 }
                 is Effect.ShowSuccess -> {
-                    // 글 타입에 따라 다른 네비게이션 목적지 설정
-                    val navigateTo = when (effect.writeType) {
-                        ArticleWriteType.FEED -> NotificationUtil.NAVIGATE_TO_COMMUNITY_FEED
-                        ArticleWriteType.FAN_TALK -> NotificationUtil.NAVIGATE_TO_COMMUNITY_FAN_TALK
-                        ArticleWriteType.FREE_BOARD -> NotificationUtil.NAVIGATE_TO_FREE_BOARD
+                    if (effect.isEditMode) {
+                        // 수정 모드: 다이얼로그 표시
+                        editCompleteMessage = effect.message
+                        showEditCompleteDialog = true
+                    } else {
+                        // 새 글 작성: 노티피케이션 표시 후 화면 닫기
+                        val navigateTo = when (effect.writeType) {
+                            ArticleWriteType.FEED -> NotificationUtil.NAVIGATE_TO_COMMUNITY_FEED
+                            ArticleWriteType.FAN_TALK -> NotificationUtil.NAVIGATE_TO_COMMUNITY_FAN_TALK
+                            ArticleWriteType.FREE_BOARD -> NotificationUtil.NAVIGATE_TO_FREE_BOARD
+                        }
+                        NotificationUtil.showArticleUploadCompleteNotification(
+                            context = context,
+                            navigateTo = navigateTo,
+                            idolId = effect.idolId,
+                            tagId = effect.tagId
+                        )
+                        onNavigateBackWithResult(null) // 새 글은 null
                     }
-                    NotificationUtil.showArticleUploadCompleteNotification(
-                        context = context,
-                        navigateTo = navigateTo,
-                        idolId = effect.idolId,
-                        tagId = effect.tagId
-                    )
                 }
                 is Effect.RequestPhotoPermission -> {
                     showPermissionDialogAndRequest(MediaType.IMAGE)
@@ -355,8 +362,8 @@ fun ArticleWriteScreen(
         bottomBar = {
             // 수정 모드에서는 사진/동영상 버튼 숨김, 최애만 설정은 표시
             ArticleWriteBottomBar(
-                isPhotoEnabled = state.isPhotoEnabled,
-                isVideoEnabled = state.isVideoEnabled,
+                showPhotoButton = state.isPhotoEnabled,
+                showVideoButton = state.isVideoEnabled,
                 showSettingButton = state.showPrivateSetting,
                 onPhotoClick = { viewModel.sendIntent(Intent.OnPhotoClick) },
                 onVideoClick = { viewModel.sendIntent(Intent.OnVideoClick) },
@@ -522,16 +529,30 @@ fun ArticleWriteScreen(
         )
     }
 
-    // 로딩 표시
-    if (state.isLoading || state.isSaving) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.3f)),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(color = ColorPalette.main)
-        }
+    // 로딩 표시 (오리 애니메이션) - 수정 완료 다이얼로그가 표시될 때는 숨김
+    ExoLoading(isLoading = (state.isLoading || state.isSaving) && !showEditCompleteDialog)
+
+    // 수정 완료 다이얼로그
+    val scope = rememberCoroutineScope()
+    if (showEditCompleteDialog) {
+        ExoDialog(
+            message = editCompleteMessage,
+            onDismiss = { },
+            onConfirm = {
+                showEditCompleteDialog = false
+                scope.launch {
+                    delay(100)
+                    // 수정된 ArticleModel 생성
+                    val updatedArticle = state.editingArticle?.copy(
+                        title = state.title,
+                        content = state.content
+                    )
+                    onNavigateBackWithResult(updatedArticle)
+                }
+            },
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false
+        )
     }
 }
 
@@ -612,8 +633,8 @@ private fun ArticleWriteTopBar(
 
 @Composable
 private fun ArticleWriteBottomBar(
-    isPhotoEnabled: Boolean,
-    isVideoEnabled: Boolean,
+    showPhotoButton: Boolean,
+    showVideoButton: Boolean,
     showSettingButton: Boolean,
     onPhotoClick: () -> Unit,
     onVideoClick: () -> Unit,
@@ -637,44 +658,46 @@ private fun ArticleWriteBottomBar(
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 사진 버튼
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clickable(
-                        enabled = isPhotoEnabled,
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onPhotoClick
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.icon_input_field_photo),
-                    contentDescription = "사진 첨부",
-                    modifier = Modifier.size(28.dp),
-                    tint = if (isPhotoEnabled) ColorPalette.textDefault else ColorPalette.gray200
-                )
+            // 사진 버튼 (수정 모드에서는 숨김)
+            if (showPhotoButton) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onPhotoClick
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.icon_input_field_photo),
+                        contentDescription = "사진 첨부",
+                        modifier = Modifier.size(28.dp),
+                        tint = ColorPalette.textDefault
+                    )
+                }
             }
 
-            // 동영상 버튼
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clickable(
-                        enabled = isVideoEnabled,
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onVideoClick
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.icon_input_field_video),
-                    contentDescription = "동영상 첨부",
-                    modifier = Modifier.size(28.dp),
-                    tint = if (isVideoEnabled) ColorPalette.textDefault else ColorPalette.gray200
-                )
+            // 동영상 버튼 (수정 모드에서는 숨김)
+            if (showVideoButton) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onVideoClick
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.icon_input_field_video),
+                        contentDescription = "동영상 첨부",
+                        modifier = Modifier.size(28.dp),
+                        tint = ColorPalette.textDefault
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.weight(1f))

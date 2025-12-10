@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.article.write
+package net.ib.mn.presentation.overlay.articlewrite
 
 import android.net.Uri
 import net.ib.mn.base.UiEffect
@@ -252,7 +252,7 @@ class ArticleWriteContract {
     sealed class Effect : UiEffect {
         // 네비게이션
         data object NavigateBack : Effect()
-        data class NavigateBackWithResult(val isEdited: Boolean) : Effect()
+        data class NavigateBackWithResult(val updatedArticle: ArticleModel?) : Effect()
 
         // 권한 요청
         data object RequestPhotoPermission : Effect()
@@ -288,7 +288,8 @@ class ArticleWriteContract {
             val heartReward: Int? = null,
             val writeType: ArticleWriteType,
             val idolId: Int?,
-            val tagId: Int? = null
+            val tagId: Int? = null,
+            val isEditMode: Boolean = false
         ) : Effect()
 
         // 키보드 숨기기

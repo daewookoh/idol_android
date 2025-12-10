@@ -43,8 +43,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
-import net.ib.mn.navigation.LocalAppNavigator
-import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.common.ArticleItemType
 import net.ib.mn.presentation.common.ExoArticleItem
 import net.ib.mn.presentation.common.ExoArticleNavigation
@@ -74,10 +72,10 @@ fun CommunityFeedSubPage(
     onNavigateToArticleDetail: (ArticleModel, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _ -> },
     onNavigateToPhotoDetail: (ArticleModel, Int) -> Unit = { _, _ -> },
     onNavigateToNoticeDetail: (ArticleModel) -> Unit = {},
+    onNavigateToArticleEdit: (ArticleModel) -> Unit = {},  // 수정하기 콜백
     viewModel: CommunityFeedViewModel = hiltViewModel(key = "feed_${idolData.id}"),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
-    val navigator = LocalAppNavigator.current
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
     val idolId = idolData.id.toIntOrNull() ?: 0
@@ -110,13 +108,7 @@ fun CommunityFeedSubPage(
                     onNavigateToNoticeDetail(event.article)
                 }
                 is ExoArticleNavigation.EditArticle -> {
-                    navigator.navigate(
-                        Screen.ArticleWrite(
-                            writeType = "FEED",
-                            idolId = event.article.idol?.id ?: idolId,
-                            editingArticleId = event.article.id
-                        )
-                    )
+                    onNavigateToArticleEdit(event.article)
                 }
             }
         }

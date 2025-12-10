@@ -5,8 +5,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
-import net.ib.mn.presentation.article.write.ArticleWriteScreen
-import net.ib.mn.presentation.article.write.ArticleWriteType
 import net.ib.mn.presentation.awards.AwardsScreen
 import net.ib.mn.presentation.community.CommunityScreen
 import net.ib.mn.presentation.search.SearchScreen
@@ -18,9 +16,8 @@ import net.ib.mn.presentation.main.MainScreen
 import net.ib.mn.presentation.signup.SignUpPagesScreen
 import net.ib.mn.presentation.startup.StartUpScreen
 import net.ib.mn.presentation.webview.WebViewScreen
-import net.ib.mn.presentation.article.PhotoDetailScreen
-import net.ib.mn.domain.model.ArticleModel
-import net.ib.mn.presentation.article.ArticleDetailWrapper
+import net.ib.mn.presentation.overlay.articledetail.ArticleDetailWrapper
+import net.ib.mn.util.logD
 
 /**
  * CompositionLocal로 AppNavigator를 하위 컴포저블에 전달.
@@ -182,27 +179,8 @@ fun NavGraph(
                         )
                     }
 
-                    // ArticleWrite 화면
-                    is Screen.ArticleWrite -> NavEntry(screen) {
-                        val writeType = try {
-                            ArticleWriteType.valueOf(screen.writeType)
-                        } catch (e: Exception) {
-                            ArticleWriteType.FEED
-                        }
-                        ArticleWriteScreen(
-                            writeType = writeType,
-                            idolId = screen.idolId,
-                            editingArticleId = screen.editingArticleId,
-                            tagId = screen.tagId,
-                            onNavigateBack = {
-                                navigator.popBackStack()
-                            },
-                            onNavigateBackWithResult = { isEdited ->
-                                navigator.popBackStack()
-                                // TODO: 결과를 이전 화면에 전달하는 로직 추가 (필요시)
-                            }
-                        )
-                    }
+                    // ArticleWrite 화면은 오버레이로만 열림 (NavGraph에서 제거됨)
+                    // ArticleDetailScreen, CommunityScreen 등에서 직접 오버레이로 표시
 
                     // Search 화면 (검색 입력)
                     // Navigation 3: LocalAppNavigator를 통해 Screen에서 직접 네비게이션 처리
@@ -226,19 +204,6 @@ fun NavGraph(
                             idolId = screen.idolId,
                             initialTab = screen.initialTab,
                             sortLatest = screen.sortLatest
-                        )
-                    }
-
-                    // PhotoDetail 화면 (이미지 상세 보기)
-                    is Screen.PhotoDetail -> NavEntry(screen) {
-                        val article = ArticleModel(
-                            id = "0",
-                            imageUrl = screen.imageUrl
-                        )
-                        PhotoDetailScreen(
-                            article = article,
-                            showShareButton = screen.showShareButton,
-                            onBackClick = { navigator.popBackStack() }
                         )
                     }
 

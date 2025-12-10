@@ -29,8 +29,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
-import net.ib.mn.navigation.LocalAppNavigator
-import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.common.ArticleItemType
 import net.ib.mn.presentation.common.ExoArticleItem
 import net.ib.mn.presentation.common.ExoArticleNavigation
@@ -49,11 +47,10 @@ fun ProfilePostPage(
     blockStatusChecked: Boolean = true,
     onNavigateToArticleDetail: (ArticleModel, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _ -> },
     onNavigateToPhotoDetail: (ArticleModel, Int) -> Unit = { _, _ -> },
+    onNavigateToArticleEdit: (ArticleModel) -> Unit = {},
     viewModel: ProfilePostViewModel = hiltViewModel(),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
-    val navigator = LocalAppNavigator.current
-
     // ExoArticle 네비게이션 이벤트 처리
     LaunchedEffect(Unit) {
         articleViewModel.navigationEvent.collect { event ->
@@ -67,13 +64,7 @@ fun ProfilePostPage(
                     onNavigateToPhotoDetail(event.article, event.mediaIndex)
                 }
                 is ExoArticleNavigation.EditArticle -> {
-                    navigator.navigate(
-                        Screen.ArticleWrite(
-                            writeType = "FEED",
-                            idolId = event.article.idol?.id,
-                            editingArticleId = event.article.id
-                        )
-                    )
+                    onNavigateToArticleEdit(event.article)
                 }
                 else -> { /* 다른 이벤트는 무시 */ }
             }

@@ -3,8 +3,8 @@ package net.ib.mn.presentation.awards
 import androidx.activity.compose.BackHandler
 import net.ib.mn.util.IntentUtil
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -191,8 +191,8 @@ fun AwardsScreen(
         // IdolRankingHistoryScreen (랭킹 변동)
         AnimatedVisibility(
             visible = showIdolIdolRankingHistoryScreen,
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
+            enter = fadeIn(),
+            exit = fadeOut()
         ) {
             IdolRankingHistoryScreen(
                 idolId = selectedIdolId,
@@ -204,8 +204,8 @@ fun AwardsScreen(
         // CommunityScreen (실시간 랭킹 아이템 클릭 시)
         AnimatedVisibility(
             visible = selectedCommunityRankingItem != null,
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
+            enter = fadeIn(),
+            exit = fadeOut()
         ) {
             selectedCommunityRankingItem?.let { rankingItem ->
                 val idolId = rankingItem.id.toIntOrNull() ?: return@let

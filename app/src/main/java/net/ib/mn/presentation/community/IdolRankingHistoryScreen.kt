@@ -5,8 +5,8 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -237,8 +237,8 @@ fun IdolRankingHistoryScreen(
     // DailyRankingHistoryScreen 오버레이
     AnimatedVisibility(
         visible = showDailyRankingHistory,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn(),
+        exit = fadeOut()
     ) {
         DailyRankingHistoryScreen(
             historyParam = selectedHistoryParam,
