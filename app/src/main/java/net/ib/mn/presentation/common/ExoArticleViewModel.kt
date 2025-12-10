@@ -260,14 +260,10 @@ class ExoArticleViewModel @Inject constructor(
             ))
 
             viewModelScope.launch {
-                logD("ExoArticleViewModel", "Translating article: $articleId, original: ${originalContent?.take(50)}")
                 articlesRepository.translateArticle(articleId).collect { result ->
-                    logD("ExoArticleViewModel", "Translation result: $result")
                     when (result) {
                         is ApiResult.Success -> {
                             val translatedArticle = result.data
-                            logD("ExoArticleViewModel", "Translated content: ${translatedArticle.content?.take(100)}")
-                            // 번역된 내용 적용
                             onArticleUpdated(article.copy(
                                 content = translatedArticle.content,
                                 title = translatedArticle.title,
@@ -275,14 +271,12 @@ class ExoArticleViewModel @Inject constructor(
                                 originalContent = originalContent,
                                 originalTitle = originalTitle
                             ))
-                            logD("ExoArticleViewModel", "Article translated: $articleId")
                         }
                         is ApiResult.Error -> {
                             // 번역 실패 - 원래 상태로 복원
                             onArticleUpdated(article.copy(
                                 translateState = ArticleTranslateState.ORIGINAL
                             ))
-                            logE("ExoArticleViewModel", "Failed to translate article: ${result.error.message}")
                         }
                         else -> { /* skip */ }
                     }
