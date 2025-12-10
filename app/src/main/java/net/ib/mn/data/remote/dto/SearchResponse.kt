@@ -140,7 +140,11 @@ data class SearchIdolDto(
 
 /**
  * 검색된 서포트 정보
- * old 프로젝트의 SupportInfoModel 구조 기반
+ * old 프로젝트의 SupportListModel 구조 기반
+ *
+ * 검색 API에서는 idol 객체가 아닌 idol_id만 제공됨
+ * - idol_id: 아이돌 ID (숫자)
+ * - type_id: 광고 타입 ID (숫자)
  */
 data class SearchSupportDto(
     @SerializedName("id")
@@ -158,44 +162,61 @@ data class SearchSupportDto(
     @SerializedName("thumbnail_url")
     val thumbnailUrl: String? = null,
 
-    @SerializedName("goal_heart")
+    @SerializedName("goal")
     val goalHeart: Long = 0,
 
-    @SerializedName("current_heart")
+    @SerializedName("diamond")
     val currentHeart: Long = 0,
 
     @SerializedName("status")
-    val status: String? = null, // "진행중", "성공" 등
+    val status: Int? = null,  // 0=진행중, 1=성공, 2=실패
 
-    @SerializedName("start_date")
+    @SerializedName("created_at")
     val startDate: String? = null,
 
-    @SerializedName("end_date")
+    @SerializedName("expired_at")
     val endDate: String? = null,
 
-    @SerializedName("idol")
-    val idol: MostIdol? = null,
+    // 검색 API에서는 idol_id만 제공됨
+    @SerializedName("idol_id")
+    val idolId: Int? = null,
 
     @SerializedName("user")
     val user: SearchUserDto? = null,
 
-    @SerializedName("created_at")
-    val createdAt: String? = null
-) {
-    /**
-     * 달성률 계산 (0.0 ~ 1.0)
-     */
-    val progressRatio: Float
-        get() = if (goalHeart > 0) {
-            (currentHeart.toFloat() / goalHeart).coerceIn(0f, 1f)
-        } else 0f
+    @SerializedName("d_day")
+    val createdAt: String? = null,
 
-    /**
-     * 달성률 퍼센트 (0 ~ 100)
-     */
-    val progressPercent: Int
-        get() = (progressRatio * 100).toInt()
+    // 검색 API에서는 type_id만 제공됨
+    @SerializedName("type_id")
+    val typeId: Int? = null,
+
+    // 광고 게시 시작일
+    @SerializedName("ad_started_at")
+    val adStartDate: String? = null,
+
+    // 성공 시 게시글 정보
+    @SerializedName("article")
+    val article: SupportArticleDto? = null
+) {
+    val likeCount: Int?
+        get() = article?.heart
+
+    val commentCount: Int?
+        get() = article?.commentCount
 }
+
+/**
+ * 서포트 성공 시 게시글 정보 DTO
+ * old 프로젝트의 ArticleModel 구조 기반 - num_comments 사용
+ */
+data class SupportArticleDto(
+    @SerializedName("heart")
+    val heart: Int = 0,
+
+    @SerializedName("num_comments")
+    val commentCount: Int = 0
+)
 
 /**
  * 검색된 배경화면 정보

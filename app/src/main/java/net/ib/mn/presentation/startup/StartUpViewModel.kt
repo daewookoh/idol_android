@@ -11,10 +11,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.ib.mn.base.BaseViewModel
+import net.ib.mn.data.remote.dto.toDomain
 import net.ib.mn.data.remote.dto.toEntity
 import net.ib.mn.domain.model.ApiResult
-import net.ib.mn.util.logD
-import net.ib.mn.util.logW
 import net.ib.mn.domain.usecase.GetAdTypeListUseCase
 import net.ib.mn.domain.usecase.GetBlocksUseCase
 import net.ib.mn.domain.usecase.GetConfigSelfUseCase
@@ -28,7 +27,6 @@ import net.ib.mn.domain.usecase.GetUserSelfUseCase
 import net.ib.mn.domain.usecase.GetUserStatusUseCase
 import net.ib.mn.domain.usecase.UpdateTimezoneUseCase
 import net.ib.mn.util.Constants
-import net.ib.mn.util.NumberFormatUtil
 import javax.inject.Inject
 
 /**
@@ -92,10 +90,6 @@ class StartUpViewModel @Inject constructor(
     private val chartDatabaseRepository: net.ib.mn.data.repository.ChartRankingRepository,
 ) : BaseViewModel<StartUpContract.State, StartUpContract.Intent, StartUpContract.Effect>() {
 
-    companion object {
-        private const val TAG = "StartUpViewModel"
-    }
-
     override fun createInitialState(): StartUpContract.State {
         return StartUpContract.State(
             progress = 0f,
@@ -135,18 +129,8 @@ class StartUpViewModel @Inject constructor(
 
                 val hasValidCredentials = authRepository.hasValidCredentialsAsync()
 
-                if (hasValidCredentials) {
-
-                } else {
-                    logW("USER_INFO", "========================================")
-                    logW("USER_INFO", "[StartUpViewModel] ⚠️ Auth credentials incomplete or missing")
-                    logW("USER_INFO", "[StartUpViewModel] User not logged in - navigating to Login screen")
-                    logW("USER_INFO", "========================================")
-
-                    logW(TAG, "⚠️  Auth credentials incomplete - user not logged in (guest mode)")
-                    // Guest mode - Navigate to Login screen
+                if (!hasValidCredentials) {
                     setState { copy(isLoading = false, progress = 0f, currentStep = "Login required") }
-
                     setEffect { StartUpContract.Effect.NavigateToLogin }
                     return@launch
                 }
@@ -230,19 +214,11 @@ class StartUpViewModel @Inject constructor(
         val isStartupSuccess = loadConfigStartup()
 
         if (!isStartupSuccess) {
-            logW(TAG, "⚠️  This is likely because BASE_URL points to a non-existent server")
-            logW(TAG, "⚠️  Check Constants.BASE_URL = \"${Constants.BASE_URL}\"")
-            logW(TAG, "⚠️  Clearing all auth credentials and local data...")
-
-            // 모든 인증 정보 및 로컬 데이터 삭제
             preferencesManager.clearAll()
-
-            // 로그인 페이지로 이동
             setState { copy(isLoading = false, progress = 0f, currentStep = "Login required") }
             setEffect { StartUpContract.Effect.NavigateToLogin }
             return
         }
-
 
         loadIdols()
 
@@ -360,7 +336,6 @@ class StartUpViewModel @Inject constructor(
                     is ApiResult.Loading -> {}
                     is ApiResult.Success -> {
                     val data = result.data
-                    logD(TAG, "✅ ConfigSelf loaded: showAwardTab = ${data.showAwardTab}")
 
                     // DataStore에 UDP 설정 저장
                     data.udpBroadcastUrl?.let {
@@ -381,7 +356,6 @@ class StartUpViewModel @Inject constructor(
                     preferencesManager.setChatRoomDiamond(data.chatroomDiamond)
 
                     // Chat URL 저장
-                    logD(TAG, "💬 Chat URL: ${data.chatUrl}")
                     preferencesManager.setChatUrl(data.chatUrl)
 
                     // Menu Config 저장
@@ -560,17 +534,23 @@ class StartUpViewModel @Inject constructor(
     }
 
     /**
-     * AdTypeList API 호출
+     * AdTypeList API 호출 (서포트 광고 타입 목록)
+     * old 프로젝트의 getAdTypeList()와 동일
+     * PreferencesManager에 저장하여 검색 결과 서포트 표시 시 사용
      */
     private suspend fun loadAdTypeList() {
-        getAdTypeListUseCase().collect { result ->
-            when (result) {
-                is ApiResult.Loading -> {}
-                is ApiResult.Success -> {
-                }
-                is ApiResult.Error -> {
+        try {
+            val response = configsApi.getAdTypeList()
+
+            if (response.isSuccessful && response.body() != null) {
+                val body = response.body()!!
+
+                if (body.success && body.objects != null) {
+                    val adTypeList = body.objects.map { it.toDomain() }
+                    preferencesManager.saveAdTypeList(adTypeList)
                 }
             }
+        } catch (_: Exception) {
         }
     }
 
@@ -815,18 +795,15 @@ class StartUpViewModel @Inject constructor(
                                 if (body.success && body.data != null) {
                                     // SharedPreference에 저장
                                     preferencesManager.saveChartIdolIds(code, body.data)
-                                } else {
-                                    logW(TAG, "⚠️ No data for chart: $code")
                                 }
-                            } else {
                             }
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                         }
                     }
                 }.awaitAll()
             }
 
-        } catch (e: Exception) {
+        } catch (_: Exception) {
         }
     }
 
@@ -844,23 +821,11 @@ class StartUpViewModel @Inject constructor(
     }
 
     /**
-     * 하트 수를 포맷팅 (천 단위 콤마)
-     */
-    private fun formatHeartCount(count: Int): String {
-        return NumberFormatUtil.formatWithComma(count)
-    }
-
-    /**
      * AwardsCurrent API 호출 (safeApiCall 패턴 적용)
      * showAwardTab이 true일 때만 호출하여 이벤트 플로팅 버튼 이미지 URL을 가져옴
      */
     private suspend fun loadAwardsCurrent() {
         if (!configRepository.getShowAwardTab()) return
-
-        configRepository.loadAwardsCurrent().collect { result ->
-            if (result is ApiResult.Error) {
-                logW(TAG, "AwardsCurrent API error: ${result.error.message}")
-            }
-        }
+        configRepository.loadAwardsCurrent().collect { }
     }
 }

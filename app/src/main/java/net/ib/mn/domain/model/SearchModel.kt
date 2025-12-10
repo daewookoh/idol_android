@@ -1,6 +1,5 @@
 package net.ib.mn.domain.model
 
-import net.ib.mn.data.remote.dto.MostIdol
 import net.ib.mn.data.remote.dto.SearchIdolDto
 import net.ib.mn.data.remote.dto.SearchSupportDto
 import net.ib.mn.data.remote.dto.SearchSuggestDto
@@ -99,6 +98,13 @@ data class SearchIdolModel(
 
 /**
  * 검색된 서포트 모델
+ * old 프로젝트의 SupportListModel 기반
+ *
+ * 검색 API에서는 idol 객체가 아닌 idol_id만 제공됨
+ * - idol_id: 아이돌 ID (숫자)
+ * - type_id: 광고 타입 ID (숫자)
+ *
+ * 아이돌/광고타입 정보는 ViewModel에서 별도 조회하여 채워짐
  */
 data class SearchSupportModel(
     val id: Int,
@@ -108,11 +114,31 @@ data class SearchSupportModel(
     val thumbnailUrl: String?,
     val goalHeart: Long,
     val currentHeart: Long,
-    val status: String?,
+    val status: Int,  // 0=진행중, 1=성공, 2=실패
     val startDate: String?,
     val endDate: String?,
-    val idol: MostIdol?,
-    val createdAt: String?
+    val idolId: Int?,  // 아이돌 ID (검색 API에서는 idol 객체가 아닌 idol_id만 제공)
+    val createdAt: String?,
+    // 광고 타입 관련
+    val typeId: Int? = null,  // 광고 타입 ID
+    // 광고 게시 기간 관련 (성공 시 표시)
+    val adStartDate: String? = null,  // 광고 게시 시작일
+    // 성공 시 게시글 정보
+    val likeCount: Int = 0,
+    val commentCount: Int = 0,
+    // 아이돌 정보 (ViewModel에서 idolId로 조회하여 채움)
+    val idolName: String? = null,
+    val idolNameEn: String? = null,
+    val idolNameJp: String? = null,
+    val idolNameZh: String? = null,
+    val idolNameZhTw: String? = null,
+    val idolType: String? = null,  // "S" (솔로) or "G" (그룹)
+    val idolGroupId: Int? = null,  // 그룹 ID (그룹 이름 조회용)
+    val idolGroupName: String? = null,  // 그룹 이름 (groupId로 조회)
+    // 광고 타입 정보 (ViewModel에서 typeId로 조회하여 채움)
+    val adTypeName: String? = null,
+    val adTypeCategory: String? = null,  // korea, foreign, mobile
+    val adTypePeriod: String? = null  // 광고 게시 기간 (예: "2W", "1M")
 ) {
     /**
      * 달성률 (0.0 ~ 1.0)
@@ -132,13 +158,19 @@ data class SearchSupportModel(
      * 진행 중인 서포트 여부
      */
     val isOngoing: Boolean
-        get() = status == "진행중" || status == "ongoing"
+        get() = status == 0
 
     /**
      * 성공한 서포트 여부
      */
     val isSuccess: Boolean
-        get() = status == "성공" || status == "success"
+        get() = status == 1
+
+    /**
+     * 실패한 서포트 여부
+     */
+    val isFailed: Boolean
+        get() = status == 2
 }
 
 /**
@@ -216,11 +248,15 @@ fun SearchSupportDto.toDomain(): SearchSupportModel = SearchSupportModel(
     thumbnailUrl = thumbnailUrl,
     goalHeart = goalHeart,
     currentHeart = currentHeart,
-    status = status,
+    status = status ?: 0,
     startDate = startDate,
     endDate = endDate,
-    idol = idol,
-    createdAt = createdAt
+    idolId = idolId,
+    createdAt = createdAt,
+    typeId = typeId,
+    adStartDate = adStartDate,
+    likeCount = likeCount ?: 0,
+    commentCount = commentCount ?: 0
 )
 
 fun SearchWallpaperDto.toDomain(): SearchWallpaperModel = SearchWallpaperModel(

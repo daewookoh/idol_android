@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import net.ib.mn.domain.model.MostPicksModel
+import net.ib.mn.domain.model.SupportAdTypeModel
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -210,6 +211,9 @@ class PreferencesManager @Inject constructor(
 
         // Search History (최근 검색어)
         val KEY_RECENT_SEARCHES = stringPreferencesKey("recent_searches_json")
+
+        // Support Ad Type List (서포트 광고 타입 목록)
+        val KEY_AD_TYPE_LIST = stringPreferencesKey("ad_type_list_json")
     }
 
     // ============================================================
@@ -1489,5 +1493,61 @@ class PreferencesManager @Inject constructor(
         context.dataStore.edit { preferences ->
             preferences.remove(KEY_RECENT_SEARCHES)
         }
+    }
+
+    // ============================================================
+    // Support Ad Type List (서포트 광고 타입)
+    // old 프로젝트의 Const.AD_TYPE_LIST와 동일
+    // ============================================================
+
+    /**
+     * 광고 타입 리스트 저장
+     * StartupViewModel에서 API 호출 후 저장
+     */
+    suspend fun saveAdTypeList(adTypes: List<SupportAdTypeModel>) {
+        val json = gson.toJson(adTypes)
+        context.dataStore.edit { preferences ->
+            preferences[KEY_AD_TYPE_LIST] = json
+        }
+    }
+
+    /**
+     * 광고 타입 리스트 가져오기 (일회성)
+     */
+    suspend fun getAdTypeList(): List<SupportAdTypeModel> {
+        val json = context.dataStore.data.first()[KEY_AD_TYPE_LIST]
+        return if (json != null) {
+            try {
+                gson.fromJson(json, Array<SupportAdTypeModel>::class.java).toList()
+            } catch (e: Exception) {
+                logE("PreferencesManager", "Failed to parse ad type list", e)
+                emptyList()
+            }
+        } else {
+            emptyList()
+        }
+    }
+
+    /**
+     * 광고 타입 리스트 동기적으로 가져오기 (ViewHolder용)
+     */
+    fun getAdTypeListSync(): List<SupportAdTypeModel> {
+        return runBlocking {
+            getAdTypeList()
+        }
+    }
+
+    /**
+     * 특정 type_id로 광고 타입 조회
+     */
+    suspend fun getAdTypeById(typeId: Int): SupportAdTypeModel? {
+        return getAdTypeList().find { it.id == typeId }
+    }
+
+    /**
+     * 특정 type_id로 광고 타입 조회 (동기)
+     */
+    fun getAdTypeByIdSync(typeId: Int): SupportAdTypeModel? {
+        return getAdTypeListSync().find { it.id == typeId }
     }
 }

@@ -81,6 +81,7 @@ import net.ib.mn.ui.components.ProfileImageType
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.NumberFormatUtil
+import net.ib.mn.util.getAdDatePeriod
 
 /**
  * 검색 결과 화면
@@ -1007,13 +1008,27 @@ private fun SupportSectionHeader() {
 
 /**
  * 검색된 서포트 아이템
- * old 프로젝트의 item_support_main.xml 레이아웃 기반
+ * old 프로젝트의 item_support_main.xml 및 SupportMainAdapter.kt 기반
+ * - 104dp 테두리 + 74dp 이미지
+ * - 성공/실패 시 SUCCESS/FAIL 리본 테두리 이미지 표시
+ * - 달성률 배지 (진행중: main200 배경/main_light 텍스트, 종료: gray300 배경/흰색 텍스트 "종료")
+ * - 아이돌 이름 + 그룹명 (14sp bold / 10sp bold)
+ * - 서포트 제목 (12sp bold)
+ * - 이모지 + 광고 타입명 (성공/실패시만)
+ * - 기간: 진행중 "시작일 ~ 종료일", 성공 "날짜 포함 N주"
+ * - 성공 시 좋아요/댓글 수 표시
+ * - 화살표: 12dp, 진행중 icon_main_arrow, 종료 icon_main_arrow_finish
  */
 @Composable
 private fun SearchSupportItem(
     support: SearchSupportModel,
     onClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    val isSuccess = support.status == 1
+    val isFailed = support.status == 2
+    val isEnded = isSuccess || isFailed
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -1022,98 +1037,201 @@ private fun SearchSupportItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onClick() }
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { onClick() }
                 .padding(horizontal = 10.dp, vertical = 15.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 썸네일 (원형)
+            // 프로필 이미지 (104dp 테두리 + 74dp 이미지)
             Box(
                 modifier = Modifier.size(104.dp),
                 contentAlignment = Alignment.Center
             ) {
+                // 프로필 이미지 (먼저 그려서 뒤에 배치)
                 AsyncImage(
                     model = support.thumbnailUrl ?: support.imageUrl,
                     contentDescription = support.title,
                     modifier = Modifier
                         .size(74.dp)
-                        .clip(CircleShape),
+                        .clip(CircleShape)
+                        .background(colorResource(id = R.color.gray100)),
                     contentScale = ContentScale.Crop,
-                    placeholder = painterResource(id = R.drawable.menu_profile_default2),
-                    error = painterResource(id = R.drawable.menu_profile_default2)
+                    error = painterResource(
+                        id = if (support.id % 2 == 0) R.drawable.menu_profile_1
+                        else R.drawable.menu_profile_2
+                    )
                 )
+
+                // 성공/실패 테두리 이미지 (SUCCESS/FAIL 리본) - 프로필 위에 오버레이
+                if (isEnded) {
+                    Icon(
+                        painter = painterResource(
+                            id = if (isSuccess) R.drawable.img_success
+                            else R.drawable.img_finish_fail
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier.size(104.dp),
+                        tint = Color.Unspecified
+                    )
+                }
             }
 
             // 서포트 정보
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 10.dp, end = 10.dp)
+                    .padding(start = 20.dp, end = 10.dp),
+                verticalArrangement = Arrangement.Center
             ) {
-                // 달성률 뱃지
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(colorResource(id = R.color.main200))
-                        .padding(horizontal = 7.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.support_achievement, support.progressPercent),
-                        color = colorResource(id = R.color.main_light),
-                        fontSize = 13.sp
-                    )
+                // 달성률 배지 (진행중인 경우만 표시, old: 21dp height, brand500 배경)
+                if (!isEnded) {
+                    Box(
+                        modifier = Modifier
+                            .height(21.dp)
+                            .clip(RoundedCornerShape(5.dp))
+                            .background(colorResource(id = R.color.main))
+                            .padding(horizontal = 7.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.support_achievement, support.progressPercent),
+                            color = Color.White,
+                            fontSize = 13.sp,
+                            lineHeight = 17.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(3.dp))
                 }
 
+                // 아이돌 이름 + 그룹명 (ViewModel에서 idolId로 조회한 정보)
+                if (support.idolName != null) {
+                    val fullName = buildIdolFullName(context, support)
+                    ExoNameWithGroup(
+                        fullName = fullName,
+                        nameFontSize = 14.sp,
+                        groupFontSize = 10.sp,
+                        spacing = 4.dp
+                    )
+                    Spacer(modifier = Modifier.height(3.dp))
+                }
+
+                // 서포트 제목 (old: 12sp, marginTop 2.7dp)
                 Spacer(modifier = Modifier.height(3.dp))
-
-                // 아이돌 이름
-                Text(
-                    text = support.idol?.name ?: "",
-                    color = colorResource(id = R.color.text_default),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.height(3.dp))
-
-                // 서포트 제목
                 Text(
                     text = support.title,
                     color = colorResource(id = R.color.text_default),
                     fontSize = 12.sp,
+                    lineHeight = 17.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
 
-                // 서포트 내용/광고 타입
-                support.content?.let { content ->
+                // 이모지 + 광고 타입 (old: 12sp, marginTop 2.3dp)
+                // 성공/실패시 카테고리별 이모지 표시: 🇰🇷(K), 🌎(F), 📱(M)
+                if (support.adTypeName != null) {
                     Spacer(modifier = Modifier.height(2.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        // 이모지 (카테고리별)
+                        val emoji = when (support.adTypeCategory) {
+                            "K" -> "\uD83C\uDDF0\uD83C\uDDF7 " // 🇰🇷
+                            "F" -> "\uD83C\uDF0E " // 🌎
+                            "M" -> "\uD83D\uDCF1 " // 📱
+                            else -> ""
+                        }
+                        if (emoji.isNotEmpty()) {
+                            Text(
+                                text = emoji,
+                                fontSize = 12.sp
+                            )
+                        }
+                        Text(
+                            text = support.adTypeName,
+                            color = colorResource(id = R.color.text_gray),
+                            fontSize = 12.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                // 기간 (old: 12sp, marginTop 2.3dp)
+                Spacer(modifier = Modifier.height(2.dp))
+                if (isSuccess) {
+                    // 성공 시: "yyyy. M. d. 포함 N주" 형식
+                    val periodText = buildSuccessPeriodText(context, support)
+                    if (periodText.isNotEmpty()) {
+                        Text(
+                            text = periodText,
+                            color = colorResource(id = R.color.text_gray),
+                            fontSize = 12.sp,
+                            lineHeight = 17.sp
+                        )
+                    }
+                } else if (support.startDate != null && support.endDate != null) {
+                    // 진행중: "yyyy. M. d. ~ yyyy. M. d." 형식
+                    val formattedStart = formatSupportDate(context, support.startDate)
+                    val formattedEnd = formatSupportDate(context, support.endDate)
                     Text(
-                        text = content,
+                        text = "$formattedStart ~ $formattedEnd",
                         color = colorResource(id = R.color.text_gray),
                         fontSize = 12.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        lineHeight = 17.sp
                     )
                 }
 
-                // 기간
-                if (support.startDate != null && support.endDate != null) {
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = "${support.startDate} ~ ${support.endDate}",
-                        color = colorResource(id = R.color.text_gray),
-                        fontSize = 12.sp
-                    )
+                // 성공 시 좋아요/댓글 수
+                if (isSuccess) {
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        // 좋아요
+                        Icon(
+                            painter = painterResource(id = R.drawable.icon_board_like),
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = Color.Unspecified
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = NumberFormatUtil.formatWithComma(support.likeCount.toLong()),
+                            color = colorResource(id = R.color.text_gray),
+                            fontSize = 10.sp,
+                            lineHeight = 17.sp
+                        )
+
+                        Spacer(modifier = Modifier.width(24.dp))
+
+                        // 댓글
+                        Icon(
+                            painter = painterResource(id = R.drawable.icon_board_comment),
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = Color.Unspecified
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = NumberFormatUtil.formatWithComma(support.commentCount.toLong()),
+                            color = colorResource(id = R.color.text_gray),
+                            fontSize = 10.sp,
+                            lineHeight = 17.sp
+                        )
+                    }
                 }
             }
 
-            // 화살표
+            // 화살표 (old: 12dp, marginEnd 5.3dp)
             Icon(
-                painter = painterResource(id = R.drawable.icon_arrow_right),
+                painter = painterResource(
+                    id = if (isEnded) R.drawable.icon_main_arrow_finish
+                    else R.drawable.icon_main_arrow
+                ),
                 contentDescription = null,
-                modifier = Modifier.size(12.dp),
-                tint = colorResource(id = R.color.gray300)
+                modifier = Modifier
+                    .padding(end = 5.dp)
+                    .size(12.dp),
+                tint = Color.Unspecified
             )
         }
 
@@ -1122,6 +1240,91 @@ private fun SearchSupportItem(
             color = colorResource(id = R.color.gray110),
             thickness = 0.3.dp
         )
+    }
+}
+
+/**
+ * 서포트 날짜 포맷팅 (old 프로젝트의 UtilK.getKSTDateString과 동일)
+ * 로케일에 맞는 날짜 형식으로 변환
+ */
+private fun formatSupportDate(context: android.content.Context, dateString: String): String {
+    return try {
+        // ISO 8601 형식 파싱 (API는 UTC로 제공)
+        val inputFormat = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.US)
+        inputFormat.timeZone = java.util.TimeZone.getTimeZone("UTC")
+        val date = inputFormat.parse(dateString)
+        if (date != null) {
+            val locale = LocaleUtil.getAppLocale(context)
+            val formatter = if (locale == java.util.Locale.KOREA) {
+                java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM, locale)
+            } else {
+                java.text.DateFormat.getDateInstance(java.text.DateFormat.SHORT, locale)
+            }
+            // 출력은 KST로
+            (formatter as? java.text.SimpleDateFormat)?.timeZone = java.util.TimeZone.getTimeZone("Asia/Seoul")
+            formatter.format(date)
+        } else {
+            dateString
+        }
+    } catch (e: Exception) {
+        dateString
+    }
+}
+
+/**
+ * 서포트의 아이돌 이름+그룹명 생성
+ * old 프로젝트의 UtilK.setName 로직 참고
+ * - 로케일에 따라 적절한 이름 선택
+ * - 솔로(type == "S")면 이름만 반환
+ * - 그룹이면 "이름_그룹명" 형식
+ */
+private fun buildIdolFullName(context: android.content.Context, support: SearchSupportModel): String {
+    // 로케일에 맞는 이름 선택
+    val name = LocaleUtil.getLocalizedName(
+        context = context,
+        name = support.idolName.orEmpty(),
+        nameEn = support.idolNameEn.orEmpty(),
+        nameZh = support.idolNameZh.orEmpty(),
+        nameZhTw = support.idolNameZhTw.orEmpty(),
+        nameJp = support.idolNameJp.orEmpty()
+    )
+
+    if (name.isEmpty()) return ""
+
+    // 이미 "_"가 포함되어 있으면 그대로 반환
+    if (name.contains("_")) return name
+
+    val isSolo = support.idolType.equals("S", ignoreCase = true)
+    return if (!isSolo && !support.idolGroupName.isNullOrEmpty()) {
+        "${name}_${support.idolGroupName}"
+    } else {
+        name
+    }
+}
+
+/**
+ * 성공 서포트 기간 텍스트 생성 (old: String.format(R.string.format_include_date, dateString, adPeriod))
+ * "날짜 포함 N주" 형식 (영어: "N weeks including date")
+ *
+ * old 프로젝트: d_day 필드 사용 (SearchSupportModel에서는 createdAt)
+ * adTypePeriod 예: "2W" (2주), "1M" (1개월)
+ */
+private fun buildSuccessPeriodText(context: android.content.Context, support: SearchSupportModel): String {
+    // old 프로젝트: d_day 필드 사용 (SearchSupportModel에서는 createdAt)
+    val dateStr = support.createdAt ?: return ""
+    val formattedDate = formatSupportDate(context, dateStr)
+
+    // 광고 기간이 있으면 "날짜 포함 N주" 형식
+    val period = support.adTypePeriod
+    return if (!period.isNullOrEmpty()) {
+        val periodText = period.getAdDatePeriod(context)
+        if (periodText.isNotEmpty()) {
+            context.getString(R.string.format_include_date, formattedDate, periodText)
+        } else {
+            formattedDate
+        }
+    } else {
+        formattedDate
     }
 }
 

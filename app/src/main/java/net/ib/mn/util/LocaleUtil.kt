@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import net.ib.mn.data.local.entity.IdolEntity
 import net.ib.mn.data.remote.dto.MostIdol
+import net.ib.mn.domain.model.SearchIdolModel
 import java.util.Locale
 
 /**
@@ -88,6 +89,71 @@ object LocaleUtil {
         )
 
     /**
+     * MostIdol 객체에서 "이름_그룹명" 형식의 전체 이름 추출
+     * ExoNameWithGroup과 함께 사용
+     *
+     * API에서 name이 이미 "이름_그룹명" 형식으로 올 수 있음
+     * - name에 "_"가 포함되어 있으면 그대로 반환
+     * - 없고 groupName이 있으면 "이름_그룹명" 형식으로 결합
+     * - 솔로(type == "S")면 이름만 반환
+     */
+    fun getLocalizedIdolFullName(context: Context, most: MostIdol): String {
+        val name = getLocalizedIdolName(context, most)
+
+        // 이름이 비어있으면 빈 문자열 반환
+        if (name.isEmpty()) {
+            return ""
+        }
+
+        // 이미 "_"가 포함되어 있으면 그대로 반환
+        if (name.contains("_")) {
+            return name
+        }
+
+        val isSolo = most.type.equals("S", ignoreCase = true)
+        return if (!isSolo && !most.groupName.isNullOrEmpty()) {
+            "${name}_${most.groupName}"
+        } else {
+            name
+        }
+    }
+
+    /**
+     * SearchIdolModel 객체에서 언어에 맞는 아이돌 이름 추출
+     */
+    fun getLocalizedIdolName(context: Context, idol: SearchIdolModel): String =
+        getLocalizedName(
+            context = context,
+            name = idol.name,
+            nameEn = idol.nameEn.orEmpty(),
+            nameZh = idol.nameZh.orEmpty(),
+            nameZhTw = idol.nameZhTw.orEmpty(),
+            nameJp = idol.nameJp.orEmpty()
+        )
+
+    /**
+     * SearchIdolModel 객체에서 "이름_그룹명" 형식의 전체 이름 추출
+     */
+    fun getLocalizedIdolFullName(context: Context, idol: SearchIdolModel): String {
+        val name = getLocalizedIdolName(context, idol)
+
+        if (name.isEmpty()) {
+            return ""
+        }
+
+        if (name.contains("_")) {
+            return name
+        }
+
+        val isSolo = idol.type.equals("S", ignoreCase = true)
+        return if (!isSolo && !idol.groupName.isNullOrEmpty()) {
+            "${name}_${idol.groupName}"
+        } else {
+            name
+        }
+    }
+
+    /**
      * IdolEntity 객체에서 언어에 맞는 아이돌 이름 추출
      */
     fun getLocalizedIdolName(context: Context, idol: IdolEntity): String =
@@ -100,7 +166,7 @@ object LocaleUtil {
             nameJp = idol.nameJp
         )
 
-    private fun getLocalizedName(
+    fun getLocalizedName(
         context: Context,
         name: String,
         nameEn: String,

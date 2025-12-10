@@ -195,6 +195,9 @@ data class MostIdol(
     @SerializedName("group_id")
     val groupId: Int?,
 
+    @SerializedName("group_name")
+    val groupName: String? = null,
+
     @SerializedName("resource_uri")
     val resourceUri: String?,
 
@@ -290,9 +293,89 @@ data class AdTypeListResponse(
     @SerializedName("success")
     val success: Boolean,
 
-    @SerializedName("data")
-    val data: List<AdType>?
+    @SerializedName("objects")
+    val objects: List<SupportAdTypeDto>?,
+
+    @SerializedName("gcode")
+    val gcode: Int?,
+
+    @SerializedName("msg")
+    val msg: String?
 )
+
+/**
+ * 서포트 광고 타입 DTO
+ * old 프로젝트의 SupportAdTypeListModel과 동일한 구조
+ */
+data class SupportAdTypeDto(
+    @SerializedName("id")
+    val id: Int,
+
+    @SerializedName("image_url")
+    val imageUrl: String?,
+
+    @SerializedName("image_url2")
+    val imageUrl2: String?,
+
+    @SerializedName("icon_url")
+    val iconUrl: String?,
+
+    @SerializedName("name")
+    val name: String,
+
+    @SerializedName("period")
+    val period: String,
+
+    @SerializedName("description")
+    val description: String?,
+
+    @SerializedName("location")
+    val location: String?,
+
+    @SerializedName("goal")
+    val goal: Int?,
+
+    @SerializedName("require")
+    val require: Int?,
+
+    @SerializedName("guide")
+    val guide: String?,
+
+    @SerializedName("is_viewable")
+    val isViewable: String?,
+
+    @SerializedName("category")
+    val category: String?,
+
+    @SerializedName("location_image_url")
+    val locationImageUrl: String?,
+
+    @SerializedName("location_map_url")
+    val locationMapUrl: String?
+)
+
+/**
+ * SupportAdTypeDto를 SupportAdTypeModel로 변환
+ */
+fun SupportAdTypeDto.toDomain(): net.ib.mn.domain.model.SupportAdTypeModel {
+    return net.ib.mn.domain.model.SupportAdTypeModel(
+        id = id,
+        imageUrl = imageUrl,
+        imageUrl2 = imageUrl2,
+        iconUrl = iconUrl,
+        name = name,
+        period = period,
+        description = description ?: "",
+        location = location ?: "",
+        goal = goal ?: 0,
+        require = require ?: 0,
+        guide = guide ?: "",
+        isViewable = isViewable ?: "Y",
+        category = category ?: "",
+        locationImageUrl = locationImageUrl,
+        locationMapUrl = locationMapUrl
+    )
+}
 
 data class AdType(
     @SerializedName("id")

@@ -1,6 +1,9 @@
 package net.ib.mn.util
 
+import android.content.Context
 import android.text.format.DateUtils
+import net.ib.mn.R
+import net.ib.mn.domain.model.AdDate
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -156,5 +159,57 @@ object DateTimeUtil {
         } catch (e: Exception) {
             ""
         }
+    }
+}
+
+/**
+ * 광고 기간 문자열을 사용자 친화적인 형식으로 변환
+ * old 프로젝트의 getAdDatePeriod 확장함수와 동일
+ *
+ * @param context Context
+ * @return "1주", "2주" 등의 형식
+ */
+fun String.getAdDatePeriod(context: Context): String {
+    return when {
+        this.contains(AdDate.DAY.value) -> this.formatAdPeriod(
+            AdDate.DAY.value,
+            R.string.date_format_day,
+            R.string.date_format_days,
+            context
+        )
+        this.contains(AdDate.WEEK.value) -> this.formatAdPeriod(
+            AdDate.WEEK.value,
+            R.string.date_format_week,
+            R.string.date_format_weeks,
+            context
+        )
+        this.contains(AdDate.MONTH.value) -> this.formatAdPeriod(
+            AdDate.MONTH.value,
+            R.string.date_format_month,
+            R.string.date_format_months,
+            context
+        )
+        else -> ""
+    }
+}
+
+/**
+ * 기간 포맷팅 헬퍼 함수
+ */
+private fun String.formatAdPeriod(
+    period: String,
+    singularResId: Int,
+    pluralResId: Int,
+    context: Context
+): String {
+    return try {
+        val periodValue = this.substring(0, this.indexOf(period)).toInt()
+        if (periodValue == 1) {
+            context.getString(singularResId)
+        } else {
+            String.format(context.getString(pluralResId), periodValue)
+        }
+    } catch (e: Exception) {
+        ""
     }
 }

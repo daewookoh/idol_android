@@ -1,5 +1,6 @@
 package net.ib.mn.data.remote.api
 
+import net.ib.mn.data.remote.dto.AdTypeListResponse
 import net.ib.mn.data.remote.dto.ConfigSelfResponse
 import net.ib.mn.data.remote.dto.ConfigStartupResponse
 import net.ib.mn.data.remote.dto.TypeListResponse
@@ -38,4 +39,11 @@ interface ConfigsApi {
      */
     @GET("idol_supports/inapp_banner/")
     suspend fun getInAppBanner(): Response<ResponseBody>
+
+    /**
+     * 서포트 광고 타입 리스트 조회
+     * old 프로젝트의 ConfigsApi.getAdTypeList()와 동일
+     */
+    @GET("idol_supports/type_list/")
+    suspend fun getAdTypeList(): Response<AdTypeListResponse>
 }

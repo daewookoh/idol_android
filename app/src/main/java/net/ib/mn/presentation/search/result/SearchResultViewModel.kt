@@ -17,6 +17,7 @@ import net.ib.mn.domain.model.SearchWallpaperModel
 import net.ib.mn.domain.repository.FavoritesRepository
 import net.ib.mn.domain.repository.IdolRepository
 import net.ib.mn.domain.repository.SearchRepository
+import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.repository.UserCacheRepository
 import net.ib.mn.data.repository.UsersRepository
 import javax.inject.Inject
@@ -41,7 +42,8 @@ class SearchResultViewModel @Inject constructor(
     private val usersRepository: UsersRepository,
     private val userCacheRepository: UserCacheRepository,
     private val idolRepository: IdolRepository,
-    private val articleUpdateManager: ArticleUpdateManager
+    private val articleUpdateManager: ArticleUpdateManager,
+    private val preferencesManager: PreferencesManager
 ) : BaseViewModel<SearchResultContract.State, SearchResultContract.Intent, SearchResultContract.Effect>() {
 
     companion object {
@@ -152,6 +154,9 @@ class SearchResultViewModel @Inject constructor(
 
                         // 아이돌 이름이 없는 배경화면은 DB에서 조회
                         loadMissingIdolNamesForWallpapers(wallpapersWithIdolName)
+
+                        // 서포트의 아이돌 정보 로드
+                        loadIdolInfoForSupports(data.supports)
                     }
                     is ApiResult.Error -> {
                         setState {
@@ -492,6 +497,84 @@ class SearchResultViewModel @Inject constructor(
             }
 
             setState { copy(wallpapers = updatedWallpapers) }
+        }
+    }
+
+    /**
+     * 서포트의 아이돌 정보 및 광고 타입 정보 로드
+     * old 프로젝트의 SupportViewHolder.bind 및 getTypeList 로직 참고
+     * - idolId로 로컬 DB에서 아이돌 정보 조회
+     * - typeId로 PreferencesManager에서 광고 타입 정보 조회
+     */
+    private fun loadIdolInfoForSupports(supports: List<SearchSupportModel>) {
+        if (supports.isEmpty()) return
+
+        viewModelScope.launch {
+            val updatedSupports = currentState.supports.toMutableList()
+
+            // 광고 타입 리스트 로드
+            val adTypeList = preferencesManager.getAdTypeList()
+
+            // 아이돌 ID 목록 추출
+            val idolIds = supports
+                .mapNotNull { it.idolId }
+                .distinct()
+
+            idolIds.forEach { idolId ->
+                try {
+                    val idol = idolRepository.getIdolById(idolId)
+                    if (idol != null) {
+                        // 그룹 이름 조회 (groupId가 있는 경우)
+                        val groupName = if (idol.groupId > 0 && idol.type != "S") {
+                            try {
+                                idolRepository.getIdolById(idol.groupId)?.name
+                            } catch (e: Exception) {
+                                null
+                            }
+                        } else null
+
+                        // 해당 idolId를 가진 모든 서포트 업데이트
+                        updatedSupports.forEachIndexed { index, support ->
+                            if (support.idolId == idolId) {
+                                // 광고 타입 정보 조회
+                                val adType = adTypeList.find { it.id == support.typeId }
+
+                                updatedSupports[index] = support.copy(
+                                    idolName = idol.name,
+                                    idolNameEn = idol.nameEn,
+                                    idolNameJp = idol.nameJp,
+                                    idolNameZh = idol.nameZh,
+                                    idolNameZhTw = idol.nameZhTw,
+                                    idolType = idol.type,
+                                    idolGroupId = idol.groupId,
+                                    idolGroupName = groupName,
+                                    adTypeName = adType?.name,
+                                    adTypeCategory = adType?.category,
+                                    adTypePeriod = adType?.period
+                                )
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    // 조회 실패 시 무시
+                }
+            }
+
+            // idolId가 없는 서포트도 광고 타입 정보는 업데이트
+            updatedSupports.forEachIndexed { index, support ->
+                if (support.idolId == null && support.typeId != null && support.adTypeName == null) {
+                    val adType = adTypeList.find { it.id == support.typeId }
+                    if (adType != null) {
+                        updatedSupports[index] = support.copy(
+                            adTypeName = adType.name,
+                            adTypeCategory = adType.category,
+                            adTypePeriod = adType.period
+                        )
+                    }
+                }
+            }
+
+            setState { copy(supports = updatedSupports) }
         }
     }
 
