@@ -58,9 +58,8 @@ import androidx.compose.animation.fadeOut
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.navigation.LocalAppNavigator
 import net.ib.mn.navigation.Screen
-import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
-import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
 import net.ib.mn.presentation.main.freeboard.FreeBoardViewModel
+import net.ib.mn.presentation.overlay.friendinvite.FriendInviteScreen
 
 /**
  * 메인 화면.
@@ -102,12 +101,10 @@ fun MainScreen(
     // Notice 상세 화면 상태
     var selectedNoticeArticle by remember { mutableStateOf<ArticleModel?>(null) }
 
-    // ArticleWrite 오버레이 상태
-    var showArticleWriteScreen by remember { mutableStateOf(false) }
-    var articleWriteType by remember { mutableStateOf(ArticleWriteType.FREE_BOARD) }
-    var articleWriteIdolId by remember { mutableStateOf<Int?>(null) }
-    var articleWriteTagId by remember { mutableStateOf<Int?>(null) }
-    var editingArticle by remember { mutableStateOf<ArticleModel?>(null) }
+    // FriendInvite 화면 상태
+    var showFriendInviteScreen by remember { mutableStateOf(false) }
+    var friendInviteToken by remember { mutableStateOf("") }
+    var friendInviteLanguage by remember { mutableStateOf("") }
 
     // FreeBoardViewModel (MainScreen과 FreeBoardPage에서 공유)
     val freeBoardViewModel: FreeBoardViewModel = hiltViewModel()
@@ -251,13 +248,6 @@ fun MainScreen(
                     )
                     3 -> FreeBoardPage(
                         initialTagId = initialFreeBoardTagId,
-                        onNavigateToWrite = { tagId ->
-                            articleWriteType = ArticleWriteType.FREE_BOARD
-                            articleWriteIdolId = null
-                            articleWriteTagId = tagId
-                            editingArticle = null
-                            showArticleWriteScreen = true
-                        },
                         onNavigateToArticleDetail = { article, externalTabName, onArticleUpdated ->
                             selectedFreeBoardArticle = article
                             selectedFreeBoardExternalIdolName = externalTabName
@@ -266,19 +256,27 @@ fun MainScreen(
                         onNavigateToNoticeDetail = { article ->
                             selectedNoticeArticle = article
                         },
-                        onNavigateToArticleEdit = { article ->
-                            editingArticle = article
-                            articleWriteType = ArticleWriteType.FREE_BOARD
-                            articleWriteIdolId = article.idol?.id
-                            articleWriteTagId = article.tagId.takeIf { it > 0 }
-                            showArticleWriteScreen = true
-                        },
                         viewModel = freeBoardViewModel
                     )
-                    4 -> MenuPage()
+                    4 -> MenuPage(
+                        onNavigateToFriendInvite = { token, language ->
+                            friendInviteToken = token
+                            friendInviteLanguage = language
+                            showFriendInviteScreen = true
+                        }
+                    )
                 }
             }
         }
+    }
+
+    // FriendInvite 화면 (전체 화면 overlay)
+    if (showFriendInviteScreen) {
+        FriendInviteScreen(
+            token = friendInviteToken,
+            language = friendInviteLanguage,
+            onBackClick = { showFriendInviteScreen = false }
+        )
     }
 
     AnimatedVisibility(
@@ -363,14 +361,7 @@ fun MainScreen(
                 userLevel = user.level ?: 0,
                 mostIdolName = user.most?.name,
                 isMine = true,
-                onBackClick = { showMyProfile = false },
-                onNavigateToArticleEdit = { article ->
-                    editingArticle = article
-                    articleWriteType = ArticleWriteType.FEED
-                    articleWriteIdolId = article.idol?.id
-                    articleWriteTagId = null
-                    showArticleWriteScreen = true
-                }
+                onBackClick = { showMyProfile = false }
             )
         }
     }
@@ -419,35 +410,6 @@ fun MainScreen(
         }
     }
 
-    // ArticleWriteScreen 오버레이
-    AnimatedVisibility(
-        visible = showArticleWriteScreen,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        ArticleWriteScreen(
-            writeType = articleWriteType,
-            idolId = editingArticle?.idol?.id ?: articleWriteIdolId,
-            tagId = articleWriteTagId,
-            editingArticleId = editingArticle?.id,
-            onNavigateBack = {
-                showArticleWriteScreen = false
-                editingArticle = null
-                articleWriteIdolId = null
-                articleWriteTagId = null
-            },
-            onNavigateBackWithResult = { updatedArticle ->
-                showArticleWriteScreen = false
-                editingArticle = null
-                articleWriteIdolId = null
-                articleWriteTagId = null
-                // 수정 완료 시 FreeBoardPage 리스트 업데이트
-                updatedArticle?.let { article ->
-                    freeBoardViewModel.updateArticle(article)
-                }
-            }
-        )
-    }
 }
 
 private fun getGenderString(context: android.content.Context, locale: Locale): List<Pair<String, String>> {

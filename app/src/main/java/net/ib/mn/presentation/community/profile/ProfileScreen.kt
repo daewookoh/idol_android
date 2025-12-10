@@ -3,6 +3,9 @@ package net.ib.mn.presentation.community.profile
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import net.ib.mn.util.IntentUtil
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -72,6 +75,8 @@ import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.presentation.community.profile.subpage.ProfileCommentPage
 import net.ib.mn.presentation.community.profile.subpage.ProfilePhotoPage
 import net.ib.mn.presentation.community.profile.subpage.ProfilePostPage
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoBottomSheetAction
 import net.ib.mn.ui.components.ExoBottomSheetActionItem
@@ -106,8 +111,7 @@ fun ProfileScreen(
     mostIdolName: String? = null,
     isMine: Boolean = false,
     onBackClick: () -> Unit = {},
-    onNavigateToArticleDetail: (ArticleModel) -> Unit = {},
-    onNavigateToArticleEdit: (ArticleModel) -> Unit = {}
+    onNavigateToArticleDetail: (ArticleModel) -> Unit = {}
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -143,6 +147,10 @@ fun ProfileScreen(
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorDialogMessage by remember { mutableStateOf("") }
     var currentReportHeart by remember { mutableIntStateOf(0) }
+
+    // ArticleWriteScreen overlay 상태
+    var showArticleWriteScreen by remember { mutableStateOf(false) }
+    var editingArticle by remember { mutableStateOf<ArticleModel?>(null) }
 
     // 신고 상태 처리
     LaunchedEffect(reportState) {
@@ -406,7 +414,10 @@ fun ProfileScreen(
                                 isFeedPrivate = state.user.isFeedPrivate,
                                 isBlocked = state.user.isBlocked,
                                 blockStatusChecked = state.user.blockStatusChecked,
-                                onNavigateToArticleEdit = onNavigateToArticleEdit
+                                onNavigateToArticleEdit = { article ->
+                                    editingArticle = article
+                                    showArticleWriteScreen = true
+                                }
                             )
                             ProfileTab.COMMENT -> ProfileCommentPage(userId = userId)
                         }
@@ -539,6 +550,28 @@ fun ProfileScreen(
         ExoErrorDialog(
             message = blockErrorMessage,
             onDismiss = { showBlockErrorDialog = false }
+        )
+    }
+
+    // ArticleWriteScreen overlay
+    AnimatedVisibility(
+        visible = showArticleWriteScreen,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        ArticleWriteScreen(
+            writeType = ArticleWriteType.FEED,
+            idolId = editingArticle?.idol?.id,
+            tagId = null,
+            editingArticleId = editingArticle?.id,
+            onNavigateBack = {
+                showArticleWriteScreen = false
+                editingArticle = null
+            },
+            onNavigateBackWithResult = {
+                showArticleWriteScreen = false
+                editingArticle = null
+            }
         )
     }
 }

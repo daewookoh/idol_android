@@ -55,7 +55,7 @@ data class FriendUser(
     @SerializedName("nickname")
     val nickname: String = "",
 
-    @SerializedName("picture")
+    @SerializedName("image_url")
     val picture: String? = null,
 
     @SerializedName("level")

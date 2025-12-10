@@ -9,11 +9,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.remote.api.MiscApi
 import net.ib.mn.data.remote.api.StampsApi
+import net.ib.mn.data.repository.UsersRepository
+import net.ib.mn.data.repository.WebTokenResult
 import net.ib.mn.domain.model.IconMenuItem
 import net.ib.mn.domain.model.IconMenuType
 import net.ib.mn.domain.model.InAppBanner
@@ -34,7 +37,8 @@ class MenuPageViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val preferencesManager: PreferencesManager,
     private val miscApi: MiscApi,
-    private val stampsApi: StampsApi
+    private val stampsApi: StampsApi,
+    private val usersRepository: UsersRepository
 ) : ViewModel() {
 
     private val _iconMenuItems = MutableStateFlow<List<IconMenuItem>>(emptyList())
@@ -221,6 +225,23 @@ class MenuPageViewModel @Inject constructor(
                 iconResId = R.drawable.icon_menu_board,
                 type = IconMenuType.FREE_BOARD
             ))
+        }
+    }
+
+    /**
+     * 웹 토큰과 언어 정보를 가져옴
+     * old 프로젝트와 동일하게 서버에서 web_token을 가져오고, 저장된 언어 설정을 우선 사용
+     *
+     * @return Pair<token, language>? - 성공 시 토큰과 언어, 실패 시 null
+     */
+    suspend fun getInviteInfo(): Pair<String, String>? {
+        return when (val result = usersRepository.getWebToken()) {
+            is WebTokenResult.Success -> {
+                val savedLanguage = preferencesManager.language.first()
+                val language = LocaleUtil.getWebViewLocale(context, savedLanguage)
+                Pair(result.token, language)
+            }
+            else -> null
         }
     }
 

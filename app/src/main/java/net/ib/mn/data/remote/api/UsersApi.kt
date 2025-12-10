@@ -118,4 +118,14 @@ interface UsersApi {
     suspend fun provideHeart(
         @Body body: ProvideHeartRequest
     ): Response<ResponseBody>
+
+    /**
+     * 웹 토큰 조회
+     * GET users/web_token/
+     *
+     * old 프로젝트: FriendInvite에서 사용
+     * 응답: { "success": true, "token": "..." }
+     */
+    @GET("users/web_token/")
+    suspend fun getWebToken(): Response<ResponseBody>
 }

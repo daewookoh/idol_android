@@ -910,11 +910,6 @@ private fun CommunityScreenContent(
                 onBackClick = { selectedUserProfile = null },
                 onNavigateToArticleDetail = { article ->
                     selectedArticle = article
-                },
-                onNavigateToArticleEdit = { article ->
-                    editingArticle = article
-                    articleWriteType = ArticleWriteType.FEED
-                    showArticleWriteScreen = true
                 }
             )
         }

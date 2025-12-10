@@ -11,6 +11,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -60,6 +61,9 @@ fun FriendInviteScreen(
     var isLoading by remember { mutableStateOf(true) }
     var webViewInstance by remember { mutableStateOf<WebView?>(null) }
 
+    // 백버튼 처리
+    BackHandler { onBackClick() }
+
     // ViewModel 상태 구독
     val inviteMsg by viewModel.inviteMsg.collectAsState()
     val errorMsg by viewModel.errorMsg.collectAsState()
@@ -92,7 +96,7 @@ fun FriendInviteScreen(
 
     // WebView URL 생성
     val webViewUrl = remember(token, language) {
-        val urlPrefix = if (ServerUrl.HOST == ServerUrl.HOST_TEST) {
+        val urlPrefix = if (ServerUrl.isTestServer()) {
             ServerUrl.HOST_TEST
         } else {
             ServerUrl.HOST_REAL
@@ -117,6 +121,7 @@ fun FriendInviteScreen(
     }
 
     ExoScaffold(
+        modifier = Modifier.fillMaxSize(),
         topBar = {
             ExoAppBar(
                 title = stringResource(R.string.invite_friend_detail_title),

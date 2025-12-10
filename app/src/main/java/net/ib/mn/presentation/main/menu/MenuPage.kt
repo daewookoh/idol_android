@@ -14,12 +14,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.domain.model.IconMenuItem
 import net.ib.mn.domain.model.IconMenuType
@@ -39,8 +41,10 @@ fun MenuPage(
     modifier: Modifier = Modifier,
     viewModel: MenuPageViewModel = hiltViewModel(),
     onMenuItemClick: (String) -> Unit = {},
-    onBannerClick: (String?) -> Unit = {}
+    onBannerClick: (String?) -> Unit = {},
+    onNavigateToFriendInvite: (token: String, language: String) -> Unit = { _, _ -> }
 ) {
+    val scope = rememberCoroutineScope()
     val iconMenuItems by viewModel.iconMenuItems.collectAsStateWithLifecycle()
     val textMenuItems by viewModel.textMenuItems.collectAsStateWithLifecycle()
     val bannerList by viewModel.bannerList.collectAsStateWithLifecycle()
@@ -53,6 +57,19 @@ fun MenuPage(
         onBannerClick = onBannerClick,
         onMenuItemClick = { item ->
             onMenuItemClick(item.id)
+        },
+        onTextMenuItemClick = { item ->
+            when (item.type) {
+                TextMenuType.INVITE_FRIEND -> {
+                    scope.launch {
+                        val inviteInfo = viewModel.getInviteInfo()
+                        if (inviteInfo != null) {
+                            onNavigateToFriendInvite(inviteInfo.first, inviteInfo.second)
+                        }
+                    }
+                }
+                else -> {}
+            }
         }
     )
 }

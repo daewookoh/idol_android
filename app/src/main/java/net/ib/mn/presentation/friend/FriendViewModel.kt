@@ -5,12 +5,16 @@ import android.content.SharedPreferences
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.base.BaseViewModel
+import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.repository.FriendsRepository
 import net.ib.mn.data.repository.UsersRepository
+import net.ib.mn.data.repository.WebTokenResult
 import net.ib.mn.domain.model.FriendModel
+import net.ib.mn.util.LocaleUtil
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -33,6 +37,7 @@ import javax.inject.Inject
 class FriendViewModel @Inject constructor(
     private val friendsRepository: FriendsRepository,
     private val usersRepository: UsersRepository,
+    private val preferencesManager: PreferencesManager,
     @ApplicationContext private val context: Context
 ) : BaseViewModel<FriendContract.State, FriendContract.Intent, FriendContract.Effect>() {
 
@@ -293,12 +298,27 @@ class FriendViewModel @Inject constructor(
 
     /**
      * 친구 초대
+     * old 프로젝트: FriendsViewModel.invite()
+     * - 서버에서 웹 토큰을 별도로 가져옴 (accessToken이 아닌 web_token)
+     * - 저장된 언어 설정을 우선 사용
      */
     private fun invite() {
         viewModelScope.launch {
-            // TODO: WebToken 가져와서 초대 화면으로 이동
-            // 현재는 간단하게 토스트만 표시
-            setEffect { FriendContract.Effect.ShowToast("친구 초대 기능은 추후 구현 예정입니다.") }
+            // 웹 토큰 가져오기 (old: getWebTokenSuspend())
+            when (val tokenResult = usersRepository.getWebToken()) {
+                is WebTokenResult.Success -> {
+                    // 저장된 언어 설정 사용 (old: languagePreferenceRepository.getSystemLanguage())
+                    val savedLanguage = preferencesManager.language.first()
+                    val language = LocaleUtil.getWebViewLocale(context, savedLanguage)
+                    setEffect { FriendContract.Effect.NavigateToInvite(language, tokenResult.token) }
+                }
+                is WebTokenResult.ApiError -> {
+                    setEffect { FriendContract.Effect.ShowToast(tokenResult.message ?: context.getString(R.string.error_abnormal_exception)) }
+                }
+                is WebTokenResult.NetworkError -> {
+                    setEffect { FriendContract.Effect.ShowToast(context.getString(R.string.error_abnormal_exception)) }
+                }
+            }
         }
     }
 }

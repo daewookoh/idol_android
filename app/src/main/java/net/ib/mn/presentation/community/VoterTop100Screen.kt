@@ -52,10 +52,7 @@ import java.text.NumberFormat
 import net.ib.mn.R
 import net.ib.mn.R.color.main
 import net.ib.mn.data.remote.dto.VoterTop100Model
-import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.presentation.community.profile.ProfileScreen
-import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
-import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold
@@ -112,10 +109,6 @@ fun VoterTop100Screen(
 
     // 선택된 유저 프로필 화면 표시 상태
     var selectedUser by remember { mutableStateOf<VoterTop100Model?>(null) }
-
-    // ArticleWriteScreen 오버레이 상태
-    var showArticleWriteScreen by remember { mutableStateOf(false) }
-    var editingArticle by remember { mutableStateOf<ArticleModel?>(null) }
 
     BackHandler {
         if (selectedUser != null) {
@@ -244,34 +237,9 @@ fun VoterTop100Screen(
                 userLevel = user.level,
                 mostIdolName = mostIdolName,
                 isMine = false,  // 타인의 프로필
-                onBackClick = { selectedUser = null },
-                onNavigateToArticleEdit = { article ->
-                    editingArticle = article
-                    showArticleWriteScreen = true
-                }
+                onBackClick = { selectedUser = null }
             )
         }
-    }
-
-    // ArticleWriteScreen 오버레이
-    AnimatedVisibility(
-        visible = showArticleWriteScreen,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        ArticleWriteScreen(
-            writeType = ArticleWriteType.FEED,
-            idolId = editingArticle?.idol?.id,
-            editingArticleId = editingArticle?.id,
-            onNavigateBack = {
-                showArticleWriteScreen = false
-                editingArticle = null
-            },
-            onNavigateBackWithResult = { _ ->
-                showArticleWriteScreen = false
-                editingArticle = null
-            }
-        )
     }
 }
 

@@ -70,6 +70,7 @@ import net.ib.mn.domain.model.FriendMostIdol
 import net.ib.mn.domain.model.FriendUser
 import net.ib.mn.navigation.LocalAppNavigator
 import net.ib.mn.navigation.Screen
+import net.ib.mn.presentation.overlay.friendinvite.FriendInviteScreen
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoDialog
 import net.ib.mn.ui.components.ExoScaffold
@@ -111,6 +112,11 @@ fun FriendScreen(
     var showBannerTooltip by remember { mutableStateOf(!bannerTooltipDismissed) }
     var showHeartTooltip by remember { mutableStateOf(!heartTooltipDismissed) }
 
+    // FriendInviteScreen overlay 상태
+    var showFriendInviteScreen by remember { mutableStateOf(false) }
+    var inviteToken by remember { mutableStateOf("") }
+    var inviteLanguage by remember { mutableStateOf("") }
+
     // Effect 처리
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
@@ -124,7 +130,9 @@ fun FriendScreen(
                     showDialog = true
                 }
                 is FriendContract.Effect.NavigateToInvite -> {
-                    // TODO: 초대 화면으로 이동
+                    inviteToken = effect.token
+                    inviteLanguage = effect.language
+                    showFriendInviteScreen = true
                 }
             }
         }
@@ -252,6 +260,15 @@ fun FriendScreen(
                 }
             }
         }
+    }
+
+    // FriendInviteScreen overlay
+    if (showFriendInviteScreen) {
+        FriendInviteScreen(
+            token = inviteToken,
+            language = inviteLanguage,
+            onBackClick = { showFriendInviteScreen = false }
+        )
     }
 }
 
@@ -413,6 +430,12 @@ private fun FriendListContent(
                 onReceiveHeart = onReceiveHeart,
                 onSendHeartToAll = onSendHeartToAll
             )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 10.dp),
+                thickness = 1.dp,
+                color = colorResource(R.color.gray100)
+            )
         }
 
         // 친구 목록
@@ -491,7 +514,7 @@ private fun FriendListHeader(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 10.dp),
+                .padding(horizontal = 10.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -503,30 +526,30 @@ private fun FriendListHeader(
             )
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(13.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // 하트 받기 버튼
                 IconButton(
                     onClick = onReceiveHeart,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(50.dp)
                 ) {
                     AsyncImage(
                         model = R.drawable.btn_take_heart,
                         contentDescription = "하트 받기",
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(50.dp)
                     )
                 }
 
                 // 전체 하트 보내기 버튼
                 IconButton(
                     onClick = onSendHeartToAll,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(50.dp)
                 ) {
                     AsyncImage(
                         model = R.drawable.btn_give_heart_all_off,
                         contentDescription = "전체 하트 보내기",
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(50.dp)
                     )
                 }
             }
@@ -539,7 +562,7 @@ private fun FriendListHeader(
                 onDismiss = onDismissTooltip,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 50.dp, end= 70.dp)
+                    .padding(end= 78.dp).offset(y=55.dp)
             )
         }
     }
@@ -723,7 +746,7 @@ private fun FriendItem(
                 Text(
                     text = mostText,
                     color = colorResource(R.color.gray580),
-                    fontSize = 13.sp
+                    fontSize = 13.sp, lineHeight = 17.sp
                 )
 
                 // 누적 투표
@@ -732,7 +755,7 @@ private fun FriendItem(
                 Text(
                     text = stringResource(R.string.level_heart_format, voteCountFormatted),
                     color = colorResource(R.color.gray580),
-                    fontSize = 13.sp
+                    fontSize = 13.sp, lineHeight = 17.sp
                 )
 
                 // 소개글 (상태 메시지)
@@ -740,7 +763,7 @@ private fun FriendItem(
                     Text(
                         text = statusMsg,
                         color = colorResource(R.color.gray300),
-                        fontSize = 13.sp,
+                        fontSize = 13.sp, lineHeight = 17.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -751,7 +774,7 @@ private fun FriendItem(
             IconButton(
                 onClick = onSendHeart,
                 enabled = !isSendingHeart,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(50.dp)
             ) {
                 if (isSendingHeart) {
                     CircularProgressIndicator(
@@ -763,7 +786,7 @@ private fun FriendItem(
                     AsyncImage(
                         model = R.drawable.btn_give_heart_off,
                         contentDescription = "Send Heart",
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(50.dp)
                     )
                 }
             }
@@ -779,22 +802,16 @@ private fun FriendItem(
 
 /**
  * 레벨 배지
+ * old 프로젝트와 동일하게 level 값을 그대로 icon_level_{level}로 매핑
  */
 @Composable
 private fun LevelBadge(level: Int) {
-    // 레벨에 따른 아이콘 리소스 매핑 (0-9까지)
-    val levelIconRes = when {
-        level >= 40 -> R.drawable.icon_level_9
-        level >= 35 -> R.drawable.icon_level_8
-        level >= 30 -> R.drawable.icon_level_7
-        level >= 25 -> R.drawable.icon_level_6
-        level >= 20 -> R.drawable.icon_level_5
-        level >= 15 -> R.drawable.icon_level_4
-        level >= 10 -> R.drawable.icon_level_3
-        level >= 5 -> R.drawable.icon_level_2
-        level >= 1 -> R.drawable.icon_level_1
-        else -> R.drawable.icon_level_0
-    }
+    val context = LocalContext.current
+    // old 프로젝트: MAX_LEVEL 이상이면 MAX_LEVEL로 제한
+    val clampedLevel = level.coerceIn(0, 50) // MAX_LEVEL = 50
+    val resName = String.format(java.util.Locale.ENGLISH, "icon_level_%d", clampedLevel)
+    val levelIconRes = context.resources.getIdentifier(resName, "drawable", context.packageName)
+        .takeIf { it != 0 } ?: R.drawable.icon_level_0
 
     AsyncImage(
         model = levelIconRes,

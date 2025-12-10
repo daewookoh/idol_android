@@ -321,6 +321,49 @@ class UsersRepository @Inject constructor(
             ProvideHeartResult.Error(message = e.message)
         }
     }
+
+    /**
+     * 웹 토큰 조회
+     *
+     * old 프로젝트: FriendsViewModel.getWebTokenSuspend()
+     * FriendInvite 웹뷰에서 사용하는 토큰
+     *
+     * @return WebTokenResult
+     */
+    suspend fun getWebToken(): WebTokenResult {
+        return try {
+            logD(TAG, "getWebToken called")
+            val response = usersApi.getWebToken()
+
+            if (response.isSuccessful) {
+                val jsonString = response.body()?.string() ?: "{}"
+                val jsonObject = JSONObject(jsonString)
+                logD(TAG, "getWebToken response: $jsonObject")
+
+                val success = jsonObject.optBoolean("success", false)
+                val token = jsonObject.optString("token", "")
+
+                if (success && token.isNotBlank()) {
+                    logD(TAG, "getWebToken success")
+                    WebTokenResult.Success(token)
+                } else {
+                    val msg = jsonObject.optString("msg", "Failed to get token")
+                    logE(TAG, "getWebToken failed: $msg")
+                    WebTokenResult.ApiError(msg)
+                }
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Unknown error"
+                logE(TAG, "getWebToken failed: ${response.code()} - $errorBody")
+                WebTokenResult.ApiError("API Error: ${response.code()}")
+            }
+        } catch (e: IOException) {
+            logE(TAG, "getWebToken network error: ${e.message}", e)
+            WebTokenResult.NetworkError(e.message)
+        } catch (e: Exception) {
+            logE(TAG, "getWebToken exception: ${e.message}", e)
+            WebTokenResult.NetworkError(e.message)
+        }
+    }
 }
 
 /** 하트박스 결과 */
@@ -338,4 +381,11 @@ sealed interface ProvideHeartResult {
 sealed interface BlockResult {
     data object Success : BlockResult
     data class Error(val gcode: Int? = null, val message: String? = null) : BlockResult
+}
+
+/** 웹 토큰 결과 */
+sealed interface WebTokenResult {
+    data class Success(val token: String) : WebTokenResult
+    data class ApiError(val message: String? = null) : WebTokenResult
+    data class NetworkError(val message: String? = null) : WebTokenResult
 }

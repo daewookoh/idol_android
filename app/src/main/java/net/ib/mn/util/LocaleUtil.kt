@@ -44,6 +44,42 @@ object LocaleUtil {
     }
 
     /**
+     * 웹뷰용 로케일 코드 반환
+     * old 프로젝트의 LanguagePreferenceRepositoryImpl.getSystemLanguage()와 동일한 방식
+     *
+     * - 저장된 언어 설정이 있으면 우선 사용
+     * - 중국어는 zh-cn, zh-tw 형식으로 반환
+     * - 그 외에는 언어 코드만 반환 (ko, en, ja)
+     *
+     * @param savedLanguage 저장된 언어 설정 (ex: "ko_KR", "zh_CN", "en")
+     */
+    fun getWebViewLocale(context: Context, savedLanguage: String?): String {
+        // 저장된 언어 설정이 있으면 우선 사용
+        if (!savedLanguage.isNullOrEmpty()) {
+            return when {
+                savedLanguage.startsWith("zh_") || savedLanguage.startsWith("zh-") -> {
+                    savedLanguage.replace("_", "-").lowercase()
+                }
+                savedLanguage.contains("_") -> {
+                    savedLanguage.substringBefore("_")
+                }
+                else -> savedLanguage
+            }
+        }
+
+        // 저장된 설정이 없으면 시스템 언어 사용
+        val locale = getDeviceLocale(context)
+        val langCode = locale.language
+        val countryCode = locale.country
+
+        return if (langCode == "zh") {
+            "$langCode-${countryCode.lowercase()}"
+        } else {
+            langCode
+        }
+    }
+
+    /**
      * 앱 로케일 반환
      */
     fun getAppLocale(context: Context): Locale = getDeviceLocale(context)

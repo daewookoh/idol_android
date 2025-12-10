@@ -1,5 +1,8 @@
 package net.ib.mn.presentation.main.freeboard
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -59,6 +62,8 @@ import net.ib.mn.presentation.common.ArticleItemType
 import net.ib.mn.presentation.common.ExoArticleItem
 import net.ib.mn.presentation.common.ExoArticleNavigation
 import net.ib.mn.presentation.common.ExoArticleViewModel
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
+import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
 import net.ib.mn.ui.components.ExoBottomSheet
 import net.ib.mn.ui.components.ExoBottomSheetItem
 import net.ib.mn.ui.components.ExoBottomSheetList
@@ -74,17 +79,21 @@ import net.ib.mn.util.LocaleUtil
 @Composable
 fun FreeBoardPage(
     initialTagId: Int? = null,
-    onNavigateToWrite: (tagId: Int?) -> Unit = {},
     onNavigateToArticleDetail: (ArticleModel, externalTabName: String?, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _, _ -> },
     onNavigateToNoticeDetail: (ArticleModel) -> Unit = {},
-    onNavigateToArticleEdit: (ArticleModel) -> Unit = {},
     viewModel: FreeBoardViewModel = hiltViewModel(),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     // 초기 태그 적용 여부 (한 번만 실행)
     var initialTagApplied by remember { mutableStateOf(false) }
+
+    // ArticleWriteScreen overlay 상태
+    var showArticleWriteScreen by remember { mutableStateOf(false) }
+    var articleWriteTagId by remember { mutableStateOf<Int?>(null) }
+    var editingArticle by remember { mutableStateOf<ArticleModel?>(null) }
 
     // Load initial data
     LaunchedEffect(Unit) {
@@ -107,7 +116,9 @@ fun FreeBoardPage(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is FreeBoardContract.Effect.NavigateToWrite -> {
-                    onNavigateToWrite(effect.tagId)
+                    articleWriteTagId = effect.tagId
+                    editingArticle = null
+                    showArticleWriteScreen = true
                 }
                 is FreeBoardContract.Effect.ShowLanguageFilterDialog -> {
                     // Show language filter dialog
@@ -123,7 +134,6 @@ fun FreeBoardPage(
     }
 
     // ExoArticle 네비게이션 이벤트 처리
-    val context = LocalContext.current
     LaunchedEffect(Unit) {
         articleViewModel.navigationEvent.collect { event ->
             when (event) {
@@ -140,7 +150,9 @@ fun FreeBoardPage(
                     onNavigateToNoticeDetail(event.article)
                 }
                 is ExoArticleNavigation.EditArticle -> {
-                    onNavigateToArticleEdit(event.article)
+                    editingArticle = event.article
+                    articleWriteTagId = event.article.tagId.takeIf { it > 0 }
+                    showArticleWriteScreen = true
                 }
                 else -> { /* 다른 이벤트는 무시 */ }
             }
@@ -152,6 +164,31 @@ fun FreeBoardPage(
         onIntent = viewModel::sendIntent,
         articleViewModel = articleViewModel
     )
+
+    // ArticleWriteScreen overlay
+    AnimatedVisibility(
+        visible = showArticleWriteScreen,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        ArticleWriteScreen(
+            writeType = ArticleWriteType.FREE_BOARD,
+            idolId = editingArticle?.idol?.id,
+            tagId = articleWriteTagId,
+            editingArticleId = editingArticle?.id,
+            onNavigateBack = {
+                showArticleWriteScreen = false
+                editingArticle = null
+                articleWriteTagId = null
+            },
+            onNavigateBackWithResult = { updatedArticle ->
+                showArticleWriteScreen = false
+                editingArticle = null
+                articleWriteTagId = null
+                updatedArticle?.let { viewModel.updateArticle(it) }
+            }
+        )
+    }
 }
 
 /**
