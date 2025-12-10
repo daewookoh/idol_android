@@ -190,11 +190,11 @@ class ExoArticleViewModel @Inject constructor(
     }
 
     /**
-     * 게시글 수정
+     * 게시글 수정 화면으로 이동
      */
     fun onEditArticle(article: ArticleModel) {
         viewModelScope.launch {
-            _dialogEvent.emit(ExoArticleDialog.EditArticle(article = article))
+            _navigationEvent.emit(ExoArticleNavigation.EditArticle(article = article))
         }
     }
 
@@ -437,6 +437,10 @@ sealed interface ExoArticleNavigation {
     data class NoticeDetail(
         val article: ArticleModel
     ) : ExoArticleNavigation
+
+    data class EditArticle(
+        val article: ArticleModel
+    ) : ExoArticleNavigation
 }
 
 /**
@@ -445,7 +449,6 @@ sealed interface ExoArticleNavigation {
 sealed interface ExoArticleDialog {
     data class MoreOptions(val article: ArticleModel) : ExoArticleDialog
     data class Translation(val content: String, val nation: String?) : ExoArticleDialog
-    data class EditArticle(val article: ArticleModel) : ExoArticleDialog
     data class DeleteArticle(val article: ArticleModel) : ExoArticleDialog
     data class ReportArticle(val article: ArticleModel) : ExoArticleDialog
     data class ShareArticle(val article: ArticleModel) : ExoArticleDialog

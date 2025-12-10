@@ -19,7 +19,6 @@ import net.ib.mn.presentation.signup.SignUpPagesScreen
 import net.ib.mn.presentation.startup.StartUpScreen
 import net.ib.mn.presentation.webview.WebViewScreen
 import net.ib.mn.presentation.article.PhotoDetailScreen
-import net.ib.mn.domain.model.ArticleFile
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.presentation.article.ArticleDetailWrapper
 
@@ -225,7 +224,8 @@ fun NavGraph(
                     is Screen.Community -> NavEntry(screen) {
                         CommunityScreen(
                             idolId = screen.idolId,
-                            initialTab = screen.initialTab
+                            initialTab = screen.initialTab,
+                            sortLatest = screen.sortLatest
                         )
                     }
 

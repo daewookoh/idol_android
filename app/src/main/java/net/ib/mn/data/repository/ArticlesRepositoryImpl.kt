@@ -13,6 +13,7 @@ import net.ib.mn.data.remote.dto.ArticleVoteResponse
 import net.ib.mn.data.remote.dto.CreateArticleRequest
 import net.ib.mn.data.remote.dto.FileData
 import net.ib.mn.data.remote.dto.InsertArticleRequest
+import net.ib.mn.data.remote.dto.UpdateArticleRequest
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.NoticeModel
@@ -21,6 +22,7 @@ import net.ib.mn.domain.repository.ArticlesResponse
 import net.ib.mn.domain.repository.CheckReadyResult
 import net.ib.mn.domain.repository.CreateArticleResult
 import net.ib.mn.domain.repository.FileUploadData
+import net.ib.mn.domain.repository.UpdateArticleResult
 import net.ib.mn.util.logE
 import org.json.JSONObject
 import javax.inject.Inject
@@ -481,5 +483,59 @@ class ArticlesRepositoryImpl @Inject constructor(
             logE(TAG, "checkReady", e)
             CheckReadyResult(success = false)
         }
+    }
+
+    /**
+     * 게시글 수정
+     * Old 프로젝트의 updateArticle과 동일
+     */
+    override fun updateArticle(
+        articleId: String,
+        content: String,
+        title: String?,
+        show: String,
+        tagId: String?,
+        linkTitle: String?,
+        linkDesc: String?,
+        linkUrl: String?
+    ): Flow<ApiResult<UpdateArticleResult>> = flow {
+        emit(ApiResult.Loading)
+        try {
+            val request = UpdateArticleRequest(
+                articleId = articleId,
+                content = content,
+                title = title,
+                linkTitle = linkTitle,
+                linkDesc = linkDesc,
+                linkUrl = linkUrl,
+                show = show,
+                tagId = tagId
+            )
+            val response = articlesApi.updateArticle(request)
+            if (response.success) {
+                emit(ApiResult.Success(UpdateArticleResult(
+                    gcode = response.gcode,
+                    success = response.success,
+                    provide = response.provide,
+                    msg = response.msg
+                )))
+            } else {
+                emit(ApiResult.Error.create(
+                    exception = Exception(response.msg ?: "게시글 수정에 실패했습니다."),
+                    message = response.msg ?: "게시글 수정에 실패했습니다."
+                ))
+            }
+        } catch (e: Exception) {
+            logE(TAG, "updateArticle", e)
+            emit(ApiResult.Error.create(
+                exception = e,
+                message = e.message ?: "게시글 수정에 실패했습니다."
+            ))
+        }
+    }.catch { e ->
+        emit(ApiResult.Error.create(
+            exception = e as? Exception ?: Exception(e.message),
+            message = e.message ?: "게시글 수정에 실패했습니다."
+        ))
     }
 }

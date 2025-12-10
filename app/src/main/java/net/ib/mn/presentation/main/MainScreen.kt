@@ -53,6 +53,8 @@ import net.ib.mn.ui.components.LocalRankingItemClick
 import net.ib.mn.presentation.community.DailyRankingHistoryScreen
 import java.util.Locale
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -259,34 +261,41 @@ fun MainScreen(
         }
     }
 
-    selectedRankingItem?.let { rankingItem ->
-        val idolId = rankingItem.id.toIntOrNull() ?: return@let
+    AnimatedVisibility(
+        visible = selectedRankingItem != null,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        selectedRankingItem?.let { rankingItem ->
+            val idolId = rankingItem.id.toIntOrNull() ?: return@let
 
-        var showChattingTab by remember { mutableStateOf(false) }
-        LaunchedEffect(rankingItem) {
-            showChattingTab = viewModel.shouldShowChattingTab(rankingItem)
-        }
-
-        // 푸시 알림에서 온 경우 초기 탭 및 최신순 정렬 설정 (한 번만 적용)
-        val communityInitialTab = pendingCommunityTab ?: 0
-        val shouldForceLatestOrder = pendingCommunityTab != null
-        LaunchedEffect(rankingItem) {
-            pendingCommunityTab = null // 한 번 사용 후 초기화
-        }
-
-        CommunityScreen(
-            idolId = idolId,
-            showChattingTab = showChattingTab,
-            initialTab = communityInitialTab,
-            forceLatestOrder = shouldForceLatestOrder,
-            onBackClick = viewModel::closeCommunity,
-            onNavigateToArticleWrite = { writeType, idolIdParam ->
-                navigator.navigate(Screen.ArticleWrite(
-                    writeType = writeType,
-                    idolId = idolIdParam
-                ))
+            var showChattingTab by remember { mutableStateOf(false) }
+            LaunchedEffect(rankingItem) {
+                showChattingTab = viewModel.shouldShowChattingTab(rankingItem)
             }
-        )
+
+            // 푸시 알림에서 온 경우 초기 탭 및 최신순 정렬 설정 (한 번만 적용)
+            // remember로 초기 값 캡처하여 recomposition에서도 유지
+            val communityInitialTab = remember(rankingItem) { pendingCommunityTab ?: 0 }
+            val sortLatest = remember(rankingItem) { pendingCommunityTab != null }
+            LaunchedEffect(rankingItem) {
+                pendingCommunityTab = null // 한 번 사용 후 초기화
+            }
+
+            CommunityScreen(
+                idolId = idolId,
+                showChattingTab = showChattingTab,
+                initialTab = communityInitialTab,
+                sortLatest = sortLatest,
+                onBackClick = viewModel::closeCommunity,
+                onNavigateToArticleWrite = { writeType, idolIdParam ->
+                    navigator.navigate(Screen.ArticleWrite(
+                        writeType = writeType,
+                        idolId = idolIdParam
+                    ))
+                }
+            )
+        }
     }
 
     // CUMULATIVE 아이템 클릭 시 IdolRankingHistoryScreen 표시

@@ -98,7 +98,6 @@ class ArticleWriteContract {
         val writeType: ArticleWriteType = ArticleWriteType.FEED,
 
         // 수정 모드
-        val isEditMode: Boolean = false,
         val editingArticle: ArticleModel? = null,
 
         // 아이돌 정보
@@ -153,12 +152,20 @@ class ArticleWriteContract {
             get() = writeType == ArticleWriteType.FREE_BOARD
 
         /**
+         * 수정 모드 여부 (editingArticle이 있으면 수정 모드)
+         */
+        val isEditMode: Boolean
+            get() = editingArticle != null
+
+        /**
          * 작성/수정 버튼 활성화 여부
          */
         val isSubmitEnabled: Boolean
             get() {
-                // 수정 모드에서는 기본적으로 활성화
-                if (isEditMode) return true
+                // 수정 모드에서는 내용이 있어야 활성화
+                if (isEditMode) {
+                    return content.isNotBlank() || title.isNotBlank()
+                }
 
                 // 로딩 중이면 비활성화
                 if (isLoading || isSaving) return false
@@ -203,7 +210,7 @@ class ArticleWriteContract {
         data class Initialize(
             val writeType: ArticleWriteType,
             val idolId: Int?,
-            val editingArticle: ArticleModel? = null,
+            val editingArticleId: String? = null,  // 수정 모드일 때 게시글 ID
             val tagId: Int? = null
         ) : Intent()
 

@@ -258,6 +258,32 @@ interface ArticlesRepository {
      * @return 처리 결과 (success, reward 포함)
      */
     suspend fun checkReady(articleId: Long): CheckReadyResult
+
+    /**
+     * 게시글 수정
+     * Old 프로젝트의 updateArticle과 동일
+     * API: POST articles/update/
+     *
+     * @param articleId 게시글 ID
+     * @param content 내용
+     * @param title 제목
+     * @param show 공개 범위 ("public" or "private")
+     * @param tagId 태그 ID
+     * @param linkTitle 링크 제목
+     * @param linkDesc 링크 설명
+     * @param linkUrl 링크 URL
+     * @return 수정 결과
+     */
+    fun updateArticle(
+        articleId: String,
+        content: String,
+        title: String? = null,
+        show: String = "public",
+        tagId: String? = null,
+        linkTitle: String? = null,
+        linkDesc: String? = null,
+        linkUrl: String? = null
+    ): Flow<ApiResult<UpdateArticleResult>>
 }
 
 /**
@@ -293,6 +319,16 @@ data class CheckReadyResult(
         const val GCODE_UPLOAD_FAILED = 3902  // 업로드 실패
     }
 }
+
+/**
+ * 게시글 수정 결과
+ */
+data class UpdateArticleResult(
+    val gcode: Int,
+    val success: Boolean,
+    val provide: Long = 0,  // 하트 보상
+    val msg: String? = null
+)
 
 /**
  * 게시글 목록 응답 모델

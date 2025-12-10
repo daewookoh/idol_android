@@ -171,3 +171,51 @@ data class CreateArticleResponse(
         const val GCODE_UPDATE_SUCCESS = 2000      // 게시글 수정 성공
     }
 }
+
+/**
+ * 게시글 수정 요청
+ * Old 프로젝트의 UpdateArticleDTO와 동일
+ * API: POST articles/update/
+ */
+data class UpdateArticleRequest(
+    @SerializedName("article_id")
+    val articleId: String,
+
+    @SerializedName("content")
+    val content: String,
+
+    @SerializedName("title")
+    val title: String? = null,
+
+    @SerializedName("link_title")
+    val linkTitle: String? = null,
+
+    @SerializedName("link_desc")
+    val linkDesc: String? = null,
+
+    @SerializedName("link_url")
+    val linkUrl: String? = null,
+
+    @SerializedName("show")
+    val show: String,  // "public" or "private"
+
+    @SerializedName("tag_id")
+    val tagId: String? = null
+)
+
+/**
+ * 게시글 수정 응답
+ */
+data class UpdateArticleResponse(
+    @SerializedName("gcode")
+    val gcode: Int = 0,
+
+    @SerializedName("success")
+    val success: Boolean = false,
+
+    @SerializedName("msg")
+    val msg: String? = null,
+
+    @SerializedName("provide")
+    val provide: Long = 0  // 하트 보상
+)

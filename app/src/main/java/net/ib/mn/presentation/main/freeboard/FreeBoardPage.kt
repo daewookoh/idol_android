@@ -55,6 +55,8 @@ import kotlinx.coroutines.flow.collectLatest
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.TagModel
+import net.ib.mn.navigation.LocalAppNavigator
+import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.common.ArticleItemType
 import net.ib.mn.presentation.common.ExoArticleItem
 import net.ib.mn.presentation.common.ExoArticleNavigation
@@ -80,6 +82,7 @@ fun FreeBoardPage(
     viewModel: FreeBoardViewModel = hiltViewModel(),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
+    val navigator = LocalAppNavigator.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     // 초기 태그 적용 여부 (한 번만 실행)
@@ -137,6 +140,16 @@ fun FreeBoardPage(
                 }
                 is ExoArticleNavigation.NoticeDetail -> {
                     onNavigateToNoticeDetail(event.article)
+                }
+                is ExoArticleNavigation.EditArticle -> {
+                    navigator.navigate(
+                        Screen.ArticleWrite(
+                            writeType = "FREE_BOARD",
+                            idolId = event.article.idol?.id,
+                            editingArticleId = event.article.id,
+                            tagId = event.article.tagId.takeIf { it > 0 }
+                        )
+                    )
                 }
                 else -> { /* 다른 이벤트는 무시 */ }
             }

@@ -136,11 +136,13 @@ sealed class Screen {
      * 배너 클릭, 검색 결과에서 아이돌 클릭 등으로 진입
      * @param idolId 아이돌 ID
      * @param initialTab 초기 탭 (0: FEED, 1: FAN_TALK)
+     * @param sortLatest 최신순 정렬 여부 (푸시 알림에서 진입 시 true)
      */
     @Serializable
     data class Community(
         val idolId: Int,
-        val initialTab: Int = 0
+        val initialTab: Int = 0,
+        val sortLatest: Boolean = false
     ) : Screen()
 
     /**

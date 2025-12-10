@@ -261,7 +261,7 @@ fun ArticleWriteScreen(
             Intent.Initialize(
                 writeType = writeType,
                 idolId = idolId,
-                editingArticle = null, // TODO: editingArticleId로 게시글 로드
+                editingArticleId = editingArticleId,
                 tagId = tagId
             )
         )
@@ -346,6 +346,7 @@ fun ArticleWriteScreen(
             )
         },
         bottomBar = {
+            // 수정 모드에서는 사진/동영상 버튼 숨김, 최애만 설정은 표시
             ArticleWriteBottomBar(
                 isPhotoEnabled = state.isPhotoEnabled,
                 isVideoEnabled = state.isVideoEnabled,
@@ -397,6 +398,7 @@ fun ArticleWriteScreen(
             if (state.attachedMedia.isNotEmpty()) {
                 AttachedMediaRow(
                     media = state.attachedMedia,
+                    isEditMode = state.isEditMode,  // 수정 모드에서는 삭제 버튼 숨김
                     onRemove = { index -> viewModel.sendIntent(Intent.OnMediaRemoved(index)) }
                 )
             }
@@ -641,13 +643,10 @@ private fun ArticleWriteBottomBar(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(
-                        if (isPhotoEnabled) R.drawable.icon_input_field_photo
-                        else R.drawable.icon_input_field_photo_disable
-                    ),
+                    painter = painterResource(R.drawable.icon_input_field_photo),
                     contentDescription = "사진 첨부",
                     modifier = Modifier.size(28.dp),
-                    tint = Color.Unspecified
+                    tint = if (isPhotoEnabled) ColorPalette.textDefault else ColorPalette.gray200
                 )
             }
 
@@ -664,13 +663,10 @@ private fun ArticleWriteBottomBar(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(
-                        if (isVideoEnabled) R.drawable.icon_input_field_video
-                        else R.drawable.icon_input_field_video_disable
-                    ),
+                    painter = painterResource(R.drawable.icon_input_field_video),
                     contentDescription = "동영상 첨부",
                     modifier = Modifier.size(28.dp),
-                    tint = Color.Unspecified
+                    tint = if (isVideoEnabled) ColorPalette.textDefault else ColorPalette.gray200
                 )
             }
 
@@ -692,7 +688,7 @@ private fun ArticleWriteBottomBar(
                         painter = painterResource(R.drawable.icon_input_field_setting),
                         contentDescription = "설정",
                         modifier = Modifier.size(28.dp),
-                        tint = Color.Unspecified
+                        tint = ColorPalette.textDefault
                     )
                 }
             }
@@ -809,6 +805,7 @@ private fun ContentInputField(
 @Composable
 private fun AttachedMediaRow(
     media: List<AttachedMedia>,
+    isEditMode: Boolean = false,
     onRemove: (Int) -> Unit
 ) {
     LazyRow(
@@ -820,6 +817,7 @@ private fun AttachedMediaRow(
         itemsIndexed(media) { index, item ->
             AttachedMediaItem(
                 media = item,
+                showRemoveButton = !isEditMode,  // 수정 모드에서는 삭제 버튼 숨김
                 onRemove = { onRemove(index) }
             )
         }
@@ -829,6 +827,7 @@ private fun AttachedMediaRow(
 @Composable
 private fun AttachedMediaItem(
     media: AttachedMedia,
+    showRemoveButton: Boolean = true,
     onRemove: () -> Unit
 ) {
     Box(
@@ -858,25 +857,27 @@ private fun AttachedMediaItem(
             )
         }
 
-        // 삭제 버튼
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .offset(x = 4.dp, y = (-4).dp)
-                .size(22.dp)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onRemove
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.btn_media_del_nor),
-                contentDescription = "삭제",
-                modifier = Modifier.size(22.dp),
-                tint = Color.Unspecified
-            )
+        // 삭제 버튼 (수정 모드에서는 숨김)
+        if (showRemoveButton) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = 4.dp, y = (-4).dp)
+                    .size(22.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onRemove
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.btn_media_del_nor),
+                    contentDescription = "삭제",
+                    modifier = Modifier.size(22.dp),
+                    tint = Color.Unspecified
+                )
+            }
         }
     }
 }

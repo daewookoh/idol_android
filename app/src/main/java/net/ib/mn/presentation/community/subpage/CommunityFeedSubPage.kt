@@ -43,6 +43,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.navigation.LocalAppNavigator
+import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.common.ArticleItemType
 import net.ib.mn.presentation.common.ExoArticleItem
 import net.ib.mn.presentation.common.ExoArticleNavigation
@@ -75,6 +77,7 @@ fun CommunityFeedSubPage(
     viewModel: CommunityFeedViewModel = hiltViewModel(key = "feed_${idolData.id}"),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
+    val navigator = LocalAppNavigator.current
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
     val idolId = idolData.id.toIntOrNull() ?: 0
@@ -105,6 +108,15 @@ fun CommunityFeedSubPage(
                 }
                 is ExoArticleNavigation.NoticeDetail -> {
                     onNavigateToNoticeDetail(event.article)
+                }
+                is ExoArticleNavigation.EditArticle -> {
+                    navigator.navigate(
+                        Screen.ArticleWrite(
+                            writeType = "FEED",
+                            idolId = event.article.idol?.id ?: idolId,
+                            editingArticleId = event.article.id
+                        )
+                    )
                 }
             }
         }
@@ -310,12 +322,7 @@ private fun FeedFilterHeader(
             ) {
                 // 목록 보기 버튼
                 Icon(
-                    painter = painterResource(
-                        if (viewType == ViewType.LIST)
-                            R.drawable.btn_layout_vertical_on
-                        else
-                            R.drawable.btn_layout_vertical_off
-                    ),
+                    painter = painterResource(R.drawable.btn_layout_vertical_on),
                     contentDescription = "List view",
                     modifier = Modifier
                         .size(17.dp)
@@ -325,19 +332,14 @@ private fun FeedFilterHeader(
                         ) {
                             onViewTypeChange(ViewType.LIST)
                         },
-                    tint = Color.Unspecified
+                    tint = if (viewType == ViewType.LIST) ColorPalette.textDefault else ColorPalette.gray200
                 )
 
                 Spacer(modifier = Modifier.width(15.dp))
 
                 // 그리드 보기 버튼
                 Icon(
-                    painter = painterResource(
-                        if (viewType != ViewType.LIST)
-                            R.drawable.btn_layout_grid_on
-                        else
-                            R.drawable.btn_layout_grid_off
-                    ),
+                    painter = painterResource(R.drawable.btn_layout_grid_on),
                     contentDescription = "Grid view",
                     modifier = Modifier
                         .size(17.dp)
@@ -347,7 +349,7 @@ private fun FeedFilterHeader(
                         ) {
                             onViewTypeChange(ViewType.GRID)
                         },
-                    tint = Color.Unspecified
+                    tint = if (viewType != ViewType.LIST) ColorPalette.textDefault else ColorPalette.gray200
                 )
             }
 

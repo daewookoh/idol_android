@@ -7,6 +7,8 @@ import net.ib.mn.data.remote.dto.ArticleVoteResponse
 import net.ib.mn.data.remote.dto.CreateArticleRequest
 import net.ib.mn.data.remote.dto.CreateArticleResponse
 import net.ib.mn.data.remote.dto.InsertArticleRequest
+import net.ib.mn.data.remote.dto.UpdateArticleRequest
+import net.ib.mn.data.remote.dto.UpdateArticleResponse
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -207,4 +209,13 @@ interface ArticlesApi {
     suspend fun checkReady(
         @Query("article_id") articleId: Long
     ): Response<ResponseBody>
+
+    /**
+     * 게시글 수정
+     * Old 프로젝트: POST "articles/update/"
+     */
+    @POST("articles/update/")
+    suspend fun updateArticle(
+        @Body request: UpdateArticleRequest
+    ): UpdateArticleResponse
 }

@@ -83,6 +83,15 @@ fun ArticleDetailWrapper(
                 is ExoArticleNavigation.Community -> {
                     navigator.navigate(Screen.Community(idolId = event.idolId))
                 }
+                is ExoArticleNavigation.EditArticle -> {
+                    navigator.navigate(
+                        Screen.ArticleWrite(
+                            writeType = if (isFeed) "FEED" else "FREE_BOARD",
+                            idolId = event.article.idol?.id,
+                            editingArticleId = event.article.id
+                        )
+                    )
+                }
                 else -> { /* 다른 이벤트 무시 */ }
             }
         }

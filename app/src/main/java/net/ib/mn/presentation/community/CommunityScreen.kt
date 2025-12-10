@@ -129,7 +129,7 @@ enum class CommunityTab {
  * @param idolId 아이돌 ID
  * @param showChattingTab 채팅 탭 표시 여부
  * @param initialTab 초기 탭 (0: FEED, 1: FAN_TALK, 2: CHAT, 3: SCHEDULE)
- * @param forceLatestOrder 최신순 정렬 강제 적용
+ * @param sortLatest 최신순 정렬 강제 적용
  * @param onBackClick 뒤로가기 클릭 콜백
  * @param onMostChanged 최애 변경 콜백
  * @param onNavigateToArticleWrite 글쓰기 화면 이동 콜백
@@ -139,7 +139,7 @@ fun CommunityScreen(
     idolId: Int,
     showChattingTab: Boolean = true,
     initialTab: Int = 0,
-    forceLatestOrder: Boolean = false,
+    sortLatest: Boolean = false,
     onBackClick: (() -> Unit)? = null,
     onMostChanged: (Boolean) -> Unit = {},
     onNavigateToArticleWrite: ((writeType: String, idolId: Int?) -> Unit)? = null,
@@ -170,7 +170,7 @@ fun CommunityScreen(
         idolData = idolData!!,
         showChattingTab = showChattingTab,
         initialTab = initialTab,
-        forceLatestOrder = forceLatestOrder,
+        sortLatest = sortLatest,
         onBackClick = onBackClick ?: { navigator.popBackStack(); Unit },
         onMostChanged = onMostChanged,
         onNavigateToArticleWrite = onNavigateToArticleWrite ?: { writeType, idolIdParam ->
@@ -186,7 +186,7 @@ fun CommunityScreen(
  * @param idolData 아이돌 실시간 데이터 (Flow로 실시간 업데이트됨)
  * @param showChattingTab 채팅 탭 표시 여부 (최애이거나, 최애의 그룹이거나, 관리자일 경우 true)
  * @param initialTab 초기 탭 인덱스 (0: FEED, 1: FAN_TALK, 2: CHAT, 3: SCHEDULE) - 푸시 알림에서 온 경우
- * @param forceLatestOrder 푸시 알림에서 온 경우 최신순 정렬 강제 적용
+ * @param sortLatest 푸시 알림에서 온 경우 최신순 정렬 강제 적용
  * @param onBackClick 뒤로가기 클릭 이벤트
  * @param onMostChanged 최애 변경 콜백
  * @param onNavigateToArticleWrite 글쓰기 화면 이동 콜백 (writeType, idolId)
@@ -197,7 +197,7 @@ private fun CommunityScreenContent(
     idolData: CommunityViewModel.IdolData,
     showChattingTab: Boolean = false,
     initialTab: Int? = null,
-    forceLatestOrder: Boolean = false,
+    sortLatest: Boolean = false,
     onBackClick: () -> Unit = {},
     onMostChanged: (Boolean) -> Unit = {},
     onNavigateToArticleWrite: (writeType: String, idolId: Int?) -> Unit = { _, _ -> },
@@ -283,8 +283,8 @@ private fun CommunityScreenContent(
     )
 
     // 푸시 알림에서 온 경우 최신순 정렬 적용
-    LaunchedEffect(forceLatestOrder) {
-        if (forceLatestOrder) {
+    LaunchedEffect(sortLatest) {
+        if (sortLatest) {
             feedViewModel.setOrderBy(OrderByType.TIME)
         }
     }

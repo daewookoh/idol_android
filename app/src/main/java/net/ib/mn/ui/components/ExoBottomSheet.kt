@@ -116,7 +116,7 @@ fun ExoBottomSheet(
                             Text(
                                 text = title,
                                 style = ExoTypo.body15.copy(fontWeight = FontWeight.Bold),
-                                color = ColorPalette.gray150,
+                                color = ColorPalette.textGray,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
                                     .fillMaxWidth()

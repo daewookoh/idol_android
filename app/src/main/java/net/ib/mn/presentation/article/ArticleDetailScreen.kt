@@ -59,6 +59,8 @@ import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.CommentModel
 import net.ib.mn.domain.model.ScheduleModel
+import net.ib.mn.navigation.LocalAppNavigator
+import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.common.ArticleType
 import net.ib.mn.presentation.common.ExoArticle
 import net.ib.mn.presentation.common.ExoArticleNavigation
@@ -109,6 +111,7 @@ fun ArticleDetailScreen(
 ) {
     // 스케줄 모드 여부
     val isScheduleMode = schedule != null
+    val navigator = LocalAppNavigator.current
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -302,6 +305,15 @@ fun ArticleDetailScreen(
                 }
                 is ExoArticleNavigation.MediaDetail -> {
                     onNavigateToPhotoDetail(event.article, event.mediaIndex)
+                }
+                is ExoArticleNavigation.EditArticle -> {
+                    navigator.navigate(
+                        Screen.ArticleWrite(
+                            writeType = if (isFeed) "FEED" else "FREE_BOARD",
+                            idolId = event.article.idol?.id,
+                            editingArticleId = event.article.id
+                        )
+                    )
                 }
                 else -> { /* 다른 이벤트는 무시 */ }
             }

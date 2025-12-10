@@ -28,8 +28,10 @@ import net.ib.mn.domain.repository.PresignedUrlResult
 import net.ib.mn.presentation.article.write.ArticleWriteContract.*
 import net.ib.mn.domain.model.UploadVideoSpecModel
 import net.ib.mn.util.Constants
+import net.ib.mn.util.IdolImageUtil.toSecureUrl
 import net.ib.mn.util.ImageUtil
 import net.ib.mn.util.LinkParser
+import net.ib.mn.util.NotificationUtil
 import net.ib.mn.util.VideoProcessor
 import net.ib.mn.util.logD
 import net.ib.mn.util.logE
@@ -81,8 +83,17 @@ class ArticleWriteViewModel @Inject constructor(
             setState { copy(isLoading = true) }
 
             try {
-                // 아이돌 정보 로드
-                val idol = intent.idolId?.let { idolRepository.getIdolById(it) }
+                // 수정 모드 여부 (editingArticleId가 있으면 수정 모드)
+                val isEditMode = intent.editingArticleId != null
+
+                // 수정 모드인 경우 기존 게시글 데이터 로드
+                val editingArticle: ArticleModel? = intent.editingArticleId?.let { articleId ->
+                    loadArticleForEdit(articleId.toLong())
+                }
+
+                // 아이돌 정보 로드 (수정 모드에서는 게시글의 아이돌 ID 사용)
+                val idolId = intent.idolId ?: editingArticle?.idol?.id
+                val idol = idolId?.let { idolRepository.getIdolById(it) }
 
                 // 최애 아이돌 ID 조회
                 val mostIdolId = preferencesManager.getMostIdolId()
@@ -102,13 +113,14 @@ class ArticleWriteViewModel @Inject constructor(
                 }
 
                 // 선택된 태그 (intent에서 tagId가 전달된 경우)
-                val selectedTag = intent.tagId?.let { tagId ->
+                var selectedTag = intent.tagId?.let { tagId ->
                     tags.find { it.id == tagId }
                 }
 
-                // 수정 모드인 경우 기존 데이터 설정
-                val editingArticle = intent.editingArticle
-                val isEditMode = editingArticle != null
+                // 수정 모드에서 태그 선택 (자유게시판인 경우)
+                if (intent.writeType == ArticleWriteType.FREE_BOARD && editingArticle != null) {
+                    selectedTag = tags.find { it.id == editingArticle.tagId }
+                }
 
                 // FREE_BOARD용 placeholder 설정 (old 프로젝트와 동일)
                 val titlePlaceholder: String?
@@ -131,7 +143,6 @@ class ArticleWriteViewModel @Inject constructor(
                     copy(
                         isLoading = false,
                         writeType = intent.writeType,
-                        isEditMode = isEditMode,
                         editingArticle = editingArticle,
                         idol = idol,
                         idolName = idol?.name ?: "",
@@ -149,13 +160,26 @@ class ArticleWriteViewModel @Inject constructor(
                     )
                 }
 
-                // 수정 모드에서 기존 미디어 파일 로드
+                // 수정 모드에서 기존 미디어 파일 로드 (읽기 전용 표시)
                 editingArticle?.let { loadExistingMedia(it) }
 
             } catch (e: Exception) {
+                logE(TAG, "initialize", e)
                 setState { copy(isLoading = false, error = e.message) }
                 setEffect { Effect.ShowError(e.message ?: "초기화에 실패했습니다.") }
             }
+        }
+    }
+
+    /**
+     * 수정할 게시글 로드
+     */
+    private suspend fun loadArticleForEdit(articleId: Long): ArticleModel? {
+        return try {
+            articlesRepository.getArticle(articleId)
+        } catch (e: Exception) {
+            logE(TAG, "loadArticleForEdit", e)
+            null
         }
     }
 
@@ -389,21 +413,23 @@ class ArticleWriteViewModel @Inject constructor(
             return
         }
 
+        val isEditMode = currentState.isEditMode
+
+        // 업로드 중 알림 표시 후 바로 화면 닫기 (old 프로젝트와 동일)
+        setEffect { Effect.ShowUploadingNotification }
+        setEffect { Effect.NavigateBackWithResult(isEdited = isEditMode) }
+
+        // 백그라운드에서 업로드 진행
         viewModelScope.launch {
-            setState { copy(isSaving = true) }
-
-            // 업로드 중 알림 표시 (old 프로젝트의 PresignedUrlService와 동일)
-            setEffect { Effect.ShowUploadingNotification }
-
             try {
-                if (currentState.isEditMode) {
+                if (isEditMode) {
                     updateArticle()
                 } else {
                     createArticle()
                 }
             } catch (e: Exception) {
-                setState { copy(isSaving = false) }
-                setEffect { Effect.ShowError(e.message ?: "저장에 실패했습니다.") }
+                logE(TAG, "onSubmitClick", e)
+                // 에러 발생 시 알림으로 표시 (화면은 이미 닫힘)
             }
         }
     }
@@ -570,25 +596,112 @@ class ArticleWriteViewModel @Inject constructor(
                         }
                     }
 
-                    // 작성 내용 초기화 후 나가기
+                    // 작성 내용 초기화
                     clearContent()
-                    setState { copy(isSaving = false) }
-                    setEffect { Effect.NavigateBackWithResult(isEdited = false) }
                 }
                 is ApiResult.Error -> {
                     logE(TAG, "createArticle - ${result.message}")
-                    setState { copy(isSaving = false) }
-                    setEffect { Effect.ShowError(result.message ?: "저장에 실패했습니다.") }
+                    // 에러 알림 표시 (화면은 이미 닫힘)
+                    NotificationUtil.showArticleUploadFailedNotification(context, result.message ?: "저장에 실패했습니다.")
                 }
                 is ApiResult.Loading -> { /* Loading state handled by isSaving */ }
             }
         }
     }
 
+    /**
+     * 게시글 수정
+     * Old 프로젝트의 WriteArticleActivity.tryEdit() 참고
+     */
     private suspend fun updateArticle() {
-        // TODO: 수정 API 연동 후 구현
-        setState { copy(isSaving = false) }
-        setEffect { Effect.NavigateBackWithResult(isEdited = true) }
+        val state = currentState
+        val articleId = state.editingArticle?.id ?: run {
+            logE(TAG, "updateArticle - editingArticle is null")
+            setState { copy(isSaving = false) }
+            setEffect { Effect.ShowError("게시글 정보를 찾을 수 없습니다.") }
+            return
+        }
+
+        // 공개 범위: 최애공개면 "private", 전체공개면 "public"
+        val showScope = if (state.isPrivateToFavorite) "private" else "public"
+
+        // 태그 ID (자유게시판인 경우)
+        val tagId = if (state.writeType == ArticleWriteType.FREE_BOARD) {
+            state.selectedTag?.id?.toString()
+        } else {
+            null
+        }
+
+        articlesRepository.updateArticle(
+            articleId = articleId,
+            content = state.content,
+            title = state.title.ifBlank { null },
+            show = showScope,
+            tagId = tagId,
+            linkTitle = state.linkPreview?.title,
+            linkDesc = state.linkPreview?.description,
+            linkUrl = state.linkPreview?.url
+        ).collectLatest { result ->
+            when (result) {
+                is ApiResult.Success -> {
+                    val data = result.data
+                    val writeType = state.writeType
+                    val idolId = state.idol?.id
+                    val currentTagId = state.selectedTag?.id
+
+                    when (data.gcode) {
+                        GCODE_UPDATE_SUCCESS -> {
+                            setEffect {
+                                Effect.ShowSuccess(
+                                    message = "수정이 완료되었습니다.",
+                                    writeType = writeType,
+                                    idolId = idolId,
+                                    tagId = currentTagId
+                                )
+                            }
+                        }
+                        GCODE_SUCCESS -> {
+                            setEffect {
+                                Effect.ShowSuccess(
+                                    message = "수정이 완료되었습니다.",
+                                    writeType = writeType,
+                                    idolId = idolId,
+                                    tagId = currentTagId
+                                )
+                            }
+                        }
+                        GCODE_SUCCESS_WITH_HEART -> {
+                            setEffect {
+                                Effect.ShowSuccess(
+                                    message = "수정이 완료되었습니다.\n하트 ${data.provide.toInt()}개가 지급되었습니다.",
+                                    heartReward = data.provide.toInt(),
+                                    writeType = writeType,
+                                    idolId = idolId,
+                                    tagId = currentTagId
+                                )
+                            }
+                        }
+                        else -> {
+                            setEffect {
+                                Effect.ShowSuccess(
+                                    message = "수정이 완료되었습니다.",
+                                    writeType = writeType,
+                                    idolId = idolId,
+                                    tagId = currentTagId
+                                )
+                            }
+                        }
+                    }
+
+                }
+                is ApiResult.Error -> {
+                    logE(TAG, "updateArticle - ${result.message}")
+                    // 에러 알림 표시 (화면은 이미 닫힘)
+                    NotificationUtil.showArticleUploadFailedNotification(context, result.message ?: "수정에 실패했습니다.")
+                }
+                is ApiResult.Loading -> { /* Loading state handled by isSaving */ }
+            }
+        }
     }
 
     /**
@@ -818,11 +931,11 @@ class ArticleWriteViewModel @Inject constructor(
     }
 
     private fun loadExistingMedia(article: ArticleModel) {
-        // 기존 미디어 파일을 Uri로 변환하여 로드
+        // 기존 미디어 파일을 Uri로 변환하여 로드 (secureUrl 적용)
         val mediaList = article.files.mapNotNull { file ->
-            file.thumbnailUrl?.let { url ->
+            file.thumbnailUrl?.toSecureUrl()?.let { secureUrl ->
                 AttachedMedia(
-                    uri = Uri.parse(url),
+                    uri = Uri.parse(secureUrl),
                     type = if (file.isVideo) MediaType.VIDEO else MediaType.IMAGE
                 )
             }
@@ -837,5 +950,6 @@ class ArticleWriteViewModel @Inject constructor(
         // GCode 상수 (Old 프로젝트와 동일)
         private const val GCODE_SUCCESS = 0
         private const val GCODE_SUCCESS_WITH_HEART = 1
+        private const val GCODE_UPDATE_SUCCESS = 2000
     }
 }
