@@ -57,6 +57,7 @@ import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleFile
 import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.domain.model.ArticleTranslateState
 import net.ib.mn.ui.components.ExoArticleVoteDialog
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoVideoPlayer
@@ -149,6 +150,15 @@ fun ExoArticle(
 
     // 투표 다이얼로그 상태
     var showVoteDialog by remember { mutableStateOf(false) }
+
+    // 번역 상태
+    var localArticle by remember { mutableStateOf(article) }
+    LaunchedEffect(article.id, article.content, article.title) {
+        // article이 외부에서 변경되면 localArticle 동기화 (번역 상태 유지)
+        if (localArticle.translateState == ArticleTranslateState.ORIGINAL) {
+            localArticle = article
+        }
+    }
 
     // 시간 표시: 전체 날짜+시간 (예: "2024.11.27 오후 5:05")
     val createdAt = remember(article.createdAt) {
@@ -340,8 +350,8 @@ fun ExoArticle(
                 Spacer(modifier = Modifier.height(3.dp))
             }
 
-            // 3. 제목
-            if (!article.title.isNullOrEmpty()) {
+            // 3. 제목 (FEED 타입에서는 표시하지 않음)
+            if (!type.isFeed && !article.title.isNullOrEmpty()) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -366,9 +376,12 @@ fun ExoArticle(
                 }
             }
 
-            // 4. 내용
-            val content = article.content ?: ""
-            val displayContent = if (isYoutubeLink) YoutubeHelper.removeYoutubeLink(content) else content
+            // 4. 내용 (번역 상태에 따라 표시 내용 변경)
+            val originalContent = article.content ?: ""
+            val currentContent = localArticle.content ?: originalContent
+            val displayContent = if (isYoutubeLink) YoutubeHelper.removeYoutubeLink(currentContent) else currentContent
+            val translateState = localArticle.translateState
+
             if (displayContent.isNotEmpty()) {
                 Text(
                     text = displayContent,
@@ -392,23 +405,49 @@ fun ExoArticle(
             }
 
             // 번역 버튼 (FREE_BOARD에서는 숨김 - old 프로젝트 TranslateUiHelper와 동일)
-            val systemLanguage = remember { LocaleUtil.getSystemLanguage(context).lowercase() }
-            val isTranslatable = remember(content, article.nation, showTranslation) {
-                showTranslation &&
-                    content.isNotEmpty() &&
-                    !isYoutubeLink &&
-                    !article.nation.isNullOrEmpty() &&
-                    !systemLanguage.startsWith(article.nation!!.lowercase()) &&
-                    LocaleUtil.extractTranslatable(content).isNotEmpty()
+            // 번역 가능 조건:
+            // 1. 콘텐츠가 비어있지 않아야 함
+            // 2. YouTube 링크가 아니어야 함
+            // 3. 게시글 nation이 있어야 함 (언어 정보 필요)
+            // 4. 사용자 언어와 게시글 언어가 달라야 함
+            // 5. URL, 해시태그, 이모지 등을 제외한 번역 가능한 텍스트가 있어야 함
+            val shouldShowTranslation = remember(originalContent, article.nation) {
+                if (originalContent.isEmpty() || isYoutubeLink) return@remember false
+                val nation = article.nation
+                if (nation.isNullOrEmpty()) return@remember false
+
+                // 사용자 디바이스 언어와 게시글 언어 비교
+                val userLang = LocaleUtil.getAppLocale(context).language.lowercase()
+                val articleLang = nation.lowercase()
+
+                // 언어가 같으면 번역 불필요
+                if (userLang == articleLang) return@remember false
+                // 한국어는 ko로 통일해서 비교
+                if ((userLang == "ko" || userLang.startsWith("ko")) &&
+                    (articleLang == "ko" || articleLang.startsWith("ko"))) return@remember false
+
+                // 번역 가능한 텍스트가 있는지 확인 (URL, 해시태그, 이모지 등 제외)
+                val translatableText = LocaleUtil.extractTranslatable(originalContent)
+                translatableText.isNotBlank()
             }
-            if (!type.isFreeBoard && isTranslatable) {
+
+            if (!type.isFreeBoard && showTranslation && shouldShowTranslation) {
+                // 번역 상태에 따른 버튼 텍스트
+                val translateButtonText = when (translateState) {
+                    ArticleTranslateState.TRANSLATING -> stringResource(R.string.translating)
+                    ArticleTranslateState.TRANSLATED -> stringResource(R.string.see_original)
+                    else -> stringResource(R.string.see_translate)
+                }
+
                 Text(
-                    text = stringResource(R.string.see_translate),
+                    text = translateButtonText,
                     style = ExoTypo.body12.copy(color = ColorPalette.textGray),
                     modifier = Modifier
                         .padding(start = 20.dp, top = 6.dp, end = 20.dp, bottom = 6.dp)
-                        .clickable {
-                            viewModel.translateContent(article.content ?: "", article.nation)
+                        .clickable(enabled = translateState != ArticleTranslateState.TRANSLATING) {
+                            viewModel.translateArticle(localArticle) { updatedArticle ->
+                                localArticle = updatedArticle
+                            }
                         }
                 )
             }

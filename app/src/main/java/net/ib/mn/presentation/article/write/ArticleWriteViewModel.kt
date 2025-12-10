@@ -417,7 +417,6 @@ class ArticleWriteViewModel @Inject constructor(
 
         // 업로드 중 알림 표시 후 바로 화면 닫기 (old 프로젝트와 동일)
         setEffect { Effect.ShowUploadingNotification }
-        setEffect { Effect.NavigateBackWithResult(isEdited = isEditMode) }
 
         // 백그라운드에서 업로드 진행
         viewModelScope.launch {
@@ -429,9 +428,13 @@ class ArticleWriteViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 logE(TAG, "onSubmitClick", e)
-                // 에러 발생 시 알림으로 표시 (화면은 이미 닫힘)
+                // 에러 발생 시 알림으로 표시
+                NotificationUtil.showArticleUploadFailedNotification(context, e.message ?: "저장에 실패했습니다.")
             }
         }
+
+        // 화면 닫기
+        setEffect { Effect.NavigateBackWithResult(isEdited = isEditMode) }
     }
 
     private fun validateInput(): Boolean {

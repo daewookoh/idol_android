@@ -52,6 +52,7 @@ import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.NotificationUtil
+import net.ib.mn.util.logD
 
 /**
  * 게시글 작성/수정 화면
@@ -271,8 +272,14 @@ fun ArticleWriteScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is Effect.NavigateBack -> onNavigateBack()
-                is Effect.NavigateBackWithResult -> onNavigateBackWithResult(effect.isEdited)
+                is Effect.NavigateBack -> {
+                    logD("ArticleWriteScreen", "Effect.NavigateBack received")
+                    onNavigateBack()
+                }
+                is Effect.NavigateBackWithResult -> {
+                    logD("ArticleWriteScreen", "Effect.NavigateBackWithResult received, isEdited=${effect.isEdited}")
+                    onNavigateBackWithResult(effect.isEdited)
+                }
                 is Effect.ShowBackConfirmDialog -> showBackConfirmDialog = true
                 is Effect.ShowTagSelector -> showTagSelectorSheet = true
                 is Effect.ShowSettingBottomSheet -> showSettingSheet = true
