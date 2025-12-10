@@ -95,11 +95,16 @@ import java.util.Locale
 
 /**
  * PhotoDetailScreen - 사진/미디어 상세 화면
+ * @param article 게시글 모델 (미디어 파일 포함)
+ * @param initialIndex 초기 페이지 인덱스
+ * @param showShareButton 공유 버튼 표시 여부 (배경화면 등에서는 false)
+ * @param onBackClick 뒤로가기 콜백
  */
 @Composable
 fun PhotoDetailScreen(
     article: ArticleModel,
     initialIndex: Int = 0,
+    showShareButton: Boolean = true,
     onBackClick: () -> Unit = {},
     viewModel: PhotoDetailViewModel = hiltViewModel()
 ) {
@@ -249,19 +254,22 @@ fun PhotoDetailScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.btn_img_share),
-                    contentDescription = "Share",
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) {
-                            viewModel.shareArticle(context, article)
-                        },
-                    tint = Color.Unspecified
-                )
+                // 공유 버튼 (showShareButton이 true일 때만 표시)
+                if (showShareButton) {
+                    Icon(
+                        painter = painterResource(R.drawable.btn_img_share),
+                        contentDescription = "Share",
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                viewModel.shareArticle(context, article)
+                            },
+                        tint = Color.Unspecified
+                    )
+                }
 
                 val currentMedia = effectiveMediaFiles.getOrNull(pagerState.currentPage)
                 if (currentMedia?.isVideo == true) {

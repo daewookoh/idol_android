@@ -28,7 +28,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -64,12 +62,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import kotlinx.coroutines.flow.collectLatest
 import net.ib.mn.R
-import net.ib.mn.data.remote.dto.MostIdol
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.SearchIdolModel
 import net.ib.mn.domain.model.SearchSupportModel
 import net.ib.mn.domain.model.SearchWallpaperModel
 import net.ib.mn.navigation.LocalAppNavigator
+import net.ib.mn.navigation.Screen
+import net.ib.mn.presentation.common.ArticleItemType
+import net.ib.mn.presentation.common.ExoArticleItem
+import net.ib.mn.presentation.common.ExoArticleNavigation
+import net.ib.mn.presentation.common.ExoArticleViewModel
 import net.ib.mn.presentation.common.SearchBar
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.components.ExoNameWithGroup
@@ -77,6 +79,7 @@ import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ProfileImageType
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.NumberFormatUtil
 
 /**
@@ -96,12 +99,15 @@ import net.ib.mn.util.NumberFormatUtil
 @Composable
 fun SearchResultScreen(
     keyword: String,
+    timestamp: Long = System.currentTimeMillis(),
     modifier: Modifier = Modifier,
-    viewModel: SearchResultViewModel = hiltViewModel(key = "search_result_$keyword")
+    viewModel: SearchResultViewModel = hiltViewModel(key = "search_result_${keyword}_$timestamp"),
+    articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
     val navigator = LocalAppNavigator.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
 
     // 최애 설정 다이얼로그 상태
     var showSetMostDialog by remember { mutableStateOf<SearchIdolModel?>(null) }
@@ -110,6 +116,38 @@ fun SearchResultScreen(
     LaunchedEffect(Unit) {
         if (keyword.isNotBlank() && state.keyword.isEmpty()) {
             viewModel.sendIntent(SearchResultContract.Intent.Search(keyword))
+        }
+    }
+
+    // ExoArticleItem의 네비게이션 이벤트 처리
+    LaunchedEffect(Unit) {
+        articleViewModel.navigationEvent.collect { event ->
+            when (event) {
+                is ExoArticleNavigation.ArticleDetail -> {
+                    navigator.navigate(
+                        Screen.ArticleDetail(
+                            articleId = event.articleId,
+                            isFeed = event.isFeed
+                        )
+                    )
+                }
+                is ExoArticleNavigation.Profile -> {
+                    // TODO: 프로필 화면으로 이동
+                }
+                is ExoArticleNavigation.MediaDetail -> {
+                    val imageUrls = event.article.mediaFiles.mapNotNull { it.originUrl }
+                    val selectedUrl = imageUrls.getOrNull(event.mediaIndex) ?: imageUrls.firstOrNull()
+                    if (selectedUrl != null) {
+                        navigator.navigate(
+                            Screen.PhotoDetail(imageUrl = selectedUrl)
+                        )
+                    }
+                }
+                is ExoArticleNavigation.Community -> {
+                    navigator.navigate(Screen.Community(idolId = event.idolId))
+                }
+                else -> { /* 다른 이벤트 무시 */ }
+            }
         }
     }
 
@@ -203,6 +241,7 @@ fun SearchResultScreen(
         onSearchQueryChange = { viewModel.sendIntent(SearchResultContract.Intent.UpdateSearchQuery(it)) },
         onSearch = { query ->
             if (query.isNotBlank()) {
+                focusManager.clearFocus()
                 viewModel.sendIntent(SearchResultContract.Intent.Search(query))
             }
         },
@@ -225,10 +264,11 @@ fun SearchResultScreen(
             // TODO: 서포트 상세 화면으로 이동
         },
         onWallpaperClick = { wallpaper ->
-            // TODO: 배경화면 상세 화면으로 이동
+            // TODO: 배경화면 상세 화면으로 이동 (더보기 클릭 시)
         },
-        onArticleClick = { article ->
-            // TODO: 게시글 상세 화면으로 이동
+        onWallpaperImageClick = { imageUrl ->
+            // 배경화면은 공유 버튼 숨김
+            navigator.navigate(Screen.PhotoDetail(imageUrl = imageUrl, showShareButton = false))
         }
     )
 }
@@ -250,8 +290,9 @@ private fun SearchResultContent(
     onSetMost: (SearchIdolModel) -> Unit = {},
     onSupportClick: (SearchSupportModel) -> Unit = {},
     onWallpaperClick: (SearchWallpaperModel) -> Unit = {},
-    onArticleClick: (ArticleModel) -> Unit = {}
+    onWallpaperImageClick: (String) -> Unit = {}
 ) {
+    val context = LocalContext.current
     val listState = rememberLazyListState()
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -366,28 +407,29 @@ private fun SearchResultContent(
                     item { SectionDivider() }
                 }
 
-                // 배경화면 섹션 (아이돌별로 그룹핑하여 가로 스크롤)
+                // 배경화면 섹션 (아이돌별로 가로 스크롤)
                 if (state.wallpapers.isNotEmpty()) {
-                    // 아이돌별로 그룹핑
-                    val wallpapersByIdol = state.wallpapers.groupBy { it.idol?.name ?: "Unknown" }
-                    wallpapersByIdol.forEach { (idolName, wallpapers) ->
-                        item {
-                            WallpaperSection(
-                                idolName = idolName,
-                                wallpapers = wallpapers,
-                                onWallpaperClick = { onWallpaperClick(it) }
-                            )
-                        }
+                    items(state.wallpapers) { wallpaper ->
+                        WallpaperSection(
+                            wallpaper = wallpaper,
+                            onImageClick = onWallpaperImageClick,
+                            onWallpaperClick = onWallpaperClick
+                        )
                     }
                     item { SectionDivider() }
                 }
 
-                // 잡담게시판(SmallTalk) 섹션
+                // 잡담게시판(SmallTalk) 섹션 - ExoArticleItem FREE_BOARD 타입 사용
                 if (state.smallTalks.isNotEmpty()) {
-                    items(state.smallTalks) { article ->
-                        SmallTalkItem(
+                    items(
+                        items = state.smallTalks,
+                        key = { "smalltalk_${it.id}" }
+                    ) { article ->
+                        ExoArticleItem(
                             article = article,
-                            onClick = { onArticleClick(article) }
+                            type = ArticleItemType.FREE_BOARD,
+                            isVisible = true,
+                            showTranslation = false
                         )
                     }
                     if (state.hasMoreSmallTalks && !state.isLoadingMoreSmallTalk) {
@@ -404,12 +446,22 @@ private fun SearchResultContent(
                     item { SectionDivider() }
                 }
 
-                // 커뮤니티 게시글 섹션
+                // 커뮤니티 게시글 섹션 - ExoArticleItem FEED 타입 사용
                 if (state.articles.isNotEmpty()) {
-                    items(state.articles) { article ->
-                        SearchArticleItem(
+                    items(
+                        items = state.articles,
+                        key = { it.id }
+                    ) { article ->
+                        // 아이돌 정보에서 커뮤니티 이름 추출
+                        val communityName = article.idol?.let { idol ->
+                            LocaleUtil.getLocalizedIdolName(context, idol)
+                        }
+                        ExoArticleItem(
                             article = article,
-                            onClick = { onArticleClick(article) }
+                            type = ArticleItemType.FEED,
+                            externalCommunityName = communityName,
+                            isVisible = true,
+                            showTranslation = true
                         )
                     }
                     if (state.isLoadingMoreArticle) {
@@ -1074,19 +1126,24 @@ private fun SearchSupportItem(
 }
 
 /**
- * 배경화면 섹션 (아이돌 이름별로 그룹핑)
+ * 배경화면 섹션 (아이돌별로 가로 스크롤)
  * old 프로젝트의 item_search_wallpaper_idol.xml 레이아웃 기반
+ * - 아이돌 이름 + "배경화면" 헤더
+ * - 가로 스크롤로 배경화면 이미지 목록 표시
+ * - 마지막에 "더보기" 버튼 표시
+ * @param onImageClick 이미지 클릭 시 (이미지 URL) 콜백
  */
 @Composable
 private fun WallpaperSection(
-    idolName: String,
-    wallpapers: List<SearchWallpaperModel>,
+    wallpaper: SearchWallpaperModel,
+    onImageClick: (String) -> Unit,
     onWallpaperClick: (SearchWallpaperModel) -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(colorResource(id = R.color.background_100))
+            .padding(bottom = 30.dp) // old: setMargins bottom 30
     ) {
         // 헤더: "아이돌이름 배경화면"
         Row(
@@ -1096,7 +1153,7 @@ private fun WallpaperSection(
                 .padding(horizontal = 20.dp, vertical = 10.dp)
         ) {
             Text(
-                text = idolName,
+                text = wallpaper.idolName ?: "Unknown",
                 color = colorResource(id = R.color.text_gray),
                 fontSize = 13.sp
             )
@@ -1113,361 +1170,70 @@ private fun WallpaperSection(
             thickness = 0.3.dp
         )
 
-        // 가로 스크롤 배경화면 목록
+        // 가로 스크롤 배경화면 목록 (old: 200dp height, padding 15dp 좌우, 16dp 상하)
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
                 .background(colorResource(id = R.color.background_100)),
             contentPadding = PaddingValues(horizontal = 15.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            horizontalArrangement = Arrangement.spacedBy(5.dp) // old: marginStart 5dp
         ) {
-            items(wallpapers) { wallpaper ->
+            // 배경화면 이미지들 (old: 100dp x 166dp, radius 10dp 추가)
+            itemsIndexed(wallpaper.imageUrls) { index, imageUrl ->
                 AsyncImage(
-                    model = wallpaper.thumbnailUrl ?: wallpaper.imageUrl,
-                    contentDescription = wallpaper.title,
+                    model = imageUrl,
+                    contentDescription = null,
                     modifier = Modifier
-                        .size(width = 120.dp, height = 168.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable { onWallpaperClick(wallpaper) },
+                        .size(width = 100.dp, height = 166.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null // 호버 효과 제거
+                        ) {
+                            onImageClick(imageUrl)
+                        },
                     contentScale = ContentScale.Crop
                 )
             }
-        }
-    }
-}
 
-/**
- * 검색된 배경화면 아이템 (리스트 형태 - 폴백용)
- */
-@Composable
-private fun SearchWallpaperItem(
-    wallpaper: SearchWallpaperModel,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // 썸네일
-        AsyncImage(
-            model = wallpaper.thumbnailUrl ?: wallpaper.imageUrl,
-            contentDescription = wallpaper.title,
-            modifier = Modifier
-                .size(64.dp)
-                .clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop
-        )
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            // 제목
-            wallpaper.title?.let { title ->
-                Text(
-                    text = title,
-                    color = colorResource(id = R.color.gray900),
-                    fontSize = 14.sp,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-
-            // 아이돌 이름
-            wallpaper.idol?.name?.let { name ->
-                Text(
-                    text = name,
-                    color = colorResource(id = R.color.gray580),
-                    fontSize = 12.sp
-                )
-            }
-        }
-    }
-
-    HorizontalDivider(
-        color = colorResource(id = R.color.gray100),
-        thickness = 1.dp
-    )
-}
-
-/**
- * 잡담게시판(SmallTalk) 아이템
- * old 프로젝트의 item_small_talk.xml 레이아웃 기반
- */
-@Composable
-private fun SmallTalkItem(
-    article: ArticleModel,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(colorResource(id = R.color.background_100))
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onClick() }
-                .padding(horizontal = 20.dp, vertical = 17.dp),
-            verticalAlignment = Alignment.Top
-        ) {
-            // 왼쪽: 제목, 내용, 메타 정보
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 12.dp)
-            ) {
-                // 제목
-                article.title?.let { title ->
-                    Text(
-                        text = title,
-                        color = colorResource(id = R.color.text_default),
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                // 내용
-                article.content?.let { content ->
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = content,
-                        color = colorResource(id = R.color.text_gray),
-                        fontSize = 13.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                // 작성자, 날짜
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    article.user?.nickname?.let { nickname ->
-                        Text(
-                            text = nickname,
-                            color = colorResource(id = R.color.text_dimmed),
-                            fontSize = 11.sp
-                        )
-                        Text(
-                            text = " · ",
-                            color = colorResource(id = R.color.text_dimmed),
-                            fontSize = 11.sp
-                        )
-                    }
-                    article.createdAt?.let { date ->
-                        Text(
-                            text = date,
-                            color = colorResource(id = R.color.text_dimmed),
-                            fontSize = 11.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+            // 더보기 버튼 (old: cl_more, 100dp x 166dp, bg_radius10_gray100)
+            if (wallpaper.totalCount > wallpaper.imageUrls.size) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .size(width = 100.dp, height = 166.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(colorResource(id = R.color.gray100))
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null // 호버 효과 제거
+                            ) {
+                                onWallpaperClick(wallpaper)
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.view_more),
+                                color = colorResource(id = R.color.text_dimmed),
+                                fontSize = 14.sp
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Icon(
+                                painter = painterResource(id = R.drawable.btn_go),
+                                contentDescription = null,
+                                tint = Color.Unspecified
+                            )
+                        }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                // 좋아요, 댓글, 조회수
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // 좋아요
-                    Icon(
-                        painter = painterResource(id = R.drawable.icon_board_like),
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = Color.Unspecified
-                    )
-                    Spacer(modifier = Modifier.width(3.dp))
-                    Text(
-                        text = "${article.likeCount}",
-                        color = colorResource(id = R.color.text_gray),
-                        fontSize = 12.sp
-                    )
-
-                    Spacer(modifier = Modifier.width(14.dp))
-
-                    // 댓글
-                    Icon(
-                        painter = painterResource(id = R.drawable.icon_board_comment),
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = Color.Unspecified
-                    )
-                    Spacer(modifier = Modifier.width(3.dp))
-                    Text(
-                        text = "${article.commentCount}",
-                        color = colorResource(id = R.color.text_gray),
-                        fontSize = 12.sp
-                    )
-
-                    Spacer(modifier = Modifier.width(14.dp))
-
-                    // 조회수
-                    Icon(
-                        painter = painterResource(id = R.drawable.icon_board_hits),
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = Color.Unspecified
-                    )
-                    Spacer(modifier = Modifier.width(3.dp))
-                    Text(
-                        text = "${article.viewCount}",
-                        color = colorResource(id = R.color.text_gray),
-                        fontSize = 12.sp
-                    )
-                }
             }
-
-            // 오른쪽: 썸네일 (있는 경우만)
-            val thumbnailUrl = article.thumbnailUrl ?: article.imageUrl
-            if (!thumbnailUrl.isNullOrEmpty()) {
-                AsyncImage(
-                    model = thumbnailUrl,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(70.dp)
-                        .clip(RoundedCornerShape(4.dp)),
-                    contentScale = ContentScale.Crop
-                )
-            }
-        }
-
-        // 하단 구분선
-        HorizontalDivider(
-            color = colorResource(id = R.color.gray110),
-            thickness = 0.3.dp
-        )
-    }
-}
-
-/**
- * 검색된 게시글 아이템
- */
-@Composable
-private fun SearchArticleItem(
-    article: ArticleModel,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.Top
-    ) {
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            // 제목
-            article.title?.let { title ->
-                Text(
-                    text = title,
-                    color = colorResource(id = R.color.gray900),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-            }
-
-            // 내용
-            article.content?.let { content ->
-                Text(
-                    text = content,
-                    color = colorResource(id = R.color.gray580),
-                    fontSize = 13.sp,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // 메타 정보
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // 작성자
-                article.user?.nickname?.let { nickname ->
-                    Text(
-                        text = nickname,
-                        color = colorResource(id = R.color.gray580),
-                        fontSize = 12.sp
-                    )
-                    Text(
-                        text = " · ",
-                        color = colorResource(id = R.color.gray300),
-                        fontSize = 12.sp
-                    )
-                }
-
-                // 좋아요
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_community_heart),
-                    contentDescription = null,
-                    tint = colorResource(id = R.color.gray300),
-                    modifier = Modifier.size(12.dp)
-                )
-                Spacer(modifier = Modifier.width(2.dp))
-                Text(
-                    text = "${article.likeCount}",
-                    color = colorResource(id = R.color.gray580),
-                    fontSize = 12.sp
-                )
-
-                Text(
-                    text = " · ",
-                    color = colorResource(id = R.color.gray300),
-                    fontSize = 12.sp
-                )
-
-                // 댓글
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_community_comment),
-                    contentDescription = null,
-                    tint = colorResource(id = R.color.gray300),
-                    modifier = Modifier.size(12.dp)
-                )
-                Spacer(modifier = Modifier.width(2.dp))
-                Text(
-                    text = "${article.commentCount}",
-                    color = colorResource(id = R.color.gray580),
-                    fontSize = 12.sp
-                )
-            }
-        }
-
-        // 썸네일 (있는 경우만)
-        val thumbnailUrl = article.thumbnailUrl ?: article.imageUrl
-        if (!thumbnailUrl.isNullOrEmpty()) {
-            Spacer(modifier = Modifier.width(12.dp))
-            AsyncImage(
-                model = thumbnailUrl,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
-            )
         }
     }
-
-    HorizontalDivider(
-        color = colorResource(id = R.color.gray100),
-        thickness = 1.dp
-    )
 }
 
 @Preview(showBackground = true)

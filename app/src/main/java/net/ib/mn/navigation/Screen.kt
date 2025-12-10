@@ -123,10 +123,12 @@ sealed class Screen {
      * SearchResult 화면 - 검색 결과 화면
      * old 프로젝트의 SearchResultActivity에 해당
      * @param keyword 검색 키워드
+     * @param timestamp 화면 생성 시간 (같은 키워드라도 새로 진입 시 새 ViewModel 생성)
      */
     @Serializable
     data class SearchResult(
-        val keyword: String
+        val keyword: String,
+        val timestamp: Long = System.currentTimeMillis()
     ) : Screen()
 
     /**
@@ -139,5 +141,27 @@ sealed class Screen {
     data class Community(
         val idolId: Int,
         val initialTab: Int = 0
+    ) : Screen()
+
+    /**
+     * PhotoDetail 화면 - 사진/미디어 상세 보기
+     * @param imageUrl 이미지 URL
+     * @param showShareButton 공유 버튼 표시 여부 (배경화면 등에서는 false)
+     */
+    @Serializable
+    data class PhotoDetail(
+        val imageUrl: String,
+        val showShareButton: Boolean = true
+    ) : Screen()
+
+    /**
+     * ArticleDetail 화면 - 게시글 상세 (댓글 포함)
+     * @param articleId 게시글 ID
+     * @param isFeed FEED 타입 여부 (하트 투표 표시)
+     */
+    @Serializable
+    data class ArticleDetail(
+        val articleId: String,
+        val isFeed: Boolean = true
     ) : Screen()
 }

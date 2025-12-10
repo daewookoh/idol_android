@@ -105,12 +105,13 @@ class ExoArticleViewModel @Inject constructor(
     /**
      * 게시글 상세 화면으로 이동 (댓글 포함)
      */
-    fun navigateToArticleDetail(article: ArticleModel) {
+    fun navigateToArticleDetail(article: ArticleModel, isFeed: Boolean = true) {
         viewModelScope.launch {
             _navigationEvent.emit(
                 ExoArticleNavigation.ArticleDetail(
                     articleId = article.id,
-                    article = article
+                    article = article,
+                    isFeed = isFeed
                 )
             )
         }
@@ -420,7 +421,8 @@ sealed interface ExoArticleNavigation {
 
     data class ArticleDetail(
         val articleId: String,
-        val article: ArticleModel
+        val article: ArticleModel,
+        val isFeed: Boolean = true
     ) : ExoArticleNavigation
 
     data class MediaDetail(

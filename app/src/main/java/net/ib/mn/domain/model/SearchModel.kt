@@ -143,14 +143,15 @@ data class SearchSupportModel(
 
 /**
  * 검색된 배경화면 모델
+ * old 프로젝트의 WallpaperModel 구조 기반
+ * - 아이돌별로 그룹핑된 배경화면 목록
  */
 data class SearchWallpaperModel(
-    val id: Int,
-    val title: String?,
-    val imageUrl: String?,
-    val thumbnailUrl: String?,
-    val idol: MostIdol?,
-    val createdAt: String?
+    val idolId: Int,
+    val imageUrls: List<String>,
+    val totalCount: Int,
+    // idolName은 별도 API 호출로 가져와야 하므로 nullable
+    val idolName: String? = null
 )
 
 /**
@@ -223,12 +224,10 @@ fun SearchSupportDto.toDomain(): SearchSupportModel = SearchSupportModel(
 )
 
 fun SearchWallpaperDto.toDomain(): SearchWallpaperModel = SearchWallpaperModel(
-    id = id,
-    title = title,
-    imageUrl = imageUrl,
-    thumbnailUrl = thumbnailUrl,
-    idol = idol,
-    createdAt = createdAt
+    idolId = idolId,
+    imageUrls = imageUrls ?: emptyList(),
+    totalCount = totalCount,
+    idolName = null // 아이돌 이름은 별도 조회 필요
 )
 
 fun SearchTrendDto.toDomain(): SearchTrendModel = SearchTrendModel(

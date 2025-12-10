@@ -226,7 +226,7 @@ class SearchResultContract {
         /**
          * 배경화면 상세 화면으로 이동
          */
-        data class NavigateToWallpaperDetail(val wallpaperId: Int) : Effect()
+        data class NavigateToWallpaperDetail(val idolId: Int) : Effect()
 
         /**
          * 게시글 상세 화면으로 이동

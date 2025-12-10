@@ -109,6 +109,7 @@ enum class ArticleItemType {
  * @param article 게시글 데이터
  * @param type 게시글 타입 (FEED: 전체UI, FREE_BOARD: 컴팩트UI, ADMIN_NOTICE: 공지UI)
  * @param tagName FREE_BOARD 타입에서 표시할 태그 이름
+ * @param externalCommunityName 외부에서 전달되는 커뮤니티 이름 (검색 결과 등에서 상단에 표시)
  * @param isVisible 화면에 보이는지 여부 (GIF/비디오 최적화용)
  * @param showTranslation 번역 버튼 표시 여부
  * @param showPopularIcon 인기글 아이콘 표시 여부
@@ -122,6 +123,7 @@ fun ExoArticleItem(
     article: ArticleModel,
     type: ArticleItemType = ArticleItemType.FEED,
     tagName: String? = null,
+    externalCommunityName: String? = null,
     isVisible: Boolean = true,
     showTranslation: Boolean = true,
     showPopularIcon: Boolean = false,
@@ -146,7 +148,7 @@ fun ExoArticleItem(
         ArticleItemCompact(
             article = article,
             showPopularIcon = showPopularIcon,
-            onClick = { viewModel.navigateToArticleDetail(article) },
+            onClick = { viewModel.navigateToArticleDetail(article, isFeed = false) },
             modifier = modifier
         )
         return
@@ -242,6 +244,36 @@ fun ExoArticleItem(
                 .fillMaxWidth()
                 .background(ColorPalette.background100)
         ) {
+            // 0. 커뮤니티 정보 헤더 (검색 결과에서 사용)
+            if (!externalCommunityName.isNullOrEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(ColorPalette.background100)
+                        .clickable {
+                            article.idol?.id?.let { idolId ->
+                                viewModel.navigateToCommunity(idolId)
+                            }
+                        }
+                        .padding(horizontal = 20.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = externalCommunityName,
+                        style = ExoTypo.body13.copy(color = ColorPalette.textGray)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(id = R.string.guide_community_title),
+                        style = ExoTypo.body13.copy(color = ColorPalette.textDimmed)
+                    )
+                }
+                HorizontalDivider(
+                    color = ColorPalette.gray110,
+                    thickness = 0.3.dp
+                )
+            }
+
             // 1. 사용자 프로필 섹션
             Row(
                 modifier = Modifier

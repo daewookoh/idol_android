@@ -18,6 +18,10 @@ import net.ib.mn.presentation.main.MainScreen
 import net.ib.mn.presentation.signup.SignUpPagesScreen
 import net.ib.mn.presentation.startup.StartUpScreen
 import net.ib.mn.presentation.webview.WebViewScreen
+import net.ib.mn.presentation.article.PhotoDetailScreen
+import net.ib.mn.domain.model.ArticleFile
+import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.presentation.article.ArticleDetailWrapper
 
 /**
  * CompositionLocal로 AppNavigator를 하위 컴포저블에 전달.
@@ -210,7 +214,10 @@ fun NavGraph(
                     // SearchResult 화면 (검색 결과)
                     // Navigation 3: LocalAppNavigator를 통해 Screen에서 직접 네비게이션 처리
                     is Screen.SearchResult -> NavEntry(screen) {
-                        SearchResultScreen(keyword = screen.keyword)
+                        SearchResultScreen(
+                            keyword = screen.keyword,
+                            timestamp = screen.timestamp
+                        )
                     }
 
                     // Community 화면 (독립적인 커뮤니티 화면)
@@ -219,6 +226,28 @@ fun NavGraph(
                         CommunityScreen(
                             idolId = screen.idolId,
                             initialTab = screen.initialTab
+                        )
+                    }
+
+                    // PhotoDetail 화면 (이미지 상세 보기)
+                    is Screen.PhotoDetail -> NavEntry(screen) {
+                        val article = ArticleModel(
+                            id = "0",
+                            imageUrl = screen.imageUrl
+                        )
+                        PhotoDetailScreen(
+                            article = article,
+                            showShareButton = screen.showShareButton,
+                            onBackClick = { navigator.popBackStack() }
+                        )
+                    }
+
+                    // ArticleDetail 화면 (게시글 상세)
+                    is Screen.ArticleDetail -> NavEntry(screen) {
+                        ArticleDetailWrapper(
+                            articleId = screen.articleId,
+                            isFeed = screen.isFeed,
+                            onBackClick = { navigator.popBackStack() }
                         )
                     }
                 }

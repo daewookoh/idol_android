@@ -7,12 +7,15 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.ib.mn.base.BaseViewModel
+import net.ib.mn.domain.manager.ArticleUpdateEvent
+import net.ib.mn.domain.manager.ArticleUpdateManager
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.SearchIdolModel
 import net.ib.mn.domain.model.SearchSupportModel
 import net.ib.mn.domain.model.SearchWallpaperModel
 import net.ib.mn.domain.repository.FavoritesRepository
+import net.ib.mn.domain.repository.IdolRepository
 import net.ib.mn.domain.repository.SearchRepository
 import net.ib.mn.data.repository.UserCacheRepository
 import net.ib.mn.data.repository.UsersRepository
@@ -36,12 +39,18 @@ class SearchResultViewModel @Inject constructor(
     private val searchRepository: SearchRepository,
     private val favoritesRepository: FavoritesRepository,
     private val usersRepository: UsersRepository,
-    private val userCacheRepository: UserCacheRepository
+    private val userCacheRepository: UserCacheRepository,
+    private val idolRepository: IdolRepository,
+    private val articleUpdateManager: ArticleUpdateManager
 ) : BaseViewModel<SearchResultContract.State, SearchResultContract.Intent, SearchResultContract.Effect>() {
 
     companion object {
         private const val SMALL_TALK_LIMIT = 10
         private const val ARTICLE_LIMIT = 50
+    }
+
+    init {
+        observeArticleUpdates()
     }
 
     override fun createInitialState(): SearchResultContract.State = SearchResultContract.State()
@@ -118,12 +127,18 @@ class SearchResultViewModel @Inject constructor(
                             )
                         }
 
+                        // 배경화면에 아이돌 이름 설정
+                        val wallpapersWithIdolName = data.wallpapers.map { wallpaper ->
+                            val idolName = data.idols.find { it.id == wallpaper.idolId }?.name
+                            wallpaper.copy(idolName = idolName)
+                        }
+
                         setState {
                             copy(
                                 isLoading = false,
                                 idols = idolsWithState,
                                 supports = data.supports,
-                                wallpapers = data.wallpapers,
+                                wallpapers = wallpapersWithIdolName,
                                 smallTalks = data.smallTalks,
                                 articles = data.articles,
                                 smallTalkOffset = data.smallTalkOffset,
@@ -134,6 +149,9 @@ class SearchResultViewModel @Inject constructor(
                                 error = null
                             )
                         }
+
+                        // 아이돌 이름이 없는 배경화면은 DB에서 조회
+                        loadMissingIdolNamesForWallpapers(wallpapersWithIdolName)
                     }
                     is ApiResult.Error -> {
                         setState {
@@ -434,7 +452,7 @@ class SearchResultViewModel @Inject constructor(
      * 배경화면 클릭 처리
      */
     private fun handleWallpaperClick(wallpaper: SearchWallpaperModel) {
-        setEffect { SearchResultContract.Effect.NavigateToWallpaperDetail(wallpaper.id) }
+        setEffect { SearchResultContract.Effect.NavigateToWallpaperDetail(wallpaper.idolId) }
     }
 
     /**
@@ -442,5 +460,102 @@ class SearchResultViewModel @Inject constructor(
      */
     private fun handleArticleClick(article: ArticleModel) {
         setEffect { SearchResultContract.Effect.NavigateToArticleDetail(article.id) }
+    }
+
+    /**
+     * 아이돌 이름이 없는 배경화면에 대해 DB에서 아이돌 이름 조회
+     * old 프로젝트의 SearchedWallpaperIdolViewHolder.setCategory 로직 참고
+     */
+    private fun loadMissingIdolNamesForWallpapers(wallpapers: List<SearchWallpaperModel>) {
+        val missingIdolIds = wallpapers
+            .filter { it.idolName == null }
+            .map { it.idolId }
+            .distinct()
+
+        if (missingIdolIds.isEmpty()) return
+
+        viewModelScope.launch {
+            val updatedWallpapers = currentState.wallpapers.toMutableList()
+
+            missingIdolIds.forEach { idolId ->
+                try {
+                    val idol = idolRepository.getIdolById(idolId)
+                    if (idol != null) {
+                        val index = updatedWallpapers.indexOfFirst { it.idolId == idolId }
+                        if (index != -1) {
+                            updatedWallpapers[index] = updatedWallpapers[index].copy(idolName = idol.name)
+                        }
+                    }
+                } catch (e: Exception) {
+                    // 조회 실패 시 무시
+                }
+            }
+
+            setState { copy(wallpapers = updatedWallpapers) }
+        }
+    }
+
+    /**
+     * ArticleUpdateManager의 이벤트를 구독하여 게시글 상태를 실시간으로 업데이트
+     */
+    private fun observeArticleUpdates() {
+        articleUpdateManager.articleUpdateEvent
+            .onEach { event ->
+                when (event) {
+                    is ArticleUpdateEvent.Updated -> {
+                        updateArticleInList(event)
+                    }
+                    is ArticleUpdateEvent.Deleted -> {
+                        removeArticleFromList(event.articleId)
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    /**
+     * 게시글 업데이트 이벤트 처리
+     */
+    private fun updateArticleInList(event: ArticleUpdateEvent.Updated) {
+        setState {
+            copy(
+                // smallTalks 리스트 업데이트
+                smallTalks = smallTalks.map { article ->
+                    if (article.id == event.articleId) {
+                        article.copy(
+                            likeCount = event.likeCount ?: article.likeCount,
+                            commentCount = event.commentCount ?: article.commentCount,
+                            heart = event.heart ?: article.heart
+                        )
+                    } else {
+                        article
+                    }
+                },
+                // articles 리스트 업데이트
+                articles = articles.map { article ->
+                    if (article.id == event.articleId) {
+                        article.copy(
+                            likeCount = event.likeCount ?: article.likeCount,
+                            commentCount = event.commentCount ?: article.commentCount,
+                            heart = event.heart ?: article.heart
+                        )
+                    } else {
+                        article
+                    }
+                }
+            )
+        }
+    }
+
+    /**
+     * 게시글 삭제 이벤트 처리
+     */
+    private fun removeArticleFromList(articleId: String) {
+        setState {
+            copy(
+                smallTalks = smallTalks.filter { it.id != articleId },
+                articles = articles.filter { it.id != articleId }
+            )
+        }
     }
 }

@@ -199,25 +199,19 @@ data class SearchSupportDto(
 
 /**
  * 검색된 배경화면 정보
+ * old 프로젝트의 WallpaperModel 구조 기반
+ * - 아이돌별로 그룹핑된 배경화면 목록
+ * - image_urls: 해당 아이돌의 배경화면 이미지 URL 리스트
  */
 data class SearchWallpaperDto(
-    @SerializedName("id")
-    val id: Int = 0,
+    @SerializedName("idol_id")
+    val idolId: Int = 0,
 
-    @SerializedName("title")
-    val title: String? = null,
+    @SerializedName("image_urls")
+    val imageUrls: List<String>? = null,
 
-    @SerializedName("image_url")
-    val imageUrl: String? = null,
-
-    @SerializedName("thumbnail_url")
-    val thumbnailUrl: String? = null,
-
-    @SerializedName("idol")
-    val idol: MostIdol? = null,
-
-    @SerializedName("created_at")
-    val createdAt: String? = null
+    @SerializedName("total_count")
+    val totalCount: Int = 0
 )
 
 /**
