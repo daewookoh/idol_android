@@ -281,21 +281,5 @@ class MenuPageViewModel @Inject constructor(
             iconResId = R.drawable.icon_sidemenu_game,
             type = TextMenuType.GAME
         ))
-
-        if (LocaleUtil.isExistCurrentLocale(context, SupportedLanguage.BOARD_KIN_QUIZZES_TOP100_LOCALES)) {
-            add(TextMenuItem(
-                id = "quiz",
-                labelResId = R.string.menu_quiz,
-                iconResId = R.drawable.icon_sidemenu_quiz,
-                type = TextMenuType.QUIZ
-            ))
-        }
-
-        add(TextMenuItem(
-            id = "face",
-            labelResId = R.string.menu_face,
-            iconResId = R.drawable.icon_sidemenu_similar,
-            type = TextMenuType.FACE
-        ))
     }
 }

@@ -1960,6 +1960,8 @@ Give a special gift to my idol on CHOEAEDOL!💖</string>
     <string name="friend_tooltip_invite_friend">Get up to 110,000 Hearts!</string>
     <string name="friend_bnr_invite_friend_title">Invite Friends\nGet Hearts</string>
     <string name="invite_friend_detail_title">Invite Friends</string>
+    <string name="friend_invite_msg">Come join %1$s\'s fan community!</string>
+    <string name="friend_invite_msg_default">Come join the fan community!</string>
     <string name="reward_invite_mission_bonus">Friend Invitation Mission Bonus Reward</string>
     <string name="reward_invite_mission_completion">Friend Invitation Mission Completion Reward</string>
     <string name="signup_desc2_noreward">Enter your recommender’s invitation code to exchange Hearts as friends.</string>
@@ -1968,4 +1970,8 @@ Give a special gift to my idol on CHOEAEDOL!💖</string>
     <string name="heart_arcade_description1">Play mini-games and earn hearts!</string>
     <string name="celeb_login_desc">⚡️Start in 3 seconds\nSee actor rankings now!</string>
     <string name="describe_monthly_payment_ios">%1$d-week free trial, then %2$s/month unless canceled.\nCancel at least 24 hours before renewal in App Store</string>
+
+    <!-- Friend Screen -->
+    <string name="btn_send_all_hearts">Send All</string>
+    <string name="btn_take_all_hearts">Receive All</string>
 </resources>

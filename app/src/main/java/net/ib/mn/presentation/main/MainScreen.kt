@@ -220,7 +220,7 @@ fun MainScreen(
                         )
                     },
                     onSearchClick = { navigator.navigate(Screen.Search) },
-                    onFriendsClick = { },
+                    onFriendsClick = { navigator.navigate(Screen.Friend) },
                     onAttendanceClick = { },
                     onNotificationClick = { },
                     onSettingClick = { }

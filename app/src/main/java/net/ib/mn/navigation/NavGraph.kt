@@ -7,6 +7,10 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import net.ib.mn.presentation.awards.AwardsScreen
 import net.ib.mn.presentation.community.CommunityScreen
+import net.ib.mn.presentation.friend.FriendScreen
+import net.ib.mn.presentation.friend.add.FriendAddScreen
+import net.ib.mn.presentation.friend.waiting.FriendWaitingScreen
+import net.ib.mn.presentation.friend.delete.FriendDeleteScreen
 import net.ib.mn.presentation.search.SearchScreen
 import net.ib.mn.presentation.search.result.SearchResultScreen
 import net.ib.mn.presentation.login.EmailLoginScreen
@@ -214,6 +218,26 @@ fun NavGraph(
                             isFeed = screen.isFeed,
                             onBackClick = { navigator.popBackStack() }
                         )
+                    }
+
+                    // Friend 화면 (친구 목록)
+                    is Screen.Friend -> NavEntry(screen) {
+                        FriendScreen()
+                    }
+
+                    // FriendAdd 화면 (뉴프렌즈)
+                    is Screen.FriendAdd -> NavEntry(screen) {
+                        FriendAddScreen()
+                    }
+
+                    // FriendWaiting 화면 (친구 신청 관리)
+                    is Screen.FriendWaiting -> NavEntry(screen) {
+                        FriendWaitingScreen()
+                    }
+
+                    // FriendDelete 화면 (친구 삭제)
+                    is Screen.FriendDelete -> NavEntry(screen) {
+                        FriendDeleteScreen()
                     }
                 }
             }

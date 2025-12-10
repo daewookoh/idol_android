@@ -140,4 +140,28 @@ sealed class Screen {
         val articleId: String,
         val isFeed: Boolean = true
     ) : Screen()
+
+    /**
+     * Friend 화면 - 친구 목록 및 관리
+     */
+    @Serializable
+    data object Friend : Screen()
+
+    /**
+     * FriendAdd 화면 - 뉴프렌즈 (새 친구 추가)
+     */
+    @Serializable
+    data object FriendAdd : Screen()
+
+    /**
+     * FriendWaiting 화면 - 친구 신청 관리
+     */
+    @Serializable
+    data object FriendWaiting : Screen()
+
+    /**
+     * FriendDelete 화면 - 친구 삭제
+     */
+    @Serializable
+    data object FriendDelete : Screen()
 }
