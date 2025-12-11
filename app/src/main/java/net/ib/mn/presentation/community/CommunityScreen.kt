@@ -907,10 +907,7 @@ private fun CommunityScreenContent(
                 userLevel = userInfo.level,
                 mostIdolName = userInfo.mostIdolName,
                 isMine = false,  // 타인의 프로필
-                onBackClick = { selectedUserProfile = null },
-                onNavigateToArticleDetail = { article ->
-                    selectedArticle = article
-                }
+                onBackClick = { selectedUserProfile = null }
             )
         }
     }

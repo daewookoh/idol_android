@@ -74,8 +74,10 @@ import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.presentation.overlay.profile.subpage.ProfileCommentPage
 import net.ib.mn.presentation.overlay.profile.subpage.ProfilePhotoPage
 import net.ib.mn.presentation.overlay.profile.subpage.ProfilePostPage
+import net.ib.mn.presentation.overlay.articledetail.ArticleDetailScreen
 import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
 import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
+import net.ib.mn.presentation.overlay.photodetail.PhotoDetailScreen
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoBottomSheetAction
 import net.ib.mn.ui.components.ExoBottomSheetActionItem
@@ -109,8 +111,7 @@ fun ProfileScreen(
     userLevel: Int = 0,
     mostIdolName: String? = null,
     isMine: Boolean = false,
-    onBackClick: () -> Unit = {},
-    onNavigateToArticleDetail: (ArticleModel) -> Unit = {}
+    onBackClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -150,6 +151,21 @@ fun ProfileScreen(
     // ArticleWriteScreen overlay 상태
     var showArticleWriteScreen by remember { mutableStateOf(false) }
     var editingArticle by remember { mutableStateOf<ArticleModel?>(null) }
+
+    // ArticleDetailScreen overlay 상태
+    var showArticleDetailScreen by remember { mutableStateOf(false) }
+    var selectedArticle by remember { mutableStateOf<ArticleModel?>(null) }
+
+    // PhotoDetailScreen overlay 상태 (ProfilePostPage용)
+    var showPhotoDetailScreen by remember { mutableStateOf(false) }
+    var photoDetailArticle by remember { mutableStateOf<ArticleModel?>(null) }
+    var photoDetailIndex by remember { mutableIntStateOf(0) }
+
+    // ProfilePostPage용 ArticleDetailScreen overlay 상태
+    var showPostArticleDetailScreen by remember { mutableStateOf(false) }
+    var postSelectedArticle by remember { mutableStateOf<ArticleModel?>(null) }
+    var postArticleUpdatedCallback by remember { mutableStateOf<((ArticleModel) -> Unit)?>(null) }
+    var postArticleDeletedCallback by remember { mutableStateOf<(() -> Unit)?>(null) }
 
     // 신고 상태 처리
     LaunchedEffect(reportState) {
@@ -405,7 +421,10 @@ fun ProfileScreen(
                                 isFeedPrivate = state.user.isFeedPrivate,
                                 isBlocked = state.user.isBlocked,
                                 blockStatusChecked = state.user.blockStatusChecked,
-                                onNavigateToArticleDetail = onNavigateToArticleDetail
+                                onNavigateToArticleDetail = { article ->
+                                    selectedArticle = article
+                                    showArticleDetailScreen = true
+                                }
                             )
                             ProfileTab.ACTIVITY -> ProfilePostPage(
                                 userId = userId,
@@ -413,6 +432,17 @@ fun ProfileScreen(
                                 isFeedPrivate = state.user.isFeedPrivate,
                                 isBlocked = state.user.isBlocked,
                                 blockStatusChecked = state.user.blockStatusChecked,
+                                onNavigateToArticleDetail = { article, onUpdated, onDeleted ->
+                                    postSelectedArticle = article
+                                    postArticleUpdatedCallback = onUpdated
+                                    postArticleDeletedCallback = onDeleted
+                                    showPostArticleDetailScreen = true
+                                },
+                                onNavigateToPhotoDetail = { article, index ->
+                                    photoDetailArticle = article
+                                    photoDetailIndex = index
+                                    showPhotoDetailScreen = true
+                                },
                                 onNavigateToArticleEdit = { article ->
                                     editingArticle = article
                                     showArticleWriteScreen = true
@@ -572,6 +602,97 @@ fun ProfileScreen(
                 editingArticle = null
             }
         )
+    }
+
+    // ArticleDetailScreen overlay (ProfilePhotoPage용)
+    AnimatedVisibility(
+        visible = showArticleDetailScreen && selectedArticle != null,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        selectedArticle?.let { article ->
+            ArticleDetailScreen(
+                article = article,
+                isFeed = true,
+                onBackClick = {
+                    showArticleDetailScreen = false
+                    selectedArticle = null
+                },
+                onArticleUpdated = { updatedArticle ->
+                    selectedArticle = updatedArticle
+                },
+                onArticleDeleted = {
+                    showArticleDetailScreen = false
+                    selectedArticle = null
+                },
+                onNavigateToProfile = { profileUserId, nickname, imageUrl, level, mostIdolName ->
+                    // 현재 프로필과 같은 유저면 무시
+                    if (profileUserId != userId) {
+                        // 다른 유저 프로필로 이동은 복잡하므로 일단 닫기
+                        showArticleDetailScreen = false
+                        selectedArticle = null
+                    }
+                }
+            )
+        }
+    }
+
+    // ArticleDetailScreen overlay (ProfilePostPage용)
+    AnimatedVisibility(
+        visible = showPostArticleDetailScreen && postSelectedArticle != null,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        postSelectedArticle?.let { article ->
+            ArticleDetailScreen(
+                article = article,
+                isFeed = true,
+                onBackClick = {
+                    showPostArticleDetailScreen = false
+                    postSelectedArticle = null
+                    postArticleUpdatedCallback = null
+                    postArticleDeletedCallback = null
+                },
+                onArticleUpdated = { updatedArticle ->
+                    postSelectedArticle = updatedArticle
+                    postArticleUpdatedCallback?.invoke(updatedArticle)
+                },
+                onArticleDeleted = {
+                    postArticleDeletedCallback?.invoke()
+                    showPostArticleDetailScreen = false
+                    postSelectedArticle = null
+                    postArticleUpdatedCallback = null
+                    postArticleDeletedCallback = null
+                },
+                onNavigateToProfile = { profileUserId, nickname, imageUrl, level, mostIdolName ->
+                    // 현재 프로필과 같은 유저면 무시
+                    if (profileUserId != userId) {
+                        showPostArticleDetailScreen = false
+                        postSelectedArticle = null
+                        postArticleUpdatedCallback = null
+                        postArticleDeletedCallback = null
+                    }
+                }
+            )
+        }
+    }
+
+    // PhotoDetailScreen overlay (ProfilePostPage용)
+    AnimatedVisibility(
+        visible = showPhotoDetailScreen && photoDetailArticle != null,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        photoDetailArticle?.let { article ->
+            PhotoDetailScreen(
+                article = article,
+                initialIndex = photoDetailIndex,
+                onBackClick = {
+                    showPhotoDetailScreen = false
+                    photoDetailArticle = null
+                }
+            )
+        }
     }
 }
 

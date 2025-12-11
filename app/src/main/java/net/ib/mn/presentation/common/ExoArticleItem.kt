@@ -595,12 +595,11 @@ fun ExoArticleItem(
                         onClick = { showVoteDialog = true }
                     )
                 }
-                // 좋아요 (FEED에서만 색상 표시)
-                val showLikeColor = type == ArticleItemType.FEED && localIsLiked
+                // 좋아요 (컨텐츠 영역은 아이콘 고정)
                 ArticleItemStatItem(
-                    iconRes = if (showLikeColor) R.drawable.icon_board_like_active else R.drawable.icon_board_like,
+                    iconRes = R.drawable.icon_board_like,
                     count = localLikeCount,
-                    tintColor = if (showLikeColor) null else ColorPalette.textDefault,
+                    tintColor = ColorPalette.textDefault,
                     onClick = onLikeClick
                 )
                 // 댓글

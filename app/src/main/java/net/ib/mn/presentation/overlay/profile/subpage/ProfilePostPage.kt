@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,7 @@ import net.ib.mn.presentation.common.ExoArticleItem
 import net.ib.mn.presentation.common.ExoArticleNavigation
 import net.ib.mn.presentation.common.ExoArticleViewModel
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.util.LocaleUtil
 
 /**
  * ProfilePostPage - 프로필 게시글(Activity) 탭
@@ -45,7 +47,7 @@ fun ProfilePostPage(
     isFeedPrivate: Boolean = false,
     isBlocked: Boolean = false,
     blockStatusChecked: Boolean = true,
-    onNavigateToArticleDetail: (ArticleModel, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _ -> },
+    onNavigateToArticleDetail: (ArticleModel, onArticleUpdated: (ArticleModel) -> Unit, onArticleDeleted: () -> Unit) -> Unit = { _, _, _ -> },
     onNavigateToPhotoDetail: (ArticleModel, Int) -> Unit = { _, _ -> },
     onNavigateToArticleEdit: (ArticleModel) -> Unit = {},
     viewModel: ProfilePostViewModel = hiltViewModel(),
@@ -56,9 +58,11 @@ fun ProfilePostPage(
         articleViewModel.navigationEvent.collect { event ->
             when (event) {
                 is ExoArticleNavigation.ArticleDetail -> {
-                    onNavigateToArticleDetail(event.article) { updatedArticle ->
-                        viewModel.updateArticle(updatedArticle)
-                    }
+                    onNavigateToArticleDetail(
+                        event.article,
+                        { updatedArticle -> viewModel.updateArticle(updatedArticle) },
+                        { viewModel.removeArticle(event.article.id) }
+                    )
                 }
                 is ExoArticleNavigation.MediaDetail -> {
                     onNavigateToPhotoDetail(event.article, event.mediaIndex)
@@ -70,6 +74,7 @@ fun ProfilePostPage(
             }
         }
     }
+
     // 차단 상태 확인 전에는 로딩 표시
     if (!blockStatusChecked) {
         LoadingContent()
@@ -210,6 +215,8 @@ private fun PostList(
     articleViewModel: ExoArticleViewModel,
     postViewModel: ProfilePostViewModel
 ) {
+    val context = LocalContext.current
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -224,10 +231,16 @@ private fun PostList(
             val visibleItems = listState.layoutInfo.visibleItemsInfo
             val isVisible = visibleItems.any { it.index == index }
 
-            // ExoArticleItem - FREE_BOARD 타입 (컴팩트 UI)
+            // 커뮤니티 이름 (idol 정보에서 가져옴)
+            val communityName = remember(article.idol) {
+                article.idol?.let { LocaleUtil.getLocalizedIdolName(context, it) }
+            }
+
+            // ExoArticleItem - FEED 타입 (커뮤니티 이름 포함)
             ExoArticleItem(
                 article = article,
-                type = ArticleItemType.FREE_BOARD,
+                type = ArticleItemType.FEED,
+                externalCommunityName = communityName,
                 isVisible = isVisible,
                 showTranslation = true,
                 onDeleted = { deletedArticleId ->

@@ -487,11 +487,11 @@ fun ExoArticle(
                         onClick = { showVoteDialog = true }
                     )
                 }
-                // 좋아요
+                // 좋아요 (컨텐츠 영역은 아이콘 고정)
                 ArticleStatItem(
-                    iconRes = if (localIsLiked) R.drawable.icon_board_like_active else R.drawable.icon_board_like,
+                    iconRes = R.drawable.icon_board_like,
                     count = localLikeCount,
-                    tintColor = if (localIsLiked) null else ColorPalette.textDefault,
+                    tintColor = ColorPalette.textDefault,
                     onClick = onLikeClick
                 )
                 // 댓글 (클릭 없음 - 상세 화면)
