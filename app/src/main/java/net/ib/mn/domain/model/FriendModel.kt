@@ -1,6 +1,7 @@
 package net.ib.mn.domain.model
 
 import com.google.gson.annotations.SerializedName
+import java.util.Date
 
 /**
  * 친구 모델
@@ -9,7 +10,7 @@ import com.google.gson.annotations.SerializedName
  */
 data class FriendModel(
     @SerializedName("user")
-    val user: FriendUser,
+    val user: FriendUser = FriendUser(),
 
     @SerializedName("is_friend")
     val isFriend: String = "N",
@@ -71,7 +72,21 @@ data class FriendUser(
     val statusMessage: String? = null,
 
     @SerializedName("heart")
-    val heart: Int = 0
+    val heart: Int = 0,
+
+    @SerializedName("last_act")
+    val lastAct: Date? = null,
+
+    @SerializedName("emoticon")
+    val emoticon: FriendEmoticon? = null
+)
+
+/**
+ * 친구 이모티콘
+ */
+data class FriendEmoticon(
+    @SerializedName("emoji_url")
+    val emojiUrl: String? = null
 )
 
 /**

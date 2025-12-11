@@ -1,6 +1,12 @@
 package net.ib.mn.data.repository
 
+import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -12,8 +18,15 @@ import net.ib.mn.data.remote.api.RespondRequestBody
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.FriendModel
 import org.json.JSONObject
+import java.lang.reflect.Type
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 import javax.inject.Singleton
+import net.ib.mn.util.logE
 
 /**
  * FriendsRepository - 친구 관련 Repository
@@ -25,7 +38,42 @@ class FriendsRepository @Inject constructor(
     private val friendsApi: FriendsApi
 ) : BaseRepository() {
 
-    private val gson = Gson()
+    companion object {
+        private const val REMOTE_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss"
+    }
+
+    /**
+     * old 프로젝트의 IdolGson과 동일한 설정
+     * - LOWER_CASE_WITH_UNDERSCORES: snake_case -> camelCase 자동 매핑
+     * - DateDeserializer: 서버의 날짜 문자열을 Date로 파싱
+     */
+    private val gson: Gson = GsonBuilder()
+        .setDateFormat(REMOTE_DATE_FORMAT)
+        .registerTypeAdapter(Date::class.java, DateDeserializer())
+        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+        .create()
+
+    /**
+     * 서버 날짜 문자열 파싱용 Deserializer
+     */
+    private class DateDeserializer : JsonDeserializer<Date?> {
+        @Throws(JsonParseException::class)
+        override fun deserialize(
+            element: JsonElement,
+            typeOfT: Type,
+            context: JsonDeserializationContext
+        ): Date? {
+            val dateString = element.asString
+            val formatter = SimpleDateFormat(REMOTE_DATE_FORMAT, Locale.US)
+            formatter.timeZone = TimeZone.getTimeZone("UTC")
+            return try {
+                formatter.parse(dateString)
+            } catch (e: ParseException) {
+                logE("DateDeserializer parse error", e)
+                null
+            }
+        }
+    }
 
     /**
      * 내 친구 목록 조회 (Flow)
@@ -381,6 +429,51 @@ class FriendsRepository @Inject constructor(
         val gcode = json.optInt("gcode", 0)
         return FriendRequestResponse(success = success, gcode = gcode)
     }
+
+    /**
+     * 친구 삭제 (Flow)
+     *
+     * @param ids 삭제할 친구 ID 목록
+     * @return Flow<ApiResult<DeleteFriendsResponse>>
+     */
+    fun deleteFriendsFlow(ids: List<Int>): Flow<ApiResult<DeleteFriendsResponse>> =
+        safeApiCallWithJsonString(
+            apiCall = { friendsApi.deleteFriends(net.ib.mn.data.remote.api.DeleteFriendsBody(ids)) },
+            parser = { json -> parseDeleteFriendsResponse(json) }
+        )
+
+    /**
+     * 친구 삭제 (suspend)
+     *
+     * @param ids 삭제할 친구 ID 목록
+     * @return DeleteFriendsResult
+     */
+    suspend fun deleteFriends(ids: List<Int>): DeleteFriendsResult {
+        return when (val result = deleteFriendsFlow(ids).first { it !is ApiResult.Loading }) {
+            is ApiResult.Success -> {
+                val response = result.data
+                if (response.success) {
+                    DeleteFriendsResult.Success
+                } else {
+                    DeleteFriendsResult.Error(response.message)
+                }
+            }
+            is ApiResult.Error -> {
+                DeleteFriendsResult.Error(result.error.message)
+            }
+            is ApiResult.Loading -> {
+                DeleteFriendsResult.Error("로딩 중 오류")
+            }
+        }
+    }
+
+    private fun parseDeleteFriendsResponse(jsonString: String): DeleteFriendsResponse {
+        val json = JSONObject(jsonString)
+        return DeleteFriendsResponse(
+            success = json.optBoolean("success", false),
+            message = json.optString("msg", "")
+        )
+    }
 }
 
 /**
@@ -474,3 +567,19 @@ data class FriendRequestActionResponse(
     val success: Boolean,
     val message: String? = null
 )
+
+/**
+ * 친구 삭제 응답
+ */
+data class DeleteFriendsResponse(
+    val success: Boolean,
+    val message: String? = null
+)
+
+/**
+ * 친구 삭제 결과
+ */
+sealed class DeleteFriendsResult {
+    data object Success : DeleteFriendsResult()
+    data class Error(val message: String?) : DeleteFriendsResult()
+}

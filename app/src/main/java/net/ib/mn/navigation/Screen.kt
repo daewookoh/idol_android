@@ -65,7 +65,7 @@ sealed class Screen {
      */
     @Serializable
     data class Main(
-        val initialTab: Int = 3,
+        val initialTab: Int = 0,
         val initialIdolId: Int? = null,
         val initialCommunityTab: Int? = null,
         val initialFreeBoardTagId: Int? = null

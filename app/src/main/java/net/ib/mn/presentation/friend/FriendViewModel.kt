@@ -72,11 +72,20 @@ class FriendViewModel @Inject constructor(
 
     /**
      * 친구 목록 로드
+     * - 이미 데이터가 있으면 로딩 화면 없이 백그라운드에서 새로고침
+     * - 처음 로드할 때만 로딩 화면 표시
      */
     private fun loadFriends() {
-        if (currentState.isLoading) return
+        if (currentState.isLoading || currentState.isRefreshing) return
 
-        setState { copy(isLoading = true, error = null) }
+        val hasData = currentState.friends.isNotEmpty()
+
+        // 이미 데이터가 있으면 isRefreshing 사용 (깜빡임 방지)
+        if (hasData) {
+            setState { copy(isRefreshing = true, error = null) }
+        } else {
+            setState { copy(isLoading = true, error = null) }
+        }
 
         viewModelScope.launch {
             val response = friendsRepository.getFriendsSelf()
@@ -84,6 +93,7 @@ class FriendViewModel @Inject constructor(
                 setState {
                     copy(
                         isLoading = false,
+                        isRefreshing = false,
                         friends = response.friends,
                         requesters = response.requesters,
                         error = null
@@ -93,6 +103,7 @@ class FriendViewModel @Inject constructor(
                 setState {
                     copy(
                         isLoading = false,
+                        isRefreshing = false,
                         error = response.errorMessage ?: context.getString(R.string.error_abnormal_exception)
                     )
                 }

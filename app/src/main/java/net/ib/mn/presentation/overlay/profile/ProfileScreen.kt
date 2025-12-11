@@ -76,6 +76,7 @@ import net.ib.mn.presentation.overlay.profile.subpage.ProfilePostPage
 import net.ib.mn.presentation.overlay.articledetail.ArticleDetailScreen
 import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
 import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
+import net.ib.mn.presentation.overlay.photodetail.PhotoDetailScreen
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoBottomSheetAction
 import net.ib.mn.ui.components.ExoBottomSheetActionItem
