@@ -26,8 +26,7 @@ class FriendAddContract {
      * @property isLoading 로딩 중 여부
      * @property isNewFriendsApplied 뉴프렌즈 신청 여부 (true: 신청됨, false: 미신청)
      * @property isAllowFriendReq 친구 요청 허용 여부
-     * @property myStatusMessage 내 상태 메시지
-     * @property myUser 나의 유저 정보 (뉴프렌즈 신청 시 목록에 표시)
+     * @property myUserId 본인 유저 ID (목록에서 본인 제외용)
      * @property sendingRequestIds 친구 요청 보내는 중인 유저 ID 목록
      * @property error 에러 메시지
      */
@@ -36,8 +35,7 @@ class FriendAddContract {
         val isLoading: Boolean = false,
         val isNewFriendsApplied: Boolean = false,
         val isAllowFriendReq: Boolean = true,
-        val myStatusMessage: String = "",
-        val myUser: FriendUser? = null,
+        val myUserId: Int = 0,
         val sendingRequestIds: Set<Int> = emptySet(),
         val error: String? = null
     ) : UiState
