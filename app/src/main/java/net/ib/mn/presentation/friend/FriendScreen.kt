@@ -37,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -130,6 +131,12 @@ fun FriendScreen(
     // ProfileScreen overlay 상태
     var selectedFriend by remember { mutableStateOf<FriendModel?>(null) }
 
+    // 화면이 다시 보일 때마다 데이터 리로드 (FriendRequestScreen에서 돌아올 때 등)
+    LifecycleResumeEffect(Unit) {
+        viewModel.sendIntent(FriendContract.Intent.LoadFriends)
+        onPauseOrDispose { }
+    }
+
     // 1초마다 타이머 갱신 (old 프로젝트의 mRefreshTimer와 동일)
     LaunchedEffect(state.friends) {
         if (state.friends.isNotEmpty()) {
@@ -192,7 +199,7 @@ fun FriendScreen(
                     }
                     // 친구 신청 관리
                     IconButton(
-                        onClick = { navigator.navigate(Screen.FriendRequest) },
+                        onClick = { navigator.navigate(Screen.FriendRequest()) },
                         modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
@@ -258,7 +265,7 @@ fun FriendScreen(
                                 selectedFriend = friend
                             },
                             onRequestClick = {
-                                navigator.navigate(Screen.FriendRequest)
+                                navigator.navigate(Screen.FriendRequest(initialTab = 0))
                             }
                         )
                     }

@@ -232,7 +232,7 @@ fun NavGraph(
 
                     // FriendRequest 화면 (친구 신청 관리)
                     is Screen.FriendRequest -> NavEntry(screen) {
-                        FriendRequestScreen()
+                        FriendRequestScreen(initialTab = screen.initialTab)
                     }
 
                     // FriendDelete 화면 (친구 삭제)

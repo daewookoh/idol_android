@@ -12,6 +12,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
@@ -129,11 +131,21 @@ fun FriendInviteScreen(
             )
         }
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        // 웹뷰 배경색 (다크모드 대응)
+        val webViewBackgroundColor = ColorPalette.background100.toArgb()
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(ColorPalette.background100)
+        ) {
             AndroidView(
                 factory = { ctx ->
                     WebView(ctx).apply {
                         webViewInstance = this
+
+                        // 웹뷰 배경색 설정 (다크모드 대응)
+                        setBackgroundColor(webViewBackgroundColor)
 
                         // UserAgent 설정 (old와 동일)
                         val baseUa = WebSettings.getDefaultUserAgent(ctx)
@@ -151,7 +163,6 @@ fun FriendInviteScreen(
                         // JavaScript Interface 추가 (네이티브-웹뷰 통신)
                         addJavascriptInterface(
                             WebBridge(
-                                context = ctx,
                                 onInviteCodeClick = { viewModel.getInviteMsg() },
                                 onInviteBtnClick = { viewModel.getInviteMsg() },
                                 onError = { message ->
@@ -218,7 +229,6 @@ fun FriendInviteScreen(
  * 웹뷰에서 네이티브로 이벤트를 전달
  */
 private class WebBridge(
-    private val context: Context,
     private val onInviteCodeClick: () -> Unit,
     private val onInviteBtnClick: () -> Unit,
     private val onError: (String) -> Unit

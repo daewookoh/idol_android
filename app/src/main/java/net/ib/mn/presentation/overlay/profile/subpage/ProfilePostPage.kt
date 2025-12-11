@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
@@ -211,7 +212,7 @@ private fun BlockedContent() {
 @Composable
 private fun PostList(
     state: ProfilePostUiState.Success,
-    listState: androidx.compose.foundation.lazy.LazyListState,
+    listState: LazyListState,
     articleViewModel: ExoArticleViewModel,
     postViewModel: ProfilePostViewModel
 ) {

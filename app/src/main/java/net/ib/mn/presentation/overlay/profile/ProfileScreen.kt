@@ -43,7 +43,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -77,7 +76,6 @@ import net.ib.mn.presentation.overlay.profile.subpage.ProfilePostPage
 import net.ib.mn.presentation.overlay.articledetail.ArticleDetailScreen
 import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
 import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
-import net.ib.mn.presentation.overlay.photodetail.PhotoDetailScreen
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoBottomSheetAction
 import net.ib.mn.ui.components.ExoBottomSheetActionItem

@@ -155,9 +155,10 @@ sealed class Screen {
 
     /**
      * FriendRequest 화면 - 친구 신청 관리
+     * @param initialTab 초기 탭 인덱스 (0: 받은 요청, 1: 보낸 요청)
      */
     @Serializable
-    data object FriendRequest : Screen()
+    data class FriendRequest(val initialTab: Int = 1) : Screen()
 
     /**
      * FriendDelete 화면 - 친구 삭제

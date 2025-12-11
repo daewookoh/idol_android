@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import net.ib.mn.data.remote.api.CancelFriendRequestBody
 import net.ib.mn.data.remote.api.FriendRequestBody
 import net.ib.mn.data.remote.api.FriendsApi
 import net.ib.mn.data.remote.api.GiveHeartBody
@@ -203,6 +204,32 @@ class FriendsRepository @Inject constructor(
     }
 
     /**
+     * 친구 요청 취소 (Flow)
+     *
+     * @param userId 유저 ID
+     * @return Flow<ApiResult<FriendRequestActionResponse>>
+     */
+    fun cancelFriendRequestFlow(userId: Int): Flow<ApiResult<FriendRequestActionResponse>> =
+        safeApiCallWithJsonString(
+            apiCall = { friendsApi.cancelFriendRequest(CancelFriendRequestBody(userId)) },
+            parser = { json -> parseFriendRequestActionResponse(json) }
+        )
+
+    /**
+     * 친구 요청 취소 (suspend)
+     *
+     * @param userId 유저 ID
+     * @return FriendRequestActionResponse
+     */
+    suspend fun cancelFriendRequest(userId: Int): FriendRequestActionResponse {
+        return when (val result = cancelFriendRequestFlow(userId).first { it !is ApiResult.Loading }) {
+            is ApiResult.Success -> result.data
+            is ApiResult.Error -> FriendRequestActionResponse(success = false, message = result.error.message)
+            is ApiResult.Loading -> FriendRequestActionResponse(success = false, message = "로딩 중 오류")
+        }
+    }
+
+    /**
      * 친구 요청 보내기 (Flow)
      *
      * @param userId 유저 ID
@@ -322,8 +349,10 @@ class FriendsRepository @Inject constructor(
 
     private fun parseFriendRequestActionResponse(jsonString: String): FriendRequestActionResponse {
         val json = JSONObject(jsonString)
+        // old 프로젝트와 동일하게 HTTP 응답 성공 시 success=true로 처리
+        // (API가 success 필드를 반환하지 않는 경우가 있음)
         return FriendRequestActionResponse(
-            success = json.optBoolean("success", false),
+            success = true,
             message = json.optString("msg", "")
         )
     }
