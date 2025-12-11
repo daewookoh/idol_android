@@ -145,7 +145,7 @@ fun FriendAddScreen(
                     else -> {
                         RecommendedUserList(
                             users = state.recommendedUsers,
-                            myUserId = state.myUser?.id ?: 0,
+                            myUserId = state.myUserId,
                             sendingRequestIds = state.sendingRequestIds,
                             onSendRequest = { userId ->
                                 viewModel.sendIntent(FriendAddContract.Intent.SendFriendRequest(userId))
