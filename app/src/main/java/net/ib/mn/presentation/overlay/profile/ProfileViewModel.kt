@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.community.profile
+package net.ib.mn.presentation.overlay.profile
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle

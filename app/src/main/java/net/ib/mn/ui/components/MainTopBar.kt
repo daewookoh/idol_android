@@ -157,8 +157,8 @@ private fun MainToolbarMenu(
         Icon(
             painter = painterResource(id = R.drawable.btn_navigation_search),
             contentDescription = "검색",
-            modifier = Modifier.size(22.dp),
-            tint = Color.Unspecified
+            modifier = Modifier.size(24.dp),
+            tint = colorResource(R.color.text_default)
         )
     }
 
@@ -175,8 +175,8 @@ private fun MainToolbarMenu(
         Icon(
             painter = painterResource(id = R.drawable.btn_navigation_friend),
             contentDescription = "친구",
-            modifier = Modifier.size(22.dp),
-            tint = Color.Unspecified
+            modifier = Modifier.size(24.dp),
+            tint = colorResource(R.color.text_default)
         )
     }
 }
@@ -217,8 +217,8 @@ private fun MyInfoToolbarMenu(
         Icon(
             painter = painterResource(id = R.drawable.btn_navigation_bell),
             contentDescription = "알림",
-            modifier = Modifier.size(22.dp),
-            tint = Color.Unspecified
+            modifier = Modifier.size(24.dp),
+            tint = colorResource(R.color.text_default)
         )
 
         // 새 알림 빨간점 표시
@@ -243,8 +243,8 @@ private fun MyInfoToolbarMenu(
         Icon(
             painter = painterResource(id = R.drawable.btn_navigation_setting),
             contentDescription = "설정",
-            modifier = Modifier.size(22.dp),
-            tint = Color.Unspecified
+            modifier = Modifier.size(24.dp),
+            tint = colorResource(R.color.text_default)
         )
     }
 }

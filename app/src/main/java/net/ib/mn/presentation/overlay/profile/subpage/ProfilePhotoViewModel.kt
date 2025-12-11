@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.community.profile.subpage
+package net.ib.mn.presentation.overlay.profile.subpage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

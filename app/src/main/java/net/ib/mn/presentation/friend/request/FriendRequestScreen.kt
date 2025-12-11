@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.friend.waiting
+package net.ib.mn.presentation.friend.request
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,7 +14,7 @@ import net.ib.mn.ui.components.ExoScaffold
  * 친구 신청 관리 화면
  */
 @Composable
-fun FriendWaitingScreen(
+fun FriendRequestScreen(
     modifier: Modifier = Modifier
 ) {
     val navigator = LocalAppNavigator.current

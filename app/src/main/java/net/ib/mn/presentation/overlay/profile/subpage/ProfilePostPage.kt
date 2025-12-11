@@ -1,21 +1,15 @@
-package net.ib.mn.presentation.community.profile.subpage
+package net.ib.mn.presentation.overlay.profile.subpage
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -28,32 +22,54 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
+import net.ib.mn.presentation.common.ArticleItemType
+import net.ib.mn.presentation.common.ExoArticleItem
+import net.ib.mn.presentation.common.ExoArticleNavigation
+import net.ib.mn.presentation.common.ExoArticleViewModel
 import net.ib.mn.ui.theme.ColorPalette
 
 /**
- * ProfilePhotoPage - 프로필 사진 탭 (3열 그리드)
+ * ProfilePostPage - 프로필 게시글(Activity) 탭
  */
 @Composable
-fun ProfilePhotoPage(
+fun ProfilePostPage(
     userId: Int,
     isMine: Boolean = false,
     isFeedPrivate: Boolean = false,
     isBlocked: Boolean = false,
     blockStatusChecked: Boolean = true,
-    onNavigateToArticleDetail: (ArticleModel) -> Unit = {},
-    viewModel: ProfilePhotoViewModel = hiltViewModel()
+    onNavigateToArticleDetail: (ArticleModel, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _ -> },
+    onNavigateToPhotoDetail: (ArticleModel, Int) -> Unit = { _, _ -> },
+    onNavigateToArticleEdit: (ArticleModel) -> Unit = {},
+    viewModel: ProfilePostViewModel = hiltViewModel(),
+    articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
+    // ExoArticle 네비게이션 이벤트 처리
+    LaunchedEffect(Unit) {
+        articleViewModel.navigationEvent.collect { event ->
+            when (event) {
+                is ExoArticleNavigation.ArticleDetail -> {
+                    onNavigateToArticleDetail(event.article) { updatedArticle ->
+                        viewModel.updateArticle(updatedArticle)
+                    }
+                }
+                is ExoArticleNavigation.MediaDetail -> {
+                    onNavigateToPhotoDetail(event.article, event.mediaIndex)
+                }
+                is ExoArticleNavigation.EditArticle -> {
+                    onNavigateToArticleEdit(event.article)
+                }
+                else -> { /* 다른 이벤트는 무시 */ }
+            }
+        }
+    }
     // 차단 상태 확인 전에는 로딩 표시
     if (!blockStatusChecked) {
         LoadingContent()
@@ -73,38 +89,38 @@ fun ProfilePhotoPage(
     }
 
     val uiState by viewModel.uiState.collectAsState()
-    val gridState = rememberLazyGridState()
+    val listState = rememberLazyListState()
 
     LaunchedEffect(userId) {
-        viewModel.loadPhotos(userId, isMine)
+        viewModel.loadPosts(userId, isMine)
     }
 
     // 무한 스크롤
     val shouldLoadMore by remember {
         derivedStateOf {
-            val lastVisibleItem = gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            lastVisibleItem >= gridState.layoutInfo.totalItemsCount - 6
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            lastVisibleItem >= listState.layoutInfo.totalItemsCount - 3
         }
     }
 
     LaunchedEffect(shouldLoadMore) {
-        if (shouldLoadMore && uiState is ProfilePhotoUiState.Success) {
-            if ((uiState as ProfilePhotoUiState.Success).hasMore) {
+        if (shouldLoadMore && uiState is ProfilePostUiState.Success) {
+            if ((uiState as ProfilePostUiState.Success).hasMore) {
                 viewModel.loadMore()
             }
         }
     }
 
     when (val state = uiState) {
-        is ProfilePhotoUiState.Loading -> LoadingContent()
-        is ProfilePhotoUiState.Empty -> EmptyContent(stringResource(R.string.feed_no_posts))
-        is ProfilePhotoUiState.Private -> PrivateContent()
-        is ProfilePhotoUiState.Error -> EmptyContent(state.message)
-        is ProfilePhotoUiState.Success -> PhotoGrid(
-            photos = state.photos,
-            gridState = gridState,
-            viewModel = viewModel,
-            onNavigateToArticleDetail = onNavigateToArticleDetail
+        is ProfilePostUiState.Loading -> LoadingContent()
+        is ProfilePostUiState.Empty -> EmptyContent(stringResource(R.string.feed_no_posts))
+        is ProfilePostUiState.Private -> PrivateContent()
+        is ProfilePostUiState.Error -> EmptyContent(state.message)
+        is ProfilePostUiState.Success -> PostList(
+            state = state,
+            listState = listState,
+            articleViewModel = articleViewModel,
+            postViewModel = viewModel
         )
     }
 }
@@ -154,7 +170,7 @@ private fun PrivateContent() {
             )
             Spacer(modifier = Modifier.height(14.dp))
             Text(
-                text = stringResource(R.string.feed_is_private),
+                text = stringResource(R.string.feed_private),
                 color = ColorPalette.textGray,
                 fontSize = 12.sp
             )
@@ -188,73 +204,39 @@ private fun BlockedContent() {
 }
 
 @Composable
-private fun PhotoGrid(
-    photos: List<ProfilePhotoItem>,
-    gridState: androidx.compose.foundation.lazy.grid.LazyGridState,
-    viewModel: ProfilePhotoViewModel,
-    onNavigateToArticleDetail: (ArticleModel) -> Unit
+private fun PostList(
+    state: ProfilePostUiState.Success,
+    listState: androidx.compose.foundation.lazy.LazyListState,
+    articleViewModel: ExoArticleViewModel,
+    postViewModel: ProfilePostViewModel
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(ColorPalette.background100),
-        state = gridState
+            .background(ColorPalette.gray80),
+        state = listState
     ) {
-        items(items = photos, key = { it.id }) { photo ->
-            PhotoItem(photo) {
-                // ArticleDetail 화면으로 이동
-                viewModel.getArticle(photo.id)?.let { article ->
-                    onNavigateToArticleDetail(article)
-                }
-            }
-        }
-    }
-}
+        itemsIndexed(
+            items = state.posts,
+            key = { _, article -> article.id }
+        ) { index, article ->
+            // 화면에 보이는지 체크 (GIF/비디오 최적화)
+            val visibleItems = listState.layoutInfo.visibleItemsInfo
+            val isVisible = visibleItems.any { it.index == index }
 
-@Composable
-private fun PhotoItem(photo: ProfilePhotoItem, onClick: () -> Unit) {
-    val context = LocalContext.current
-
-    Box(
-        modifier = Modifier
-            .aspectRatio(1f)
-            .background(ColorPalette.gray100)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClick
-            )
-    ) {
-        AsyncImage(
-            model = ImageRequest.Builder(context)
-                .data(photo.thumbnailUrl)
-                .crossfade(true)
-                .build(),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        // GIF/MP4 아이콘 (old와 동일: 28x18dp, marginEnd=10dp, marginBottom=10dp)
-        when {
-            photo.isGif -> Icon(
-                painter = painterResource(R.drawable.icon_gif),
-                contentDescription = null,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 10.dp, bottom = 10.dp)
-                    .size(width = 28.dp, height = 18.dp),
-                tint = Color.Unspecified
-            )
-            photo.isVideo -> Icon(
-                painter = painterResource(R.drawable.icon_mp4),
-                contentDescription = null,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 10.dp, bottom = 10.dp)
-                    .size(width = 28.dp, height = 18.dp),
-                tint = Color.Unspecified
+            // ExoArticleItem - FREE_BOARD 타입 (컴팩트 UI)
+            ExoArticleItem(
+                article = article,
+                type = ArticleItemType.FREE_BOARD,
+                isVisible = isVisible,
+                showTranslation = true,
+                onDeleted = { deletedArticleId ->
+                    postViewModel.removeArticle(deletedArticleId)
+                },
+                onArticleUpdated = { updatedArticle ->
+                    postViewModel.updateArticle(updatedArticle)
+                },
+                viewModel = articleViewModel
             )
         }
     }

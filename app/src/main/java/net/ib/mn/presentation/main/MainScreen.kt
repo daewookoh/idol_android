@@ -46,7 +46,7 @@ import net.ib.mn.presentation.webview.WebViewScreen
 import net.ib.mn.util.ServerUrl
 import net.ib.mn.presentation.community.CommunityScreen
 import net.ib.mn.presentation.community.IdolRankingHistoryScreen
-import net.ib.mn.presentation.community.profile.ProfileScreen
+import net.ib.mn.presentation.overlay.profile.ProfileScreen
 import net.ib.mn.ui.components.LocalHofDailyItemClick
 import net.ib.mn.ui.components.LocalIdolRankingHistoryClick
 import net.ib.mn.ui.components.LocalRankingItemClick
@@ -97,6 +97,9 @@ fun MainScreen(
     var selectedFreeBoardArticle by remember { mutableStateOf<ArticleModel?>(null) }
     var selectedFreeBoardExternalIdolName by remember { mutableStateOf<String?>(null) }
     var freeBoardArticleUpdatedCallback by remember { mutableStateOf<((ArticleModel) -> Unit)?>(null) }
+
+    // FreeBoard 게시글 상세에서 프로필 클릭 시 상태
+    var freeBoardSelectedUserProfile by remember { mutableStateOf<FreeBoardUserProfileInfo?>(null) }
 
     // Notice 상세 화면 상태
     var selectedNoticeArticle by remember { mutableStateOf<ArticleModel?>(null) }
@@ -383,7 +386,35 @@ fun MainScreen(
                 },
                 onArticleUpdated = { updatedArticle ->
                     freeBoardArticleUpdatedCallback?.invoke(updatedArticle)
+                },
+                onNavigateToProfile = { userId, nickname, imageUrl, level, mostIdolName ->
+                    freeBoardSelectedUserProfile = FreeBoardUserProfileInfo(
+                        userId = userId,
+                        nickname = nickname,
+                        imageUrl = imageUrl,
+                        level = level,
+                        mostIdolName = mostIdolName
+                    )
                 }
+            )
+        }
+    }
+
+    // FreeBoard 게시글 상세에서 프로필 클릭 시 ProfileScreen 표시
+    AnimatedVisibility(
+        visible = freeBoardSelectedUserProfile != null,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        freeBoardSelectedUserProfile?.let { userInfo ->
+            ProfileScreen(
+                userId = userInfo.userId,
+                userNickname = userInfo.nickname,
+                userImageUrl = userInfo.imageUrl,
+                userLevel = userInfo.level,
+                mostIdolName = userInfo.mostIdolName,
+                isMine = false,
+                onBackClick = { freeBoardSelectedUserProfile = null }
             )
         }
     }
@@ -420,6 +451,17 @@ private fun getGenderString(context: android.content.Context, locale: Locale): L
         localizedContext.getString(R.string.female) to Constants.TYPE_FEMALE
     )
 }
+
+/**
+ * FreeBoard 게시글 상세에서 프로필 클릭 시 사용되는 데이터 클래스
+ */
+private data class FreeBoardUserProfileInfo(
+    val userId: Int,
+    val nickname: String,
+    val imageUrl: String?,
+    val level: Int,
+    val mostIdolName: String? = null
+)
 
 @Preview(
     name = "Light Mode",

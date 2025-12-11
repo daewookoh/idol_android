@@ -77,7 +77,7 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.domain.model.ApiResult
-import net.ib.mn.presentation.community.profile.ProfileScreen
+import net.ib.mn.presentation.overlay.profile.ProfileScreen
 import net.ib.mn.presentation.community.subpage.CommunityChatSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFanTalkSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFeedSubPage

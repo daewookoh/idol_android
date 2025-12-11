@@ -1,6 +1,5 @@
-package net.ib.mn.presentation.community.profile
+package net.ib.mn.presentation.overlay.profile
 
-import android.net.Uri
 import androidx.activity.compose.BackHandler
 import net.ib.mn.util.IntentUtil
 import androidx.compose.animation.AnimatedVisibility
@@ -72,9 +71,9 @@ import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
-import net.ib.mn.presentation.community.profile.subpage.ProfileCommentPage
-import net.ib.mn.presentation.community.profile.subpage.ProfilePhotoPage
-import net.ib.mn.presentation.community.profile.subpage.ProfilePostPage
+import net.ib.mn.presentation.overlay.profile.subpage.ProfileCommentPage
+import net.ib.mn.presentation.overlay.profile.subpage.ProfilePhotoPage
+import net.ib.mn.presentation.overlay.profile.subpage.ProfilePostPage
 import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
 import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
 import net.ib.mn.ui.components.ExoAppBar
@@ -315,7 +314,7 @@ fun ProfileScreen(
                             Icon(
                                 painter = painterResource(R.drawable.btn_navigation_report),
                                 contentDescription = "Report",
-                                tint = Color.Unspecified,
+                                tint = colorResource(R.color.text_default),
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -1293,6 +1292,10 @@ private fun FriendButton(
         else -> null // Loading, Error, ShowAlreadyRequestedDialog, ShowAlreadyFriendDialog - 클릭 불가
     }
 
+    // 다크모드 대응 색상
+    val iconTintOn = colorResource(R.color.text_default)  // 활성 상태 (친구 추가 가능, 요청 대기)
+    val iconTintOff = colorResource(R.color.text_dimmed)  // 비활성 상태 (이미 친구)
+
     // 로딩 중일 때는 Box로 표시 (클릭 불가)
     if (friendState is FriendState.Loading) {
         Box(
@@ -1318,12 +1321,12 @@ private fun FriendButton(
                     Icon(
                         painter = painterResource(R.drawable.btn_navigation_friend_add),
                         contentDescription = "Add Friend",
-                        tint = Color.Unspecified,
+                        tint = iconTintOn,
                         modifier = Modifier.size(24.dp)
                     )
                 }
                 is FriendState.AlreadyFriend, is FriendState.ShowAlreadyFriendDialog -> {
-                    // 이미 친구 - btn_navigation_friend_already
+                    // 이미 친구 - btn_navigation_friend_already (딤드 색상 drawable)
                     Icon(
                         painter = painterResource(R.drawable.btn_navigation_friend_already),
                         contentDescription = "Already Friend",
@@ -1336,7 +1339,7 @@ private fun FriendButton(
                     Icon(
                         painter = painterResource(R.drawable.btn_navigation_friend_waiting),
                         contentDescription = "Friend Request Pending",
-                        tint = Color.Unspecified,
+                        tint = iconTintOn,
                         modifier = Modifier.size(24.dp)
                     )
                 }

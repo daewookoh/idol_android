@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.community.profile.subpage
+package net.ib.mn.presentation.overlay.profile.subpage
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -15,11 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,7 +38,6 @@ fun ProfileCommentPage(
     userId: Int,
     viewModel: ProfileCommentViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
 

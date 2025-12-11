@@ -65,7 +65,7 @@ sealed class Screen {
      */
     @Serializable
     data class Main(
-        val initialTab: Int = 0,
+        val initialTab: Int = 3,
         val initialIdolId: Int? = null,
         val initialCommunityTab: Int? = null,
         val initialFreeBoardTagId: Int? = null
@@ -154,10 +154,10 @@ sealed class Screen {
     data object FriendAdd : Screen()
 
     /**
-     * FriendWaiting 화면 - 친구 신청 관리
+     * FriendRequest 화면 - 친구 신청 관리
      */
     @Serializable
-    data object FriendWaiting : Screen()
+    data object FriendRequest : Screen()
 
     /**
      * FriendDelete 화면 - 친구 삭제

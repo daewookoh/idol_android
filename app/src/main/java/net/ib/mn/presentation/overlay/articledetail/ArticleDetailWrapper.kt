@@ -1,5 +1,8 @@
 package net.ib.mn.presentation.overlay.articledetail
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.presentation.common.ExoArticleViewModel
+import net.ib.mn.presentation.overlay.profile.ProfileScreen
 import net.ib.mn.ui.theme.ColorPalette
 
 /**
@@ -37,6 +41,9 @@ fun ArticleDetailWrapper(
     var article by remember { mutableStateOf<ArticleModel?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    // 프로필 화면 상태
+    var selectedUserProfile by remember { mutableStateOf<WrapperUserProfileInfo?>(null) }
 
     // articleId로 게시글 데이터 로드
     LaunchedEffect(articleId) {
@@ -105,9 +112,45 @@ fun ArticleDetailWrapper(
                     onBackClick()
                 },
                 onNavigateToProfile = { userId, nickname, imageUrl, level, mostIdolName ->
-                    // TODO: 프로필 화면으로 이동
+                    selectedUserProfile = WrapperUserProfileInfo(
+                        userId = userId,
+                        nickname = nickname,
+                        imageUrl = imageUrl,
+                        level = level,
+                        mostIdolName = mostIdolName
+                    )
                 }
             )
         }
     }
+
+    // ProfileScreen 오버레이
+    AnimatedVisibility(
+        visible = selectedUserProfile != null,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        selectedUserProfile?.let { userInfo ->
+            ProfileScreen(
+                userId = userInfo.userId,
+                userNickname = userInfo.nickname,
+                userImageUrl = userInfo.imageUrl,
+                userLevel = userInfo.level,
+                mostIdolName = userInfo.mostIdolName,
+                isMine = false,
+                onBackClick = { selectedUserProfile = null }
+            )
+        }
+    }
 }
+
+/**
+ * ArticleDetailWrapper에서 사용되는 프로필 정보 데이터 클래스
+ */
+private data class WrapperUserProfileInfo(
+    val userId: Int,
+    val nickname: String,
+    val imageUrl: String?,
+    val level: Int,
+    val mostIdolName: String? = null
+)

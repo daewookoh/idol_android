@@ -52,7 +52,7 @@ import java.text.NumberFormat
 import net.ib.mn.R
 import net.ib.mn.R.color.main
 import net.ib.mn.data.remote.dto.VoterTop100Model
-import net.ib.mn.presentation.community.profile.ProfileScreen
+import net.ib.mn.presentation.overlay.profile.ProfileScreen
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold

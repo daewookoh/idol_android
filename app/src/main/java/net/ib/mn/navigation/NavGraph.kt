@@ -9,7 +9,7 @@ import net.ib.mn.presentation.awards.AwardsScreen
 import net.ib.mn.presentation.community.CommunityScreen
 import net.ib.mn.presentation.friend.FriendScreen
 import net.ib.mn.presentation.friend.add.FriendAddScreen
-import net.ib.mn.presentation.friend.waiting.FriendWaitingScreen
+import net.ib.mn.presentation.friend.request. FriendRequestScreen
 import net.ib.mn.presentation.friend.delete.FriendDeleteScreen
 import net.ib.mn.presentation.search.SearchScreen
 import net.ib.mn.presentation.search.result.SearchResultScreen
@@ -230,9 +230,9 @@ fun NavGraph(
                         FriendAddScreen()
                     }
 
-                    // FriendWaiting 화면 (친구 신청 관리)
-                    is Screen.FriendWaiting -> NavEntry(screen) {
-                        FriendWaitingScreen()
+                    // FriendRequest 화면 (친구 신청 관리)
+                    is Screen.FriendRequest -> NavEntry(screen) {
+                        FriendRequestScreen()
                     }
 
                     // FriendDelete 화면 (친구 삭제)

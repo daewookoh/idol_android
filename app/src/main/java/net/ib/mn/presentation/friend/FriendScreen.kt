@@ -1,6 +1,7 @@
 package net.ib.mn.presentation.friend
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,7 +31,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,20 +57,20 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.isActive
 import net.ib.mn.R
 import net.ib.mn.domain.model.FriendModel
-import net.ib.mn.domain.model.FriendMostIdol
-import net.ib.mn.domain.model.FriendUser
 import net.ib.mn.navigation.LocalAppNavigator
 import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.overlay.friendinvite.FriendInviteScreen
+import net.ib.mn.presentation.overlay.profile.ProfileScreen
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoDialog
 import net.ib.mn.ui.components.ExoScaffold
@@ -102,20 +102,41 @@ fun FriendScreen(
 
     // 툴팁 표시 여부를 SharedPreferences에서 읽어옴
     val tooltipPrefs = remember { context.getSharedPreferences("friend_tooltip", Context.MODE_PRIVATE) }
-    val heartTooltipDismissed = remember { tooltipPrefs.getBoolean("heart_tooltip_dismissed", false) }
-    val bannerTooltipDismissed = remember { tooltipPrefs.getBoolean("banner_tooltip_dismissed", false) }
+
+    // 하트 쿨타임 SharedPreferences
+    val heartPrefs = remember { context.getSharedPreferences("heart", Context.MODE_PRIVATE) }
+
+    // 타이머 갱신을 위한 tick (1초마다 증가)
+    var timerTick by remember { mutableStateOf(0L) }
 
     var showDialog by remember { mutableStateOf(false) }
     var dialogTitle by remember { mutableStateOf<String?>(null) }
     var dialogMessage by remember { mutableStateOf("") }
     var searchQuery by remember { mutableStateOf("") }
-    var showBannerTooltip by remember { mutableStateOf(!bannerTooltipDismissed) }
-    var showHeartTooltip by remember { mutableStateOf(!heartTooltipDismissed) }
+    var showBannerTooltip by remember {
+        mutableStateOf(!tooltipPrefs.getBoolean("banner_tooltip_dismissed", false))
+    }
+    var showHeartTooltip by remember {
+        mutableStateOf(!tooltipPrefs.getBoolean("heart_tooltip_dismissed", false))
+    }
 
     // FriendInviteScreen overlay 상태
     var showFriendInviteScreen by remember { mutableStateOf(false) }
     var inviteToken by remember { mutableStateOf("") }
     var inviteLanguage by remember { mutableStateOf("") }
+
+    // ProfileScreen overlay 상태
+    var selectedFriend by remember { mutableStateOf<FriendModel?>(null) }
+
+    // 1초마다 타이머 갱신 (old 프로젝트의 mRefreshTimer와 동일)
+    LaunchedEffect(state.friends) {
+        if (state.friends.isNotEmpty()) {
+            while (isActive) {
+                delay(1000L)
+                timerTick++
+            }
+        }
+    }
 
     // Effect 처리
     LaunchedEffect(Unit) {
@@ -157,7 +178,10 @@ fun FriendScreen(
                 onNavigationClick = { navigator.popBackStack() },
                 actions = {
                     // 뉴프렌즈 (새 친구 추가)
-                    IconButton(onClick = { navigator.navigate(Screen.FriendAdd) }) {
+                    IconButton(
+                        onClick = { navigator.navigate(Screen.FriendAdd) },
+                        modifier = Modifier.size(36.dp)
+                    ) {
                         Icon(
                             painter = painterResource(R.drawable.btn_navigation_friend_add),
                             contentDescription = "뉴프렌즈",
@@ -165,7 +189,10 @@ fun FriendScreen(
                         )
                     }
                     // 친구 신청 관리
-                    IconButton(onClick = { navigator.navigate(Screen.FriendWaiting) }) {
+                    IconButton(
+                        onClick = { navigator.navigate(Screen.FriendRequest) },
+                        modifier = Modifier.size(36.dp)
+                    ) {
                         Icon(
                             painter = painterResource(R.drawable.btn_navigation_friend_waiting),
                             contentDescription = "친구 신청",
@@ -173,7 +200,10 @@ fun FriendScreen(
                         )
                     }
                     // 친구 삭제
-                    IconButton(onClick = { navigator.navigate(Screen.FriendDelete) }) {
+                    IconButton(
+                        onClick = { navigator.navigate(Screen.FriendDelete) },
+                        modifier = Modifier.size(36.dp)
+                    ) {
                         Icon(
                             painter = painterResource(R.drawable.btn_navigation_friend_delete),
                             contentDescription = "친구 삭제",
@@ -211,11 +241,8 @@ fun FriendScreen(
                             friends = state.friends,
                             requesters = state.requesters,
                             sendingHeartIds = state.sendingHeartIds,
-                            showHeartTooltip = showHeartTooltip,
-                            onDismissHeartTooltip = {
-                                showHeartTooltip = false
-                                tooltipPrefs.edit().putBoolean("heart_tooltip_dismissed", true).apply()
-                            },
+                            heartPrefs = heartPrefs,
+                            timerTick = timerTick,
                             onSendHeart = { friend ->
                                 viewModel.sendIntent(FriendContract.Intent.SendHeart(friend.user.id, friend.user.nickname))
                             },
@@ -226,13 +253,28 @@ fun FriendScreen(
                                 viewModel.sendIntent(FriendContract.Intent.ReceiveHeart)
                             },
                             onFriendClick = { friend ->
-                                // TODO: 피드 화면으로 이동
+                                selectedFriend = friend
                             },
                             onRequestClick = {
-                                // TODO: 친구 요청 목록으로 이동
+                                navigator.navigate(Screen.FriendRequest)
                             }
                         )
                     }
+                }
+
+                // HeartTooltip을 LazyColumn 외부에 배치하여 모든 아이템 위에 표시
+                if (showHeartTooltip && state.friends.isNotEmpty()) {
+                    HeartTooltip(
+                        text = stringResource(R.string.label_tooltip_friend_heart),
+                        onDismiss = {
+                            showHeartTooltip = false
+                            tooltipPrefs.edit().putBoolean("heart_tooltip_dismissed", true).apply()
+                        },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(end = 68.dp)
+                            .offset(y = if (state.requesters.isNotEmpty()) 130.dp else 60.dp)
+                    )
                 }
             }
 
@@ -268,6 +310,19 @@ fun FriendScreen(
             token = inviteToken,
             language = inviteLanguage,
             onBackClick = { showFriendInviteScreen = false }
+        )
+    }
+
+    // ProfileScreen overlay
+    selectedFriend?.let { friend ->
+        ProfileScreen(
+            userId = friend.user.id,
+            userNickname = friend.user.nickname,
+            userImageUrl = friend.user.picture,
+            userLevel = friend.user.level,
+            mostIdolName = friend.user.most?.name,
+            isMine = false,
+            onBackClick = { selectedFriend = null }
         )
     }
 }
@@ -398,8 +453,8 @@ private fun FriendListContent(
     friends: List<FriendModel>,
     requesters: List<FriendModel>,
     sendingHeartIds: Set<Int>,
-    showHeartTooltip: Boolean,
-    onDismissHeartTooltip: () -> Unit,
+    heartPrefs: SharedPreferences,
+    timerTick: Long,
     onSendHeart: (FriendModel) -> Unit,
     onSendHeartToAll: () -> Unit,
     onReceiveHeart: () -> Unit,
@@ -425,8 +480,8 @@ private fun FriendListContent(
         item {
             FriendListHeader(
                 friendCount = friends.size,
-                showTooltip = showHeartTooltip,
-                onDismissTooltip = onDismissHeartTooltip,
+                heartPrefs = heartPrefs,
+                timerTick = timerTick,
                 onReceiveHeart = onReceiveHeart,
                 onSendHeartToAll = onSendHeartToAll
             )
@@ -443,6 +498,8 @@ private fun FriendListContent(
             FriendItem(
                 friend = friend,
                 isSendingHeart = sendingHeartIds.contains(friend.user.id),
+                heartPrefs = heartPrefs,
+                timerTick = timerTick,
                 onSendHeart = { onSendHeart(friend) },
                 onClick = { onFriendClick(friend) }
             )
@@ -465,7 +522,7 @@ private fun FriendRequestNotice(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
             ) { onClick() }
-            .padding(vertical = 15.dp),
+            .padding(top = 15.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
@@ -497,51 +554,80 @@ private fun FriendRequestNotice(
 
 /**
  * 친구 목록 헤더 (친구 수 표시 + 하트 버튼)
+ * old 프로젝트: 전체 하트 보내기 버튼 옆에 쿨타임 타이머 표시
  */
 @Composable
 private fun FriendListHeader(
     friendCount: Int,
-    showTooltip: Boolean,
-    onDismissTooltip: () -> Unit,
+    heartPrefs: SharedPreferences,
+    timerTick: Long,
     onReceiveHeart: () -> Unit,
     onSendHeartToAll: () -> Unit
 ) {
-    Box(
+    // timerTick을 사용하여 매초 recomposition 트리거
+    @Suppress("UNUSED_EXPRESSION")
+    timerTick
+
+    // 전체 하트 보내기 쿨타임 체크
+    val lastSendAllTime = heartPrefs.getLong("send_heart_all", -1)
+    val currentTime = System.currentTimeMillis()
+    val cooldownMs = 10 * 60 * 1000L  // 10분
+    val expireTime = lastSendAllTime + cooldownMs
+    val showSendAllTimer = lastSendAllTime > 0 && currentTime < expireTime
+
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(colorResource(R.color.background_100))
+            .padding(horizontal = 10.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        // 친구 목록 (N)
+        Text(
+            text = stringResource(R.string.friend_section_title) + " ($friendCount)",
+            color = colorResource(R.color.gray300),
+            fontSize = 13.sp
+        )
+
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 친구 목록 (N)
-            Text(
-                text = stringResource(R.string.friend_section_title) + " ($friendCount)",
-                color = colorResource(R.color.gray300),
-                fontSize = 13.sp
-            )
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+            // 하트 받기 버튼
+            IconButton(
+                onClick = onReceiveHeart,
+                modifier = Modifier.size(50.dp)
             ) {
-                // 하트 받기 버튼
-                IconButton(
-                    onClick = onReceiveHeart,
+                AsyncImage(
+                    model = R.drawable.btn_take_heart,
+                    contentDescription = "하트 받기",
                     modifier = Modifier.size(50.dp)
+                )
+            }
+
+            // 전체 하트 보내기 버튼 또는 타이머
+            if (showSendAllTimer) {
+                // 타이머 표시 (old: sectionWaitTimer)
+                val remainingSeconds = (expireTime - currentTime) / 1000
+                val timerText = String.format(
+                    java.util.Locale.getDefault(),
+                    "%d:%02d",
+                    remainingSeconds / 60,
+                    remainingSeconds % 60
+                )
+                Box(
+                    modifier = Modifier.size(50.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    AsyncImage(
-                        model = R.drawable.btn_take_heart,
-                        contentDescription = "하트 받기",
-                        modifier = Modifier.size(50.dp)
+                    Text(
+                        text = timerText,
+                        color = colorResource(R.color.main),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
-
-                // 전체 하트 보내기 버튼
+            } else {
                 IconButton(
                     onClick = onSendHeartToAll,
                     modifier = Modifier.size(50.dp)
@@ -553,17 +639,6 @@ private fun FriendListHeader(
                     )
                 }
             }
-        }
-
-        // 툴팁
-        if (showTooltip) {
-            HeartTooltip(
-                text = stringResource(R.string.label_tooltip_friend_heart),
-                onDismiss = onDismissTooltip,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(end= 78.dp).offset(y=55.dp)
-            )
         }
     }
 }
@@ -680,14 +755,28 @@ private fun BannerTooltip(
 
 /**
  * 친구 아이템
+ * old 프로젝트: 하트 보내기 버튼 옆에 쿨타임 타이머 표시
  */
 @Composable
 private fun FriendItem(
     friend: FriendModel,
     isSendingHeart: Boolean,
+    heartPrefs: SharedPreferences,
+    timerTick: Long,
     onSendHeart: () -> Unit,
     onClick: () -> Unit
 ) {
+    // timerTick을 사용하여 매초 recomposition 트리거
+    @Suppress("UNUSED_EXPRESSION")
+    timerTick
+
+    // 개별 하트 쿨타임 체크
+    val lastSentTime = heartPrefs.getLong("send_heart_${friend.user.id}", -1)
+    val currentTime = System.currentTimeMillis()
+    val cooldownMs = 10 * 60 * 1000L  // 10분
+    val expireTime = lastSentTime + cooldownMs
+    val showTimer = lastSentTime > 0 && currentTime < expireTime
+
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -770,19 +859,43 @@ private fun FriendItem(
                 }
             }
 
-            // 하트 보내기 버튼
-            IconButton(
-                onClick = onSendHeart,
-                enabled = !isSendingHeart,
-                modifier = Modifier.size(50.dp)
-            ) {
-                if (isSendingHeart) {
+            // 하트 보내기 버튼 또는 타이머
+            if (showTimer) {
+                // 타이머 표시 (old: waitTimer)
+                val remainingSeconds = (expireTime - currentTime) / 1000
+                val timerText = String.format(
+                    java.util.Locale.getDefault(),
+                    "%d:%02d",
+                    remainingSeconds / 60,
+                    remainingSeconds % 60
+                )
+                Box(
+                    modifier = Modifier.size(50.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = timerText,
+                        color = colorResource(R.color.main),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            } else if (isSendingHeart) {
+                Box(
+                    modifier = Modifier.size(50.dp),
+                    contentAlignment = Alignment.Center
+                ) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
                         strokeWidth = 2.dp,
                         color = colorResource(R.color.main)
                     )
-                } else {
+                }
+            } else {
+                IconButton(
+                    onClick = onSendHeart,
+                    modifier = Modifier.size(50.dp)
+                ) {
                     AsyncImage(
                         model = R.drawable.btn_give_heart_off,
                         contentDescription = "Send Heart",
@@ -879,39 +992,6 @@ private fun InviteBanner(
             modifier = Modifier.size(16.dp)
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun FriendItemPreview() {
-    FriendItem(
-        friend = FriendModel(
-            user = FriendUser(
-                id = 1,
-                nickname = "테스트 유저",
-                level = 25,
-                levelHeart = 2354157,
-                statusMessage = "마코쨩과 함께 세계로!!",
-                most = FriendMostIdol(id = 1, name = "지우_NMIXX")
-            ),
-            isFriend = "Y"
-        ),
-        isSendingHeart = false,
-        onSendHeart = {},
-        onClick = {}
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun FriendListHeaderPreview() {
-    FriendListHeader(
-        friendCount = 4,
-        showTooltip = true,
-        onDismissTooltip = {},
-        onReceiveHeart = {},
-        onSendHeartToAll = {}
-    )
 }
 
 @Preview(showBackground = true)
