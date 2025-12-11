@@ -49,10 +49,16 @@ class SearchResultViewModel @Inject constructor(
     companion object {
         private const val SMALL_TALK_LIMIT = 10
         private const val ARTICLE_LIMIT = 50
+        private const val FAVORITE_DEBOUNCE_MS = 2000L
     }
+
+    // 즐겨찾기 중복 클릭 방지용 (idolId -> 마지막 클릭 시간)
+    private val favoriteClickTimes = mutableMapOf<Int, Long>()
 
     init {
         observeArticleUpdates()
+        observeFavoriteChanges()
+        observeMostChanges()
     }
 
     override fun createInitialState(): SearchResultContract.State = SearchResultContract.State()
@@ -298,6 +304,7 @@ class SearchResultViewModel @Inject constructor(
     /**
      * 즐겨찾기 토글
      * 최애인 경우 즐겨찾기 해제 불가 (Old 프로젝트와 동일)
+     * 2초 debounce 적용하여 중복 클릭 방지
      */
     private fun toggleFavorite(idol: SearchIdolModel) {
         // 최애인 경우 즐겨찾기 해제 불가
@@ -305,23 +312,70 @@ class SearchResultViewModel @Inject constructor(
             return
         }
 
+        // 중복 클릭 방지 (2초 debounce)
+        val currentTime = System.currentTimeMillis()
+        val lastClickTime = favoriteClickTimes[idol.id] ?: 0L
+        if (currentTime - lastClickTime < FAVORITE_DEBOUNCE_MS) {
+            return
+        }
+        favoriteClickTimes[idol.id] = currentTime
+
         viewModelScope.launch {
-            try {
-                val newFavoriteState = !idol.isFavorite
+            val newFavoriteState = !idol.isFavorite
 
-                // UI 즉시 업데이트
-                updateIdolFavoriteState(idol.id, newFavoriteState)
+            // UI 즉시 업데이트
+            updateIdolFavoriteState(idol.id, newFavoriteState)
 
-                // API 호출
-                if (newFavoriteState) {
-                    favoritesRepository.addFavorite(idol.id)
+            // API 호출
+            if (newFavoriteState) {
+                favoritesRepository.addFavorite(idol.id)
+                    .onEach { result ->
+                        when (result) {
+                            is ApiResult.Success -> {
+                                // 로컬 캐시 업데이트 (favoriteId 반환됨)
+                                userCacheRepository.addFavoriteToCache(idol.id, result.data)
+                            }
+                            is ApiResult.Error -> {
+                                // 실패 시 롤백
+                                updateIdolFavoriteState(idol.id, false)
+                                setEffect { SearchResultContract.Effect.ShowToast(result.message ?: "Failed to add favorite") }
+                            }
+                            is ApiResult.Loading -> { /* ignore */ }
+                        }
+                    }
+                    .catch { e ->
+                        updateIdolFavoriteState(idol.id, false)
+                        setEffect { SearchResultContract.Effect.ShowToast(e.message ?: "Failed to add favorite") }
+                    }
+                    .launchIn(viewModelScope)
+            } else {
+                // 즐겨찾기 삭제 시 favoriteId 필요
+                val favoriteId = userCacheRepository.getFavoriteId(idol.id)
+                if (favoriteId != null) {
+                    favoritesRepository.removeFavorite(favoriteId)
+                        .onEach { result ->
+                            when (result) {
+                                is ApiResult.Success -> {
+                                    // 로컬 캐시에서 제거
+                                    userCacheRepository.removeFavoriteFromCache(idol.id)
+                                }
+                                is ApiResult.Error -> {
+                                    // 실패 시 롤백
+                                    updateIdolFavoriteState(idol.id, true)
+                                    setEffect { SearchResultContract.Effect.ShowToast(result.message ?: "Failed to remove favorite") }
+                                }
+                                is ApiResult.Loading -> { /* ignore */ }
+                            }
+                        }
+                        .catch { e ->
+                            updateIdolFavoriteState(idol.id, true)
+                            setEffect { SearchResultContract.Effect.ShowToast(e.message ?: "Failed to remove favorite") }
+                        }
+                        .launchIn(viewModelScope)
                 } else {
-                    favoritesRepository.removeFavorite(idol.id)
+                    // favoriteId가 없으면 롤백
+                    updateIdolFavoriteState(idol.id, true)
                 }
-            } catch (e: Exception) {
-                // 실패 시 롤백
-                updateIdolFavoriteState(idol.id, idol.isFavorite)
-                setEffect { SearchResultContract.Effect.ShowToast(e.message ?: "Failed to update favorite") }
             }
         }
     }
@@ -640,5 +694,47 @@ class SearchResultViewModel @Inject constructor(
                 articles = articles.filter { it.id != articleId }
             )
         }
+    }
+
+    /**
+     * UserCacheRepository의 favoriteIdolIds Flow를 구독하여
+     * 아이돌 목록의 isFavorite 상태를 실시간으로 업데이트
+     */
+    private fun observeFavoriteChanges() {
+        userCacheRepository.favoriteIdolIds
+            .onEach { favoriteIds ->
+                // 현재 아이돌 목록의 즐겨찾기 상태를 로컬 캐시 기준으로 업데이트
+                if (currentState.idols.isNotEmpty()) {
+                    setState {
+                        copy(
+                            idols = idols.map { idol ->
+                                idol.copy(isFavorite = favoriteIds.contains(idol.id))
+                            }
+                        )
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    /**
+     * UserCacheRepository의 mostIdolId Flow를 구독하여
+     * 아이돌 목록의 isMost 상태를 실시간으로 업데이트
+     */
+    private fun observeMostChanges() {
+        userCacheRepository.mostIdolId
+            .onEach { mostId ->
+                // 현재 아이돌 목록의 최애 상태를 로컬 캐시 기준으로 업데이트
+                if (currentState.idols.isNotEmpty()) {
+                    setState {
+                        copy(
+                            idols = idols.map { idol ->
+                                idol.copy(isMost = idol.id == mostId)
+                            }
+                        )
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
     }
 }
