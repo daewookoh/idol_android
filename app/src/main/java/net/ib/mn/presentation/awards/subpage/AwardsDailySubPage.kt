@@ -3,11 +3,8 @@ package net.ib.mn.presentation.awards.subpage
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -153,16 +150,13 @@ fun AwardsDailySubPage(
 }
 
 /**
- * 로딩 상태
+ * 로딩 상태 - 깜빡임 방지를 위해 로딩 인디케이터 숨김
  */
 @Composable
 private fun DailyLoadingContent() {
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator(color = ColorPalette.main)
-    }
+        modifier = Modifier.fillMaxSize()
+    )
 }
 
 /**

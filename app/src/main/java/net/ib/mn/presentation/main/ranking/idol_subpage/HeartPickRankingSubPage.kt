@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
 import net.ib.mn.ui.components.ExoHeartPickCard
+import net.ib.mn.ui.components.LocalHeartPickDetailClick
 
 /**
  * 기적(HeartPick) 랭킹 SubPage
@@ -44,6 +45,9 @@ fun HeartPickRankingSubPage(
 
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = listState ?: rememberLazyListState()
+
+    // MainScreen에서 제공하는 HeartPickDetailScreen 열기 콜백
+    val onHeartPickDetailClick = LocalHeartPickDetailClick.current
 
     // 초기 로드
     LaunchedEffect(Unit) {
@@ -115,8 +119,12 @@ fun HeartPickRankingSubPage(
                             openPeriod = cardData.openPeriod,
                             isNew = cardData.isNew,
                             onCardClick = {
+                                // MainScreen에서 HeartPickDetailScreen 오버레이로 표시
+                                onHeartPickDetailClick(cardData.id)
                             },
                             onVoteClick = {
+                                // MainScreen에서 HeartPickDetailScreen 오버레이로 표시
+                                onHeartPickDetailClick(cardData.id)
                             }
                         )
                     }

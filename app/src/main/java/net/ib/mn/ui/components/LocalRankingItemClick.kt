@@ -51,3 +51,16 @@ val LocalHofDailyItemClick = compositionLocalOf<(net.ib.mn.data.remote.dto.Daily
     // 기본값: 아무 동작도 하지 않음
     { _, _ -> }
 }
+
+/**
+ * HeartPickDetail 화면으로 이동하기 위한 CompositionLocal
+ *
+ * HeartPick 카드 클릭 시 사용됩니다.
+ * MainScreen에서 제공하고, HeartPickRankingSubPage에서 소비합니다.
+ *
+ * @param heartPickId 하트픽 ID
+ */
+val LocalHeartPickDetailClick = compositionLocalOf<(Int) -> Unit> {
+    // 기본값: 아무 동작도 하지 않음
+    { _ -> }
+}

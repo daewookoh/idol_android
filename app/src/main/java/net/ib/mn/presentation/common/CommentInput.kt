@@ -202,23 +202,15 @@ fun CommentInput(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                if (isLoading) {
-                    androidx.compose.material3.CircularProgressIndicator(
-                        color = ColorPalette.main,
-                        modifier = Modifier.size(24.dp),
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Icon(
-                        painter = painterResource(
-                            if (canSubmit) R.drawable.btn_chat_enter_on
-                            else R.drawable.btn_chat_enter_off
-                        ),
-                        contentDescription = "Send",
-                        modifier = Modifier.size(32.dp),
-                        tint = Color.Unspecified
-                    )
-                }
+                Icon(
+                    painter = painterResource(
+                        if (canSubmit) R.drawable.btn_chat_enter_on
+                        else R.drawable.btn_chat_enter_off
+                    ),
+                    contentDescription = "Send",
+                    modifier = Modifier.size(32.dp),
+                    tint = Color.Unspecified
+                )
             }
         }
     }

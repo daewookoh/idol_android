@@ -113,13 +113,25 @@ class CommentsRepository @Inject constructor(
     )
 
     /**
-     * 댓글 삭제
+     * 댓글 삭제 (commentId 사용)
      *
      * @param commentId 댓글 ID
      * @return 성공 여부
      */
     fun deleteComment(commentId: Int): Flow<ApiResult<Boolean>> = safeApiCallWithJsonString(
         apiCall = { commentsApi.deleteComment(commentId) },
+        parser = { true }
+    )
+
+    /**
+     * 댓글 삭제 (resourceUri 사용)
+     * 하트픽 댓글 등 resourceUri가 "replies/{id}/" 형식인 경우 사용
+     *
+     * @param resourceUri 댓글 리소스 URI (예: "replies/123/")
+     * @return 성공 여부
+     */
+    fun deleteCommentByUri(resourceUri: String): Flow<ApiResult<Boolean>> = safeApiCallWithJsonString(
+        apiCall = { commentsApi.deleteCommentByUri(resourceUri) },
         parser = { true }
     )
 

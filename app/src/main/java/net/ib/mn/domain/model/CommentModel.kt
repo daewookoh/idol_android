@@ -169,3 +169,13 @@ data class CommentsMeta(
     @SerializedName("offset")
     val offset: Int = 0
 )
+
+/**
+ * 하트픽 댓글 응답 (커서 기반 페이지네이션)
+ * old 프로젝트: heartpick/replies/ API 응답 구조
+ */
+data class HeartPickCommentsResponse(
+    val comments: List<CommentModel> = emptyList(),
+    val nextCursor: String? = null,
+    val hasMore: Boolean = false
+)

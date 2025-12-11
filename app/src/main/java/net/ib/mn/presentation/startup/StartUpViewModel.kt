@@ -301,6 +301,15 @@ class StartUpViewModel @Inject constructor(
                             preferencesManager.setFreeBoardPlaceholder(placeholder)
                         }
 
+                        // Help Info (각 픽 안내 텍스트)
+                        configData.helpInfos?.let { helpInfos ->
+                            preferencesManager.saveHelpInfo(
+                                heartPick = helpInfos.heartPick,
+                                onePick = helpInfos.onePick,
+                                themePick = helpInfos.themePick
+                            )
+                        }
+
                     }
                     // NOTE: 메모리 캐싱이 필요한 경우 구현 방법:
                     // 1. Application 클래스에 ConfigCache 싱글톤 생성

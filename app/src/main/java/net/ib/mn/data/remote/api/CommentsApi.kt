@@ -51,11 +51,20 @@ interface CommentsApi {
     ): Response<ResponseBody>
 
     /**
-     * 댓글 삭제
+     * 댓글 삭제 (commentId 사용)
      */
     @DELETE("comments/{id}/")
     suspend fun deleteComment(
         @Path("id") commentId: Int
+    ): Response<ResponseBody>
+
+    /**
+     * 댓글 삭제 (resourceUri 사용)
+     * 하트픽 댓글 등 resourceUri가 "replies/{id}/" 형식인 경우 사용
+     */
+    @DELETE("{path}")
+    suspend fun deleteCommentByUri(
+        @Path(value = "path", encoded = true) path: String
     ): Response<ResponseBody>
 
     /**

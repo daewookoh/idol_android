@@ -119,6 +119,11 @@ class PreferencesManager @Inject constructor(
         val KEY_NOTICES = stringPreferencesKey("notices_json")
         val KEY_EVENTS = stringPreferencesKey("events_json")
 
+        // Help Info (서버에서 받아오는 안내 텍스트)
+        val KEY_HELP_INFO_HEARTPICK = stringPreferencesKey("help_info_heartpick")
+        val KEY_HELP_INFO_ONEPICK = stringPreferencesKey("help_info_onepick")
+        val KEY_HELP_INFO_THEMEPICK = stringPreferencesKey("help_info_themepick")
+
         // ConfigSelf Data
         val KEY_LANGUAGE = stringPreferencesKey("config_self_language")
         val KEY_THEME = stringPreferencesKey("config_self_theme")
@@ -1549,5 +1554,47 @@ class PreferencesManager @Inject constructor(
      */
     fun getAdTypeByIdSync(typeId: Int): SupportAdTypeModel? {
         return getAdTypeListSync().find { it.id == typeId }
+    }
+
+    // ============================================================
+    // Help Info (서버에서 받아오는 안내 텍스트)
+    // ============================================================
+
+    /**
+     * HelpInfo 저장 (startup API에서 받아온 데이터)
+     */
+    suspend fun saveHelpInfo(heartPick: String?, onePick: String?, themePick: String?) {
+        context.dataStore.edit { preferences ->
+            heartPick?.let { preferences[KEY_HELP_INFO_HEARTPICK] = it }
+            onePick?.let { preferences[KEY_HELP_INFO_ONEPICK] = it }
+            themePick?.let { preferences[KEY_HELP_INFO_THEMEPICK] = it }
+        }
+    }
+
+    /**
+     * 하트픽 안내 텍스트 가져오기 (동기)
+     */
+    fun getHelpInfoHeartPick(): String? {
+        return runBlocking {
+            context.dataStore.data.first()[KEY_HELP_INFO_HEARTPICK]
+        }
+    }
+
+    /**
+     * 원픽 안내 텍스트 가져오기 (동기)
+     */
+    fun getHelpInfoOnePick(): String? {
+        return runBlocking {
+            context.dataStore.data.first()[KEY_HELP_INFO_ONEPICK]
+        }
+    }
+
+    /**
+     * 테마픽 안내 텍스트 가져오기 (동기)
+     */
+    fun getHelpInfoThemePick(): String? {
+        return runBlocking {
+            context.dataStore.data.first()[KEY_HELP_INFO_THEMEPICK]
+        }
     }
 }

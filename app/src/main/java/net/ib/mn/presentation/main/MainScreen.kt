@@ -50,6 +50,7 @@ import net.ib.mn.presentation.overlay.profile.ProfileScreen
 import net.ib.mn.ui.components.LocalHofDailyItemClick
 import net.ib.mn.ui.components.LocalIdolRankingHistoryClick
 import net.ib.mn.ui.components.LocalRankingItemClick
+import net.ib.mn.ui.components.LocalHeartPickDetailClick
 import net.ib.mn.presentation.community.DailyRankingHistoryScreen
 import java.util.Locale
 import androidx.compose.animation.AnimatedVisibility
@@ -60,6 +61,7 @@ import net.ib.mn.navigation.LocalAppNavigator
 import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.main.freeboard.FreeBoardViewModel
 import net.ib.mn.presentation.overlay.friendinvite.FriendInviteScreen
+import net.ib.mn.presentation.overlay.heartpick.HeartPickDetailScreen
 
 /**
  * 메인 화면.
@@ -112,18 +114,30 @@ fun MainScreen(
     // FreeBoardViewModel (MainScreen과 FreeBoardPage에서 공유)
     val freeBoardViewModel: FreeBoardViewModel = hiltViewModel()
 
+    // HeartPickDetailScreen 오버레이 상태
+    var selectedHeartPickId by remember { mutableStateOf<Int?>(null) }
+
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val navigator = LocalAppNavigator.current
 
-    // 백버튼 처리: 탭이 0이 아니면 탭 0으로 이동, 탭이 0이면 앱 종료
+    // 백버튼 처리: 오버레이 먼저 닫기 -> 탭 0으로 이동 -> 앱 종료
     BackHandler {
-        if (selectedTab != 0) {
-            selectedTab = 0
-            viewModel.onTabSelected(0)
-        } else {
-            (context as? Activity)?.finish()
+        when {
+            // HeartPickDetailScreen 오버레이가 열려있으면 먼저 닫기
+            selectedHeartPickId != null -> {
+                selectedHeartPickId = null
+            }
+            // 탭이 0이 아니면 탭 0으로 이동
+            selectedTab != 0 -> {
+                selectedTab = 0
+                viewModel.onTabSelected(0)
+            }
+            // 탭이 0이면 앱 종료
+            else -> {
+                (context as? Activity)?.finish()
+            }
         }
     }
 
@@ -198,7 +212,8 @@ fun MainScreen(
     CompositionLocalProvider(
         LocalRankingItemClick provides viewModel::openCommunity,
         LocalIdolRankingHistoryClick provides viewModel::openIdolRankingHistory,
-        LocalHofDailyItemClick provides viewModel::openDailyRankingHistory
+        LocalHofDailyItemClick provides viewModel::openDailyRankingHistory,
+        LocalHeartPickDetailClick provides { heartPickId -> selectedHeartPickId = heartPickId }
     ) {
         ExoScaffold(
             topBar = {
@@ -280,6 +295,20 @@ fun MainScreen(
             language = friendInviteLanguage,
             onBackClick = { showFriendInviteScreen = false }
         )
+    }
+
+    // HeartPickDetailScreen 오버레이 (전체 화면)
+    AnimatedVisibility(
+        visible = selectedHeartPickId != null,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        selectedHeartPickId?.let { heartPickId ->
+            HeartPickDetailScreen(
+                heartPickId = heartPickId,
+                onBackClick = { selectedHeartPickId = null }
+            )
+        }
     }
 
     AnimatedVisibility(

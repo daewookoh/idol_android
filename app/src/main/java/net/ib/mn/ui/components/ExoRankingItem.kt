@@ -50,8 +50,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
@@ -1286,7 +1288,7 @@ fun HeartPickRankingItem(
                     modifier = Modifier.fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // 투표수: 색상바 우측에 배치
+                    // 투표수: 색상바 우측에 배치 (old: text_white_black, bold 없음)
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(progressPercent)
@@ -1295,12 +1297,15 @@ fun HeartPickRankingItem(
                     ) {
                         ExoHeartCounter(
                             count = item.heartCount,
-                            style = ExoTypo.stat10.copy(lineHeight = 17.sp),
+                            style = ExoTypo.body11.copy(
+                                lineHeight = 17.sp,
+                                color = ColorPalette.textWhiteBlack
+                            ),
                             modifier = Modifier.padding(end = 4.dp)
                         )
                     }
 
-                    // 퍼센트: 나머지 영역의 우측에 배치 (old: text_dimmed 색상)
+                    // 퍼센트: 나머지 영역의 우측에 배치 (old: text_dimmed, bold 없음)
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -1309,7 +1314,7 @@ fun HeartPickRankingItem(
                     ) {
                         Text(
                             text = percentageText,
-                            style = ExoTypo.stat10.copy(
+                            style = ExoTypo.body11.copy(
                                 lineHeight = 17.sp,
                                 color = ColorPalette.textDimmed
                             ),
@@ -1318,6 +1323,428 @@ fun HeartPickRankingItem(
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * HeartPickDetailRankingItem - 하트픽 상세 화면용 랭킹 아이템
+ *
+ * HeartPickRankingItem과 동일한 레이아웃, width만 fillMaxWidth()로 변경
+ * 1위일 때는 커스텀 레이아웃 (old: item_heart_pick_1st.xml)
+ *
+ * @param item 랭킹 아이템 데이터
+ * @param isFavorite 나의 최애 여부 (배경색 변경)
+ * @param showVoteButton 투표 버튼 표시 여부 (투표 중일 때만 true)
+ * @param onClick 아이템 클릭 콜백
+ * @param onVoteClick 투표 버튼 클릭 콜백
+ */
+@Composable
+fun HeartPickDetailRankingItem(
+    item: RankingItem,
+    isFavorite: Boolean = item.isFavorite,
+    showVoteButton: Boolean = false,
+    onClick: () -> Unit = {},
+    onVoteClick: () -> Unit = {}
+) {
+    if (item.rank == 1) {
+        // 1위 전용 레이아웃 (old: item_heart_pick_1st.xml)
+        HeartPickDetail1stRankingItem(
+            item = item,
+            isFavorite = isFavorite,
+            showVoteButton = showVoteButton,
+            onClick = onClick,
+            onVoteClick = onVoteClick
+        )
+    } else {
+        // 2위 이하 레이아웃
+        HeartPickDetailOtherRankingItem(
+            item = item,
+            isFavorite = isFavorite,
+            showVoteButton = showVoteButton,
+            onClick = onClick,
+            onVoteClick = onVoteClick
+        )
+    }
+}
+
+/**
+ * HeartPickDetail1stRankingItem - 하트픽 상세 1위 전용 레이아웃
+ *
+ * old 프로젝트 item_heart_pick_1st.xml 기반:
+ * - 프로필 이미지: 90dp x 90dp
+ * - 1위 배지: 30dp (icon_heartpick_1st) 좌측 상단
+ * - 하단 gradient: 6dp
+ */
+@Composable
+private fun HeartPickDetail1stRankingItem(
+    item: RankingItem,
+    isFavorite: Boolean,
+    showVoteButton: Boolean,
+    onClick: () -> Unit,
+    onVoteClick: () -> Unit
+) {
+    val backgroundColor = if (isFavorite) ColorPalette.main100 else ColorPalette.background200
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { onClick() }
+    ) {
+        // 메인 컨텐츠 영역 (Row -> Box로 변경하여 겹침 허용)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(backgroundColor)
+                .padding(vertical = 12.dp)
+        ) {
+            // 레이아웃 수치 계산
+            val startPadding = 16.dp
+            val imageSize = 102.dp
+            // 이름 텍스트의 시작 위치 (기존 로직: 16(Spacer) + 102(Img) - 16(Offset) + 18(Pad) = 120dp)
+            val textStartPadding = 120.dp
+
+            // 1. 정보 영역 (이름 + 프로그레스 바) - [하단 레이어]
+            // 먼저 그려서 이미지 밑에 깔리게 합니다.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterStart),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    // 이름
+                    Box(
+                        modifier = Modifier.padding(start = textStartPadding)
+                    ) {
+                        ExoNameWithGroup(
+                            fullName = item.name,
+                            nameFontSize = 15.sp,
+                            groupFontSize = 10.sp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    // 프로그레스 바
+                    // 시작 위치를 startPadding(16dp)으로 설정하여 이미지 영역 밑까지 바가 확장되도록 함
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 90.dp, end = if (showVoteButton) 0.dp else 16.dp)
+                            .height(17.dp)
+                    ) {
+                    val progressPercent = remember(item.heartCount, item.maxHeartCount) {
+                        if (item.maxHeartCount == 0L || item.heartCount == 0L) {
+                            0.2f
+                        } else {
+                            val voteRoot = kotlin.math.sqrt(kotlin.math.sqrt(item.heartCount.toDouble()))
+                            val maxRoot = kotlin.math.sqrt(kotlin.math.sqrt(item.maxHeartCount.toDouble()))
+                            val p = 20 + (voteRoot * 60 / maxRoot)
+                            (p / 100f).toFloat().coerceIn(0.2f, 0.8f)
+                        }
+                    }
+
+                    // 배경
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                color = ColorPalette.background400,
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                            )
+                    )
+
+                    // 프로그레스 바 (색상 채움)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(progressPercent)
+                            .fillMaxHeight()
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(
+                                        ColorPalette.sLeagueProgress,
+                                        ColorPalette.main
+                                    )
+                                ),
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp)
+                            )
+                    )
+
+                    val percentageText = "${item.percentage}%"
+
+                    // 텍스트 정보 (투표수, %)
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // 투표수: 색상바 우측에 배치
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(progressPercent)
+                                .fillMaxHeight(),
+                            contentAlignment = Alignment.CenterEnd
+                        ) {
+                            ExoHeartCounter(
+                                count = item.heartCount,
+                                style = ExoTypo.body11.copy(
+                                    lineHeight = 17.sp,
+                                    color = ColorPalette.textWhiteBlack
+                                ),
+                                modifier = Modifier.padding(end = 4.dp)
+                            )
+                        }
+
+                        // 퍼센트: 나머지 영역의 우측에 배치
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
+                            contentAlignment = Alignment.CenterEnd
+                        ) {
+                            Text(
+                                text = percentageText,
+                                style = ExoTypo.body11.copy(
+                                    lineHeight = 17.sp,
+                                    color = ColorPalette.textDimmed
+                                ),
+                                modifier = Modifier.padding(end = 6.dp)
+                            )
+                        }
+                    }
+                    }
+                }
+
+                // 투표 버튼
+                if (showVoteButton) {
+                    Icon(
+                        painter = painterResource(R.drawable.btn_ranking_vote_heart),
+                        contentDescription = "투표",
+                        tint = ColorPalette.main,
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                            .size(50.dp)
+                            .clickable(
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() }
+                            ) { onVoteClick() }
+                            .padding(10.dp)
+                    )
+                }
+            }
+
+            // 2. 프로필 이미지 영역 - [상단 레이어]
+            // 나중에 그려서 정보 영역 위에 올라오게 합니다.
+            Box(
+                modifier = Modifier
+                    .padding(start = startPadding)
+                    .size(imageSize)
+                    .align(Alignment.CenterStart)
+            ) {
+                // 프로필 이미지
+                ExoProfileImage(
+                    imageUrl = item.photoUrl,
+                    type = ProfileImageType.XLARGE,
+                    modifier = Modifier.offset(x = 10.dp)
+                )
+
+                // 1위 배지
+                Icon(
+                    painter = painterResource(R.drawable.icon_heartpick_1st),
+                    contentDescription = "1위",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .size(30.dp)
+                        .align(Alignment.TopStart)
+                )
+            }
+        }
+
+        // 하단 gradient (6dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Black.copy(alpha = 0.1f),
+                            Color.Transparent
+                        )
+                    )
+                )
+        )
+    }
+}
+
+/**
+ * HeartPickDetailOtherRankingItem - 하트픽 상세 2위 이하 레이아웃
+ */
+@Composable
+private fun HeartPickDetailOtherRankingItem(
+    item: RankingItem,
+    isFavorite: Boolean,
+    showVoteButton: Boolean,
+    onClick: () -> Unit,
+    onVoteClick: () -> Unit
+) {
+    val backgroundColor = if (isFavorite) ColorPalette.main100 else ColorPalette.background200
+
+    // HeartPickRankingItem과 동일한 Row 레이아웃, width만 fillMaxWidth()로 변경
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(backgroundColor)
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { onClick() }
+            .padding(top = 14.dp, bottom = 8.dp, end = if (showVoteButton) 0.dp else 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // 순위 번호 (왼쪽 큰 숫자) - HeartPickRankingItem과 동일
+        Text(
+            text = "${item.rank}",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(40.dp)
+        )
+
+        // 프로필 이미지 (2위 이하 표시용 - MEDIUM, 55dp)
+        ExoProfileImage(
+            imageUrl = item.photoUrl,
+            type = ProfileImageType.MEDIUM,
+            rank = item.rank,
+            contentDescription = "프로필 이미지"
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // 정보 영역
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            // 이름 (old: name 15dp, group 10dp)
+            ExoNameWithGroup(
+                fullName = item.name,
+                nameFontSize = 15.sp,
+                groupFontSize = 10.sp
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // 프로그레스 바 (old: minHeight 17dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(17.dp)
+            ) {
+                // 프로그레스 계산: 20% ~ 80% 범위, 4th root 사용
+                val progressPercent = remember(item.heartCount, item.maxHeartCount) {
+                    if (item.maxHeartCount == 0L) {
+                        0.2f
+                    } else if (item.heartCount == 0L) {
+                        0.2f
+                    } else {
+                        val voteRoot = kotlin.math.sqrt(kotlin.math.sqrt(item.heartCount.toDouble()))
+                        val maxRoot = kotlin.math.sqrt(kotlin.math.sqrt(item.maxHeartCount.toDouble()))
+                        val p = 20 + (voteRoot * 60 / maxRoot)
+                        (p / 100f).toFloat().coerceIn(0.2f, 0.8f)
+                    }
+                }
+
+                // 배경 (회색 - old: progressbar_ranking_background_400)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            color = ColorPalette.background400,
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                        )
+                )
+
+                // 프로그레스 바 (MAIN 스타일 - gradient)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(progressPercent)
+                        .fillMaxHeight()
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(
+                                    ColorPalette.sLeagueProgress,
+                                    ColorPalette.main
+                                )
+                            ),
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp)
+                        )
+                )
+
+                // 퍼센트 표시 (ViewModel에서 계산된 percentage 사용)
+                val percentageText = "${item.percentage}%"
+
+                // 투표수와 퍼센트를 함께 배치
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // 투표수: 색상바 우측에 배치 (old: text_white_black, bold 없음)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(progressPercent)
+                            .fillMaxHeight(),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        ExoHeartCounter(
+                            count = item.heartCount,
+                            style = ExoTypo.body11.copy(
+                                lineHeight = 17.sp,
+                                color = ColorPalette.textWhiteBlack
+                            ),
+                            modifier = Modifier.padding(end = 4.dp)
+                        )
+                    }
+
+                    // 퍼센트: 나머지 영역의 우측에 배치 (old: text_dimmed, bold 없음)
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        Text(
+                            text = percentageText,
+                            style = ExoTypo.body11.copy(
+                                lineHeight = 17.sp,
+                                color = ColorPalette.textDimmed
+                            ),
+                            modifier = Modifier.padding(end = 6.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        // 투표 버튼
+        if (showVoteButton) {
+            Icon(
+                painter = painterResource(R.drawable.btn_ranking_vote_heart),
+                contentDescription = "투표",
+                tint = ColorPalette.main,
+                modifier = Modifier
+                    .padding(end = 10.dp)
+                    .size(50.dp)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) { onVoteClick() }
+                    .padding(10.dp)
+            )
         }
     }
 }
