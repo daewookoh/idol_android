@@ -73,7 +73,9 @@ import net.ib.mn.presentation.overlay.friendinvite.FriendInviteScreen
 import net.ib.mn.presentation.overlay.profile.ProfileScreen
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoDialog
+import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold
+import net.ib.mn.ui.components.ProfileImageType
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -791,15 +793,9 @@ private fun FriendItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 프로필 이미지
-            AsyncImage(
-                model = friend.user.picture,
-                contentDescription = "Profile",
-                error = painterResource(R.drawable.menu_profile_default),
-                placeholder = painterResource(R.drawable.menu_profile_default),
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
+            ExoProfileImage(
+                imageUrl = friend.user.picture,
+                type = ProfileImageType.SMALL
             )
 
             Spacer(modifier = Modifier.width(10.dp))

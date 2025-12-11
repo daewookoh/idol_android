@@ -2,10 +2,14 @@ package net.ib.mn.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import net.ib.mn.data.remote.api.UsersApi
 import net.ib.mn.data.remote.dto.BlockUserRequest
 import net.ib.mn.data.remote.dto.ProvideHeartRequest
 import net.ib.mn.data.remote.dto.ProvideHeartResponse
+import net.ib.mn.data.remote.dto.SetStatusRequest
+import net.ib.mn.domain.model.FriendUser
 import net.ib.mn.domain.model.ApiError
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.util.logD
@@ -364,6 +368,119 @@ class UsersRepository @Inject constructor(
             WebTokenResult.NetworkError(e.message)
         }
     }
+
+    /**
+     * 뉴프렌즈 추천 목록 조회
+     *
+     * old 프로젝트: NewFriendsActivity.getNewFriends()
+     * 응답: { "success": true, "objects": [...] }
+     *
+     * @return NewFriendsRecommendResult
+     */
+    suspend fun newFriendsRecommend(): NewFriendsRecommendResult {
+        return try {
+            logD(TAG, "newFriendsRecommend called")
+            val response = usersApi.newFriendsRecommend()
+
+            if (response.isSuccessful) {
+                val jsonString = response.body()?.string() ?: "{}"
+                val jsonObject = JSONObject(jsonString)
+                logD(TAG, "newFriendsRecommend response: $jsonObject")
+
+                val success = jsonObject.optBoolean("success", false)
+                if (success) {
+                    val array = jsonObject.optJSONArray("objects")
+                    val users = mutableListOf<FriendUser>()
+                    val gson = Gson()
+                    val type = object : TypeToken<FriendUser>() {}.type
+
+                    if (array != null) {
+                        for (i in 0 until array.length()) {
+                            try {
+                                val user: FriendUser = gson.fromJson(array.getJSONObject(i).toString(), type)
+                                users.add(user)
+                            } catch (e: Exception) {
+                                logE(TAG, "Failed to parse user at index $i: ${e.message}")
+                            }
+                        }
+                    }
+
+                    logD(TAG, "newFriendsRecommend success: ${users.size} users")
+                    NewFriendsRecommendResult.Success(users)
+                } else {
+                    val msg = jsonObject.optString("msg", "Failed to get recommendations")
+                    logE(TAG, "newFriendsRecommend failed: $msg")
+                    NewFriendsRecommendResult.Error(msg)
+                }
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Unknown error"
+                logE(TAG, "newFriendsRecommend failed: ${response.code()} - $errorBody")
+                NewFriendsRecommendResult.Error("API Error: ${response.code()}")
+            }
+        } catch (e: IOException) {
+            logE(TAG, "newFriendsRecommend network error: ${e.message}", e)
+            NewFriendsRecommendResult.Error(e.message)
+        } catch (e: Exception) {
+            logE(TAG, "newFriendsRecommend exception: ${e.message}", e)
+            NewFriendsRecommendResult.Error(e.message)
+        }
+    }
+
+    /**
+     * 유저 상태 설정 (뉴프렌즈 신청/취소)
+     *
+     * old 프로젝트: NewFriendsActivity.setStatus()
+     * 응답: { "success": true, "msg": "..." }
+     *
+     * @param newFriends "Y": 뉴프렌즈 신청, "N": 뉴프렌즈 취소
+     * @return SetStatusResult
+     */
+    suspend fun setStatus(newFriends: String): SetStatusResult {
+        return try {
+            logD(TAG, "setStatus called with newFriends: $newFriends")
+            val request = SetStatusRequest(newFriends = newFriends)
+            val response = usersApi.setStatus(request)
+
+            if (response.isSuccessful) {
+                val jsonString = response.body()?.string() ?: "{}"
+                val jsonObject = JSONObject(jsonString)
+                logD(TAG, "setStatus response: $jsonObject")
+
+                val success = jsonObject.optBoolean("success", false)
+                val msg = jsonObject.optString("msg", "")
+
+                if (success) {
+                    logD(TAG, "setStatus success")
+                    SetStatusResult.Success
+                } else {
+                    logE(TAG, "setStatus failed: $msg")
+                    SetStatusResult.Error(msg)
+                }
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Unknown error"
+                logE(TAG, "setStatus failed: ${response.code()} - $errorBody")
+                SetStatusResult.Error("API Error: ${response.code()}")
+            }
+        } catch (e: IOException) {
+            logE(TAG, "setStatus network error: ${e.message}", e)
+            SetStatusResult.Error(e.message)
+        } catch (e: Exception) {
+            logE(TAG, "setStatus exception: ${e.message}", e)
+            SetStatusResult.Error(e.message)
+        }
+    }
+}
+
+/** 뉴프렌즈 추천 결과 */
+sealed interface NewFriendsRecommendResult {
+    data class Success(val users: List<FriendUser>) : NewFriendsRecommendResult
+    data class Error(val message: String? = null) : NewFriendsRecommendResult
+}
+
+/** 유저 상태 설정 결과 */
+sealed interface SetStatusResult {
+    data object Success : SetStatusResult
+    data class Error(val message: String? = null) : SetStatusResult
 }
 
 /** 하트박스 결과 */

@@ -966,3 +966,20 @@ data class RedirectResponse(
     @SerializedName("url")
     val url: String?
 )
+
+// ============================================================
+// /users/set_status/ - 유저 상태 설정
+// ============================================================
+data class SetStatusRequest(
+    @SerializedName("status_message")
+    val statusMessage: String? = null,
+
+    @SerializedName("feed_is_viewable")
+    val feedIsViewable: String? = null,
+
+    @SerializedName("friend_allow")
+    val friendAllow: String? = null,
+
+    @SerializedName("new_friends")
+    val newFriends: String? = null  // "Y": 뉴프렌즈 신청, "N": 뉴프렌즈 취소
+)

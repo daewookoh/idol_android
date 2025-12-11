@@ -3,6 +3,7 @@ package net.ib.mn.data.remote.api
 import net.ib.mn.data.remote.dto.BlockUserRequest
 import net.ib.mn.data.remote.dto.CommonResponse
 import net.ib.mn.data.remote.dto.ProvideHeartRequest
+import net.ib.mn.data.remote.dto.SetStatusRequest
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -128,4 +129,24 @@ interface UsersApi {
      */
     @GET("users/web_token/")
     suspend fun getWebToken(): Response<ResponseBody>
+
+    /**
+     * 뉴프렌즈 추천 목록 조회
+     * GET users/new_friends_recommend/
+     *
+     * old 프로젝트: NewFriendsActivity에서 사용
+     * 응답: { "success": true, "objects": [...] }
+     */
+    @GET("users/new_friends_recommend/")
+    suspend fun newFriendsRecommend(): Response<ResponseBody>
+
+    /**
+     * 유저 상태 설정
+     * POST users/status/
+     *
+     * old 프로젝트: NewFriendsActivity에서 뉴프렌즈 신청/취소에 사용
+     * 응답: { "success": true, "msg": "..." }
+     */
+    @POST("users/status/")
+    suspend fun setStatus(@Body body: SetStatusRequest): Response<ResponseBody>
 }
