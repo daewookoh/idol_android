@@ -30,15 +30,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.util.NumberFormatUtil
@@ -153,36 +153,19 @@ private fun UpcomingHeartPickCard(
                 ) {
                     // 배경 이미지
                     if (backgroundImageUrl.isNotEmpty()) {
-
-                        val context = LocalContext.current
-                        val imageModel = remember(backgroundImageUrl) {
-                            coil.request.ImageRequest.Builder(context)
-                                .data(backgroundImageUrl)
-                                .crossfade(true)
-                                .listener(
-                                    onStart = {
-                                    },
-                                    onSuccess = { _, _ ->
-                                    },
-                                    onError = { _, result ->
-                                    }
-                                )
-                                .build()
-                        }
-
                         AsyncImage(
-                            model = imageModel,
+                            model = backgroundImageUrl,
                             contentDescription = "Background",
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .aspectRatio(1f / 0.4f),
+                                .height(108.dp),
                             contentScale = ContentScale.Crop
                         )
                     } else {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .aspectRatio(1f / 0.4f)
+                                .height(108.dp)
                                 .background(ColorPalette.background200)
                         )
                     }
@@ -191,7 +174,7 @@ private fun UpcomingHeartPickCard(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(1f / 0.4f)
+                            .height(108.dp)
                             .background(
                                 brush = Brush.verticalGradient(
                                     colors = listOf(
@@ -205,7 +188,7 @@ private fun UpcomingHeartPickCard(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(1f / 0.42f)
+                            .height(108.dp)
                     ) {
                         // D-Day 배지
                         Row(
@@ -240,8 +223,11 @@ private fun UpcomingHeartPickCard(
                         // 제목
                         Text(
                             text = title,
-                            fontSize = 19.sp,
-                            color = ColorPalette.fixWhite,
+                            style = TextStyle(
+                                fontSize = 19.sp,
+                                color = ColorPalette.fixWhite,
+                                platformStyle = PlatformTextStyle(includeFontPadding = false)
+                            ),
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -252,8 +238,11 @@ private fun UpcomingHeartPickCard(
                         // 부제목
                         Text(
                             text = subTitle,
-                            fontSize = 13.sp,
-                            color = ColorPalette.fixWhite,
+                            style = TextStyle(
+                                fontSize = 13.sp,
+                                color = ColorPalette.fixWhite,
+                                platformStyle = PlatformTextStyle(includeFontPadding = false)
+                            ),
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -429,8 +418,11 @@ private fun ActiveHeartPickCard(
                         // 제목
                         Text(
                             text = title,
-                            fontSize = 19.sp,
-                            color = ColorPalette.fixWhite,
+                            style = TextStyle(
+                                fontSize = 19.sp,
+                                color = ColorPalette.fixWhite,
+                                platformStyle = PlatformTextStyle(includeFontPadding = false)
+                            ),
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -441,8 +433,11 @@ private fun ActiveHeartPickCard(
                         // 부제목
                         Text(
                             text = subTitle,
-                            fontSize = 13.sp,
-                            color = ColorPalette.fixWhite,
+                            style = TextStyle(
+                                fontSize = 13.sp,
+                                color = ColorPalette.fixWhite,
+                                platformStyle = PlatformTextStyle(includeFontPadding = false)
+                            ),
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -560,18 +555,16 @@ private fun ActiveHeartPickCard(
                     ) {
                         // RankingItem 리스트 생성
                         val rankingItems = remember(otherIdols, firstPlaceIdol) {
-                            val firstPlaceVotes = firstPlaceIdol?.voteCount?.replace(",", "")?.toLongOrNull() ?: 0L
+                            val firstPlaceVotes = firstPlaceIdol?.voteCountRaw ?: 0L
 
                             otherIdols.mapIndexed { index, idol ->
-                                val idolVotes = idol.voteCount.replace(",", "").toLongOrNull() ?: 0L
-
                                 RankingItem(
-                                    rank = index + 2,
+                                    rank = idol.rank,  // RankingUtil에서 계산된 동점자 순위 사용
                                     name = "${idol.name}_${idol.groupName}",
                                     voteCount = idol.voteCount,
                                     photoUrl = idol.photoUrl,
-                                    id = "${index + 2}_${idol.name}",
-                                    heartCount = idolVotes,
+                                    id = "${idol.rank}_${index}_${idol.name}",
+                                    heartCount = idol.voteCountRaw,
                                     maxHeartCount = firstPlaceVotes,
                                     percentage = idol.percentage
                                 )
@@ -764,8 +757,11 @@ private fun EndedHeartPickCard(
                             // 제목
                             Text(
                                 text = title,
-                                fontSize = 19.sp,
-                                color = ColorPalette.fixWhite,
+                                style = TextStyle(
+                                    fontSize = 19.sp,
+                                    color = ColorPalette.fixWhite,
+                                    platformStyle = PlatformTextStyle(includeFontPadding = false)
+                                ),
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -775,8 +771,11 @@ private fun EndedHeartPickCard(
                             // 부제목
                             Text(
                                 text = subTitle,
-                                fontSize = 13.sp,
-                                color = ColorPalette.fixWhite,
+                                style = TextStyle(
+                                    fontSize = 13.sp,
+                                    color = ColorPalette.fixWhite,
+                                    platformStyle = PlatformTextStyle(includeFontPadding = false)
+                                ),
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -1011,5 +1010,7 @@ data class IdolRankInfo(
     val groupName: String,
     val photoUrl: String,
     val voteCount: String,
-    val percentage: Int
+    val voteCountRaw: Long = 0L,
+    val percentage: Int,
+    val rank: Int = 0  // 동점자 순위 (RankingUtil에서 계산)
 )

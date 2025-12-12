@@ -11,12 +11,13 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -34,6 +35,7 @@ import net.ib.mn.ui.theme.ColorPalette
  *
  * 테마픽과 이미지픽을 탭으로 전환하며 표시
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnePickRankingSubPage(
     chartCode: String,
@@ -47,6 +49,7 @@ fun OnePickRankingSubPage(
     }
 
     val uiState by viewModel.uiState.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
     val scrollState = listState ?: rememberLazyListState()
 
     // 초기 로드
@@ -85,34 +88,23 @@ fun OnePickRankingSubPage(
             modifier = Modifier.fillMaxWidth()
         )
 
-        // 컨텐츠 영역
-        when (val state = uiState) {
-            is OnePickRankingSubPageViewModel.UiState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = ColorPalette.main)
+        // 컨텐츠 영역 with PullToRefresh
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = { viewModel.refresh() },
+            modifier = Modifier.fillMaxSize()
+        ) {
+            when (val state = uiState) {
+                is OnePickRankingSubPageViewModel.UiState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = ColorPalette.main)
+                    }
                 }
-            }
 
-            is OnePickRankingSubPageViewModel.UiState.Error -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.msg_error_ok),
-                        fontSize = 16.sp,
-                        color = ColorPalette.main
-                    )
-                }
-            }
-
-            is OnePickRankingSubPageViewModel.UiState.ThemePickSuccess -> {
-                if (state.items.isEmpty()) {
+                is OnePickRankingSubPageViewModel.UiState.Error -> {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -120,65 +112,78 @@ fun OnePickRankingSubPage(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = stringResource(R.string.msg_no_data),
+                            text = stringResource(R.string.msg_error_ok),
                             fontSize = 16.sp,
-                            color = ColorPalette.textDimmed
+                            color = ColorPalette.main
                         )
                     }
-                } else {
-                    LazyColumn(
-                        state = scrollState,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(state.items) { cardData ->
-                            ExoThemePickCard(
-                                state = cardData.state,
-                                title = cardData.title,
-                                subTitle = cardData.subTitle,
-                                imageUrl = cardData.imageUrl,
-                                voteCount = cardData.voteCount,
-                                periodDate = cardData.periodDate,
-                                onCardClick = {
-                                },
-                                onVoteClick = {
-                                }
+                }
+
+                is OnePickRankingSubPageViewModel.UiState.ThemePickSuccess -> {
+                    if (state.items.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.msg_no_data),
+                                fontSize = 16.sp,
+                                color = ColorPalette.textDimmed
                             )
+                        }
+                    } else {
+                        LazyColumn(
+                            state = scrollState,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(state.items) { cardData ->
+                                ExoThemePickCard(
+                                    state = cardData.state,
+                                    title = cardData.title,
+                                    subTitle = cardData.subTitle,
+                                    imageUrl = cardData.imageUrl,
+                                    voteCount = cardData.voteCount,
+                                    periodDate = cardData.periodDate,
+                                    onCardClick = { },
+                                    onVoteClick = { }
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-            is OnePickRankingSubPageViewModel.UiState.ImagePickSuccess -> {
-                if (state.items.isEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.msg_no_data),
-                            fontSize = 16.sp,
-                            color = ColorPalette.textDimmed
-                        )
-                    }
-                } else {
-                    LazyColumn(
-                        state = scrollState,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(state.items) { cardData ->
-                            ExoImagePickCard(
-                                state = cardData.state,
-                                title = cardData.title,
-                                subTitle = cardData.subTitle,
-                                voteCount = cardData.voteCount,
-                                periodDate = cardData.periodDate,
-                                onCardClick = {
-                                },
-                                onVoteClick = {
-                                }
+                is OnePickRankingSubPageViewModel.UiState.ImagePickSuccess -> {
+                    if (state.items.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.msg_no_data),
+                                fontSize = 16.sp,
+                                color = ColorPalette.textDimmed
                             )
+                        }
+                    } else {
+                        LazyColumn(
+                            state = scrollState,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(state.items) { cardData ->
+                                ExoImagePickCard(
+                                    state = cardData.state,
+                                    title = cardData.title,
+                                    subTitle = cardData.subTitle,
+                                    voteCount = cardData.voteCount,
+                                    periodDate = cardData.periodDate,
+                                    onCardClick = { },
+                                    onVoteClick = { }
+                                )
+                            }
                         }
                     }
                 }

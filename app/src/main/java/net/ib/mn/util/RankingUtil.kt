@@ -5,6 +5,8 @@ import android.text.TextUtils
 import androidx.appcompat.app.AppCompatDelegate
 import net.ib.mn.data.local.dao.IdolDao
 import net.ib.mn.data.local.entity.IdolEntity
+import net.ib.mn.domain.model.HeartPickIdol
+import net.ib.mn.domain.model.HeartPickModel
 import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.util.logD
 import net.ib.mn.util.logE
@@ -168,6 +170,78 @@ object RankingUtil {
         }
 
         return result
+    }
+
+    /**
+     * HeartPickIdol을 RankingItem으로 변환
+     * sortAndRank와 동일한 로직 사용을 위한 변환 함수
+     */
+    private fun HeartPickIdol.toRankingItem(): RankingItem {
+        return RankingItem(
+            id = id.toString(),
+            name = title,  // 정렬 기준으로 사용
+            rank = 0,
+            voteCount = vote.toString(),
+            heartCount = vote.toLong(),
+            maxHeartCount = 0L,
+            photoUrl = imageUrl
+        )
+    }
+
+    /**
+     * HeartPickIdol 정렬 및 순위 계산
+     * - sortAndRank와 동일한 로직 사용 (코드 일원화)
+     * - 투표수 내림차순 정렬
+     * - 동점일 경우 이름 오름차순 정렬 (Collator 사용)
+     * - 동점자는 동일한 순위 부여
+     *
+     * @param idols 정렬할 HeartPickIdol 리스트
+     * @return 정렬되고 순위가 계산된 HeartPickIdol 리스트
+     */
+    fun sortAndRankHeartPickIdols(idols: List<HeartPickIdol>): List<HeartPickIdol> {
+        if (idols.isEmpty()) return emptyList()
+
+        // 1. HeartPickIdol -> RankingItem 변환 (id를 키로 매핑)
+        val idolMap = idols.associateBy { it.id.toString() }
+        val rankingItems = idols.map { it.toRankingItem() }
+
+        // 2. sortAndRank로 정렬 및 순위 계산 (공통 로직 사용)
+        val sortedRankingItems = sortAndRank(rankingItems)
+
+        // 3. 정렬된 순서와 순위를 원본 HeartPickIdol에 적용
+        var previousVote = sortedRankingItems.firstOrNull()?.heartCount?.toInt() ?: 0
+        var previousDiff = 0
+
+        return sortedRankingItems.mapIndexed { index, rankingItem ->
+            val originalIdol = idolMap[rankingItem.id] ?: return@mapIndexed null
+            val currentDiff = if (index > 0 && sortedRankingItems[index - 1].heartCount == rankingItem.heartCount) {
+                previousDiff
+            } else {
+                val diff = previousVote - rankingItem.heartCount.toInt()
+                previousDiff = diff
+                previousVote = rankingItem.heartCount.toInt()
+                diff
+            }
+            originalIdol.copy(
+                rank = rankingItem.rank,
+                diffVote = currentDiff
+            )
+        }.filterNotNull()
+    }
+
+    /**
+     * HeartPickModel의 아이돌 목록 정렬 및 순위 계산
+     * - 내부 heartPickIdols를 정렬하고 순위를 계산하여 새 HeartPickModel 반환
+     *
+     * @param heartPick 처리할 HeartPickModel
+     * @return 정렬되고 순위가 계산된 HeartPickModel
+     */
+    fun sortAndRankHeartPickModel(heartPick: HeartPickModel): HeartPickModel {
+        val idols = heartPick.heartPickIdols ?: return heartPick
+        if (idols.isEmpty()) return heartPick
+
+        val sortedIdols = sortAndRankHeartPickIdols(idols)
+        return heartPick.copy(heartPickIdols = ArrayList(sortedIdols))
     }
 
     /**

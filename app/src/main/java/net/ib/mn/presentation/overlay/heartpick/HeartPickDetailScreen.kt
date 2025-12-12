@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -55,10 +56,13 @@ import net.ib.mn.domain.model.HeartPickIdol
 import net.ib.mn.domain.model.HeartPickModel
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.ui.components.ExoAppBar
+import net.ib.mn.ui.components.ExoNameWithGroup
+import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold
+import net.ib.mn.ui.components.ExoHeartPickVoteDialog
 import net.ib.mn.ui.components.ExoTitleDialog
-import net.ib.mn.ui.components.ExoVoteDialog
 import net.ib.mn.ui.components.HeartPickDetailRankingItem
+import net.ib.mn.ui.components.ProfileImageType
 import net.ib.mn.ui.components.RankingItem
 import java.text.NumberFormat
 import java.util.Locale
@@ -165,7 +169,7 @@ fun HeartPickDetailScreen(
         HeartPickDetailContract.HeartPickStatus.VOTING -> stringResource(R.string.heartpick)
     }
 
-    // 투표 다이얼로그
+    // 투표 다이얼로그 (하트픽 전용)
     if (showVoteDialog && selectedIdol != null) {
         val idol = selectedIdol!!
         val fullName = if (idol.subtitle.isNotEmpty()) {
@@ -173,13 +177,22 @@ fun HeartPickDetailScreen(
         } else {
             idol.title
         }
-        ExoVoteDialog(
-            idolId = idol.idolId,
+        ExoHeartPickVoteDialog(
+            heartPickId = heartPickId,
+            heartPickIdolId = idol.id,  // HeartPickIdol.id (하트픽 아이돌 ID)
             fullName = fullName,
-            idolHeart = idol.vote.toLong(),
             onVote = { votedHeart ->
-                // 투표 완료 후 데이터 새로고침
-                viewModel.sendIntent(HeartPickDetailContract.Intent.LoadHeartPick(heartPickId))
+                // 투표 완료 후 해당 아이돌의 투표수 실시간 업데이트
+                viewModel.sendIntent(
+                    HeartPickDetailContract.Intent.UpdateIdolVote(
+                        idolId = idol.idolId,
+                        addedVote = votedHeart.toInt()
+                    )
+                )
+            },
+            onShare = {
+                // 공유하기 버튼 클릭 시 ViewModel의 Share Intent 호출
+                viewModel.sendIntent(HeartPickDetailContract.Intent.Share)
             },
             onDismiss = {
                 showVoteDialog = false
@@ -238,6 +251,7 @@ fun HeartPickDetailScreen(
                         contentDescription = "Share",
                         tint = colorResource(R.color.text_default),
                         modifier = Modifier
+                            .padding(end = 10.dp)
                             .size(24.dp)
                             .clickable(
                                 indication = null,
@@ -344,7 +358,7 @@ private fun HeartPickBanner(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(140.dp)
+            .height(126.dp)
     ) {
         AsyncImage(
             model = bannerUrl,
@@ -362,29 +376,30 @@ private fun HeartPickBanner(
         }
 
         // D-Day 뱃지
-        Box(
+        Row(
             modifier = Modifier
                 .padding(start = 20.dp, top = 16.dp)
+                .height(20.dp)
                 .background(
                     color = Color(0xE6202020),
                     shape = RoundedCornerShape(10.dp)
                 )
-                .padding(horizontal = 8.dp, vertical = 4.dp)
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(R.drawable.icon_heartpick_timer),
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(11.dp)
-                )
-                Spacer(modifier = Modifier.width(3.dp))
-                Text(
-                    text = dDayText,
-                    color = Color.White,
-                    fontSize = 12.sp
-                )
-            }
+            Icon(
+                painter = painterResource(R.drawable.icon_heartpick_timer),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(11.dp)
+            )
+            Spacer(modifier = Modifier.width(3.dp))
+            Text(
+                text = dDayText,
+                color = Color.White,
+                fontSize = 12.sp,
+                lineHeight = 20.sp
+            )
         }
 
         // 제목 + 부제목
@@ -397,7 +412,6 @@ private fun HeartPickBanner(
                 text = title,
                 color = Color.White,
                 fontSize = 19.sp,
-                fontWeight = FontWeight.Bold,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -531,7 +545,7 @@ private fun PrelaunchInfoSection(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
                     ) { onCommentClick() }
-                    .padding(horizontal = 7.dp, vertical = 3.dp),
+                    .padding(horizontal = 7.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -693,38 +707,25 @@ private fun PrelaunchIdolItem(
             .padding(horizontal = 26.dp, vertical = 9.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AsyncImage(
-            model = idol.imageUrl,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(55.dp)
-                .clip(CircleShape)
+        ExoProfileImage(
+            imageUrl = idol.imageUrl,
+            type = ProfileImageType.MEDIUM,
+            contentDescription = idol.title
         )
 
         Spacer(modifier = Modifier.width(9.dp))
 
-        Row(verticalAlignment = Alignment.Bottom) {
-            Text(
-                text = idol.title,
-                color = colorResource(R.color.text_default),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            if (idol.subtitle.isNotEmpty()) {
-                Spacer(modifier = Modifier.width(5.dp))
-                Text(
-                    text = idol.subtitle,
-                    color = colorResource(R.color.text_dimmed),
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+        // 이름_그룹명 형식으로 ExoNameWithGroup 사용
+        val fullName = if (idol.subtitle.isNotEmpty()) {
+            "${idol.title}_${idol.subtitle}"
+        } else {
+            idol.title
         }
+        ExoNameWithGroup(
+            fullName = fullName,
+            nameFontSize = 14.sp,
+            groupFontSize = 10.sp
+        )
     }
 }
 
@@ -743,6 +744,7 @@ private fun VotingOrFinishedContent(
     val heartPick = state.heartPick ?: return
     val idols = heartPick.heartPickIdols ?: emptyList()
     val isVoting = state.status == HeartPickDetailContract.HeartPickStatus.VOTING
+    val numberFormat = remember { NumberFormat.getNumberInstance(Locale.getDefault()) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -781,21 +783,42 @@ private fun VotingOrFinishedContent(
             }
 
             // 아이돌 순위 목록 - HeartPickDetailRankingItem 사용
-            items(idols, key = { it.id }) { idol ->
-                val index = idols.indexOf(idol)
+            itemsIndexed(idols, key = { _, idol -> idol.id }) { index, idol ->
                 val rankingItem = idol.toRankingItem(
-                    rank = index + 1,
+                    rank = idol.rank,  // RankingUtil에서 계산된 동점자 순위 사용
                     totalVote = heartPick.vote,
                     firstPlaceVote = heartPick.getFirstPlaceVote(),
                     isFavorite = state.myIdol?.idolId == idol.idolId
                 )
-                HeartPickDetailRankingItem(
-                    item = rankingItem,
-                    isFavorite = state.myIdol?.idolId == idol.idolId,
-                    showVoteButton = isVoting,
-                    onClick = { onIdolClick(idol.idolId) },
-                    onVoteClick = { onVoteClick(idol) }
-                )
+
+                // 2위, 3위에 툴팁 표시 (투표 종료가 아닐 때, 실제 순위 기준)
+                val showTooltipForItem = state.showTooltip &&
+                    state.status != HeartPickDetailContract.HeartPickStatus.VOTE_FINISHED &&
+                    (idol.rank == 2 || idol.rank == 3) &&
+                    idol.diffVote > 0
+
+                Box {
+                    HeartPickDetailRankingItem(
+                        item = rankingItem,
+                        isFavorite = state.myIdol?.idolId == idol.idolId,
+                        showVoteButton = isVoting,
+                        isFirstItem = index == 0,  // 첫번째 아이템 여부
+                        onClick = { onIdolClick(idol.idolId) },
+                        onVoteClick = { onVoteClick(idol) }
+                    )
+
+                    // 득표차 툴팁 (우측 상단)
+                    if (showTooltipForItem) {
+                        VoteDiffTooltip(
+                            rankDiff = idol.rank - 1,
+                            voteDiff = idol.diffVote,
+                            numberFormat = numberFormat,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(top = 4.dp, end = 10.dp)
+                        )
+                    }
+                }
             }
         }
 
@@ -820,6 +843,34 @@ private fun VotingOrFinishedContent(
 }
 
 /**
+ * 득표차 툴팁 (2위, 3위 아이템 위에 표시)
+ * old 프로젝트: item_heart_pick_rank.xml의 cl_tool_tip
+ */
+@Composable
+private fun VoteDiffTooltip(
+    rankDiff: Int,
+    voteDiff: Int,
+    numberFormat: NumberFormat,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = stringResource(
+            R.string.heartpick_tooltip_msg,
+            numberFormat.format(rankDiff),
+            numberFormat.format(voteDiff)
+        ),
+        color = Color.White,
+        fontSize = 10.sp,
+        modifier = modifier
+            .background(
+                color = Color(0xFF333333),
+                shape = RoundedCornerShape(8.dp)
+            )
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    )
+}
+
+/**
  * 결과 화면 배너
  */
 @Composable
@@ -832,7 +883,7 @@ private fun ResultBanner(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(140.dp)
+            .height(126.dp)
     ) {
         // 배너 이미지
         AsyncImage(
@@ -858,30 +909,30 @@ private fun ResultBanner(
         )
 
         // 상태 뱃지 (투표 종료 / D-Day)
-        Box(
+        Row(
             modifier = Modifier
                 .padding(start = 16.dp, top = 16.dp)
+                .height(20.dp)
                 .background(
                     color = Color(0xE6202020),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(10.dp)
                 )
-                .padding(horizontal = 10.dp, vertical = 6.dp)
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(R.drawable.icon_heartpick_timer),
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(12.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = dDayText,
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
+            Icon(
+                painter = painterResource(R.drawable.icon_heartpick_timer),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(11.dp)
+            )
+            Spacer(modifier = Modifier.width(3.dp))
+            Text(
+                text = dDayText,
+                color = Color.White,
+                fontSize = 12.sp,
+                lineHeight = 20.sp
+            )
         }
 
         // 제목 + 부제목 (하단)
@@ -893,12 +944,11 @@ private fun ResultBanner(
             Text(
                 text = title,
                 color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
+                fontSize = 19.sp,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = subtitle,
                 color = Color(0xCCFFFFFF),
@@ -980,7 +1030,7 @@ private fun ResultInfoSection(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
                     ) { onCommentClick() }
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                    .padding(horizontal = 7.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(

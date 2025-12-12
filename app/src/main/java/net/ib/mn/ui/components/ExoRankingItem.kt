@@ -1207,7 +1207,8 @@ fun HeartPickRankingItem(
         // 순위 번호 (왼쪽 큰 숫자)
         Text(
             text = "${item.rank}",
-            style = ExoTypo.title20,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier.width(24.dp)
         )
 
@@ -1229,7 +1230,8 @@ fun HeartPickRankingItem(
             ExoNameWithGroup(
                 fullName = item.name,
                 nameFontSize = 15.sp,
-                groupFontSize = 10.sp
+                groupFontSize = 10.sp,
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -1250,7 +1252,7 @@ fun HeartPickRankingItem(
                         val voteRoot = kotlin.math.sqrt(kotlin.math.sqrt(item.heartCount.toDouble()))
                         val maxRoot = kotlin.math.sqrt(kotlin.math.sqrt(item.maxHeartCount.toDouble()))
                         val p = 20 + (voteRoot * 60 / maxRoot)
-                        (p / 100f).toFloat().coerceIn(0.2f, 0.8f)
+                        (p / 100f).toFloat().coerceIn(0.2f, 0.7f)
                     }
                 }
 
@@ -1344,11 +1346,12 @@ fun HeartPickDetailRankingItem(
     item: RankingItem,
     isFavorite: Boolean = item.isFavorite,
     showVoteButton: Boolean = false,
+    isFirstItem: Boolean = false,  // 리스트의 첫번째 아이템인지 여부
     onClick: () -> Unit = {},
     onVoteClick: () -> Unit = {}
 ) {
-    if (item.rank == 1) {
-        // 1위 전용 레이아웃 (old: item_heart_pick_1st.xml)
+    // 1위 전용 레이아웃: 순위가 1위이면서 첫번째 아이템인 경우만
+    if (item.rank == 1 && isFirstItem) {
         HeartPickDetail1stRankingItem(
             item = item,
             isFavorite = isFavorite,
@@ -1357,7 +1360,7 @@ fun HeartPickDetailRankingItem(
             onVoteClick = onVoteClick
         )
     } else {
-        // 2위 이하 레이아웃
+        // 2위 이하 또는 동점 1위 (첫번째 아이템이 아닌 경우)
         HeartPickDetailOtherRankingItem(
             item = item,
             isFavorite = isFavorite,
@@ -1399,7 +1402,7 @@ private fun HeartPickDetail1stRankingItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(backgroundColor)
-                .padding(vertical = 12.dp)
+                .padding(vertical = 8.dp)
         ) {
             // 레이아웃 수치 계산
             val startPadding = 16.dp
@@ -1634,7 +1637,8 @@ private fun HeartPickDetailOtherRankingItem(
             ExoNameWithGroup(
                 fullName = item.name,
                 nameFontSize = 15.sp,
-                groupFontSize = 10.sp
+                groupFontSize = 10.sp,
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(4.dp))

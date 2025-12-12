@@ -57,7 +57,13 @@ fun ExoHeartCounter(
     }
 
     // 현재 표시할 값 (애니메이션 중인 값)
-    val displayValue = animatedCount.value.toLong()
+    // Float 부동소수점 오차로 인해 99.9999가 100으로 반올림되는 문제 방지
+    // 애니메이션 완료 후에는 정확한 count 값 사용
+    val displayValue = if (animatedCount.value >= count.toFloat()) {
+        count
+    } else {
+        animatedCount.value.toLong()
+    }
 
     // 포맷팅
     val formattedText = if (formatWithComma) {

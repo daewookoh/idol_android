@@ -40,6 +40,7 @@ class HeartPickDetailContract {
         val myIdolPosition: Int = -1,
         val isNotifyEnabled: Boolean = false,
         val isRewardExpanded: Boolean = false,
+        val showTooltip: Boolean = true,   // 2,3위 득표차 툴팁 표시 여부
         val isLoading: Boolean = true,
         val error: String? = null
     ) : UiState
@@ -77,6 +78,9 @@ class HeartPickDetailContract {
 
         /** 댓글 수 감소 (댓글 삭제 시) */
         data object DecrementCommentCount : Intent()
+
+        /** 특정 아이돌의 투표수 업데이트 (투표 성공 시 실시간 반영) */
+        data class UpdateIdolVote(val idolId: Int, val addedVote: Int) : Intent()
     }
 
     /**

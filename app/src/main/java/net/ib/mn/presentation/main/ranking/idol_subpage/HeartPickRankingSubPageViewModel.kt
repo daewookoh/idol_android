@@ -9,15 +9,21 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.Calendar
 import java.util.Locale
+import java.util.TimeZone
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.ib.mn.R
 import net.ib.mn.domain.model.ApiResult
+import net.ib.mn.domain.model.HeartPickIdol
 import net.ib.mn.domain.model.HeartPickModel
 import net.ib.mn.domain.repository.HeartpickRepository
 import net.ib.mn.ui.components.HeartPickState
@@ -25,6 +31,7 @@ import net.ib.mn.ui.components.IdolRankInfo
 import net.ib.mn.util.IdolImageUtil
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
 import net.ib.mn.util.NumberFormatUtil
+import net.ib.mn.util.RankingUtil
 
 /**
  * HeartPick 랭킹 ViewModel
@@ -49,6 +56,9 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+
     private var cachedData: List<HeartPickCardData>? = null
 
     init {
@@ -63,19 +73,33 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
         }
     }
 
+    fun refresh() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isRefreshing.value = true
+            heartpickRepository.getHeartPickList(offset = 0, limit = 100).collect { result ->
+                when (result) {
+                    is ApiResult.Loading -> Unit
+                    is ApiResult.Success -> {
+                        processHeartPickData(result.data)
+                        _isRefreshing.value = false
+                    }
+                    is ApiResult.Error -> {
+                        _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
+                        _isRefreshing.value = false
+                    }
+                }
+            }
+        }
+    }
+
     private fun loadHeartPickList() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = UiState.Loading
 
-
-            // heartpick/ API 호출
             heartpickRepository.getHeartPickList(offset = 0, limit = 100).collect { result ->
                 when (result) {
-                    is ApiResult.Loading -> {
-                    }
-                    is ApiResult.Success -> {
-                        processHeartPickData(result.data)
-                    }
+                    is ApiResult.Loading -> Unit
+                    is ApiResult.Success -> processHeartPickData(result.data)
                     is ApiResult.Error -> {
                         _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
                     }
@@ -97,35 +121,32 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
 
                 val totalVote = heartPick.vote
 
-                val firstPlaceIdol = if (state != HeartPickState.UPCOMING && heartPick.heartPickIdols?.isNotEmpty() == true) {
-                    val first = heartPick.heartPickIdols[0]
-                    val percentage = if (totalVote > 0) {
-                        (100.0f * first.vote.toFloat() / totalVote.toFloat()).roundToInt()
-                    } else 0
+                // RankingUtil을 사용하여 정렬 및 순위 계산
+                val sortedIdols = heartPick.heartPickIdols?.let {
+                    RankingUtil.sortAndRankHeartPickIdols(it)
+                }
 
-                    IdolRankInfo(
-                        name = first.title,
-                        groupName = first.subtitle,
-                        photoUrl = first.imageUrl.toSecureUrl(),
-                        voteCount = NumberFormatUtil.formatWithComma(first.vote),
-                        percentage = percentage
+                fun HeartPickIdol.toIdolRankInfo(): IdolRankInfo {
+                    val percentage = if (totalVote > 0) {
+                        (100.0f * vote.toFloat() / totalVote.toFloat()).roundToInt()
+                    } else 0
+                    return IdolRankInfo(
+                        name = title,
+                        groupName = subtitle,
+                        photoUrl = imageUrl.toSecureUrl(),
+                        voteCount = context.getString(R.string.vote_count_format, NumberFormatUtil.formatWithComma(vote)),
+                        voteCountRaw = vote.toLong(),
+                        percentage = percentage,
+                        rank = rank  // RankingUtil에서 계산된 동점자 순위
                     )
+                }
+
+                val firstPlaceIdol = if (state != HeartPickState.UPCOMING && sortedIdols?.isNotEmpty() == true) {
+                    sortedIdols[0].toIdolRankInfo()
                 } else null
 
-                val otherIdols = if (state != HeartPickState.UPCOMING && heartPick.heartPickIdols != null && heartPick.heartPickIdols.size > 1) {
-                    heartPick.heartPickIdols.drop(1).take(10).map { idol ->
-                        val percentage = if (totalVote > 0) {
-                            (100.0f * idol.vote.toFloat() / totalVote.toFloat()).roundToInt()
-                        } else 0
-
-                        IdolRankInfo(
-                            name = idol.title,
-                            groupName = idol.subtitle,
-                            photoUrl = idol.imageUrl.toSecureUrl(),
-                            voteCount = NumberFormatUtil.formatWithComma(idol.vote),
-                            percentage = percentage
-                        )
-                    }
+                val otherIdols = if (state != HeartPickState.UPCOMING && sortedIdols != null && sortedIdols.size > 1) {
+                    sortedIdols.drop(1).take(10).map { it.toIdolRankInfo() }
                 } else emptyList()
 
                 // 상태에 따라 날짜 형식 다르게 처리
@@ -145,7 +166,7 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
                 val localizedBannerUrl = IdolImageUtil.getLocalizedBannerUrl(context, heartPick.bannerUrl)
                 val secureUrl = localizedBannerUrl.toSecureUrl()
 
-                val cardData = HeartPickCardData(
+                HeartPickCardData(
                     id = heartPick.id,
                     state = state,
                     title = heartPick.title,
@@ -159,12 +180,9 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
                     periodDate = periodDate,
                     openDate = openDate,
                     openPeriod = openPeriod,
-                    isNew = false  // TODO: 신규 판별 로직 추가
+                    isNew = false
                 )
-
-                cardData
             }
-
 
             cachedData = cardDataList
 
@@ -209,24 +227,25 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
 
     private fun calculateOpenDate(beginAt: String): String {
         return try {
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            val now = Calendar.getInstance().time
+            // Old 프로젝트와 동일하게 사용자 타임존 기준으로 계산
+            val userZoneId = TimeZone.getDefault().toZoneId()
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).apply {
+                timeZone = TimeZone.getTimeZone("UTC")
+            }
+
             val beginDate = dateFormat.parse(beginAt)
 
             if (beginDate != null) {
-                val diff = beginDate.time - now.time
-                val days = diff / (1000 * 60 * 60 * 24)
+                val nowUserZone = ZonedDateTime.now(userZoneId).toLocalDate().atStartOfDay(userZoneId)
+                val beginUserZone = Instant.ofEpochMilli(beginDate.time).atZone(userZoneId).toLocalDate().atStartOfDay(userZoneId)
+                val diffInDays = ChronoUnit.DAYS.between(nowUserZone.toLocalDate(), beginUserZone.toLocalDate())
 
-                if (days > 0) {
-                    "Vote Open D-$days"
-                } else {
-                    "Vote Open"
-                }
+                context.getString(net.ib.mn.R.string.vote_dday, diffInDays.toString())
             } else {
-                "Vote Open"
+                context.getString(net.ib.mn.R.string.vote_dday, "0")
             }
         } catch (e: Exception) {
-            "Vote Open"
+            context.getString(net.ib.mn.R.string.vote_dday, "0")
         }
     }
 

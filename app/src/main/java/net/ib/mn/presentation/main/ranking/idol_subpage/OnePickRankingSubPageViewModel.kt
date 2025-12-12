@@ -66,6 +66,9 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+
     private var cachedThemePickData: List<ThemePickCardData>? = null
     private var cachedImagePickData: List<ImagePickCardData>? = null
 
@@ -130,12 +133,52 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
     }
 
     /**
+     * Pull to Refresh
+     */
+    fun refresh() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isRefreshing.value = true
+            when (currentTab) {
+                TabType.THEME_PICK -> {
+                    themepickRepository.getThemePickList(offset = 0, limit = 30).collect { result ->
+                        when (result) {
+                            is ApiResult.Loading -> Unit
+                            is ApiResult.Success -> {
+                                processThemePickData(result.data)
+                                _isRefreshing.value = false
+                            }
+                            is ApiResult.Error -> {
+                                _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
+                                _isRefreshing.value = false
+                            }
+                        }
+                    }
+                }
+                TabType.IMAGE_PICK -> {
+                    onepickRepository.getImagePickList(offset = 0, limit = 30).collect { result ->
+                        when (result) {
+                            is ApiResult.Loading -> Unit
+                            is ApiResult.Success -> {
+                                processImagePickData(result.data)
+                                _isRefreshing.value = false
+                            }
+                            is ApiResult.Error -> {
+                                _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
+                                _isRefreshing.value = false
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * 테마픽 목록 로드
      */
     private fun loadThemePickList() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = UiState.Loading
-
 
             themepickRepository.getThemePickList(offset = 0, limit = 30).collect { result ->
                 when (result) {

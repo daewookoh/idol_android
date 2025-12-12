@@ -17,6 +17,7 @@ import net.ib.mn.domain.model.HeartPickIdol
 import net.ib.mn.domain.model.HeartPickModel
 import net.ib.mn.domain.repository.HeartpickRepository
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
+import net.ib.mn.util.RankingUtil
 import net.ib.mn.util.link.LinkUtil
 import net.ib.mn.util.logE
 import java.text.SimpleDateFormat
@@ -42,6 +43,7 @@ class HeartPickDetailViewModel @Inject constructor(
 ) : BaseViewModel<HeartPickDetailContract.State, HeartPickDetailContract.Intent, HeartPickDetailContract.Effect>() {
 
     private var timerJob: Job? = null
+    private var tooltipTimerJob: Job? = null
     private var currentHeartPickId: Int = 0
 
     override fun createInitialState(): HeartPickDetailContract.State = HeartPickDetailContract.State()
@@ -58,6 +60,7 @@ class HeartPickDetailViewModel @Inject constructor(
             is HeartPickDetailContract.Intent.UpdateCommentCount -> updateCommentCount(intent.newCount)
             is HeartPickDetailContract.Intent.IncrementCommentCount -> incrementCommentCount()
             is HeartPickDetailContract.Intent.DecrementCommentCount -> decrementCommentCount()
+            is HeartPickDetailContract.Intent.UpdateIdolVote -> updateIdolVote(intent.idolId, intent.addedVote)
         }
     }
 
@@ -81,29 +84,31 @@ class HeartPickDetailViewModel @Inject constructor(
                         }
 
                         // 순위 및 득표차 계산 (투표중/종료 상태일 때만)
-                        if (status != HeartPickDetailContract.HeartPickStatus.PRELAUNCH) {
-                            calculateRankAndDiff(heartPick)
+                        val processedHeartPick = if (status != HeartPickDetailContract.HeartPickStatus.PRELAUNCH) {
+                            RankingUtil.sortAndRankHeartPickModel(heartPick)
+                        } else {
+                            heartPick
                         }
 
                         // D-Day/기간 계산
-                        val dDayText = calculateDDayText(heartPick, status)
-                        val periodText = calculatePeriodText(heartPick)
+                        val dDayText = calculateDDayText(processedHeartPick, status)
+                        val periodText = calculatePeriodText(processedHeartPick)
 
                         // 배너 URL에 secureUrl 적용
-                        val secureBannerUrl = heartPick.bannerUrl.toSecureUrl()
+                        val secureBannerUrl = processedHeartPick.bannerUrl.toSecureUrl()
 
                         // 나의 최애 아이돌 찾기
                         val mostIdolId = preferencesManager.getMostIdolId()
-                        val myIdol = heartPick.heartPickIdols?.find { it.idolId == mostIdolId }
+                        val myIdol = processedHeartPick.heartPickIdols?.find { it.idolId == mostIdolId }
                         val myIdolPosition = if (myIdol != null) {
-                            heartPick.heartPickIdols?.indexOf(myIdol) ?: -1
+                            processedHeartPick.heartPickIdols?.indexOf(myIdol) ?: -1
                         } else {
                             -1
                         }
 
                         setState {
                             copy(
-                                heartPick = heartPick,
+                                heartPick = processedHeartPick,
                                 status = status,
                                 dDayText = dDayText,
                                 periodText = periodText,
@@ -116,12 +121,17 @@ class HeartPickDetailViewModel @Inject constructor(
 
                         // 카운트다운 타이머 시작 (투표중 상태일 때만)
                         if (status == HeartPickDetailContract.HeartPickStatus.VOTING) {
-                            startCountdownIfNeeded(heartPick)
+                            startCountdownIfNeeded(processedHeartPick)
                         }
 
                         // 알림 설정 조회 (예정 상태일 때만)
                         if (status == HeartPickDetailContract.HeartPickStatus.PRELAUNCH) {
                             loadNotificationSetting(heartPickId)
+                        }
+
+                        // 툴팁 타이머 시작 (투표중/종료 상태일 때, 3초 후 숨김)
+                        if (status != HeartPickDetailContract.HeartPickStatus.PRELAUNCH) {
+                            startTooltipTimer()
                         }
                     }
                     is ApiResult.Error -> {
@@ -141,38 +151,20 @@ class HeartPickDetailViewModel @Inject constructor(
     }
 
     private fun loadNotificationSetting(heartPickId: Int) {
-        // TODO: Repository에 getAlarmSetting 메소드 추가 필요
-        // 현재는 기본값 false 유지
-    }
-
-    /**
-     * 순위 및 득표차 계산
-     */
-    private fun calculateRankAndDiff(heartPick: HeartPickModel) {
-        val idols = heartPick.heartPickIdols ?: return
-        if (idols.size <= 1) {
-            idols.firstOrNull()?.apply {
-                rank = 1
-                diffVote = 0
-            }
-            return
-        }
-
-        var currentRank = 1
-        var previousVote = idols.firstOrNull()?.vote ?: 0
-        var difference = 0
-
-        for (index in idols.indices) {
-            val idol = idols[index]
-            if (idol.vote == previousVote) {
-                idol.rank = currentRank
-                idol.diffVote = difference
-            } else {
-                currentRank = index + 1
-                idol.rank = currentRank
-                difference = previousVote - idol.vote
-                idol.diffVote = difference
-                previousVote = idol.vote
+        viewModelScope.launch {
+            heartpickRepository.getOpenHeartPickNotification(heartPickId).collect { result ->
+                when (result) {
+                    is ApiResult.Success -> {
+                        setState { copy(isNotifyEnabled = result.data) }
+                    }
+                    is ApiResult.Error -> {
+                        // 에러 시 기본값 false 유지
+                        logE("HeartPickDetailVM", "Failed to load notification setting: ${result.message}")
+                    }
+                    is ApiResult.Loading -> {
+                        // 로딩 중
+                    }
+                }
             }
         }
     }
@@ -282,18 +274,32 @@ class HeartPickDetailViewModel @Inject constructor(
     }
 
     /**
-     * old 프로젝트 HeartPickViewModel.shareHeartPick() 과 동일한 포맷
+     * 툴팁 타이머 시작 (3초 후 숨김)
+     * old 프로젝트: HeartPickActivity.onTimer()
+     */
+    private fun startTooltipTimer() {
+        tooltipTimerJob?.cancel()
+        tooltipTimerJob = viewModelScope.launch {
+            delay(3000)
+            setState { copy(showTooltip = false) }
+        }
+    }
+
+    /**
+     * 하트픽 공유하기
      *
-     * 포맷: 💖나의 최애픽! 하트픽💖
-     *       {제목}
-     *       [#{앱이름} #하트픽 순위]
+     * - PRELAUNCH (개설 예정): old HeartPickPrelaunchActivity.shareHeartPick()과 동일
+     *   포맷: R.string.share_heartpick_upcoming
+     *   💖하트로 사랑을 보내는 하트픽 예고💖
+     *   [{title}]
+     *   🎁[{prizeName}]
+     *   과연 1위를 차지할 주인공은 누구? 👀
      *
-     *       1위 {이름}_{그룹}
-     *       2위 {이름}_{그룹}
-     *       3위 {이름}_{그룹}
+     *   📌 지금 바로 {mostName} {groupName} 응원 준비하기
+     *   🔗{url}
      *
-     *       내 최애에게 특별한 선물하러 가기💖
-     *       {딥링크}
+     * - VOTING/VOTE_FINISHED: old HeartPickViewModel.shareHeartPick()과 동일
+     *   포맷: 💖나의 최애픽! 하트픽💖 ...
      */
     private fun shareHeartPick() {
         val heartPick = currentState.heartPick ?: return
@@ -301,40 +307,91 @@ class HeartPickDetailViewModel @Inject constructor(
 
         if (idols.isNullOrEmpty()) return
 
-        val appName = context.getString(R.string.app_name)
-
-        // 순위별 이름 구성 (이름_그룹 형식)
-        val top1Name = idols.getOrNull(0)?.let { formatIdolName(it.title, it.subtitle) } ?: ""
-        val top2Name = idols.getOrNull(1)?.let { formatIdolName(it.title, it.subtitle) } ?: ""
-        val top3Name = idols.getOrNull(2)?.let { formatIdolName(it.title, it.subtitle) } ?: ""
-
-        // 순위 텍스트 (1위, 2위, 3위)
-        val rank1 = if (top1Name.isNotEmpty()) "1위" else ""
-        val rank2 = if (top2Name.isNotEmpty()) "2위" else ""
-        val rank3 = if (top3Name.isNotEmpty()) "3위" else ""
-
-        // 딥링크 URL 생성 (old: LinkStatus.HEARTPICK.status = "heartpick")
+        // 딥링크 URL 생성
         val url = LinkUtil.getAppLinkUrl(
             context = context,
             params = listOf("heartpick", heartPick.id.toString())
         )
 
-        // 공유 메시지 구성
-        val shareText = buildString {
-            append("💖나의 최애픽! 하트픽💖\n")
-            append(heartPick.title)
-            append("\n")
-            append("[#$appName #하트픽 순위]\n\n")
-
-            if (rank1.isNotEmpty()) append("$rank1 $top1Name\n")
-            if (rank2.isNotEmpty()) append("$rank2 $top2Name\n")
-            if (rank3.isNotEmpty()) append("$rank3 $top3Name\n")
-
-            append("\n내 최애에게 특별한 선물하러 가기💖\n")
-            append(url)
-        }.trim()
+        val shareText = if (currentState.status == HeartPickDetailContract.HeartPickStatus.PRELAUNCH) {
+            // 개설 예정 공유 포맷 (old HeartPickPrelaunchActivity와 동일)
+            shareHeartPickPrelaunch(heartPick, url)
+        } else {
+            // 투표중/종료 공유 포맷 (old HeartPickViewModel과 동일)
+            shareHeartPickVoting(heartPick, url)
+        }
 
         setEffect { HeartPickDetailContract.Effect.ShareHeartPick(shareText) }
+    }
+
+    /**
+     * 개설 예정 공유 포맷 (old HeartPickPrelaunchActivity.shareHeartPick()과 동일)
+     */
+    private fun shareHeartPickPrelaunch(heartPick: HeartPickModel, url: String): String {
+        // myIdol은 이미 loadHeartPick()에서 state에 저장되어 있음
+        val existMost = currentState.myIdol
+        val mostText = existMost?.title
+            ?: context.getString(R.string.share_onepick_upcoming_nobias)
+        val groupText = existMost?.subtitle.orEmpty()
+
+        // prize 이름이 null이면 빈 문자열
+        val prizeName = heartPick.prize?.name.orEmpty()
+
+        return context.getString(
+            R.string.share_heartpick_upcoming,
+            heartPick.title,
+            prizeName,
+            mostText,
+            groupText,
+            url
+        ).trimNewlineWhiteSpace()
+    }
+
+    /**
+     * 투표중/종료 공유 포맷 (old HeartPickViewModel.shareHeartPick()과 동일)
+     *
+     * R.string.heartpick_share_msg 사용:
+     * 💖My Pick! Heart Pick💖
+     * %s (title)
+     * [#%s (appName) #HeartPick Ranking]
+     *
+     * %s (rank1) %s (name1)
+     * %s (rank2) %s (name2)
+     * %s (rank3) %s (name3)
+     *
+     * Give a special gift to your bias💖
+     */
+    private fun shareHeartPickVoting(heartPick: HeartPickModel, url: String): String {
+        val idols = heartPick.heartPickIdols ?: return ""
+        val appName = context.getString(R.string.app_name)
+
+        // 순위별 이름 구성 (이름_그룹 형식)
+        val top1Name = idols.getOrNull(0)?.let { formatIdolName(it.title, it.subtitle) }.orEmpty()
+        val top2Name = idols.getOrNull(1)?.let { formatIdolName(it.title, it.subtitle) }.orEmpty()
+        val top3Name = idols.getOrNull(2)?.let { formatIdolName(it.title, it.subtitle) }.orEmpty()
+
+        // 순위 텍스트 (rank_format: "%s위" / "%s")
+        val rank1 = if (top1Name.isNotEmpty()) context.getString(R.string.rank_format, "1") else ""
+        val rank2 = if (top2Name.isNotEmpty()) context.getString(R.string.rank_format, "2") else ""
+        val rank3 = if (top3Name.isNotEmpty()) context.getString(R.string.rank_format, "3") else ""
+
+        val msg = context.getString(
+            R.string.heartpick_share_msg,
+            heartPick.title,
+            appName,
+            rank1, top1Name,
+            rank2, top2Name,
+            rank3, top3Name
+        )
+
+        return (msg + url).trimNewlineWhiteSpace()
+    }
+
+    /**
+     * 연속된 줄바꿈과 공백 정리
+     */
+    private fun String.trimNewlineWhiteSpace(): String {
+        return this.replace(Regex("\\n\\s*\\n\\s*\\n+"), "\n\n").trim()
     }
 
     /**
@@ -367,10 +424,28 @@ class HeartPickDetailViewModel @Inject constructor(
     private fun toggleNotification() {
         if (currentState.isNotifyEnabled) return
 
-        // TODO: Repository에 postAlarmSetting 메소드 추가 필요
-        // 현재는 로컬 상태만 변경
-        setState { copy(isNotifyEnabled = true) }
-        setEffect { HeartPickDetailContract.Effect.ShowNotifyEnabledToast }
+        val heartPickId = currentState.heartPick?.id ?: return
+
+        viewModelScope.launch {
+            heartpickRepository.postOpenHeartPickNotification(heartPickId).collect { result ->
+                when (result) {
+                    is ApiResult.Success -> {
+                        setState { copy(isNotifyEnabled = true) }
+                        setEffect { HeartPickDetailContract.Effect.ShowNotifyEnabledToast }
+                    }
+                    is ApiResult.Error -> {
+                        setEffect {
+                            HeartPickDetailContract.Effect.ShowToast(
+                                result.message ?: context.getString(R.string.desc_failed_to_connect_internet)
+                            )
+                        }
+                    }
+                    is ApiResult.Loading -> {
+                        // 로딩 중
+                    }
+                }
+            }
+        }
     }
 
     private fun toggleRewardExpand() {
@@ -406,8 +481,56 @@ class HeartPickDetailViewModel @Inject constructor(
         setState { copy(heartPick = updatedHeartPick) }
     }
 
+    /**
+     * 특정 아이돌의 투표수 업데이트 (투표 성공 시 실시간 반영)
+     *
+     * DB 데이터를 건드리지 않고 UI에서만 투표수를 업데이트합니다.
+     *
+     * @param idolId 아이돌 ID
+     * @param addedVote 추가된 투표수
+     */
+    private fun updateIdolVote(idolId: Int, addedVote: Int) {
+        val currentHeartPick = currentState.heartPick ?: return
+        val currentIdols = currentHeartPick.heartPickIdols ?: return
+
+        // 해당 아이돌의 투표수 업데이트
+        val updatedIdols = ArrayList(currentIdols.map { idol ->
+            if (idol.idolId == idolId) {
+                idol.copy(vote = idol.vote + addedVote)
+            } else {
+                idol
+            }
+        })
+
+        // RankingUtil을 사용하여 정렬 및 순위 계산
+        val updatedHeartPick = RankingUtil.sortAndRankHeartPickModel(
+            currentHeartPick.copy(
+                heartPickIdols = updatedIdols,
+                vote = currentHeartPick.vote + addedVote
+            )
+        )
+
+        // 나의 최애 아이돌 위치 재계산
+        val sortedIdols = updatedHeartPick.heartPickIdols
+        val myIdol = sortedIdols?.find { it.idolId == currentState.myIdol?.idolId }
+        val myIdolPosition = if (myIdol != null) {
+            sortedIdols?.indexOf(myIdol) ?: -1
+        } else {
+            -1
+        }
+
+        setState {
+            copy(
+                heartPick = updatedHeartPick,
+                myIdol = myIdol,
+                myIdolPosition = myIdolPosition
+            )
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         timerJob?.cancel()
+        tooltipTimerJob?.cancel()
     }
 }

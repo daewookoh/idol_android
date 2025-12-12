@@ -2,9 +2,12 @@ package net.ib.mn.data.remote.api
 
 import net.ib.mn.data.remote.dto.HeartPickListResponse
 import net.ib.mn.data.remote.dto.HeartPickResponse
+import net.ib.mn.data.remote.dto.HeartPickVoteDTO
+import net.ib.mn.data.remote.dto.OpenNotificationDTO
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -80,5 +83,40 @@ interface HeartpickApi {
         @Part content: MultipartBody.Part,
         @Part image_url: MultipartBody.Part? = null,
         @Part image: MultipartBody.Part? = null
+    ): Response<ResponseBody>
+
+    /**
+     * 하트픽 오픈 알림 설정 조회
+     *
+     * @param heartPickId 하트픽 ID
+     * @return Response<ResponseBody> - objects: List<Int> (알림 설정된 하트픽 ID 목록)
+     */
+    @GET("heartpick/alarm/")
+    suspend fun getOpenHeartPickNotification(
+        @Query("id") heartPickId: Int
+    ): Response<ResponseBody>
+
+    /**
+     * 하트픽 오픈 알림 설정
+     *
+     * @param body OpenNotificationDTO (id: 하트픽 ID)
+     * @return Response<ResponseBody>
+     */
+    @POST("heartpick/alarm/")
+    suspend fun postOpenHeartPickNotification(
+        @Body body: OpenNotificationDTO
+    ): Response<ResponseBody>
+
+    /**
+     * 하트픽 투표
+     *
+     * old 프로젝트: HeartpickApi.vote()
+     *
+     * @param body HeartPickVoteDTO (heartpick_id, heartpick_idol_id, number)
+     * @return Response<ResponseBody> - bonus_heart, voted
+     */
+    @POST("heartpick/vote/")
+    suspend fun voteHeartPick(
+        @Body body: HeartPickVoteDTO
     ): Response<ResponseBody>
 }

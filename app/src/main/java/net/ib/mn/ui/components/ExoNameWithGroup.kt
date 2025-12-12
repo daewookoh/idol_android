@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +42,7 @@ import net.ib.mn.ui.theme.ColorPalette
  * @param nameFontWeight 이름 폰트 굵기 (기본값: FontWeight.Bold)
  * @param spacing 이름과 그룹명 사이 간격 (기본값: 5.dp)
  * @param textAlign 텍스트 정렬 (기본값: TextAlign.Start)
+ * @param singleLine true이면 한 줄로 표시하고 그룹명이 넘치면 ellipsis 처리 (기본값: false)
  */
 @Composable
 fun ExoNameWithGroup(
@@ -52,7 +54,8 @@ fun ExoNameWithGroup(
     groupColor: Int = R.color.text_dimmed,
     nameFontWeight: FontWeight = FontWeight.Bold,
     spacing: androidx.compose.ui.unit.Dp = 5.dp,
-    textAlign: TextAlign = TextAlign.Start
+    textAlign: TextAlign = TextAlign.Start,
+    singleLine: Boolean = false
 ) {
     // "_"로 분리
     val parts = fullName.split("_", limit = 2)
@@ -70,7 +73,9 @@ fun ExoNameWithGroup(
             lineHeight = nameFontSize,
             fontWeight = nameFontWeight,
             color = colorResource(nameColor),
-            textAlign = textAlign
+            textAlign = textAlign,
+            maxLines = if (singleLine) 1 else Int.MAX_VALUE,
+            overflow = if (singleLine) TextOverflow.Ellipsis else TextOverflow.Clip
         )
 
         // 그룹명 (있는 경우만 표시, old: marginBottom=1dp, gravity=bottom)
@@ -83,7 +88,11 @@ fun ExoNameWithGroup(
                 fontWeight = FontWeight.Bold,
                 color = colorResource(groupColor),
                 textAlign = textAlign,
-                modifier = Modifier.padding(bottom = 1.dp)
+                modifier = Modifier
+                    .padding(bottom = 1.dp)
+                    .then(if (singleLine) Modifier.weight(1f, fill = false) else Modifier),
+                maxLines = if (singleLine) 1 else Int.MAX_VALUE,
+                overflow = if (singleLine) TextOverflow.Ellipsis else TextOverflow.Clip
             )
         }
     }

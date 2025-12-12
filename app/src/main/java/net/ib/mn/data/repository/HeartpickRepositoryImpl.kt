@@ -4,6 +4,9 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
 import net.ib.mn.data.remote.api.HeartpickApi
+import net.ib.mn.data.remote.dto.HeartPickVoteDTO
+import net.ib.mn.data.remote.dto.HeartPickVoteResponse
+import net.ib.mn.data.remote.dto.OpenNotificationDTO
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.CommentModel
 import net.ib.mn.domain.model.HeartPickCommentsResponse
@@ -71,6 +74,35 @@ class HeartpickRepositoryImpl @Inject constructor(
         parser = { true }
     )
 
+    override fun getOpenHeartPickNotification(heartPickId: Int): Flow<ApiResult<Boolean>> =
+        safeApiCallWithJsonString(
+            apiCall = { heartpickApi.getOpenHeartPickNotification(heartPickId) },
+            parser = { json -> parseNotificationResponse(json, heartPickId) }
+        )
+
+    override fun postOpenHeartPickNotification(heartPickId: Int): Flow<ApiResult<Boolean>> =
+        safeApiCallWithJsonString(
+            apiCall = { heartpickApi.postOpenHeartPickNotification(OpenNotificationDTO(heartPickId)) },
+            parser = { true }
+        )
+
+    override fun voteHeartPick(
+        heartPickId: Int,
+        heartPickIdolId: Int,
+        number: Long
+    ): Flow<ApiResult<HeartPickVoteResponse>> = safeApiCallWithJsonString(
+        apiCall = {
+            heartpickApi.voteHeartPick(
+                HeartPickVoteDTO(
+                    heartpickId = heartPickId,
+                    heartpickIdolId = heartPickIdolId,
+                    number = number
+                )
+            )
+        },
+        parser = { json -> parseHeartPickVoteResponse(json) }
+    )
+
     // ============================================================
     // Private Helpers
     // ============================================================
@@ -82,7 +114,6 @@ class HeartpickRepositoryImpl @Inject constructor(
             val listType = object : TypeToken<List<CommentModel>>() {}.type
             val comments: List<CommentModel> = gson.fromJson(objectsArray.toString(), listType)
 
-            // 커서 기반 페이지네이션 처리 (old 프로젝트와 동일)
             val meta = jsonObject.optJSONObject("meta")
             var nextCursor: String? = meta?.optString("next_cursor", "")
             if (nextCursor.isNullOrEmpty() || nextCursor == "null") nextCursor = null
@@ -97,7 +128,34 @@ class HeartpickRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun createPart(name: String, value: String): MultipartBody.Part {
-        return MultipartBody.Part.createFormData(name, value)
+    private fun parseNotificationResponse(json: String, heartPickId: Int): Boolean {
+        return try {
+            val jsonObject = JSONObject(json)
+            val objectsArray = jsonObject.optJSONArray("objects")
+            if (objectsArray != null) {
+                val listType = object : TypeToken<List<Int>>() {}.type
+                val ids: List<Int> = gson.fromJson(objectsArray.toString(), listType)
+                ids.contains(heartPickId)
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            false
+        }
     }
+
+    private fun parseHeartPickVoteResponse(json: String): HeartPickVoteResponse {
+        return try {
+            val jsonObject = JSONObject(json)
+            HeartPickVoteResponse(
+                bonusHeart = jsonObject.optInt("bonus_heart", 0),
+                voted = jsonObject.optLong("voted", 0)
+            )
+        } catch (e: Exception) {
+            HeartPickVoteResponse()
+        }
+    }
+
+    private fun createPart(name: String, value: String): MultipartBody.Part =
+        MultipartBody.Part.createFormData(name, value)
 }
