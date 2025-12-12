@@ -62,6 +62,10 @@ import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.main.freeboard.FreeBoardViewModel
 import net.ib.mn.presentation.overlay.friendinvite.FriendInviteScreen
 import net.ib.mn.presentation.overlay.heartpick.HeartPickDetailScreen
+import net.ib.mn.presentation.overlay.themepick.ThemePickDetailScreen
+import net.ib.mn.presentation.overlay.themepick.result.ThemePickResultScreen
+import net.ib.mn.ui.components.LocalThemePickDetailClick
+import net.ib.mn.ui.components.LocalThemePickResultClick
 
 /**
  * 메인 화면.
@@ -117,6 +121,10 @@ fun MainScreen(
     // HeartPickDetailScreen 오버레이 상태
     var selectedHeartPickId by remember { mutableStateOf<Int?>(null) }
 
+    // ThemePickDetailScreen / ThemePickResultScreen 오버레이 상태
+    var selectedThemePickId by remember { mutableStateOf<Int?>(null) }
+    var selectedThemePickResultId by remember { mutableStateOf<Int?>(null) }
+
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -125,6 +133,14 @@ fun MainScreen(
     // 백버튼 처리: 오버레이 먼저 닫기 -> 탭 0으로 이동 -> 앱 종료
     BackHandler {
         when {
+            // ThemePickResultScreen 오버레이가 열려있으면 먼저 닫기
+            selectedThemePickResultId != null -> {
+                selectedThemePickResultId = null
+            }
+            // ThemePickDetailScreen 오버레이가 열려있으면 먼저 닫기
+            selectedThemePickId != null -> {
+                selectedThemePickId = null
+            }
             // HeartPickDetailScreen 오버레이가 열려있으면 먼저 닫기
             selectedHeartPickId != null -> {
                 selectedHeartPickId = null
@@ -213,7 +229,9 @@ fun MainScreen(
         LocalRankingItemClick provides viewModel::openCommunity,
         LocalIdolRankingHistoryClick provides viewModel::openIdolRankingHistory,
         LocalHofDailyItemClick provides viewModel::openDailyRankingHistory,
-        LocalHeartPickDetailClick provides { heartPickId -> selectedHeartPickId = heartPickId }
+        LocalHeartPickDetailClick provides { heartPickId -> selectedHeartPickId = heartPickId },
+        LocalThemePickDetailClick provides { themePickId -> selectedThemePickId = themePickId },
+        LocalThemePickResultClick provides { themePickId -> selectedThemePickResultId = themePickId }
     ) {
         ExoScaffold(
             topBar = {
@@ -307,6 +325,41 @@ fun MainScreen(
             HeartPickDetailScreen(
                 heartPickId = heartPickId,
                 onBackClick = { selectedHeartPickId = null }
+            )
+        }
+    }
+
+    // ThemePickDetailScreen 오버레이 (전체 화면)
+    AnimatedVisibility(
+        visible = selectedThemePickId != null,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        selectedThemePickId?.let { themePickId ->
+            ThemePickDetailScreen(
+                themePickId = themePickId,
+                onBackClick = { selectedThemePickId = null },
+                onNavigateToResult = { resultId ->
+                    selectedThemePickResultId = resultId
+                }
+            )
+        }
+    }
+
+    // ThemePickResultScreen 오버레이 (전체 화면)
+    AnimatedVisibility(
+        visible = selectedThemePickResultId != null,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        selectedThemePickResultId?.let { themePickId ->
+            ThemePickResultScreen(
+                themePickId = themePickId,
+                onBackClick = { selectedThemePickResultId = null },
+                onNavigateToVote = { voteId ->
+                    selectedThemePickResultId = null
+                    selectedThemePickId = voteId
+                }
             )
         }
     }

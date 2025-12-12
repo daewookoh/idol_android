@@ -107,6 +107,7 @@ fun ExoDialog(
                     Text(
                         text = title,
                         fontSize = 16.sp,
+                        lineHeight = 17.sp,
                         fontWeight = FontWeight.Normal,
                         color = colorResource(id = R.color.main),
                         textAlign = TextAlign.Center,
@@ -117,14 +118,11 @@ fun ExoDialog(
                 }
 
                 // 메시지 (스크롤 가능)
-                // old 프로젝트: TextView의 기본 줄간격 사용 (lineSpacingExtra 없음)
-                // Compose Text의 기본 lineHeight는 fontSize * 1.2 정도이므로,
-                // old 프로젝트와 동일하게 맞추기 위해 lineHeight를 명시적으로 설정
                 val scrollState = rememberScrollState()
                 Text(
                     text = message,
                     fontSize = 14.sp,
-                    lineHeight = 20.sp, // old 프로젝트 TextView 기본 줄간격과 유사하게 설정 (14sp * 1.43 ≈ 20sp)
+                    lineHeight = 15.sp,
                     fontWeight = FontWeight.Normal,
                     color = colorResource(id = R.color.gray580),
                     textAlign = TextAlign.Center,
@@ -162,6 +160,7 @@ fun ExoDialog(
                     Text(
                         text = confirmButtonText,
                         fontSize = 14.sp,
+                        lineHeight = 15.sp,
                         fontWeight = FontWeight.Normal
                     )
                 }
@@ -273,6 +272,7 @@ fun ExoConfirmDialog(
             Text(
                 text = title,
                 fontSize = 16.sp,
+                lineHeight = 17.sp,
                 fontWeight = FontWeight.Normal,
                 color = colorResource(id = R.color.main),
                 textAlign = TextAlign.Center,
@@ -286,7 +286,7 @@ fun ExoConfirmDialog(
             Text(
                 text = message,
                 fontSize = 14.sp,
-                lineHeight = 20.sp,
+                lineHeight = 15.sp,
                 fontWeight = FontWeight.Normal,
                 color = colorResource(id = R.color.gray580),
                 textAlign = TextAlign.Center,
@@ -326,6 +326,7 @@ fun ExoConfirmDialog(
                     Text(
                         text = confirmButtonText,
                         fontSize = 14.sp,
+                        lineHeight = 15.sp,
                         fontWeight = FontWeight.Normal
                     )
                 }
@@ -351,6 +352,7 @@ fun ExoConfirmDialog(
                     Text(
                         text = dismissButtonText,
                         fontSize = 14.sp,
+                        lineHeight = 15.sp,
                         fontWeight = FontWeight.Normal
                     )
                 }
@@ -436,6 +438,7 @@ fun ExoConfirmDialog(
             Text(
                 text = title,
                 fontSize = 16.sp,
+                lineHeight = 17.sp,
                 fontWeight = FontWeight.Normal,
                 color = colorResource(id = R.color.main),
                 textAlign = TextAlign.Center,
@@ -449,7 +452,7 @@ fun ExoConfirmDialog(
             Text(
                 text = message,
                 fontSize = 14.sp,
-                lineHeight = 20.sp,
+                lineHeight = 15.sp,
                 fontWeight = FontWeight.Normal,
                 color = colorResource(id = R.color.gray580),
                 textAlign = TextAlign.Center,
@@ -489,6 +492,7 @@ fun ExoConfirmDialog(
                     Text(
                         text = confirmButtonText,
                         fontSize = 14.sp,
+                        lineHeight = 15.sp,
                         fontWeight = FontWeight.Normal
                     )
                 }
@@ -514,6 +518,7 @@ fun ExoConfirmDialog(
                     Text(
                         text = dismissButtonText,
                         fontSize = 14.sp,
+                        lineHeight = 15.sp,
                         fontWeight = FontWeight.Normal
                     )
                 }
@@ -631,6 +636,7 @@ fun ExoBurningDayDialog(
             Text(
                 text = title,
                 fontSize = 16.sp,
+                lineHeight = 17.sp,
                 fontWeight = FontWeight.Normal,
                 color = colorResource(id = R.color.main),
                 textAlign = TextAlign.Center,
@@ -656,7 +662,7 @@ fun ExoBurningDayDialog(
                 Text(
                     text = guideText1,
                     fontSize = 13.sp,
-                    lineHeight = 15.sp,
+                    lineHeight = 14.sp,
                     fontWeight = FontWeight.Normal,
                     color = colorResource(id = R.color.text_gray),
                     textAlign = TextAlign.Start,
@@ -686,7 +692,7 @@ fun ExoBurningDayDialog(
                 Text(
                     text = guideText2,
                     fontSize = 12.sp,
-                    lineHeight = 14.sp,
+                    lineHeight = 13.sp,
                     fontWeight = FontWeight.Normal,
                     color = colorResource(id = R.color.gray900),
                     textAlign = TextAlign.Center,
@@ -718,6 +724,7 @@ fun ExoBurningDayDialog(
                     Text(
                         text = confirmButtonText,
                         fontSize = 14.sp,
+                        lineHeight = 15.sp,
                         fontWeight = FontWeight.Normal
                     )
                 }
@@ -736,6 +743,7 @@ fun ExoBurningDayDialog(
                     Text(
                         text = dismissButtonText,
                         fontSize = 14.sp,
+                        lineHeight = 15.sp,
                         fontWeight = FontWeight.Normal
                     )
                 }

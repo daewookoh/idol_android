@@ -18,6 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -25,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
+import net.ib.mn.ui.components.ExoSimpleDialog
 import net.ib.mn.ui.components.ExoImagePickCard
 import net.ib.mn.ui.components.ExoTabSwitch
 import net.ib.mn.ui.components.ExoThemePickCard
@@ -41,7 +45,9 @@ fun OnePickRankingSubPage(
     chartCode: String,
     isVisible: Boolean = true,
     listState: LazyListState? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onThemePickDetailClick: (Int) -> Unit = {},
+    onThemePickResultClick: (Int) -> Unit = {}
 ) {
 
     val viewModel: OnePickRankingSubPageViewModel = hiltViewModel<OnePickRankingSubPageViewModel, OnePickRankingSubPageViewModel.Factory> { factory ->
@@ -51,6 +57,17 @@ fun OnePickRankingSubPage(
     val uiState by viewModel.uiState.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val scrollState = listState ?: rememberLazyListState()
+
+    // 참여자 없음 다이얼로그 상태
+    var showNoParticipantsDialog by remember { mutableStateOf(false) }
+
+    // 참여자 없음 다이얼로그
+    if (showNoParticipantsDialog) {
+        ExoSimpleDialog(
+            message = stringResource(R.string.onepick_no_votes),
+            onDismiss = { showNoParticipantsDialog = false }
+        )
+    }
 
     // 초기 로드
     LaunchedEffect(Unit) {
@@ -146,8 +163,20 @@ fun OnePickRankingSubPage(
                                     imageUrl = cardData.imageUrl,
                                     voteCount = cardData.voteCount,
                                     periodDate = cardData.periodDate,
-                                    onCardClick = { },
-                                    onVoteClick = { }
+                                    voteStatus = cardData.voteStatus,
+                                    onCardClick = {
+                                        onThemePickDetailClick(cardData.id)
+                                    },
+                                    onVoteClick = {
+                                        onThemePickDetailClick(cardData.id)
+                                    },
+                                    onCurrentRankingClick = {
+                                        if (cardData.voteCountRaw == 0) {
+                                            showNoParticipantsDialog = true
+                                        } else {
+                                            onThemePickResultClick(cardData.id)
+                                        }
+                                    }
                                 )
                             }
                         }
@@ -181,7 +210,14 @@ fun OnePickRankingSubPage(
                                     voteCount = cardData.voteCount,
                                     periodDate = cardData.periodDate,
                                     onCardClick = { },
-                                    onVoteClick = { }
+                                    onVoteClick = { },
+                                    onCurrentRankingClick = {
+                                        if (cardData.voteCountRaw == 0) {
+                                            showNoParticipantsDialog = true
+                                        } else {
+                                            // TODO: Navigate to ImagePick result
+                                        }
+                                    }
                                 )
                             }
                         }

@@ -21,10 +21,9 @@ import net.ib.mn.domain.repository.OnepickRepository
 import net.ib.mn.domain.repository.ThemepickRepository
 import net.ib.mn.ui.components.ThemePickState
 import net.ib.mn.ui.components.ImagePickState
+import net.ib.mn.util.DateTimeUtil
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
 import net.ib.mn.util.NumberFormatUtil
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 /**
  * OnePick (테마픽/이미지픽) ViewModel
@@ -227,27 +226,25 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
                     else -> ThemePickState.ENDED
                 }
 
-                val periodDate = formatPeriodDate(themePick.beginAt, themePick.expiredAt)
-                val voteCount = NumberFormatUtil.formatNumberShort(themePick.count)
+                val periodDate = DateTimeUtil.formatPeriodSpaced(themePick.beginAt, themePick.expiredAt)
+                val voteCount = "${NumberFormatUtil.formatWithComma(themePick.count)}표"
 
-                // UPCOMING 상태일 때 D-Day 계산
-                val subTitle = if (state == ThemePickState.UPCOMING) {
-                    calculateDDay(themePick.beginAt)
-                } else {
-                    themePick.subtitle
-                }
+                // HeartPick과 동일한 D-Day 계산 (종료일 기준)
+                val dDay = DateTimeUtil.calculateDDay(context, themePick.expiredAt, themePick.status)
 
                 ThemePickCardData(
                     id = themePick.id,
                     state = state,
                     title = themePick.title,
-                    subTitle = subTitle,
+                    subTitle = themePick.subtitle,
                     imageUrl = themePick.imageUrl.toSecureUrl(),
                     voteCount = voteCount,
-                    periodDate = periodDate
+                    voteCountRaw = themePick.count,
+                    periodDate = periodDate,
+                    dDay = dDay,
+                    voteStatus = themePick.vote
                 )
             }
-
 
             cachedThemePickData = cardDataList
             _uiState.value = UiState.ThemePickSuccess(cardDataList)
@@ -265,70 +262,29 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
                     else -> ImagePickState.ENDED
                 }
 
-                val periodDate = formatPeriodDate(imagePick.createdAt, imagePick.expiredAt)
-                val voteCount = NumberFormatUtil.formatNumberShort(imagePick.count)
+                val periodDate = DateTimeUtil.formatPeriodSpaced(imagePick.createdAt, imagePick.expiredAt)
+                val voteCount = "${NumberFormatUtil.formatWithComma(imagePick.count)}표"
 
-                // UPCOMING 상태일 때 D-Day 계산
-                val subTitle = if (state == ImagePickState.UPCOMING) {
-                    calculateDDay(imagePick.createdAt)
-                } else {
-                    imagePick.subtitle
-                }
+                // HeartPick과 동일한 D-Day 계산 (종료일 기준)
+                val dDay = DateTimeUtil.calculateDDay(context, imagePick.expiredAt, imagePick.status)
 
                 ImagePickCardData(
                     id = imagePick.id,
                     state = state,
                     title = imagePick.title,
-                    subTitle = subTitle,
+                    subTitle = imagePick.subtitle,
                     imageUrl = "", // 이미지픽은 별도 이미지 URL이 없음
                     voteCount = voteCount,
-                    periodDate = periodDate
+                    voteCountRaw = imagePick.count,
+                    periodDate = periodDate,
+                    dDay = dDay
                 )
             }
-
 
             cachedImagePickData = cardDataList
             _uiState.value = UiState.ImagePickSuccess(cardDataList)
         } catch (e: Exception) {
             _uiState.value = UiState.Error(e.message ?: "Error")
-        }
-    }
-
-    private fun formatPeriodDate(beginAt: String, expiredAt: String): String {
-        return try {
-            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            val outputFormat = SimpleDateFormat("yyyy. M. d.", Locale.getDefault())
-
-            val beginDate = inputFormat.parse(beginAt)
-            val endDate = inputFormat.parse(expiredAt)
-
-            if (beginDate != null && endDate != null) {
-                "${outputFormat.format(beginDate)} ~ ${outputFormat.format(endDate)}"
-            } else {
-                ""
-            }
-        } catch (e: Exception) {
-            ""
-        }
-    }
-
-    private fun calculateDDay(beginAt: String): String {
-        return try {
-            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            val beginDate = inputFormat.parse(beginAt)
-
-            if (beginDate != null) {
-                val currentTime = System.currentTimeMillis()
-                val beginTime = beginDate.time
-                val diffInMillis = beginTime - currentTime
-                val diffInDays = (diffInMillis / (1000 * 60 * 60 * 24)).toInt()
-
-                "투표시작 D-$diffInDays"
-            } else {
-                ""
-            }
-        } catch (e: Exception) {
-            ""
         }
     }
 
@@ -340,6 +296,8 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
 
 /**
  * 테마픽 카드 데이터
+ *
+ * @param voteStatus 투표 상태 (ThemePickModel.VOTE_ABLE, VOTE_SEE_VIDEOAD, VOTE_IMPOSSIBLE)
  */
 data class ThemePickCardData(
     val id: Int,
@@ -348,7 +306,10 @@ data class ThemePickCardData(
     val subTitle: String,
     val imageUrl: String,
     val voteCount: String,
-    val periodDate: String
+    val voteCountRaw: Int = 0,
+    val periodDate: String,
+    val dDay: String = "",
+    val voteStatus: String = ""  // "N": 투표가능, "V": 광고후 투표, "Y": 오늘 투표 완료
 )
 
 /**
@@ -361,5 +322,7 @@ data class ImagePickCardData(
     val subTitle: String,
     val imageUrl: String,
     val voteCount: String,
-    val periodDate: String
+    val voteCountRaw: Int = 0,
+    val periodDate: String,
+    val dDay: String = ""
 )

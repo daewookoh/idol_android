@@ -1,9 +1,14 @@
 package net.ib.mn.data.remote.api
 
+import net.ib.mn.data.remote.dto.BaseResponse
 import net.ib.mn.data.remote.dto.ThemePickListResponse
 import net.ib.mn.data.remote.dto.ThemePickResponse
+import net.ib.mn.data.remote.dto.ThemePickVoteRequest
+import net.ib.mn.data.remote.dto.OpenNotificationRequest
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -28,7 +33,7 @@ interface ThemepickApi {
     ): Response<ThemePickListResponse>
 
     /**
-     * 특정 테마픽 상세 조회
+     * 특정 테마픽 상세 조회 (후보 목록 포함)
      *
      * @param id 테마픽 ID
      * @return Response<ThemePickResponse>
@@ -37,4 +42,26 @@ interface ThemepickApi {
     suspend fun getThemePick(
         @Path(value = "id") id: Int
     ): Response<ThemePickResponse>
+
+    /**
+     * 테마픽 투표
+     *
+     * @param voteRequest 투표 요청 데이터
+     * @return Response<BaseResponse<Unit>>
+     */
+    @POST("themepick/vote/")
+    suspend fun vote(
+        @Body voteRequest: ThemePickVoteRequest
+    ): Response<BaseResponse<Unit>>
+
+    /**
+     * 테마픽 개설 알림 설정
+     *
+     * @param notificationRequest 알림 설정 요청 데이터
+     * @return Response<BaseResponse<Unit>>
+     */
+    @POST("themepick/open-notification/")
+    suspend fun postOpenNotification(
+        @Body notificationRequest: OpenNotificationRequest
+    ): Response<BaseResponse<Unit>>
 }

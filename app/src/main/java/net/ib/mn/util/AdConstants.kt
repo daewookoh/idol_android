@@ -10,6 +10,37 @@ import net.ib.mn.BuildConfig
 object AdConstants {
 
     // ============================================================
+    // AdMob Rewarded Video Unit IDs (old 프로젝트와 동일)
+    // ============================================================
+
+    /** 테마픽/이미지픽 리워드 광고 단위 ID */
+    val ADMOB_REWARDED_VIDEO_ONEPICK_UNIT_ID: String =
+        if (BuildConfig.CELEB) "ca-app-pub-4951070488234097/2440792080" else "ca-app-pub-4951070488234097/2107681793"
+
+    /** 퀴즈 리워드 광고 단위 ID */
+    val ADMOB_REWARDED_VIDEO_QUIZ_UNIT_ID: String =
+        if (BuildConfig.CELEB) "ca-app-pub-4951070488234097/2619232567" else "ca-app-pub-4951070488234097/4514768160"
+
+    /** 무료충전소 리워드 광고 단위 ID */
+    val ADMOB_REWARDED_VIDEO_FREECHARGE_UNIT_ID: String =
+        if (BuildConfig.CELEB) "ca-app-pub-4951070488234097/5416403233" else "ca-app-pub-4951070488234097/9020606325"
+
+    /** 프로필 리워드 광고 단위 ID */
+    val ADMOB_REWARDED_VIDEO_PROFILE_UNIT_ID: String =
+        if (BuildConfig.CELEB) "ca-app-pub-4951070488234097/5688937806" else "ca-app-pub-4951070488234097/5920872096"
+
+    /** 하트박스 리워드 광고 단위 ID */
+    val ADMOB_REWARDED_VIDEO_HEARTBOX_UNIT_ID: String =
+        if (BuildConfig.CELEB) "ca-app-pub-4951070488234097/2682428689" else "ca-app-pub-4951070488234097/4607790421"
+
+    /** 레벨보상 리워드 광고 단위 ID */
+    val ADMOB_REWARDED_VIDEO_LEVELREWARD_UNIT_ID: String =
+        if (BuildConfig.CELEB) "ca-app-pub-4951070488234097/2249220392" else "ca-app-pub-4951070488234097/5081361311"
+
+    /** 리워드 광고 테스트 단위 ID */
+    const val ADMOB_REWARDED_VIDEO_TEST_UNIT_ID: String = "ca-app-pub-3940256099942544/5224354917"
+
+    // ============================================================
     // AdManager (GAM) Unit IDs
     // ============================================================
 

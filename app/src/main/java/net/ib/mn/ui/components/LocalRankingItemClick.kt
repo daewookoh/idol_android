@@ -64,3 +64,29 @@ val LocalHeartPickDetailClick = compositionLocalOf<(Int) -> Unit> {
     // 기본값: 아무 동작도 하지 않음
     { _ -> }
 }
+
+/**
+ * ThemePickDetail 화면으로 이동하기 위한 CompositionLocal
+ *
+ * ThemePick 카드 클릭 시 사용됩니다.
+ * MainScreen에서 제공하고, RankingPage에서 소비합니다.
+ *
+ * @param themePickId 테마픽 ID
+ */
+val LocalThemePickDetailClick = compositionLocalOf<(Int) -> Unit> {
+    // 기본값: 아무 동작도 하지 않음
+    { _ -> }
+}
+
+/**
+ * ThemePickResult 화면으로 이동하기 위한 CompositionLocal
+ *
+ * ThemePick 결과 화면으로 이동 시 사용됩니다.
+ * MainScreen에서 제공하고, ThemePickDetailScreen에서 소비합니다.
+ *
+ * @param themePickId 테마픽 ID
+ */
+val LocalThemePickResultClick = compositionLocalOf<(Int) -> Unit> {
+    // 기본값: 아무 동작도 하지 않음
+    { _ -> }
+}

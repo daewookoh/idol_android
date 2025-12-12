@@ -49,6 +49,7 @@ enum class ImagePickState {
  * @param periodDate 투표 기간
  * @param onCardClick 카드 클릭 이벤트
  * @param onVoteClick 투표 클릭 이벤트
+ * @param onCurrentRankingClick 현재 순위 보기 클릭 이벤트 (ACTIVE 상태에서만 사용)
  * @param modifier Modifier
  */
 @Composable
@@ -60,6 +61,7 @@ fun ExoImagePickCard(
     periodDate: String,
     onCardClick: () -> Unit,
     onVoteClick: () -> Unit,
+    onCurrentRankingClick: () -> Unit = onVoteClick,
     modifier: Modifier = Modifier
 ) {
     when (state) {
@@ -86,6 +88,7 @@ fun ExoImagePickCard(
             voteCount = voteCount,
             onCardClick = onCardClick,
             onVoteClick = onVoteClick,
+            onCurrentRankingClick = onCurrentRankingClick,
             modifier = modifier
         )
     }
@@ -243,6 +246,7 @@ private fun ImagePickActiveCard(
     voteCount: String,
     onCardClick: () -> Unit,
     onVoteClick: () -> Unit,
+    onCurrentRankingClick: () -> Unit,
     modifier: Modifier
 ) {
     Card(
@@ -277,7 +281,7 @@ private fun ImagePickActiveCard(
                 modifier = Modifier
                     .clip(RoundedCornerShape(6.dp))
                     .background(ColorPalette.main200)
-                    .clickable(onClick = onVoteClick)
+                    .clickable(onClick = onCurrentRankingClick)
                     .padding(horizontal = 7.dp, vertical = 3.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start

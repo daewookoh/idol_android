@@ -39,10 +39,12 @@ import net.ib.mn.util.IdolImageUtil.toSecureUrl
  */
 object ProfileImageType {
     const val XLARGE = "XLARGE"     // 아이돌 다이얼로그, 하트픽 상세 1위: 전체 90dp(테두리 없음)
+    const val XLARGE_SQUARE = "XLARGE_SQUARE"   // 테마픽 상세 1위: 90dp, radius 10 (사각형)
     const val LARGE_CIRCLE = "LARGE_CIRCLE"     // 메인 랭킹: 전체 77dp, 테두리 60dp, 이미지 50dp
     const val LARGE = "LARGE"     // 하트픽1위: 전체 70dp(테두리 없음)
     const val MEDIUM_CIRCLE = "MEDIUM_CIRCLE"   // 기적/루키: 전체 62dp, 테두리 52dp, 이미지 42dp
     const val MEDIUM = "MEDIUM"                 // 하트픽: 55dp (테두리 없음)
+    const val MEDIUM_SQUARE = "MEDIUM_SQUARE"   // 테마픽 상세 2위 이하: 55dp, radius 10 (사각형)
     const val SMALL_CIRCLE = "SMALL_CIRCLE"     // 명예의 전당: 45dp (테두리 없음, 원형)
     const val SMALL = "SMALL"                   // 기본: 40dp (테두리 없음)
     const val XSMALL = "XSMALL"                 // VoterTop100: 35dp (테두리 없음)
@@ -119,10 +121,12 @@ fun ExoProfileImage(
     val (boxSize, borderSize, imageSize) = remember(type) {
         when (type) {
             ProfileImageType.XLARGE -> Triple(90.dp, 0.dp, 90.dp)          // 아이돌 다이얼로그, 하트픽 상세 1위
+            ProfileImageType.XLARGE_SQUARE -> Triple(90.dp, 0.dp, 90.dp)   // 테마픽 상세 (radius 10)
             ProfileImageType.LARGE_CIRCLE -> Triple(77.dp, 60.dp, 50.dp)   // 메인 랭킹
             ProfileImageType.MEDIUM_CIRCLE -> Triple(62.dp, 52.dp, 42.dp)  // 기적/루키
             ProfileImageType.LARGE -> Triple(77.dp, 0.dp, 77.dp)          // 하트픽
             ProfileImageType.MEDIUM -> Triple(55.dp, 0.dp, 55.dp)          // 하트픽
+            ProfileImageType.MEDIUM_SQUARE -> Triple(55.dp, 0.dp, 55.dp)   // 테마픽 2위 이하 (radius 10)
             ProfileImageType.SMALL_CIRCLE -> Triple(45.dp, 0.dp, 45.dp)    // 명예의 전당
             ProfileImageType.SMALL -> Triple(40.dp, 0.dp, 40.dp)           // 기본
             ProfileImageType.XSMALL -> Triple(35.dp, 0.dp, 35.dp)          // VoterTop100
@@ -221,7 +225,10 @@ fun ExoProfileImage(
     } else {
         // 기타 타입: 테두리 없이 이미지만
         var imageModifier = Modifier.fillMaxSize()
-        if (useCircleClip) {
+        // SQUARE 타입들: radius 10의 사각형
+        if (type == ProfileImageType.XLARGE_SQUARE || type == ProfileImageType.MEDIUM_SQUARE) {
+            imageModifier = imageModifier.clip(RoundedCornerShape(10.dp))
+        } else if (useCircleClip) {
             imageModifier = imageModifier.clip(CircleShape)
         }
         if (useGrayBackground) {

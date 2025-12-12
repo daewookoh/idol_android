@@ -52,8 +52,10 @@ enum class ThemePickState {
  * @param imageUrl 배경 이미지 URL
  * @param voteCount 전체 투표수
  * @param periodDate 투표 기간
+ * @param voteStatus 투표 상태 ("N": 투표가능, "V": 광고후 투표, "Y": 오늘 투표 완료)
  * @param onCardClick 카드 클릭 이벤트
  * @param onVoteClick 투표 클릭 이벤트
+ * @param onCurrentRankingClick 현재 순위 보기 클릭 이벤트 (ACTIVE 상태에서만 사용)
  * @param modifier Modifier
  */
 @Composable
@@ -64,8 +66,10 @@ fun ExoThemePickCard(
     imageUrl: String,
     voteCount: String,
     periodDate: String,
+    voteStatus: String = "N",
     onCardClick: () -> Unit,
     onVoteClick: () -> Unit,
+    onCurrentRankingClick: () -> Unit = onVoteClick,
     modifier: Modifier = Modifier
 ) {
     when (state) {
@@ -91,8 +95,10 @@ fun ExoThemePickCard(
             title = title,
             periodDate = periodDate,
             voteCount = voteCount,
+            voteStatus = voteStatus,
             onCardClick = onCardClick,
             onVoteClick = onVoteClick,
+            onCurrentRankingClick = onCurrentRankingClick,
             modifier = modifier
         )
     }
@@ -275,6 +281,11 @@ private fun ThemePickUpcomingCard(
 
 /**
  * ACTIVE 상태 테마픽 카드
+ *
+ * @param voteStatus 투표 상태:
+ *   - "N": 첫 투표 가능 → "투표하기" 버튼 (mainLight)
+ *   - "V": 광고 시청 후 추가 투표 가능 → "다시 투표" 버튼 (mainLight)
+ *   - "Y": 오늘 투표 완료 → "오늘 투표 완료" 버튼 (gray, 비활성화)
  */
 @Composable
 private fun ThemePickActiveCard(
@@ -282,10 +293,34 @@ private fun ThemePickActiveCard(
     title: String,
     periodDate: String,
     voteCount: String,
+    voteStatus: String,
     onCardClick: () -> Unit,
     onVoteClick: () -> Unit,
+    onCurrentRankingClick: () -> Unit,
     modifier: Modifier
 ) {
+    // 투표 상태에 따른 버튼 설정
+    val hasVotedToday = voteStatus == "Y"
+    val needsVideoAd = voteStatus == "V"
+
+    val buttonText = when {
+        hasVotedToday -> stringResource(R.string.onepick_already_voted)
+        needsVideoAd -> stringResource(R.string.themepick_vote_again)    // "다시 투표"
+        else -> stringResource(R.string.guide_vote_title)                 // "투표하기"
+    }
+
+    val buttonColor = if (hasVotedToday) {
+        ColorPalette.fixGray900  // 회색 (비활성)
+    } else {
+        ColorPalette.mainLight   // 메인 색상 (활성)
+    }
+
+    val buttonTextColor = if (hasVotedToday) {
+        ColorPalette.fixWhite
+    } else {
+        ColorPalette.textWhiteBlack
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -316,7 +351,7 @@ private fun ThemePickActiveCard(
                 modifier = Modifier
                     .clip(RoundedCornerShape(6.dp))
                     .background(ColorPalette.main200)
-                    .clickable(onClick = onVoteClick)
+                    .clickable(onClick = onCurrentRankingClick)
                     .padding(horizontal = 7.dp, vertical = 3.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
@@ -341,12 +376,15 @@ private fun ThemePickActiveCard(
                 ExoButton(
                     onClick = onVoteClick,
                     modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(R.string.guide_vote_title),
+                    enabled = !hasVotedToday,
+                    text = buttonText,
                     fontSize = 14.sp,
                     height = 41.dp,
                     shape = RoundedCornerShape(20.dp),
-                    containerColor = ColorPalette.mainLight,
-                    contentColor = ColorPalette.textWhiteBlack
+                    containerColor = buttonColor,
+                    disabledContainerColor = buttonColor,
+                    contentColor = buttonTextColor,
+                    disabledContentColor = buttonTextColor
                 )
             }
         }

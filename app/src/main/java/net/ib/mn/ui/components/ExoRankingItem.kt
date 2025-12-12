@@ -2002,3 +2002,383 @@ fun HofDailyRankingItem(
         )
     }
 }
+
+/**
+ * ThemePickRankingItem - 테마픽 결과 화면용 랭킹 아이템
+ *
+ * HeartPickDetailRankingItem과 유사한 레이아웃, 테마픽 전용 스타일 적용
+ *
+ * @param item 랭킹 아이템 데이터
+ * @param isFirstItem 리스트의 첫번째 아이템인지 여부 (1위 스타일 적용)
+ * @param type 테마픽 타입 ("I": 아이돌, 그 외: 기타)
+ * @param onClick 아이템 클릭 콜백
+ */
+@Composable
+fun ThemePickRankingItem(
+    item: RankingItem,
+    isFirstItem: Boolean = false,
+    type: String = "I",
+    onClick: () -> Unit = {}
+) {
+    // 1위 전용 레이아웃: 순위가 1위이면서 첫번째 아이템인 경우만
+    if (item.rank == 1 && isFirstItem) {
+        ThemePick1stRankingItem(
+            item = item,
+            type = type,
+            onClick = onClick
+        )
+    } else {
+        ThemePickOtherRankingItem(
+            item = item,
+            type = type,
+            onClick = onClick
+        )
+    }
+}
+
+/**
+ * ThemePick1stRankingItem - 테마픽 1위 전용 레이아웃
+ */
+@Composable
+private fun ThemePick1stRankingItem(
+    item: RankingItem,
+    type: String,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { onClick() }
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(ColorPalette.background200)
+                .padding(vertical = 8.dp)
+        ) {
+            val startPadding = 16.dp
+            val imageSize = 102.dp
+            val textStartPadding = 120.dp
+
+            // 정보 영역 (하단 레이어)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterStart),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    // 이름
+                    Box(modifier = Modifier.padding(start = textStartPadding)) {
+                        if (type == "I") {
+                            ExoNameWithGroup(
+                                fullName = item.name,
+                                nameFontSize = 15.sp,
+                                groupFontSize = 10.sp
+                            )
+                        } else {
+                            Column {
+                                val parts = item.name.split("_", limit = 2)
+                                Text(
+                                    text = parts.getOrNull(0) ?: item.name,
+                                    style = ExoTypo.title15,
+                                    maxLines = 1,
+                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                )
+                                if (parts.size > 1) {
+                                    Text(
+                                        text = parts[1],
+                                        style = ExoTypo.body11.copy(color = ColorPalette.textGray),
+                                        maxLines = 1,
+                                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    // 프로그레스 바
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 90.dp, end = 16.dp)
+                            .height(17.dp)
+                    ) {
+                        val progressPercent = remember(item.heartCount, item.maxHeartCount) {
+                            if (item.maxHeartCount == 0L || item.heartCount == 0L) {
+                                0.2f
+                            } else {
+                                val voteRoot = kotlin.math.sqrt(kotlin.math.sqrt(item.heartCount.toDouble()))
+                                val maxRoot = kotlin.math.sqrt(kotlin.math.sqrt(item.maxHeartCount.toDouble()))
+                                val p = 20 + (voteRoot * 60 / maxRoot)
+                                (p / 100f).toFloat().coerceIn(0.2f, 0.8f)
+                            }
+                        }
+
+                        // 배경
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    color = ColorPalette.background400,
+                                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                                )
+                        )
+
+                        // 프로그레스 바
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(progressPercent)
+                                .fillMaxHeight()
+                                .background(
+                                    brush = Brush.horizontalGradient(
+                                        colors = listOf(
+                                            ColorPalette.sLeagueProgress,
+                                            ColorPalette.main
+                                        )
+                                    ),
+                                    shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp)
+                                )
+                        )
+
+                        val percentageText = "${item.percentage}%"
+
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(progressPercent)
+                                    .fillMaxHeight(),
+                                contentAlignment = Alignment.CenterEnd
+                            ) {
+                                ExoHeartCounter(
+                                    count = item.heartCount,
+                                    style = ExoTypo.body11.copy(
+                                        lineHeight = 17.sp,
+                                        color = ColorPalette.textWhiteBlack
+                                    ),
+                                    modifier = Modifier.padding(end = 4.dp)
+                                )
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                                contentAlignment = Alignment.CenterEnd
+                            ) {
+                                Text(
+                                    text = percentageText,
+                                    style = ExoTypo.body11.copy(
+                                        lineHeight = 17.sp,
+                                        color = ColorPalette.textDimmed
+                                    ),
+                                    modifier = Modifier.padding(end = 6.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 프로필 이미지 영역 (상단 레이어)
+            Box(
+                modifier = Modifier
+                    .padding(start = startPadding)
+                    .size(imageSize)
+                    .align(Alignment.CenterStart)
+            ) {
+                ExoProfileImage(
+                    imageUrl = item.photoUrl,
+                    type = ProfileImageType.XLARGE_SQUARE,
+                    modifier = Modifier.offset(x = 10.dp)
+                )
+
+                // 1위 배지
+                Icon(
+                    painter = painterResource(R.drawable.icon_heartpick_1st),
+                    contentDescription = "1위",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .size(30.dp)
+                        .align(Alignment.TopStart)
+                )
+            }
+        }
+
+        // 하단 gradient
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Black.copy(alpha = 0.1f),
+                            Color.Transparent
+                        )
+                    )
+                )
+        )
+    }
+}
+
+/**
+ * ThemePickOtherRankingItem - 테마픽 2위 이하 레이아웃
+ */
+@Composable
+private fun ThemePickOtherRankingItem(
+    item: RankingItem,
+    type: String,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(ColorPalette.background200)
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { onClick() }
+            .padding(top = 14.dp, bottom = 8.dp, end = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // 순위 번호
+        Text(
+            text = "${item.rank}",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(40.dp)
+        )
+
+        // 프로필 이미지
+        ExoProfileImage(
+            imageUrl = item.photoUrl,
+            type = ProfileImageType.MEDIUM_SQUARE,
+            rank = item.rank,
+            contentDescription = "프로필 이미지"
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // 정보 영역
+        Column(modifier = Modifier.weight(1f)) {
+            // 이름
+            if (type == "I") {
+                ExoNameWithGroup(
+                    fullName = item.name,
+                    nameFontSize = 15.sp,
+                    groupFontSize = 10.sp,
+                    singleLine = true
+                )
+            } else {
+                val parts = item.name.split("_", limit = 2)
+                Text(
+                    text = parts.getOrNull(0) ?: item.name,
+                    style = ExoTypo.title15,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+                if (parts.size > 1) {
+                    Text(
+                        text = parts[1],
+                        style = ExoTypo.body11.copy(color = ColorPalette.textGray),
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // 프로그레스 바
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(17.dp)
+            ) {
+                val progressPercent = remember(item.heartCount, item.maxHeartCount) {
+                    if (item.maxHeartCount == 0L || item.heartCount == 0L) {
+                        0.2f
+                    } else {
+                        val voteRoot = kotlin.math.sqrt(kotlin.math.sqrt(item.heartCount.toDouble()))
+                        val maxRoot = kotlin.math.sqrt(kotlin.math.sqrt(item.maxHeartCount.toDouble()))
+                        val p = 20 + (voteRoot * 60 / maxRoot)
+                        (p / 100f).toFloat().coerceIn(0.2f, 0.8f)
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            color = ColorPalette.background400,
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                        )
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(progressPercent)
+                        .fillMaxHeight()
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(
+                                    ColorPalette.sLeagueProgress,
+                                    ColorPalette.main
+                                )
+                            ),
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp)
+                        )
+                )
+
+                val percentageText = "${item.percentage}%"
+
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(progressPercent)
+                            .fillMaxHeight(),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        ExoHeartCounter(
+                            count = item.heartCount,
+                            style = ExoTypo.body11.copy(
+                                lineHeight = 17.sp,
+                                color = ColorPalette.textWhiteBlack
+                            ),
+                            modifier = Modifier.padding(end = 4.dp)
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        Text(
+                            text = percentageText,
+                            style = ExoTypo.body11.copy(
+                                lineHeight = 17.sp,
+                                color = ColorPalette.textDimmed
+                            ),
+                            modifier = Modifier.padding(end = 6.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}

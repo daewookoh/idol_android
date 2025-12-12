@@ -78,6 +78,8 @@ import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.main.MainViewModel
 import net.ib.mn.presentation.main.ranking.idol_subpage.*
 import net.ib.mn.presentation.webview.WebViewScreen
+import net.ib.mn.presentation.overlay.themepick.ThemePickDetailScreen
+import net.ib.mn.presentation.overlay.themepick.result.ThemePickResultScreen
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.Constants
@@ -107,6 +109,10 @@ fun RankingPage(
     // WebView 상태 관리
     var webViewEventId by rememberSaveable { mutableStateOf<Int?>(null) }
     var webViewTitle by rememberSaveable { mutableStateOf("") }
+
+    // ThemePick 오버레이 상태 관리
+    var selectedThemePickDetailId by rememberSaveable { mutableStateOf<Int?>(null) }
+    var selectedThemePickResultId by rememberSaveable { mutableStateOf<Int?>(null) }
 
     // 최애 이동 토스트 상태
     val showMyFavToast by viewModel.showMyFavToast.collectAsState()
@@ -267,7 +273,12 @@ fun RankingPage(
                         onInfoClick = { webViewEventId = it; webViewTitle = "Rookie" }
                     )
                     "HEARTPICK" -> HeartPickRankingSubPage(chartCode = chartCode, isVisible = isCurrentPage)
-                    "ONEPICK" -> OnePickRankingSubPage(chartCode = chartCode, isVisible = isCurrentPage)
+                    "ONEPICK" -> OnePickRankingSubPage(
+                        chartCode = chartCode,
+                        isVisible = isCurrentPage,
+                        onThemePickDetailClick = { id -> selectedThemePickDetailId = id },
+                        onThemePickResultClick = { id -> selectedThemePickResultId = id }
+                    )
                     "HOF" -> HallOfFameRankingSubPage(
                         chartCode = chartCode,
                         isVisible = isCurrentPage,
@@ -312,6 +323,46 @@ fun RankingPage(
                 url = "${ServerUrl.HOST}/api/v1/events/$eventId/",
                 title = webViewTitle,
                 onNavigateBack = { webViewEventId = null }
+            )
+        }
+    }
+
+    // ThemePickDetailScreen 오버레이
+    AnimatedVisibility(
+        visible = selectedThemePickDetailId != null,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        selectedThemePickDetailId?.let { themePickId ->
+            ThemePickDetailScreen(
+                themePickId = themePickId,
+                onBackClick = { selectedThemePickDetailId = null },
+                onNavigateToResult = { id ->
+                    selectedThemePickDetailId = null
+                    selectedThemePickResultId = id
+                }
+            )
+        }
+    }
+
+    // ThemePickResultScreen 오버레이
+    AnimatedVisibility(
+        visible = selectedThemePickResultId != null,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        selectedThemePickResultId?.let { themePickId ->
+            ThemePickResultScreen(
+                themePickId = themePickId,
+                onBackClick = { selectedThemePickResultId = null },
+                onNavigateToVote = { id ->
+                    selectedThemePickResultId = null
+                    selectedThemePickDetailId = id
+                },
+                onNavigateToCommunity = { idolId ->
+                    selectedThemePickResultId = null
+                    navigator.navigate(Screen.Community(idolId))
+                }
             )
         }
     }
