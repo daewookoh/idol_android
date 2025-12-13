@@ -2018,6 +2018,8 @@ fun ThemePickRankingItem(
     item: RankingItem,
     isFirstItem: Boolean = false,
     isImagePick: Boolean = false,
+    isLive: Boolean = false,
+    selectedItemId: String? = null,
     onClick: () -> Unit = {}
 ) {
     // 1위 전용 레이아웃: 순위가 1위이면서 첫번째 아이템인 경우만
@@ -2025,12 +2027,16 @@ fun ThemePickRankingItem(
         ThemePick1stRankingItem(
             item = item,
             isImagePick = isImagePick,
+            isLive = isLive,
+            isSelected = selectedItemId == item.id,
             onClick = onClick
         )
     } else {
         ThemePickOtherRankingItem(
             item = item,
             isImagePick = isImagePick,
+            isLive = isLive,
+            isSelected = selectedItemId == item.id,
             onClick = onClick
         )
     }
@@ -2043,8 +2049,12 @@ fun ThemePickRankingItem(
 private fun ThemePick1stRankingItem(
     item: RankingItem,
     isImagePick: Boolean,
+    isLive: Boolean = false,
+    isSelected: Boolean = false,
     onClick: () -> Unit
 ) {
+    // isLive=true && isImagePick=false 일 때 투표 아이콘 표시 여부
+    val showVoteIcon = isLive && !isImagePick
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -2084,10 +2094,11 @@ private fun ThemePick1stRankingItem(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     // 프로그레스 바
+                    // showVoteIcon이면 아이콘 영역을 위해 end 패딩을 줄임
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 90.dp, end = 16.dp)
+                            .padding(start = 90.dp, end = if (showVoteIcon) 8.dp else 16.dp)
                             .height(17.dp)
                     ) {
                         val progressPercent = remember(item.heartCount, item.maxHeartCount) {
@@ -2167,6 +2178,26 @@ private fun ThemePick1stRankingItem(
                         }
                     }
                 }
+
+                // 투표 아이콘 영역 (isLive=true && isImagePick=false 일 때만 표시)
+                // 일정한 너비를 유지하여 모든 순위에서 동일한 영역 차지
+                if (showVoteIcon) {
+                    Box(
+                        modifier = Modifier
+                            .width(60.dp)
+                            .padding(start = 4.dp, end = 8.dp, top = 5.dp),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        Image(
+                            painter = painterResource(
+                                if (isSelected) R.drawable.btn_themapick_vote_selected_result
+                                else R.drawable.btn_themapick_vote_gray_result
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier.size(50.dp)
+                        )
+                    }
+                }
             }
 
             // 프로필 이미지 영역 (상단 레이어)
@@ -2218,8 +2249,12 @@ private fun ThemePick1stRankingItem(
 private fun ThemePickOtherRankingItem(
     item: RankingItem,
     isImagePick: Boolean,
+    isLive: Boolean = false,
+    isSelected: Boolean = false,
     onClick: () -> Unit
 ) {
+    // isLive=true && isImagePick=false 일 때 투표 아이콘 표시 여부
+    val showVoteIcon = isLive && !isImagePick
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -2228,7 +2263,7 @@ private fun ThemePickOtherRankingItem(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
             ) { onClick() }
-            .padding(top = 14.dp, bottom = 8.dp, end = 16.dp),
+            .padding(top = 14.dp, bottom = 8.dp, end = if (showVoteIcon) 0.dp else 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // 순위 번호
@@ -2262,9 +2297,11 @@ private fun ThemePickOtherRankingItem(
             Spacer(modifier = Modifier.height(4.dp))
 
             // 프로그레스 바
+            // showVoteIcon이면 아이콘 영역을 위해 end 패딩을 줄임 (1위와 동일하게)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(end = if (showVoteIcon) 8.dp else 0.dp)
                     .height(17.dp)
             ) {
                 val progressPercent = remember(item.heartCount, item.maxHeartCount) {
@@ -2340,6 +2377,26 @@ private fun ThemePickOtherRankingItem(
                         )
                     }
                 }
+            }
+        }
+
+        // 투표 아이콘 영역 (isLive=true && isImagePick=false 일 때만 표시)
+        // 일정한 너비를 유지하여 모든 순위에서 동일한 영역 차지
+        if (showVoteIcon) {
+            Box(
+                modifier = Modifier
+                    .width(60.dp)
+                    .padding(start = 4.dp, end = 8.dp, top = 5.dp),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Image(
+                    painter = painterResource(
+                        if (isSelected) R.drawable.btn_themapick_vote_selected_result
+                        else R.drawable.btn_themapick_vote_gray_result
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier.size(50.dp)
+                )
             }
         }
     }

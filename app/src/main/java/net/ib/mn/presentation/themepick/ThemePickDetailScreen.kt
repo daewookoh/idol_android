@@ -1157,7 +1157,7 @@ private fun VoteButton(
 
     val btnText = when {
         hasVotedToday -> stringResource(R.string.themepick_today_voted)   // "오늘 투표 완료"
-        needsVideoAd -> stringResource(R.string.themepick_vote_with_ad)   // "투표하기 [AD]"
+        needsVideoAd -> stringResource(R.string.themepick_vote_again)     // "추가 투표하기"
         else -> stringResource(R.string.guide_vote_title)                 // "투표하기"
     }
 

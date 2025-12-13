@@ -338,6 +338,8 @@ private fun ResultContent(
                         item = rankingItem,
                         isFirstItem = index == 0,
                         isImagePick = false,
+                        isLive = true,
+                        selectedItemId = state.voteId.toString(),
                         onClick = { onItemClick(candidate.idolId) }
                     )
                 }

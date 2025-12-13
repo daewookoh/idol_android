@@ -95,7 +95,8 @@ class ThemePickLiveViewModel @Inject constructor(
                 needsVideoAd = processedThemePick.needsVideoAd(),
                 hasVotedToday = processedThemePick.hasVotedToday(),
                 isFinished = processedThemePick.isFinished(),
-                isLoading = false
+                isLoading = false,
+                voteId = processedThemePick.voteId
             )
         }
     }

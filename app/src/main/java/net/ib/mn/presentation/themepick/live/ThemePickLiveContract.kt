@@ -30,7 +30,8 @@ class ThemePickLiveContract {
         val isFinished: Boolean = false,
         val isLoading: Boolean = true,
         val isVoting: Boolean = false,
-        val error: String? = null
+        val error: String? = null,
+        val voteId: Int = 0
     ) : UiState
 
     /**

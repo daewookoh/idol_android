@@ -345,6 +345,7 @@ private fun ImagePickActiveCard(
                 ExoPickVoteButton(
                     voteStatus = voteStatus,
                     onClick = onVoteClick,
+                    isImagePick = true,
                     modifier = Modifier.fillMaxWidth()
                 )
             }

@@ -39,25 +39,26 @@ data class VoteButtonState(
  * voteStatus 값에 따른 버튼 상태를 반환
  *
  * @param voteStatus 투표 상태 코드 ("N": 투표가능, "V": 광고후 투표, "Y": 오늘 투표 완료)
+ * @param isImagePick 이미지픽 여부 (true: 이미지픽용 스트링, false: 테마픽용 스트링)
  * @return VoteButtonState
  */
 @Composable
-fun rememberVoteButtonState(voteStatus: String): VoteButtonState {
+fun rememberVoteButtonState(voteStatus: String, isImagePick: Boolean = false): VoteButtonState {
     return when (voteStatus) {
         VoteStatusCode.VOTED_TODAY -> VoteButtonState(
-            textResId = R.string.themepick_today_voted,  // "오늘 투표 완료"
+            textResId = R.string.themepick_today_voted,  // "오늘 투표 완료" (테마픽/이미지픽 공용)
             containerColor = ColorPalette.fixGray900,
             contentColor = ColorPalette.fixWhite,
             enabled = false
         )
         VoteStatusCode.NEED_VIDEO_AD -> VoteButtonState(
-            textResId = R.string.themepick_vote_again,   // "추가 투표하기"
+            textResId = if (isImagePick) R.string.imagepick_vote_with_ad else R.string.themepick_vote_again,
             containerColor = ColorPalette.mainLight,
             contentColor = ColorPalette.textWhiteBlack,
             enabled = true
         )
         else -> VoteButtonState(
-            textResId = R.string.guide_vote_title,       // "투표하기"
+            textResId = R.string.guide_vote_title,  // "투표하기" (테마픽/이미지픽 공용)
             containerColor = ColorPalette.mainLight,
             contentColor = ColorPalette.textWhiteBlack,
             enabled = true
@@ -69,21 +70,23 @@ fun rememberVoteButtonState(voteStatus: String): VoteButtonState {
  * 픽 카드용 투표 버튼 (테마픽/이미지픽 공용)
  *
  * voteStatus에 따라 버튼 텍스트와 색상이 자동으로 결정됨:
- * - "N": 투표하기 (mainLight)
- * - "V": 추가 투표하기 (mainLight)
- * - "Y": 오늘 투표 완료 (gray, 비활성화)
+ * - "N": 투표하기/참여하기 (mainLight)
+ * - "V": 추가 투표하기/추가 투표하기 [AD] (mainLight)
+ * - "Y": 오늘 투표 완료/오늘 참여 완료 (gray, 비활성화)
  *
  * @param voteStatus 투표 상태 코드
  * @param onClick 클릭 이벤트
+ * @param isImagePick 이미지픽 여부 (true: 이미지픽용 스트링, false: 테마픽용 스트링)
  * @param modifier Modifier
  */
 @Composable
 fun ExoPickVoteButton(
     voteStatus: String,
     onClick: () -> Unit,
+    isImagePick: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    val buttonState = rememberVoteButtonState(voteStatus)
+    val buttonState = rememberVoteButtonState(voteStatus, isImagePick)
 
     ExoButton(
         onClick = onClick,
