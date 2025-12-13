@@ -326,28 +326,6 @@ private fun ThemePickActiveCard(
     onCurrentRankingClick: () -> Unit,
     modifier: Modifier
 ) {
-    // 투표 상태에 따른 버튼 설정
-    val hasVotedToday = voteStatus == "Y"
-    val needsVideoAd = voteStatus == "V"
-
-    val buttonText = when {
-        hasVotedToday -> stringResource(R.string.themepick_today_voted)   // "오늘 투표 완료"
-        needsVideoAd -> stringResource(R.string.themepick_vote_again)     // "다시 투표"
-        else -> stringResource(R.string.guide_vote_title)                 // "투표하기"
-    }
-
-    val buttonColor = if (hasVotedToday) {
-        ColorPalette.fixGray900  // 회색 (비활성)
-    } else {
-        ColorPalette.mainLight   // 메인 색상 (활성)
-    }
-
-    val buttonTextColor = if (hasVotedToday) {
-        ColorPalette.fixWhite
-    } else {
-        ColorPalette.textWhiteBlack
-    }
-
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -403,19 +381,11 @@ private fun ThemePickActiveCard(
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    // 투표 참여 버튼
-                    ExoButton(
+                    // 투표 참여 버튼 (공통 컴포넌트 사용)
+                    ExoPickVoteButton(
+                        voteStatus = voteStatus,
                         onClick = onVoteClick,
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = !hasVotedToday,
-                        text = buttonText,
-                        fontSize = 14.sp,
-                        height = 41.dp,
-                        shape = RoundedCornerShape(20.dp),
-                        containerColor = buttonColor,
-                        disabledContainerColor = buttonColor,
-                        contentColor = buttonTextColor,
-                        disabledContentColor = buttonTextColor
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }

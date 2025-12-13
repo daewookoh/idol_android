@@ -92,6 +92,9 @@ class MainActivity : ComponentActivity() {
         // 푸시 알림 클릭 시 네비게이션 정보 추출 (Navigation 3)
         val notificationNav = getNavigationFromIntent(intent)
 
+        // 딥링크 정보 추출
+        val deepLinkNav = getDeepLinkFromIntent(intent)
+
         setContent {
             // PreferencesManager에서 테마 설정 구독
             val themeString by preferencesManager.theme.collectAsState(initial = null)
@@ -123,7 +126,18 @@ class MainActivity : ComponentActivity() {
                     } else {
                         Screen.StartUp()
                     }
-                    val navigator = rememberAppNavigator(startDestination = startDestination)
+
+                    // 딥링크 대상 화면
+                    val pendingDeepLink: Screen? = when (deepLinkNav) {
+                        is DeepLinkNavigation.ThemePick -> Screen.ThemePickDetail(deepLinkNav.id)
+                        is DeepLinkNavigation.ImagePick -> Screen.ImagePickDetail(deepLinkNav.id)
+                        null -> null
+                    }
+
+                    val navigator = rememberAppNavigator(
+                        startDestination = startDestination,
+                        pendingDeepLink = pendingDeepLink
+                    )
                     NavGraph(navigator = navigator)
                 }
             }
@@ -136,7 +150,7 @@ class MainActivity : ComponentActivity() {
      *
      * 사용 예시:
      * - adb shell am start -a android.intent.action.VIEW -d "devloveidol://?host=test.myloveidol.com"
-     * - adb shell am start -a android.intent.action.VIEW -d "devloveidol://?reset_auth=true"
+     * - adb shell am stxnvyart -a android.intent.action.VIEW -d "devloveidol://?reset_auth=true"
      *
      * @return true if activity restart is needed (host parameter was processed), false otherwise
      */
@@ -270,6 +284,39 @@ class MainActivity : ComponentActivity() {
         val communityTab: Int? = null,
         val freeBoardTagId: Int? = null
     )
+
+    /**
+     * 딥링크 네비게이션 정보
+     */
+    private sealed class DeepLinkNavigation {
+        data class ThemePick(val id: Int) : DeepLinkNavigation()
+        data class ImagePick(val id: Int) : DeepLinkNavigation()
+    }
+
+    /**
+     * Intent에서 딥링크 정보 추출
+     * @return DeepLinkNavigation (null이면 딥링크 아님)
+     */
+    private fun getDeepLinkFromIntent(intent: Intent?): DeepLinkNavigation? {
+        if (intent?.action != Intent.ACTION_VIEW) return null
+
+        val uri = intent.data ?: return null
+        val pathSegments = uri.pathSegments
+
+        if (pathSegments.isEmpty()) return null
+
+        return when (pathSegments[0]) {
+            "themepick" -> {
+                val id = pathSegments.getOrNull(1)?.toIntOrNull()
+                if (id != null) DeepLinkNavigation.ThemePick(id) else null
+            }
+            "onepick" -> {
+                val id = pathSegments.getOrNull(1)?.toIntOrNull()
+                if (id != null) DeepLinkNavigation.ImagePick(id) else null
+            }
+            else -> null
+        }
+    }
 
     /**
      * Intent에서 네비게이션 정보 추출 (푸시 알림 클릭 처리)

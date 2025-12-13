@@ -19,7 +19,7 @@ import net.ib.mn.data.remote.api.ImagesApi
 import net.ib.mn.data.remote.api.MarketApi
 import net.ib.mn.data.remote.api.MessageApi
 import net.ib.mn.data.remote.api.MiscApi
-import net.ib.mn.data.remote.api.OnepickApi
+import net.ib.mn.data.remote.api.ImagepickApi
 import net.ib.mn.data.remote.api.ReportApi
 import net.ib.mn.data.remote.api.ScheduleApi
 import net.ib.mn.data.remote.api.SearchApi
@@ -150,8 +150,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOnepickApi(retrofit: Retrofit): OnepickApi =
-        retrofit.create(OnepickApi::class.java)
+    fun provideImagepickApi(retrofit: Retrofit): ImagepickApi =
+        retrofit.create(ImagepickApi::class.java)
 
     @Provides
     @Singleton

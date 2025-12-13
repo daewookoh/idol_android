@@ -19,7 +19,9 @@ import net.ib.mn.presentation.search.SearchScreen
 import net.ib.mn.presentation.search.result.SearchResultScreen
 import net.ib.mn.presentation.heartpick.HeartPickDetailScreen
 import net.ib.mn.presentation.themepick.ThemePickDetailScreen
-import net.ib.mn.presentation.themepick.result.ThemePickResultScreen
+import net.ib.mn.presentation.themepick.live.ThemePickLiveScreen
+import net.ib.mn.presentation.imagepick.ImagePickDetailScreen
+import net.ib.mn.presentation.imagepick.live.ImagePickLiveScreen
 import net.ib.mn.presentation.community.history.idol.IdolRankingHistoryScreen
 import net.ib.mn.presentation.community.history.daily.DailyRankingHistoryScreen
 import net.ib.mn.presentation.profile.ProfileScreen
@@ -275,18 +277,43 @@ fun NavGraph(
                             themePickId = screen.themePickId,
                             onBackClick = { navigator.popBackStack() },
                             onNavigateToResult = { resultId ->
-                                navigator.navigate(Screen.ThemePickResult(resultId))
+                                navigator.navigate(Screen.ThemePickLive(resultId))
                             }
                         )
                     }
 
-                    // ThemePickResult 화면 (테마픽 결과)
-                    is Screen.ThemePickResult -> NavEntry(screen) {
-                        ThemePickResultScreen(
+                    // ThemePickLive 화면 (테마픽 실시간 순위)
+                    is Screen.ThemePickLive -> NavEntry(screen) {
+                        ThemePickLiveScreen(
                             themePickId = screen.themePickId,
                             onBackClick = { navigator.popBackStack() },
                             onNavigateToVote = { voteId ->
                                 navigator.navigate(Screen.ThemePickDetail(voteId))
+                            },
+                            onNavigateToCommunity = { idolId ->
+                                navigator.navigate(Screen.Community(idolId))
+                            }
+                        )
+                    }
+
+                    // ImagePickDetail 화면 (이미지픽 상세)
+                    is Screen.ImagePickDetail -> NavEntry(screen) {
+                        ImagePickDetailScreen(
+                            imagePickId = screen.imagePickId,
+                            onBackClick = { navigator.popBackStack() },
+                            onNavigateToResult = { resultId ->
+                                navigator.navigate(Screen.ImagePickLive(resultId))
+                            }
+                        )
+                    }
+
+                    // ImagePickLive 화면 (이미지픽 실시간 순위)
+                    is Screen.ImagePickLive -> NavEntry(screen) {
+                        ImagePickLiveScreen(
+                            imagePickId = screen.imagePickId,
+                            onBackClick = { navigator.popBackStack() },
+                            onNavigateToVote = { voteId ->
+                                navigator.navigate(Screen.ImagePickDetail(voteId))
                             },
                             onNavigateToCommunity = { idolId ->
                                 navigator.navigate(Screen.Community(idolId))

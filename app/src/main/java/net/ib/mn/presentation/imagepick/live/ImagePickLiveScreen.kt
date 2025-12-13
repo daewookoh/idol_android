@@ -1,10 +1,7 @@
-package net.ib.mn.presentation.themepick.result
+package net.ib.mn.presentation.imagepick.live
 
 import android.content.Intent
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -12,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -35,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -52,33 +48,34 @@ import coil.compose.AsyncImage
 import kotlinx.coroutines.flow.collectLatest
 import net.ib.mn.R
 import net.ib.mn.data.local.PreferencesManager
-import net.ib.mn.domain.model.ThemePickIdol
-import net.ib.mn.domain.model.ThemePickModel
+import net.ib.mn.domain.model.ImagePickIdolModel
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ExoTitleDialog
-import net.ib.mn.ui.components.RankingItem
-import net.ib.mn.ui.components.ThemePickRankingItem
+import net.ib.mn.ui.components.ImagePickRankingItem
+import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
+import net.ib.mn.util.IdolImageUtil.toSecureUrl
 import java.text.NumberFormat
 import java.util.Locale
 import kotlin.math.roundToInt
 
 /**
- * 테마픽 순위 결과 화면
+ * 이미지픽 순위 결과 화면
  *
- * old 프로젝트의 ThemePickResultActivity를 Compose로 재구현.
+ * old 프로젝트의 OnepickResultActivity를 Compose로 재구현.
  *
  * 투표 후 현재 순위를 보여주는 화면.
- * - 헤더: 배너 이미지, 제목, 투표 정보 (총 투표수, 기간)
+ * - 헤더: 제목, 투표 정보 (총 투표수, 기간)
  * - 1위: 큰 이미지 레이아웃
  * - 2위 이하: 일반 랭킹 아이템
  * - 하단: 투표 버튼 (진행 중일 때)
  */
 @Composable
-fun ThemePickResultScreen(
-    themePickId: Int,
+fun ImagePickLiveScreen(
+    imagePickId: Int,
     modifier: Modifier = Modifier,
-    viewModel: ThemePickResultViewModel = hiltViewModel(),
+    viewModel: ImagePickLiveViewModel = hiltViewModel(),
     onBackClick: () -> Unit = {},
     onNavigateToVote: ((Int) -> Unit)? = null,
     onNavigateToCommunity: ((Int) -> Unit)? = null
@@ -90,18 +87,18 @@ fun ThemePickResultScreen(
     var showInfoDialog by remember { mutableStateOf(false) }
 
     // 초기 데이터 로드
-    LaunchedEffect(themePickId) {
-        viewModel.sendIntent(ThemePickResultContract.Intent.LoadResult(themePickId))
+    LaunchedEffect(imagePickId) {
+        viewModel.sendIntent(ImagePickLiveContract.Intent.LoadResult(imagePickId))
     }
 
     // Effect 처리
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
-                is ThemePickResultContract.Effect.ShowToast -> {
+                is ImagePickLiveContract.Effect.ShowToast -> {
                     Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
                 }
-                is ThemePickResultContract.Effect.ShareThemePick -> {
+                is ImagePickLiveContract.Effect.ShareImagePick -> {
                     val sendIntent = Intent().apply {
                         action = Intent.ACTION_SEND
                         putExtra(Intent.EXTRA_TEXT, effect.shareText)
@@ -109,14 +106,17 @@ fun ThemePickResultScreen(
                     }
                     context.startActivity(Intent.createChooser(sendIntent, null))
                 }
-                is ThemePickResultContract.Effect.NavigateToVote -> {
-                    onNavigateToVote?.invoke(effect.themePickId)
+                is ImagePickLiveContract.Effect.NavigateToVote -> {
+                    onNavigateToVote?.invoke(effect.imagePickId)
                 }
-                is ThemePickResultContract.Effect.NavigateToCommunity -> {
+                is ImagePickLiveContract.Effect.NavigateToCommunity -> {
                     onNavigateToCommunity?.invoke(effect.idolId)
                 }
-                is ThemePickResultContract.Effect.NavigateBack -> {
+                is ImagePickLiveContract.Effect.NavigateBack -> {
                     onBackClick()
+                }
+                is ImagePickLiveContract.Effect.ShowVideoAd -> {
+                    // TODO: 광고 표시 구현
                 }
             }
         }
@@ -124,18 +124,18 @@ fun ThemePickResultScreen(
 
     // 타이틀 결정 (종료됨이면 최종결과)
     val title = if (state.isFinished) {
-        "${stringResource(R.string.themepick)} ${stringResource(R.string.lable_final_result)}"
+        "${stringResource(R.string.imagepick)} ${stringResource(R.string.lable_final_result)}"
     } else {
-        stringResource(R.string.themepick)
+        stringResource(R.string.imagepick)
     }
 
     // 안내 다이얼로그
     if (showInfoDialog) {
         val preferencesManager = remember { PreferencesManager(context, com.google.gson.Gson()) }
-        val helpText = remember { preferencesManager.getHelpInfoThemePick() }
+        val helpText = remember { preferencesManager.getHelpInfoOnePick() }
 
         ExoTitleDialog(
-            title = stringResource(R.string.popup_title_themepick),
+            title = stringResource(R.string.popup_title_imagepick),
             message = helpText ?: "",
             onDismiss = { showInfoDialog = false }
         )
@@ -161,7 +161,7 @@ fun ThemePickResultScreen(
                         Icon(
                             painter = painterResource(R.drawable.icon_info),
                             contentDescription = "Info",
-                            tint = Color.Unspecified,
+                            tint = androidx.compose.ui.graphics.Color.Unspecified,
                             modifier = Modifier
                                 .size(16.dp)
                                 .clickable(
@@ -187,7 +187,7 @@ fun ThemePickResultScreen(
                                 indication = null,
                                 interactionSource = remember { MutableInteractionSource() }
                             ) {
-                                viewModel.sendIntent(ThemePickResultContract.Intent.Share)
+                                viewModel.sendIntent(ImagePickLiveContract.Intent.Share)
                             }
                     )
                 }
@@ -198,17 +198,14 @@ fun ThemePickResultScreen(
             when {
                 state.isLoading -> LoadingView()
                 state.error != null -> ErrorView(error = state.error!!)
-                state.themePick != null -> {
+                state.imagePick != null -> {
                     ResultContent(
                         state = state,
-                        onRewardToggle = {
-                            viewModel.sendIntent(ThemePickResultContract.Intent.ToggleRewardExpand)
-                        },
                         onVoteClick = {
-                            viewModel.sendIntent(ThemePickResultContract.Intent.GoToVote)
+                            viewModel.sendIntent(ImagePickLiveContract.Intent.GoToVote)
                         },
                         onItemClick = { idolId ->
-                            viewModel.sendIntent(ThemePickResultContract.Intent.OnItemClick(idolId))
+                            viewModel.sendIntent(ImagePickLiveContract.Intent.OnItemClick(idolId))
                         }
                     )
                 }
@@ -256,12 +253,11 @@ private fun ErrorView(error: String) {
 
 @Composable
 private fun ResultContent(
-    state: ThemePickResultContract.State,
-    onRewardToggle: () -> Unit,
+    state: ImagePickLiveContract.State,
     onVoteClick: () -> Unit,
     onItemClick: (Int?) -> Unit
 ) {
-    val themePick = state.themePick ?: return
+    val imagePick = state.imagePick ?: return
     val rankItems = state.rankItems
     val numberFormat = remember { NumberFormat.getNumberInstance(Locale.getDefault()) }
 
@@ -275,72 +271,45 @@ private fun ResultContent(
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            // 헤더 섹션 (배너 이미지)
+            // 헤더 섹션 (타이틀, 참여인원, 투표기간)
             item {
-                Spacer(modifier = Modifier.height(16.dp))
-                ThemePickBanner(
-                    imageUrl = state.secureImageUrl
-                )
-            }
-
-            // 제목
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = themePick.title,
-                        color = if (state.isFinished) {
-                            colorResource(R.color.gray300)
-                        } else {
-                            colorResource(R.color.main_light)
-                        },
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-
-            // 정보 섹션 (전체 투표수, 기간)
-            item {
-                ResultInfoSection(
+                ImagePickLiveHeader(
+                    title = imagePick.title,
+                    participantsCount = numberFormat.format(imagePick.count),
                     periodText = state.periodText,
-                    totalVote = themePick.count,
-                    numberFormat = numberFormat
-                )
-            }
-
-            // 1위 리워드
-            item {
-                RewardSection(
-                    themePick = themePick,
-                    isExpanded = state.isRewardExpanded,
-                    onToggle = onRewardToggle
+                    isFinished = state.isFinished
                 )
             }
 
             // 순위 목록
             if (rankItems.isEmpty()) {
                 item {
-                    EmptyView()
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.onepick_no_votes),
+                            color = colorResource(R.color.text_gray),
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             } else {
-                itemsIndexed(rankItems, key = { _, candidate -> candidate.id }) { index, candidate ->
-                    val rankingItem = candidate.toRankingItem(
-                        totalVote = themePick.count,
-                        firstPlaceVote = themePick.getFirstPlaceVote()
-                    )
+                // 1위 득표수
+                val firstPlaceVote = rankItems.firstOrNull()?.voteCount ?: 0L
+                val totalVote = imagePick.count
 
-                    ThemePickResultRankingItem(
-                        item = rankingItem,
-                        candidate = candidate,
-                        isFirstItem = index == 0,
-                        type = themePick.type,
-                        onClick = { onItemClick(candidate.idolId) }
+                itemsIndexed(rankItems, key = { _, candidate -> candidate.id }) { index, candidate ->
+                    ImagePickRankingItem(
+                        item = candidate,
+                        rank = index + 1,
+                        isFirst = index == 0,
+                        totalVoteCount = totalVote.toLong(),
+                        onClick = { onItemClick(candidate.idol?.id) }
                     )
                 }
             }
@@ -350,7 +319,7 @@ private fun ResultContent(
             }
         }
 
-        // 하단 투표 버튼 (진행 중이고 종료되지 않은 경우만)
+        // 하단 투표 버튼
         if (!state.isFinished) {
             VoteButton(
                 canVote = state.canVote,
@@ -362,182 +331,6 @@ private fun ResultContent(
     }
 }
 
-/**
- * 공통 배너 이미지
- * Old 프로젝트: layout_constraintDimensionRatio="3.3:1" (너비:높이)
- */
-@Composable
-private fun ThemePickBanner(
-    imageUrl: String?,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .aspectRatio(3.3f / 1f)
-            .clip(RoundedCornerShape(13.dp))
-    ) {
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-    }
-}
-
-@Composable
-private fun ResultInfoSection(
-    periodText: String,
-    totalVote: Int,
-    numberFormat: NumberFormat
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-    ) {
-        // 전체 투표수
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = stringResource(R.string.themepick_total_votes),
-                color = colorResource(R.color.text_gray),
-                fontSize = 14.sp
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "${numberFormat.format(totalVote)}${stringResource(R.string.votes)}",
-                color = colorResource(R.color.text_default),
-                fontSize = 14.sp
-            )
-        }
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        // 기간
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = stringResource(R.string.onepick_period),
-                color = colorResource(R.color.text_gray),
-                fontSize = 14.sp
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = periodText,
-                color = colorResource(R.color.text_default),
-                fontSize = 14.sp
-            )
-        }
-    }
-}
-
-@Composable
-private fun EmptyView() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 40.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = stringResource(R.string.onepick_no_votes),
-            color = colorResource(R.color.text_gray),
-            fontSize = 16.sp,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
-/**
- * 1위 보상 섹션
- */
-@Composable
-private fun RewardSection(
-    themePick: ThemePickModel,
-    isExpanded: Boolean,
-    onToggle: () -> Unit
-) {
-    if (themePick.prize == null) return
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp)
-            .background(
-                color = colorResource(R.color.gray80),
-                shape = RoundedCornerShape(15.dp)
-            )
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) { onToggle() }
-            .padding(horizontal = 20.dp, vertical = 16.dp)
-    ) {
-        Column {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(R.drawable.icon_heartpick_reward),
-                    contentDescription = null,
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(22.dp)
-                )
-                Spacer(modifier = Modifier.width(9.dp))
-                Text(
-                    text = stringResource(R.string.first_rank_reward),
-                    color = colorResource(R.color.text_default),
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f)
-                )
-                Icon(
-                    painter = painterResource(R.drawable.icon_arrow_drop_down),
-                    contentDescription = null,
-                    tint = colorResource(R.color.text_gray),
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-
-            AnimatedVisibility(
-                visible = isExpanded,
-                enter = expandVertically(),
-                exit = shrinkVertically()
-            ) {
-                Column {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    themePick.prize.name?.let { prizeName ->
-                        Text(
-                            text = prizeName,
-                            color = colorResource(R.color.text_default),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                    themePick.prize.location?.let { location ->
-                        Text(
-                            text = location,
-                            color = colorResource(R.color.text_gray),
-                            fontSize = 13.sp
-                        )
-                    }
-                    themePick.prize.imageUrl?.let { imageUrl ->
-                        Spacer(modifier = Modifier.height(8.dp))
-                        AsyncImage(
-                            model = imageUrl,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(133.dp)
-                                .clip(RoundedCornerShape(15.dp))
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
 @Composable
 private fun VoteButton(
     canVote: Boolean,
@@ -545,138 +338,188 @@ private fun VoteButton(
     hasVotedToday: Boolean,
     onVoteClick: () -> Unit
 ) {
-    val isEnabled = !hasVotedToday
-
-    val btnColor = when {
-        hasVotedToday -> colorResource(R.color.gray110)
-        else -> colorResource(R.color.main_light)
+    val buttonText = when {
+        hasVotedToday -> stringResource(R.string.themepick_today_voted)
+        needsVideoAd -> stringResource(R.string.imagepick_vote_with_ad)
+        else -> stringResource(R.string.onepick_vote)
     }
 
-    val btnText = when {
-        hasVotedToday -> stringResource(R.string.themepick_today_voted)   // "오늘 투표 완료"
-        needsVideoAd -> stringResource(R.string.themepick_vote_again)     // "다시 투표"
-        else -> stringResource(R.string.guide_vote_title)                 // "투표하기"
+    val buttonColor = if (hasVotedToday) {
+        ColorPalette.fixGray900
+    } else {
+        colorResource(R.color.main)
     }
 
-    Column(
+    val textColor = if (hasVotedToday) {
+        ColorPalette.fixWhite
+    } else {
+        androidx.compose.ui.graphics.Color.White
+    }
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(colorResource(R.color.background_100))
+            .padding(16.dp)
     ) {
-        // 섹션 구분선
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(1.dp)
-                .background(colorResource(R.color.gray150))
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // 투표 버튼
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp)
-                .height(40.dp)
-                .background(color = btnColor, shape = RoundedCornerShape(8.dp))
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                    enabled = isEnabled
-                ) { onVoteClick() }
+                .height(50.dp)
+                .background(buttonColor, shape = RoundedCornerShape(8.dp))
+                .clickable(enabled = !hasVotedToday) { onVoteClick() },
+            contentAlignment = Alignment.Center
         ) {
             Text(
-                text = btnText,
-                color = Color.White,
+                text = buttonText,
+                color = textColor,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                fontWeight = FontWeight.Bold
             )
         }
     }
 }
 
 // ============================================================
-// ThemePickIdol -> RankingItem 변환 확장 함수
+// ImagePickLiveHeader - 이미지픽 결과 헤더
 // ============================================================
 
 /**
- * ThemePickIdol을 RankingItem으로 변환
+ * 이미지픽 결과 헤더 (타이틀, 참여인원, 투표기간)
+ * old 프로젝트 item_image_pick_header.xml 기반
  */
-private fun ThemePickIdol.toRankingItem(
-    totalVote: Int,
-    firstPlaceVote: Long
-): RankingItem {
-    val fullName = if (subtitle.isNotEmpty()) {
-        "${title}_${subtitle}"
-    } else {
-        title
+@Composable
+private fun ImagePickLiveHeader(
+    title: String,
+    participantsCount: String,
+    periodText: String,
+    isFinished: Boolean
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(colorResource(R.color.background_200))
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+    ) {
+        // 타이틀 (둥근 배경)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = colorResource(R.color.notice_background),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .padding(horizontal = 20.dp, vertical = 17.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = title,
+                style = ExoTypo.title14.copy(
+                    color = if (isFinished) {
+                        colorResource(R.color.gray300)
+                    } else {
+                        colorResource(R.color.main_light)
+                    }
+                )
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // 참여인원
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.num_participants),
+                style = ExoTypo.body14.copy(
+                    color = colorResource(R.color.text_gray),
+                    lineHeight = 20.sp
+                )
+            )
+            Spacer(modifier = Modifier.width(11.dp))
+            Text(
+                text = stringResource(R.string.num_participants_format, participantsCount),
+                style = ExoTypo.body13.copy(
+                    color = colorResource(R.color.text_default),
+                    lineHeight = 20.sp
+                )
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // 투표기간
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.onepick_period),
+                style = ExoTypo.body14.copy(
+                    color = colorResource(R.color.text_gray),
+                    lineHeight = 20.sp
+                )
+            )
+            Spacer(modifier = Modifier.width(11.dp))
+            Text(
+                text = periodText,
+                style = ExoTypo.body13.copy(
+                    color = colorResource(R.color.text_default),
+                    lineHeight = 20.sp
+                )
+            )
+        }
     }
-
-    val percentage = if (totalVote > 0) {
-        ((100.0f * vote.toFloat() / totalVote.toFloat())).roundToInt()
-    } else 0
-
-    return RankingItem(
-        id = id.toString(),
-        name = fullName,
-        rank = rank,
-        voteCount = vote.toString(),
-        heartCount = vote,
-        maxHeartCount = firstPlaceVote,
-        photoUrl = imageUrl,
-        percentage = percentage,
-        isFavorite = false
-    )
 }
 
 // ============================================================
-// ThemePickResultRankingItem - 보트 아이콘이 있는 랭킹 아이템
+// ImagePickLiveRankingItem - 이미지픽 결과 랭킹 아이템
 // ============================================================
 
 /**
- * 테마픽 결과 화면용 랭킹 아이템
- * 기존 ThemePickRankingItem과 유사하지만 우측에 보트 아이콘(off 상태)이 추가됨
+ * 이미지픽 결과 화면용 랭킹 아이템
+ * ThemePickResultScreen과 동일한 형태, 프로필 이미지만 원형
  */
 @Composable
-private fun ThemePickResultRankingItem(
-    item: RankingItem,
-    candidate: ThemePickIdol,
+private fun ImagePickLiveRankingItem(
+    item: ImagePickIdolModel,
+    totalVote: Int,
+    firstPlaceVote: Long,
     isFirstItem: Boolean = false,
-    type: String = "I",
     onClick: () -> Unit = {}
 ) {
     if (item.rank == 1 && isFirstItem) {
-        ThemePickResult1stRankingItem(
+        ImagePickLive1stRankingItem(
             item = item,
-            candidate = candidate,
-            type = type,
+            totalVote = totalVote,
+            firstPlaceVote = firstPlaceVote,
             onClick = onClick
         )
     } else {
-        ThemePickResultOtherRankingItem(
+        ImagePickLiveOtherRankingItem(
             item = item,
-            candidate = candidate,
-            type = type,
+            totalVote = totalVote,
             onClick = onClick
         )
     }
 }
 
 /**
- * 테마픽 결과 1위 랭킹 아이템
+ * 이미지픽 결과 1위 랭킹 아이템
  */
 @Composable
-private fun ThemePickResult1stRankingItem(
-    item: RankingItem,
-    candidate: ThemePickIdol,
-    type: String,
+private fun ImagePickLive1stRankingItem(
+    item: ImagePickIdolModel,
+    totalVote: Int,
+    firstPlaceVote: Long,
     onClick: () -> Unit
 ) {
     val numberFormat = remember { NumberFormat.getNumberInstance(Locale.getDefault()) }
+    val idolName = item.idol?.name ?: ""
+    val imageUrl = item.idol?.imageUrl?.toSecureUrl()
+    val percentage = if (totalVote > 0) {
+        ((100.0f * item.voteCount.toFloat() / totalVote.toFloat())).roundToInt()
+    } else 0
 
     Column(
         modifier = Modifier
@@ -698,17 +541,17 @@ private fun ThemePickResult1stRankingItem(
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // 프로필 이미지 (큰 사이즈)
+                // 프로필 이미지 (큰 사이즈, 원형)
                 Box(
                     modifier = Modifier.size(90.dp)
                 ) {
                     AsyncImage(
-                        model = item.photoUrl,
-                        contentDescription = item.name,
+                        model = imageUrl,
+                        contentDescription = idolName,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
-                            .clip(RoundedCornerShape(10.dp))
+                            .clip(CircleShape)
                     )
                     // 1위 아이콘
                     AsyncImage(
@@ -729,7 +572,7 @@ private fun ThemePickResult1stRankingItem(
                 ) {
                     // 이름
                     Text(
-                        text = item.name.replace("_", " "),
+                        text = idolName,
                         color = colorResource(R.color.text_default),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
@@ -744,14 +587,14 @@ private fun ThemePickResult1stRankingItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = numberFormat.format(item.heartCount),
+                            text = numberFormat.format(item.voteCount),
                             color = colorResource(R.color.text_default),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "${item.percentage}%",
+                            text = "${percentage}%",
                             color = colorResource(R.color.text_gray),
                             fontSize = 12.sp
                         )
@@ -770,16 +613,20 @@ private fun ThemePickResult1stRankingItem(
 }
 
 /**
- * 테마픽 결과 2위 이하 랭킹 아이템
+ * 이미지픽 결과 2위 이하 랭킹 아이템
  */
 @Composable
-private fun ThemePickResultOtherRankingItem(
-    item: RankingItem,
-    candidate: ThemePickIdol,
-    type: String,
+private fun ImagePickLiveOtherRankingItem(
+    item: ImagePickIdolModel,
+    totalVote: Int,
     onClick: () -> Unit
 ) {
     val numberFormat = remember { NumberFormat.getNumberInstance(Locale.getDefault()) }
+    val idolName = item.idol?.name ?: ""
+    val imageUrl = item.idol?.imageUrl?.toSecureUrl()
+    val percentage = if (totalVote > 0) {
+        ((100.0f * item.voteCount.toFloat() / totalVote.toFloat())).roundToInt()
+    } else 0
 
     Row(
         modifier = Modifier
@@ -802,14 +649,14 @@ private fun ThemePickResultOtherRankingItem(
             modifier = Modifier.width(42.dp)
         )
 
-        // 프로필 이미지
+        // 프로필 이미지 (원형)
         AsyncImage(
-            model = item.photoUrl,
-            contentDescription = item.name,
+            model = imageUrl,
+            contentDescription = idolName,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(55.dp)
-                .clip(RoundedCornerShape(10.dp))
+                .clip(CircleShape)
         )
 
         Spacer(modifier = Modifier.width(9.dp))
@@ -820,7 +667,7 @@ private fun ThemePickResultOtherRankingItem(
         ) {
             // 이름
             Text(
-                text = item.name.replace("_", " "),
+                text = idolName,
                 color = colorResource(R.color.text_default),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
@@ -835,13 +682,13 @@ private fun ThemePickResultOtherRankingItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = numberFormat.format(item.heartCount),
+                    text = numberFormat.format(item.voteCount),
                     color = colorResource(R.color.text_default),
                     fontSize = 13.sp
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "${item.percentage}%",
+                    text = "${percentage}%",
                     color = colorResource(R.color.text_gray),
                     fontSize = 11.sp
                 )

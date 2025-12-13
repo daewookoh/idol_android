@@ -1225,7 +1225,8 @@ private fun VoteButton(
 @Composable
 private fun FinishedContent(
     state: ThemePickDetailContract.State,
-    onRewardToggle: () -> Unit
+    onRewardToggle: () -> Unit,
+    isImagePick: Boolean = false
 ) {
     val themePick = state.themePick ?: return
     val candidates = themePick.candidates ?: emptyList()
@@ -1290,7 +1291,7 @@ private fun FinishedContent(
             ThemePickRankingItem(
                 item = rankingItem,
                 isFirstItem = index == 0,
-                type = themePick.type,
+                isImagePick = isImagePick,
                 onClick = { }
             )
         }

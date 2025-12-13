@@ -181,11 +181,25 @@ sealed class Screen {
     data class ThemePickDetail(val themePickId: Int) : Screen()
 
     /**
-     * ThemePickResult 화면 - 테마픽 결과
+     * ThemePickLive 화면 - 테마픽 실시간 순위
      * @param themePickId 테마픽 ID
      */
     @Serializable
-    data class ThemePickResult(val themePickId: Int) : Screen()
+    data class ThemePickLive(val themePickId: Int) : Screen()
+
+    /**
+     * ImagePickDetail 화면 - 이미지픽 상세
+     * @param imagePickId 이미지픽 ID
+     */
+    @Serializable
+    data class ImagePickDetail(val imagePickId: Int) : Screen()
+
+    /**
+     * ImagePickLive 화면 - 이미지픽 실시간 순위
+     * @param imagePickId 이미지픽 ID
+     */
+    @Serializable
+    data class ImagePickLive(val imagePickId: Int) : Screen()
 
     /**
      * IdolRankingHistory 화면 - 아이돌 랭킹 히스토리

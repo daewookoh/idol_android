@@ -57,7 +57,9 @@ import net.ib.mn.presentation.main.freeboard.FreeBoardViewModel
 import net.ib.mn.presentation.friend.invite.FriendInviteScreen
 import net.ib.mn.presentation.profile.ProfileScreen
 import net.ib.mn.ui.components.LocalThemePickDetailClick
-import net.ib.mn.ui.components.LocalThemePickResultClick
+import net.ib.mn.ui.components.LocalThemePickLiveClick
+import net.ib.mn.ui.components.LocalImagePickDetailClick
+import net.ib.mn.ui.components.LocalImagePickLiveClick
 
 /**
  * 메인 화면.
@@ -251,8 +253,14 @@ fun MainScreen(
         LocalThemePickDetailClick provides { themePickId ->
             navigator.navigate(Screen.ThemePickDetail(themePickId))
         },
-        LocalThemePickResultClick provides { themePickId ->
-            navigator.navigate(Screen.ThemePickResult(themePickId))
+        LocalThemePickLiveClick provides { themePickId ->
+            navigator.navigate(Screen.ThemePickLive(themePickId))
+        },
+        LocalImagePickDetailClick provides { imagePickId ->
+            navigator.navigate(Screen.ImagePickDetail(imagePickId))
+        },
+        LocalImagePickLiveClick provides { imagePickId ->
+            navigator.navigate(Screen.ImagePickLive(imagePickId))
         }
     ) {
         ExoScaffold(

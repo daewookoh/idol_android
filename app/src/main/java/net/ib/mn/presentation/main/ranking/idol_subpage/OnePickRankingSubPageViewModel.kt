@@ -10,6 +10,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.model.ImagePickModel
 import net.ib.mn.domain.model.ThemePickModel
-import net.ib.mn.domain.repository.OnepickRepository
+import net.ib.mn.domain.repository.ImagepickRepository
 import net.ib.mn.domain.repository.ThemepickRepository
 import net.ib.mn.ui.components.ThemePickState
 import net.ib.mn.ui.components.ImagePickState
@@ -39,7 +40,7 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
     @Assisted private val chartCode: String,
     @ApplicationContext private val context: Context,
     private val themepickRepository: ThemepickRepository,
-    private val onepickRepository: OnepickRepository,
+    private val imagepickRepository: ImagepickRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -137,6 +138,14 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
     fun refresh() {
         viewModelScope.launch(Dispatchers.IO) {
             _isRefreshing.value = true
+            val startTime = System.currentTimeMillis()
+
+            suspend fun finishRefresh() {
+                val elapsed = System.currentTimeMillis() - startTime
+                if (elapsed < 1000) delay(1000 - elapsed)
+                _isRefreshing.value = false
+            }
+
             when (currentTab) {
                 TabType.THEME_PICK -> {
                     themepickRepository.getThemePickList(offset = 0, limit = 30).collect { result ->
@@ -144,26 +153,26 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
                             is ApiResult.Loading -> Unit
                             is ApiResult.Success -> {
                                 processThemePickData(result.data)
-                                _isRefreshing.value = false
+                                finishRefresh()
                             }
                             is ApiResult.Error -> {
                                 _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
-                                _isRefreshing.value = false
+                                finishRefresh()
                             }
                         }
                     }
                 }
                 TabType.IMAGE_PICK -> {
-                    onepickRepository.getImagePickList(offset = 0, limit = 30).collect { result ->
+                    imagepickRepository.getImagePickList(offset = 0, limit = 30).collect { result ->
                         when (result) {
                             is ApiResult.Loading -> Unit
                             is ApiResult.Success -> {
                                 processImagePickData(result.data)
-                                _isRefreshing.value = false
+                                finishRefresh()
                             }
                             is ApiResult.Error -> {
                                 _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
-                                _isRefreshing.value = false
+                                finishRefresh()
                             }
                         }
                     }
@@ -181,14 +190,9 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
 
             themepickRepository.getThemePickList(offset = 0, limit = 30).collect { result ->
                 when (result) {
-                    is ApiResult.Loading -> {
-                    }
-                    is ApiResult.Success -> {
-                        processThemePickData(result.data)
-                    }
-                    is ApiResult.Error -> {
-                        _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
-                    }
+                    is ApiResult.Loading -> Unit
+                    is ApiResult.Success -> processThemePickData(result.data)
+                    is ApiResult.Error -> _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
                 }
             }
         }
@@ -201,17 +205,11 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = UiState.Loading
 
-
-            onepickRepository.getImagePickList(offset = 0, limit = 30).collect { result ->
+            imagepickRepository.getImagePickList(offset = 0, limit = 30).collect { result ->
                 when (result) {
-                    is ApiResult.Loading -> {
-                    }
-                    is ApiResult.Success -> {
-                        processImagePickData(result.data)
-                    }
-                    is ApiResult.Error -> {
-                        _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
-                    }
+                    is ApiResult.Loading -> Unit
+                    is ApiResult.Success -> processImagePickData(result.data)
+                    is ApiResult.Error -> _uiState.value = UiState.Error(result.message ?: result.exception.message ?: "Error loading data")
                 }
             }
         }
@@ -267,7 +265,7 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
                 }
 
                 val periodDate = DateTimeUtil.formatPeriodSpaced(imagePick.createdAt, imagePick.expiredAt)
-                val voteCount = "${NumberFormatUtil.formatWithComma(imagePick.count)}표"
+                val voteCount = NumberFormatUtil.formatWithComma(imagePick.count)
 
                 // HeartPick과 동일한 D-Day 계산 (종료일 기준)
                 val dDay = DateTimeUtil.calculateDDay(context, imagePick.expiredAt, imagePick.status)
@@ -285,6 +283,7 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
                     voteCountRaw = imagePick.count,
                     periodDate = periodDate,
                     dDay = dDay,
+                    voteStatus = imagePick.vote,
                     isNew = isNew
                 )
             }
@@ -325,6 +324,7 @@ data class ThemePickCardData(
 /**
  * 이미지픽 카드 데이터
  *
+ * @param voteStatus 투표 상태 ("N": 투표가능, "V": 광고후 투표, "Y": 오늘 투표 완료)
  * @param isNew 신규 카드 여부 (48시간 이내 시작된 카드)
  */
 data class ImagePickCardData(
@@ -337,5 +337,6 @@ data class ImagePickCardData(
     val voteCountRaw: Int = 0,
     val periodDate: String,
     val dDay: String = "",
+    val voteStatus: String = "",  // "N": 투표가능, "V": 광고후 투표, "Y": 오늘 투표 완료
     val isNew: Boolean = false
 )

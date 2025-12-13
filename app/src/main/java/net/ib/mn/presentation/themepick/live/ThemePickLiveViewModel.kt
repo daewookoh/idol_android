@@ -1,4 +1,4 @@
-package net.ib.mn.presentation.themepick.result
+package net.ib.mn.presentation.themepick.live
 
 import android.content.Context
 import androidx.lifecycle.viewModelScope
@@ -19,27 +19,27 @@ import java.util.TimeZone
 import javax.inject.Inject
 
 /**
- * ThemePickResult (테마픽 순위 결과) 화면 ViewModel
+ * ThemePickLive (테마픽 순위 결과) 화면 ViewModel
  *
- * old 프로젝트: ThemePickResultActivity
+ * old 프로젝트: ThemePickLiveActivity
  */
 @HiltViewModel
-class ThemePickResultViewModel @Inject constructor(
+class ThemePickLiveViewModel @Inject constructor(
     private val themepickRepository: ThemepickRepository,
     @ApplicationContext private val context: Context
-) : BaseViewModel<ThemePickResultContract.State, ThemePickResultContract.Intent, ThemePickResultContract.Effect>() {
+) : BaseViewModel<ThemePickLiveContract.State, ThemePickLiveContract.Intent, ThemePickLiveContract.Effect>() {
 
     private var currentThemePickId: Int = 0
 
-    override fun createInitialState(): ThemePickResultContract.State = ThemePickResultContract.State()
+    override fun createInitialState(): ThemePickLiveContract.State = ThemePickLiveContract.State()
 
-    override fun handleIntent(intent: ThemePickResultContract.Intent) {
+    override fun handleIntent(intent: ThemePickLiveContract.Intent) {
         when (intent) {
-            is ThemePickResultContract.Intent.LoadResult -> loadResult(intent.themePickId)
-            is ThemePickResultContract.Intent.Share -> shareThemePick()
-            is ThemePickResultContract.Intent.ToggleRewardExpand -> toggleRewardExpand()
-            is ThemePickResultContract.Intent.GoToVote -> goToVote()
-            is ThemePickResultContract.Intent.OnItemClick -> onItemClick(intent.idolId)
+            is ThemePickLiveContract.Intent.LoadResult -> loadResult(intent.themePickId)
+            is ThemePickLiveContract.Intent.Share -> shareThemePick()
+            is ThemePickLiveContract.Intent.ToggleRewardExpand -> toggleRewardExpand()
+            is ThemePickLiveContract.Intent.GoToVote -> goToVote()
+            is ThemePickLiveContract.Intent.OnItemClick -> onItemClick(intent.idolId)
         }
     }
 
@@ -59,7 +59,7 @@ class ThemePickResultViewModel @Inject constructor(
                     is ApiResult.Error -> {
                         setState { copy(isLoading = false, error = result.message) }
                         setEffect {
-                            ThemePickResultContract.Effect.ShowToast(
+                            ThemePickLiveContract.Effect.ShowToast(
                                 result.message ?: context.getString(R.string.desc_failed_to_connect_internet)
                             )
                         }
@@ -102,7 +102,7 @@ class ThemePickResultViewModel @Inject constructor(
 
     /**
      * 후보 정렬 및 순위 계산
-     * old 프로젝트: ThemePickResultActivity.loadRank()의 정렬 로직
+     * old 프로젝트: ThemePickLiveActivity.loadRank()의 정렬 로직
      */
     private fun sortAndRankCandidates(themePick: ThemePickModel): ThemePickModel {
         val candidates = themePick.candidates ?: return themePick
@@ -168,14 +168,14 @@ class ThemePickResultViewModel @Inject constructor(
             params = listOf("themepick", themePick.id.toString())
         )
 
-        val shareText = shareThemePickResult(themePick, url)
-        setEffect { ThemePickResultContract.Effect.ShareThemePick(shareText) }
+        val shareText = shareThemePickLive(themePick, url)
+        setEffect { ThemePickLiveContract.Effect.ShareThemePick(shareText) }
     }
 
     /**
      * 진행중/종료 상태 공유 포맷
      */
-    private fun shareThemePickResult(themePick: ThemePickModel, url: String): String {
+    private fun shareThemePickLive(themePick: ThemePickModel, url: String): String {
         val candidates = themePick.candidates ?: return ""
 
         val top1Name = candidates.getOrNull(0)?.let { formatCandidateName(it) }.orEmpty()
@@ -222,7 +222,7 @@ class ThemePickResultViewModel @Inject constructor(
      */
     private fun goToVote() {
         val themePick = currentState.themePick ?: return
-        setEffect { ThemePickResultContract.Effect.NavigateToVote(themePick.id) }
+        setEffect { ThemePickLiveContract.Effect.NavigateToVote(themePick.id) }
     }
 
     /**
@@ -230,7 +230,7 @@ class ThemePickResultViewModel @Inject constructor(
      */
     private fun onItemClick(idolId: Int?) {
         if (idolId != null) {
-            setEffect { ThemePickResultContract.Effect.NavigateToCommunity(idolId) }
+            setEffect { ThemePickLiveContract.Effect.NavigateToCommunity(idolId) }
         }
     }
 }

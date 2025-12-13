@@ -33,7 +33,9 @@ import net.ib.mn.ui.components.ExoImagePickCard
 import net.ib.mn.ui.components.ExoTabSwitch
 import net.ib.mn.ui.components.ExoThemePickCard
 import net.ib.mn.ui.components.LocalThemePickDetailClick
-import net.ib.mn.ui.components.LocalThemePickResultClick
+import net.ib.mn.ui.components.LocalThemePickLiveClick
+import net.ib.mn.ui.components.LocalImagePickDetailClick
+import net.ib.mn.ui.components.LocalImagePickLiveClick
 import net.ib.mn.ui.theme.ColorPalette
 
 /**
@@ -51,7 +53,9 @@ fun OnePickRankingSubPage(
 ) {
     // CompositionLocal을 통해 Navigation으로 화면 전환
     val onThemePickDetailClick = LocalThemePickDetailClick.current
-    val onThemePickResultClick = LocalThemePickResultClick.current
+    val onThemePickLiveClick = LocalThemePickLiveClick.current
+    val onImagePickDetailClick = LocalImagePickDetailClick.current
+    val onImagePickLiveClick = LocalImagePickLiveClick.current
 
     val viewModel: OnePickRankingSubPageViewModel = hiltViewModel<OnePickRankingSubPageViewModel, OnePickRankingSubPageViewModel.Factory> { factory ->
         factory.create(chartCode)
@@ -178,7 +182,7 @@ fun OnePickRankingSubPage(
                                         if (cardData.voteCountRaw == 0) {
                                             showNoParticipantsDialog = true
                                         } else {
-                                            onThemePickResultClick(cardData.id)
+                                            onThemePickLiveClick(cardData.id)
                                         }
                                     }
                                 )
@@ -213,14 +217,19 @@ fun OnePickRankingSubPage(
                                     subTitle = cardData.subTitle,
                                     voteCount = cardData.voteCount,
                                     periodDate = cardData.periodDate,
+                                    voteStatus = cardData.voteStatus,
                                     isNew = cardData.isNew,
-                                    onCardClick = { },
-                                    onVoteClick = { },
+                                    onCardClick = {
+                                        onImagePickDetailClick(cardData.id)
+                                    },
+                                    onVoteClick = {
+                                        onImagePickDetailClick(cardData.id)
+                                    },
                                     onCurrentRankingClick = {
                                         if (cardData.voteCountRaw == 0) {
                                             showNoParticipantsDialog = true
                                         } else {
-                                            // TODO: Navigate to ImagePick result
+                                            onImagePickLiveClick(cardData.id)
                                         }
                                     }
                                 )

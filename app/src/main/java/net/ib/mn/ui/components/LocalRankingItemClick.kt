@@ -79,14 +79,40 @@ val LocalThemePickDetailClick = compositionLocalOf<(Int) -> Unit> {
 }
 
 /**
- * ThemePickResult 화면으로 이동하기 위한 CompositionLocal
+ * ThemePickLive 화면으로 이동하기 위한 CompositionLocal
  *
- * ThemePick 결과 화면으로 이동 시 사용됩니다.
+ * ThemePick 실시간 순위 화면으로 이동 시 사용됩니다.
  * MainScreen에서 제공하고, ThemePickDetailScreen에서 소비합니다.
  *
  * @param themePickId 테마픽 ID
  */
-val LocalThemePickResultClick = compositionLocalOf<(Int) -> Unit> {
+val LocalThemePickLiveClick = compositionLocalOf<(Int) -> Unit> {
+    // 기본값: 아무 동작도 하지 않음
+    { _ -> }
+}
+
+/**
+ * ImagePickDetail 화면으로 이동하기 위한 CompositionLocal
+ *
+ * ImagePick 카드 클릭 시 사용됩니다.
+ * MainScreen에서 제공하고, OnePickRankingSubPage에서 소비합니다.
+ *
+ * @param imagePickId 이미지픽 ID
+ */
+val LocalImagePickDetailClick = compositionLocalOf<(Int) -> Unit> {
+    // 기본값: 아무 동작도 하지 않음
+    { _ -> }
+}
+
+/**
+ * ImagePickLive 화면으로 이동하기 위한 CompositionLocal
+ *
+ * ImagePick 실시간 순위 화면으로 이동 시 사용됩니다.
+ * MainScreen에서 제공하고, ImagePickDetailScreen에서 소비합니다.
+ *
+ * @param imagePickId 이미지픽 ID
+ */
+val LocalImagePickLiveClick = compositionLocalOf<(Int) -> Unit> {
     // 기본값: 아무 동작도 하지 않음
     { _ -> }
 }

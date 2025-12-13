@@ -19,7 +19,8 @@ import net.ib.mn.util.logD
  */
 @Stable
 class AppNavigator(
-    val backStack: SnapshotStateList<Screen>
+    val backStack: SnapshotStateList<Screen>,
+    private var _pendingDeepLink: Screen? = null
 ) {
     /**
      * 새 화면으로 네비게이션
@@ -64,19 +65,35 @@ class AppNavigator(
      */
     val stackSize: Int
         get() = backStack.size
+
+    /**
+     * 대기 중인 딥링크가 있으면 가져오고 소비 (한 번만 사용)
+     */
+    fun consumePendingDeepLink(): Screen? {
+        val deepLink = _pendingDeepLink
+        _pendingDeepLink = null
+        return deepLink
+    }
+
+    /**
+     * 대기 중인 딥링크가 있는지 확인
+     */
+    fun hasPendingDeepLink(): Boolean = _pendingDeepLink != null
 }
 
 /**
  * AppNavigator를 생성하고 기억하는 Composable 함수.
  *
  * @param startDestination 시작 화면
+ * @param pendingDeepLink 대기 중인 딥링크 화면 (StartUp 완료 후 이동)
  */
 @Composable
 fun rememberAppNavigator(
-    startDestination: Screen = Screen.StartUp()
+    startDestination: Screen = Screen.StartUp(),
+    pendingDeepLink: Screen? = null
 ): AppNavigator {
     val backStack = remember { mutableStateListOf(startDestination) }
-    return remember(backStack) {
-        AppNavigator(backStack)
+    return remember(backStack, pendingDeepLink) {
+        AppNavigator(backStack, pendingDeepLink)
     }
 }

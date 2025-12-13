@@ -8,7 +8,7 @@ import net.ib.mn.data.repository.FavoritesRepositoryImpl
 import net.ib.mn.data.repository.HeartpickRepositoryImpl
 import net.ib.mn.data.repository.IdolRepositoryImpl
 import net.ib.mn.data.repository.MessageRepositoryImpl
-import net.ib.mn.data.repository.OnepickRepositoryImpl
+import net.ib.mn.data.repository.ImagepickRepositoryImpl
 import net.ib.mn.data.repository.ThemepickRepositoryImpl
 import net.ib.mn.data.repository.UserRepositoryImpl
 import net.ib.mn.data.repository.UtilityRepositoryImpl
@@ -31,7 +31,7 @@ import net.ib.mn.domain.repository.FavoritesRepository
 import net.ib.mn.domain.repository.HeartpickRepository
 import net.ib.mn.domain.repository.IdolRepository
 import net.ib.mn.domain.repository.MessageRepository
-import net.ib.mn.domain.repository.OnepickRepository
+import net.ib.mn.domain.repository.ImagepickRepository
 import net.ib.mn.domain.repository.ThemepickRepository
 import net.ib.mn.domain.repository.UserRepository
 import net.ib.mn.domain.repository.UtilityRepository
@@ -103,9 +103,9 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindOnepickRepository(
-        impl: OnepickRepositoryImpl
-    ): OnepickRepository
+    abstract fun bindImagepickRepository(
+        impl: ImagepickRepositoryImpl
+    ): ImagepickRepository
 
     @Binds
     @Singleton

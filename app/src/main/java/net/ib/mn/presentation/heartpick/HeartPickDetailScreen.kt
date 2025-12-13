@@ -1024,13 +1024,13 @@ private fun ResultInfoSection(
         // 전체 투표수
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "전체 투표수",
+                text = stringResource(R.string.themepick_total_votes),
                 color = colorResource(R.color.text_gray),
                 fontSize = 14.sp
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
-                text = "${numberFormat.format(totalVote)}표",
+                text = stringResource(R.string.num_participants_format, numberFormat.format(totalVote)),
                 color = colorResource(R.color.text_default),
                 fontSize = 14.sp
             )

@@ -2017,20 +2017,20 @@ fun HofDailyRankingItem(
 fun ThemePickRankingItem(
     item: RankingItem,
     isFirstItem: Boolean = false,
-    type: String = "I",
+    isImagePick: Boolean = false,
     onClick: () -> Unit = {}
 ) {
     // 1위 전용 레이아웃: 순위가 1위이면서 첫번째 아이템인 경우만
     if (item.rank == 1 && isFirstItem) {
         ThemePick1stRankingItem(
             item = item,
-            type = type,
+            isImagePick = isImagePick,
             onClick = onClick
         )
     } else {
         ThemePickOtherRankingItem(
             item = item,
-            type = type,
+            isImagePick = isImagePick,
             onClick = onClick
         )
     }
@@ -2042,7 +2042,7 @@ fun ThemePickRankingItem(
 @Composable
 private fun ThemePick1stRankingItem(
     item: RankingItem,
-    type: String,
+    isImagePick: Boolean,
     onClick: () -> Unit
 ) {
     Column(
@@ -2073,31 +2073,12 @@ private fun ThemePick1stRankingItem(
                 Column(modifier = Modifier.weight(1f)) {
                     // 이름
                     Box(modifier = Modifier.padding(start = textStartPadding)) {
-                        if (type == "I") {
-                            ExoNameWithGroup(
-                                fullName = item.name,
-                                nameFontSize = 15.sp,
-                                groupFontSize = 10.sp
-                            )
-                        } else {
-                            Column {
-                                val parts = item.name.split("_", limit = 2)
-                                Text(
-                                    text = parts.getOrNull(0) ?: item.name,
-                                    style = ExoTypo.title15,
-                                    maxLines = 1,
-                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                                )
-                                if (parts.size > 1) {
-                                    Text(
-                                        text = parts[1],
-                                        style = ExoTypo.body11.copy(color = ColorPalette.textGray),
-                                        maxLines = 1,
-                                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                                    )
-                                }
-                            }
-                        }
+                        ExoNameWithGroup(
+                            fullName = item.name,
+                            nameFontSize = 15.sp,
+                            groupFontSize = 10.sp,
+                            singleLine = false
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -2197,7 +2178,7 @@ private fun ThemePick1stRankingItem(
             ) {
                 ExoProfileImage(
                     imageUrl = item.photoUrl,
-                    type = ProfileImageType.XLARGE_SQUARE,
+                    type = if(isImagePick) ProfileImageType.XLARGE else  ProfileImageType.XLARGE_SQUARE,
                     modifier = Modifier.offset(x = 10.dp)
                 )
 
@@ -2236,7 +2217,7 @@ private fun ThemePick1stRankingItem(
 @Composable
 private fun ThemePickOtherRankingItem(
     item: RankingItem,
-    type: String,
+    isImagePick: Boolean,
     onClick: () -> Unit
 ) {
     Row(
@@ -2262,7 +2243,7 @@ private fun ThemePickOtherRankingItem(
         // 프로필 이미지
         ExoProfileImage(
             imageUrl = item.photoUrl,
-            type = ProfileImageType.MEDIUM_SQUARE,
+            type = if(isImagePick) ProfileImageType.MEDIUM else ProfileImageType.MEDIUM_SQUARE,
             rank = item.rank,
             contentDescription = "프로필 이미지"
         )
@@ -2271,31 +2252,12 @@ private fun ThemePickOtherRankingItem(
 
         // 정보 영역
         Column(modifier = Modifier.weight(1f)) {
-            // 이름
-            if (type == "I") {
-                ExoNameWithGroup(
-                    fullName = item.name,
-                    nameFontSize = 15.sp,
-                    groupFontSize = 10.sp,
-                    singleLine = true
-                )
-            } else {
-                val parts = item.name.split("_", limit = 2)
-                Text(
-                    text = parts.getOrNull(0) ?: item.name,
-                    style = ExoTypo.title15,
-                    maxLines = 1,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                )
-                if (parts.size > 1) {
-                    Text(
-                        text = parts[1],
-                        style = ExoTypo.body11.copy(color = ColorPalette.textGray),
-                        maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                    )
-                }
-            }
+            ExoNameWithGroup(
+                fullName = item.name,
+                nameFontSize = 15.sp,
+                groupFontSize = 10.sp,
+                singleLine = true
+            )
 
             Spacer(modifier = Modifier.height(4.dp))
 
@@ -2381,4 +2343,61 @@ private fun ThemePickOtherRankingItem(
             }
         }
     }
+}
+
+// ============================================================
+// ImagePick Ranking Item
+// ============================================================
+
+/**
+ * ImagePickRankingItem - 이미지픽 순위 아이템
+ *
+ * ThemePickRankingItem을 래핑하여 이미지픽용 type("O")으로 사용
+ *
+ * @param item 이미지픽 후보 데이터
+ * @param rank 순위 (1-based)
+ * @param isFirst 1위 여부 (큰 레이아웃 적용)
+ * @param onClick 아이템 클릭 콜백
+ */
+@Composable
+fun ImagePickRankingItem(
+    item: net.ib.mn.domain.model.ImagePickIdolModel,
+    rank: Int,
+    isFirst: Boolean = false,
+    totalVoteCount: Long = 0L,
+    onClick: () -> Unit = {}
+) {
+    val numberFormat = remember { java.text.NumberFormat.getNumberInstance(java.util.Locale.getDefault()) }
+
+    // ImagePickIdolModel을 RankingItem으로 변환
+    // imageUrl: 이미지픽 전용 이미지 (없으면 아이돌 기본 이미지 사용)
+    val photoUrl = item.imageUrl ?: item.idol?.imageUrl
+
+    // 퍼센티지 계산
+    val percentage = if (totalVoteCount > 0) {
+        ((item.voteCount * 100.0) / totalVoteCount).toInt()
+    } else {
+        0
+    }
+
+    val rankingItem = RankingItem(
+        rank = rank,
+        name = item.idol?.name ?: "",
+        nameEn = item.idol?.nameEn,
+        voteCount = "${numberFormat.format(item.voteCount)}표",
+        photoUrl = photoUrl,
+        id = item.id.toString(),
+        heartCount = item.voteCount,
+        maxHeartCount = item.firstPlaceVoteCount,
+        minHeartCount = item.lastPlaceVoteCount,
+        percentage = percentage
+    )
+
+    // ThemePickRankingItem 사용
+    ThemePickRankingItem(
+        item = rankingItem,
+        isFirstItem = isFirst,
+        isImagePick = true,
+        onClick = onClick
+    )
 }

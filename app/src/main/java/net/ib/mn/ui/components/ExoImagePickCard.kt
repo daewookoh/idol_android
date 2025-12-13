@@ -47,6 +47,7 @@ enum class ImagePickState {
  * @param subTitle 부제목
  * @param voteCount 전체 투표수
  * @param periodDate 투표 기간
+ * @param voteStatus 투표 상태 ("N": 투표가능, "V": 광고후 투표, "Y": 오늘 투표 완료)
  * @param isNew 신규 카드 여부 (48시간 이내 시작된 카드면 N 아이콘 표시)
  * @param onCardClick 카드 클릭 이벤트
  * @param onVoteClick 투표 클릭 이벤트
@@ -60,6 +61,7 @@ fun ExoImagePickCard(
     subTitle: String,
     voteCount: String,
     periodDate: String,
+    voteStatus: String = "N",
     isNew: Boolean = false,
     onCardClick: () -> Unit,
     onVoteClick: () -> Unit,
@@ -92,6 +94,7 @@ fun ExoImagePickCard(
             subTitle = subTitle,
             periodDate = periodDate,
             voteCount = voteCount,
+            voteStatus = voteStatus,
             showNewIcon = showNewIcon,
             onCardClick = onCardClick,
             onVoteClick = onVoteClick,
@@ -263,6 +266,11 @@ private fun ImagePickUpcomingCard(
 
 /**
  * ACTIVE 상태 이미지픽 카드
+ *
+ * @param voteStatus 투표 상태:
+ *   - "N": 첫 투표 가능 → "투표하기" 버튼 (mainLight)
+ *   - "V": 광고 시청 후 추가 투표 가능 → "추가 투표하기" 버튼 (mainLight)
+ *   - "Y": 오늘 투표 완료 → "오늘 투표 완료" 버튼 (gray, 비활성화)
  */
 @Composable
 private fun ImagePickActiveCard(
@@ -270,6 +278,7 @@ private fun ImagePickActiveCard(
     subTitle: String,
     periodDate: String,
     voteCount: String,
+    voteStatus: String,
     showNewIcon: Boolean,
     onCardClick: () -> Unit,
     onVoteClick: () -> Unit,
@@ -332,16 +341,11 @@ private fun ImagePickActiveCard(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // 투표 참여 버튼
-                ExoButton(
+                // 투표 참여 버튼 (공통 컴포넌트 사용)
+                ExoPickVoteButton(
+                    voteStatus = voteStatus,
                     onClick = onVoteClick,
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(R.string.guide_vote_title),
-                    fontSize = 14.sp,
-                    height = 41.dp,
-                    shape = RoundedCornerShape(20.dp),
-                    containerColor = ColorPalette.mainLight,
-                    contentColor = ColorPalette.textWhiteBlack
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
