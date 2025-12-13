@@ -70,8 +70,8 @@ import net.ib.mn.R
 import net.ib.mn.domain.model.FriendModel
 import net.ib.mn.navigation.LocalAppNavigator
 import net.ib.mn.navigation.Screen
-import net.ib.mn.presentation.overlay.friendinvite.FriendInviteScreen
-import net.ib.mn.presentation.overlay.profile.ProfileScreen
+import net.ib.mn.presentation.friend.invite.FriendInviteScreen
+import net.ib.mn.presentation.profile.ProfileScreen
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoDialog
 import net.ib.mn.ui.components.ExoProfileImage

@@ -1,6 +1,5 @@
 package net.ib.mn.presentation.main.ranking
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
@@ -8,8 +7,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -78,8 +75,6 @@ import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.main.MainViewModel
 import net.ib.mn.presentation.main.ranking.idol_subpage.*
 import net.ib.mn.presentation.webview.WebViewScreen
-import net.ib.mn.presentation.overlay.themepick.ThemePickDetailScreen
-import net.ib.mn.presentation.overlay.themepick.result.ThemePickResultScreen
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.Constants
@@ -109,10 +104,6 @@ fun RankingPage(
     // WebView 상태 관리
     var webViewEventId by rememberSaveable { mutableStateOf<Int?>(null) }
     var webViewTitle by rememberSaveable { mutableStateOf("") }
-
-    // ThemePick 오버레이 상태 관리
-    var selectedThemePickDetailId by rememberSaveable { mutableStateOf<Int?>(null) }
-    var selectedThemePickResultId by rememberSaveable { mutableStateOf<Int?>(null) }
 
     // 최애 이동 토스트 상태
     val showMyFavToast by viewModel.showMyFavToast.collectAsState()
@@ -275,9 +266,7 @@ fun RankingPage(
                     "HEARTPICK" -> HeartPickRankingSubPage(chartCode = chartCode, isVisible = isCurrentPage)
                     "ONEPICK" -> OnePickRankingSubPage(
                         chartCode = chartCode,
-                        isVisible = isCurrentPage,
-                        onThemePickDetailClick = { id -> selectedThemePickDetailId = id },
-                        onThemePickResultClick = { id -> selectedThemePickResultId = id }
+                        isVisible = isCurrentPage
                     )
                     "HOF" -> HallOfFameRankingSubPage(
                         chartCode = chartCode,
@@ -323,46 +312,6 @@ fun RankingPage(
                 url = "${ServerUrl.HOST}/api/v1/events/$eventId/",
                 title = webViewTitle,
                 onNavigateBack = { webViewEventId = null }
-            )
-        }
-    }
-
-    // ThemePickDetailScreen 오버레이
-    AnimatedVisibility(
-        visible = selectedThemePickDetailId != null,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        selectedThemePickDetailId?.let { themePickId ->
-            ThemePickDetailScreen(
-                themePickId = themePickId,
-                onBackClick = { selectedThemePickDetailId = null },
-                onNavigateToResult = { id ->
-                    selectedThemePickDetailId = null
-                    selectedThemePickResultId = id
-                }
-            )
-        }
-    }
-
-    // ThemePickResultScreen 오버레이
-    AnimatedVisibility(
-        visible = selectedThemePickResultId != null,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        selectedThemePickResultId?.let { themePickId ->
-            ThemePickResultScreen(
-                themePickId = themePickId,
-                onBackClick = { selectedThemePickResultId = null },
-                onNavigateToVote = { id ->
-                    selectedThemePickResultId = null
-                    selectedThemePickDetailId = id
-                },
-                onNavigateToCommunity = { idolId ->
-                    selectedThemePickResultId = null
-                    navigator.navigate(Screen.Community(idolId))
-                }
             )
         }
     }

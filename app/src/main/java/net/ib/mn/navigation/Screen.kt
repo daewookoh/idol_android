@@ -165,4 +165,70 @@ sealed class Screen {
      */
     @Serializable
     data object FriendDelete : Screen()
+
+    /**
+     * HeartPickDetail 화면 - 하트픽 상세
+     * @param heartPickId 하트픽 ID
+     */
+    @Serializable
+    data class HeartPickDetail(val heartPickId: Int) : Screen()
+
+    /**
+     * ThemePickDetail 화면 - 테마픽 상세
+     * @param themePickId 테마픽 ID
+     */
+    @Serializable
+    data class ThemePickDetail(val themePickId: Int) : Screen()
+
+    /**
+     * ThemePickResult 화면 - 테마픽 결과
+     * @param themePickId 테마픽 ID
+     */
+    @Serializable
+    data class ThemePickResult(val themePickId: Int) : Screen()
+
+    /**
+     * IdolRankingHistory 화면 - 아이돌 랭킹 히스토리
+     * @param idolId 아이돌 ID
+     * @param idolName 아이돌 이름
+     */
+    @Serializable
+    data class IdolRankingHistory(
+        val idolId: Int,
+        val idolName: String
+    ) : Screen()
+
+    /**
+     * DailyRankingHistory 화면 - 일일 랭킹 히스토리
+     * @param historyParam 히스토리 파라미터 (날짜)
+     * @param type 아이돌 타입
+     * @param chartCode 차트 코드
+     * @param dateTitle 날짜 타이틀
+     */
+    @Serializable
+    data class DailyRankingHistory(
+        val historyParam: String,
+        val type: String,
+        val chartCode: String,
+        val dateTitle: String
+    ) : Screen()
+
+    /**
+     * Profile 화면 - 프로필 상세
+     * @param userId 유저 ID
+     * @param nickname 닉네임
+     * @param imageUrl 프로필 이미지 URL
+     * @param level 레벨
+     * @param mostIdolName 최애 아이돌 이름
+     * @param isMine 내 프로필 여부
+     */
+    @Serializable
+    data class Profile(
+        val userId: Int,
+        val nickname: String,
+        val imageUrl: String? = null,
+        val level: Int,
+        val mostIdolName: String? = null,
+        val isMine: Boolean = false
+    ) : Screen()
 }

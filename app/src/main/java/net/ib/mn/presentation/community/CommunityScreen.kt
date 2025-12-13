@@ -77,7 +77,7 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.domain.model.ApiResult
-import net.ib.mn.presentation.overlay.profile.ProfileScreen
+import net.ib.mn.presentation.profile.ProfileScreen
 import net.ib.mn.presentation.community.subpage.CommunityChatSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFanTalkSubPage
 import net.ib.mn.presentation.community.subpage.CommunityFeedSubPage
@@ -90,15 +90,15 @@ import net.ib.mn.presentation.community.subpage.CommunityScheduleViewModel
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.ScheduleModel
 import net.ib.mn.domain.model.TrendsModel
-import net.ib.mn.presentation.overlay.articledetail.ArticleDetailScreen
-import net.ib.mn.presentation.overlay.photodetail.PhotoDetailScreen
+import net.ib.mn.presentation.article.detail.ArticleDetailScreen
+import net.ib.mn.presentation.photo.PhotoDetailScreen
 import net.ib.mn.presentation.community.schedule.ScheduleDetailScreen
 import net.ib.mn.presentation.community.schedule.ScheduleWriteScreen
 import net.ib.mn.presentation.community.chat.create.ChatRoomCreateScreen
 import net.ib.mn.presentation.community.chat.room.ChatRoomScreen
 import net.ib.mn.presentation.webview.WebViewScreen
-import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
-import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
+import net.ib.mn.presentation.article.write.ArticleWriteScreen
+import net.ib.mn.presentation.article.write.ArticleWriteType
 import java.util.Date
 import net.ib.mn.util.ServerUrl
 import net.ib.mn.ui.components.*
@@ -110,6 +110,10 @@ import net.ib.mn.util.NumberFormatUtil
 import net.ib.mn.util.link.LinkUtil
 import net.ib.mn.navigation.LocalAppNavigator
 import net.ib.mn.navigation.Screen
+import net.ib.mn.presentation.community.burningday.BurningDayDialog
+import net.ib.mn.presentation.community.history.idol.IdolRankingHistoryScreen
+import net.ib.mn.presentation.community.trends.TrendsScreen
+import net.ib.mn.presentation.community.votertop100.VoterTop100Screen
 
 /**
  * CommunityTab - 커뮤니티 탭 타입

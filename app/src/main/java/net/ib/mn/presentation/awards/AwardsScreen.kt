@@ -43,7 +43,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.presentation.community.CommunityScreen
-import net.ib.mn.presentation.community.IdolRankingHistoryScreen
+import net.ib.mn.presentation.community.history.idol.IdolRankingHistoryScreen
 import net.ib.mn.presentation.awards.subpage.AwardsCumulativeSubPage
 import net.ib.mn.presentation.awards.subpage.AwardsDailySubPage
 import net.ib.mn.presentation.awards.subpage.AwardsGuideSubPage

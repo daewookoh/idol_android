@@ -48,18 +48,6 @@ class MainViewModel @Inject constructor(
     private val _logoutCompleted = MutableStateFlow(false)
     val logoutCompleted: StateFlow<Boolean> = _logoutCompleted.asStateFlow()
 
-    // CommunityScreen 표시 상태 (RankingItem 클릭 시 사용)
-    private val _selectedRankingItem = MutableStateFlow<net.ib.mn.ui.components.RankingItem?>(null)
-    val selectedRankingItem: StateFlow<net.ib.mn.ui.components.RankingItem?> = _selectedRankingItem.asStateFlow()
-
-    // IdolRankingHistoryScreen 표시 상태 (CUMULATIVE 아이템 클릭 시 사용)
-    private val _selectedIdolRankingHistoryItem = MutableStateFlow<net.ib.mn.ui.components.RankingItem?>(null)
-    val selectedIdolRankingHistoryItem: StateFlow<net.ib.mn.ui.components.RankingItem?> = _selectedIdolRankingHistoryItem.asStateFlow()
-
-    // DailyRankingHistoryScreen 표시 상태 (HofDailyRankingItem 클릭 시 사용)
-    private val _selectedHofDailyItem = MutableStateFlow<Pair<net.ib.mn.data.remote.dto.DailyRankModel, String>?>(null)
-    val selectedHofDailyItem: StateFlow<Pair<net.ib.mn.data.remote.dto.DailyRankModel, String>?> = _selectedHofDailyItem.asStateFlow()
-
     // 즉시 반응하는 로컬 카테고리 상태 (UI 반응성 개선)
     private val _currentCategory = MutableStateFlow<String?>(null)
     val currentCategory: StateFlow<String?> = _currentCategory.asStateFlow()
@@ -91,112 +79,6 @@ class MainViewModel @Inject constructor(
 
         // 기존 콜백 제거 - 새 전략에서는 onTabSelected()에서 직접 API 호출 여부를 판단
         // idolBroadcastManager.setOnReactionEnabledCallback { ... }
-    }
-
-    /**
-     * CommunityScreen 열기 (RankingItem 클릭 시)
-     */
-    fun openCommunity(rankingItem: net.ib.mn.ui.components.RankingItem) {
-        _selectedRankingItem.value = rankingItem
-    }
-
-    /**
-     * CommunityScreen 열기 (idol ID로)
-     * ExoTop3 클릭 시 사용
-     */
-    fun openCommunityByIdolId(idolId: Int) {
-        viewModelScope.launch {
-            val idol = idolRepository.getIdolById(idolId)
-            if (idol != null) {
-                val rankingItem = net.ib.mn.ui.components.RankingItem(
-                    id = idol.id.toString(),
-                    rank = 1,
-                    name = idol.name,
-                    nameEn = idol.nameEn,
-                    voteCount = idol.heart.toString(),
-                    photoUrl = idol.imageUrl,
-                    fandomName = idol.fdName,
-                    groupId = idol.groupId,
-                    category = idol.category,
-                    miracleCount = idol.miracleCount,
-                    fairyCount = idol.fairyCount,
-                    angelCount = idol.angelCount,
-                    anniversary = idol.anniversary,
-                    anniversaryDays = idol.anniversaryDays ?: 0
-                )
-                _selectedRankingItem.value = rankingItem
-            }
-        }
-    }
-
-    /**
-     * IdolRankingHistoryScreen 열기 (CUMULATIVE 아이템 클릭 시)
-     */
-    fun openIdolRankingHistory(rankingItem: net.ib.mn.ui.components.RankingItem) {
-        _selectedIdolRankingHistoryItem.value = rankingItem
-    }
-
-    /**
-     * IdolRankingHistoryScreen 닫기
-     */
-    fun closeIdolRankingHistory() {
-        _selectedIdolRankingHistoryItem.value = null
-    }
-
-    /**
-     * DailyRankingHistoryScreen 열기 (HofDailyRankingItem 클릭 시)
-     *
-     * @param dailyRankModel 일일 랭킹 모델
-     * @param chartCode 차트 코드 (app 플레이버에서 필요)
-     */
-    fun openDailyRankingHistory(dailyRankModel: net.ib.mn.data.remote.dto.DailyRankModel, chartCode: String) {
-        _selectedHofDailyItem.value = Pair(dailyRankModel, chartCode)
-    }
-
-    /**
-     * DailyRankingHistoryScreen 닫기
-     */
-    fun closeDailyRankingHistory() {
-        _selectedHofDailyItem.value = null
-    }
-
-    /**
-     * 채팅 탭 표시 여부 계산 (old 프로젝트의 setIsShowChattingTab과 동일)
-     * 조건: 최애이거나, 최애의 그룹이거나, 관리자인 경우
-     *
-     * @param rankingItem 현재 커뮤니티의 아이돌
-     * @return 채팅 탭 표시 여부
-     */
-    suspend fun shouldShowChattingTab(rankingItem: net.ib.mn.ui.components.RankingItem): Boolean {
-        val userHeart = _userInfo.value?.heart ?: 0
-        val mostIdolId = preferencesManager.getMostIdolId()
-
-        val idolId = rankingItem.id.toIntOrNull() ?: 0
-        val groupId = rankingItem.groupId
-
-        // 관리자인 경우
-        if (userHeart == Constants.LEVEL_ADMIN) {
-            return true
-        }
-
-        // 최애인 경우
-        if (mostIdolId != null && mostIdolId == idolId) {
-            return true
-        }
-
-        // 최애의 그룹인 경우 (현재 아이돌이 그룹이고, 최애가 해당 그룹의 멤버인 경우)
-        if (groupId != null && mostIdolId != null && groupId == mostIdolId) {
-            return true
-        }
-
-        return false
-    }
-
-    /**
-     * CommunityScreen 닫기
-     */
-    fun closeCommunity() {
-        _selectedRankingItem.value = null
     }
 
     /**

@@ -83,9 +83,9 @@ import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.NumberFormatUtil
 import net.ib.mn.util.getAdDatePeriod
 import net.ib.mn.domain.model.ArticleFile
-import net.ib.mn.presentation.overlay.photodetail.PhotoDetailScreen
-import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
-import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
+import net.ib.mn.presentation.photo.PhotoDetailScreen
+import net.ib.mn.presentation.article.write.ArticleWriteScreen
+import net.ib.mn.presentation.article.write.ArticleWriteType
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut

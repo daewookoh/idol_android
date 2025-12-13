@@ -49,7 +49,7 @@ import kotlinx.coroutines.flow.collect
 import net.ib.mn.R
 import net.ib.mn.domain.model.FriendModel
 import net.ib.mn.navigation.LocalAppNavigator
-import net.ib.mn.presentation.overlay.profile.ProfileScreen
+import net.ib.mn.presentation.profile.ProfileScreen
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.components.ExoDialog

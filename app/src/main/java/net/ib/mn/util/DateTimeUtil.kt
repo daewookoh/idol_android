@@ -363,6 +363,24 @@ object DateTimeUtil {
             ""
         }
     }
+
+    /**
+     * 시작일이 현재 시간으로부터 48시간 이내인지 확인 (신규 카드 표시용)
+     *
+     * @param beginAt 시작일 (yyyy-MM-dd'T'HH:mm:ss 형식)
+     * @return 48시간 이내이면 true
+     */
+    fun isWithin48Hours(beginAt: String?): Boolean {
+        if (beginAt.isNullOrEmpty()) return false
+        return try {
+            val beginDate = parseServerDate(beginAt) ?: return false
+            val now = Calendar.getInstance().time
+            val hoursDifference = (now.time - beginDate.time) / MILLIS_PER_HOUR
+            hoursDifference in 0..47
+        } catch (e: Exception) {
+            false
+        }
+    }
 }
 
 // ============================================================

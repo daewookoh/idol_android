@@ -1,5 +1,9 @@
 package net.ib.mn.navigation
 
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -13,6 +17,12 @@ import net.ib.mn.presentation.friend.request. FriendRequestScreen
 import net.ib.mn.presentation.friend.delete.FriendDeleteScreen
 import net.ib.mn.presentation.search.SearchScreen
 import net.ib.mn.presentation.search.result.SearchResultScreen
+import net.ib.mn.presentation.heartpick.HeartPickDetailScreen
+import net.ib.mn.presentation.themepick.ThemePickDetailScreen
+import net.ib.mn.presentation.themepick.result.ThemePickResultScreen
+import net.ib.mn.presentation.community.history.idol.IdolRankingHistoryScreen
+import net.ib.mn.presentation.community.history.daily.DailyRankingHistoryScreen
+import net.ib.mn.presentation.profile.ProfileScreen
 import net.ib.mn.presentation.login.EmailLoginScreen
 import net.ib.mn.presentation.login.LoginScreen
 import net.ib.mn.presentation.login.PasswordResetScreen
@@ -20,7 +30,7 @@ import net.ib.mn.presentation.main.MainScreen
 import net.ib.mn.presentation.signup.SignUpPagesScreen
 import net.ib.mn.presentation.startup.StartUpScreen
 import net.ib.mn.presentation.webview.WebViewScreen
-import net.ib.mn.presentation.overlay.articledetail.ArticleDetailWrapper
+import net.ib.mn.presentation.article.detail.ArticleDetailWrapper
 import net.ib.mn.util.logD
 
 /**
@@ -45,11 +55,22 @@ val LocalAppNavigator = compositionLocalOf<AppNavigator> {
 fun NavGraph(
     navigator: AppNavigator
 ) {
+    // 전역 화면 전환 애니메이션 (fadeIn/fadeOut 300ms)
+    // sizeTransform = null로 설정하여 스케일 애니메이션 비활성화
+    val fadeTransition = ContentTransform(
+        targetContentEnter = fadeIn(tween(300)),
+        initialContentExit = fadeOut(tween(300)),
+        sizeTransform = null
+    )
+
     // navigator를 CompositionLocal로 제공
     CompositionLocalProvider(LocalAppNavigator provides navigator) {
         NavDisplay(
             backStack = navigator.backStack,
             onBack = { navigator.popBackStack() },
+            transitionSpec = { fadeTransition },
+            popTransitionSpec = { fadeTransition },
+            predictivePopTransitionSpec = { fadeTransition },
             entryProvider = { screen ->
                 when (screen) {
                     // StartUp 화면
@@ -238,6 +259,72 @@ fun NavGraph(
                     // FriendDelete 화면 (친구 삭제)
                     is Screen.FriendDelete -> NavEntry(screen) {
                         FriendDeleteScreen()
+                    }
+
+                    // HeartPickDetail 화면 (하트픽 상세)
+                    is Screen.HeartPickDetail -> NavEntry(screen) {
+                        HeartPickDetailScreen(
+                            heartPickId = screen.heartPickId,
+                            onBackClick = { navigator.popBackStack() }
+                        )
+                    }
+
+                    // ThemePickDetail 화면 (테마픽 상세)
+                    is Screen.ThemePickDetail -> NavEntry(screen) {
+                        ThemePickDetailScreen(
+                            themePickId = screen.themePickId,
+                            onBackClick = { navigator.popBackStack() },
+                            onNavigateToResult = { resultId ->
+                                navigator.navigate(Screen.ThemePickResult(resultId))
+                            }
+                        )
+                    }
+
+                    // ThemePickResult 화면 (테마픽 결과)
+                    is Screen.ThemePickResult -> NavEntry(screen) {
+                        ThemePickResultScreen(
+                            themePickId = screen.themePickId,
+                            onBackClick = { navigator.popBackStack() },
+                            onNavigateToVote = { voteId ->
+                                navigator.navigate(Screen.ThemePickDetail(voteId))
+                            },
+                            onNavigateToCommunity = { idolId ->
+                                navigator.navigate(Screen.Community(idolId))
+                            }
+                        )
+                    }
+
+                    // IdolRankingHistory 화면 (아이돌 랭킹 히스토리)
+                    is Screen.IdolRankingHistory -> NavEntry(screen) {
+                        IdolRankingHistoryScreen(
+                            idolId = screen.idolId,
+                            idolName = screen.idolName,
+                            onBackClick = { navigator.popBackStack() }
+                        )
+                    }
+
+                    // DailyRankingHistory 화면 (일일 랭킹 히스토리)
+                    is Screen.DailyRankingHistory -> NavEntry(screen) {
+                        DailyRankingHistoryScreen(
+                            historyParam = screen.historyParam,
+                            type = screen.type,
+                            chartCode = screen.chartCode,
+                            dateTitle = screen.dateTitle,
+                            onBackClick = { navigator.popBackStack() }
+                        )
+                    }
+
+                    // Profile 화면 (프로필 상세)
+                    is Screen.Profile -> NavEntry(screen) {
+                        ProfileScreen(
+                            userId = screen.userId,
+                            userNickname = screen.nickname,
+                            userImageUrl = screen.imageUrl,
+                            userLevel = screen.level,
+                            mostIdolName = screen.mostIdolName,
+                            isMine = screen.isMine,
+                            onBackClick = { navigator.popBackStack() }
+                        )
                     }
                 }
             }

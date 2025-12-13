@@ -62,8 +62,8 @@ import net.ib.mn.presentation.common.ArticleItemType
 import net.ib.mn.presentation.common.ExoArticleItem
 import net.ib.mn.presentation.common.ExoArticleNavigation
 import net.ib.mn.presentation.common.ExoArticleViewModel
-import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteScreen
-import net.ib.mn.presentation.overlay.articlewrite.ArticleWriteType
+import net.ib.mn.presentation.article.write.ArticleWriteScreen
+import net.ib.mn.presentation.article.write.ArticleWriteType
 import net.ib.mn.ui.components.ExoBottomSheet
 import net.ib.mn.ui.components.ExoBottomSheetItem
 import net.ib.mn.ui.components.ExoBottomSheetList

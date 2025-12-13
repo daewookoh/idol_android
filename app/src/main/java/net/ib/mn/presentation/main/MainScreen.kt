@@ -41,29 +41,21 @@ import net.ib.mn.presentation.main.myfavorite.MyFavoritePage
 import net.ib.mn.presentation.main.myinfo.MyInfoPage
 import net.ib.mn.presentation.main.ranking.RankingPage
 import net.ib.mn.domain.model.ArticleModel
-import net.ib.mn.presentation.overlay.articledetail.ArticleDetailScreen
+import net.ib.mn.presentation.article.detail.ArticleDetailScreen
 import net.ib.mn.presentation.webview.WebViewScreen
 import net.ib.mn.util.ServerUrl
-import net.ib.mn.presentation.community.CommunityScreen
-import net.ib.mn.presentation.community.IdolRankingHistoryScreen
-import net.ib.mn.presentation.overlay.profile.ProfileScreen
 import net.ib.mn.ui.components.LocalHofDailyItemClick
 import net.ib.mn.ui.components.LocalIdolRankingHistoryClick
 import net.ib.mn.ui.components.LocalRankingItemClick
 import net.ib.mn.ui.components.LocalHeartPickDetailClick
-import net.ib.mn.presentation.community.DailyRankingHistoryScreen
 import java.util.Locale
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.components.ExoOverlay
 import net.ib.mn.navigation.LocalAppNavigator
 import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.main.freeboard.FreeBoardViewModel
-import net.ib.mn.presentation.overlay.friendinvite.FriendInviteScreen
-import net.ib.mn.presentation.overlay.heartpick.HeartPickDetailScreen
-import net.ib.mn.presentation.overlay.themepick.ThemePickDetailScreen
-import net.ib.mn.presentation.overlay.themepick.result.ThemePickResultScreen
+import net.ib.mn.presentation.friend.invite.FriendInviteScreen
+import net.ib.mn.presentation.profile.ProfileScreen
 import net.ib.mn.ui.components.LocalThemePickDetailClick
 import net.ib.mn.ui.components.LocalThemePickResultClick
 
@@ -84,19 +76,13 @@ fun MainScreen(
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(initialTab) }
 
-    // 푸시 알림에서 아이돌 커뮤니티로 이동 시 자동으로 커뮤니티 열기
-    var pendingCommunityTab by remember { mutableStateOf(initialCommunityTab) }
     val logoutCompleted by viewModel.logoutCompleted.collectAsState()
     val timerText by topBarViewModel.timerText.collectAsState()
     val hasNewNotification by topBarViewModel.hasNewNotification.collectAsState()
-    val selectedRankingItem by viewModel.selectedRankingItem.collectAsState()
-    val selectedIdolRankingHistoryItem by viewModel.selectedIdolRankingHistoryItem.collectAsState()
-    val selectedHofDailyItem by viewModel.selectedHofDailyItem.collectAsState()
     val currentCategory by viewModel.currentCategory.collectAsState()
     val defaultCategory = currentCategory ?: Constants.TYPE_MALE
 
-    // MyInfo 프로필 클릭 시 ProfileScreen 표시 상태
-    var showMyProfile by remember { mutableStateOf(false) }
+    // MyInfo 프로필 클릭 시 ProfileScreen으로 이동하기 위한 사용자 데이터
     val userData by viewModel.userCacheRepository.userData.collectAsState(initial = null)
 
     // FreeBoard 게시글 상세 화면 상태
@@ -118,12 +104,6 @@ fun MainScreen(
     // FreeBoardViewModel (MainScreen과 FreeBoardPage에서 공유)
     val freeBoardViewModel: FreeBoardViewModel = hiltViewModel()
 
-    // HeartPickDetailScreen 오버레이 상태
-    var selectedHeartPickId by remember { mutableStateOf<Int?>(null) }
-
-    // ThemePickDetailScreen / ThemePickResultScreen 오버레이 상태
-    var selectedThemePickId by remember { mutableStateOf<Int?>(null) }
-    var selectedThemePickResultId by remember { mutableStateOf<Int?>(null) }
 
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
@@ -131,19 +111,26 @@ fun MainScreen(
     val navigator = LocalAppNavigator.current
 
     // 백버튼 처리: 오버레이 먼저 닫기 -> 탭 0으로 이동 -> 앱 종료
+    // Navigation 화면들은 NavGraph에서 자동 처리됨
     BackHandler {
         when {
-            // ThemePickResultScreen 오버레이가 열려있으면 먼저 닫기
-            selectedThemePickResultId != null -> {
-                selectedThemePickResultId = null
+            // Notice 상세 화면 오버레이
+            selectedNoticeArticle != null -> {
+                selectedNoticeArticle = null
             }
-            // ThemePickDetailScreen 오버레이가 열려있으면 먼저 닫기
-            selectedThemePickId != null -> {
-                selectedThemePickId = null
+            // FreeBoard 프로필 오버레이 (FreeBoard 게시글 위에 열림)
+            freeBoardSelectedUserProfile != null -> {
+                freeBoardSelectedUserProfile = null
             }
-            // HeartPickDetailScreen 오버레이가 열려있으면 먼저 닫기
-            selectedHeartPickId != null -> {
-                selectedHeartPickId = null
+            // FreeBoard 게시글 상세 오버레이
+            selectedFreeBoardArticle != null -> {
+                selectedFreeBoardArticle = null
+                selectedFreeBoardExternalIdolName = null
+                freeBoardArticleUpdatedCallback = null
+            }
+            // FriendInviteScreen 오버레이
+            showFriendInviteScreen -> {
+                showFriendInviteScreen = false
             }
             // 탭이 0이 아니면 탭 0으로 이동
             selectedTab != 0 -> {
@@ -163,9 +150,13 @@ fun MainScreen(
         viewModel.checkEvent()
         viewModel.onTabSelected(selectedTab)
 
-        // 푸시 알림에서 아이돌 커뮤니티로 이동 시 자동으로 열기
+        // 푸시 알림에서 아이돌 커뮤니티로 이동 시 Navigation으로 열기
         initialIdolId?.let { idolId ->
-            viewModel.openCommunityByIdolId(idolId)
+            navigator.navigate(Screen.Community(
+                idolId = idolId,
+                initialTab = initialCommunityTab ?: 0,
+                sortLatest = initialCommunityTab != null
+            ))
         }
     }
 
@@ -226,12 +217,43 @@ fun MainScreen(
     )
 
     CompositionLocalProvider(
-        LocalRankingItemClick provides viewModel::openCommunity,
-        LocalIdolRankingHistoryClick provides viewModel::openIdolRankingHistory,
-        LocalHofDailyItemClick provides viewModel::openDailyRankingHistory,
-        LocalHeartPickDetailClick provides { heartPickId -> selectedHeartPickId = heartPickId },
-        LocalThemePickDetailClick provides { themePickId -> selectedThemePickId = themePickId },
-        LocalThemePickResultClick provides { themePickId -> selectedThemePickResultId = themePickId }
+        LocalRankingItemClick provides { rankingItem ->
+            navigator.navigate(Screen.Community(idolId = rankingItem.id.toIntOrNull() ?: return@provides))
+        },
+        LocalIdolRankingHistoryClick provides { rankingItem ->
+            navigator.navigate(Screen.IdolRankingHistory(
+                idolId = rankingItem.id.toIntOrNull() ?: return@provides,
+                idolName = rankingItem.name
+            ))
+        },
+        LocalHofDailyItemClick provides { dailyRankModel, chartCode ->
+            val historyParam = dailyRankModel.createdAt.substringBefore("T")
+            val dateTitle = try {
+                val parts = historyParam.split("-")
+                if (parts.size == 3) {
+                    "${parts[0]}년 ${parts[1].toInt()}월 ${parts[2].toInt()}일"
+                } else {
+                    historyParam
+                }
+            } catch (e: Exception) {
+                historyParam
+            }
+            navigator.navigate(Screen.DailyRankingHistory(
+                historyParam = historyParam,
+                type = dailyRankModel.idol?.type ?: "",
+                chartCode = chartCode,
+                dateTitle = dateTitle
+            ))
+        },
+        LocalHeartPickDetailClick provides { heartPickId ->
+            navigator.navigate(Screen.HeartPickDetail(heartPickId))
+        },
+        LocalThemePickDetailClick provides { themePickId ->
+            navigator.navigate(Screen.ThemePickDetail(themePickId))
+        },
+        LocalThemePickResultClick provides { themePickId ->
+            navigator.navigate(Screen.ThemePickResult(themePickId))
+        }
     ) {
         ExoScaffold(
             topBar = {
@@ -280,7 +302,18 @@ fun MainScreen(
                     0 -> RankingPage()
                     1 -> MyFavoritePage()
                     2 -> MyInfoPage(
-                        onNavigateToProfile = { showMyProfile = true }
+                        onNavigateToProfile = {
+                            userData?.let { user ->
+                                navigator.navigate(Screen.Profile(
+                                    userId = user.id ?: 0,
+                                    nickname = user.nickname ?: "",
+                                    imageUrl = user.profileImage,
+                                    level = user.level ?: 0,
+                                    mostIdolName = user.most?.name,
+                                    isMine = true
+                                ))
+                            }
+                        }
                     )
                     3 -> FreeBoardPage(
                         initialTagId = initialFreeBoardTagId,
@@ -306,8 +339,12 @@ fun MainScreen(
         }
     }
 
-    // FriendInvite 화면 (전체 화면 overlay)
-    if (showFriendInviteScreen) {
+    // FriendInvite 화면 오버레이
+    ExoOverlay(
+        visible = showFriendInviteScreen,
+        onDismiss = { showFriendInviteScreen = false },
+        enableBackHandler = false
+    ) {
         FriendInviteScreen(
             token = friendInviteToken,
             language = friendInviteLanguage,
@@ -315,211 +352,70 @@ fun MainScreen(
         )
     }
 
-    // HeartPickDetailScreen 오버레이 (전체 화면)
-    AnimatedVisibility(
-        visible = selectedHeartPickId != null,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        selectedHeartPickId?.let { heartPickId ->
-            HeartPickDetailScreen(
-                heartPickId = heartPickId,
-                onBackClick = { selectedHeartPickId = null }
-            )
-        }
-    }
-
-    // ThemePickDetailScreen 오버레이 (전체 화면)
-    AnimatedVisibility(
-        visible = selectedThemePickId != null,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        selectedThemePickId?.let { themePickId ->
-            ThemePickDetailScreen(
-                themePickId = themePickId,
-                onBackClick = { selectedThemePickId = null },
-                onNavigateToResult = { resultId ->
-                    selectedThemePickResultId = resultId
-                }
-            )
-        }
-    }
-
-    // ThemePickResultScreen 오버레이 (전체 화면)
-    AnimatedVisibility(
-        visible = selectedThemePickResultId != null,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        selectedThemePickResultId?.let { themePickId ->
-            ThemePickResultScreen(
-                themePickId = themePickId,
-                onBackClick = { selectedThemePickResultId = null },
-                onNavigateToVote = { voteId ->
-                    selectedThemePickResultId = null
-                    selectedThemePickId = voteId
-                }
-            )
-        }
-    }
-
-    AnimatedVisibility(
-        visible = selectedRankingItem != null,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        selectedRankingItem?.let { rankingItem ->
-            val idolId = rankingItem.id.toIntOrNull() ?: return@let
-
-            var showChattingTab by remember { mutableStateOf(false) }
-            LaunchedEffect(rankingItem) {
-                showChattingTab = viewModel.shouldShowChattingTab(rankingItem)
-            }
-
-            // 푸시 알림에서 온 경우 초기 탭 및 최신순 정렬 설정 (한 번만 적용)
-            // remember로 초기 값 캡처하여 recomposition에서도 유지
-            val communityInitialTab = remember(rankingItem) { pendingCommunityTab ?: 0 }
-            val sortLatest = remember(rankingItem) { pendingCommunityTab != null }
-            LaunchedEffect(rankingItem) {
-                pendingCommunityTab = null // 한 번 사용 후 초기화
-            }
-
-            CommunityScreen(
-                idolId = idolId,
-                showChattingTab = showChattingTab,
-                initialTab = communityInitialTab,
-                sortLatest = sortLatest,
-                onBackClick = viewModel::closeCommunity
-            )
-        }
-    }
-
-    // CUMULATIVE 아이템 클릭 시 IdolRankingHistoryScreen 표시
-    selectedIdolRankingHistoryItem?.let { rankingItem ->
-        IdolRankingHistoryScreen(
-            idolId = rankingItem.id.toIntOrNull() ?: 0,
-            idolName = rankingItem.name,
-            onBackClick = viewModel::closeIdolRankingHistory
-        )
-    }
-
-    // HofDailyRankingItem 클릭 시 DailyRankingHistoryScreen 표시
-    selectedHofDailyItem?.let { (dailyRankModel, chartCode) ->
-        // createdAt 형식: "2024-01-01T00:00:00" -> 날짜 부분만 추출
-        val historyParam = remember(dailyRankModel.createdAt) {
-            dailyRankModel.createdAt.substringBefore("T")
-        }
-        // 날짜 타이틀 포맷: "2024-01-01" -> "2024년 1월 1일"
-        val dateTitle = remember(historyParam) {
-            try {
-                val parts = historyParam.split("-")
-                if (parts.size == 3) {
-                    "${parts[0]}년 ${parts[1].toInt()}월 ${parts[2].toInt()}일"
-                } else {
-                    historyParam
-                }
-            } catch (e: Exception) {
-                historyParam
-            }
-        }
-        DailyRankingHistoryScreen(
-            historyParam = historyParam,
-            type = dailyRankModel.idol?.type ?: "",
-            chartCode = chartCode,
-            dateTitle = dateTitle,
-            onBackClick = viewModel::closeDailyRankingHistory
-        )
-    }
-
-    // MyInfo 프로필 클릭 시 ProfileScreen 표시
-    AnimatedVisibility(
-        visible = showMyProfile && userData != null,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        userData?.let { user ->
-            ProfileScreen(
-                userId = user.id ?: 0,
-                userNickname = user.nickname ?: "",
-                userImageUrl = user.profileImage,
-                userLevel = user.level ?: 0,
-                mostIdolName = user.most?.name,
-                isMine = true,
-                onBackClick = { showMyProfile = false }
-            )
-        }
-    }
-
-    // FreeBoard 게시글 상세 화면
-    AnimatedVisibility(
-        visible = selectedFreeBoardArticle != null,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        selectedFreeBoardArticle?.let { article ->
-            ArticleDetailScreen(
-                article = article,
-                externalTabName = selectedFreeBoardExternalIdolName,
-                onBackClick = {
-                    selectedFreeBoardArticle = null
-                    selectedFreeBoardExternalIdolName = null
-                    freeBoardArticleUpdatedCallback = null
-                },
-                onArticleUpdated = { updatedArticle ->
-                    freeBoardArticleUpdatedCallback?.invoke(updatedArticle)
-                },
-                onNavigateToProfile = { userId, nickname, imageUrl, level, mostIdolName ->
-                    freeBoardSelectedUserProfile = FreeBoardUserProfileInfo(
-                        userId = userId,
-                        nickname = nickname,
-                        imageUrl = imageUrl,
-                        level = level,
-                        mostIdolName = mostIdolName
-                    )
-                }
-            )
-        }
-    }
-
-    // FreeBoard 게시글 상세에서 프로필 클릭 시 ProfileScreen 표시
-    AnimatedVisibility(
-        visible = freeBoardSelectedUserProfile != null,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        freeBoardSelectedUserProfile?.let { userInfo ->
-            ProfileScreen(
-                userId = userInfo.userId,
-                userNickname = userInfo.nickname,
-                userImageUrl = userInfo.imageUrl,
-                userLevel = userInfo.level,
-                mostIdolName = userInfo.mostIdolName,
-                isMine = false,
-                onBackClick = { freeBoardSelectedUserProfile = null }
-            )
-        }
-    }
-
-    // Notice 상세 화면
-    AnimatedVisibility(
-        visible = selectedNoticeArticle != null,
-        enter = fadeIn(),
-        exit = fadeOut(),
-        modifier = Modifier.fillMaxSize()
-    ) {
-        selectedNoticeArticle?.let { article ->
-            Box(modifier = Modifier.fillMaxSize().background(ColorPalette.background100)) {
-                WebViewScreen(
-                    htmlContent = article.contentHtml ?: article.content,
-                    baseUrl = ServerUrl.HOST,
-                    screenTitle = stringResource(R.string.title_notice),
-                    contentTitle = article.title,
-                    onNavigateBack = {
-                        selectedNoticeArticle = null
-                    }
+    // FreeBoard 게시글 상세 오버레이
+    ExoOverlay(
+        data = selectedFreeBoardArticle,
+        onDismiss = {
+            selectedFreeBoardArticle = null
+            selectedFreeBoardExternalIdolName = null
+            freeBoardArticleUpdatedCallback = null
+        },
+        enableBackHandler = false
+    ) { article ->
+        ArticleDetailScreen(
+            article = article,
+            externalTabName = selectedFreeBoardExternalIdolName,
+            onBackClick = {
+                selectedFreeBoardArticle = null
+                selectedFreeBoardExternalIdolName = null
+                freeBoardArticleUpdatedCallback = null
+            },
+            onArticleUpdated = { updatedArticle ->
+                freeBoardArticleUpdatedCallback?.invoke(updatedArticle)
+            },
+            onNavigateToProfile = { userId, nickname, imageUrl, level, mostIdolName ->
+                freeBoardSelectedUserProfile = FreeBoardUserProfileInfo(
+                    userId = userId,
+                    nickname = nickname,
+                    imageUrl = imageUrl,
+                    level = level,
+                    mostIdolName = mostIdolName
                 )
             }
+        )
+    }
+
+    // FreeBoard 프로필 오버레이
+    ExoOverlay(
+        data = freeBoardSelectedUserProfile,
+        onDismiss = { freeBoardSelectedUserProfile = null },
+        enableBackHandler = false
+    ) { userInfo ->
+        ProfileScreen(
+            userId = userInfo.userId,
+            userNickname = userInfo.nickname,
+            userImageUrl = userInfo.imageUrl,
+            userLevel = userInfo.level,
+            mostIdolName = userInfo.mostIdolName,
+            isMine = false,
+            onBackClick = { freeBoardSelectedUserProfile = null }
+        )
+    }
+
+    // Notice 상세 오버레이
+    ExoOverlay(
+        data = selectedNoticeArticle,
+        onDismiss = { selectedNoticeArticle = null },
+        enableBackHandler = false
+    ) { article ->
+        Box(modifier = Modifier.fillMaxSize().background(ColorPalette.background100)) {
+            WebViewScreen(
+                htmlContent = article.contentHtml ?: article.content,
+                baseUrl = ServerUrl.HOST,
+                screenTitle = stringResource(R.string.title_notice),
+                contentTitle = article.title,
+                onNavigateBack = { selectedNoticeArticle = null }
+            )
         }
     }
 

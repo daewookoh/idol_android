@@ -219,7 +219,7 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
 
     private fun processThemePickData(themePickList: List<ThemePickModel>) {
         try {
-            val cardDataList = themePickList.map { themePick ->
+            val cardDataList = themePickList.mapIndexed { index, themePick ->
                 val state = when (themePick.status) {
                     ThemePickModel.STATUS_PREPARING -> ThemePickState.UPCOMING
                     ThemePickModel.STATUS_PROGRESS -> ThemePickState.ACTIVE
@@ -227,10 +227,13 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
                 }
 
                 val periodDate = DateTimeUtil.formatPeriodSpaced(themePick.beginAt, themePick.expiredAt)
-                val voteCount = "${NumberFormatUtil.formatWithComma(themePick.count)}표"
+                val voteCount = NumberFormatUtil.formatWithComma(themePick.count)
 
                 // HeartPick과 동일한 D-Day 계산 (종료일 기준)
                 val dDay = DateTimeUtil.calculateDDay(context, themePick.expiredAt, themePick.status)
+
+                // 신규 카드 여부: 첫 번째 아이템이면서 48시간 이내에 시작된 경우
+                val isNew = index == 0 && DateTimeUtil.isWithin48Hours(themePick.beginAt)
 
                 ThemePickCardData(
                     id = themePick.id,
@@ -242,7 +245,8 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
                     voteCountRaw = themePick.count,
                     periodDate = periodDate,
                     dDay = dDay,
-                    voteStatus = themePick.vote
+                    voteStatus = themePick.vote,
+                    isNew = isNew
                 )
             }
 
@@ -255,7 +259,7 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
 
     private fun processImagePickData(imagePickList: List<ImagePickModel>) {
         try {
-            val cardDataList = imagePickList.map { imagePick ->
+            val cardDataList = imagePickList.mapIndexed { index, imagePick ->
                 val state = when (imagePick.status) {
                     ImagePickModel.STATUS_PREPARING -> ImagePickState.UPCOMING
                     ImagePickModel.STATUS_PROGRESS -> ImagePickState.ACTIVE
@@ -268,6 +272,9 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
                 // HeartPick과 동일한 D-Day 계산 (종료일 기준)
                 val dDay = DateTimeUtil.calculateDDay(context, imagePick.expiredAt, imagePick.status)
 
+                // 신규 카드 여부: 첫 번째 아이템이면서 48시간 이내에 시작된 경우
+                val isNew = index == 0 && DateTimeUtil.isWithin48Hours(imagePick.createdAt)
+
                 ImagePickCardData(
                     id = imagePick.id,
                     state = state,
@@ -277,7 +284,8 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
                     voteCount = voteCount,
                     voteCountRaw = imagePick.count,
                     periodDate = periodDate,
-                    dDay = dDay
+                    dDay = dDay,
+                    isNew = isNew
                 )
             }
 
@@ -298,6 +306,7 @@ class OnePickRankingSubPageViewModel @AssistedInject constructor(
  * 테마픽 카드 데이터
  *
  * @param voteStatus 투표 상태 (ThemePickModel.VOTE_ABLE, VOTE_SEE_VIDEOAD, VOTE_IMPOSSIBLE)
+ * @param isNew 신규 카드 여부 (48시간 이내 시작된 카드)
  */
 data class ThemePickCardData(
     val id: Int,
@@ -309,11 +318,14 @@ data class ThemePickCardData(
     val voteCountRaw: Int = 0,
     val periodDate: String,
     val dDay: String = "",
-    val voteStatus: String = ""  // "N": 투표가능, "V": 광고후 투표, "Y": 오늘 투표 완료
+    val voteStatus: String = "",  // "N": 투표가능, "V": 광고후 투표, "Y": 오늘 투표 완료
+    val isNew: Boolean = false
 )
 
 /**
  * 이미지픽 카드 데이터
+ *
+ * @param isNew 신규 카드 여부 (48시간 이내 시작된 카드)
  */
 data class ImagePickCardData(
     val id: Int,
@@ -324,5 +336,6 @@ data class ImagePickCardData(
     val voteCount: String,
     val voteCountRaw: Int = 0,
     val periodDate: String,
-    val dDay: String = ""
+    val dDay: String = "",
+    val isNew: Boolean = false
 )

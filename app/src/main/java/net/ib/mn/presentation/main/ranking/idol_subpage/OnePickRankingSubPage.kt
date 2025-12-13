@@ -32,6 +32,8 @@ import net.ib.mn.ui.components.ExoSimpleDialog
 import net.ib.mn.ui.components.ExoImagePickCard
 import net.ib.mn.ui.components.ExoTabSwitch
 import net.ib.mn.ui.components.ExoThemePickCard
+import net.ib.mn.ui.components.LocalThemePickDetailClick
+import net.ib.mn.ui.components.LocalThemePickResultClick
 import net.ib.mn.ui.theme.ColorPalette
 
 /**
@@ -45,10 +47,11 @@ fun OnePickRankingSubPage(
     chartCode: String,
     isVisible: Boolean = true,
     listState: LazyListState? = null,
-    modifier: Modifier = Modifier,
-    onThemePickDetailClick: (Int) -> Unit = {},
-    onThemePickResultClick: (Int) -> Unit = {}
+    modifier: Modifier = Modifier
 ) {
+    // CompositionLocal을 통해 Navigation으로 화면 전환
+    val onThemePickDetailClick = LocalThemePickDetailClick.current
+    val onThemePickResultClick = LocalThemePickResultClick.current
 
     val viewModel: OnePickRankingSubPageViewModel = hiltViewModel<OnePickRankingSubPageViewModel, OnePickRankingSubPageViewModel.Factory> { factory ->
         factory.create(chartCode)
@@ -164,6 +167,7 @@ fun OnePickRankingSubPage(
                                     voteCount = cardData.voteCount,
                                     periodDate = cardData.periodDate,
                                     voteStatus = cardData.voteStatus,
+                                    isNew = cardData.isNew,
                                     onCardClick = {
                                         onThemePickDetailClick(cardData.id)
                                     },
@@ -209,6 +213,7 @@ fun OnePickRankingSubPage(
                                     subTitle = cardData.subTitle,
                                     voteCount = cardData.voteCount,
                                     periodDate = cardData.periodDate,
+                                    isNew = cardData.isNew,
                                     onCardClick = { },
                                     onVoteClick = { },
                                     onCurrentRankingClick = {
