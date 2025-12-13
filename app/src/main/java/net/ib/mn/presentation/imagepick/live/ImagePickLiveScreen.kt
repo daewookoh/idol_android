@@ -47,10 +47,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import kotlinx.coroutines.flow.collectLatest
 import net.ib.mn.R
+import net.ib.mn.ad.RewardAdManager
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.domain.model.ImagePickIdolModel
 import net.ib.mn.ui.components.ExoAppBar
+import net.ib.mn.ui.components.ExoLoading
 import net.ib.mn.ui.components.ExoScaffold
+import net.ib.mn.ui.components.ExoSimpleDialog
 import net.ib.mn.ui.components.ExoTitleDialog
 import net.ib.mn.ui.components.ImagePickRankingItem
 import net.ib.mn.ui.theme.ColorPalette
@@ -86,6 +89,18 @@ fun ImagePickLiveScreen(
     // 안내 다이얼로그 상태
     var showInfoDialog by remember { mutableStateOf(false) }
 
+    // 광고 에러 다이얼로그 상태
+    var showAdErrorDialog by remember { mutableStateOf(false) }
+
+    // 광고 로딩 상태
+    var isAdLoading by remember { mutableStateOf(false) }
+
+    // RewardAdManager
+    val rewardAdManager = remember { RewardAdManager.getInstance() }
+
+    // Activity 참조 (광고 표시용)
+    val activity = LocalContext.current as? android.app.Activity
+
     // 초기 데이터 로드
     LaunchedEffect(imagePickId) {
         viewModel.sendIntent(ImagePickLiveContract.Intent.LoadResult(imagePickId))
@@ -116,10 +131,43 @@ fun ImagePickLiveScreen(
                     onBackClick()
                 }
                 is ImagePickLiveContract.Effect.ShowVideoAd -> {
-                    // TODO: 광고 표시 구현
+                    if (activity != null && !isAdLoading) {
+                        isAdLoading = true
+                        rewardAdManager.loadAd(
+                            context = context,
+                            onLoaded = {
+                                rewardAdManager.showAd(
+                                    activity = activity,
+                                    onRewarded = {
+                                        isAdLoading = false
+                                        viewModel.voteAfterAd()
+                                    },
+                                    onFailed = { _ ->
+                                        isAdLoading = false
+                                        showAdErrorDialog = true
+                                    },
+                                    onDismissed = {
+                                        isAdLoading = false
+                                    }
+                                )
+                            },
+                            onFailed = { _ ->
+                                isAdLoading = false
+                                showAdErrorDialog = true
+                            }
+                        )
+                    }
                 }
             }
         }
+    }
+
+    // 광고 에러 다이얼로그
+    if (showAdErrorDialog) {
+        ExoSimpleDialog(
+            message = stringResource(R.string.video_ad_unable),
+            onDismiss = { showAdErrorDialog = false }
+        )
     }
 
     // 타이틀 결정 (종료됨이면 최종결과)
@@ -210,6 +258,9 @@ fun ImagePickLiveScreen(
                     )
                 }
             }
+
+            // 광고 로딩 중 오버레이
+            ExoLoading(isLoading = isAdLoading)
         }
     }
 }

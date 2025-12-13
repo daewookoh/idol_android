@@ -3,6 +3,7 @@ package net.ib.mn.presentation.imagepick
 import android.content.Intent
 import android.provider.Settings
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.core.app.NotificationManagerCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -61,6 +62,7 @@ import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.components.ExoLoading
 import net.ib.mn.ui.components.ExoScaffold
+import net.ib.mn.ui.components.ExoSimpleDialog
 import net.ib.mn.ui.components.ExoTitleDialog
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
 
@@ -94,6 +96,12 @@ fun ImagePickDetailScreen(
 
     // 알림 권한 설정 다이얼로그 상태
     var showNotificationPermissionDialog by remember { mutableStateOf(false) }
+
+    // 나가기 확인 다이얼로그 상태
+    var showExitConfirmDialog by remember { mutableStateOf(false) }
+
+    // 광고 에러 다이얼로그 상태
+    var showAdErrorDialog by remember { mutableStateOf(false) }
 
     // 광고 로딩 상태
     var isAdLoading by remember { mutableStateOf(false) }
@@ -152,18 +160,18 @@ fun ImagePickDetailScreen(
                                         isAdLoading = false
                                         viewModel.sendIntent(ImagePickDetailContract.Intent.VoteAfterAd)
                                     },
-                                    onFailed = { error ->
+                                    onFailed = { _ ->
                                         isAdLoading = false
-                                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                                        showAdErrorDialog = true
                                     },
                                     onDismissed = {
                                         isAdLoading = false
                                     }
                                 )
                             },
-                            onFailed = { error ->
+                            onFailed = { _ ->
                                 isAdLoading = false
-                                Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                                showAdErrorDialog = true
                             }
                         )
                     }
@@ -174,8 +182,42 @@ fun ImagePickDetailScreen(
                 is ImagePickDetailContract.Effect.ShowNoParticipantsDialog -> {
                     Toast.makeText(context, context.getString(R.string.onepick_no_votes), Toast.LENGTH_SHORT).show()
                 }
+                is ImagePickDetailContract.Effect.ShowExitConfirmDialog -> {
+                    showExitConfirmDialog = true
+                }
             }
         }
+    }
+
+    // 뒤로가기 핸들러 (투표 중 나가기 확인)
+    BackHandler(enabled = viewModel.shouldShowExitDialog()) {
+        showExitConfirmDialog = true
+    }
+
+    // 나가기 확인 다이얼로그 (old 프로젝트: OnepickMatchActivity.showAlert)
+    if (showExitConfirmDialog) {
+        // canVote 상태에 따라 메시지 결정
+        // canVote = true: onepick_confirm_exit2 (투표가 완료되지 않았습니다. 나가시겠습니까?)
+        // canVote = false: onepick_confirm_exit (이미 투표하셨습니다. 나가시겠습니까?)
+        val exitMessage = if (viewModel.canVoteNow()) {
+            stringResource(R.string.onepick_confirm_exit2)
+        } else {
+            stringResource(R.string.onepick_confirm_exit)
+        }
+
+        ExoConfirmDialog(
+            title = "",
+            message = exitMessage,
+            confirmButtonText = stringResource(R.string.confirm),
+            dismissButtonText = stringResource(R.string.btn_cancel),
+            onConfirm = {
+                showExitConfirmDialog = false
+                viewModel.sendIntent(ImagePickDetailContract.Intent.ExitEarly)
+            },
+            onDismiss = {
+                showExitConfirmDialog = false
+            }
+        )
     }
 
     // 투표 완료 다이얼로그
@@ -189,7 +231,9 @@ fun ImagePickDetailScreen(
             dismissButtonText = stringResource(R.string.button_close),
             onConfirm = {
                 showVoteCompleteDialog = false
-                viewModel.sendIntent(ImagePickDetailContract.Intent.GoToResult)
+                // 현재 화면을 닫고 결과 화면으로 이동 (백버튼 누르면 투표화면으로 돌아오지 않도록)
+                onBackClick()
+                onNavigateToResult?.invoke(imagePickId)
             },
             onDismiss = {
                 showVoteCompleteDialog = false
@@ -239,6 +283,14 @@ fun ImagePickDetailScreen(
         )
     }
 
+    // 광고 에러 다이얼로그
+    if (showAdErrorDialog) {
+        ExoSimpleDialog(
+            message = stringResource(R.string.video_ad_unable),
+            onDismiss = { showAdErrorDialog = false }
+        )
+    }
+
     ExoScaffold(
         modifier = modifier
             .fillMaxSize()
@@ -270,7 +322,13 @@ fun ImagePickDetailScreen(
                         )
                     }
                 },
-                onNavigationClick = onBackClick,
+                onNavigationClick = {
+                    if (viewModel.shouldShowExitDialog()) {
+                        showExitConfirmDialog = true
+                    } else {
+                        onBackClick()
+                    }
+                },
                 actions = {
                     Icon(
                         painter = painterResource(R.drawable.btn_navigation_share),
@@ -508,76 +566,55 @@ private fun ProgressContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(R.color.background_100))
+            .background(Color.Black),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-        ) {
-            // 제목
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // 라운드 표시
-                    val roundText = if (state.tournamentRound == ImagePickDetailContract.TournamentRound.FINAL) {
-                        stringResource(R.string.final_round)
-                    } else {
-                        stringResource(R.string.qualifying_round)
-                    }
+        // 상단 여백
+        Spacer(modifier = Modifier.height(16.dp))
 
-                    Text(
-                        text = roundText,
-                        fontSize = 14.sp,
-                        color = colorResource(R.color.main_light),
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = imagePick.title,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = colorResource(R.color.text_default),
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-
-            // 진행 상황 표시 (예선일 때만)
-            if (state.tournamentRound == ImagePickDetailContract.TournamentRound.QUALIFYING && state.totalRounds > 1) {
-                item {
-                    ProgressIndicator(
-                        currentRound = state.currentRoundIndex,
-                        totalRounds = state.totalRounds
-                    )
-                }
-            }
-
-            // 이미지 그리드
-            item {
-                ImageGrid(
-                    candidates = state.currentRoundCandidates,
-                    dimension = state.dimension,
-                    date = state.date,
-                    onImageSelect = onImageSelect
-                )
-            }
+        // 라운드 표시 (예선/결선)
+        val roundText = if (state.tournamentRound == ImagePickDetailContract.TournamentRound.FINAL) {
+            stringResource(R.string.final_round)
+        } else {
+            stringResource(R.string.qualifying_round)
         }
 
-        // 하단 버튼 영역 (투표 시작 전에만 표시)
-        if (state.currentRoundIndex == 0 && state.selectedPicks.isEmpty()) {
-            VoteButton(
-                canVote = state.canVote,
-                needsVideoAd = state.needsVideoAd,
-                hasVotedToday = state.hasVotedToday,
-                onVoteClick = onVoteClick,
-                onShowRankingClick = onShowRankingClick
+        Text(
+            text = roundText,
+            fontSize = 16.sp,
+            color = colorResource(R.color.main_light),
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // 질문 텍스트 (이모지 + 제목)
+        Text(
+            text = imagePick.title,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.White,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 이미지 그리드
+        ImageGrid(
+            candidates = state.currentRoundCandidates,
+            dimension = state.dimension,
+            date = state.date,
+            onImageSelect = onImageSelect
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 진행 상황 표시 (페이지 인디케이터)
+        if (state.totalRounds > 1) {
+            ProgressIndicator(
+                currentRound = state.currentRoundIndex,
+                totalRounds = state.totalRounds
             )
         }
     }
@@ -621,10 +658,9 @@ private fun ImageGrid(
         columns = GridCells.Fixed(dimension),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
-            .height((120 * dimension).dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+            .height((130 * dimension).dp),
+        horizontalArrangement = Arrangement.spacedBy(0.dp),
+        verticalArrangement = Arrangement.spacedBy(0.dp),
         userScrollEnabled = false
     ) {
         items(candidates) { candidate ->
@@ -648,8 +684,7 @@ private fun ImageGridItem(
     Box(
         modifier = Modifier
             .aspectRatio(1f)
-            .clip(RoundedCornerShape(8.dp))
-            .background(if (isEmpty) colorResource(R.color.background_200) else Color.White)
+            .background(if (isEmpty) Color.Black else Color.Black)
             .clickable(enabled = !isEmpty) { onClick() },
         contentAlignment = Alignment.Center
     ) {

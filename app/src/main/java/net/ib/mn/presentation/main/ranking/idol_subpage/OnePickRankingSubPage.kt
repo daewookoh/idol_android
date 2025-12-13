@@ -23,15 +23,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
+import net.ib.mn.ad.RewardAdManager
+import net.ib.mn.ui.components.ExoLoading
 import net.ib.mn.ui.components.ExoSimpleDialog
 import net.ib.mn.ui.components.ExoImagePickCard
 import net.ib.mn.ui.components.ExoTabSwitch
 import net.ib.mn.ui.components.ExoThemePickCard
+import net.ib.mn.ui.components.VoteStatusCode
 import net.ib.mn.ui.components.LocalThemePickDetailClick
 import net.ib.mn.ui.components.LocalThemePickLiveClick
 import net.ib.mn.ui.components.LocalImagePickDetailClick
@@ -57,6 +61,9 @@ fun OnePickRankingSubPage(
     val onImagePickDetailClick = LocalImagePickDetailClick.current
     val onImagePickLiveClick = LocalImagePickLiveClick.current
 
+    val context = LocalContext.current
+    val activity = context as? android.app.Activity
+
     val viewModel: OnePickRankingSubPageViewModel = hiltViewModel<OnePickRankingSubPageViewModel, OnePickRankingSubPageViewModel.Factory> { factory ->
         factory.create(chartCode)
     }
@@ -68,6 +75,15 @@ fun OnePickRankingSubPage(
     // 참여자 없음 다이얼로그 상태
     var showNoParticipantsDialog by remember { mutableStateOf(false) }
 
+    // 광고 에러 다이얼로그 상태
+    var showAdErrorDialog by remember { mutableStateOf(false) }
+
+    // 광고 로딩 상태
+    var isAdLoading by remember { mutableStateOf(false) }
+
+    // RewardAdManager
+    val rewardAdManager = remember { RewardAdManager.getInstance() }
+
     // 참여자 없음 다이얼로그
     if (showNoParticipantsDialog) {
         ExoSimpleDialog(
@@ -76,16 +92,25 @@ fun OnePickRankingSubPage(
         )
     }
 
+    // 광고 에러 다이얼로그
+    if (showAdErrorDialog) {
+        ExoSimpleDialog(
+            message = stringResource(R.string.video_ad_unable),
+            onDismiss = { showAdErrorDialog = false }
+        )
+    }
+
     // 초기 로드
     LaunchedEffect(Unit) {
         viewModel.reloadIfNeeded()
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(ColorPalette.background400)
-    ) {
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(ColorPalette.background400)
+        ) {
         // 탭 영역
         val tabs = listOf(
             stringResource(R.string.themepick),
@@ -223,7 +248,44 @@ fun OnePickRankingSubPage(
                                         onImagePickDetailClick(cardData.id)
                                     },
                                     onVoteClick = {
-                                        onImagePickDetailClick(cardData.id)
+                                        when (cardData.voteStatus) {
+                                            VoteStatusCode.NEED_VIDEO_AD -> {
+                                                // 광고 시청 후 투표 화면 이동
+                                                if (activity != null && !isAdLoading) {
+                                                    isAdLoading = true
+                                                    rewardAdManager.loadAd(
+                                                        context = context,
+                                                        onLoaded = {
+                                                            rewardAdManager.showAd(
+                                                                activity = activity,
+                                                                onRewarded = {
+                                                                    isAdLoading = false
+                                                                    onImagePickDetailClick(cardData.id)
+                                                                },
+                                                                onFailed = { _ ->
+                                                                    isAdLoading = false
+                                                                    showAdErrorDialog = true
+                                                                },
+                                                                onDismissed = {
+                                                                    isAdLoading = false
+                                                                }
+                                                            )
+                                                        },
+                                                        onFailed = { _ ->
+                                                            isAdLoading = false
+                                                            showAdErrorDialog = true
+                                                        }
+                                                    )
+                                                }
+                                            }
+                                            VoteStatusCode.VOTED_TODAY -> {
+                                                // 이미 투표 완료 - 아무 동작 없음 (버튼 비활성화됨)
+                                            }
+                                            else -> {
+                                                // 첫 투표 가능 - 바로 투표 화면으로
+                                                onImagePickDetailClick(cardData.id)
+                                            }
+                                        }
                                     },
                                     onCurrentRankingClick = {
                                         if (cardData.voteCountRaw == 0) {
@@ -239,5 +301,9 @@ fun OnePickRankingSubPage(
                 }
             }
         }
+        }
+
+        // 광고 로딩 중 오버레이
+        ExoLoading(isLoading = isAdLoading)
     }
 }

@@ -49,6 +49,7 @@ class ImagePickDetailViewModel @Inject constructor(
             is ImagePickDetailContract.Intent.VoteAfterAd -> voteAfterAd()
             is ImagePickDetailContract.Intent.Share -> share()
             is ImagePickDetailContract.Intent.GoToResult -> goToResult()
+            is ImagePickDetailContract.Intent.ExitEarly -> exitEarly()
         }
     }
 
@@ -358,6 +359,51 @@ class ImagePickDetailViewModel @Inject constructor(
             setEffect { ImagePickDetailContract.Effect.ShowNoParticipantsDialog }
         } else {
             setEffect { ImagePickDetailContract.Effect.NavigateToResult(imagePickId) }
+        }
+    }
+
+    /**
+     * 투표 중 나가기 확인 다이얼로그 표시 여부 확인
+     * @return true: 다이얼로그 표시 필요, false: 바로 나가기 가능
+     */
+    fun shouldShowExitDialog(): Boolean {
+        val state = uiState.value
+        // 투표가 진행 중인 경우에만 다이얼로그 표시
+        return state.selectedPicks.isNotEmpty() ||
+               (state.currentRoundIndex > 0 && state.tournamentRound == ImagePickDetailContract.TournamentRound.QUALIFYING)
+    }
+
+    /**
+     * 현재 투표 가능 상태인지 (메시지 결정용)
+     */
+    fun canVoteNow(): Boolean = uiState.value.canVote
+
+    /**
+     * 투표 중 나가기 (참여 처리)
+     * old 프로젝트: OnepickMatchActivity.chooseMyPick(null)
+     *
+     * 빈 voteIds로 API 호출하여 참여 처리
+     */
+    private fun exitEarly() {
+        val state = uiState.value
+
+        viewModelScope.launch {
+            imagepickRepository.voteImagePick(
+                id = imagePickId,
+                voteIds = "",  // 빈 문자열로 참여 처리
+                voteType = state.voteType
+            ).collectLatest { result ->
+                when (result) {
+                    is ApiResult.Success -> {
+                        setEffect { ImagePickDetailContract.Effect.NavigateBack }
+                    }
+                    is ApiResult.Error -> {
+                        // 에러가 발생해도 나가기
+                        setEffect { ImagePickDetailContract.Effect.NavigateBack }
+                    }
+                    is ApiResult.Loading -> { }
+                }
+            }
         }
     }
 }

@@ -94,6 +94,9 @@ class ImagePickDetailContract {
 
         /** 결과 화면으로 이동 */
         data object GoToResult : Intent()
+
+        /** 투표 중 나가기 (참여 처리) */
+        data object ExitEarly : Intent()
     }
 
     /**
@@ -129,5 +132,8 @@ class ImagePickDetailContract {
 
         /** 참여자 없음 다이얼로그 */
         data object ShowNoParticipantsDialog : Effect()
+
+        /** 투표 중 나가기 확인 다이얼로그 */
+        data class ShowExitConfirmDialog(val canVote: Boolean) : Effect()
     }
 }
