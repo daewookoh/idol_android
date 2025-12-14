@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.StateFlow
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.remote.api.UsersApi
 import net.ib.mn.data.remote.dto.UpdateTutorialRequest
+import net.ib.mn.util.logD
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -62,6 +63,8 @@ class TutorialRepository @Inject constructor(
      * @return API 성공 여부
      */
     suspend fun updateTutorial(tutorialIndex: Int): Result<Long> {
+        logD(TAG, "updateTutorial: tutorialIndex=$tutorialIndex")
+
         // 즉시 로컬 상태 업데이트 (API 응답 전에 UI가 변경되도록)
         // 이렇게 하면 튜토리얼 하트가 즉시 사라지고, 같은 튜토리얼이 다시 표시되지 않음
         TutorialManager.complete(tutorialIndex)
@@ -70,30 +73,45 @@ class TutorialRepository @Inject constructor(
         // 로컬 저장소에 즉시 저장 (앱 재실행 시에도 완료 상태 유지)
         val localBitmask = TutorialManager.getBitmask()
         preferencesManager.setTutorialBitmask(localBitmask)
+        logD(TAG, "updateTutorial: localBitmask saved = $localBitmask")
 
         return try {
             val response = usersApi.updateTutorial(
                 UpdateTutorialRequest(tutorialIndex)
             )
 
-            if (response.isSuccessful && response.body()?.success == true) {
-                val newBitmask = response.body()?.tutorial ?: 0L
+            val responseBody = response.body()
+            logD(TAG, "updateTutorial: API response code=${response.code()}, success=${responseBody?.success}, tutorial=${responseBody?.tutorial}, raw=${response.errorBody()?.string()}")
 
-                // 서버 응답으로 TutorialManager 재동기화
-                TutorialManager.init(newBitmask)
+            if (response.isSuccessful && responseBody?.success == true) {
+                val serverBitmask = response.body()?.tutorial ?: 0L
+                logD(TAG, "updateTutorial: serverBitmask=$serverBitmask")
 
-                // 서버 응답 비트마스크로 로컬 저장소 업데이트
-                preferencesManager.setTutorialBitmask(newBitmask)
+                // 서버 응답과 현재 로컬 bitmask를 AND 연산으로 병합
+                // API 호출 중 다른 튜토리얼이 로컬에서 완료되었을 수 있으므로
+                // 어느 쪽에서든 완료(0)된 튜토리얼은 완료 상태 유지
+                val currentLocalBitmask = TutorialManager.getBitmask()
+                val mergedBitmask = serverBitmask and currentLocalBitmask
+                logD(TAG, "updateTutorial: currentLocal=$currentLocalBitmask, merged=$mergedBitmask")
 
-                Result.success(newBitmask)
+                TutorialManager.init(mergedBitmask)
+                preferencesManager.setTutorialBitmask(mergedBitmask)
+
+                Result.success(mergedBitmask)
             } else {
                 // API 실패해도 로컬 상태는 유지 (사용자 경험 우선)
+                logD(TAG, "updateTutorial: API failed, keeping local state")
                 Result.failure(Exception("Tutorial update failed: ${response.code()}"))
             }
         } catch (e: Exception) {
             // 네트워크 오류 시에도 로컬 상태는 유지 (사용자 경험 우선)
+            logD(TAG, "updateTutorial: Exception - ${e.message}")
             Result.failure(e)
         }
+    }
+
+    companion object {
+        private const val TAG = "TutorialRepository"
     }
 
     /**

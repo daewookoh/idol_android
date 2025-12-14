@@ -1032,7 +1032,7 @@ data class SetStatusRequest(
  * @param tutorialIndex 완료할 튜토리얼의 비트 인덱스
  */
 data class UpdateTutorialRequest(
-    @SerializedName("tutorial_index")
+    @SerializedName("index")
     val tutorialIndex: Int
 )
 

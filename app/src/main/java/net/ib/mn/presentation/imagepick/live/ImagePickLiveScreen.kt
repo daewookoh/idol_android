@@ -24,11 +24,15 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -104,6 +108,21 @@ fun ImagePickLiveScreen(
     // 초기 데이터 로드
     LaunchedEffect(imagePickId) {
         viewModel.sendIntent(ImagePickLiveContract.Intent.LoadResult(imagePickId))
+    }
+
+    // Lifecycle 관찰 - 화면 복귀 시 조용히 새로고침
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            // ON_RESUME이고 이미 데이터가 있을 때만 새로고침
+            if (event == Lifecycle.Event.ON_RESUME && state.imagePick != null) {
+                viewModel.refreshSilently(imagePickId)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     // Effect 처리

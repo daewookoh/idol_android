@@ -207,6 +207,65 @@ class ImagePickLiveViewModel @Inject constructor(
         setEffect { ImagePickLiveContract.Effect.NavigateToVote(imagePickId) }
     }
 
+    /**
+     * 화면 복귀 시 조용히 새로고침 (로딩 표시 없이)
+     */
+    fun refreshSilently(id: Int) {
+        imagePickId = id
+        // isLoading을 true로 설정하지 않음
+        viewModelScope.launch {
+            imagepickRepository.getImagePickResult(id).collectLatest { result ->
+                when (result) {
+                    is ApiResult.Success -> {
+                        val data = result.data
+                        val periodText = DateTimeUtil.formatPeriodSpaced(data.createdAt, data.expiredAt)
+                        val canVote = data.vote == "N"
+                        val needsVideoAd = data.vote == "V"
+                        val hasVotedToday = data.vote == "Y"
+                        val isFinished = data.status == ImagePickModel.STATUS_FINISHED
+
+                        val imagePick = ImagePickModel(
+                            title = data.title ?: "",
+                            subtitle = data.subtitle ?: "",
+                            description = "",
+                            status = data.status ?: ImagePickModel.STATUS_PROGRESS,
+                            vote = data.vote,
+                            count = data.count ?: 0,
+                            createdAt = data.createdAt ?: "",
+                            expiredAt = data.expiredAt ?: "",
+                            hashTag = "",
+                            resourceUri = "/onepick/$id/",
+                            voteType = "",
+                            alarm = data.alarm
+                        )
+
+                        val rankedItems = data.candidates
+                            .filter { it.voteCount > 0 }
+                            .sortedByDescending { it.voteCount }
+                            .toMutableList()
+
+                        assignRanks(rankedItems)
+
+                        setState {
+                            copy(
+                                imagePick = imagePick,
+                                periodText = periodText,
+                                canVote = canVote,
+                                needsVideoAd = needsVideoAd,
+                                hasVotedToday = hasVotedToday,
+                                isFinished = isFinished,
+                                rankItems = rankedItems,
+                                date = data.date
+                            )
+                        }
+                    }
+                    is ApiResult.Error -> { /* 조용히 실패 */ }
+                    is ApiResult.Loading -> { }
+                }
+            }
+        }
+    }
+
     private fun onItemClick(idolId: Int?) {
         if (idolId != null && idolId > 0) {
             setEffect { ImagePickLiveContract.Effect.NavigateToCommunity(idolId) }

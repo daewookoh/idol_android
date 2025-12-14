@@ -539,11 +539,16 @@ class StartUpViewModel @Inject constructor(
                         statusData.tutorialCompleted?.let { preferencesManager.setTutorialCompleted(it) }
                         statusData.firstLogin?.let { preferencesManager.setFirstLogin(it) }
 
-                        // 튜토리얼 비트마스크 초기화 (old 프로젝트와 동일)
-                        val bitmask = statusData.tutorial ?: 0L
-                        net.ib.mn.util.logD("StartUpViewModel", "Initializing TutorialManager with bitmask: $bitmask")
-                        TutorialManager.init(bitmask)
-                        preferencesManager.setTutorialBitmask(bitmask)
+                        // 튜토리얼 비트마스크 초기화
+                        // 서버와 로컬 bitmask를 AND 연산으로 병합
+                        // - 비트가 0 = 완료됨, 비트가 1 = 미완료
+                        // - 어느 쪽에서든 완료(0)된 튜토리얼은 완료 상태 유지
+                        val serverBitmask = statusData.tutorial ?: 0L
+                        val localBitmask = preferencesManager.getTutorialBitmaskSync()
+                        val mergedBitmask = serverBitmask and localBitmask
+                        net.ib.mn.util.logD("StartUpViewModel", "Tutorial bitmask - server: $serverBitmask, local: $localBitmask, merged: $mergedBitmask")
+                        TutorialManager.init(mergedBitmask)
+                        preferencesManager.setTutorialBitmask(mergedBitmask)
 
                     }
                 }

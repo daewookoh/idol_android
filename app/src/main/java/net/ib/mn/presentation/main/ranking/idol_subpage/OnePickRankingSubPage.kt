@@ -100,9 +100,11 @@ fun OnePickRankingSubPage(
         )
     }
 
-    // 초기 로드
-    LaunchedEffect(Unit) {
-        viewModel.reloadIfNeeded()
+    // 초기 로드 및 화면 복귀 시 새로고침
+    LaunchedEffect(isVisible) {
+        if (isVisible) {
+            viewModel.refresh()
+        }
     }
 
     Box(modifier = modifier.fillMaxSize()) {
