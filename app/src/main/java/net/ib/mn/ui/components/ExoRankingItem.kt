@@ -2263,8 +2263,7 @@ private fun ThemePickOtherRankingItem(
         // 순위 번호
         Text(
             text = "${item.rank}",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
+            style = ExoTypo.typo16Bold,
             textAlign = TextAlign.Center,
             modifier = Modifier.width(40.dp)
         )

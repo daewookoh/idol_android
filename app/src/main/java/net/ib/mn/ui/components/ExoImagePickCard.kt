@@ -166,7 +166,7 @@ private fun ImagePickEndedCard(
                         .padding(horizontal = 16.dp)
                         .padding(bottom = 16.dp),
                     text = stringResource(R.string.see_result),
-                    style = ExoTypo.typo14,
+                    fontSize = 14.sp,
                     height = 41.dp,
                     shape = RoundedCornerShape(20.dp),
                     containerColor = ColorPalette.fixGray900,
@@ -248,7 +248,7 @@ private fun ImagePickUpcomingCard(
                     onClick = onCardClick,
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(R.string.vote_alert_before),
-                    style = ExoTypo.typo14,
+                    fontSize = 14.sp,
                     height = 41.dp,
                     shape = RoundedCornerShape(20.dp),
                     containerColor = ColorPalette.mainLight,

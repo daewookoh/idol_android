@@ -270,7 +270,7 @@ private fun UpcomingHeartPickCard(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     text = stringResource(R.string.vote_preview),
-                    style = ExoTypo.typo14,
+                    fontSize = 14.sp,
                     height = 41.dp,
                     shape = RoundedCornerShape(20.dp),
                     containerColor = ColorPalette.main200,
@@ -569,7 +569,7 @@ private fun ActiveHeartPickCard(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     text = stringResource(R.string.guide_vote_title),
-                    style = ExoTypo.typo14,
+                    fontSize = 14.sp,
                     height = 41.dp,
                     shape = RoundedCornerShape(20.dp),
                     containerColor = ColorPalette.mainLight,
@@ -928,7 +928,7 @@ private fun EndedHeartPickCard(
                             .padding(horizontal = 16.dp)
                             .padding(bottom = 44.dp),
                         text = stringResource(R.string.see_result),
-                        style = ExoTypo.typo14,
+                        fontSize = 14.sp,
                         height = 41.dp,
                         shape = RoundedCornerShape(20.dp),
                         containerColor = ColorPalette.fixGray900,
