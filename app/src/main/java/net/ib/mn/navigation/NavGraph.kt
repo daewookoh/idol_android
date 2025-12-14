@@ -301,10 +301,7 @@ fun NavGraph(
                     is Screen.ImagePickDetail -> NavEntry(screen) {
                         ImagePickDetailScreen(
                             imagePickId = screen.imagePickId,
-                            onBackClick = { navigator.popBackStack() },
-                            onNavigateToResult = { resultId ->
-                                navigator.navigate(Screen.ImagePickLive(resultId))
-                            }
+                            onBackClick = { navigator.popBackStack() }
                         )
                     }
 

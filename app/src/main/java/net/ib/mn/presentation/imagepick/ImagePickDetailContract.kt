@@ -92,9 +92,6 @@ class ImagePickDetailContract {
         /** 공유 버튼 클릭 */
         data object Share : Intent()
 
-        /** 결과 화면으로 이동 */
-        data object GoToResult : Intent()
-
         /** 투표 중 나가기 (참여 처리) */
         data object ExitEarly : Intent()
     }
@@ -108,9 +105,6 @@ class ImagePickDetailContract {
 
         /** 공유 인텐트 실행 */
         data class ShareImagePick(val shareText: String) : Effect()
-
-        /** 결과 화면으로 이동 */
-        data class NavigateToResult(val imagePickId: Int) : Effect()
 
         /** 투표 완료 다이얼로그 표시 */
         data class ShowVoteCompleteDialog(

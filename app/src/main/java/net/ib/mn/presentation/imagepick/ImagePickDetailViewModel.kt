@@ -48,7 +48,6 @@ class ImagePickDetailViewModel @Inject constructor(
             is ImagePickDetailContract.Intent.SubmitVote -> submitVote()
             is ImagePickDetailContract.Intent.VoteAfterAd -> voteAfterAd()
             is ImagePickDetailContract.Intent.Share -> share()
-            is ImagePickDetailContract.Intent.GoToResult -> goToResult()
             is ImagePickDetailContract.Intent.ExitEarly -> exitEarly()
         }
     }
@@ -351,15 +350,6 @@ class ImagePickDetailViewModel @Inject constructor(
         val shareText = "[${imagePick.title}]"
 
         setEffect { ImagePickDetailContract.Effect.ShareImagePick(shareText) }
-    }
-
-    private fun goToResult() {
-        val candidates = uiState.value.candidates
-        if (candidates.isEmpty() || candidates.all { it.voteCount == 0L }) {
-            setEffect { ImagePickDetailContract.Effect.ShowNoParticipantsDialog }
-        } else {
-            setEffect { ImagePickDetailContract.Effect.NavigateToResult(imagePickId) }
-        }
     }
 
     /**

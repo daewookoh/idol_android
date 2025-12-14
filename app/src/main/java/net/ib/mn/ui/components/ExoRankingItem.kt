@@ -2089,7 +2089,7 @@ private fun ThemePick1stRankingItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(ColorPalette.background200)
-                .padding(vertical = 8.dp)
+                .padding(top=if(isImagePick) 16.dp else 8.dp, bottom = if(isImagePick) 0.dp else 8.dp)
         ) {
             val startPadding = 16.dp
             val imageSize = 102.dp

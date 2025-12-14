@@ -72,6 +72,16 @@ fun OnePickRankingSubPage(
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val scrollState = listState ?: rememberLazyListState()
 
+    // Pull-to-refresh로 당겼을 때만 애니메이션 표시
+    var isPullRefreshing by remember { mutableStateOf(false) }
+
+    // isRefreshing이 false가 되면 isPullRefreshing도 false로
+    LaunchedEffect(isRefreshing) {
+        if (!isRefreshing) {
+            isPullRefreshing = false
+        }
+    }
+
     // 참여자 없음 다이얼로그 상태
     var showNoParticipantsDialog by remember { mutableStateOf(false) }
 
@@ -141,8 +151,11 @@ fun OnePickRankingSubPage(
 
         // 컨텐츠 영역 with PullToRefresh
         PullToRefreshBox(
-            isRefreshing = isRefreshing,
-            onRefresh = { viewModel.refresh() },
+            isRefreshing = isPullRefreshing,
+            onRefresh = {
+                isPullRefreshing = true
+                viewModel.refresh()
+            },
             modifier = Modifier.fillMaxSize()
         ) {
             when (val state = uiState) {

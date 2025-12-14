@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -65,7 +66,12 @@ import net.ib.mn.ui.components.ExoLoading
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ExoSimpleDialog
 import net.ib.mn.ui.components.ExoTitleDialog
+import net.ib.mn.ui.components.RankingItem
+import net.ib.mn.ui.components.ThemePickRankingItem
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
+import java.text.NumberFormat
+import java.util.Locale
+import kotlin.math.roundToInt
 
 /**
  * 이미지픽 상세/투표 화면
@@ -82,8 +88,7 @@ fun ImagePickDetailScreen(
     imagePickId: Int,
     modifier: Modifier = Modifier,
     viewModel: ImagePickDetailViewModel = hiltViewModel(),
-    onBackClick: () -> Unit = {},
-    onNavigateToResult: ((Int) -> Unit)? = null
+    onBackClick: () -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -132,9 +137,6 @@ fun ImagePickDetailScreen(
                         type = "text/plain"
                     }
                     context.startActivity(Intent.createChooser(sendIntent, null))
-                }
-                is ImagePickDetailContract.Effect.NavigateToResult -> {
-                    onNavigateToResult?.invoke(effect.imagePickId)
                 }
                 is ImagePickDetailContract.Effect.ShowVoteCompleteDialog -> {
                     voteCompleteDialogData = VoteCompleteDialogData(
@@ -228,13 +230,11 @@ fun ImagePickDetailScreen(
         ExoConfirmDialog(
             title = "",
             message = "${stringResource(R.string.my_pick)}: ${data.candidateName}",
-            confirmButtonText = stringResource(R.string.see_result),
+            confirmButtonText = stringResource(R.string.confirm),
             dismissButtonText = stringResource(R.string.button_close),
             onConfirm = {
                 showVoteCompleteDialog = false
-                // 현재 화면을 닫고 결과 화면으로 이동 (백버튼 누르면 투표화면으로 돌아오지 않도록)
                 onBackClick()
-                onNavigateToResult?.invoke(imagePickId)
             },
             onDismiss = {
                 showVoteCompleteDialog = false
@@ -372,20 +372,11 @@ fun ImagePickDetailScreen(
                                 state = state,
                                 onImageSelect = { candidate ->
                                     viewModel.sendIntent(ImagePickDetailContract.Intent.SelectImage(candidate))
-                                },
-                                onVoteClick = {
-                                    viewModel.sendIntent(ImagePickDetailContract.Intent.StartVote)
-                                },
-                                onShowRankingClick = {
-                                    viewModel.sendIntent(ImagePickDetailContract.Intent.GoToResult)
                                 }
                             )
                         }
                         ImagePickDetailContract.ImagePickStatus.FINISHED -> {
-                            // 종료 상태면 결과 화면으로 이동
-                            LaunchedEffect(Unit) {
-                                onNavigateToResult?.invoke(imagePickId)
-                            }
+                            FinishedContent(state = state)
                         }
                     }
                 }
@@ -553,9 +544,7 @@ private fun NotifyButton(
 @Composable
 private fun ProgressContent(
     state: ImagePickDetailContract.State,
-    onImageSelect: (ImagePickIdolModel) -> Unit,
-    onVoteClick: () -> Unit,
-    onShowRankingClick: () -> Unit
+    onImageSelect: (ImagePickIdolModel) -> Unit
 ) {
     val imagePick = state.imagePick ?: return
 
@@ -698,92 +687,163 @@ private fun ImageGridItem(
     }
 }
 
-@Composable
-private fun VoteButton(
-    canVote: Boolean,
-    needsVideoAd: Boolean,
-    hasVotedToday: Boolean,
-    onVoteClick: () -> Unit,
-    onShowRankingClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(colorResource(R.color.background_100))
-    ) {
-        // 섹션 구분선
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(colorResource(R.color.gray150))
-        )
+// ============================================================
+// FINISHED (투표 종료) Content
+// ============================================================
 
-        // 현재 순위 보기 버튼
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Row(
+@Composable
+private fun FinishedContent(
+    state: ImagePickDetailContract.State
+) {
+    val imagePick = state.imagePick ?: return
+    val numberFormat = remember { NumberFormat.getNumberInstance(Locale.getDefault()) }
+
+    // 투표수가 있는 후보만 필터링하고 정렬 (ImagePickLiveViewModel 로직과 동일)
+    val rankedCandidates = remember(state.candidates) {
+        val filtered = state.candidates
+            .filter { it.voteCount > 0 }
+            .sortedByDescending { it.voteCount }
+            .toMutableList()
+
+        // 순위 할당 (동점자 처리 포함)
+        if (filtered.isNotEmpty()) {
+            val firstPlaceVote = filtered.first().voteCount
+            val lastPlaceVote = filtered.last().voteCount
+
+            for (i in filtered.indices) {
+                val item = filtered[i]
+                item.rank = when {
+                    i == 0 -> 1
+                    filtered[i - 1].voteCount == item.voteCount -> filtered[i - 1].rank
+                    else -> i + 1
+                }
+                item.firstPlaceVoteCount = firstPlaceVote
+                item.lastPlaceVoteCount = lastPlaceVote
+            }
+        }
+        filtered
+    }
+
+    val firstPlaceVote = rankedCandidates.firstOrNull()?.voteCount ?: 1L
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorResource(R.color.background_200))
+    ) {
+        // 제목
+        item {
+            Column(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(colorResource(R.color.main200))
-                    .clickable { onShowRankingClick() }
-                    .padding(horizontal = 12.dp, vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.see_current_ranking),
-                    style = ExoTypo.typo13.copy(color = colorResource(R.color.main_light))
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    painter = painterResource(R.drawable.arrow_left_to_right),
-                    contentDescription = null,
-                    modifier = Modifier.size(8.dp),
-                    tint = colorResource(R.color.main_light)
+                    text = imagePick.title,
+                    style = ExoTypo.typo18Bold.copy(color = colorResource(R.color.text_default)),
+                    textAlign = TextAlign.Center
                 )
             }
         }
 
-        // 투표하기 버튼
-        val btnColor = when {
-            hasVotedToday -> ColorPalette.fixGray900
-            else -> colorResource(R.color.main_light)
+        // 정보 섹션 (전체 투표수, 기간, 종료 상태)
+        item {
+            FinishedInfoSection(
+                periodText = state.periodText,
+                totalVote = imagePick.count,
+                numberFormat = numberFormat
+            )
         }
 
-        val btnTextColor = when {
-            hasVotedToday -> ColorPalette.fixWhite
-            else -> Color.White
+        // 순위 목록
+        itemsIndexed(rankedCandidates, key = { _, candidate -> candidate.id }) { index, candidate ->
+            val rankingItem = candidate.toRankingItem(
+                totalVote = imagePick.count,
+                firstPlaceVote = firstPlaceVote
+            )
+
+            ThemePickRankingItem(
+                item = rankingItem,
+                isFirstItem = index == 0,
+                isImagePick = true,
+                onClick = { }
+            )
         }
 
-        val btnText = when {
-            hasVotedToday -> stringResource(R.string.themepick_today_voted)   // "오늘 투표 완료"
-            needsVideoAd -> stringResource(R.string.imagepick_vote_with_ad)   // "추가 투표하기 [AD]"
-            else -> stringResource(R.string.guide_vote_title)                 // "투표하기"
+        item {
+            Spacer(modifier = Modifier.height(20.dp))
         }
+    }
+}
 
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp)
-                .height(40.dp)
-                .background(color = btnColor, shape = RoundedCornerShape(8.dp))
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                    enabled = !hasVotedToday
-                ) { onVoteClick() }
-        ) {
+@Composable
+private fun FinishedInfoSection(
+    periodText: String,
+    totalVote: Int,
+    numberFormat: NumberFormat
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ) {
+        // 전체 투표수
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = btnText,
-                style = ExoTypo.typo16Bold.copy(color = btnTextColor),
-                textAlign = TextAlign.Center
+                text = stringResource(R.string.themepick_total_votes),
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray))
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "${numberFormat.format(totalVote)}${stringResource(R.string.votes)}",
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_default))
+            )
+        }
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        // 기간
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = stringResource(R.string.onepick_period),
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray))
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = periodText,
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_default))
             )
         }
     }
+}
+
+// ============================================================
+// ImagePickIdolModel -> RankingItem 변환 확장 함수
+// ============================================================
+
+/**
+ * ImagePickIdolModel을 RankingItem으로 변환
+ */
+private fun ImagePickIdolModel.toRankingItem(
+    totalVote: Int,
+    firstPlaceVote: Long
+): RankingItem {
+    val name = idol?.name ?: ""
+
+    val percentage = if (totalVote > 0) {
+        ((100.0f * voteCount.toFloat() / totalVote.toFloat())).roundToInt()
+    } else 0
+
+    return RankingItem(
+        id = id.toString(),
+        name = name,
+        rank = rank,
+        voteCount = voteCount.toString(),
+        heartCount = voteCount,
+        maxHeartCount = firstPlaceVote,
+        photoUrl = imageUrl ?: idol?.imageUrl,
+        percentage = percentage,
+        isFavorite = false
+    )
 }
