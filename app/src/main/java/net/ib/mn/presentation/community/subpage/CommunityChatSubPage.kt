@@ -156,7 +156,7 @@ fun CommunityChatSubPage(
             }
             state.isEmpty -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "채팅방이 없습니다.", style = ExoTypo.body14, color = ColorPalette.textDimmed)
+                    Text(text = "채팅방이 없습니다.", style = ExoTypo.typo14, color = ColorPalette.textDimmed)
                 }
             }
             else -> {
@@ -324,7 +324,7 @@ private fun ChatRoomSectionHeader(
             // old: 12sp, text_dimmed
             Text(
                 text = title,
-                style = ExoTypo.body12,
+                style = ExoTypo.typo12,
                 color = ColorPalette.textDimmed
             )
 
@@ -335,7 +335,7 @@ private fun ChatRoomSectionHeader(
                 // old: 12sp, text_gray
                 Text(
                     text = filterText,
-                    style = ExoTypo.body12,
+                    style = ExoTypo.typo12,
                     color = ColorPalette.textGray
                 )
                 Spacer(modifier = Modifier.width(5.dp))
@@ -373,7 +373,7 @@ private fun ChatRoomItem(room: ChatRoomModel, onClick: () -> Unit, onLongClick: 
                         if (room.levelLimit > 0) {
                             Text(
                                 text = "Lv.${room.levelLimit}",
-                                style = ExoTypo.caption10.copy(fontSize = 10.sp, lineHeight = 12.sp),
+                                style = ExoTypo.typo10.copy(fontSize = 10.sp, lineHeight = 12.sp),
                                 color = ColorPalette.gray50,
                                 modifier = Modifier
                                     .background(ColorPalette.main, RoundedCornerShape(10.dp))
@@ -384,7 +384,7 @@ private fun ChatRoomItem(room: ChatRoomModel, onClick: () -> Unit, onLongClick: 
                         if (room.isAnonymousRoom) {
                             Text(
                                 text = stringResource(R.string.chat_anonymous),
-                                style = ExoTypo.caption10.copy(fontSize = 10.sp),
+                                style = ExoTypo.typo10.copy(fontSize = 10.sp),
                                 color = ColorPalette.main
                             )
                         }
@@ -394,7 +394,7 @@ private fun ChatRoomItem(room: ChatRoomModel, onClick: () -> Unit, onLongClick: 
                     if (!room.lastMessageTime.isNullOrEmpty()) {
                         Text(
                             text = formatChatTime(room.lastMessageTime),
-                            style = ExoTypo.caption10,
+                            style = ExoTypo.typo10,
                             color = ColorPalette.textDimmed
                         )
                     }
@@ -405,7 +405,7 @@ private fun ChatRoomItem(room: ChatRoomModel, onClick: () -> Unit, onLongClick: 
                 // 제목
                 Text(
                     text = room.title,
-                    style = ExoTypo.body14,
+                    style = ExoTypo.typo14,
                     color = ColorPalette.gray1000,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -416,7 +416,7 @@ private fun ChatRoomItem(room: ChatRoomModel, onClick: () -> Unit, onLongClick: 
                     Spacer(modifier = Modifier.height(3.dp))
                     Text(
                         text = room.desc,
-                        style = ExoTypo.caption11,
+                        style = ExoTypo.typo11,
                         color = ColorPalette.textDimmed,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -436,7 +436,7 @@ private fun ChatRoomItem(room: ChatRoomModel, onClick: () -> Unit, onLongClick: 
                 ) {
                     Text(
                         text = if (room.unreadCount > 99) "99+" else room.unreadCount.toString(),
-                        style = ExoTypo.caption10,
+                        style = ExoTypo.typo10,
                         color = ColorPalette.gray50
                     )
                 }

@@ -33,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.ib.mn.BuildConfig
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.domain.model.ScheduleCategory
 import net.ib.mn.domain.model.ScheduleModel
 import net.ib.mn.presentation.community.schedule.ScheduleWriteContract.Effect
@@ -150,8 +151,7 @@ fun ScheduleWriteScreen(
                     } else {
                         Text(
                             text = stringResource(R.string.lable_save),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
+                            style = ExoTypo.typo16Bold
                         )
                     }
                 }
@@ -359,8 +359,7 @@ private fun InputRow(
     ) {
         Text(
             text = if (isRequired) "*" else "",
-            fontSize = 14.sp,
-            color = ColorPalette.main,
+            style = ExoTypo.typo14.copy(color = ColorPalette.main),
             modifier = Modifier.width(10.dp)
         )
 
@@ -370,7 +369,7 @@ private fun InputRow(
             modifier = Modifier
                 .weight(1f)
                 .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier),
-            textStyle = TextStyle(fontSize = 14.sp, color = ColorPalette.textDefault),
+            textStyle = ExoTypo.typo14.copy(color = ColorPalette.textDefault),
             cursorBrush = SolidColor(ColorPalette.main),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
@@ -381,7 +380,7 @@ private fun InputRow(
             decorationBox = { innerTextField ->
                 Box {
                     if (value.isEmpty()) {
-                        Text(text = hint, fontSize = 14.sp, color = ColorPalette.textDimmed)
+                        Text(text = hint, style = ExoTypo.typo14.copy(color = ColorPalette.textDimmed))
                     }
                     innerTextField()
                 }
@@ -411,15 +410,13 @@ private fun SelectRow(
     ) {
         Text(
             text = if (isRequired) "*" else "",
-            fontSize = 14.sp,
-            color = ColorPalette.main,
+            style = ExoTypo.typo14.copy(color = ColorPalette.main),
             modifier = Modifier.width(10.dp)
         )
 
         Text(
             text = label ?: hint,
-            fontSize = 14.sp,
-            color = if (label != null) ColorPalette.textDefault else ColorPalette.textDimmed
+            style = ExoTypo.typo14.copy(color = if (label != null) ColorPalette.textDefault else ColorPalette.textDimmed)
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -435,7 +432,7 @@ private fun SelectRow(
         }
 
         value?.let {
-            Text(text = it, fontSize = 12.sp, color = ColorPalette.textDefault)
+            Text(text = it, style = ExoTypo.typo12.copy(color = ColorPalette.textDefault))
             Spacer(modifier = Modifier.width(14.dp))
         }
 
@@ -468,8 +465,7 @@ private fun CheckboxRow(
     ) {
         Text(
             text = label,
-            fontSize = 14.sp,
-            color = if (isChecked) ColorPalette.textDefault else ColorPalette.textDimmed
+            style = ExoTypo.typo14.copy(color = if (isChecked) ColorPalette.textDefault else ColorPalette.textDimmed)
         )
         Spacer(modifier = Modifier.weight(1f))
         Checkbox(
@@ -502,8 +498,7 @@ private fun LocationRow(
     ) {
         Text(
             text = label ?: hint,
-            fontSize = 14.sp,
-            color = if (label != null) ColorPalette.textDefault else ColorPalette.textDimmed
+            style = ExoTypo.typo14.copy(color = if (label != null) ColorPalette.textDefault else ColorPalette.textDimmed)
         )
         Spacer(modifier = Modifier.weight(1f))
 
@@ -519,7 +514,7 @@ private fun LocationRow(
         }
 
         value?.let {
-            Text(text = it, fontSize = 12.sp, color = ColorPalette.textDefault)
+            Text(text = it, style = ExoTypo.typo12.copy(color = ColorPalette.textDefault))
             Spacer(modifier = Modifier.width(14.dp))
         }
 
@@ -553,14 +548,14 @@ private fun MultiLineInputRow(
             modifier = Modifier
                 .fillMaxSize()
                 .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier),
-            textStyle = TextStyle(fontSize = 14.sp, color = ColorPalette.textDefault),
+            textStyle = ExoTypo.typo14.copy(color = ColorPalette.textDefault),
             cursorBrush = SolidColor(ColorPalette.main),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { onImeAction?.invoke() }),
             decorationBox = { innerTextField ->
                 Box {
                     if (value.isEmpty()) {
-                        Text(text = hint, fontSize = 14.sp, color = ColorPalette.textDimmed)
+                        Text(text = hint, style = ExoTypo.typo14.copy(color = ColorPalette.textDimmed))
                     }
                     innerTextField()
                 }
@@ -609,8 +604,7 @@ private fun CategoryBottomSheet(
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         text = stringResource(category.labelResId),
-                        fontSize = 15.sp,
-                        color = ColorPalette.textDefault
+                        style = ExoTypo.typo15.copy(color = ColorPalette.textDefault)
                     )
                 }
             }
@@ -679,7 +673,7 @@ private fun DateTimePickerDialog(
             dismissButton = {
                 TextButton(onClick = { step = 0 }) { Text(stringResource(R.string.btn_cancel)) }
             },
-            title = { Text(stringResource(R.string.schedule_time), fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.schedule_time), style = ExoTypo.typo14Bold) },
             text = {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     TimePicker(state = timePickerState)

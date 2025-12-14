@@ -40,6 +40,7 @@ import coil.request.ImageRequest
 import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * ProfilePhotoPage - 프로필 사진 탭 (3열 그리드)
@@ -131,8 +132,7 @@ private fun EmptyContent(message: String) {
     ) {
         Text(
             text = message,
-            color = ColorPalette.textGray,
-            fontSize = 14.sp
+            style = ExoTypo.typo14.copy(color = ColorPalette.textGray)
         )
     }
 }
@@ -155,8 +155,7 @@ private fun PrivateContent() {
             Spacer(modifier = Modifier.height(14.dp))
             Text(
                 text = stringResource(R.string.feed_is_private),
-                color = ColorPalette.textGray,
-                fontSize = 12.sp
+                style = ExoTypo.typo12.copy(color = ColorPalette.textGray)
             )
         }
     }
@@ -180,8 +179,7 @@ private fun BlockedContent() {
             Spacer(modifier = Modifier.height(14.dp))
             Text(
                 text = stringResource(R.string.user_blocked),
-                color = ColorPalette.textGray,
-                fontSize = 12.sp
+                style = ExoTypo.typo12.copy(color = ColorPalette.textGray)
             )
         }
     }

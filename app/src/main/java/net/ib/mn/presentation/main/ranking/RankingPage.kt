@@ -390,16 +390,15 @@ private fun RankingTabRow(
                 ) {
                     Text(
                         text = tabName,
-                        style = ExoTypo.title14.copy(
+                        style = ExoTypo.typo14Bold.copy(
                             lineHeight = 14.sp,
                             color = if (selectedIndex == index) ColorPalette.main else ColorPalette.textDimmed
                         )
                     )
                     if (showNewBadge) {
-                        val fontSizeInDp = with(LocalDensity.current) { 8.dp.toSp() }
                         Text(
                             text = "NEW",
-                            style = TextStyle(fontSize = fontSizeInDp, fontWeight = FontWeight.Bold, color = ColorPalette.main),
+                            style = ExoTypo.typo8Main,
                             modifier = Modifier.align(Alignment.TopCenter).padding(top = 6.dp)
                         )
                     }
@@ -578,20 +577,14 @@ private fun ShowMyFavToast(
                 Text(
                     text = stringResource(id = R.string.banner_go_myidol_title),
                     color = colorResource(id = R.color.text_default),
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    )
+                    style = ExoTypo.typo14
                 )
             }
             Text(
                 text = stringResource(id = R.string.banner_go_myidol_btn),
                 color = colorResource(id = R.color.main_light),
                 textDecoration = TextDecoration.Underline,
-                style = TextStyle(
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                ),
+                style = ExoTypo.typo14,
                 maxLines = 1
             )
         }

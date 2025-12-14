@@ -49,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import net.ib.mn.ui.theme.ExoTypo
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -253,9 +254,7 @@ fun ScheduleLocationScreen(
             ) {
                 Text(
                     text = stringResource(R.string.schedule_use_location),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    style = ExoTypo.typo16Bold.copy(color = Color.White)
                 )
             }
         },
@@ -328,10 +327,7 @@ fun ScheduleLocationScreen(
                             value = searchQuery,
                             onValueChange = { searchQuery = it },
                             modifier = Modifier.weight(1f),
-                            textStyle = TextStyle(
-                                fontSize = 15.sp,
-                                color = ColorPalette.textDefault
-                            ),
+                            textStyle = ExoTypo.typo15.copy(color = ColorPalette.textDefault),
                             cursorBrush = SolidColor(ColorPalette.main),
                             singleLine = true,
                             decorationBox = { innerTextField ->
@@ -339,8 +335,7 @@ fun ScheduleLocationScreen(
                                     if (searchQuery.isEmpty()) {
                                         Text(
                                             text = stringResource(R.string.hint_search),
-                                            fontSize = 15.sp,
-                                            color = ColorPalette.textDimmed
+                                            style = ExoTypo.typo15.copy(color = ColorPalette.textDimmed)
                                         )
                                     }
                                     innerTextField()
@@ -390,14 +385,11 @@ fun ScheduleLocationScreen(
                                 ) {
                                     Text(
                                         text = prediction.getPrimaryText(null).toString(),
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Medium,
-                                        color = ColorPalette.textDefault
+                                        style = ExoTypo.typo14.copy(color = ColorPalette.textDefault)
                                     )
                                     Text(
                                         text = prediction.getSecondaryText(null).toString(),
-                                        fontSize = 12.sp,
-                                        color = ColorPalette.textDimmed
+                                        style = ExoTypo.typo12.copy(color = ColorPalette.textDimmed)
                                     )
                                 }
                                 HorizontalDivider(

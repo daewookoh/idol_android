@@ -211,7 +211,7 @@ fun ExoCommentItem(
                         // 닉네임 (textDefault + bold)
                         Text(
                             text = comment.user?.nickname ?: "",
-                            style = ExoTypo.body14.copy(
+                            style = ExoTypo.typo14.copy(
                                 color = ColorPalette.textDefault,
                                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
                             ),
@@ -226,7 +226,7 @@ fun ExoCommentItem(
                     }
                     Text(
                         text = createdAt,
-                        style = ExoTypo.body11.copy(color = ColorPalette.gray200),
+                        style = ExoTypo.typo11.copy(color = ColorPalette.gray200),
                         modifier = Modifier.padding(start = 8.dp)
                     )
                 }
@@ -287,7 +287,7 @@ fun ExoCommentItem(
                             ) {
                                 Text(
                                     text = "GIF",
-                                    style = ExoTypo.stat10.copy(color = ColorPalette.textWhiteBlack)
+                                    style = ExoTypo.typo10Bold.copy(color = ColorPalette.textWhiteBlack)
                                 )
                             }
                         }
@@ -302,7 +302,7 @@ fun ExoCommentItem(
                 if (!contentText.isNullOrEmpty()) {
                     Text(
                         text = contentText,
-                        style = ExoTypo.body14,
+                        style = ExoTypo.typo14,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -349,7 +349,7 @@ fun ExoCommentItem(
 
                     Text(
                         text = translateButtonText,
-                        style = ExoTypo.body12.copy(color = translateTextColor),
+                        style = ExoTypo.typo12.copy(color = translateTextColor),
                         modifier = Modifier
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
@@ -376,7 +376,7 @@ fun ExoCommentItem(
                         text = {
                             Text(
                                 text = stringResource(android.R.string.copy),
-                                style = ExoTypo.body14
+                                style = ExoTypo.typo14
                             )
                         },
                         onClick = {
@@ -399,7 +399,7 @@ fun ExoCommentItem(
                         text = {
                             Text(
                                 text = stringResource(R.string.report),
-                                style = ExoTypo.body14
+                                style = ExoTypo.typo14
                             )
                         },
                         onClick = {
@@ -415,7 +415,7 @@ fun ExoCommentItem(
                         text = {
                             Text(
                                 text = stringResource(R.string.title_remove),
-                                style = ExoTypo.body14
+                                style = ExoTypo.typo14
                             )
                         },
                         onClick = {
@@ -449,7 +449,7 @@ fun CommentEmpty(
     ) {
         Text(
             text = stringResource(R.string.empty_comment),
-            style = ExoTypo.body14.copy(color = ColorPalette.textDimmed)
+            style = ExoTypo.typo14.copy(color = ColorPalette.textDimmed)
         )
     }
 }

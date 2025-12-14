@@ -199,8 +199,7 @@ fun ImagePickLiveScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = title,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = ExoTypo.typo20Bold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -291,8 +290,7 @@ private fun ErrorView(error: String) {
     ) {
         Text(
             text = error,
-            color = colorResource(R.color.text_gray),
-            fontSize = 16.sp,
+            style = ExoTypo.typo16.copy(color = colorResource(R.color.text_gray)),
             textAlign = TextAlign.Center
         )
     }
@@ -343,8 +341,7 @@ private fun ResultContent(
                     ) {
                         Text(
                             text = stringResource(R.string.onepick_no_votes),
-                            color = colorResource(R.color.text_gray),
-                            fontSize = 14.sp,
+                            style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray)),
                             textAlign = TextAlign.Center
                         )
                     }
@@ -423,9 +420,7 @@ private fun VoteButton(
         ) {
             Text(
                 text = buttonText,
-                color = textColor,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
+                style = ExoTypo.typo16Bold.copy(color = textColor)
             )
         }
     }
@@ -465,7 +460,7 @@ private fun ImagePickLiveHeader(
         ) {
             Text(
                 text = title,
-                style = ExoTypo.title14.copy(
+                style = ExoTypo.typo14Bold.copy(
                     color = if (isFinished) {
                         colorResource(R.color.gray300)
                     } else {
@@ -483,7 +478,7 @@ private fun ImagePickLiveHeader(
         ) {
             Text(
                 text = stringResource(R.string.num_participants),
-                style = ExoTypo.body14.copy(
+                style = ExoTypo.typo14.copy(
                     color = colorResource(R.color.text_gray),
                     lineHeight = 20.sp
                 )
@@ -491,7 +486,7 @@ private fun ImagePickLiveHeader(
             Spacer(modifier = Modifier.width(11.dp))
             Text(
                 text = stringResource(R.string.num_participants_format, participantsCount),
-                style = ExoTypo.body13.copy(
+                style = ExoTypo.typo13.copy(
                     color = colorResource(R.color.text_default),
                     lineHeight = 20.sp
                 )
@@ -506,7 +501,7 @@ private fun ImagePickLiveHeader(
         ) {
             Text(
                 text = stringResource(R.string.onepick_period),
-                style = ExoTypo.body14.copy(
+                style = ExoTypo.typo14.copy(
                     color = colorResource(R.color.text_gray),
                     lineHeight = 20.sp
                 )
@@ -514,7 +509,7 @@ private fun ImagePickLiveHeader(
             Spacer(modifier = Modifier.width(11.dp))
             Text(
                 text = periodText,
-                style = ExoTypo.body13.copy(
+                style = ExoTypo.typo13.copy(
                     color = colorResource(R.color.text_default),
                     lineHeight = 20.sp
                 )
@@ -624,9 +619,7 @@ private fun ImagePickLive1stRankingItem(
                     // 이름
                     Text(
                         text = idolName,
-                        color = colorResource(R.color.text_default),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = ExoTypo.typo16Bold.copy(color = colorResource(R.color.text_default)),
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -639,15 +632,15 @@ private fun ImagePickLive1stRankingItem(
                     ) {
                         Text(
                             text = numberFormat.format(item.voteCount),
-                            color = colorResource(R.color.text_default),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold
+                            style = ExoTypo.typo14.copy(
+                                color = colorResource(R.color.text_default),
+                                fontWeight = FontWeight.SemiBold
+                            )
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "${percentage}%",
-                            color = colorResource(R.color.text_gray),
-                            fontSize = 12.sp
+                            style = ExoTypo.typo12.copy(color = colorResource(R.color.text_gray))
                         )
                     }
                 }
@@ -693,9 +686,7 @@ private fun ImagePickLiveOtherRankingItem(
         // 순위
         Text(
             text = numberFormat.format(item.rank),
-            color = colorResource(R.color.text_default),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
+            style = ExoTypo.typo16Bold.copy(color = colorResource(R.color.text_default)),
             textAlign = TextAlign.Center,
             modifier = Modifier.width(42.dp)
         )
@@ -719,9 +710,10 @@ private fun ImagePickLiveOtherRankingItem(
             // 이름
             Text(
                 text = idolName,
-                color = colorResource(R.color.text_default),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
+                style = ExoTypo.typo14.copy(
+                    color = colorResource(R.color.text_default),
+                    fontWeight = FontWeight.Medium
+                ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -734,14 +726,12 @@ private fun ImagePickLiveOtherRankingItem(
             ) {
                 Text(
                     text = numberFormat.format(item.voteCount),
-                    color = colorResource(R.color.text_default),
-                    fontSize = 13.sp
+                    style = ExoTypo.typo13.copy(color = colorResource(R.color.text_default))
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "${percentage}%",
-                    color = colorResource(R.color.text_gray),
-                    fontSize = 11.sp
+                    style = ExoTypo.typo11.copy(color = colorResource(R.color.text_gray))
                 )
             }
         }

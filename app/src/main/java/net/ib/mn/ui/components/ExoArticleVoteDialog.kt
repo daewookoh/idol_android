@@ -47,6 +47,7 @@ import net.ib.mn.R
 import net.ib.mn.data.remote.dto.ArticleVoteResponse
 import net.ib.mn.presentation.main.ranking.idol_subpage.VoteViewModel
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.NumberFormatUtil
 
 /**
@@ -119,9 +120,7 @@ fun ExoArticleVoteDialog(
                 // 타이틀
                 Text(
                     text = stringResource(R.string.title_vote_heart),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = ColorPalette.main,
+                    style = ExoTypo.typo16Bold.copy(color = ColorPalette.main),
                     modifier = Modifier.padding(top = 20.dp, bottom = 15.dp),
                     textAlign = TextAlign.Center
                 )
@@ -146,15 +145,12 @@ fun ExoArticleVoteDialog(
                         // 내 하트
                         Text(
                             text = stringResource(R.string.my_heart),
-                            fontSize = 12.sp,
-                            color = ColorPalette.textDefault
+                            style = ExoTypo.typo12.copy(color = ColorPalette.textDefault)
                         )
                         Spacer(modifier = Modifier.height(5.dp))
                         Text(
                             text = NumberFormatUtil.formatWithComma(totalHeart),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorPalette.mainLight
+                            style = ExoTypo.typo18Bold.copy(color = ColorPalette.mainLight)
                         )
 
                         Spacer(modifier = Modifier.height(10.dp))
@@ -172,16 +168,13 @@ fun ExoArticleVoteDialog(
                             ) {
                                 Text(
                                     text = stringResource(R.string.ever_heart),
-                                    fontSize = 12.sp,
-                                    color = ColorPalette.textDimmed,
+                                    style = ExoTypo.typo12.copy(color = ColorPalette.textDimmed),
                                     textAlign = TextAlign.Center
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
                                 Text(
                                     text = NumberFormatUtil.formatWithComma(strongHeart),
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = ColorPalette.textGray,
+                                    style = ExoTypo.typo14Bold.copy(color = ColorPalette.textGray),
                                     textAlign = TextAlign.Center
                                 )
                             }
@@ -189,8 +182,7 @@ fun ExoArticleVoteDialog(
                             // +
                             Text(
                                 text = "+",
-                                fontSize = 15.sp,
-                                color = ColorPalette.textDimmed,
+                                style = ExoTypo.typo15.copy(color = ColorPalette.textDimmed),
                                 modifier = Modifier.padding(horizontal = 5.dp)
                             )
 
@@ -201,16 +193,13 @@ fun ExoArticleVoteDialog(
                             ) {
                                 Text(
                                     text = stringResource(R.string.weak_heart),
-                                    fontSize = 12.sp,
-                                    color = ColorPalette.textDimmed,
+                                    style = ExoTypo.typo12.copy(color = ColorPalette.textDimmed),
                                     textAlign = TextAlign.Center
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
                                 Text(
                                     text = NumberFormatUtil.formatWithComma(freeHeart),
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = ColorPalette.textGray,
+                                    style = ExoTypo.typo14Bold.copy(color = ColorPalette.textGray),
                                     textAlign = TextAlign.Center
                                 )
                             }
@@ -318,8 +307,7 @@ fun ExoArticleVoteDialog(
                         .clip(RoundedCornerShape(6.dp))
                         .background(ColorPalette.background300)
                         .padding(horizontal = 10.dp),
-                    textStyle = TextStyle(
-                        fontSize = 14.sp,
+                    textStyle = ExoTypo.typo14.copy(
                         color = ColorPalette.main,
                         textAlign = TextAlign.Start
                     ),
@@ -370,8 +358,7 @@ fun ExoArticleVoteDialog(
                     ) {
                         Text(
                             text = stringResource(R.string.confirm),
-                            fontSize = 13.sp,
-                            color = ColorPalette.textGray
+                            style = ExoTypo.typo13.copy(color = ColorPalette.textGray)
                         )
                     }
 
@@ -392,8 +379,7 @@ fun ExoArticleVoteDialog(
                     ) {
                         Text(
                             text = stringResource(R.string.btn_cancel),
-                            fontSize = 13.sp,
-                            color = ColorPalette.textGray
+                            style = ExoTypo.typo13.copy(color = ColorPalette.textGray)
                         )
                     }
                 }
@@ -433,8 +419,7 @@ private fun ArticleHeartButton(
             Spacer(modifier = Modifier.width(5.dp))
             Text(
                 text = "X $count",
-                fontSize = 11.sp,
-                color = ColorPalette.textDefault
+                style = ExoTypo.typo11.copy(color = ColorPalette.textDefault)
             )
         }
     }
@@ -470,8 +455,7 @@ private fun ArticleHeartAllButton(
             Spacer(modifier = Modifier.width(5.dp))
             Text(
                 text = label,
-                fontSize = 11.sp,
-                color = ColorPalette.textDefault
+                style = ExoTypo.typo11.copy(color = ColorPalette.textDefault)
             )
         }
     }

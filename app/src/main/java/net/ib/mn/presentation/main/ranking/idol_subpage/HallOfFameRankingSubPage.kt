@@ -78,7 +78,7 @@ fun HallOfFameRankingSubPage(
             ) {
                 Text(
                     text = stringResource(R.string.hof_cumulative_tab),
-                    style = ExoTypo.body13.copy(color = if (selectedTabIndex == 0) ColorPalette.textDefault else ColorPalette.textDimmed)
+                    style = ExoTypo.typo13.copy(color = if (selectedTabIndex == 0) ColorPalette.textDefault else ColorPalette.textDimmed)
                 )
             }
             Tab(
@@ -89,7 +89,7 @@ fun HallOfFameRankingSubPage(
             ) {
                 Text(
                     text = stringResource(R.string.hof_daily_tab),
-                    style = ExoTypo.body13.copy(color = if (selectedTabIndex == 1) ColorPalette.textDefault else ColorPalette.textDimmed)
+                    style = ExoTypo.typo13.copy(color = if (selectedTabIndex == 1) ColorPalette.textDefault else ColorPalette.textDimmed)
                 )
             }
         }

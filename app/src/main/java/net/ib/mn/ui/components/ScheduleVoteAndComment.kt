@@ -26,11 +26,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import net.ib.mn.BuildConfig
 import net.ib.mn.R
 import net.ib.mn.domain.model.ScheduleModel
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * 투표 다이얼로그 타입
@@ -247,6 +247,9 @@ private fun ScheduleActionButton(
             modifier = Modifier.size(14.dp)
         )
         Spacer(modifier = Modifier.width(5.dp))
-        Text(text = text, fontSize = 11.sp, color = color)
+        Text(
+            text = text,
+            style = ExoTypo.typo11.copy(color = color)
+        )
     }
 }

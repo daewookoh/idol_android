@@ -20,8 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.R
 import net.ib.mn.ui.components.ExoHeartPickCard
 import net.ib.mn.ui.components.LocalHeartPickDetailClick
@@ -82,8 +82,7 @@ fun HeartPickRankingSubPage(
                 ) {
                     Text(
                         text = stringResource(R.string.msg_error_ok),
-                        fontSize = 16.sp,
-                        color = ColorPalette.main
+                        style = ExoTypo.typo16.copy(color = ColorPalette.main)
                     )
                 }
             }
@@ -100,8 +99,7 @@ fun HeartPickRankingSubPage(
                     ) {
                         Text(
                             text = stringResource(R.string.msg_no_data),
-                            fontSize = 16.sp,
-                            color = ColorPalette.textDimmed
+                            style = ExoTypo.typo16.copy(color = ColorPalette.textDimmed)
                         )
                     }
                 } else {

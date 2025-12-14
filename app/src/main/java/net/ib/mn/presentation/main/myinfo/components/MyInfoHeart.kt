@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * MyInfo 하트/다이아 정보 컴포넌트
@@ -80,17 +81,14 @@ fun MyInfoHeart(
                     // tv_my_heart
                     Text(
                         text = stringResource(id = R.string.my_info_own_heart),
-                        color = colorResource(id = R.color.text_gray),
-                        fontSize = 14.sp,
+                        style = ExoTypo.typo14.copy(color = colorResource(id = R.color.text_gray)),
                         lineHeight = 14.sp
                     )
 
                     // tv_my_heart_count
                     Text(
                         text = heartCount,
-                        color = colorResource(id = R.color.text_default),
-                        fontSize = 19.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = ExoTypo.typo19Bold.copy(color = colorResource(id = R.color.text_default)),
                         lineHeight = 19.sp,
                         maxLines = 1
                     )
@@ -116,16 +114,13 @@ fun MyInfoHeart(
                     ) {
                         Text(
                             text = stringResource(id = R.string.ever_heart_short),
-                            color = colorResource(id = R.color.text_default),
-                            fontSize = 14.sp,
+                            style = ExoTypo.typo14.copy(color = colorResource(id = R.color.text_default)),
                             lineHeight = 14.sp
                         )
 
                         Text(
                             text = strongHeart,
-                            color = colorResource(id = R.color.text_default),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = ExoTypo.typo14Bold.copy(color = colorResource(id = R.color.text_default)),
                             lineHeight = 14.sp,
                             maxLines = 1
                         )
@@ -141,16 +136,13 @@ fun MyInfoHeart(
                     ) {
                         Text(
                             text = stringResource(id = R.string.daily_heart_short),
-                            color = colorResource(id = R.color.text_default),
-                            fontSize = 14.sp,
+                            style = ExoTypo.typo14.copy(color = colorResource(id = R.color.text_default)),
                             lineHeight = 14.sp
                         )
 
                         Text(
                             text = weakHeart,
-                            color = colorResource(id = R.color.text_default),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = ExoTypo.typo14Bold.copy(color = colorResource(id = R.color.text_default)),
                             lineHeight = 14.sp,
                             maxLines = 1
                         )
@@ -180,17 +172,14 @@ fun MyInfoHeart(
                     // tv_my_dia
                     Text(
                         text = stringResource(id = R.string.my_info_own_diamond),
-                        color = colorResource(id = R.color.text_gray),
-                        fontSize = 14.sp,
+                        style = ExoTypo.typo14.copy(color = colorResource(id = R.color.text_gray)),
                         lineHeight = 14.sp
                     )
 
                     // tv_my_dia_count
                     Text(
                         text = diaCount,
-                        color = colorResource(id = R.color.text_default),
-                        fontSize = 19.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = ExoTypo.typo19Bold.copy(color = colorResource(id = R.color.text_default)),
                         lineHeight = 19.sp,
                         maxLines = 1
                     )
@@ -214,8 +203,7 @@ fun MyInfoHeart(
             ) {
                 Text(
                     text = stringResource(id = R.string.my_info_heart_dia_detail),
-                    color = colorResource(id = R.color.text_gray),
-                    fontSize = 14.sp,
+                    style = ExoTypo.typo14.copy(color = colorResource(id = R.color.text_gray))
                 )
             }
         }

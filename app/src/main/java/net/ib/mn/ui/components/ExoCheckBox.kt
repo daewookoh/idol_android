@@ -20,6 +20,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 
 /**
@@ -78,13 +79,15 @@ fun ExoCheckBox(
                 is String -> {
                     Text(
                         text = text,
-                        style = if (isMain) ExoTypo.checkboxMain else ExoTypo.checkboxSub
+                        style = if (isMain) ExoTypo.typo17Bold else ExoTypo.typo16,
+                        color = ColorPalette.textDefault
                     )
                 }
                 is AnnotatedString -> {
                     Text(
                         text = text,
-                        style = if (isMain) ExoTypo.checkboxMain else ExoTypo.checkboxSub
+                        style = if (isMain) ExoTypo.typo17Bold else ExoTypo.typo16,
+                        color = ColorPalette.textDefault
                     )
                 }
             }

@@ -270,12 +270,12 @@ fun ExoArticleItem(
                 ) {
                     Text(
                         text = externalCommunityName,
-                        style = ExoTypo.body13.copy(color = ColorPalette.textGray)
+                        style = ExoTypo.typo13.copy(color = ColorPalette.textGray)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(id = R.string.guide_community_title),
-                        style = ExoTypo.body13.copy(color = ColorPalette.textDimmed)
+                        style = ExoTypo.typo13.copy(color = ColorPalette.textDimmed)
                     )
                 }
                 HorizontalDivider(
@@ -366,7 +366,7 @@ fun ExoArticleItem(
 
                         Text(
                             text = article.user?.nickname ?: "",
-                            style = ExoTypo.body14Main,
+                            style = ExoTypo.typo14Main,
                             modifier = Modifier.clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
@@ -394,7 +394,7 @@ fun ExoArticleItem(
                     ) {
                         Text(
                             text = createdAt,
-                            style = ExoTypo.body12
+                            style = ExoTypo.typo12
                         )
 
                         if (article.isMostOnly == "Y") {
@@ -442,7 +442,7 @@ fun ExoArticleItem(
                     ) {
                         Text(
                             text = tag,
-                            style = ExoTypo.label13.copy(fontWeight = FontWeight.Medium)
+                            style = ExoTypo.typo13Bold.copy(fontWeight = FontWeight.Medium)
                         )
                     }
                 }
@@ -476,7 +476,7 @@ fun ExoArticleItem(
 
                     Text(
                         text = article.title!!,
-                        style = ExoTypo.title15Default,
+                        style = ExoTypo.typo15Bold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -492,7 +492,7 @@ fun ExoArticleItem(
             if (displayContent.isNotEmpty()) {
                 Text(
                     text = displayContent,
-                    style = ExoTypo.body14,
+                    style = ExoTypo.typo14,
                     maxLines = if (isExpanded) Int.MAX_VALUE else 3,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
@@ -503,7 +503,7 @@ fun ExoArticleItem(
                 if (!isExpanded && displayContent.length > 100) {
                     Text(
                         text = "... 더보기",
-                        style = ExoTypo.body13.copy(color = ColorPalette.textDimmed),
+                        style = ExoTypo.typo13.copy(color = ColorPalette.textDimmed),
                         modifier = Modifier
                             .padding(start = 20.dp, top = 13.dp, end = 20.dp)
                             .clickable { isExpanded = true }
@@ -548,7 +548,7 @@ fun ExoArticleItem(
 
                 Text(
                     text = translateButtonText,
-                    style = ExoTypo.body12.copy(color = ColorPalette.textGray),
+                    style = ExoTypo.typo12.copy(color = ColorPalette.textGray),
                     modifier = Modifier
                         .padding(start = 20.dp, top = 6.dp, end = 20.dp, bottom = 6.dp)
                         .clickable(enabled = translateState != ArticleTranslateState.TRANSLATING) {
@@ -876,7 +876,7 @@ private fun ArticleItemMediaSection(
             ) {
                 Text(
                     text = "${pagerState.currentPage + 1}/${mediaFiles.size}",
-                    style = ExoTypo.stat10.copy(color = ColorPalette.textWhiteBlack),
+                    style = ExoTypo.typo10Bold.copy(color = ColorPalette.textWhiteBlack),
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
@@ -997,7 +997,7 @@ private fun ArticleItemMediaItem(
         if (media.isVideo && displayDuration.isNotEmpty()) {
             Text(
                 text = displayDuration,
-                style = ExoTypo.body12.copy(
+                style = ExoTypo.typo12.copy(
                     color = Color.White,
                     shadow = Shadow(
                         color = Color.Black,
@@ -1024,7 +1024,7 @@ private fun ArticleItemMediaItem(
             ) {
                 Text(
                     text = "GIF",
-                    style = ExoTypo.stat10.copy(color = Color.White)
+                    style = ExoTypo.typo10Bold.copy(color = Color.White)
                 )
             }
         }
@@ -1069,7 +1069,7 @@ private fun ArticleItemStatItem(
         Spacer(modifier = Modifier.width(3.dp))
         Text(
             text = NumberFormatUtil.formatWithComma(count.toLong()),
-            style = ExoTypo.stat13
+            style = ExoTypo.typo13
         )
     }
 }
@@ -1106,7 +1106,7 @@ private fun ArticleItemActionButton(
             Spacer(modifier = Modifier.width(7.dp))
             Text(
                 text = label,
-                style = ExoTypo.body14.copy(color = ColorPalette.textGray)
+                style = ExoTypo.typo14.copy(color = ColorPalette.textGray)
             )
         }
     }
@@ -1143,7 +1143,7 @@ private fun ArticleItemNotice(
             Spacer(modifier = Modifier.width(5.dp))
             Text(
                 text = article.title ?: "",
-                style = ExoTypo.body12.copy(color = ColorPalette.mainLight),
+                style = ExoTypo.typo12.copy(color = ColorPalette.mainLight),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -1232,9 +1232,7 @@ private fun ArticleItemCompact(
                         }
                         Text(
                             text = article.title!!,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorPalette.textDefault,
+                            style = ExoTypo.typo15Bold.copy(color = ColorPalette.textDefault),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f)
@@ -1246,8 +1244,7 @@ private fun ArticleItemCompact(
                 if (!article.content.isNullOrEmpty()) {
                     Text(
                         text = article.content!!,
-                        fontSize = 13.sp,
-                        color = ColorPalette.textGray,
+                        style = ExoTypo.typo13.copy(color = ColorPalette.textGray),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
@@ -1263,19 +1260,16 @@ private fun ArticleItemCompact(
                 ) {
                     Text(
                         text = article.user?.nickname ?: "",
-                        fontSize = 11.sp,
-                        color = ColorPalette.textDimmed,
+                        style = ExoTypo.typo11.copy(color = ColorPalette.textDimmed),
                         maxLines = 1
                     )
                     Text(
                         text = " · ",
-                        fontSize = 11.sp,
-                        color = ColorPalette.textDimmed
+                        style = ExoTypo.typo11.copy(color = ColorPalette.textDimmed)
                     )
                     Text(
                         text = DateTimeUtil.formatBoardDate(article.createdAt),
-                        fontSize = 11.sp,
-                        color = ColorPalette.textDimmed
+                        style = ExoTypo.typo11.copy(color = ColorPalette.textDimmed)
                     )
                 }
 
@@ -1293,8 +1287,7 @@ private fun ArticleItemCompact(
                     Spacer(modifier = Modifier.width(3.dp))
                     Text(
                         text = article.likeCount.toString(),
-                        fontSize = 12.sp,
-                        color = ColorPalette.textGray
+                        style = ExoTypo.typo12.copy(color = ColorPalette.textGray)
                     )
 
                     Spacer(modifier = Modifier.width(14.dp))
@@ -1308,8 +1301,7 @@ private fun ArticleItemCompact(
                     Spacer(modifier = Modifier.width(3.dp))
                     Text(
                         text = article.commentCount.toString(),
-                        fontSize = 12.sp,
-                        color = ColorPalette.textGray
+                        style = ExoTypo.typo12.copy(color = ColorPalette.textGray)
                     )
 
                     Spacer(modifier = Modifier.width(14.dp))
@@ -1323,8 +1315,7 @@ private fun ArticleItemCompact(
                     Spacer(modifier = Modifier.width(3.dp))
                     Text(
                         text = article.viewCount.toString(),
-                        fontSize = 12.sp,
-                        color = ColorPalette.textGray
+                        style = ExoTypo.typo12.copy(color = ColorPalette.textGray)
                     )
                 }
             }
@@ -1343,9 +1334,7 @@ private fun ArticleItemCompact(
                     if (imageCount > 1) {
                         Text(
                             text = "+${imageCount - 1}",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorPalette.textLight,
+                            style = ExoTypo.typo14Bold.copy(color = ColorPalette.textLight),
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(top = 3.dp, end = 5.dp)

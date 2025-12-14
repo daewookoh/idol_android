@@ -35,12 +35,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.delay
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.HapticUtil
 
 /**
@@ -151,9 +150,9 @@ fun MainBottomNavigation(
                     Spacer(modifier = Modifier.height(3.dp))
                     Text(
                         text = item,
-                        color = defaultTextColor,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Normal,
+                        style = ExoTypo.typo10.copy(
+                            color = defaultTextColor
+                        ),
                         modifier = Modifier.padding(0.dp),
                         textAlign = TextAlign.Center
                     )

@@ -53,6 +53,7 @@ import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.LocalRankingItemClick
 import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 
 private const val TAB_HEIGHT = 48
 private const val INDICATOR_HEIGHT = 3
@@ -258,8 +259,9 @@ private fun AwardsBottomTabBar(
                 ) {
                     Text(
                         text = title,
-                        color = if (isSelected) ColorPalette.main else ColorPalette.textDimmed,
-                        fontSize = 15.sp,
+                        style = ExoTypo.typo15.copy(
+                            color = if (isSelected) ColorPalette.main else ColorPalette.textDimmed
+                        ),
                         textAlign = TextAlign.Center
                     )
                 }

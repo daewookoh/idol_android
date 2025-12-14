@@ -77,6 +77,7 @@ import net.ib.mn.ui.components.ExoDialog
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ProfileImageType
+import net.ib.mn.ui.theme.ExoTypo
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -367,9 +368,8 @@ private fun SearchBar(
                 value = query,
                 onValueChange = onQueryChange,
                 modifier = Modifier.weight(1f),
-                textStyle = TextStyle(
-                    color = colorResource(R.color.text_default),
-                    fontSize = 12.sp
+                textStyle = ExoTypo.typo12.copy(
+                    color = colorResource(R.color.text_default)
                 ),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
@@ -385,7 +385,7 @@ private fun SearchBar(
                         Text(
                             text = "",
                             color = colorResource(R.color.text_dimmed),
-                            fontSize = 12.sp
+                            style = ExoTypo.typo12
                         )
                     }
                     innerTextField()
@@ -428,7 +428,7 @@ private fun LoadingView() {
             Text(
                 text = stringResource(R.string.lable_get_info),
                 color = colorResource(R.color.text_gray),
-                fontSize = 16.sp
+                style = ExoTypo.typo16
             )
         }
     }
@@ -448,7 +448,7 @@ private fun EmptyView() {
         Text(
             text = stringResource(R.string.nofriend1),
             color = colorResource(R.color.text_gray),
-            fontSize = 16.sp,
+            style = ExoTypo.typo16,
             textAlign = TextAlign.Center
         )
     }
@@ -548,15 +548,14 @@ private fun FriendRequestNotice(
             Text(
                 text = "$count",
                 color = colorResource(R.color.main),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
+                style = ExoTypo.typo14Bold
             )
         }
         Spacer(modifier = Modifier.height(5.dp))
         Text(
             text = stringResource(R.string.notice_new_friend_request),
             color = colorResource(R.color.gray580),
-            fontSize = 12.sp
+            style = ExoTypo.typo12
         )
     }
 }
@@ -596,7 +595,7 @@ private fun FriendListHeader(
         Text(
             text = stringResource(R.string.friend_section_title) + " ($friendCount)",
             color = colorResource(R.color.gray300),
-            fontSize = 13.sp
+            style = ExoTypo.typo13
         )
 
         Row(
@@ -632,8 +631,7 @@ private fun FriendListHeader(
                     Text(
                         text = timerText,
                         color = colorResource(R.color.main),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
+                        style = ExoTypo.typo14Bold
                     )
                 }
             } else {
@@ -695,7 +693,7 @@ private fun HeartTooltip(
                 Text(
                     text = text,
                     color = colorResource(R.color.text_white_black),
-                    fontSize = 13.sp
+                    style = ExoTypo.typo13
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Icon(
@@ -740,7 +738,7 @@ private fun BannerTooltip(
                 Text(
                     text = text,
                     color = colorResource(R.color.text_white_black),
-                    fontSize = 13.sp
+                    style = ExoTypo.typo13
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Icon(
@@ -821,8 +819,7 @@ private fun FriendItem(
                     Text(
                         text = "\u200E${friend.user.nickname}",
                         color = colorResource(R.color.main),
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Medium,
+                        style = ExoTypo.typo15,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -838,7 +835,7 @@ private fun FriendItem(
                 Text(
                     text = mostText,
                     color = colorResource(R.color.gray580),
-                    fontSize = 13.sp, lineHeight = 17.sp
+                    style = ExoTypo.typo13.copy(lineHeight = 17.sp)
                 )
 
                 // 누적 투표
@@ -847,7 +844,7 @@ private fun FriendItem(
                 Text(
                     text = stringResource(R.string.level_heart_format, voteCountFormatted),
                     color = colorResource(R.color.gray580),
-                    fontSize = 13.sp, lineHeight = 17.sp
+                    style = ExoTypo.typo13.copy(lineHeight = 17.sp)
                 )
 
                 // 소개글 (상태 메시지)
@@ -855,7 +852,7 @@ private fun FriendItem(
                     Text(
                         text = statusMsg,
                         color = colorResource(R.color.gray300),
-                        fontSize = 13.sp, lineHeight = 17.sp,
+                        style = ExoTypo.typo13.copy(lineHeight = 17.sp),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -879,8 +876,7 @@ private fun FriendItem(
                     Text(
                         text = timerText,
                         color = colorResource(R.color.main),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
+                        style = ExoTypo.typo14Bold
                     )
                 }
             } else if (isSendingHeart) {
@@ -981,8 +977,7 @@ private fun InviteBanner(
         Text(
             text = stringResource(R.string.friend_bnr_invite_friend_title),
             color = colorResource(R.color.pink_500),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
+            style = ExoTypo.typo16Bold,
             modifier = Modifier.weight(1f),
             maxLines = 2
         )

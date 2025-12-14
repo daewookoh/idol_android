@@ -17,8 +17,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.ui.components.ExoTabSwitch
 import net.ib.mn.ui.components.HofAccumulativeTop1RankingItem
 import net.ib.mn.ui.components.RankingItem
@@ -105,16 +105,14 @@ fun HallOfFameRankingSecondSubAccumulativePage(
                 error != null -> {
                     Text(
                         text = "Error: $error",
-                        fontSize = 14.sp,
-                        color = ColorPalette.textDimmed,
+                        style = ExoTypo.typo14.copy(color = ColorPalette.textDimmed),
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
                 rankingData.isEmpty() -> {
                     Text(
                         text = "데이터가 없습니다",
-                        fontSize = 14.sp,
-                        color = ColorPalette.textDimmed,
+                        style = ExoTypo.typo14.copy(color = ColorPalette.textDimmed),
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }

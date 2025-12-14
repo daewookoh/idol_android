@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import net.ib.mn.ui.theme.ExoTypo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
@@ -120,10 +121,7 @@ fun SwitchToggleButton(
                     text = genderList[0].first,
                     textAlign = TextAlign.Center,
                     color = boxTextColor,
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                    ),
+                    style = ExoTypo.typo12
                 )
             }
             
@@ -138,10 +136,7 @@ fun SwitchToggleButton(
                     text = genderList[1].first,
                     color = boxTextColor,
                     textAlign = TextAlign.Center,
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                    ),
+                    style = ExoTypo.typo12
                 )
             }
         }
@@ -160,10 +155,7 @@ fun SwitchToggleButton(
                 text = thumbBoxText,
                 color = thumbTextColor,
                 textAlign = TextAlign.Center,
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                ),
+                style = ExoTypo.typo12
             )
         }
     }

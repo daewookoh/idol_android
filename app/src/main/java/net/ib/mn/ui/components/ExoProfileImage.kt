@@ -400,9 +400,8 @@ private fun BoxScope.AnniversaryBadge(
             ) {
                 Text(
                     text = "${anniversaryDays}${stringResource(R.string.lable_day)}",
-                    style = ExoTypo.body7.copy(
-                        color = ColorPalette.textWhiteBlack,
-                        fontWeight = FontWeight.Bold
+                    style = ExoTypo.typo7Bold.copy(
+                        color = ColorPalette.textWhiteBlack
                     )
                 )
             }

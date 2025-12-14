@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.ib.mn.R
 import net.ib.mn.util.NumberFormatUtil
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * MyInfo 레벨 프로그레스 바 컴포넌트
@@ -89,9 +90,7 @@ fun MyInfoLevel(
                 val formattedLevel = NumberFormatUtil.formatWithComma(level)
                 Text(
                     text = "Lv. $formattedLevel",
-                    color = mainLightColor,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = ExoTypo.typo12Bold.copy(color = mainLightColor),
                     lineHeight = 12.sp
                 )
 
@@ -100,8 +99,7 @@ fun MyInfoLevel(
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
                         text = stringResource(id = R.string.total_amount, totalExp),
-                        color = mainLightColor,
-                        fontSize = 10.sp,
+                        style = ExoTypo.typo10.copy(color = mainLightColor),
                         lineHeight = 10.sp,
                         maxLines = 1
                     )
@@ -138,8 +136,7 @@ fun MyInfoLevel(
             if (levelUpText.isNotEmpty()) {
                 Text(
                     text = stringResource(id = R.string.next_level_progress, levelUpText),
-                    color = textDefaultColor,
-                    fontSize = 12.sp,
+                    style = ExoTypo.typo12.copy(color = textDefaultColor),
                     lineHeight = 12.sp,
                     modifier = Modifier.align(Alignment.End)
                 )

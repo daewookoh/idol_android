@@ -151,7 +151,7 @@ private fun MyFavoriteContent(
                         if (state.mostFavoriteIdol != null) {
                             Text(
                                 text = "즐겨찾기한 아이돌이 랭킹에 없습니다.",
-                                style = ExoTypo.body15,
+                                style = ExoTypo.typo15,
                                 color = ColorPalette.gray200,
                                 modifier = Modifier.padding(10.dp)
                             )
@@ -268,7 +268,7 @@ private fun SectionHeader(sectionName: String) {
     ) {
         Text(
             text = sectionName,
-            style = ExoTypo.body14.copy(fontWeight = FontWeight.Bold),
+            style = ExoTypo.typo14.copy(fontWeight = FontWeight.Bold),
             color = ColorPalette.textDefault
         )
     }
@@ -354,10 +354,10 @@ private fun MostFavoriteInfoBar(
                 mostFavoriteIdol.rank?.let { rank ->
                     Text(
                         text = if(rank == 0) "-" else rank.toString(),
-                        fontSize = 20.sp,
-                        lineHeight = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = ColorPalette.textLight,
+                        style = ExoTypo.typo20Bold.copy(
+                            lineHeight = 20.sp,
+                            color = ColorPalette.textLight
+                        ),
                         modifier = Modifier.align(Alignment.Bottom)
                     )
                 }
@@ -370,10 +370,10 @@ private fun MostFavoriteInfoBar(
                 // 이름
                 Text(
                     text = idolName,
-                    fontSize = 18.sp,
-                    lineHeight = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = ColorPalette.textLight,
+                    style = ExoTypo.typo18Bold.copy(
+                        lineHeight = 18.sp,
+                        color = ColorPalette.textLight
+                    ),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
@@ -385,9 +385,10 @@ private fun MostFavoriteInfoBar(
                 groupName?.let { group ->
                     Text(
                         text = group,
-                        fontSize = 10.sp,
-                        lineHeight = 18.sp,
-                        color = ColorPalette.textLight,
+                        style = ExoTypo.typo10.copy(
+                            lineHeight = 18.sp,
+                            color = ColorPalette.textLight
+                        ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
@@ -400,7 +401,7 @@ private fun MostFavoriteInfoBar(
                 mostFavoriteIdol.heart?.let { heart ->
                     ExoHeartCounter(
                         count = heart,
-                        style = ExoTypo.stat10.copy(lineHeight = 18.sp),
+                        style = ExoTypo.typo10Bold.copy(lineHeight = 18.sp),
                         color = ColorPalette.textLight,
                         modifier = Modifier
                             .padding(start = 8.dp)
@@ -490,7 +491,7 @@ private fun SupportBiasBar(
 
             Text(
                 text = annotatedString,
-                style = ExoTypo.body15,
+                style = ExoTypo.typo15,
                 color = ColorPalette.textDefault,
                 modifier = Modifier
                     .weight(1f)
@@ -584,7 +585,7 @@ private fun EmptyFavoriteHeader(
         // 설명 텍스트 1
         Text(
             text = stringResource(R.string.desc_empty_favorite1),
-            style = ExoTypo.body14.copy(fontWeight = FontWeight.Bold),
+            style = ExoTypo.typo14.copy(fontWeight = FontWeight.Bold),
             color = ColorPalette.textDefault,
             textAlign = TextAlign.Center
         )
@@ -594,7 +595,7 @@ private fun EmptyFavoriteHeader(
         // 설명 텍스트 2
         Text(
             text = stringResource(R.string.desc_empty_favorite2),
-            style = ExoTypo.body12,
+            style = ExoTypo.typo12,
             color = ColorPalette.gray200,
             textAlign = TextAlign.Center
         )
@@ -604,7 +605,7 @@ private fun EmptyFavoriteHeader(
         // 최애 설정 버튼
         Text(
             text = stringResource(R.string.desc_empty_favorite3),
-            style = ExoTypo.body12.copy(fontWeight = FontWeight.Bold),
+            style = ExoTypo.typo12.copy(fontWeight = FontWeight.Bold),
             color = ColorPalette.textDefault,
             textAlign = TextAlign.Center,
             modifier = Modifier

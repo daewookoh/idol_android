@@ -26,6 +26,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import net.ib.mn.ui.theme.ExoTypo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -133,8 +134,7 @@ fun VoterTop100Screen(
                     ) {
                         Text(
                             text = titlePrefix,
-                            fontSize = 18.sp,
-                            lineHeight = 18.sp,
+                            style = ExoTypo.typo18,
                             color = ColorPalette.textDefault,
                             maxLines = 1,
                             modifier = Modifier.alignByBaseline()
@@ -142,16 +142,14 @@ fun VoterTop100Screen(
 
                         Text(
                             text = idolName,
-                            fontSize = 18.sp,
-                            lineHeight = 18.sp,
+                            style = ExoTypo.typo18,
                             modifier = Modifier.alignByBaseline()
                         )
 
                         if (groupName.isNotEmpty()) {
                             Text(
                                 text = " $groupName",
-                                fontSize = 10.sp,
-                                lineHeight = 18.sp,
+                                style = ExoTypo.typo10,
                                 modifier = Modifier.alignByBaseline()
                             )
                         }
@@ -192,8 +190,7 @@ fun VoterTop100Screen(
                     ) {
                         Text(
                             text = stringResource(R.string.empty_heart_vote_ranking),
-                            color = ColorPalette.textGray,
-                            fontSize = 14.sp
+                            style = ExoTypo.typo14Gray
                         )
                     }
                 } else {
@@ -301,11 +298,7 @@ private fun VoterTop100UserItem(
                 val rankText = stringResource(R.string.rank_format, (item.rank + 1).toString())
                 Text(
                     text = rankText,
-                    fontSize = 13.sp,
-                    color = if (item.rank < 3) ColorPalette.main else ColorPalette.textGray,
-                    style = TextStyle(
-                        platformStyle = PlatformTextStyle(includeFontPadding = false)
-                    )
+                    style = if (item.rank < 3) ExoTypo.typo13Main else ExoTypo.typo13Gray
                 )
             }
 
@@ -357,11 +350,7 @@ private fun VoterTop100UserItem(
                     // 닉네임
                     Text(
                         text = item.nickname,
-                        fontSize = 13.sp,
-                        color = ColorPalette.main,
-                        style = TextStyle(
-                            platformStyle = PlatformTextStyle(includeFontPadding = false)
-                        )
+                        style = ExoTypo.typo13Main
                     )
                 }
 
@@ -371,11 +360,7 @@ private fun VoterTop100UserItem(
                 val voteCountText = numberFormat.format(item.levelHeart)
                 Text(
                     text = stringResource(R.string.vote_count_format, voteCountText),
-                    fontSize = 13.sp,
-                    color = ColorPalette.textGray,
-                    style = TextStyle(
-                        platformStyle = PlatformTextStyle(includeFontPadding = false)
-                    )
+                    style = ExoTypo.typo13Gray
                 )
             }
         }

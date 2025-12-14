@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import net.ib.mn.R
@@ -24,6 +23,7 @@ import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.components.cumulativeRankingItems
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * DailyRankingHistoryScreen - 특정 날짜 전체 랭킹 히스토리 화면
@@ -109,8 +109,7 @@ fun DailyRankingHistoryScreen(
                     ) {
                         Text(
                             text = stringResource(R.string.no_data),
-                            color = ColorPalette.textGray,
-                            fontSize = 14.sp
+                            style = ExoTypo.typo14.copy(color = ColorPalette.textGray)
                         )
                     }
                 } else {

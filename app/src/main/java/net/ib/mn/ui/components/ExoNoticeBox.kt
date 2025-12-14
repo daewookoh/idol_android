@@ -10,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
@@ -19,14 +21,18 @@ import net.ib.mn.ui.theme.ExoTypo
  * Notice 박스 공용 컴포넌트
  *
  * @param text 표시할 텍스트
- * @param style 텍스트 스타일 (기본값: ExoTypo.title13)
+ * @param style 텍스트 스타일 (기본값: ExoTypo.typo13Bold)
+ * @param color 텍스트 색상 (기본값: mainLight)
+ * @param textAlign 텍스트 정렬 (기본값: Center)
  * @param modifier Modifier
  */
 @Composable
 fun ExoNoticeBox(
     text: String,
     modifier: Modifier = Modifier,
-    style: TextStyle = ExoTypo.title13
+    style: TextStyle = ExoTypo.typo13Bold,
+    color: Color = ColorPalette.mainLight,
+    textAlign: TextAlign = TextAlign.Center
 ) {
     Box(
         modifier = modifier
@@ -38,7 +44,9 @@ fun ExoNoticeBox(
     ) {
         Text(
             text = text,
-            style = style
+            style = style,
+            color = color,
+            textAlign = textAlign
         )
     }
 }

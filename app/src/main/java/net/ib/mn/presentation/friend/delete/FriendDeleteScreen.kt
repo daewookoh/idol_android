@@ -56,6 +56,7 @@ import net.ib.mn.ui.components.ExoDialog
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ProfileImageType
+import net.ib.mn.ui.theme.ExoTypo
 import java.text.DateFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -266,8 +267,7 @@ private fun LoadingView() {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.lable_get_info),
-                color = colorResource(R.color.text_gray),
-                fontSize = 16.sp
+                style = ExoTypo.typo16.copy(color = colorResource(R.color.text_gray))
             )
         }
     }
@@ -286,8 +286,7 @@ private fun EmptyView() {
     ) {
         Text(
             text = stringResource(R.string.empty_friends),
-            color = colorResource(R.color.text_gray),
-            fontSize = 16.sp,
+            style = ExoTypo.typo16.copy(color = colorResource(R.color.text_gray)),
             textAlign = TextAlign.Center
         )
     }
@@ -328,8 +327,7 @@ private fun FilterHeader(
         ) {
             Text(
                 text = sortText,
-                color = colorResource(R.color.text_gray),
-                fontSize = 12.sp
+                style = ExoTypo.typo12.copy(color = colorResource(R.color.text_gray))
             )
 
             Icon(
@@ -367,8 +365,7 @@ private fun FriendListHeader(
     ) {
         Text(
             text = stringResource(R.string.friend_section_title),
-            color = colorResource(R.color.gray300),
-            fontSize = 14.sp
+            style = ExoTypo.typo14.copy(color = colorResource(R.color.gray300))
         )
 
         Icon(
@@ -476,8 +473,7 @@ private fun FriendDeleteItem(
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(
                         text = item.giveHeart.toString(),
-                        color = colorResource(R.color.gray580),
-                        fontSize = 11.sp
+                        style = ExoTypo.typo11.copy(color = colorResource(R.color.gray580))
                     )
                 }
             }
@@ -494,10 +490,10 @@ private fun FriendDeleteItem(
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(
                         text = "\u200E${user.nickname}",
-                        color = colorResource(R.color.main),
-                        fontSize = 15.sp,
-                        lineHeight = 17.sp,
-                        fontWeight = FontWeight.Medium,
+                        style = ExoTypo.typo15.copy(
+                            color = colorResource(R.color.main),
+                            lineHeight = 17.sp
+                        ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -512,9 +508,10 @@ private fun FriendDeleteItem(
 
                 Text(
                     text = mostText,
-                    color = colorResource(R.color.gray580),
-                    fontSize = 13.sp,
-                    lineHeight = 17.sp,
+                    style = ExoTypo.typo13.copy(
+                        color = colorResource(R.color.gray580),
+                        lineHeight = 17.sp
+                    )
                 )
 
                 // 누적 투표
@@ -522,18 +519,20 @@ private fun FriendDeleteItem(
                     .format(user.levelHeart)
                 Text(
                     text = stringResource(R.string.level_heart_format, voteCountFormatted),
-                    color = colorResource(R.color.gray580),
-                    fontSize = 13.sp,
-                    lineHeight = 17.sp,
+                    style = ExoTypo.typo13.copy(
+                        color = colorResource(R.color.gray580),
+                        lineHeight = 17.sp
+                    )
                 )
 
                 // 상태 메시지 (있을 경우)
                 user.statusMessage?.takeIf { it.isNotEmpty() }?.let { statusMsg ->
                     Text(
                         text = statusMsg,
-                        color = colorResource(R.color.gray300),
-                        fontSize = 13.sp,
-                        lineHeight = 17.sp,
+                        style = ExoTypo.typo13.copy(
+                            color = colorResource(R.color.gray300),
+                            lineHeight = 17.sp
+                        ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -543,9 +542,10 @@ private fun FriendDeleteItem(
                 val lastLoginText = formatLastLogin(context, item.lastAct)
                 Text(
                     text = "${context.getString(R.string.last_login)}:$lastLoginText",
-                    color = colorResource(R.color.gray580),
-                    fontSize = 12.sp,
-                    lineHeight = 17.sp,
+                    style = ExoTypo.typo12.copy(
+                        color = colorResource(R.color.gray580),
+                        lineHeight = 17.sp
+                    )
                 )
             }
 

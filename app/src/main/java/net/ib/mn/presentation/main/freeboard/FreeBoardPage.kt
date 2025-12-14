@@ -69,6 +69,7 @@ import net.ib.mn.ui.components.ExoBottomSheetItem
 import net.ib.mn.ui.components.ExoBottomSheetList
 import net.ib.mn.ui.components.ExoSearchBox
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.BoardLanguage
 import net.ib.mn.util.LocaleUtil
 
@@ -557,9 +558,10 @@ private fun TagChip(
         ) {
             Text(
                 text = getTagDisplayName(tag),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Normal,
-                color = textColor
+                style = ExoTypo.typo14.copy(
+                    fontWeight = FontWeight.Normal,
+                    color = textColor
+                )
             )
         }
     }
@@ -597,8 +599,7 @@ private fun FilterButton(
         Spacer(modifier = Modifier.width(5.dp))
         Text(
             text = text,
-            fontSize = 12.sp,
-            color = ColorPalette.textGray
+            style = ExoTypo.typo12.copy(color = ColorPalette.textGray)
         )
     }
 }
@@ -621,8 +622,7 @@ private fun EmptyView(hasSearchKeyword: Boolean) {
             } else {
                 stringResource(R.string.freeboard_empty)
             },
-            fontSize = 14.sp,
-            color = ColorPalette.textDefault,
+            style = ExoTypo.typo14.copy(color = ColorPalette.textDefault),
             textAlign = TextAlign.Center
         )
     }
@@ -657,9 +657,7 @@ private fun NoMostIdolEmptyView() {
             // 타이틀: "최애를 설정해야 볼 수 있어요!"
             Text(
                 text = stringResource(R.string.freeboard_nobias_title),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = ColorPalette.textDefault,
+                style = ExoTypo.typo16Bold.copy(color = ColorPalette.textDefault),
                 textAlign = TextAlign.Center
             )
 
@@ -672,8 +670,7 @@ private fun NoMostIdolEmptyView() {
                 } else {
                     stringResource(R.string.freeboard_nobias_subtitle)
                 },
-                fontSize = 13.sp,
-                color = ColorPalette.textGray,
+                style = ExoTypo.typo13.copy(color = ColorPalette.textGray),
                 textAlign = TextAlign.Center
             )
         }

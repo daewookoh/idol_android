@@ -141,7 +141,7 @@ fun CommentInput(
                             }
                         },
                     enabled = enabled && !isLoading,
-                    textStyle = ExoTypo.body15.copy(color = ColorPalette.textGray),
+                    textStyle = ExoTypo.typo15.copy(color = ColorPalette.textGray),
                     cursorBrush = SolidColor(ColorPalette.main),
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Default
@@ -151,7 +151,7 @@ fun CommentInput(
                             if (value.isEmpty()) {
                                 Text(
                                     text = stringResource(R.string.hint_comment),
-                                    style = ExoTypo.body15.copy(color = ColorPalette.gray200)
+                                    style = ExoTypo.typo15.copy(color = ColorPalette.gray200)
                                 )
                             }
                             innerTextField()

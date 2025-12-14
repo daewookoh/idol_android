@@ -579,8 +579,7 @@ private fun ArticleWriteTopBar(
             title = {
                 Text(
                     text = title,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = ExoTypo.typo17Bold,
                     color = ColorPalette.textDefault
                 )
             },
@@ -606,9 +605,10 @@ private fun ArticleWriteTopBar(
             actions = {
                 Text(
                     text = stringResource(R.string.article_post),
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = if (isSubmitEnabled && !isSaving) ColorPalette.main else ColorPalette.gray300,
+                    style = ExoTypo.typo17.copy(
+                        fontWeight = FontWeight.Medium,
+                        color = if (isSubmitEnabled && !isSaving) ColorPalette.main else ColorPalette.gray300
+                    ),
                     modifier = Modifier
                         .clickable(
                             enabled = isSubmitEnabled && !isSaving,
@@ -747,8 +747,7 @@ private fun TagSelectorRow(
         // 카테고리 선택 텍스트 (old: tv_tag_option)
         Text(
             text = selectedTag?.name ?: stringResource(R.string.select_category_field),
-            fontSize = 14.sp,
-            color = ColorPalette.textDefault,
+            style = ExoTypo.typo14.copy(color = ColorPalette.textDefault),
             modifier = Modifier.weight(1f)
         )
 
@@ -775,8 +774,7 @@ private fun TitleInputField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 14.dp),
-        textStyle = TextStyle(
-            fontSize = 15.sp,
+        textStyle = ExoTypo.typo15.copy(
             color = ColorPalette.textDefault
         ),
         cursorBrush = SolidColor(ColorPalette.textDefault),
@@ -786,8 +784,7 @@ private fun TitleInputField(
                 if (title.isEmpty()) {
                     Text(
                         text = placeholder ?: stringResource(R.string.enter_title),
-                        fontSize = 15.sp,
-                        color = ColorPalette.textDimmed
+                        style = ExoTypo.typo15.copy(color = ColorPalette.textDimmed)
                     )
                 }
                 innerTextField()
@@ -811,8 +808,7 @@ private fun ContentInputField(
             .fillMaxSize()
             .padding(horizontal = 20.dp, vertical = 12.dp)
             .focusRequester(focusRequester),
-        textStyle = TextStyle(
-            fontSize = 15.sp,
+        textStyle = ExoTypo.typo15.copy(
             color = ColorPalette.textDefault,
             lineHeight = 22.sp
         ),
@@ -822,8 +818,7 @@ private fun ContentInputField(
                 if (content.isEmpty()) {
                     Text(
                         text = placeholder ?: stringResource(R.string.write_content),
-                        fontSize = 15.sp,
-                        color = ColorPalette.textDimmed
+                        style = ExoTypo.typo15.copy(color = ColorPalette.textDimmed)
                     )
                 }
                 innerTextField()
@@ -968,9 +963,7 @@ private fun LinkPreviewCard(
                 linkPreview.title?.let { title ->
                     Text(
                         text = title,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = ColorPalette.textDefault,
+                        style = ExoTypo.typo13Bold.copy(color = ColorPalette.textDefault),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -979,8 +972,7 @@ private fun LinkPreviewCard(
                 linkPreview.description?.let { desc ->
                     Text(
                         text = desc,
-                        fontSize = 12.sp,
-                        color = ColorPalette.textDimmed,
+                        style = ExoTypo.typo12.copy(color = ColorPalette.textDimmed),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(top = 2.dp)
@@ -990,8 +982,7 @@ private fun LinkPreviewCard(
                 linkPreview.host?.let { host ->
                     Text(
                         text = host,
-                        fontSize = 11.sp,
-                        color = ColorPalette.textGray,
+                        style = ExoTypo.typo11.copy(color = ColorPalette.textGray),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(top = 2.dp)
@@ -1055,8 +1046,7 @@ private fun TagSelectorBottomSheet(
                 ) {
                     Text(
                         text = tag.name,
-                        fontSize = 15.sp,
-                        color = ColorPalette.textDefault
+                        style = ExoTypo.typo15.copy(color = ColorPalette.textDefault)
                     )
                 }
             }
@@ -1099,8 +1089,7 @@ private fun SettingBottomSheet(
                 // 텍스트 (왼쪽)
                 Text(
                     text = stringResource(R.string.lable_show_private),
-                    fontSize = 15.sp,
-                    color = ColorPalette.textDefault,
+                    style = ExoTypo.typo15.copy(color = ColorPalette.textDefault),
                     modifier = Modifier.weight(1f)
                 )
 
@@ -1154,7 +1143,7 @@ private fun ImageRatioBottomSheet(
             ) {
                 Text(
                     text = stringResource(R.string.label_image_option_square),
-                    style = ExoTypo.body15.copy(fontWeight = FontWeight.Bold),
+                    style = ExoTypo.typo15.copy(fontWeight = FontWeight.Bold),
                     color = ColorPalette.gray900
                 )
             }
@@ -1170,7 +1159,7 @@ private fun ImageRatioBottomSheet(
             ) {
                 Text(
                     text = stringResource(R.string.label_image_option_free),
-                    style = ExoTypo.body15.copy(fontWeight = FontWeight.Bold),
+                    style = ExoTypo.typo15.copy(fontWeight = FontWeight.Bold),
                     color = ColorPalette.gray900
                 )
             }

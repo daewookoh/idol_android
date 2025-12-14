@@ -79,6 +79,7 @@ import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ProfileImageType
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.NumberFormatUtil
 import net.ib.mn.util.getAdDatePeriod
@@ -580,8 +581,7 @@ private fun MoreButton(
             Text(
                 text = text,
                 color = colorResource(id = R.color.gray580),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
+                style = ExoTypo.typo12Bold,
                 textAlign = TextAlign.Center
             )
         }
@@ -635,7 +635,7 @@ private fun EmptySearchResult(keyword: String) {
             Text(
                 text = stringResource(id = R.string.no_search_result),
                 color = colorResource(id = R.color.gray580),
-                fontSize = 16.sp,
+                style = ExoTypo.typo16,
                 textAlign = TextAlign.Center
             )
         }
@@ -755,8 +755,7 @@ private fun SearchIdolItem(
                             Text(
                                 text = NumberFormatUtil.formatWithComma(idol.heart),
                                 color = colorResource(id = R.color.text_heart_votes),
-                                fontSize = 11.sp,
-                                lineHeight = 17.sp,
+                                style = ExoTypo.typo11.copy(lineHeight = 17.sp),
                                 modifier = Modifier.padding(end = 6.dp)
                             )
                         }
@@ -834,8 +833,7 @@ private fun SearchIdolItem(
                 Text(
                     text = stringResource(id = R.string.enter_community),
                     color = colorResource(id = R.color.gray300),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
+                    style = ExoTypo.typo11Bold
                 )
             }
 
@@ -861,8 +859,7 @@ private fun SearchIdolItem(
                 Text(
                     text = stringResource(id = R.string.chat),
                     color = colorResource(id = R.color.gray300),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
+                    style = ExoTypo.typo11Bold
                 )
             }
 
@@ -888,8 +885,7 @@ private fun SearchIdolItem(
                 Text(
                     text = stringResource(id = R.string.enter_schedule),
                     color = colorResource(id = R.color.gray300),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
+                    style = ExoTypo.typo11Bold
                 )
             }
         }
@@ -933,8 +929,7 @@ private fun SearchIdolBadges(
                 Text(
                     text = angelCount.toString(),
                     color = colorResource(id = R.color.text_angel),
-                    fontSize = 7.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = ExoTypo.typo7Bold,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .offset(y = (-2).dp)
@@ -956,8 +951,7 @@ private fun SearchIdolBadges(
                 Text(
                     text = fairyCount.toString(),
                     color = colorResource(id = R.color.text_fairy),
-                    fontSize = 7.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = ExoTypo.typo7Bold,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .offset(y = (-2).dp)
@@ -979,8 +973,7 @@ private fun SearchIdolBadges(
                 Text(
                     text = miracleCount.toString(),
                     color = colorResource(id = R.color.text_miracle),
-                    fontSize = 7.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = ExoTypo.typo7Bold,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .offset(y = (-2).dp)
@@ -1008,8 +1001,7 @@ private fun SearchIdolBadges(
                     color = colorResource(
                         if (isSuper) R.color.text_super_rookie else R.color.text_rookie
                     ),
-                    fontSize = 7.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = ExoTypo.typo7Bold,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .offset(y = (-2).dp)
@@ -1036,7 +1028,7 @@ private fun IdolActionButton(
         Text(
             text = text,
             color = colorResource(id = R.color.gray580),
-            fontSize = 13.sp
+            style = ExoTypo.typo13
         )
     }
 }
@@ -1059,7 +1051,7 @@ private fun SupportSectionHeader() {
             Text(
                 text = stringResource(id = R.string.support),
                 color = colorResource(id = R.color.text_gray),
-                fontSize = 13.sp
+                style = ExoTypo.typo13
             )
         }
         HorizontalDivider(
@@ -1161,8 +1153,7 @@ private fun SearchSupportItem(
                         Text(
                             text = stringResource(id = R.string.support_achievement, support.progressPercent),
                             color = Color.White,
-                            fontSize = 13.sp,
-                            lineHeight = 17.sp
+                            style = ExoTypo.typo13.copy(lineHeight = 17.sp)
                         )
                     }
                     Spacer(modifier = Modifier.height(3.dp))
@@ -1185,9 +1176,7 @@ private fun SearchSupportItem(
                 Text(
                     text = support.title,
                     color = colorResource(id = R.color.text_default),
-                    fontSize = 12.sp,
-                    lineHeight = 17.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = ExoTypo.typo12Bold.copy(lineHeight = 17.sp),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -1207,13 +1196,13 @@ private fun SearchSupportItem(
                         if (emoji.isNotEmpty()) {
                             Text(
                                 text = emoji,
-                                fontSize = 12.sp
+                                style = ExoTypo.typo12
                             )
                         }
                         Text(
                             text = support.adTypeName,
                             color = colorResource(id = R.color.text_gray),
-                            fontSize = 12.sp,
+                            style = ExoTypo.typo12,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -1229,8 +1218,7 @@ private fun SearchSupportItem(
                         Text(
                             text = periodText,
                             color = colorResource(id = R.color.text_gray),
-                            fontSize = 12.sp,
-                            lineHeight = 17.sp
+                            style = ExoTypo.typo12.copy(lineHeight = 17.sp)
                         )
                     }
                 } else if (support.startDate != null && support.endDate != null) {
@@ -1240,8 +1228,7 @@ private fun SearchSupportItem(
                     Text(
                         text = "$formattedStart ~ $formattedEnd",
                         color = colorResource(id = R.color.text_gray),
-                        fontSize = 12.sp,
-                        lineHeight = 17.sp
+                        style = ExoTypo.typo12.copy(lineHeight = 17.sp)
                     )
                 }
 
@@ -1260,8 +1247,7 @@ private fun SearchSupportItem(
                         Text(
                             text = NumberFormatUtil.formatWithComma(support.likeCount.toLong()),
                             color = colorResource(id = R.color.text_gray),
-                            fontSize = 10.sp,
-                            lineHeight = 17.sp
+                            style = ExoTypo.typo10.copy(lineHeight = 17.sp)
                         )
 
                         Spacer(modifier = Modifier.width(24.dp))
@@ -1277,8 +1263,7 @@ private fun SearchSupportItem(
                         Text(
                             text = NumberFormatUtil.formatWithComma(support.commentCount.toLong()),
                             color = colorResource(id = R.color.text_gray),
-                            fontSize = 10.sp,
-                            lineHeight = 17.sp
+                            style = ExoTypo.typo10.copy(lineHeight = 17.sp)
                         )
                     }
                 }
@@ -1421,13 +1406,13 @@ private fun WallpaperSection(
             Text(
                 text = wallpaper.idolName ?: "Unknown",
                 color = colorResource(id = R.color.text_gray),
-                fontSize = 13.sp
+                style = ExoTypo.typo13
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = stringResource(id = R.string.background),
                 color = colorResource(id = R.color.text_dimmed),
-                fontSize = 13.sp
+                style = ExoTypo.typo13
             )
         }
 
@@ -1486,7 +1471,7 @@ private fun WallpaperSection(
                             Text(
                                 text = stringResource(id = R.string.view_more),
                                 color = colorResource(id = R.color.text_dimmed),
-                                fontSize = 14.sp
+                                style = ExoTypo.typo14
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Icon(

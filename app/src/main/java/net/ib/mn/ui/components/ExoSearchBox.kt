@@ -30,9 +30,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * 검색 박스 컴포넌트
@@ -81,9 +81,8 @@ fun ExoSearchBox(
                     isFocused = focusState.isFocused
                 },
             enabled = enabled,
-            textStyle = LocalTextStyle.current.copy(
-                color = ColorPalette.textDefault,
-                fontSize = 12.sp
+            textStyle = ExoTypo.typo12.copy(
+                color = ColorPalette.textDefault
             ),
             cursorBrush = SolidColor(ColorPalette.main),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
@@ -93,8 +92,9 @@ fun ExoSearchBox(
                 if (value.isEmpty()) {
                     Text(
                         text = placeholder,
-                        fontSize = 12.sp,
-                        color = ColorPalette.textDimmed
+                        style = ExoTypo.typo12.copy(
+                            color = ColorPalette.textDimmed
+                        )
                     )
                 }
                 innerTextField()

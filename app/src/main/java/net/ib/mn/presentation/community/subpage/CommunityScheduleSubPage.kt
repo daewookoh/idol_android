@@ -44,6 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.domain.model.ScheduleModel
 import net.ib.mn.presentation.community.CommunityViewModel
 import net.ib.mn.ui.components.ExoBottomSheetItem
@@ -187,8 +188,7 @@ fun CommunityScheduleSubPage(
                     ) {
                         Text(
                             text = stringResource(R.string.schedule_empty),
-                            fontSize = 14.sp,
-                            color = colorResource(R.color.text_dimmed)
+                            style = ExoTypo.typo14.copy(color = colorResource(R.color.text_dimmed))
                         )
                     }
                 }
@@ -272,16 +272,11 @@ private fun CalendarHeader(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = year.toString(),
-                    fontSize = 10.sp,
-                    lineHeight = 10.sp,
-                    color = colorResource(R.color.text_gray)
+                    style = ExoTypo.typo10.copy(color = colorResource(R.color.text_gray), lineHeight = 10.sp)
                 )
                 Text(
                     text = monthText,
-                    fontSize = 15.sp,
-                    lineHeight = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(R.color.text_gray)
+                    style = ExoTypo.typo15Bold.copy(color = colorResource(R.color.text_gray), lineHeight = 15.sp)
                 )
             }
 
@@ -308,8 +303,7 @@ private fun CalendarHeader(
         ) {
             Text(
                 text = localeText,
-                fontSize = 12.sp,
-                color = colorResource(R.color.text_gray)
+                style = ExoTypo.typo12.copy(color = colorResource(R.color.text_gray))
             )
             Icon(
                 painter = painterResource(R.drawable.icon_arrow_drop_down),
@@ -357,7 +351,7 @@ private fun WeekdayHeader() {
                 modifier = Modifier.weight(1f).fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = day, fontSize = 10.sp, color = color)
+                Text(text = day, style = ExoTypo.typo10.copy(color = color))
             }
         }
     }
@@ -428,9 +422,7 @@ private fun CalendarGrid(
                             ) {
                                 Text(
                                     text = day.toString(),
-                                    fontSize = 9.sp,
-                                    lineHeight = 9.sp,
-                                    color = textColor
+                                    style = ExoTypo.typo9.copy(color = textColor, lineHeight = 9.sp)
                                 )
                                 scheduleCategory?.let { category ->
                                     Icon(
@@ -484,9 +476,7 @@ private fun ScheduleItem(
             if (schedule.allday != 1) {
                 Text(
                     text = timeFormat.format(schedule.dtstart),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(R.color.text_default),
+                    style = ExoTypo.typo13Bold.copy(color = colorResource(R.color.text_default)),
                     modifier = Modifier.padding(end = 10.dp)
                 )
             }
@@ -500,9 +490,7 @@ private fun ScheduleItem(
 
             Text(
                 text = schedule.title,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorResource(R.color.text_default),
+                style = ExoTypo.typo13Bold.copy(color = colorResource(R.color.text_default)),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier

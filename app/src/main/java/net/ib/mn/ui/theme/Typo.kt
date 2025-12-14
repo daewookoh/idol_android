@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 
 val Typography = Typography(
@@ -13,305 +12,115 @@ val Typography = Typography(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+        lineHeight = 18.sp
     )
 )
 
 /**
- * 앱 전용 Typography 스타일
+ * 앱 전용 Typography - fontSize와 lineHeight만 지정
+ * lineHeight = fontSize + 2
+ *
+ * typo{size} - 기본 (Medium weight)
+ * typo{size}Bold - Bold weight
+ * typo{size}Main - Bold + Main 컬러
+ * typo{size}Gray - Medium + textGray 컬러
+ * typo{size}FixWhite - Medium + fixWhite 컬러
  */
 object ExoTypo {
-    // ============ Title Styles ============
-    /**
-     * 타이틀 텍스트 스타일 (13.sp, Bold, MainLight, Center)
-     */
-    val title13
-        @Composable get() = TextStyle(
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.mainLight,
-            textAlign = TextAlign.Center
-        )
+    private val defaultLetterSpacing = 0.1.sp
 
-    /**
-     * 타이틀 텍스트 스타일 (14.sp, Bold, TextDefault)
-     */
-    val title14
-        @Composable get() = TextStyle(
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.textDefault
-        )
+    // 기본 스타일 (Medium weight) - 7sp ~ 24sp
+    val typo7 = TextStyle(fontSize = 7.sp, lineHeight = 9.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo8 = TextStyle(fontSize = 8.sp, lineHeight = 10.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo9 = TextStyle(fontSize = 9.sp, lineHeight = 11.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo10 = TextStyle(fontSize = 10.sp, lineHeight = 12.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo11 = TextStyle(fontSize = 11.sp, lineHeight = 13.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo12 = TextStyle(fontSize = 12.sp, lineHeight = 14.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo13 = TextStyle(fontSize = 13.sp, lineHeight = 15.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo14 = TextStyle(fontSize = 14.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo15 = TextStyle(fontSize = 15.sp, lineHeight = 17.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo16 = TextStyle(fontSize = 16.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo17 = TextStyle(fontSize = 17.sp, lineHeight = 19.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo18 = TextStyle(fontSize = 18.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo19 = TextStyle(fontSize = 19.sp, lineHeight = 21.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo20 = TextStyle(fontSize = 20.sp, lineHeight = 22.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo21 = TextStyle(fontSize = 21.sp, lineHeight = 23.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo22 = TextStyle(fontSize = 22.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    val typo24 = TextStyle(fontSize = 24.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
 
-    /**
-     * 타이틀 텍스트 스타일 (15.sp, Bold, Main)
-     */
-    val title15
-        @Composable get() = TextStyle(
-            fontSize = 15.sp,
-            lineHeight = 15.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.main
-        )
+    // Bold 스타일 - 기본 스타일에서 fontWeight만 변경
+    val typo7Bold = typo7.copy(fontWeight = FontWeight.Bold)
+    val typo8Bold = typo8.copy(fontWeight = FontWeight.Bold)
+    val typo9Bold = typo9.copy(fontWeight = FontWeight.Bold)
+    val typo10Bold = typo10.copy(fontWeight = FontWeight.Bold)
+    val typo11Bold = typo11.copy(fontWeight = FontWeight.Bold)
+    val typo12Bold = typo12.copy(fontWeight = FontWeight.Bold)
+    val typo13Bold = typo13.copy(fontWeight = FontWeight.Bold)
+    val typo14Bold = typo14.copy(fontWeight = FontWeight.Bold)
+    val typo15Bold = typo15.copy(fontWeight = FontWeight.Bold)
+    val typo16Bold = typo16.copy(fontWeight = FontWeight.Bold)
+    val typo17Bold = typo17.copy(fontWeight = FontWeight.Bold)
+    val typo18Bold = typo18.copy(fontWeight = FontWeight.Bold)
+    val typo19Bold = typo19.copy(fontWeight = FontWeight.Bold)
+    val typo20Bold = typo20.copy(fontWeight = FontWeight.Bold)
+    val typo21Bold = typo21.copy(fontWeight = FontWeight.Bold)
+    val typo22Bold = typo22.copy(fontWeight = FontWeight.Bold)
+    val typo24Bold = typo24.copy(fontWeight = FontWeight.Bold)
 
-    /**
-     * 타이틀 텍스트 스타일 (15.sp, Bold, TextDefault)
-     */
-    val title15Default
-        @Composable get() = TextStyle(
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.textDefault
-        )
+    // Main 스타일 - Bold 스타일에서 color만 추가
+    val typo7Main @Composable get() = typo7Bold.copy(color = ColorPalette.main)
+    val typo8Main @Composable get() = typo8Bold.copy(color = ColorPalette.main)
+    val typo9Main @Composable get() = typo9Bold.copy(color = ColorPalette.main)
+    val typo10Main @Composable get() = typo10Bold.copy(color = ColorPalette.main)
+    val typo11Main @Composable get() = typo11Bold.copy(color = ColorPalette.main)
+    val typo12Main @Composable get() = typo12Bold.copy(color = ColorPalette.main)
+    val typo13Main @Composable get() = typo13Bold.copy(color = ColorPalette.main)
+    val typo14Main @Composable get() = typo14Bold.copy(color = ColorPalette.main)
+    val typo15Main @Composable get() = typo15Bold.copy(color = ColorPalette.main)
+    val typo16Main @Composable get() = typo16Bold.copy(color = ColorPalette.main)
+    val typo17Main @Composable get() = typo17Bold.copy(color = ColorPalette.main)
+    val typo18Main @Composable get() = typo18Bold.copy(color = ColorPalette.main)
+    val typo19Main @Composable get() = typo19Bold.copy(color = ColorPalette.main)
+    val typo20Main @Composable get() = typo20Bold.copy(color = ColorPalette.main)
+    val typo21Main @Composable get() = typo21Bold.copy(color = ColorPalette.main)
+    val typo22Main @Composable get() = typo22Bold.copy(color = ColorPalette.main)
+    val typo24Main @Composable get() = typo24Bold.copy(color = ColorPalette.main)
 
-    /**
-     * 타이틀 텍스트 스타일 (16.sp, Bold, MainLight, Center)
-     */
-    val title16
-        @Composable get() = TextStyle(
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.mainLight,
-            textAlign = TextAlign.Center
-        )
+    // Gray 스타일 - 기본 스타일에서 color만 추가
+    val typo7Gray @Composable get() = typo7.copy(color = ColorPalette.textGray)
+    val typo8Gray @Composable get() = typo8.copy(color = ColorPalette.textGray)
+    val typo9Gray @Composable get() = typo9.copy(color = ColorPalette.textGray)
+    val typo10Gray @Composable get() = typo10.copy(color = ColorPalette.textGray)
+    val typo11Gray @Composable get() = typo11.copy(color = ColorPalette.textGray)
+    val typo12Gray @Composable get() = typo12.copy(color = ColorPalette.textGray)
+    val typo13Gray @Composable get() = typo13.copy(color = ColorPalette.textGray)
+    val typo14Gray @Composable get() = typo14.copy(color = ColorPalette.textGray)
+    val typo15Gray @Composable get() = typo15.copy(color = ColorPalette.textGray)
+    val typo16Gray @Composable get() = typo16.copy(color = ColorPalette.textGray)
+    val typo17Gray @Composable get() = typo17.copy(color = ColorPalette.textGray)
+    val typo18Gray @Composable get() = typo18.copy(color = ColorPalette.textGray)
+    val typo19Gray @Composable get() = typo19.copy(color = ColorPalette.textGray)
+    val typo20Gray @Composable get() = typo20.copy(color = ColorPalette.textGray)
+    val typo21Gray @Composable get() = typo21.copy(color = ColorPalette.textGray)
+    val typo22Gray @Composable get() = typo22.copy(color = ColorPalette.textGray)
+    val typo24Gray @Composable get() = typo24.copy(color = ColorPalette.textGray)
 
-    /**
-     * 타이틀 텍스트 스타일 (18.sp, Bold, TextDefault)
-     */
-    val title18
-        @Composable get() = TextStyle(
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.textDefault
-        )
-
-    /**
-     * 타이틀 텍스트 스타일 (20.sp, AppBar용)
-     */
-    val title20
-        @Composable get() = TextStyle(
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Normal,
-            color = ColorPalette.textDefault
-        )
-
-    /**
-     * 타이틀 텍스트 스타일 (21.sp, Bold, MainLight, Center)
-     */
-    val title21
-        @Composable get() = TextStyle(
-            fontSize = 21.sp,
-            lineHeight = 21.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.mainLight,
-            textAlign = TextAlign.Center
-        )
-
-    // ============ Body Styles ============
-    /**
-     * 일반 텍스트 스타일 (7.sp, TextDefault)
-     * Memorial day badge용
-     */
-    val body7
-        @Composable get() = TextStyle(
-            fontSize = 7.sp,
-            lineHeight = 7.sp,
-            color = ColorPalette.textDefault
-        )
-
-    /**
-     * 일반 텍스트 스타일 (11.sp, TextGray)
-     */
-    val body11
-        @Composable get() = TextStyle(
-            fontSize = 11.sp,
-            lineHeight = 11.sp,
-            color = ColorPalette.textGray
-        )
-
-    /**
-     * 일반 텍스트 스타일 (12.sp, TextDimmed)
-     */
-    val body12
-        @Composable get() = TextStyle(
-            fontSize = 12.sp,
-            color = ColorPalette.textDimmed
-        )
-
-    /**
-     * 일반 텍스트 스타일 (13.sp, TextDefault)
-     */
-    val body13
-        @Composable get() = TextStyle(
-            fontSize = 13.sp,
-            lineHeight = 13.sp,
-            color = ColorPalette.textDefault
-        )
-
-    /**
-     * 일반 텍스트 스타일 (14.sp, TextDefault)
-     */
-    val body14
-        @Composable get() = TextStyle(
-            fontSize = 14.sp,
-            color = ColorPalette.textDefault
-        )
-
-    val body15
-        @Composable get() = TextStyle(
-            fontSize = 14.sp,
-            color = ColorPalette.textDefault
-        )
-
-    /**
-     * 일반 텍스트 스타일 (14.sp, Main 컬러)
-     */
-    val body14Main
-        @Composable get() = TextStyle(
-            fontSize = 14.sp,
-            color = ColorPalette.main,
-            fontWeight = FontWeight.Normal
-        )
-
-    // ============ Button Styles ============
-    /**
-     * 버튼 텍스트 스타일 (14.sp, Normal)
-     */
-    val button14
-        @Composable get() = TextStyle(
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Normal
-        )
-
-    /**
-     * 버튼 텍스트 스타일 (17.sp, Bold)
-     */
-    val button17
-        @Composable get() = TextStyle(
-            fontSize = 17.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-    // ============ Label/Badge Styles ============
-    /**
-     * 라벨 텍스트 스타일 (7.sp, Bold)
-     */
-    val label7
-        @Composable get() = TextStyle(
-            fontSize = 7.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-    /**
-     * 라벨 텍스트 스타일 (8.sp, Bold, White)
-     */
-    val label8
-        @Composable get() = TextStyle(
-            fontSize = 8.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.white
-        )
-
-    /**
-     * 라벨 텍스트 스타일 (9.sp, TextDefault)
-     */
-    val label9
-        @Composable get() = TextStyle(
-            fontSize = 9.sp,
-            color = ColorPalette.textDefault
-        )
-
-    /**
-     * 라벨 텍스트 스타일 (10.sp, Bold)
-     */
-    val label10
-        @Composable get() = TextStyle(
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-    /**
-     * 라벨 텍스트 스타일 (13.sp, Bold, MainLight)
-     */
-    val label13
-        @Composable get() = TextStyle(
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.mainLight
-        )
-
-    // ============ Statistics/Data Styles ============
-    /**
-     * 통계 텍스트 스타일 (10.sp, Bold, White)
-     */
-    val stat10
-        @Composable get() = TextStyle(
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.fixWhite
-        )
-
-    /**
-     * 통계 텍스트 스타일 (11.sp, Bold, Background100)
-     */
-    val stat11
-        @Composable get() = TextStyle(
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.background100
-        )
-
-    /**
-     * 통계 텍스트 스타일 (13.sp, TextDefault)
-     */
-    val stat13
-        @Composable get() = TextStyle(
-            fontSize = 13.sp,
-            color = ColorPalette.textDefault
-        )
-
-    // ============ Checkbox Styles ============
-    /**
-     * 체크박스 메인 라벨 (17.sp, Bold, TextDefault)
-     */
-    val checkboxMain
-        @Composable get() = TextStyle(
-            fontSize = 17.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.textDefault
-        )
-
-    /**
-     * 체크박스 서브 라벨 (16.sp, Medium, TextDefault)
-     */
-    val checkboxSub
-        @Composable get() = TextStyle(
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = ColorPalette.textDefault
-        )
-
-    // ============ Caption Styles ============
-    /**
-     * 작은 텍스트 스타일 (10.sp, letterSpacing, TextDimmed, Center)
-     */
-    val caption10
-        @Composable get() = TextStyle(
-            fontSize = 10.sp,
-            lineHeight = 10.sp,
-            letterSpacing = (-0.5).sp,
-            color = ColorPalette.textDimmed,
-            textAlign = TextAlign.Center
-        )
-
-    /**
-     * 작은 텍스트 스타일 (11.sp, TextDimmed)
-     */
-    val caption11
-        @Composable get() = TextStyle(
-            fontSize = 11.sp,
-            lineHeight = 13.sp,
-            color = ColorPalette.textDimmed
-        )
+    // FixWhite 스타일 - 기본 스타일에서 color만 추가
+    val typo7FixWhite @Composable get() = typo7.copy(color = ColorPalette.fixWhite)
+    val typo8FixWhite @Composable get() = typo8.copy(color = ColorPalette.fixWhite)
+    val typo9FixWhite @Composable get() = typo9.copy(color = ColorPalette.fixWhite)
+    val typo10FixWhite @Composable get() = typo10.copy(color = ColorPalette.fixWhite)
+    val typo11FixWhite @Composable get() = typo11.copy(color = ColorPalette.fixWhite)
+    val typo12FixWhite @Composable get() = typo12.copy(color = ColorPalette.fixWhite)
+    val typo13FixWhite @Composable get() = typo13.copy(color = ColorPalette.fixWhite)
+    val typo14FixWhite @Composable get() = typo14.copy(color = ColorPalette.fixWhite)
+    val typo15FixWhite @Composable get() = typo15.copy(color = ColorPalette.fixWhite)
+    val typo16FixWhite @Composable get() = typo16.copy(color = ColorPalette.fixWhite)
+    val typo17FixWhite @Composable get() = typo17.copy(color = ColorPalette.fixWhite)
+    val typo18FixWhite @Composable get() = typo18.copy(color = ColorPalette.fixWhite)
+    val typo19FixWhite @Composable get() = typo19.copy(color = ColorPalette.fixWhite)
+    val typo20FixWhite @Composable get() = typo20.copy(color = ColorPalette.fixWhite)
+    val typo21FixWhite @Composable get() = typo21.copy(color = ColorPalette.fixWhite)
+    val typo22FixWhite @Composable get() = typo22.copy(color = ColorPalette.fixWhite)
+    val typo24FixWhite @Composable get() = typo24.copy(color = ColorPalette.fixWhite)
 }

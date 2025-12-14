@@ -18,8 +18,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * 하단 고정 상태 버튼
@@ -77,7 +77,7 @@ fun ExoStatusButton(
         } else {
             Text(
                 text = text,
-                fontSize = 14.sp
+                style = ExoTypo.typo14
             )
         }
     }

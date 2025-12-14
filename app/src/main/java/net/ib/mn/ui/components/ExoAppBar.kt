@@ -11,10 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.sp
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * 앱 전체에서 사용하는 공통 AppBar 컴포넌트
@@ -43,8 +42,7 @@ fun ExoAppBar(
         title = {
             Text(
                 text = title,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
+                style = ExoTypo.typo20Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

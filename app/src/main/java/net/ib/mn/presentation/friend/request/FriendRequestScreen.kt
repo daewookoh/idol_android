@@ -56,6 +56,7 @@ import net.ib.mn.ui.components.ExoDialog
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ProfileImageType
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * 친구 신청 관리 화면
@@ -250,12 +251,13 @@ private fun FriendRequestTabRow(
                 text = {
                     Text(
                         text = title,
-                        color = if (selectedTabIndex == index) {
-                            colorResource(R.color.main)
-                        } else {
-                            colorResource(R.color.gray150)
-                        },
-                        fontSize = 14.sp
+                        style = ExoTypo.typo14.copy(
+                            color = if (selectedTabIndex == index) {
+                                colorResource(R.color.main)
+                            } else {
+                                colorResource(R.color.gray150)
+                            }
+                        )
                     )
                 }
             )
@@ -291,8 +293,7 @@ private fun EmptyView() {
     ) {
         Text(
             text = stringResource(R.string.empty_friend_request),
-            color = colorResource(R.color.text_gray),
-            fontSize = 16.sp,
+            style = ExoTypo.typo16.copy(color = colorResource(R.color.text_gray)),
             textAlign = TextAlign.Center
         )
     }
@@ -393,8 +394,7 @@ private fun ReceivedRequestItem(
                 Spacer(modifier = Modifier.width(2.dp))
                 Text(
                     text = "\u200E${friend.user.nickname}",
-                    color = colorResource(R.color.main),
-                    fontSize = 15.sp,
+                    style = ExoTypo.typo15.copy(color = colorResource(R.color.main)),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -485,8 +485,7 @@ private fun SentRequestItem(
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(
                         text = "\u200E${friend.user.nickname}",
-                        color = colorResource(R.color.main),
-                        fontSize = 15.sp,
+                        style = ExoTypo.typo15.copy(color = colorResource(R.color.main)),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -499,8 +498,7 @@ private fun SentRequestItem(
 
                 Text(
                     text = mostText,
-                    color = colorResource(R.color.gray580),
-                    fontSize = 13.sp
+                    style = ExoTypo.typo13.copy(color = colorResource(R.color.gray580))
                 )
             }
 
@@ -561,8 +559,7 @@ private fun FriendRequestButton(
     ) {
         Text(
             text = text,
-            color = colorResource(R.color.main),
-            fontSize = 14.sp
+            style = ExoTypo.typo14.copy(color = colorResource(R.color.main))
         )
     }
 }

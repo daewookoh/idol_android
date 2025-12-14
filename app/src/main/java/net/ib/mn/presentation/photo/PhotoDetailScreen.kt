@@ -335,7 +335,7 @@ fun PhotoDetailScreen(
             ) {
                 Text(
                     text = "${pagerState.currentPage + 1}/${effectiveMediaFiles.size}",
-                    style = ExoTypo.body14.copy(color = Color.White)
+                    style = ExoTypo.typo14.copy(color = Color.White)
                 )
             }
         }
@@ -653,7 +653,7 @@ fun PhotoDetailScreen(
             if (dateString.isNotEmpty()) {
                 Text(
                     text = dateString,
-                    style = ExoTypo.body12,
+                    style = ExoTypo.typo12,
                     color = ColorPalette.gray300,
                     modifier = Modifier.padding(end = 13.dp, top = 5.dp)
                 )
@@ -782,9 +782,7 @@ private fun HeartBoxRewardDialog(
 
                 Text(
                     text = titleText,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = ColorPalette.textChat,
+                    style = ExoTypo.typo22Bold.copy(color = ColorPalette.textChat),
                     textAlign = TextAlign.Center
                 )
 
@@ -797,16 +795,12 @@ private fun HeartBoxRewardDialog(
                         // old: tv_plus - 24sp, main color
                         Text(
                             text = "+",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorPalette.main
+                            style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
                         )
                         // old: tv_heart - 24sp, main color
                         Text(
                             text = numberFormat.format(heart),
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorPalette.main
+                            style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
                         )
                         // old: iv_heart - 21x17dp, marginStart 2dp
                         Spacer(modifier = Modifier.width(2.dp))
@@ -829,8 +823,7 @@ private fun HeartBoxRewardDialog(
                 if (detailText != null) {
                     Text(
                         text = detailText,
-                        fontSize = 14.sp,
-                        color = ColorPalette.textDimmed,
+                        style = ExoTypo.typo14.copy(color = ColorPalette.textDimmed),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp)
                     )
@@ -861,9 +854,7 @@ private fun HeartBoxRewardDialog(
                 ) {
                     Text(
                         text = confirmText,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        style = ExoTypo.typo16Bold.copy(color = Color.White)
                     )
                 }
 
@@ -875,9 +866,7 @@ private fun HeartBoxRewardDialog(
                     ) {
                         Text(
                             text = stringResource(R.string.quit),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorPalette.mainLight
+                            style = ExoTypo.typo16Bold.copy(color = ColorPalette.mainLight)
                         )
                     }
                 }

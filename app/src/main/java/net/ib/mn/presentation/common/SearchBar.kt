@@ -36,6 +36,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * 검색 바 컴포넌트
@@ -137,9 +138,8 @@ fun SearchBar(
                         .onFocusChanged { focusState ->
                             onFocusChange?.invoke(focusState.isFocused)
                         },
-                    textStyle = TextStyle(
-                        color = colorResource(id = R.color.text_default),
-                        fontSize = 12.sp
+                    textStyle = ExoTypo.typo12.copy(
+                        color = colorResource(id = R.color.text_default)
                     ),
                     singleLine = true,
                     readOnly = readOnly,
@@ -177,8 +177,7 @@ fun SearchBar(
         // 취소 버튼
         Text(
             text = stringResource(id = R.string.btn_cancel),
-            color = colorResource(id = R.color.toolbar_default),
-            fontSize = 14.sp,
+            style = ExoTypo.typo14.copy(color = colorResource(id = R.color.toolbar_default)),
             modifier = Modifier
                 .clickable(
                     indication = null,

@@ -73,6 +73,7 @@ import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ExoTitleDialog
 import net.ib.mn.ui.components.RankingItem
 import net.ib.mn.ui.components.ThemePickRankingItem
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
 import net.ib.mn.ad.RewardAdManager
 import java.text.NumberFormat
@@ -273,8 +274,7 @@ fun ThemePickDetailScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = title,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = ExoTypo.typo20Bold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -424,8 +424,7 @@ private fun ErrorView(error: String) {
     ) {
         Text(
             text = error,
-            color = colorResource(R.color.text_gray),
-            fontSize = 16.sp,
+            style = ExoTypo.typo16.copy(color = colorResource(R.color.text_gray)),
             textAlign = TextAlign.Center
         )
     }
@@ -500,9 +499,7 @@ private fun PreparingContent(
                 ) {
                     Text(
                         text = themePick.title,
-                        color = colorResource(R.color.text_default),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = ExoTypo.typo18Bold.copy(color = colorResource(R.color.text_default)),
                         textAlign = TextAlign.Center
                     )
                 }
@@ -575,9 +572,7 @@ private fun NotifyButton(
     ) {
         Text(
             text = btnText,
-            color = Color.White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold,
+            style = ExoTypo.typo16Bold.copy(color = Color.White),
             textAlign = TextAlign.Center
         )
     }
@@ -951,9 +946,7 @@ private fun ProgressContent(
                 ) {
                     Text(
                         text = themePick.title,
-                        color = colorResource(R.color.main_light),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = ExoTypo.typo18Bold.copy(color = colorResource(R.color.main_light)),
                         textAlign = TextAlign.Center
                     )
                 }
@@ -1014,14 +1007,12 @@ private fun ProgressInfoSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.themepick_total_votes),
-                color = colorResource(R.color.text_gray),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray))
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "${numberFormat.format(totalVote)}${stringResource(R.string.votes)}",
-                color = colorResource(R.color.text_default),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_default))
             )
         }
 
@@ -1031,14 +1022,12 @@ private fun ProgressInfoSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.onepick_period),
-                color = colorResource(R.color.text_gray),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray))
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = periodText,
-                color = colorResource(R.color.text_default),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_default))
             )
         }
 
@@ -1048,15 +1037,12 @@ private fun ProgressInfoSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.remaining_time),
-                color = colorResource(R.color.text_gray),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray))
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = dDayText,
-                color = colorResource(R.color.main_light),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
+                style = ExoTypo.typo14Bold.copy(color = colorResource(R.color.main_light))
             )
         }
     }
@@ -1106,15 +1092,12 @@ private fun ProgressCandidateItem(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = candidate.title,
-                color = colorResource(R.color.text_default),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_default))
             )
             if (candidate.subtitle.isNotEmpty()) {
                 Text(
                     text = candidate.subtitle,
-                    color = colorResource(R.color.text_gray),
-                    fontSize = 12.sp
+                    style = ExoTypo.typo12.copy(color = colorResource(R.color.text_gray))
                 )
             }
         }
@@ -1181,8 +1164,7 @@ private fun VoteButton(
         if (showGuide) {
             Text(
                 text = stringResource(R.string.themepick_candidate_vote),
-                color = colorResource(R.color.text_gray),
-                fontSize = 13.sp,
+                style = ExoTypo.typo13.copy(color = colorResource(R.color.text_gray)),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1209,9 +1191,7 @@ private fun VoteButton(
         ) {
             Text(
                 text = btnText,
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
+                style = ExoTypo.typo16Bold.copy(color = Color.White),
                 textAlign = TextAlign.Center
             )
         }
@@ -1255,9 +1235,7 @@ private fun FinishedContent(
             ) {
                 Text(
                     text = themePick.title,
-                    color = colorResource(R.color.text_default),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = ExoTypo.typo18Bold.copy(color = colorResource(R.color.text_default)),
                     textAlign = TextAlign.Center
                 )
             }
@@ -1317,14 +1295,12 @@ private fun FinishedInfoSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.themepick_total_votes),
-                color = colorResource(R.color.text_gray),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray))
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "${numberFormat.format(totalVote)}${stringResource(R.string.votes)}",
-                color = colorResource(R.color.text_default),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_default))
             )
         }
 
@@ -1334,14 +1310,12 @@ private fun FinishedInfoSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.onepick_period),
-                color = colorResource(R.color.text_gray),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray))
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = periodText,
-                color = colorResource(R.color.text_default),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_default))
             )
         }
     }
@@ -1387,9 +1361,7 @@ private fun RewardSection(
                 Spacer(modifier = Modifier.width(9.dp))
                 Text(
                     text = stringResource(R.string.first_rank_reward),
-                    color = colorResource(R.color.text_default),
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    style = ExoTypo.typo15Bold.copy(color = colorResource(R.color.text_default)),
                     modifier = Modifier.weight(1f)
                 )
                 Icon(
@@ -1410,16 +1382,13 @@ private fun RewardSection(
                     themePick.prize.name?.let { prizeName ->
                         Text(
                             text = prizeName,
-                            color = colorResource(R.color.text_default),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold
+                            style = ExoTypo.typo14Bold.copy(color = colorResource(R.color.text_default))
                         )
                     }
                     themePick.prize.location?.let { location ->
                         Text(
                             text = location,
-                            color = colorResource(R.color.text_gray),
-                            fontSize = 13.sp
+                            style = ExoTypo.typo13.copy(color = colorResource(R.color.text_gray))
                         )
                     }
                     themePick.prize.imageUrl?.let { imageUrl ->

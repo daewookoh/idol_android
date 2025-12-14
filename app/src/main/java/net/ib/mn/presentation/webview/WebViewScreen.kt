@@ -12,12 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ExoWebView
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExodusTheme
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * WebView 화면
@@ -57,9 +57,7 @@ fun WebViewScreen(
             if (!contentTitle.isNullOrEmpty()) {
                 Text(
                     text = contentTitle,
-                    fontSize = 13.5.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = ColorPalette.textDefault,
+                    style = ExoTypo.typo14Bold.copy(color = ColorPalette.textDefault),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 16.dp)

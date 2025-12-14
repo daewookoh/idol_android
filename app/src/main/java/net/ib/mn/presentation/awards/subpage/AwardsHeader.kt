@@ -141,7 +141,7 @@ private fun AwardsCategoryTabs(
             ) {
                 Text(
                     text = chart.name.orEmpty(),
-                    style = ExoTypo.body14.copy(
+                    style = ExoTypo.typo14.copy(
                         color = if (isSelected) ColorPalette.fixWhite else ColorPalette.textDimmed
                     )
                 )
@@ -173,7 +173,7 @@ fun AwardsHeaderInfo(
         if (title.isNotEmpty()) {
             Text(
                 text = title,
-                style = ExoTypo.title16.copy(color = ColorPalette.main),
+                style = ExoTypo.typo16Bold.copy(color = ColorPalette.main),
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(10.dp))
@@ -181,7 +181,7 @@ fun AwardsHeaderInfo(
         if (period.isNotEmpty()) {
             Text(
                 text = period,
-                style = ExoTypo.body12.copy(color = ColorPalette.textDefault),
+                style = ExoTypo.typo12.copy(color = ColorPalette.textDefault),
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(10.dp))
@@ -189,7 +189,7 @@ fun AwardsHeaderInfo(
         if (description.isNotEmpty()) {
             Text(
                 text = description,
-                style = ExoTypo.body12.copy(color = ColorPalette.textDefault),
+                style = ExoTypo.typo12.copy(color = ColorPalette.textDefault),
                 textAlign = TextAlign.Center
             )
         }
@@ -217,7 +217,7 @@ fun AwardsLineupHeaderInfo(
         if (exampleTitle.isNotEmpty()) {
             Text(
                 text = exampleTitle,
-                style = ExoTypo.title16.copy(color = ColorPalette.main),
+                style = ExoTypo.typo16Bold.copy(color = ColorPalette.main),
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(10.dp))
@@ -225,14 +225,14 @@ fun AwardsLineupHeaderInfo(
         // "지금은 투표 기간이 아닙니다!"
         Text(
             text = stringResource(R.string.award_before_title),
-            style = ExoTypo.body12.copy(color = ColorPalette.textDefault),
+            style = ExoTypo.typo12.copy(color = ColorPalette.textDefault),
             textAlign = TextAlign.Center
         )
         if (exampleDesc.isNotEmpty()) {
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = exampleDesc,
-                style = ExoTypo.body12.copy(color = ColorPalette.textDefault),
+                style = ExoTypo.typo12.copy(color = ColorPalette.textDefault),
                 textAlign = TextAlign.Center
             )
         }
@@ -257,7 +257,7 @@ fun AwardsAggregationBar(
         ) {
             Text(
                 text = periodText,
-                style = ExoTypo.body12.copy(color = ColorPalette.textDimmed),
+                style = ExoTypo.typo12.copy(color = ColorPalette.textDimmed),
                 textAlign = TextAlign.Center
             )
         }

@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
@@ -153,11 +152,11 @@ fun HallOfFameRankingSecondSubDailyPage(
             ) {
                 Text(
                     text = historyYear ?: stringResource(R.string.recent),
-                    style = ExoTypo.body11,
+                    style = ExoTypo.typo11,
                 )
                 Text(
                     text = historyMonth ?: stringResource(R.string.thirty_days),
-                    style = ExoTypo.body15.copy(fontWeight = FontWeight.Bold),
+                    style = ExoTypo.typo15.copy(fontWeight = FontWeight.Bold),
                 )
             }
 
@@ -213,16 +212,14 @@ fun HallOfFameRankingSecondSubDailyPage(
                 error != null -> {
                     Text(
                         text = "Error: $error",
-                        fontSize = 14.sp,
-                        color = ColorPalette.textDimmed,
+                        style = ExoTypo.typo14.copy(color = ColorPalette.textDimmed),
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
                 rankingData.isEmpty() -> {
                     Text(
                         text = "데이터가 없습니다",
-                        fontSize = 14.sp,
-                        color = ColorPalette.textDimmed,
+                        style = ExoTypo.typo14.copy(color = ColorPalette.textDimmed),
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }

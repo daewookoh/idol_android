@@ -6,9 +6,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * 투표 상태 코드
@@ -93,7 +93,7 @@ fun ExoPickVoteButton(
         modifier = modifier,
         enabled = buttonState.enabled,
         text = stringResource(buttonState.textResId),
-        fontSize = 14.sp,
+        style = ExoTypo.typo14,
         height = 41.dp,
         shape = RoundedCornerShape(20.dp),
         containerColor = buttonState.containerColor,

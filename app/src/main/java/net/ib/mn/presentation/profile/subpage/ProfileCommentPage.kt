@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * ProfileCommentPage - 프로필 댓글 탭
@@ -66,8 +67,7 @@ fun ProfileCommentPage(
             ) {
                 Text(
                     text = stringResource(R.string.feed_no_comments),
-                    color = ColorPalette.textGray,
-                    fontSize = 14.sp
+                    style = ExoTypo.typo14.copy(color = ColorPalette.textGray)
                 )
             }
         }
@@ -81,8 +81,7 @@ fun ProfileCommentPage(
             ) {
                 Text(
                     text = state.message,
-                    color = ColorPalette.textGray,
-                    fontSize = 14.sp
+                    style = ExoTypo.typo14.copy(color = ColorPalette.textGray)
                 )
             }
         }

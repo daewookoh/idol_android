@@ -43,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.ib.mn.BuildConfig
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.domain.model.ScheduleModel
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoConfirmDialog
@@ -164,8 +165,7 @@ fun ScheduleDetailScreen(
                 ) {
                     Text(
                         text = stringResource(R.string.schedule_empty),
-                        fontSize = 14.sp,
-                        color = ColorPalette.textDimmed
+                        style = ExoTypo.typo14.copy(color = ColorPalette.textDimmed)
                     )
                 }
             }
@@ -247,9 +247,7 @@ private fun DateHeader(dateString: String) {
             // 날짜 텍스트
             Text(
                 text = dateString,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium,
-                color = ColorPalette.textGray,
+                style = ExoTypo.typo13.copy(color = ColorPalette.textGray),
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
@@ -305,9 +303,7 @@ private fun ScheduleDetailItem(
             if (schedule.allday != 1) {
                 Text(
                     text = timeFormat.format(schedule.dtstart),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = ColorPalette.textDefault,
+                    style = ExoTypo.typo13Bold.copy(color = ColorPalette.textDefault),
                     modifier = Modifier.padding(end = 10.dp)
                 )
             }
@@ -323,9 +319,7 @@ private fun ScheduleDetailItem(
             // 제목
             Text(
                 text = schedule.title,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = ColorPalette.textDefault,
+                style = ExoTypo.typo13Bold.copy(color = ColorPalette.textDefault),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
@@ -379,8 +373,7 @@ private fun ScheduleDetailItem(
                 )
                 Text(
                     text = url,
-                    fontSize = 12.sp,
-                    color = ColorPalette.textLightBlue,
+                    style = ExoTypo.typo12.copy(color = ColorPalette.textLightBlue),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(vertical = 5.dp)
@@ -404,8 +397,7 @@ private fun ScheduleDetailItem(
                 )
                 Text(
                     text = extra,
-                    fontSize = 12.sp,
-                    color = ColorPalette.textGray,
+                    style = ExoTypo.typo12.copy(color = ColorPalette.textGray),
                     modifier = Modifier.padding(vertical = 5.dp)
                 )
             }
@@ -442,8 +434,7 @@ private fun ScheduleDetailItem(
                         )
                         Text(
                             text = location,
-                            fontSize = 9.sp,
-                            color = ColorPalette.gray580,
+                            style = ExoTypo.typo9.copy(color = ColorPalette.gray580),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -472,8 +463,7 @@ private fun ScheduleDetailItem(
                 }
                 Text(
                     text = userName,
-                    fontSize = 11.sp,
-                    color = ColorPalette.textGray,
+                    style = ExoTypo.typo11.copy(color = ColorPalette.textGray),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )

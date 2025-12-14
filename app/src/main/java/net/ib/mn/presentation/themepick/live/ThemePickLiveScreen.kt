@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import net.ib.mn.ui.theme.ExoTypo
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import kotlinx.coroutines.flow.collectLatest
@@ -150,8 +151,7 @@ fun ThemePickLiveScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = title,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = ExoTypo.typo20Bold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -242,8 +242,7 @@ private fun ErrorView(error: String) {
     ) {
         Text(
             text = error,
-            color = colorResource(R.color.text_gray),
-            fontSize = 16.sp,
+            style = ExoTypo.typo16.copy(color = colorResource(R.color.text_gray)),
             textAlign = TextAlign.Center
         )
     }
@@ -292,13 +291,13 @@ private fun ResultContent(
                 ) {
                     Text(
                         text = themePick.title,
-                        color = if (state.isFinished) {
-                            colorResource(R.color.gray300)
-                        } else {
-                            colorResource(R.color.main_light)
-                        },
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = ExoTypo.typo18Bold.copy(
+                            color = if (state.isFinished) {
+                                colorResource(R.color.gray300)
+                            } else {
+                                colorResource(R.color.main_light)
+                            }
+                        ),
                         textAlign = TextAlign.Center
                     )
                 }
@@ -402,14 +401,12 @@ private fun ResultInfoSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.themepick_total_votes),
-                color = colorResource(R.color.text_gray),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray))
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "${numberFormat.format(totalVote)}${stringResource(R.string.votes)}",
-                color = colorResource(R.color.text_default),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_default))
             )
         }
 
@@ -419,14 +416,12 @@ private fun ResultInfoSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.onepick_period),
-                color = colorResource(R.color.text_gray),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray))
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = periodText,
-                color = colorResource(R.color.text_default),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_default))
             )
         }
     }
@@ -442,8 +437,7 @@ private fun EmptyView() {
     ) {
         Text(
             text = stringResource(R.string.onepick_no_votes),
-            color = colorResource(R.color.text_gray),
-            fontSize = 16.sp,
+            style = ExoTypo.typo16.copy(color = colorResource(R.color.text_gray)),
             textAlign = TextAlign.Center
         )
     }
@@ -485,9 +479,10 @@ private fun RewardSection(
                 Spacer(modifier = Modifier.width(9.dp))
                 Text(
                     text = stringResource(R.string.first_rank_reward),
-                    color = colorResource(R.color.text_default),
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    style = ExoTypo.typo15.copy(
+                        color = colorResource(R.color.text_default),
+                        fontWeight = FontWeight.SemiBold
+                    ),
                     modifier = Modifier.weight(1f)
                 )
                 Icon(
@@ -508,16 +503,16 @@ private fun RewardSection(
                     themePick.prize.name?.let { prizeName ->
                         Text(
                             text = prizeName,
-                            color = colorResource(R.color.text_default),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold
+                            style = ExoTypo.typo14.copy(
+                                color = colorResource(R.color.text_default),
+                                fontWeight = FontWeight.SemiBold
+                            )
                         )
                     }
                     themePick.prize.location?.let { location ->
                         Text(
                             text = location,
-                            color = colorResource(R.color.text_gray),
-                            fontSize = 13.sp
+                            style = ExoTypo.typo13.copy(color = colorResource(R.color.text_gray))
                         )
                     }
                     themePick.prize.imageUrl?.let { imageUrl ->
@@ -590,9 +585,7 @@ private fun VoteButton(
         ) {
             Text(
                 text = btnText,
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
+                style = ExoTypo.typo16Bold.copy(color = Color.White),
                 textAlign = TextAlign.Center
             )
         }

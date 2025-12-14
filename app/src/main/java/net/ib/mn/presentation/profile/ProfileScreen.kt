@@ -38,6 +38,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import net.ib.mn.ui.theme.ExoTypo
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -781,8 +782,7 @@ private fun ReportReasonDialog(
             // 타이틀: 신고한 이유를 작성해 주세요
             Text(
                 text = stringResource(R.string.quiz_report_description),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
+                style = ExoTypo.typo16Bold,
                 color = colorResource(id = R.color.text_default),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -805,12 +805,11 @@ private fun ReportReasonDialog(
                 placeholder = {
                     Text(
                         text = stringResource(R.string.quiz_report_hint),
-                        fontSize = 13.sp,
+                        style = ExoTypo.typo13,
                         color = colorResource(id = R.color.gray200)
                     )
                 },
-                textStyle = TextStyle(
-                    fontSize = 13.sp,
+                textStyle = ExoTypo.typo13.copy(
                     color = colorResource(id = R.color.text_gray)
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -860,8 +859,7 @@ private fun ReportReasonDialog(
                 ) {
                     Text(
                         text = stringResource(R.string.confirm),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Normal
+                        style = ExoTypo.typo14
                     )
                 }
 
@@ -885,8 +883,7 @@ private fun ReportReasonDialog(
                 ) {
                     Text(
                         text = stringResource(R.string.btn_cancel),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Normal
+                        style = ExoTypo.typo14
                     )
                 }
             }
@@ -972,12 +969,8 @@ private fun ProfileHeader(
                     ) {
                         Text(
                             text = nickname,
-                            fontSize = 16.sp,
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                             color = ColorPalette.textDefault,
-                            style = TextStyle(
-                                platformStyle = PlatformTextStyle(includeFontPadding = false)
-                            ),
+                            style = ExoTypo.typo16Bold,
                             modifier = Modifier.weight(1f, fill = false)
                         )
 
@@ -1023,11 +1016,8 @@ private fun ProfileHeader(
                             // 아이돌 이름이 없을 때 힌트 표시
                             Text(
                                 text = stringResource(R.string.none),
-                                fontSize = 14.sp,
                                 color = ColorPalette.textDimmed,
-                                style = TextStyle(
-                                    platformStyle = PlatformTextStyle(includeFontPadding = false)
-                                ),
+                                style = ExoTypo.typo14,
                                 modifier = Modifier.weight(1f, fill = false)
                             )
                         }
@@ -1069,16 +1059,13 @@ private fun ProfileHeader(
             Spacer(modifier = Modifier.height(18.dp))
             Text(
                 text = stringResource(R.string.feed_status_message_hint),
-                fontSize = 12.sp,
                 color = ColorPalette.textDimmed,
                 maxLines = 1,
                 modifier = Modifier.clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) { onViewMoreClick() },
-                style = TextStyle(
-                    platformStyle = PlatformTextStyle(includeFontPadding = false)
-                )
+                style = ExoTypo.typo12
             )
         }
 
@@ -1141,7 +1128,7 @@ private fun StatusMessageCollapsed(
         val viewMoreWidthPx = remember(viewMoreText) {
             textMeasurer.measure(
                 text = viewMoreText,
-                style = TextStyle(fontSize = 12.sp)
+                style = ExoTypo.typo12
             ).size.width
         }
 
@@ -1149,7 +1136,7 @@ private fun StatusMessageCollapsed(
         val textWidthPx = remember(firstLine) {
             textMeasurer.measure(
                 text = firstLine,
-                style = TextStyle(fontSize = 12.sp)
+                style = ExoTypo.typo12
             ).size.width
         }
 
@@ -1167,30 +1154,23 @@ private fun StatusMessageCollapsed(
             ) {
                 Text(
                     text = firstLine,
-                    fontSize = 12.sp,
                     color = ColorPalette.textDefault,
                     maxLines = 1,
                     overflow = androidx.compose.ui.text.style.TextOverflow.Clip,
                     modifier = Modifier.widthIn(max = with(density) { (maxWidthPx - viewMoreWidthPx).toInt().toDp() }),
-                    style = TextStyle(
-                        platformStyle = PlatformTextStyle(includeFontPadding = false)
-                    )
+                    style = ExoTypo.typo12
                 )
                 Text(
                     text = viewMoreText,
-                    fontSize = 12.sp,
                     color = ColorPalette.textDimmed,
                     maxLines = 1,
-                    style = TextStyle(
-                        platformStyle = PlatformTextStyle(includeFontPadding = false)
-                    )
+                    style = ExoTypo.typo12
                 )
             }
         } else {
             // 텍스트가 한 줄에 들어가는 경우: 텍스트만 표시
             Text(
                 text = firstLine,
-                fontSize = 12.sp,
                 color = ColorPalette.textDefault,
                 maxLines = 1,
                 modifier = if (isMine) {
@@ -1201,9 +1181,7 @@ private fun StatusMessageCollapsed(
                 } else {
                     Modifier
                 },
-                style = TextStyle(
-                    platformStyle = PlatformTextStyle(includeFontPadding = false)
-                )
+                style = ExoTypo.typo12
             )
         }
     }
@@ -1233,7 +1211,6 @@ private fun ClickableStatusMessage(
         // 링크 없음 - 일반 텍스트
         Text(
             text = statusMessage,
-            fontSize = 12.sp,
             color = ColorPalette.textDefault,
             modifier = if (isMine) {
                 Modifier.clickable(
@@ -1243,9 +1220,7 @@ private fun ClickableStatusMessage(
             } else {
                 Modifier
             },
-            style = TextStyle(
-                platformStyle = PlatformTextStyle(includeFontPadding = false)
-            )
+            style = ExoTypo.typo12
         )
     } else {
         // 링크 있음 - AnnotatedString 사용
@@ -1288,11 +1263,7 @@ private fun ClickableStatusMessage(
                         IntentUtil.openUrl(context, annotation.item)
                     }
             },
-            style = TextStyle(
-                fontSize = 12.sp,
-                color = ColorPalette.textDefault,
-                platformStyle = PlatformTextStyle(includeFontPadding = false)
-            )
+            style = ExoTypo.typo12.copy(color = ColorPalette.textDefault)
         )
     }
 }

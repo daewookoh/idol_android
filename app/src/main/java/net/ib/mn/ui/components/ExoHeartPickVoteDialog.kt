@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.NumberFormatUtil
 
 /**
@@ -96,9 +97,7 @@ fun ExoHeartPickVoteDialog(
                 // 타이틀
                 Text(
                     text = stringResource(R.string.title_vote_heart),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = ColorPalette.main,
+                    style = ExoTypo.typo16Bold.copy(color = ColorPalette.main),
                     modifier = Modifier.padding(top = 20.dp, bottom = 5.dp),
                     textAlign = TextAlign.Center
                 )
@@ -138,15 +137,12 @@ fun ExoHeartPickVoteDialog(
                         // 내 하트
                         Text(
                             text = stringResource(R.string.my_heart),
-                            fontSize = 12.sp,
-                            color = ColorPalette.textDefault
+                            style = ExoTypo.typo12.copy(color = ColorPalette.textDefault)
                         )
                         Spacer(modifier = Modifier.height(5.dp))
                         Text(
                             text = NumberFormatUtil.formatWithComma(totalHeart),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorPalette.mainLight
+                            style = ExoTypo.typo18Bold.copy(color = ColorPalette.mainLight)
                         )
 
                         Spacer(modifier = Modifier.height(10.dp))
@@ -164,24 +160,20 @@ fun ExoHeartPickVoteDialog(
                             ) {
                                 Text(
                                     text = stringResource(R.string.ever_heart),
-                                    fontSize = 12.sp,
-                                    color = ColorPalette.textDimmed,
+                                    style = ExoTypo.typo12.copy(color = ColorPalette.textDimmed),
                                     textAlign = TextAlign.Center
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
                                 Text(
                                     text = NumberFormatUtil.formatWithComma(strongHeart),
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = ColorPalette.textGray,
+                                    style = ExoTypo.typo14Bold.copy(color = ColorPalette.textGray),
                                     textAlign = TextAlign.Center
                                 )
                             }
 
                             Text(
                                 text = "+",
-                                fontSize = 15.sp,
-                                color = ColorPalette.textDimmed,
+                                style = ExoTypo.typo15.copy(color = ColorPalette.textDimmed),
                                 modifier = Modifier.padding(horizontal = 5.dp)
                             )
 
@@ -192,16 +184,13 @@ fun ExoHeartPickVoteDialog(
                             ) {
                                 Text(
                                     text = stringResource(R.string.weak_heart),
-                                    fontSize = 12.sp,
-                                    color = ColorPalette.textDimmed,
+                                    style = ExoTypo.typo12.copy(color = ColorPalette.textDimmed),
                                     textAlign = TextAlign.Center
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
                                 Text(
                                     text = NumberFormatUtil.formatWithComma(freeHeart),
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = ColorPalette.textGray,
+                                    style = ExoTypo.typo14Bold.copy(color = ColorPalette.textGray),
                                     textAlign = TextAlign.Center
                                 )
                             }
@@ -302,8 +291,7 @@ fun ExoHeartPickVoteDialog(
                         .clip(RoundedCornerShape(6.dp))
                         .background(ColorPalette.background300)
                         .padding(horizontal = 10.dp),
-                    textStyle = TextStyle(
-                        fontSize = 14.sp,
+                    textStyle = ExoTypo.typo14.copy(
                         color = ColorPalette.main,
                         textAlign = TextAlign.Start
                     ),
@@ -345,8 +333,7 @@ fun ExoHeartPickVoteDialog(
                     ) {
                         Text(
                             text = if (isVoting) stringResource(R.string.loading) else stringResource(R.string.confirm),
-                            fontSize = 13.sp,
-                            color = ColorPalette.textGray
+                            style = ExoTypo.typo13.copy(color = ColorPalette.textGray)
                         )
                     }
 
@@ -368,8 +355,7 @@ fun ExoHeartPickVoteDialog(
                     ) {
                         Text(
                             text = stringResource(R.string.btn_cancel),
-                            fontSize = 13.sp,
-                            color = ColorPalette.textGray
+                            style = ExoTypo.typo13.copy(color = ColorPalette.textGray)
                         )
                     }
                 }
@@ -405,8 +391,7 @@ private fun HeartPickHeartButton(
             Spacer(modifier = Modifier.width(5.dp))
             Text(
                 text = "X $count",
-                fontSize = 11.sp,
-                color = ColorPalette.textDefault
+                style = ExoTypo.typo11.copy(color = ColorPalette.textDefault)
             )
         }
     }
@@ -439,8 +424,7 @@ private fun HeartPickHeartAllButton(
             Spacer(modifier = Modifier.width(5.dp))
             Text(
                 text = label,
-                fontSize = 11.sp,
-                color = ColorPalette.textDefault
+                style = ExoTypo.typo11.copy(color = ColorPalette.textDefault)
             )
         }
     }
@@ -497,9 +481,7 @@ fun HeartPickVoteCompleteBottomSheet(
                 // 아이돌 이름
                 Text(
                     text = idolName.replace("_", "\n"),
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = ColorPalette.textChat,
+                    style = ExoTypo.typo22Bold.copy(color = ColorPalette.textChat),
                     textAlign = TextAlign.Center
                 )
 
@@ -511,15 +493,11 @@ fun HeartPickVoteCompleteBottomSheet(
                     ) {
                         Text(
                             text = "+",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorPalette.main
+                            style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
                         )
                         Text(
                             text = bonusHeart.toString(),
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorPalette.main
+                            style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
                         )
                         Spacer(modifier = Modifier.width(2.dp))
                         Image(
@@ -533,10 +511,11 @@ fun HeartPickVoteCompleteBottomSheet(
                 // 투표 완료 메시지
                 Text(
                     text = displaySubtitle,
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
-                    letterSpacing = (-0.3).sp,
-                    color = ColorPalette.textDimmed,
+                    style = ExoTypo.typo14.copy(
+                        lineHeight = 20.sp,
+                        letterSpacing = (-0.3).sp,
+                        color = ColorPalette.textDimmed
+                    ),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp)
                 )
@@ -555,9 +534,7 @@ fun HeartPickVoteCompleteBottomSheet(
                 ) {
                     Text(
                         text = stringResource(R.string.label_share),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        style = ExoTypo.typo16Bold.copy(color = Color.White)
                     )
                 }
 

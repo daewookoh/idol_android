@@ -18,8 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import net.ib.mn.ui.theme.ColorPalette
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.domain.ranking.RankingDataSource
 import net.ib.mn.ui.components.ExoRankingList
 import net.ib.mn.ui.components.RankingItem
@@ -102,8 +102,7 @@ fun UnifiedRankingSubPage(
             ) {
                 Text(
                     text = "오류: ${state.message}",
-                    fontSize = 16.sp,
-                    color = ColorPalette.main
+                    style = ExoTypo.typo16.copy(color = ColorPalette.main)
                 )
             }
         }
@@ -129,8 +128,7 @@ fun UnifiedRankingSubPage(
                 ) {
                     Text(
                         text = "랭킹 데이터가 없습니다.",
-                        fontSize = 16.sp,
-                        color = ColorPalette.textDimmed
+                        style = ExoTypo.typo16.copy(color = ColorPalette.textDimmed)
                     )
                 }
             } else {

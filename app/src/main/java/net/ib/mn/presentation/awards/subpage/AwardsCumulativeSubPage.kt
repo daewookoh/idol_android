@@ -162,7 +162,7 @@ private fun CumulativeMessageContent(message: String) {
     ) {
         Text(
             text = message,
-            style = ExoTypo.body14.copy(color = ColorPalette.textGray),
+            style = ExoTypo.typo14.copy(color = ColorPalette.textGray),
             textAlign = TextAlign.Center
         )
     }

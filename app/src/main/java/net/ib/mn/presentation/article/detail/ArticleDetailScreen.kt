@@ -56,6 +56,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.CommentModel
 import net.ib.mn.domain.model.ScheduleModel
@@ -951,9 +952,7 @@ private fun ScheduleInfoSection(
             if (schedule.allday != 1) {
                 androidx.compose.material3.Text(
                     text = timeFormat.format(schedule.dtstart),
-                    fontSize = 14.sp,
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                    color = ColorPalette.textDefault
+                    style = ExoTypo.typo14Bold.copy(color = ColorPalette.textDefault)
                 )
                 androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(12.dp))
             }
@@ -970,9 +969,7 @@ private fun ScheduleInfoSection(
             // 제목
             androidx.compose.material3.Text(
                 text = schedule.title,
-                fontSize = 14.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                color = ColorPalette.textDefault,
+                style = ExoTypo.typo14Bold.copy(color = ColorPalette.textDefault),
                 maxLines = 2,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
@@ -996,8 +993,7 @@ private fun ScheduleInfoSection(
                 androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(8.dp))
                 androidx.compose.material3.Text(
                     text = idolName,
-                    fontSize = 13.sp,
-                    color = ColorPalette.textGray
+                    style = ExoTypo.typo13.copy(color = ColorPalette.textGray)
                 )
             }
         }
@@ -1035,8 +1031,7 @@ private fun ScheduleInfoSection(
                     )
                     androidx.compose.material3.Text(
                         text = schedule.location,
-                        fontSize = 10.sp,
-                        color = ColorPalette.gray580,
+                        style = ExoTypo.typo10.copy(color = ColorPalette.gray580),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                         maxLines = 1,
                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
@@ -1063,8 +1058,7 @@ private fun ScheduleInfoSection(
             androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(4.dp))
             androidx.compose.material3.Text(
                 text = schedule.numComments.toString(),
-                fontSize = 13.sp,
-                color = ColorPalette.textGray
+                style = ExoTypo.typo13.copy(color = ColorPalette.textGray)
             )
 
             androidx.compose.foundation.layout.Spacer(modifier = Modifier.weight(1f))
@@ -1086,8 +1080,7 @@ private fun ScheduleInfoSection(
                     androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(4.dp))
                     androidx.compose.material3.Text(
                         text = userName,
-                        fontSize = 13.sp,
-                        color = ColorPalette.textGray
+                        style = ExoTypo.typo13.copy(color = ColorPalette.textGray)
                     )
                 }
             }

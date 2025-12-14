@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * 앱 전체에서 사용하는 공통 Dialog 컴포넌트
@@ -106,10 +107,11 @@ fun ExoDialog(
                 if (title != null) {
                     Text(
                         text = title,
-                        fontSize = 16.sp,
-                        lineHeight = 17.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = colorResource(id = R.color.main),
+                        style = ExoTypo.typo16.copy(
+                            lineHeight = 17.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = colorResource(id = R.color.main)
+                        ),
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -121,10 +123,11 @@ fun ExoDialog(
                 val scrollState = rememberScrollState()
                 Text(
                     text = message,
-                    fontSize = 14.sp,
-                    lineHeight = 15.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = colorResource(id = R.color.gray580),
+                    style = ExoTypo.typo14.copy(
+                        lineHeight = 15.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = colorResource(id = R.color.gray580)
+                    ),
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -159,9 +162,10 @@ fun ExoDialog(
                 ) {
                     Text(
                         text = confirmButtonText,
-                        fontSize = 14.sp,
-                        lineHeight = 15.sp,
-                        fontWeight = FontWeight.Normal
+                        style = ExoTypo.typo14.copy(
+                            lineHeight = 15.sp,
+                            fontWeight = FontWeight.Normal
+                        )
                     )
                 }
             }
@@ -271,10 +275,11 @@ fun ExoConfirmDialog(
             // 타이틀
             Text(
                 text = title,
-                fontSize = 16.sp,
-                lineHeight = 17.sp,
-                fontWeight = FontWeight.Normal,
-                color = colorResource(id = R.color.main),
+                style = ExoTypo.typo16.copy(
+                    lineHeight = 17.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = colorResource(id = R.color.main)
+                ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -285,10 +290,11 @@ fun ExoConfirmDialog(
             val scrollState = rememberScrollState()
             Text(
                 text = message,
-                fontSize = 14.sp,
-                lineHeight = 15.sp,
-                fontWeight = FontWeight.Normal,
-                color = colorResource(id = R.color.gray580),
+                style = ExoTypo.typo14.copy(
+                    lineHeight = 15.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = colorResource(id = R.color.gray580)
+                ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -325,9 +331,10 @@ fun ExoConfirmDialog(
                 ) {
                     Text(
                         text = confirmButtonText,
-                        fontSize = 14.sp,
-                        lineHeight = 15.sp,
-                        fontWeight = FontWeight.Normal
+                        style = ExoTypo.typo14.copy(
+                            lineHeight = 15.sp,
+                            fontWeight = FontWeight.Normal
+                        )
                     )
                 }
 
@@ -351,9 +358,10 @@ fun ExoConfirmDialog(
                 ) {
                     Text(
                         text = dismissButtonText,
-                        fontSize = 14.sp,
-                        lineHeight = 15.sp,
-                        fontWeight = FontWeight.Normal
+                        style = ExoTypo.typo14.copy(
+                            lineHeight = 15.sp,
+                            fontWeight = FontWeight.Normal
+                        )
                     )
                 }
             }
@@ -437,10 +445,11 @@ fun ExoConfirmDialog(
             // 타이틀
             Text(
                 text = title,
-                fontSize = 16.sp,
-                lineHeight = 17.sp,
-                fontWeight = FontWeight.Normal,
-                color = colorResource(id = R.color.main),
+                style = ExoTypo.typo16.copy(
+                    lineHeight = 17.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = colorResource(id = R.color.main)
+                ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -451,10 +460,11 @@ fun ExoConfirmDialog(
             val scrollState = rememberScrollState()
             Text(
                 text = message,
-                fontSize = 14.sp,
-                lineHeight = 15.sp,
-                fontWeight = FontWeight.Normal,
-                color = colorResource(id = R.color.gray580),
+                style = ExoTypo.typo14.copy(
+                    lineHeight = 15.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = colorResource(id = R.color.gray580)
+                ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -491,9 +501,10 @@ fun ExoConfirmDialog(
                 ) {
                     Text(
                         text = confirmButtonText,
-                        fontSize = 14.sp,
-                        lineHeight = 15.sp,
-                        fontWeight = FontWeight.Normal
+                        style = ExoTypo.typo14.copy(
+                            lineHeight = 15.sp,
+                            fontWeight = FontWeight.Normal
+                        )
                     )
                 }
 
@@ -517,9 +528,10 @@ fun ExoConfirmDialog(
                 ) {
                     Text(
                         text = dismissButtonText,
-                        fontSize = 14.sp,
-                        lineHeight = 15.sp,
-                        fontWeight = FontWeight.Normal
+                        style = ExoTypo.typo14.copy(
+                            lineHeight = 15.sp,
+                            fontWeight = FontWeight.Normal
+                        )
                     )
                 }
             }
@@ -635,10 +647,11 @@ fun ExoBurningDayDialog(
             // 타이틀
             Text(
                 text = title,
-                fontSize = 16.sp,
-                lineHeight = 17.sp,
-                fontWeight = FontWeight.Normal,
-                color = colorResource(id = R.color.main),
+                style = ExoTypo.typo16.copy(
+                    lineHeight = 17.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = colorResource(id = R.color.main)
+                ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -661,10 +674,11 @@ fun ExoBurningDayDialog(
                 // 가이드 텍스트 1 (레벨 조건)
                 Text(
                     text = guideText1,
-                    fontSize = 13.sp,
-                    lineHeight = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = colorResource(id = R.color.text_gray),
+                    style = ExoTypo.typo13.copy(
+                        lineHeight = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = colorResource(id = R.color.text_gray)
+                    ),
                     textAlign = TextAlign.Start,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -691,10 +705,11 @@ fun ExoBurningDayDialog(
                 // 가이드 텍스트 2 (다이아 비용)
                 Text(
                     text = guideText2,
-                    fontSize = 12.sp,
-                    lineHeight = 13.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = colorResource(id = R.color.gray900),
+                    style = ExoTypo.typo12.copy(
+                        lineHeight = 13.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = colorResource(id = R.color.gray900)
+                    ),
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -723,9 +738,10 @@ fun ExoBurningDayDialog(
                 ) {
                     Text(
                         text = confirmButtonText,
-                        fontSize = 14.sp,
-                        lineHeight = 15.sp,
-                        fontWeight = FontWeight.Normal
+                        style = ExoTypo.typo14.copy(
+                            lineHeight = 15.sp,
+                            fontWeight = FontWeight.Normal
+                        )
                     )
                 }
 
@@ -742,9 +758,10 @@ fun ExoBurningDayDialog(
                 ) {
                     Text(
                         text = dismissButtonText,
-                        fontSize = 14.sp,
-                        lineHeight = 15.sp,
-                        fontWeight = FontWeight.Normal
+                        style = ExoTypo.typo14.copy(
+                            lineHeight = 15.sp,
+                            fontWeight = FontWeight.Normal
+                        )
                     )
                 }
             }

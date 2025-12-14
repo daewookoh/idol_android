@@ -277,7 +277,7 @@ fun CommunityFeedSubPage(
                 ) {
                     Text(
                         text = error,
-                        style = ExoTypo.body14.copy(color = ColorPalette.textDimmed)
+                        style = ExoTypo.typo14.copy(color = ColorPalette.textDimmed)
                     )
                 }
             }
@@ -377,7 +377,7 @@ private fun FeedFilterHeader(
                         Spacer(modifier = Modifier.width(5.dp))
                         Text(
                             text = stringResource(R.string.show_background_only),
-                            style = ExoTypo.body12.copy(color = ColorPalette.textGray)
+                            style = ExoTypo.typo12.copy(color = ColorPalette.textGray)
                         )
                     }
 
@@ -403,7 +403,7 @@ private fun FeedFilterHeader(
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
                         text = getOrderByLabel(orderBy),
-                        style = ExoTypo.body12.copy(color = ColorPalette.textGray)
+                        style = ExoTypo.typo12.copy(color = ColorPalette.textGray)
                     )
                 }
             }
@@ -539,7 +539,7 @@ private fun FeedGridItem(
             ) {
                 Text(
                     text = "+$imageCount",
-                    style = ExoTypo.body11.copy(color = Color.White)
+                    style = ExoTypo.typo11.copy(color = Color.White)
                 )
             }
         }

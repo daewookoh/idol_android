@@ -1238,7 +1238,7 @@ private fun CommunityTabRow(
                 ) {
                     Text(
                         text = title,
-                        style = ExoTypo.title14.copy(
+                        style = ExoTypo.typo14Bold.copy(
                             lineHeight = 14.sp,
                             color = if (selectedTabIndex == index) ColorPalette.textDefault else ColorPalette.textDimmed
                         )
@@ -1349,9 +1349,10 @@ private fun IdolProfile(
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(
                         text = NumberFormatUtil.formatFollowerCount(idolData.mostCount),
-                        fontSize = 12.sp,
-                        lineHeight = 12.sp,
-                        color = ColorPalette.textDimmed
+                        style = ExoTypo.typo12.copy(
+                            color = ColorPalette.textDimmed,
+                            lineHeight = 12.sp
+                        )
                     )
                 }
             }
@@ -1521,9 +1522,10 @@ private fun IdolDialog(
                         if (birthday.isNotEmpty()) {
                             Text(
                                 text = birthday,
-                                fontSize = 10.sp,
-                                lineHeight = 14.sp,
-                                color = ColorPalette.textGray
+                                style = ExoTypo.typo10.copy(
+                                    color = ColorPalette.textGray,
+                                    lineHeight = 14.sp
+                                )
                             )
                         }
                     }
@@ -1532,9 +1534,10 @@ private fun IdolDialog(
                     Text(
                         text = stringResource(R.string.most_favorite) + " : " +
                                 NumberFormatUtil.formatFollowerCount(idolData.mostCount),
-                        fontSize = 10.sp,
-                        lineHeight = 14.sp,
-                        color = ColorPalette.textGray
+                        style = ExoTypo.typo10.copy(
+                            color = ColorPalette.textGray,
+                            lineHeight = 14.sp
+                        )
                     )
 
                     // 메뉴 버튼 1행 (Old: marginTop="14dp", marginStart/End="10dp", paddingStart/End="5dp")
@@ -1612,9 +1615,7 @@ private fun IdolDialog(
                         )
                         Text(
                             text = idolData.angelCount.toString(),
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorPalette.textAngel,
+                            style = ExoTypo.typo10Bold.copy(color = ColorPalette.textAngel),
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }
@@ -1633,9 +1634,7 @@ private fun IdolDialog(
                         )
                         Text(
                             text = idolData.fairyCount.toString(),
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorPalette.textFairy,
+                            style = ExoTypo.typo10Bold.copy(color = ColorPalette.textFairy),
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }
@@ -1654,9 +1653,7 @@ private fun IdolDialog(
                         )
                         Text(
                             text = idolData.miracleCount.toString(),
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorPalette.textMiracle,
+                            style = ExoTypo.typo10Bold.copy(color = ColorPalette.textMiracle),
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }
@@ -1679,9 +1676,9 @@ private fun IdolDialog(
                         )
                         Text(
                             text = if (isSuper) "S" else idolData.rookieCount.toString(),
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (isSuper) ColorPalette.textSuperRookie else ColorPalette.textRookie,
+                            style = ExoTypo.typo10Bold.copy(
+                                color = if (isSuper) ColorPalette.textSuperRookie else ColorPalette.textRookie
+                            ),
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }
@@ -1719,8 +1716,7 @@ private fun IdolDialogMenuItem(
         Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = title,
-            fontSize = 13.sp,
-            color = ColorPalette.gray580,
+            style = ExoTypo.typo13.copy(color = ColorPalette.gray580),
             textAlign = TextAlign.Center
         )
     }

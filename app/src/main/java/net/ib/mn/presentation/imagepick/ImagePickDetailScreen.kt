@@ -60,6 +60,7 @@ import net.ib.mn.domain.model.ImagePickIdolModel
 import net.ib.mn.ui.components.ExoAppBar
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.ui.components.ExoLoading
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ExoSimpleDialog
@@ -301,8 +302,7 @@ fun ImagePickDetailScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = title,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = ExoTypo.typo20Bold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -444,8 +444,7 @@ private fun ErrorView(error: String) {
     ) {
         Text(
             text = error,
-            color = colorResource(R.color.text_gray),
-            fontSize = 16.sp,
+            style = ExoTypo.typo16.copy(color = colorResource(R.color.text_gray)),
             textAlign = TextAlign.Center
         )
     }
@@ -474,9 +473,7 @@ private fun PreparingContent(
         // 제목
         Text(
             text = imagePick.title,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorResource(R.color.text_default),
+            style = ExoTypo.typo20Bold.copy(color = colorResource(R.color.text_default)),
             textAlign = TextAlign.Center
         )
 
@@ -484,8 +481,7 @@ private fun PreparingContent(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = imagePick.subtitle,
-                fontSize = 14.sp,
-                color = colorResource(R.color.text_gray),
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray)),
                 textAlign = TextAlign.Center
             )
         }
@@ -495,8 +491,7 @@ private fun PreparingContent(
         // 투표 기간
         Text(
             text = "${stringResource(R.string.onepick_period)} : ${state.periodText}",
-            fontSize = 14.sp,
-            color = colorResource(R.color.text_gray),
+            style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray)),
             textAlign = TextAlign.Center
         )
 
@@ -542,9 +537,10 @@ private fun NotifyButton(
     ) {
         Text(
             text = btnText,
-            color = Color.White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold,
+            style = ExoTypo.typo16.copy(
+                color = Color.White,
+                fontWeight = FontWeight.SemiBold
+            ),
             textAlign = TextAlign.Center
         )
     }
@@ -581,9 +577,7 @@ private fun ProgressContent(
 
         Text(
             text = roundText,
-            fontSize = 16.sp,
-            color = colorResource(R.color.main_light),
-            fontWeight = FontWeight.Bold
+            style = ExoTypo.typo16Bold.copy(color = colorResource(R.color.main_light))
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -591,9 +585,10 @@ private fun ProgressContent(
         // 질문 텍스트 (이모지 + 제목)
         Text(
             text = imagePick.title,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.White,
+            style = ExoTypo.typo16.copy(
+                fontWeight = FontWeight.Medium,
+                color = Color.White
+            ),
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 24.dp)
         )
@@ -741,8 +736,7 @@ private fun VoteButton(
             ) {
                 Text(
                     text = stringResource(R.string.see_current_ranking),
-                    fontSize = 13.sp,
-                    color = colorResource(R.color.main_light)
+                    style = ExoTypo.typo13.copy(color = colorResource(R.color.main_light))
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Icon(
@@ -787,9 +781,7 @@ private fun VoteButton(
         ) {
             Text(
                 text = btnText,
-                color = btnTextColor,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
+                style = ExoTypo.typo16Bold.copy(color = btnTextColor),
                 textAlign = TextAlign.Center
             )
         }

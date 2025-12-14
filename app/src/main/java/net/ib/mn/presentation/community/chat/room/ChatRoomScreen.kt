@@ -358,7 +358,7 @@ fun ChatRoomScreen(
                                 Column {
                                     Text(
                                         text = state.roomTitle,
-                                        style = if (isConnected) ExoTypo.title18 else ExoTypo.title14,
+                                        style = if (isConnected) ExoTypo.typo18Bold else ExoTypo.typo14Bold,
                                         color = ColorPalette.textDefault,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
@@ -372,7 +372,7 @@ fun ChatRoomScreen(
                                                 ChatSocketManager.ConnectionState.AUTH_FAILED -> "연결 끊김"
                                                 else -> ""
                                             },
-                                            style = ExoTypo.caption11,
+                                            style = ExoTypo.typo11,
                                             color = ColorPalette.textDimmed
                                         )
                                     }
@@ -480,7 +480,7 @@ fun ChatRoomScreen(
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
                                         text = stringResource(R.string.chat_connecting),
-                                        style = ExoTypo.body14,
+                                        style = ExoTypo.typo14,
                                         color = ColorPalette.fixWhite
                                     )
                                 }
@@ -627,7 +627,7 @@ private fun ChatMessageItem(
             ) {
                 Text(
                     text = formatDateHeader(message.serverTs),
-                    style = ExoTypo.caption10,
+                    style = ExoTypo.typo10,
                     color = ColorPalette.gray300
                 )
             }
@@ -649,7 +649,7 @@ private fun ChatMessageItem(
             ) {
                 Text(
                     text = stringResource(R.string.chat_deleted_message),
-                    style = ExoTypo.caption11,
+                    style = ExoTypo.typo11,
                     color = ColorPalette.textDimmed
                 )
             }
@@ -666,7 +666,7 @@ private fun ChatMessageItem(
             ) {
                 Text(
                     text = message.content,
-                    style = ExoTypo.caption11,
+                    style = ExoTypo.typo11,
                     color = ColorPalette.textDimmed,
                     textAlign = TextAlign.Center
                 )
@@ -720,7 +720,7 @@ private fun FirstJoinMessage() {
         ) {
             Text(
                 text = stringResource(R.string.chat_first_join),
-                style = ExoTypo.caption11.copy(fontWeight = FontWeight.Bold),
+                style = ExoTypo.typo11.copy(fontWeight = FontWeight.Bold),
                 color = ColorPalette.gray900
             )
         }
@@ -729,7 +729,7 @@ private fun FirstJoinMessage() {
 
         Text(
             text = stringResource(R.string.chatroom_enter_warning_msg),
-            style = ExoTypo.caption10.copy(fontSize = 8.sp),
+            style = ExoTypo.typo10.copy(fontSize = 8.sp),
             color = ColorPalette.textDimmed,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 20.dp)
@@ -766,7 +766,7 @@ private fun MyMessageBubble(
         if (isAnonymous && isStartOfGroup && member != null) {
             Text(
                 text = member.nickname,
-                style = ExoTypo.caption11.copy(fontWeight = FontWeight.Bold),
+                style = ExoTypo.typo11.copy(fontWeight = FontWeight.Bold),
                 color = ColorPalette.gray250,
                 modifier = Modifier.padding(end = 5.dp, bottom = 2.dp)
             )
@@ -780,7 +780,7 @@ private fun MyMessageBubble(
             if (isLastOfGroup) {
                 Text(
                     text = formatMessageTime(message.serverTs),
-                    style = ExoTypo.caption10,
+                    style = ExoTypo.typo10,
                     color = ColorPalette.gray300,
                     modifier = Modifier.padding(end = 3.dp)
                 )
@@ -859,7 +859,7 @@ private fun OtherMessageBubble(
 
                         Text(
                             text = member?.nickname ?: stringResource(R.string.chat_leave_user),
-                            style = ExoTypo.caption11.copy(fontWeight = FontWeight.Bold),
+                            style = ExoTypo.typo11.copy(fontWeight = FontWeight.Bold),
                             color = if (isAnonymous) ColorPalette.gray250 else ColorPalette.textChat,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -880,7 +880,7 @@ private fun OtherMessageBubble(
                     if (isLastOfGroup) {
                         Text(
                             text = formatMessageTime(message.serverTs),
-                            style = ExoTypo.caption10,
+                            style = ExoTypo.typo10,
                             color = ColorPalette.gray300,
                             modifier = Modifier.padding(start = 3.dp)
                         )
@@ -1010,7 +1010,7 @@ private fun ImageMessageContent(
                 ) {
                     Text(
                         text = "GIF",
-                        style = ExoTypo.caption10,
+                        style = ExoTypo.typo10,
                         color = Color.White
                     )
                 }
@@ -1056,7 +1056,7 @@ private fun TextMessageBubble(
     ) {
         Text(
             text = message.content,
-            style = ExoTypo.body13,
+            style = ExoTypo.typo13,
             color = if (isMyMessage) ColorPalette.fixWhite else ColorPalette.gray900
         )
     }
@@ -1092,7 +1092,7 @@ private fun ScrollToBottomButton(
             ) {
                 Text(
                     text = if (unreadCount > 99) "99+" else unreadCount.toString(),
-                    style = ExoTypo.caption10,
+                    style = ExoTypo.typo10,
                     color = ColorPalette.fixWhite
                 )
             }
@@ -1171,7 +1171,7 @@ private fun ChatInfoDrawerContent(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(R.string.chat_room_number_of_person),
-                    style = ExoTypo.body14.copy(fontWeight = FontWeight.Bold),
+                    style = ExoTypo.typo14.copy(fontWeight = FontWeight.Bold),
                     color = ColorPalette.gray900
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -1184,7 +1184,7 @@ private fun ChatInfoDrawerContent(
                 Spacer(modifier = Modifier.width(2.dp))
                 Text(
                     text = membersCount.toString(),
-                    style = ExoTypo.caption11.copy(fontWeight = FontWeight.Bold),
+                    style = ExoTypo.typo11.copy(fontWeight = FontWeight.Bold),
                     color = ColorPalette.gray300
                 )
             }
@@ -1195,7 +1195,7 @@ private fun ChatInfoDrawerContent(
 
             Text(
                 text = stringResource(R.string.chat_room_status),
-                style = ExoTypo.body14.copy(fontWeight = FontWeight.Bold),
+                style = ExoTypo.typo14.copy(fontWeight = FontWeight.Bold),
                 color = ColorPalette.gray900
             )
 
@@ -1205,7 +1205,7 @@ private fun ChatInfoDrawerContent(
                 // 그룹/멤버 공개방 - 주석처리
 //                Text(
 //                    text = "• ${if (roomInfo?.isMostOnlyRoom == true) stringResource(R.string.lable_show_private) else stringResource(R.string.chat_room_most_and_group)}",
-//                    style = ExoTypo.caption11,
+//                    style = ExoTypo.typo11,
 //                    color = ColorPalette.gray900
 //                )
 //                Spacer(modifier = Modifier.height(7.dp))
@@ -1213,14 +1213,14 @@ private fun ChatInfoDrawerContent(
                 // 닉네임/익명방 표시: isAnonymous 파라미터 사용 (roomInfo 대신)
                 Text(
                     text = "• ${if (isAnonymous) stringResource(R.string.chat_room_anonymous) else stringResource(R.string.chat_room_nickname)}",
-                    style = ExoTypo.caption11,
+                    style = ExoTypo.typo11,
                     color = ColorPalette.gray900
                 )
                 // 레벨 제한 (old 프로젝트: 항상 표시)
                 Spacer(modifier = Modifier.height(7.dp))
                 Text(
                     text = "• ${String.format(stringResource(R.string.chat_room_level_limit), roomInfo?.levelLimit ?: 0)}",
-                    style = ExoTypo.caption11,
+                    style = ExoTypo.typo11,
                     color = ColorPalette.gray900
                 )
             }
@@ -1233,7 +1233,7 @@ private fun ChatInfoDrawerContent(
 
                 Text(
                     text = stringResource(R.string.chat_room_owner),
-                    style = ExoTypo.body14.copy(fontWeight = FontWeight.Bold),
+                    style = ExoTypo.typo14.copy(fontWeight = FontWeight.Bold),
                     color = ColorPalette.gray900
                 )
 
@@ -1265,7 +1265,7 @@ private fun ChatInfoDrawerContent(
                     // Old 로직: 익명방에서도 방장 닉네임은 실제 닉네임으로 표시
                     Text(
                         text = ownerMember?.nickname ?: "",
-                        style = ExoTypo.caption11.copy(fontWeight = FontWeight.Bold),
+                        style = ExoTypo.typo11.copy(fontWeight = FontWeight.Bold),
                         color = ColorPalette.gray580
                     )
                 }
@@ -1287,7 +1287,7 @@ private fun ChatInfoDrawerContent(
         ) {
             Text(
                 text = stringResource(R.string.chat_room_leave),
-                style = ExoTypo.body14.copy(fontWeight = FontWeight.Bold),
+                style = ExoTypo.typo14.copy(fontWeight = FontWeight.Bold),
                 color = ColorPalette.gray900
             )
             Spacer(modifier = Modifier.width(7.dp))
@@ -1401,7 +1401,7 @@ private fun ReportReasonDialog(
         ) {
             Text(
                 text = stringResource(R.string.report_description),
-                style = ExoTypo.title16,
+                style = ExoTypo.typo16Bold,
                 color = ColorPalette.textDefault
             )
 
@@ -1416,11 +1416,11 @@ private fun ReportReasonDialog(
                 placeholder = {
                     Text(
                         text = stringResource(R.string.quiz_report_hint),
-                        style = ExoTypo.body14,
+                        style = ExoTypo.typo14,
                         color = ColorPalette.textDimmed
                     )
                 },
-                textStyle = ExoTypo.body14,
+                textStyle = ExoTypo.typo14,
                 colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = ColorPalette.main,
                     unfocusedBorderColor = ColorPalette.gray200
@@ -1435,7 +1435,7 @@ private fun ReportReasonDialog(
             ) {
                 Text(
                     text = stringResource(R.string.btn_cancel),
-                    style = ExoTypo.body14,
+                    style = ExoTypo.typo14,
                     color = ColorPalette.textDimmed,
                     modifier = Modifier
                         .clickable(onClick = onDismiss)
@@ -1446,7 +1446,7 @@ private fun ReportReasonDialog(
 
                 Text(
                     text = stringResource(R.string.report),
-                    style = ExoTypo.body14,
+                    style = ExoTypo.typo14,
                     color = ColorPalette.main,
                     modifier = Modifier
                         .clickable(onClick = onConfirm)

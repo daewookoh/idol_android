@@ -115,7 +115,7 @@ fun ExoBottomSheet(
                         if (title != null) {
                             Text(
                                 text = title,
-                                style = ExoTypo.body15.copy(fontWeight = FontWeight.Bold),
+                                style = ExoTypo.typo15Bold,
                                 color = ColorPalette.textGray,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
@@ -229,7 +229,7 @@ fun <T> ExoBottomSheetList(
                     ) {
                         Text(
                             text = item.label,
-                            style = ExoTypo.body14.copy(fontWeight = FontWeight.Medium),
+                            style = ExoTypo.typo14,
                             color = ColorPalette.textDefault
                         )
                         if (isSelected) {
@@ -299,7 +299,7 @@ fun ExoBottomSheetAction(
                 ) {
                     Text(
                         text = stringResource(item.labelResId),
-                        style = ExoTypo.body14.copy(fontWeight = FontWeight.Medium),
+                        style = ExoTypo.typo14,
                         color = ColorPalette.textDefault,
                         textAlign = TextAlign.Center
                     )

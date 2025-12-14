@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.ib.mn.R
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * MyInfo 페이지 하단 링크 메뉴
@@ -78,9 +79,7 @@ fun MyInfoLinks(
                     // 하트 개수 텍스트
                     Text(
                         text = "♥\uFE0E$videoAdHeartCount",
-                        color = colorResource(id = R.color.text_white_black),
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = ExoTypo.typo10Bold.copy(color = colorResource(id = R.color.text_white_black)),
                         modifier= Modifier.padding(bottom=2.dp)
                     )
                 }
@@ -144,8 +143,7 @@ private fun MyInfoLinkButton(
             // 텍스트
             Text(
                 text = stringResource(id = titleResId),
-                color = colorResource(id = R.color.text_default),
-                fontSize = 12.sp,
+                style = ExoTypo.typo12.copy(color = colorResource(id = R.color.text_default)),
                 textAlign = TextAlign.Center,
                 maxLines = 2,
                 modifier = Modifier.fillMaxWidth()

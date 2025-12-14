@@ -28,6 +28,7 @@ import net.ib.mn.R
 import net.ib.mn.domain.model.TextMenuItem
 import net.ib.mn.domain.model.TextMenuType
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * 메뉴 텍스트 아이템 컴포넌트
@@ -80,9 +81,7 @@ fun MenuTextItem(
         // 타이틀
         Text(
             text = stringResource(id = item.labelResId),
-            fontSize = 15.sp,  // Old 프로젝트와 동일
-            fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
-            color = ColorPalette.textDefault,
+            style = ExoTypo.typo15.copy(color = ColorPalette.textDefault),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)

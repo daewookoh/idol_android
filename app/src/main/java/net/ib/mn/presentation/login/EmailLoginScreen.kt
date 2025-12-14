@@ -62,6 +62,7 @@ import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ExoTitleDialog
 import net.ib.mn.ui.components.LoadingOverlay
 import net.ib.mn.ui.theme.ExodusTheme
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.KeyboardUtil
 
 /**
@@ -178,8 +179,7 @@ private fun EmailLoginContent(
                     text = stringResource(id = R.string.login_email),
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
-                    fontSize = 18.sp,
-                    color = colorResource(id = R.color.text_default)
+                    style = ExoTypo.typo18.copy(color = colorResource(id = R.color.text_default))
                 )
             }
 
@@ -269,8 +269,7 @@ private fun EmailLoginContent(
                 ) {
                     Text(
                         text = stringResource(id = R.string.text_forgot_id),
-                        fontSize = 12.sp,
-                        color = colorResource(id = R.color.text_default),
+                        style = ExoTypo.typo12.copy(color = colorResource(id = R.color.text_default)),
                         modifier = Modifier
                             .weight(1f)
                             .clickable {
@@ -290,8 +289,7 @@ private fun EmailLoginContent(
 
                     Text(
                         text = stringResource(id = R.string.text_forgot_passwd),
-                        fontSize = 12.sp,
-                        color = colorResource(id = R.color.text_default),
+                        style = ExoTypo.typo12.copy(color = colorResource(id = R.color.text_default)),
                         modifier = Modifier
                             .weight(1f)
                             .clickable {

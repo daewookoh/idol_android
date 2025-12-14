@@ -128,7 +128,7 @@ private fun RankText(rank: Int, useMainColorForTop3: Boolean = true) {
     val textColor = if (useMainColorForTop3 && rank <= 3) ColorPalette.main else ColorPalette.gray580
     Text(
         text = stringResource(R.string.rank_count_format, rank),
-        style = ExoTypo.body11.copy(color = textColor)
+        style = ExoTypo.typo11.copy(color = textColor)
     )
 }
 
@@ -159,7 +159,7 @@ private fun VoteCountOverlay(
         ) {
             ExoHeartCounter(
                 count = item.heartCount,
-                style = ExoTypo.stat11.copy(fontWeight = FontWeight.Normal, lineHeight = 17.sp)
+                style = ExoTypo.typo11Bold.copy(fontWeight = FontWeight.Normal, lineHeight = 17.sp)
             )
         }
     }
@@ -181,7 +181,7 @@ private fun RankAndNameRow(
     ) {
         Text(
             text = if (rank == 0) "-" else stringResource(R.string.rank_count_format, rank),
-            style = ExoTypo.title15
+            style = ExoTypo.typo15Bold
         )
         Spacer(modifier = Modifier.width(5.dp))
         ExoNameWithGroup(fullName = name, nameFontSize = nameFontSize, groupFontSize = groupFontSize)
@@ -613,7 +613,7 @@ fun LazyListScope.cumulativeRankingItems(
                                                 text = remember(item.difference) {
                                                     NumberFormatUtil.formatWithComma(item.difference)
                                                 },
-                                                style = ExoTypo.label9.copy(color = ColorPalette.textDefault)
+                                                style = ExoTypo.typo9.copy(color = ColorPalette.textDefault)
                                             )
                                         }
                                     }
@@ -639,8 +639,8 @@ fun LazyListScope.cumulativeRankingItems(
                         ExoNameWithGroup(fullName = item.name, nameFontSize = 14.sp, groupFontSize = 10.sp)
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            ExoHeartCounter(count = item.heartCount, style = ExoTypo.body11.copy(color = ColorPalette.textGray))
-                            Text(text = countSuffix, style = ExoTypo.body11.copy(color = ColorPalette.textGray))
+                            ExoHeartCounter(count = item.heartCount, style = ExoTypo.typo11.copy(color = ColorPalette.textGray))
+                            Text(text = countSuffix, style = ExoTypo.typo11.copy(color = ColorPalette.textGray))
                         }
                     }
 
@@ -658,7 +658,7 @@ fun LazyListScope.cumulativeRankingItems(
                             )
                             Text(
                                 text = stringResource(R.string.label_rising, item.difference),
-                                style = ExoTypo.label10.copy(
+                                style = ExoTypo.typo10Bold.copy(
                                     color = ColorPalette.mainLight,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -826,7 +826,7 @@ private fun RankingBadges(item: RankingItem) {
                 )
                 Text(
                     text = remember(item.angelCount) { item.angelCount.toString() },
-                    style = ExoTypo.label7.copy(color = ColorPalette.textAngel),
+                    style = ExoTypo.typo7Bold.copy(color = ColorPalette.textAngel),
                     modifier = Modifier.offset(y = 5.dp)
                 )
             }
@@ -846,7 +846,7 @@ private fun RankingBadges(item: RankingItem) {
                 )
                 Text(
                     text = remember(item.fairyCount) { item.fairyCount.toString() },
-                    style = ExoTypo.label7.copy(color = ColorPalette.textFairy),
+                    style = ExoTypo.typo7Bold.copy(color = ColorPalette.textFairy),
                     modifier = Modifier.offset(y = 5.dp)
                 )
             }
@@ -866,7 +866,7 @@ private fun RankingBadges(item: RankingItem) {
                 )
                 Text(
                     text = remember(item.miracleCount) { item.miracleCount.toString() },
-                    style = ExoTypo.label7.copy(color = ColorPalette.textMiracle),
+                    style = ExoTypo.typo7Bold.copy(color = ColorPalette.textMiracle),
                     modifier = Modifier.offset(y = 5.dp)
                 )
             }
@@ -892,7 +892,7 @@ private fun RankingBadges(item: RankingItem) {
                     text = remember(item.rookieCount, isSuper) {
                         if (isSuper) "S" else item.rookieCount.toString()
                     },
-                    style = ExoTypo.label7.copy(
+                    style = ExoTypo.typo7Bold.copy(
                         color = if (isSuper) ColorPalette.textSuperRookie else ColorPalette.textRookie
                     ),
                     modifier = Modifier.offset(y = 5.dp)
@@ -914,7 +914,7 @@ private fun RankingBadges(item: RankingItem) {
                 )
                 Text(
                     text = "S",
-                    style = ExoTypo.label7.copy(color = ColorPalette.textSuperRookie),
+                    style = ExoTypo.typo7Bold.copy(color = ColorPalette.textSuperRookie),
                     modifier = Modifier.offset(y = 5.dp)
                 )
             }
@@ -965,7 +965,7 @@ fun HofAccumulativeTop1RankingItem(
             // 기간 텍스트
             Text(
                 text = period,
-                style = ExoTypo.body14.copy(color = ColorPalette.textDimmed),
+                style = ExoTypo.typo14.copy(color = ColorPalette.textDimmed),
                 modifier = Modifier.align(Alignment.Center)
             )
 
@@ -1104,7 +1104,7 @@ fun HofAccumulativeTop1RankingItem(
                                         text = remember(item.difference) {
                                             NumberFormatUtil.formatWithComma(item.difference)
                                         },
-                                        style = ExoTypo.label9.copy(color = ColorPalette.gray580)
+                                        style = ExoTypo.typo9.copy(color = ColorPalette.gray580)
                                     )
                                 }
                             }
@@ -1114,10 +1114,8 @@ fun HofAccumulativeTop1RankingItem(
                     // "1위" 텍스트 (old: title_rank)
                     Text(
                         text = stringResource(R.string.first_rank),
-                        style = ExoTypo.title15.copy(
-                            fontSize = 17.sp,
-                            color = ColorPalette.mainLight,
-                            fontWeight = FontWeight.Bold
+                        style = ExoTypo.typo17Bold.copy(
+                            color = ColorPalette.mainLight
                         )
                     )
 
@@ -1142,10 +1140,8 @@ fun HofAccumulativeTop1RankingItem(
                     }
                     Text(
                         text = scoreText,
-                        style = ExoTypo.title15.copy(
-                            fontSize = 16.sp,
-                            color = ColorPalette.mainLight,
-                            fontWeight = FontWeight.Bold
+                        style = ExoTypo.typo16Bold.copy(
+                            color = ColorPalette.mainLight
                         )
                     )
                 }
@@ -1167,7 +1163,7 @@ fun HofAccumulativeTop1RankingItem(
                     )
                     Text(
                         text = stringResource(R.string.label_rising, item.difference),
-                        style = ExoTypo.label10.copy(
+                        style = ExoTypo.typo10Bold.copy(
                             color = ColorPalette.mainLight,
                             fontWeight = FontWeight.Bold
                         )
@@ -1207,8 +1203,7 @@ fun HeartPickRankingItem(
         // 순위 번호 (왼쪽 큰 숫자)
         Text(
             text = "${item.rank}",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
+            style = ExoTypo.typo16Bold,
             modifier = Modifier.width(24.dp)
         )
 
@@ -1299,7 +1294,7 @@ fun HeartPickRankingItem(
                     ) {
                         ExoHeartCounter(
                             count = item.heartCount,
-                            style = ExoTypo.body11.copy(
+                            style = ExoTypo.typo11.copy(
                                 lineHeight = 17.sp,
                                 color = ColorPalette.textWhiteBlack
                             ),
@@ -1316,7 +1311,7 @@ fun HeartPickRankingItem(
                     ) {
                         Text(
                             text = percentageText,
-                            style = ExoTypo.body11.copy(
+                            style = ExoTypo.typo11.copy(
                                 lineHeight = 17.sp,
                                 color = ColorPalette.textDimmed
                             ),
@@ -1495,7 +1490,7 @@ private fun HeartPickDetail1stRankingItem(
                         ) {
                             ExoHeartCounter(
                                 count = item.heartCount,
-                                style = ExoTypo.body11.copy(
+                                style = ExoTypo.typo11.copy(
                                     lineHeight = 17.sp,
                                     color = ColorPalette.textWhiteBlack
                                 ),
@@ -1512,7 +1507,7 @@ private fun HeartPickDetail1stRankingItem(
                         ) {
                             Text(
                                 text = percentageText,
-                                style = ExoTypo.body11.copy(
+                                style = ExoTypo.typo11.copy(
                                     lineHeight = 17.sp,
                                     color = ColorPalette.textDimmed
                                 ),
@@ -1613,8 +1608,7 @@ private fun HeartPickDetailOtherRankingItem(
         // 순위 번호 (왼쪽 큰 숫자) - HeartPickRankingItem과 동일
         Text(
             text = "${item.rank}",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
+            style = ExoTypo.typo16Bold,
             textAlign = TextAlign.Center,
             modifier = Modifier.width(40.dp)
         )
@@ -1706,7 +1700,7 @@ private fun HeartPickDetailOtherRankingItem(
                     ) {
                         ExoHeartCounter(
                             count = item.heartCount,
-                            style = ExoTypo.body11.copy(
+                            style = ExoTypo.typo11.copy(
                                 lineHeight = 17.sp,
                                 color = ColorPalette.textWhiteBlack
                             ),
@@ -1723,7 +1717,7 @@ private fun HeartPickDetailOtherRankingItem(
                     ) {
                         Text(
                             text = percentageText,
-                            style = ExoTypo.body11.copy(
+                            style = ExoTypo.typo11.copy(
                                 lineHeight = 17.sp,
                                 color = ColorPalette.textDimmed
                             ),
@@ -1882,7 +1876,7 @@ fun HofDailyRankingItem(
                             ) {
                                 Text(
                                     text = "${days}${stringResource(R.string.lable_day)}",
-                                    style = ExoTypo.body7.copy(
+                                    style = ExoTypo.typo7.copy(
                                         color = ColorPalette.textWhiteBlack,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -1952,7 +1946,7 @@ fun HofDailyRankingItem(
                     }
                     Text(
                         text = stringResource(R.string.vote_count_format, voteCountText),
-                        style = ExoTypo.body13.copy(color = ColorPalette.gray580),
+                        style = ExoTypo.typo13.copy(color = ColorPalette.gray580),
                         modifier = Modifier.weight(1f),
                         maxLines = 1,
                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
@@ -1989,7 +1983,7 @@ fun HofDailyRankingItem(
                     }
                     Text(
                         text = dateText,
-                        style = ExoTypo.body12.copy(color = ColorPalette.gray580)
+                        style = ExoTypo.typo12.copy(color = ColorPalette.gray580)
                     )
                 }
             }
@@ -2152,7 +2146,7 @@ private fun ThemePick1stRankingItem(
                             ) {
                                 ExoHeartCounter(
                                     count = item.heartCount,
-                                    style = ExoTypo.body11.copy(
+                                    style = ExoTypo.typo11.copy(
                                         lineHeight = 17.sp,
                                         color = ColorPalette.textWhiteBlack
                                     ),
@@ -2168,7 +2162,7 @@ private fun ThemePick1stRankingItem(
                             ) {
                                 Text(
                                     text = percentageText,
-                                    style = ExoTypo.body11.copy(
+                                    style = ExoTypo.typo11.copy(
                                         lineHeight = 17.sp,
                                         color = ColorPalette.textDimmed
                                     ),
@@ -2353,7 +2347,7 @@ private fun ThemePickOtherRankingItem(
                     ) {
                         ExoHeartCounter(
                             count = item.heartCount,
-                            style = ExoTypo.body11.copy(
+                            style = ExoTypo.typo11.copy(
                                 lineHeight = 17.sp,
                                 color = ColorPalette.textWhiteBlack
                             ),
@@ -2369,7 +2363,7 @@ private fun ThemePickOtherRankingItem(
                     ) {
                         Text(
                             text = percentageText,
-                            style = ExoTypo.body11.copy(
+                            style = ExoTypo.typo11.copy(
                                 lineHeight = 17.sp,
                                 color = ColorPalette.textDimmed
                             ),

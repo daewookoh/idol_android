@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import net.ib.mn.R
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * 테마픽 카드 상태
@@ -239,9 +240,7 @@ private fun ThemePickUpcomingCard(
                 // 제목
                 Text(
                     text = title,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = ColorPalette.mainLight,
+                    style = ExoTypo.typo16Bold.copy(color = ColorPalette.mainLight),
                     modifier = Modifier
                         .padding(start = 16.dp)
                         .padding(top = 10.dp)
@@ -250,10 +249,10 @@ private fun ThemePickUpcomingCard(
                 // 부제목 (D-Day)
                 Text(
                     text = subTitle,
-                    fontSize = 21.sp,
-                    lineHeight = 21.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = ColorPalette.mainLight,
+                    style = ExoTypo.typo21Bold.copy(
+                        lineHeight = 21.sp,
+                        color = ColorPalette.mainLight
+                    ),
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -264,10 +263,11 @@ private fun ThemePickUpcomingCard(
                 // 투표 기간
                 Text(
                     text = "${stringResource(R.string.onepick_period)} : $periodDate",
-                    fontSize = 12.sp,
-                    lineHeight = 12.sp,
-                    letterSpacing = (-0.5).sp,
-                    color = ColorPalette.textDimmed,
+                    style = ExoTypo.typo12.copy(
+                        lineHeight = 12.sp,
+                        letterSpacing = (-0.5).sp,
+                        color = ColorPalette.textDimmed
+                    ),
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -368,8 +368,7 @@ private fun ThemePickActiveCard(
                     ) {
                         Text(
                             text = stringResource(R.string.see_current_ranking),
-                            fontSize = 13.sp,
-                            color = ColorPalette.mainLight
+                            style = ExoTypo.typo13.copy(color = ColorPalette.mainLight)
                         )
                         Spacer(modifier = Modifier.width(3.dp))
                         Icon(
@@ -446,9 +445,7 @@ private fun ThemePickCardContent(
     // 제목
     Text(
         text = title,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Bold,
-        color = ColorPalette.mainLight,
+        style = ExoTypo.typo16Bold.copy(color = ColorPalette.mainLight),
         modifier = Modifier
             .padding(start = 16.dp)
             .padding(top = 10.dp)
@@ -457,9 +454,10 @@ private fun ThemePickCardContent(
     // 투표 기간
     Text(
         text = "${stringResource(R.string.onepick_period)} : $periodDate",
-        fontSize = 13.sp,
-        lineHeight = 13.sp,
-        color = ColorPalette.textDefault,
+        style = ExoTypo.typo13.copy(
+            lineHeight = 13.sp,
+            color = ColorPalette.textDefault
+        ),
         modifier = Modifier
             .padding(start = 16.dp)
             .padding(top = 10.dp)
@@ -468,9 +466,10 @@ private fun ThemePickCardContent(
     // 전체 투표수
     Text(
         text = "${stringResource(R.string.themepick_total_votes)} : $voteCount${stringResource(R.string.votes)}",
-        fontSize = 13.sp,
-        lineHeight = 13.sp,
-        color = ColorPalette.textDefault,
+        style = ExoTypo.typo13.copy(
+            lineHeight = 13.sp,
+            color = ColorPalette.textDefault
+        ),
         modifier = Modifier
             .padding(start = 16.dp)
             .padding(top = 6.dp)

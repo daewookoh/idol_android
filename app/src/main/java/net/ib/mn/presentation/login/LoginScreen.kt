@@ -84,6 +84,7 @@ import net.ib.mn.ui.components.ExoDialog
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.LoadingOverlay
 import net.ib.mn.ui.theme.ExodusTheme
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.Constants
 
 /**
@@ -732,9 +733,7 @@ private fun LoginContent(
             // "시작하기" 텍스트
             Text(
                 text = stringResource(id = R.string.login_desc),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorResource(id = R.color.text_default),
+                style = ExoTypo.typo20Bold.copy(color = colorResource(id = R.color.text_default)),
                 textAlign = TextAlign.Center
             )
 
@@ -790,8 +789,7 @@ private fun LoginContent(
             // Email 로그인 링크
             Text(
                 text = stringResource(id = R.string.login_email),
-                fontSize = 13.sp,
-                color = colorResource(id = R.color.text_gray),
+                style = ExoTypo.typo13.copy(color = colorResource(id = R.color.text_gray)),
                 modifier = Modifier
                     .clickable {
                         onIntent(LoginContract.Intent.NavigateToEmailLogin)

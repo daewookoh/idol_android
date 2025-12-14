@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ProfileImageType
+import net.ib.mn.ui.theme.ExoTypo
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
@@ -134,8 +135,7 @@ fun IdolRankingHistoryScreen(
                     ) {
                         Text(
                             text = stringResource(R.string.title_rank_history) + " - ",
-                            fontSize = 18.sp,
-                            lineHeight = 18.sp,
+                            style = ExoTypo.typo18,
                             color = ColorPalette.textDefault,
                             maxLines = 1,
                             modifier = Modifier.alignByBaseline()
@@ -143,16 +143,14 @@ fun IdolRankingHistoryScreen(
 
                         Text(
                             text = displayIdolName,
-                            fontSize = 18.sp,
-                            lineHeight = 18.sp,
+                            style = ExoTypo.typo18,
                             modifier = Modifier.alignByBaseline()
                         )
 
                         if (displayGroupName.isNotEmpty()) {
                             Text(
                                 text = " $displayGroupName",
-                                fontSize = 10.sp,
-                                lineHeight = 18.sp,
+                                style = ExoTypo.typo10,
                                 modifier = Modifier.alignByBaseline()
                             )
                         }
@@ -192,8 +190,7 @@ fun IdolRankingHistoryScreen(
                     ) {
                         Text(
                             text = stringResource(R.string.no_data),
-                            color = ColorPalette.textGray,
-                            fontSize = 14.sp
+                            style = ExoTypo.typo14Gray
                         )
                     }
                 } else {
@@ -387,17 +384,14 @@ private fun IdolRankingHistoryChart(
         // 평균 일수 타이틀
         Text(
             text = stringResource(R.string.rank_history_30_average, items.size.toString()),
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Bold,
-            color = ColorPalette.main,
+            style = ExoTypo.typo15Main,
             textAlign = TextAlign.Center
         )
 
         // 평균 투표수
         Text(
             text = stringResource(R.string.vote_count_format, numberFormat.format(averageHeart)),
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold,
+            style = ExoTypo.typo13Bold,
             color = ColorPalette.gray900,
             textAlign = TextAlign.Center
         )
@@ -452,12 +446,8 @@ private fun IdolRankingHistoryItem(
             )
             Text(
                 text = rankText,
-                fontSize = 13.sp,
-                color = ColorPalette.main,
                 maxLines = 1,
-                style = TextStyle(
-                    platformStyle = PlatformTextStyle(includeFontPadding = false)
-                )
+                style = ExoTypo.typo13Main
             )
 
             Spacer(modifier = Modifier.height(2.dp))
@@ -490,12 +480,8 @@ private fun IdolRankingHistoryItem(
                     val changeRankingCount = numberFormat.format(item.difference.toLong())
                     Text(
                         text = changeRankingCount,
-                        fontSize = 9.sp,
-                        color = ColorPalette.textDefault,
                         maxLines = 1,
-                        style = TextStyle(
-                            platformStyle = PlatformTextStyle(includeFontPadding = false)
-                        )
+                        style = ExoTypo.typo9
                     )
                 }
             }
@@ -520,12 +506,8 @@ private fun IdolRankingHistoryItem(
             if (dateText.isNotEmpty()) {
                 Text(
                     text = dateText,
-                    fontSize = 12.sp,
-                    color = ColorPalette.textDefault,
                     maxLines = 1,
-                    style = TextStyle(
-                        platformStyle = PlatformTextStyle(includeFontPadding = false)
-                    )
+                    style = ExoTypo.typo12
                 )
             }
 
@@ -543,31 +525,19 @@ private fun IdolRankingHistoryItem(
                 }
                 Text(
                     text = scoreText,
-                    fontSize = 12.sp,
-                    color = ColorPalette.main,
-                    style = TextStyle(
-                        platformStyle = PlatformTextStyle(includeFontPadding = false)
-                    )
+                    style = ExoTypo.typo12Main
                 )
 
                 Text(
                     text = " / ",
-                    fontSize = 12.sp,
-                    color = ColorPalette.textGray,
-                    style = TextStyle(
-                        platformStyle = PlatformTextStyle(includeFontPadding = false)
-                    )
+                    style = ExoTypo.typo12Gray
                 )
 
                 // 투표수
                 val voteCountComma = numberFormat.format(item.heart)
                 Text(
                     text = stringResource(R.string.vote_count_format, voteCountComma),
-                    fontSize = 12.sp,
-                    color = ColorPalette.textGray,
-                    style = TextStyle(
-                        platformStyle = PlatformTextStyle(includeFontPadding = false)
-                    )
+                    style = ExoTypo.typo12Gray
                 )
             }
         }

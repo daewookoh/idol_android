@@ -215,11 +215,11 @@ fun ChatRoomCreateScreen(
                     } else {
                         Text(
                             text = String.format(stringResource(R.string.chat_room_make_button), state.diamondCost),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Normal,
-                            color = ColorPalette.textWhiteBlack,
-                            textAlign = TextAlign.Center,
-                            lineHeight = 18.sp
+                            style = ExoTypo.typo14.copy(
+                                color = ColorPalette.textWhiteBlack,
+                                lineHeight = 18.sp
+                            ),
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
@@ -291,7 +291,7 @@ fun ChatRoomCreateScreen(
                 // 필수항목 안내
                 Text(
                     text = stringResource(R.string.chat_room_require),
-                    style = ExoTypo.caption11.copy(fontWeight = FontWeight.Bold),
+                    style = ExoTypo.typo11.copy(fontWeight = FontWeight.Bold),
                     color = ColorPalette.main,
                     modifier = Modifier.padding(start = 10.dp)
                 )
@@ -339,8 +339,7 @@ private fun InputFieldWithTitle(
                 if (isRequired) {
                     Text(
                         text = "*",
-                        fontSize = 14.sp,
-                        color = ColorPalette.main,
+                        style = ExoTypo.typo14.copy(color = ColorPalette.main),
                         modifier = Modifier.width(8.5.dp)
                     )
                 } else {
@@ -348,15 +347,12 @@ private fun InputFieldWithTitle(
                 }
                 Text(
                     text = title,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = ColorPalette.gray1000
+                    style = ExoTypo.typo14Bold.copy(color = ColorPalette.gray1000)
                 )
             }
             Text(
                 text = counterText,
-                fontSize = 12.sp,
-                color = ColorPalette.gray200
+                style = ExoTypo.typo12.copy(color = ColorPalette.gray200)
             )
         }
 
@@ -377,7 +373,7 @@ private fun InputFieldWithTitle(
                         onFocusLost?.invoke()
                     }
                 },
-            textStyle = TextStyle(fontSize = 14.sp, color = ColorPalette.gray1000),
+            textStyle = ExoTypo.typo14.copy(color = ColorPalette.gray1000),
             cursorBrush = SolidColor(ColorPalette.main),
             singleLine = singleLine,
             keyboardOptions = KeyboardOptions(imeAction = if (singleLine) ImeAction.Next else ImeAction.Default),
@@ -386,8 +382,7 @@ private fun InputFieldWithTitle(
                     if (value.isEmpty()) {
                         Text(
                             text = hint,
-                            fontSize = 14.sp,
-                            color = ColorPalette.gray200
+                            style = ExoTypo.typo14.copy(color = ColorPalette.gray200)
                         )
                     }
                     innerTextField()
@@ -412,8 +407,7 @@ private fun SelectFieldWithTitle(
                 if (isRequired) {
                     Text(
                         text = "*",
-                        fontSize = 14.sp,
-                        color = ColorPalette.main,
+                        style = ExoTypo.typo14.copy(color = ColorPalette.main),
                         modifier = Modifier.width(8.5.dp)
                     )
                 } else {
@@ -421,9 +415,7 @@ private fun SelectFieldWithTitle(
                 }
                 Text(
                     text = title,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = ColorPalette.gray1000
+                    style = ExoTypo.typo14Bold.copy(color = ColorPalette.gray1000)
                 )
             }
             Spacer(modifier = Modifier.height(5.dp))
@@ -453,8 +445,9 @@ private fun SelectFieldWithTitle(
             ) {
                 Text(
                     text = value,
-                    fontSize = 14.sp,
-                    color = if (enabled) ColorPalette.gray1000 else ColorPalette.textDimmed
+                    style = ExoTypo.typo14.copy(
+                        color = if (enabled) ColorPalette.gray1000 else ColorPalette.textDimmed
+                    )
                 )
                 if (enabled && onClick != null) {
                     Icon(
@@ -491,17 +484,14 @@ private fun ChatRoomCreateInstructionDialog(
             // 타이틀
             Text(
                 text = stringResource(R.string.chat_make),
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold,
-                color = ColorPalette.main,
+                style = ExoTypo.typo17Bold.copy(color = ColorPalette.main),
                 modifier = Modifier.padding(vertical = 20.dp)
             )
 
             // Important 라벨
             Text(
                 text = stringResource(R.string.important),
-                fontSize = 14.sp,
-                color = ColorPalette.gray1000,
+                style = ExoTypo.typo14.copy(color = ColorPalette.gray1000),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 20.dp, top = 5.dp, end = 20.dp)
@@ -555,8 +545,7 @@ private fun ChatRoomCreateInstructionDialog(
                 ) {
                     Text(
                         text = stringResource(R.string.lable_do_not_read),
-                        fontSize = 14.sp,
-                        color = ColorPalette.gray300
+                        style = ExoTypo.typo14.copy(color = ColorPalette.gray300)
                     )
                 }
 
@@ -578,8 +567,7 @@ private fun ChatRoomCreateInstructionDialog(
                 ) {
                     Text(
                         text = stringResource(R.string.btn_confirm),
-                        fontSize = 14.sp,
-                        color = ColorPalette.gray300
+                        style = ExoTypo.typo14.copy(color = ColorPalette.gray300)
                     )
                 }
             }
@@ -610,9 +598,10 @@ private fun InstructionItem(
         Spacer(modifier = Modifier.width(5.dp))
         Text(
             text = text,
-            fontSize = 12.sp,
-            color = ColorPalette.gray1000,
-            lineHeight = 16.sp
+            style = ExoTypo.typo12.copy(
+                color = ColorPalette.gray1000,
+                lineHeight = 16.sp
+            )
         )
     }
 }

@@ -27,6 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import net.ib.mn.presentation.awards.AwardsViewModel
 import net.ib.mn.ui.theme.LocalDarkTheme
+import net.ib.mn.ui.theme.ExoTypo
 
 private val FixBlack = Color(0xFF000000)
 private val FixWhite = Color(0xFFFFFFFF)
@@ -86,11 +87,11 @@ fun AwardsGuideSubPage(
             // 어워즈 타이틀
             Text(
                 text = guideData?.getOrNull(0).orEmpty(),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = FixWhite,
-                textAlign = TextAlign.Center,
-                lineHeight = 24.sp
+                style = ExoTypo.typo20Bold.copy(
+                    color = FixWhite,
+                    lineHeight = 24.sp
+                ),
+                textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -98,10 +99,11 @@ fun AwardsGuideSubPage(
             // 어워즈 설명
             Text(
                 text = guideData?.getOrNull(1).orEmpty(),
-                fontSize = 12.sp,
-                color = FixWhite,
-                textAlign = TextAlign.Center,
-                lineHeight = 16.sp
+                style = ExoTypo.typo12.copy(
+                    color = FixWhite,
+                    lineHeight = 16.sp
+                ),
+                textAlign = TextAlign.Center
             )
         }
 
@@ -153,10 +155,10 @@ private fun GuideSection(
         if (title.isNotEmpty()) {
             Text(
                 text = title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = FixWhite,
-                lineHeight = 18.sp
+                style = ExoTypo.typo14Bold.copy(
+                    color = FixWhite,
+                    lineHeight = 18.sp
+                )
             )
         }
 
@@ -164,9 +166,10 @@ private fun GuideSection(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = content,
-                fontSize = 12.sp,
-                color = FixWhite,
-                lineHeight = 16.sp
+                style = ExoTypo.typo12.copy(
+                    color = FixWhite,
+                    lineHeight = 16.sp
+                )
             )
         }
     }

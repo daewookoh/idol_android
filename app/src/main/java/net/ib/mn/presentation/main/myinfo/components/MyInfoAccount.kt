@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import net.ib.mn.R
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ProfileImageType
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * MyInfo 페이지 상단 계정 정보 섹션
@@ -60,8 +61,7 @@ fun MyInfoAccount(
             Text(
                 text = subscriptionName,
                 modifier = Modifier.clickable { onSubscriptionBadgeClick() },
-                color = colorResource(id = R.color.text_white_black),
-                fontSize = 10.sp,
+                style = ExoTypo.typo10.copy(color = colorResource(id = R.color.text_white_black)),
                 lineHeight = 10.sp
             )
         }
@@ -137,9 +137,7 @@ fun MyInfoAccount(
                     // name (18sp, bold)
                     Text(
                         text = userName,
-                        color = colorResource(id = R.color.text_default),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = ExoTypo.typo14Bold.copy(color = colorResource(id = R.color.text_default)),
                         lineHeight = 14.sp
                     )
                 }
@@ -161,9 +159,7 @@ fun MyInfoAccount(
                                 }
                             }
                         },
-                    color = colorResource(id = R.color.text_default),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = ExoTypo.typo14Bold.copy(color = colorResource(id = R.color.text_default)),
                     lineHeight = 14.sp
                 )
             }

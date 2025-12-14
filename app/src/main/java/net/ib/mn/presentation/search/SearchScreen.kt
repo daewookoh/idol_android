@@ -51,6 +51,7 @@ import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.common.InAppBannerSection
 import net.ib.mn.presentation.common.SearchBar
 import net.ib.mn.ui.components.ExoScaffold
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * 검색 화면
@@ -247,8 +248,7 @@ private fun TrendsContent(
             item {
                 Text(
                     text = stringResource(id = R.string.search_hot_trend),
-                    color = colorResource(id = R.color.text_gray),
-                    fontSize = 14.sp,
+                    style = ExoTypo.typo14.copy(color = colorResource(id = R.color.text_gray)),
                     modifier = Modifier.padding(start = 20.dp, top = 25.dp)
                 )
             }
@@ -284,8 +284,7 @@ private fun HistoryContent(
         item {
             Text(
                 text = stringResource(id = R.string.search_history),
-                color = colorResource(id = R.color.text_gray),
-                fontSize = 14.sp,
+                style = ExoTypo.typo14.copy(color = colorResource(id = R.color.text_gray)),
                 modifier = Modifier.padding(start = 20.dp, top = 25.dp)
             )
         }
@@ -327,14 +326,12 @@ private fun HotTrendItem(
         ) {
             Text(
                 text = "$rank",
-                color = colorResource(id = R.color.main_light),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(id = R.color.main_light))
             )
             Spacer(modifier = Modifier.width(17.dp))
             Text(
                 text = text,
-                color = colorResource(id = R.color.text_gray),
-                fontSize = 12.sp,
+                style = ExoTypo.typo12.copy(color = colorResource(id = R.color.text_gray)),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -379,8 +376,7 @@ private fun RecentSearchItem(
             Spacer(modifier = Modifier.width(17.dp))
             Text(
                 text = keyword,
-                color = colorResource(id = R.color.text_gray),
-                fontSize = 12.sp,
+                style = ExoTypo.typo12.copy(color = colorResource(id = R.color.text_gray)),
                 modifier = Modifier.weight(1f),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -451,8 +447,7 @@ private fun SuggestionItem(
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = text,
-            color = colorResource(id = R.color.gray580),
-            fontSize = 14.sp,
+            style = ExoTypo.typo14.copy(color = colorResource(id = R.color.gray580)),
             modifier = Modifier.weight(1f),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis

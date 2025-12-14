@@ -276,7 +276,7 @@ fun ExoArticle(
 
                         Text(
                             text = article.user?.nickname ?: "",
-                            style = ExoTypo.body14Main,
+                            style = ExoTypo.typo14Main,
                             modifier = Modifier.clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
@@ -304,7 +304,7 @@ fun ExoArticle(
                     ) {
                         Text(
                             text = createdAt,
-                            style = ExoTypo.body12
+                            style = ExoTypo.typo12
                         )
 
                         if (article.isMostOnly == "Y") {
@@ -344,7 +344,7 @@ fun ExoArticle(
                 ) {
                     Text(
                         text = tag,
-                        style = ExoTypo.label13.copy(fontWeight = FontWeight.Medium)
+                        style = ExoTypo.typo13Bold.copy(fontWeight = FontWeight.Medium)
                     )
                 }
                 Spacer(modifier = Modifier.height(3.dp))
@@ -369,7 +369,7 @@ fun ExoArticle(
 
                     Text(
                         text = article.title!!,
-                        style = ExoTypo.title15Default,
+                        style = ExoTypo.typo15Bold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -385,7 +385,7 @@ fun ExoArticle(
             if (displayContent.isNotEmpty()) {
                 Text(
                     text = displayContent,
-                    style = ExoTypo.body14,
+                    style = ExoTypo.typo14,
                     maxLines = if (isExpanded) Int.MAX_VALUE else 3,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
@@ -396,7 +396,7 @@ fun ExoArticle(
                 if (!isExpanded && displayContent.length > 100) {
                     Text(
                         text = "... 더보기",
-                        style = ExoTypo.body13.copy(color = ColorPalette.textDimmed),
+                        style = ExoTypo.typo13.copy(color = ColorPalette.textDimmed),
                         modifier = Modifier
                             .padding(start = 20.dp, top = 13.dp, end = 20.dp)
                             .clickable { isExpanded = true }
@@ -441,7 +441,7 @@ fun ExoArticle(
 
                 Text(
                     text = translateButtonText,
-                    style = ExoTypo.body12.copy(color = ColorPalette.textGray),
+                    style = ExoTypo.typo12.copy(color = ColorPalette.textGray),
                     modifier = Modifier
                         .padding(start = 20.dp, top = 6.dp, end = 20.dp, bottom = 6.dp)
                         .clickable(enabled = translateState != ArticleTranslateState.TRANSLATING) {
@@ -634,7 +634,7 @@ private fun ArticleMediaSection(
             ) {
                 Text(
                     text = "${pagerState.currentPage + 1}/${mediaFiles.size}",
-                    style = ExoTypo.stat10.copy(color = ColorPalette.textWhiteBlack),
+                    style = ExoTypo.typo10Bold.copy(color = ColorPalette.textWhiteBlack),
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
@@ -755,7 +755,7 @@ private fun ArticleMediaItem(
         if (media.isVideo && displayDuration.isNotEmpty()) {
             Text(
                 text = displayDuration,
-                style = ExoTypo.body12.copy(
+                style = ExoTypo.typo12.copy(
                     color = Color.White,
                     shadow = Shadow(
                         color = Color.Black,
@@ -782,7 +782,7 @@ private fun ArticleMediaItem(
             ) {
                 Text(
                     text = "GIF",
-                    style = ExoTypo.stat10.copy(color = Color.White)
+                    style = ExoTypo.typo10Bold.copy(color = Color.White)
                 )
             }
         }
@@ -827,7 +827,7 @@ private fun ArticleStatItem(
         Spacer(modifier = Modifier.width(3.dp))
         Text(
             text = NumberFormatUtil.formatWithComma(count.toLong()),
-            style = ExoTypo.stat13
+            style = ExoTypo.typo13
         )
     }
 }
@@ -864,7 +864,7 @@ private fun ArticleActionButton(
             Spacer(modifier = Modifier.width(7.dp))
             Text(
                 text = label,
-                style = ExoTypo.body14.copy(color = ColorPalette.textGray)
+                style = ExoTypo.typo14.copy(color = ColorPalette.textGray)
             )
         }
     }

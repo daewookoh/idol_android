@@ -65,6 +65,7 @@ import net.ib.mn.ui.components.HeartPickVoteCompleteBottomSheet
 import net.ib.mn.ui.components.HeartPickDetailRankingItem
 import net.ib.mn.ui.components.ProfileImageType
 import net.ib.mn.ui.components.RankingItem
+import net.ib.mn.ui.theme.ExoTypo
 import java.text.NumberFormat
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -264,8 +265,7 @@ fun HeartPickDetailScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = title,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = ExoTypo.typo20Bold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -380,8 +380,7 @@ private fun ErrorView(error: String) {
     ) {
         Text(
             text = error,
-            color = colorResource(R.color.text_gray),
-            fontSize = 16.sp,
+            style = ExoTypo.typo16.copy(color = colorResource(R.color.text_gray)),
             textAlign = TextAlign.Center
         )
     }
@@ -439,9 +438,7 @@ private fun HeartPickBanner(
             Spacer(modifier = Modifier.width(3.dp))
             Text(
                 text = dDayText,
-                color = Color.White,
-                fontSize = 12.sp,
-                lineHeight = 20.sp
+                style = ExoTypo.typo12.copy(color = Color.White, lineHeight = 20.sp)
             )
         }
 
@@ -453,16 +450,14 @@ private fun HeartPickBanner(
         ) {
             Text(
                 text = title,
-                color = Color.White,
-                fontSize = 19.sp,
+                style = ExoTypo.typo19.copy(color = Color.White),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = subtitle,
-                color = Color.White,
-                fontSize = 13.sp,
+                style = ExoTypo.typo13.copy(color = Color.White),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -555,15 +550,12 @@ private fun PrelaunchInfoSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.kdf_period_title),
-                color = colorResource(R.color.text_gray),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray))
             )
             Spacer(modifier = Modifier.width(11.dp))
             Text(
                 text = periodText,
-                color = colorResource(R.color.text_gray),
-                fontSize = 13.sp
+                style = ExoTypo.typo13.copy(color = colorResource(R.color.text_gray))
             )
         }
 
@@ -573,9 +565,7 @@ private fun PrelaunchInfoSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.cheering_comments),
-                color = colorResource(R.color.text_gray),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray))
             )
             Spacer(modifier = Modifier.width(6.dp))
             Row(
@@ -597,9 +587,7 @@ private fun PrelaunchInfoSection(
                     } else {
                         stringResource(R.string.title_comment)
                     },
-                    color = colorResource(R.color.main_light),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium
+                    style = ExoTypo.typo13.copy(color = colorResource(R.color.main_light))
                 )
                 Spacer(modifier = Modifier.width(3.dp))
                 Icon(
@@ -638,9 +626,7 @@ private fun PrelaunchInfoSection(
                     Spacer(modifier = Modifier.width(9.dp))
                     Text(
                         text = stringResource(R.string.first_rank_reward),
-                        color = colorResource(R.color.text_default),
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        style = ExoTypo.typo15Bold.copy(color = colorResource(R.color.text_default)),
                         modifier = Modifier.weight(1f)
                     )
                     Icon(
@@ -661,16 +647,13 @@ private fun PrelaunchInfoSection(
                         heartPick.prize?.name?.let { prizeName ->
                             Text(
                                 text = prizeName,
-                                color = colorResource(R.color.text_default),
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold
+                                style = ExoTypo.typo14Bold.copy(color = colorResource(R.color.text_default))
                             )
                         }
                         heartPick.prize?.location?.let { location ->
                             Text(
                                 text = location,
-                                color = colorResource(R.color.text_gray),
-                                fontSize = 13.sp
+                                style = ExoTypo.typo13.copy(color = colorResource(R.color.text_gray))
                             )
                         }
                         heartPick.prize?.imageUrl?.let { imageUrl ->
@@ -718,9 +701,7 @@ private fun PrelaunchInfoSection(
         ) {
             Text(
                 text = btnText,
-                color = colorResource(R.color.text_white_black),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
+                style = ExoTypo.typo16Bold.copy(color = colorResource(R.color.text_white_black)),
                 textAlign = TextAlign.Center
             )
         }
@@ -902,8 +883,7 @@ private fun VoteDiffTooltip(
             numberFormat.format(rankDiff),
             numberFormat.format(voteDiff)
         ),
-        color = Color.White,
-        fontSize = 10.sp,
+        style = ExoTypo.typo10.copy(color = Color.White),
         modifier = modifier
             .background(
                 color = Color(0xFF333333),
@@ -972,9 +952,7 @@ private fun ResultBanner(
             Spacer(modifier = Modifier.width(3.dp))
             Text(
                 text = dDayText,
-                color = Color.White,
-                fontSize = 12.sp,
-                lineHeight = 20.sp
+                style = ExoTypo.typo12.copy(color = Color.White, lineHeight = 20.sp)
             )
         }
 
@@ -986,16 +964,14 @@ private fun ResultBanner(
         ) {
             Text(
                 text = title,
-                color = Color.White,
-                fontSize = 19.sp,
+                style = ExoTypo.typo19.copy(color = Color.White),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = subtitle,
-                color = Color(0xCCFFFFFF),
-                fontSize = 14.sp,
+                style = ExoTypo.typo14.copy(color = Color(0xCCFFFFFF)),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -1025,14 +1001,12 @@ private fun ResultInfoSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.themepick_total_votes),
-                color = colorResource(R.color.text_gray),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray))
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
                 text = stringResource(R.string.num_participants_format, numberFormat.format(totalVote)),
-                color = colorResource(R.color.text_default),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_default))
             )
         }
 
@@ -1042,14 +1016,12 @@ private fun ResultInfoSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.kdf_period_title),
-                color = colorResource(R.color.text_gray),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray))
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
                 text = periodText,
-                color = colorResource(R.color.text_default),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_default))
             )
         }
 
@@ -1059,8 +1031,7 @@ private fun ResultInfoSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.cheering_comments),
-                color = colorResource(R.color.text_gray),
-                fontSize = 14.sp
+                style = ExoTypo.typo14.copy(color = colorResource(R.color.text_gray))
             )
             Spacer(modifier = Modifier.width(8.dp))
             Row(
@@ -1082,9 +1053,7 @@ private fun ResultInfoSection(
                     } else {
                         stringResource(R.string.title_comment)
                     },
-                    color = colorResource(R.color.main_light),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium
+                    style = ExoTypo.typo13.copy(color = colorResource(R.color.main_light))
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Icon(
@@ -1133,9 +1102,7 @@ private fun ResultRewardSection(
                 Spacer(modifier = Modifier.width(9.dp))
                 Text(
                     text = stringResource(R.string.first_rank_reward),
-                    color = colorResource(R.color.text_default),
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    style = ExoTypo.typo15Bold.copy(color = colorResource(R.color.text_default)),
                     modifier = Modifier.weight(1f)
                 )
                 Icon(
@@ -1156,16 +1123,13 @@ private fun ResultRewardSection(
                     heartPick.prize?.name?.let { prizeName ->
                         Text(
                             text = prizeName,
-                            color = colorResource(R.color.text_default),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold
+                            style = ExoTypo.typo14Bold.copy(color = colorResource(R.color.text_default))
                         )
                     }
                     heartPick.prize?.location?.let { location ->
                         Text(
                             text = location,
-                            color = colorResource(R.color.text_gray),
-                            fontSize = 13.sp
+                            style = ExoTypo.typo13.copy(color = colorResource(R.color.text_gray))
                         )
                     }
                     heartPick.prize?.imageUrl?.let { imageUrl ->

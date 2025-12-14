@@ -23,6 +23,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import net.ib.mn.ui.theme.ExoTypo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -212,9 +213,7 @@ private fun UpcomingHeartPickCard(
                             Spacer(modifier = Modifier.width(3.dp))
                             Text(
                                 text = dDay,
-                                fontSize = 12.sp,
-                                lineHeight = 20.sp,
-                                color = ColorPalette.fixWhite,
+                                style = ExoTypo.typo12FixWhite
                             )
                         }
 
@@ -223,11 +222,7 @@ private fun UpcomingHeartPickCard(
                         // 제목
                         Text(
                             text = title,
-                            style = TextStyle(
-                                fontSize = 19.sp,
-                                color = ColorPalette.fixWhite,
-                                platformStyle = PlatformTextStyle(includeFontPadding = false)
-                            ),
+                            style = ExoTypo.typo19FixWhite,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -238,11 +233,7 @@ private fun UpcomingHeartPickCard(
                         // 부제목
                         Text(
                             text = subTitle,
-                            style = TextStyle(
-                                fontSize = 13.sp,
-                                color = ColorPalette.fixWhite,
-                                platformStyle = PlatformTextStyle(includeFontPadding = false)
-                            ),
+                            style = ExoTypo.typo13FixWhite,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -261,13 +252,12 @@ private fun UpcomingHeartPickCard(
                 ) {
                     Text(
                         text = openDate,
-                        fontSize = 21.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = ExoTypo.typo20Bold,
                         color = ColorPalette.mainLight
                     )
                     Text(
                         text = openPeriod,
-                        fontSize = 12.sp,
+                        style = ExoTypo.typo12,
                         color = ColorPalette.textDimmed,
                         modifier = Modifier.padding(top = 4.dp)
                     )
@@ -280,7 +270,7 @@ private fun UpcomingHeartPickCard(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     text = stringResource(R.string.vote_preview),
-                    fontSize = 14.sp,
+                    style = ExoTypo.typo14,
                     height = 41.dp,
                     shape = RoundedCornerShape(20.dp),
                     containerColor = ColorPalette.main200,
@@ -407,9 +397,7 @@ private fun ActiveHeartPickCard(
                             Spacer(modifier = Modifier.width(3.dp))
                             Text(
                                 text = dDay,
-                                fontSize = 12.sp,
-                                lineHeight = 20.sp,
-                                color = ColorPalette.fixWhite
+                                style = ExoTypo.typo12FixWhite
                             )
                         }
 
@@ -418,11 +406,7 @@ private fun ActiveHeartPickCard(
                         // 제목
                         Text(
                             text = title,
-                            style = TextStyle(
-                                fontSize = 19.sp,
-                                color = ColorPalette.fixWhite,
-                                platformStyle = PlatformTextStyle(includeFontPadding = false)
-                            ),
+                            style = ExoTypo.typo19FixWhite,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -433,11 +417,7 @@ private fun ActiveHeartPickCard(
                         // 부제목
                         Text(
                             text = subTitle,
-                            style = TextStyle(
-                                fontSize = 13.sp,
-                                color = ColorPalette.fixWhite,
-                                platformStyle = PlatformTextStyle(includeFontPadding = false)
-                            ),
+                            style = ExoTypo.typo13FixWhite,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -488,17 +468,14 @@ private fun ActiveHeartPickCard(
                         ) {
                             Text(
                                 text = firstPlaceIdol.name,
-                                fontSize = 16.sp,
-                                lineHeight = 16.sp,
-                                fontWeight = FontWeight.Bold,
+                                style = ExoTypo.typo16Bold,
                                 color = ColorPalette.textDefault,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
                             Text(
                                 text = firstPlaceIdol.groupName,
-                                fontSize = 12.sp,
-                                lineHeight = 12.sp,
+                                style = ExoTypo.typo12,
                                 color = ColorPalette.textDimmed,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -506,9 +483,7 @@ private fun ActiveHeartPickCard(
                             )
                             Text(
                                 text = firstPlaceIdol.voteCount,
-                                fontSize = 14.sp,
-                                lineHeight = 14.sp,
-                                fontWeight = FontWeight.Bold,
+                                style = ExoTypo.typo14Bold,
                                 color = ColorPalette.mainLight,
                                 modifier = Modifier.padding(top = 1.dp)
                             )
@@ -528,8 +503,7 @@ private fun ActiveHeartPickCard(
                         ) {
                             Text(
                                 text = "${firstPlaceIdol.percentage}%",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
+                                style = ExoTypo.typo16Bold,
                                 color = ColorPalette.mainLight
                             )
                         }
@@ -595,7 +569,7 @@ private fun ActiveHeartPickCard(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     text = stringResource(R.string.guide_vote_title),
-                    fontSize = 14.sp,
+                    style = ExoTypo.typo14,
                     height = 41.dp,
                     shape = RoundedCornerShape(20.dp),
                     containerColor = ColorPalette.mainLight,
@@ -619,8 +593,7 @@ private fun ActiveHeartPickCard(
                     )
                     Text(
                         text = NumberFormatUtil.formatNumberShort(heartVoteCount),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = ExoTypo.typo12Bold,
                         color = ColorPalette.textGray,
                         modifier = Modifier.padding(start = 3.dp)
                     )
@@ -635,8 +608,7 @@ private fun ActiveHeartPickCard(
                     )
                     Text(
                         text = NumberFormatUtil.formatNumberShort(commentCount),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = ExoTypo.typo12Bold,
                         color = ColorPalette.textGray,
                         modifier = Modifier.padding(start = 3.dp)
                     )
@@ -645,7 +617,7 @@ private fun ActiveHeartPickCard(
 
                     Text(
                         text = periodDate,
-                        fontSize = 12.sp,
+                        style = ExoTypo.typo12,
                         color = ColorPalette.textDimmed
                     )
                 }
@@ -757,11 +729,7 @@ private fun EndedHeartPickCard(
                             // 제목
                             Text(
                                 text = title,
-                                style = TextStyle(
-                                    fontSize = 19.sp,
-                                    color = ColorPalette.fixWhite,
-                                    platformStyle = PlatformTextStyle(includeFontPadding = false)
-                                ),
+                                style = ExoTypo.typo19FixWhite,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -771,11 +739,7 @@ private fun EndedHeartPickCard(
                             // 부제목
                             Text(
                                 text = subTitle,
-                                style = TextStyle(
-                                    fontSize = 13.sp,
-                                    color = ColorPalette.fixWhite,
-                                    platformStyle = PlatformTextStyle(includeFontPadding = false)
-                                ),
+                                style = ExoTypo.typo13FixWhite,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -823,17 +787,14 @@ private fun EndedHeartPickCard(
                         ) {
                             Text(
                                 text = firstPlaceIdol.name,
-                                fontSize = 16.sp,
-                                lineHeight = 16.sp,
-                                fontWeight = FontWeight.Bold,
+                                style = ExoTypo.typo16Bold,
                                 color = ColorPalette.textDefault,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
                             Text(
                                 text = firstPlaceIdol.groupName,
-                                fontSize = 12.sp,
-                                lineHeight = 12.sp,
+                                style = ExoTypo.typo12,
                                 color = ColorPalette.textDimmed,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -841,9 +802,7 @@ private fun EndedHeartPickCard(
                             )
                             Text(
                                 text = firstPlaceIdol.voteCount,
-                                fontSize = 14.sp,
-                                lineHeight = 14.sp,
-                                fontWeight = FontWeight.Bold,
+                                style = ExoTypo.typo14Bold,
                                 color = ColorPalette.mainLight,
                                 modifier = Modifier.padding(top = 1.dp)
                             )
@@ -863,8 +822,7 @@ private fun EndedHeartPickCard(
                         ) {
                             Text(
                                 text = "${firstPlaceIdol.percentage}%",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
+                                style = ExoTypo.typo16Bold,
                                 color = ColorPalette.mainLight
                             )
                         }
@@ -892,8 +850,7 @@ private fun EndedHeartPickCard(
                     )
                     Text(
                         text = NumberFormatUtil.formatNumberShort(heartVoteCount),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = ExoTypo.typo12Bold,
                         color = ColorPalette.textGray,
                         modifier = Modifier.padding(start = 3.dp)
                     )
@@ -908,8 +865,7 @@ private fun EndedHeartPickCard(
                     )
                     Text(
                         text = NumberFormatUtil.formatNumberShort(commentCount),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = ExoTypo.typo12Bold,
                         color = ColorPalette.textGray,
                         modifier = Modifier.padding(start = 3.dp)
                     )
@@ -918,7 +874,7 @@ private fun EndedHeartPickCard(
 
                     Text(
                         text = periodDate,
-                        fontSize = 12.sp,
+                        style = ExoTypo.typo12,
                         color = ColorPalette.textDimmed
                     )
                 }
@@ -959,9 +915,7 @@ private fun EndedHeartPickCard(
                         Spacer(modifier = Modifier.width(3.dp))
                         Text(
                             text = dDay,
-                            fontSize = 12.sp,
-                            lineHeight = 20.sp,
-                            color = ColorPalette.fixWhite
+                            style = ExoTypo.typo12FixWhite
                         )
                     }
 
@@ -974,7 +928,7 @@ private fun EndedHeartPickCard(
                             .padding(horizontal = 16.dp)
                             .padding(bottom = 44.dp),
                         text = stringResource(R.string.see_result),
-                        fontSize = 14.sp,
+                        style = ExoTypo.typo14,
                         height = 41.dp,
                         shape = RoundedCornerShape(20.dp),
                         containerColor = ColorPalette.fixGray900,

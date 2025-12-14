@@ -26,6 +26,7 @@ import net.ib.mn.R
 import net.ib.mn.domain.model.IconMenuItem
 import net.ib.mn.domain.model.IconMenuType
 import net.ib.mn.ui.theme.ColorPalette
+import net.ib.mn.ui.theme.ExoTypo
 
 /**
  * 메뉴 아이콘 아이템 컴포넌트
@@ -81,10 +82,11 @@ fun MenuIconItem(
             // 라벨 텍스트 (40dp 높이 - Old 프로젝트와 동일)
             Text(
                 text = stringResource(id = item.labelResId),
-                fontSize = 12.sp,
-                lineHeight = 15.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
-                color = ColorPalette.textDefault,
+                style = ExoTypo.typo12.copy(
+                    lineHeight = 15.sp,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+                    color = ColorPalette.textDefault
+                ),
                 textAlign = TextAlign.Center,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,

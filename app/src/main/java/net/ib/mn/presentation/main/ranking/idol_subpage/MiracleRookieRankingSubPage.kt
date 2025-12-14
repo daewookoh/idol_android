@@ -33,8 +33,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import net.ib.mn.ui.theme.ExoTypo
 import coil.compose.AsyncImage
 import net.ib.mn.R
 import net.ib.mn.domain.ranking.RankingDataSource
@@ -256,8 +256,7 @@ fun MiracleRookieRankingSubPage(
             ) {
                 Text(
                     text = stringResource(R.string.cumulative_rankings),
-                    fontSize = 15.sp,
-                    color = if (selectedTabIndex == 0) ColorPalette.textDefault else ColorPalette.textDimmed
+                    style = ExoTypo.typo15.copy(color = if (selectedTabIndex == 0) ColorPalette.textDefault else ColorPalette.textDimmed)
                 )
             }
             Tab(
@@ -268,8 +267,7 @@ fun MiracleRookieRankingSubPage(
             ) {
                 Text(
                     text = stringResource(R.string.award_realtime),
-                    fontSize = 15.sp,
-                    color = if (selectedTabIndex == 1) ColorPalette.textDefault else ColorPalette.textDimmed
+                    style = ExoTypo.typo15.copy(color = if (selectedTabIndex == 1) ColorPalette.textDefault else ColorPalette.textDimmed)
                 )
             }
         }
@@ -294,8 +292,7 @@ fun MiracleRookieRankingSubPage(
                 ) {
                     Text(
                         text = "오류: ${currentState.message}",
-                        fontSize = 16.sp,
-                        color = ColorPalette.main
+                        style = ExoTypo.typo16.copy(color = ColorPalette.main)
                     )
                 }
             }
@@ -310,8 +307,7 @@ fun MiracleRookieRankingSubPage(
                     ) {
                         Text(
                             text = "랭킹 데이터가 없습니다.",
-                            fontSize = 16.sp,
-                            color = ColorPalette.textDimmed
+                            style = ExoTypo.typo16.copy(color = ColorPalette.textDimmed)
                         )
                     }
                 } else {

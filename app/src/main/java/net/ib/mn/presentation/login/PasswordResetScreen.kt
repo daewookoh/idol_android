@@ -40,6 +40,7 @@ import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ExoStatusButton
 import net.ib.mn.ui.components.ExoTextField
 import net.ib.mn.ui.components.LoadingOverlay
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.KeyboardUtil
 
 /**
@@ -179,9 +180,7 @@ private fun PasswordResetContent(
                 // 이메일 라벨 (old: TextView - hint_email, 14sp, bold, marginStart 4dp)
                 Text(
                     text = stringResource(id = R.string.hint_email),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(id = R.color.text_default),
+                    style = ExoTypo.typo14Bold.copy(color = colorResource(id = R.color.text_default)),
                     modifier = Modifier.padding(start = 4.dp)
                 )
 

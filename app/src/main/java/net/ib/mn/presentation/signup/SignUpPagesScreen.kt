@@ -55,6 +55,7 @@ import net.ib.mn.ui.components.ExoSimpleDialog
 import net.ib.mn.ui.components.ExoStatusButton
 import net.ib.mn.ui.components.ExoTextField
 import net.ib.mn.ui.theme.ExodusTheme
+import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.AgreementUtil
 import net.ib.mn.util.KeyboardUtil
 import net.ib.mn.util.ToastUtil
@@ -386,9 +387,7 @@ private fun SignUpFormPage(
             if (state.domain == "email") {
                 Text(
                     text = stringResource(R.string.id),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(id = R.color.text_default),
+                    style = ExoTypo.typo14Bold.copy(color = colorResource(id = R.color.text_default)),
                     modifier = Modifier.padding(start = 4.dp)
                 )
 
@@ -418,8 +417,7 @@ private fun SignUpFormPage(
 
                 Text(
                     text = stringResource(R.string.signup_desc1),
-                    fontSize = 12.sp,
-                    color = colorResource(id = R.color.main)
+                    style = ExoTypo.typo12.copy(color = colorResource(id = R.color.main))
                 )
 
                 Spacer(modifier = Modifier.height(11.dp))
@@ -429,9 +427,7 @@ private fun SignUpFormPage(
             if (state.domain == "email") {
                 Text(
                     text = stringResource(R.string.hint_passwd),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(id = R.color.text_default),
+                    style = ExoTypo.typo14Bold.copy(color = colorResource(id = R.color.text_default)),
                     modifier = Modifier.padding(start = 4.dp)
                 )
 
@@ -459,8 +455,7 @@ private fun SignUpFormPage(
 
                 Text(
                     text = stringResource(R.string.pwd_combination),
-                    fontSize = 12.sp,
-                    color = colorResource(id = R.color.main)
+                    style = ExoTypo.typo12.copy(color = colorResource(id = R.color.main))
                 )
 
                 Spacer(modifier = Modifier.height(11.dp))
@@ -468,9 +463,7 @@ private fun SignUpFormPage(
                 // 비밀번호 확인
                 Text(
                     text = stringResource(R.string.hint_passwd_confirm),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(id = R.color.text_default),
+                    style = ExoTypo.typo14Bold.copy(color = colorResource(id = R.color.text_default)),
                     modifier = Modifier.padding(start = 4.dp)
                 )
 
@@ -500,9 +493,7 @@ private fun SignUpFormPage(
             // 닉네임 입력
             Text(
                 text = stringResource(R.string.hint_name),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorResource(id = R.color.text_default),
+                style = ExoTypo.typo14Bold.copy(color = colorResource(id = R.color.text_default)),
                 modifier = Modifier.padding(start = 4.dp)
             )
 
@@ -531,9 +522,7 @@ private fun SignUpFormPage(
             // 추천인 코드 (옵션)
             Text(
                 text = stringResource(R.string.recommender),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorResource(id = R.color.text_default),
+                style = ExoTypo.typo14Bold.copy(color = colorResource(id = R.color.text_default)),
                 modifier = Modifier.padding(start = 4.dp)
             )
 
@@ -561,8 +550,7 @@ private fun SignUpFormPage(
 
             Text(
                 text = stringResource(R.string.signup_desc2_noreward),
-                fontSize = 12.sp,
-                color = colorResource(id = R.color.main)
+                style = ExoTypo.typo12.copy(color = colorResource(id = R.color.main))
             )
         } // Column 끝
 

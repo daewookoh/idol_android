@@ -97,7 +97,7 @@ fun TrendsScreen(
                     // Empty state
                     Text(
                         text = stringResource(R.string.no_data),
-                        style = ExoTypo.body14,
+                        style = ExoTypo.typo14,
                         color = ColorPalette.textDefaultOpacity60,
                         modifier = Modifier.align(Alignment.Center)
                     )

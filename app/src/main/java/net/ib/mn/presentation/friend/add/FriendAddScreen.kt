@@ -53,6 +53,7 @@ import net.ib.mn.ui.components.ExoDialog
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ProfileImageType
+import net.ib.mn.ui.theme.ExoTypo
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -210,18 +211,17 @@ private fun NewFriendsBanner(
 
                 Text(
                     text = stringResource(R.string.participate_new_friends),
-                    color = colorResource(R.color.gray900),
-                    fontSize = 14.sp,
-                    lineHeight = 17.sp,
-                    fontWeight = FontWeight.Medium
+                    style = ExoTypo.typo14.copy(
+                        color = colorResource(R.color.gray900),
+                        lineHeight = 17.sp
+                    )
                 )
             }
 
             // 두번째 줄: 설명 (아이콘 너비만큼 들여쓰기)
             Text(
                 text = stringResource(R.string.participate_new_friends_desc),
-                color = colorResource(R.color.gray580),
-                fontSize = 10.sp,
+                style = ExoTypo.typo10.copy(color = colorResource(R.color.gray580)),
                 modifier = Modifier.padding(start = 24.dp)
             )
         }
@@ -275,9 +275,7 @@ private fun NewFriendsButton(
     ) {
         Text(
             text = text,
-            color = textColor,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium
+            style = ExoTypo.typo12.copy(color = textColor)
         )
     }
 }
@@ -300,8 +298,7 @@ private fun LoadingView() {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.lable_get_info),
-                color = colorResource(R.color.text_gray),
-                fontSize = 16.sp
+                style = ExoTypo.typo16.copy(color = colorResource(R.color.text_gray))
             )
         }
     }
@@ -320,8 +317,7 @@ private fun EmptyView() {
     ) {
         Text(
             text = stringResource(R.string.none_participation_new_friends),
-            color = colorResource(R.color.text_gray),
-            fontSize = 16.sp,
+            style = ExoTypo.typo16.copy(color = colorResource(R.color.text_gray)),
             textAlign = TextAlign.Center
         )
     }
@@ -401,9 +397,7 @@ private fun RecommendedUserItem(
 
                     Text(
                         text = "\u200E${user.nickname}",
-                        color = colorResource(R.color.main),
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Medium,
+                        style = ExoTypo.typo15.copy(color = colorResource(R.color.main)),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -418,8 +412,10 @@ private fun RecommendedUserItem(
 
                 Text(
                     text = mostText,
-                    color = colorResource(R.color.gray580),
-                    fontSize = 13.sp, lineHeight = 17.sp
+                    style = ExoTypo.typo13.copy(
+                        color = colorResource(R.color.gray580),
+                        lineHeight = 17.sp
+                    )
                 )
 
                 // 누적 투표
@@ -427,8 +423,10 @@ private fun RecommendedUserItem(
                     .format(user.levelHeart)
                 Text(
                     text = stringResource(R.string.level_heart_format, voteCountFormatted),
-                    color = colorResource(R.color.gray580),
-                    fontSize = 13.sp, lineHeight = 17.sp
+                    style = ExoTypo.typo13.copy(
+                        color = colorResource(R.color.gray580),
+                        lineHeight = 17.sp
+                    )
                 )
 
                 // 소개글 (상태 메시지)
@@ -436,8 +434,10 @@ private fun RecommendedUserItem(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = statusMsg,
-                        color = colorResource(R.color.gray300),
-                        fontSize = 13.sp, lineHeight = 17.sp,
+                        style = ExoTypo.typo13.copy(
+                            color = colorResource(R.color.gray300),
+                            lineHeight = 17.sp
+                        ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
