@@ -354,8 +354,104 @@ class FreeBoardViewModel @Inject constructor(
     }
 
     private fun refresh() {
-        setState { copy(isRefreshing = true) }
-        loadArticles()
+        viewModelScope.launch {
+            setState { copy(isRefreshing = true) }
+            val startTime = System.currentTimeMillis()
+
+            // 데이터 로드
+            loadArticlesForRefresh()
+
+            // 최소 1초는 로딩 인디케이터 표시
+            val elapsed = System.currentTimeMillis() - startTime
+            if (elapsed < 1000) {
+                kotlinx.coroutines.delay(1000 - elapsed)
+            }
+
+            setState { copy(isRefreshing = false) }
+        }
+    }
+
+    /**
+     * Pull to Refresh용 데이터 로드 (isRefreshing 상태는 refresh()에서 관리)
+     */
+    private suspend fun loadArticlesForRefresh() {
+        nextUrl = null
+
+        val currentState = uiState.value
+        val orderBy = currentState.orderBy
+        val keyword = currentState.searchKeyword?.takeIf { it.isNotEmpty() }
+        val locale = currentState.selectedLanguageId.takeIf { it.isNotEmpty() && it != "all" }
+        val selectedTagId = currentState.selectedTagId
+
+        if (selectedTagId == FreeBoardContract.State.TAG_ID_MY_FAVORITE && !currentState.hasMostIdol) {
+            return
+        }
+
+        val flow = when (selectedTagId) {
+            FreeBoardContract.State.TAG_ID_HOT -> {
+                articlesRepository.getFreeBoardHot(orderBy = orderBy, keyword = keyword, locale = locale)
+            }
+            FreeBoardContract.State.TAG_ID_ALL -> {
+                articlesRepository.getFreeBoardAll(orderBy = orderBy, keyword = keyword, locale = locale)
+            }
+            FreeBoardContract.State.TAG_ID_MY_FAVORITE -> {
+                val idolId = externalIdolId ?: (preferencesManager.getMostIdolId() ?: 0)
+                articlesRepository.getMyFavoriteArticles(idolId = idolId, orderBy = orderBy, keyword = keyword, locale = locale)
+            }
+            else -> {
+                articlesRepository.getArticles(
+                    idolId = Constants.FREE_BOARD_IDOL_ID,
+                    orderBy = orderBy,
+                    tags = selectedTagId.toString(),
+                    keyword = keyword,
+                    locale = locale,
+                    isPopular = if (currentState.showPopular) "Y" else null
+                )
+            }
+        }
+
+        flow.collect { result ->
+            when (result) {
+                is ApiResult.Success -> {
+                    val response = result.data
+                    nextUrl = response.nextUrl
+
+                    val existingArticles = uiState.value.articles
+                    val existingNotices = uiState.value.notices
+                    val existingArticlesMap = existingArticles.associateBy { it.id }
+                    val existingNoticesMap = existingNotices.associateBy { it.id }
+
+                    val mergedArticles = response.articles.map { newArticle ->
+                        val existing = existingArticlesMap[newArticle.id]
+                        if (existing != null && existing == newArticle) existing else newArticle
+                    }
+
+                    val mergedNotices = response.notices.map { newNotice ->
+                        val existing = existingNoticesMap[newNotice.id]
+                        if (existing != null && existing == newNotice) existing else newNotice
+                    }
+
+                    val finalArticles = if (mergedArticles == existingArticles) existingArticles else mergedArticles
+                    val finalNotices = if (mergedNotices == existingNotices) existingNotices else mergedNotices
+
+                    setState {
+                        copy(
+                            isLoading = false,
+                            notices = finalNotices,
+                            articles = finalArticles,
+                            totalCount = response.totalCount,
+                            hasMore = response.nextUrl != null,
+                            isEmpty = mergedArticles.isEmpty() && mergedNotices.isEmpty()
+                        )
+                    }
+                }
+                is ApiResult.Error -> {
+                    setState { copy(isLoading = false, isEmpty = articles.isEmpty()) }
+                    setEffect { FreeBoardContract.Effect.ShowError(result.message ?: "Failed to load articles") }
+                }
+                else -> {}
+            }
+        }
     }
 
     private fun loadMore() {
