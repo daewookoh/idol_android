@@ -4,6 +4,8 @@ import net.ib.mn.data.remote.dto.BlockUserRequest
 import net.ib.mn.data.remote.dto.CommonResponse
 import net.ib.mn.data.remote.dto.ProvideHeartRequest
 import net.ib.mn.data.remote.dto.SetStatusRequest
+import net.ib.mn.data.remote.dto.UpdateTutorialRequest
+import net.ib.mn.data.remote.dto.UpdateTutorialResponse
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -149,4 +151,17 @@ interface UsersApi {
      */
     @POST("users/status/")
     suspend fun setStatus(@Body body: SetStatusRequest): Response<ResponseBody>
+
+    /**
+     * 튜토리얼 완료 처리
+     * POST users/update_tutorial/
+     *
+     * 특정 튜토리얼 비트를 완료 상태로 변경합니다.
+     * 응답: { "success": true, "tutorial": 1234567890 }
+     *
+     * @param body UpdateTutorialRequest (tutorial_index: 완료할 튜토리얼 비트)
+     * @return 업데이트된 튜토리얼 비트마스크
+     */
+    @POST("users/update_tutorial/")
+    suspend fun updateTutorial(@Body body: UpdateTutorialRequest): Response<UpdateTutorialResponse>
 }

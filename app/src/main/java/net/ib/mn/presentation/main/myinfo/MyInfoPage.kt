@@ -91,7 +91,10 @@ fun MyInfoPage(
             weakHeart = weakHeart,
             diaCount = diaCount,
             onInfoClick = { /* TODO: Show currency info */ },
-            onHistoryClick = { /* TODO: Navigate to history */ }
+            onHistoryClick = { /* TODO: Navigate to history */ },
+            onTutorialComplete = { tutorialIndex ->
+                viewModel.updateTutorial(tutorialIndex)
+            }
         )
 
         Spacer(modifier = Modifier.height(14.dp))
@@ -101,7 +104,10 @@ fun MyInfoPage(
             videoAdHeartCount = videoAdHeartCount,
             onVideoAdClick = { /* TODO: Navigate to video ad */ },
             onStoreClick = { /* TODO: Navigate to store */ },
-            onFreeChargeClick = { /* TODO: Navigate to free charge */ }
+            onFreeChargeClick = { /* TODO: Navigate to free charge */ },
+            onTutorialComplete = { tutorialIndex ->
+                viewModel.updateTutorial(tutorialIndex)
+            }
         )
     }
 }

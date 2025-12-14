@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -19,6 +20,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +36,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.ib.mn.R
+import net.ib.mn.tutorial.TutorialBits
+import net.ib.mn.tutorial.TutorialManager
 
 /**
  * 메인 화면의 TopBar 컴포넌트
@@ -51,6 +56,7 @@ fun MainTopBar(
     onAttendanceClick: (() -> Unit)? = null,
     onNotificationClick: (() -> Unit)? = null,
     onSettingClick: (() -> Unit)? = null,
+    onTutorialComplete: ((Int) -> Unit)? = null, // 튜토리얼 완료 콜백
     toggleButton: @Composable () -> Unit = {}
 ) {
     val configuration = LocalConfiguration.current
@@ -121,13 +127,15 @@ fun MainTopBar(
                     hasNewNotification = hasNewNotification,
                     onAttendanceClick = onAttendanceClick,
                     onNotificationClick = onNotificationClick,
-                    onSettingClick = onSettingClick
+                    onSettingClick = onSettingClick,
+                    onTutorialComplete = onTutorialComplete
                 )
             } else if (showMainMenu) {
                 // Main 메뉴 (검색, 친구)
                 MainToolbarMenu(
                     onSearchClick = onSearchClick,
-                    onFriendsClick = onFriendsClick
+                    onFriendsClick = onFriendsClick,
+                    onTutorialComplete = onTutorialComplete
                 )
             }
         }
@@ -143,8 +151,11 @@ fun MainTopBar(
 @Composable
 private fun MainToolbarMenu(
     onSearchClick: (() -> Unit)? = null,
-    onFriendsClick: (() -> Unit)? = null
+    onFriendsClick: (() -> Unit)? = null,
+    onTutorialComplete: ((Int) -> Unit)? = null
 ) {
+    val currentTutorialIndex by TutorialManager.currentTutorialIndex.collectAsState()
+
     // 검색 버튼 (old: marginEnd="12dp")
     Box(
         modifier = Modifier
@@ -160,6 +171,21 @@ private fun MainToolbarMenu(
             modifier = Modifier.size(24.dp),
             tint = colorResource(R.color.text_default)
         )
+
+        // 튜토리얼 하트 오버레이 (MAIN_SEARCH)
+        if (currentTutorialIndex == TutorialBits.MAIN_SEARCH) {
+            ExoTutorialHeart(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .offset(x = 2.dp, y = 2.dp),
+                tutorialBit = TutorialBits.MAIN_SEARCH,
+                animationSize = 28.dp,
+                onTutorialComplete = {
+                    onTutorialComplete?.invoke(TutorialBits.MAIN_SEARCH)
+                    onSearchClick?.invoke()
+                }
+            )
+        }
     }
 
     // 친구 버튼 (old: marginEnd="16dp")
@@ -178,6 +204,21 @@ private fun MainToolbarMenu(
             modifier = Modifier.size(24.dp),
             tint = colorResource(R.color.text_default)
         )
+
+        // 튜토리얼 하트 오버레이 (MAIN_FRIEND)
+        if (currentTutorialIndex == TutorialBits.MAIN_FRIEND) {
+            ExoTutorialHeart(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .offset(x = (-4).dp, y = 2.dp),
+                tutorialBit = TutorialBits.MAIN_FRIEND,
+                animationSize = 28.dp,
+                onTutorialComplete = {
+                    onTutorialComplete?.invoke(TutorialBits.MAIN_FRIEND)
+                    onFriendsClick?.invoke()
+                }
+            )
+        }
     }
 }
 
@@ -193,8 +234,11 @@ private fun MyInfoToolbarMenu(
     hasNewNotification: Boolean = false,
     onAttendanceClick: (() -> Unit)? = null,
     onNotificationClick: (() -> Unit)? = null,
-    onSettingClick: (() -> Unit)? = null
+    onSettingClick: (() -> Unit)? = null,
+    onTutorialComplete: ((Int) -> Unit)? = null
 ) {
+    val currentTutorialIndex by TutorialManager.currentTutorialIndex.collectAsState()
+
     // 출석 체크 버튼 (기본적으로 숨김, old: marginEnd="12dp")
 //    Box(
 //        modifier = Modifier
@@ -231,6 +275,21 @@ private fun MyInfoToolbarMenu(
                     .background(Color.Red)
             )
         }
+
+        // 튜토리얼 하트 오버레이 (MENU_NOTIFICATION)
+        if (currentTutorialIndex == TutorialBits.MENU_NOTIFICATION) {
+            ExoTutorialHeart(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .offset(x = 2.dp, y = 2.dp),
+                tutorialBit = TutorialBits.MENU_NOTIFICATION,
+                animationSize = 28.dp,
+                onTutorialComplete = {
+                    onTutorialComplete?.invoke(TutorialBits.MENU_NOTIFICATION)
+                    onNotificationClick?.invoke()
+                }
+            )
+        }
     }
 
     // 설정 버튼 (old: marginEnd="16dp")
@@ -246,5 +305,20 @@ private fun MyInfoToolbarMenu(
             modifier = Modifier.size(24.dp),
             tint = colorResource(R.color.text_default)
         )
+
+        // 튜토리얼 하트 오버레이 (MENU_SETTINGS)
+        if (currentTutorialIndex == TutorialBits.MENU_SETTINGS) {
+            ExoTutorialHeart(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .offset(x = (-4).dp, y = 2.dp),
+                tutorialBit = TutorialBits.MENU_SETTINGS,
+                animationSize = 28.dp,
+                onTutorialComplete = {
+                    onTutorialComplete?.invoke(TutorialBits.MENU_SETTINGS)
+                    onSettingClick?.invoke()
+                }
+            )
+        }
     }
 }

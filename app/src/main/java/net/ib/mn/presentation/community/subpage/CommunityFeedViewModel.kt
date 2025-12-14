@@ -82,22 +82,28 @@ class CommunityFeedViewModel @Inject constructor(
             val mostIdolId = preferencesManager.getMostIdolId()
             isMost = mostIdolId != null && mostIdolId == idolId
 
-            logD(TAG, "loadFeed: idolId=$idolId, mostIdolId=$mostIdolId, isMost=$isMost")
-            loadFeedInternal()
+            // 기존 데이터가 있으면 로딩 상태를 변경하지 않음 (깜빡거림 방지)
+            val hasExistingData = _uiState.value.articles.isNotEmpty()
+            logD(TAG, "loadFeed: idolId=$idolId, mostIdolId=$mostIdolId, isMost=$isMost, hasExistingData=$hasExistingData")
+            loadFeedInternal(skipLoadingState = hasExistingData)
         }
     }
 
     /**
      * 실제 피드 로드 (내부용)
+     * @param skipLoadingState true이면 로딩 상태를 변경하지 않음 (깜빡거림 방지)
      */
-    private suspend fun loadFeedInternal() {
-        // 새 아이돌 로드 시 기존 데이터 초기화하여 로딩바가 표시되도록 함
-        _uiState.value = _uiState.value.copy(
-            isLoading = true,
-            articles = emptyList(),
-            notices = emptyList(),
-            error = null
-        )
+    private suspend fun loadFeedInternal(skipLoadingState: Boolean = false) {
+        val existingArticles = _uiState.value.articles
+        val existingNotices = _uiState.value.notices
+
+        // skipLoadingState가 false일 때만 로딩 상태 및 데이터 초기화
+        if (!skipLoadingState) {
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                error = null
+            )
+        }
 
         val orderBy = _uiState.value.orderBy
         val (imageOnly, primaryFileType) = getFilterParams()
@@ -115,20 +121,49 @@ class CommunityFeedViewModel @Inject constructor(
                 }
                 is ApiResult.Success -> {
                     nextUrl = result.data.nextUrl
+
+                    // 기존 데이터를 Map으로 변환하여 빠른 조회
+                    val existingArticlesMap = existingArticles.associateBy { it.id }
+                    val existingNoticesMap = existingNotices.associateBy { it.id }
+
+                    // 변경된 항목만 새 객체 사용, 동일하면 기존 객체 재사용
+                    val mergedArticles = result.data.articles.map { newArticle ->
+                        val existing = existingArticlesMap[newArticle.id]
+                        if (existing != null && existing == newArticle) existing else newArticle
+                    }
+
+                    val mergedNotices = result.data.notices.map { newNotice ->
+                        val existing = existingNoticesMap[newNotice.id]
+                        if (existing != null && existing == newNotice) existing else newNotice
+                    }
+
+                    // 리스트 자체도 동일하면 기존 리스트 재사용
+                    val finalArticles = if (mergedArticles == existingArticles) existingArticles else mergedArticles
+                    val finalNotices = if (mergedNotices == existingNotices) existingNotices else mergedNotices
+
+                    // skipLoadingState이고 데이터가 완전히 동일하면 setState 호출하지 않음
+                    val isDataSame = finalArticles === existingArticles && finalNotices === existingNotices
+                    if (skipLoadingState && isDataSame) {
+                        logD(TAG, "Data unchanged, skipping setState")
+                        return@collect
+                    }
+
                     _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        notices = result.data.notices,
-                        articles = result.data.articles,
+                        isLoading = if (skipLoadingState) _uiState.value.isLoading else false,
+                        notices = finalNotices,
+                        articles = finalArticles,
                         hasNextPage = result.data.nextUrl != null,
                         error = null
                     )
-                    logD(TAG, "loadFeed success: notices=${result.data.notices.size}, articles=${result.data.articles.size}")
+                    logD(TAG, "loadFeed success: notices=${mergedNotices.size}, articles=${mergedArticles.size}, reusedArticles=${finalArticles === existingArticles}")
                 }
                 is ApiResult.Error -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        error = result.message ?: "Unknown error"
-                    )
+                    if (!skipLoadingState) {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = result.message ?: "Unknown error"
+                        )
+                    }
                     logE(TAG, "loadFeed error: ${result.message}")
                 }
             }

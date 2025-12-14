@@ -24,8 +24,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -33,6 +31,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -68,6 +67,9 @@ import net.ib.mn.ui.components.ExoBottomSheet
 import net.ib.mn.ui.components.ExoBottomSheetItem
 import net.ib.mn.ui.components.ExoBottomSheetList
 import net.ib.mn.ui.components.ExoSearchBox
+import net.ib.mn.tutorial.TutorialBits
+import net.ib.mn.tutorial.TutorialManager
+import net.ib.mn.ui.components.ExoTutorialHeart
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.BoardLanguage
@@ -199,6 +201,7 @@ fun FreeBoardPage(
  * @param onIntent Intent 핸들러
  * @param isExternalIdolMode 외부에서 idolId를 전달받은 모드 (태그탭 숨김, 글쓰기 버튼 표시)
  * @param articleViewModel ExoArticleViewModel
+ * @param onTutorialComplete 튜토리얼 완료 콜백 (팬톡 상세 튜토리얼용)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -206,7 +209,8 @@ fun FreeBoardContent(
     state: FreeBoardContract.State,
     onIntent: (FreeBoardContract.Intent) -> Unit,
     isExternalIdolMode: Boolean = false,
-    articleViewModel: ExoArticleViewModel = hiltViewModel()
+    articleViewModel: ExoArticleViewModel = hiltViewModel(),
+    onTutorialComplete: ((Int) -> Unit)? = null
 ) {
     // state.searchKeyword와 동기화되는 검색 텍스트
     var searchText by remember { mutableStateOf(state.searchKeyword ?: "") }
@@ -224,6 +228,9 @@ fun FreeBoardContent(
 
     // 언어 필터 바텀시트 상태
     var showLanguageFilterSheet by remember { mutableStateOf(false) }
+
+    // 튜토리얼 상태 (팬톡 상세 튜토리얼용)
+    val currentTutorialIndex by TutorialManager.currentTutorialIndex.collectAsState()
 
     Box(
         modifier = Modifier
@@ -320,14 +327,6 @@ fun FreeBoardContent(
                     state.searchKeyword.isNullOrEmpty()
 
                 when {
-                    state.isLoading && !state.isRefreshing -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = ColorPalette.main)
-                        }
-                    }
                     isMyFavoriteTabWithNoMostIdol -> {
                         // 최애 탭인데 최애가 설정되지 않은 경우 특별한 빈 화면 표시
                         NoMostIdolEmptyView()
@@ -386,12 +385,34 @@ fun FreeBoardContent(
                                 val article = state.articles[index]
 
                                 key(article.id) {
-                                    ExoArticleItem(
-                                        article = article,
-                                        type = ArticleItemType.FREE_BOARD,
-                                        showPopularIcon = showPopularIcon,
-                                        viewModel = articleViewModel
-                                    )
+                                    // 팬톡 상세 튜토리얼: 외부 아이돌 모드(팬톡)에서 첫 번째 게시글에만 표시
+                                    val showFanTalkDetailTutorial = isExternalIdolMode &&
+                                        index == 0 &&
+                                        currentTutorialIndex == TutorialBits.COMMUNITY_FAN_TALK_DETAIL
+
+                                    Box {
+                                        ExoArticleItem(
+                                            article = article,
+                                            type = ArticleItemType.FREE_BOARD,
+                                            showPopularIcon = showPopularIcon,
+                                            viewModel = articleViewModel,
+                                            onTutorialComplete = if (isExternalIdolMode) onTutorialComplete else null
+                                        )
+
+                                        // 팬톡 상세 튜토리얼 하트
+                                        if (showFanTalkDetailTutorial) {
+                                            ExoTutorialHeart(
+                                                modifier = Modifier.align(Alignment.Center),
+                                                tutorialBit = TutorialBits.COMMUNITY_FAN_TALK_DETAIL,
+                                                animationSize = 28.dp,
+                                                onTutorialComplete = {
+                                                    onTutorialComplete?.invoke(TutorialBits.COMMUNITY_FAN_TALK_DETAIL)
+                                                    // 게시글 클릭 이벤트 트리거
+                                                    articleViewModel.navigateToArticleDetail(article, isFeed = false)
+                                                }
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }

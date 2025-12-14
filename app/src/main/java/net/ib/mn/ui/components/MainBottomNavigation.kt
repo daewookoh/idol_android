@@ -39,8 +39,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.delay
+import net.ib.mn.tutorial.TutorialBits
+import net.ib.mn.tutorial.TutorialManager
 import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.HapticUtil
+import androidx.compose.runtime.collectAsState
 
 /**
  * Old 프로젝트의 MainBottomNavigation과 동일한 UI와 애니메이션 효과를 제공하는 컴포저블
@@ -54,7 +57,8 @@ fun MainBottomNavigation(
     defaultBackgroundColor: Color,
     defaultBorderColor: Color,
     defaultTextColor: Color,
-    onTabSelected: (Int) -> Unit = {}
+    onTabSelected: (Int) -> Unit = {},
+    onTutorialComplete: (Int) -> Unit = {}
 ) {
     var selectedIndex by remember { mutableStateOf(initialSelectedIndex) }
 
@@ -64,6 +68,18 @@ fun MainBottomNavigation(
     }
 
     val context = LocalContext.current
+
+    // 튜토리얼 상태 관찰
+    val currentTutorialIndex by TutorialManager.currentTutorialIndex.collectAsState()
+
+    // 탭 인덱스를 튜토리얼 비트로 매핑
+    fun getTutorialBit(tabIndex: Int): Int? = when (tabIndex) {
+        0 -> TutorialBits.RANKING      // 9
+        1 -> TutorialBits.MY_IDOL      // 10
+        2 -> TutorialBits.PROFILE      // 11
+        4 -> TutorialBits.MENU         // 12
+        else -> null
+    }
 
     Row(
         modifier = Modifier
@@ -81,6 +97,7 @@ fun MainBottomNavigation(
     ) {
         menus.forEachIndexed { index, item ->
             val isSelected = selectedIndex == index
+            val tutorialBit = getTutorialBit(index)
 
             val icon =
                 if (isSelected) iconsOfSelected.getOrNull(index) else iconsOfUnSelected.getOrNull(
@@ -106,6 +123,14 @@ fun MainBottomNavigation(
                 null
             }
 
+            // 탭 클릭 액션
+            val onTabClick: () -> Unit = {
+                HapticUtil.vibrate(context)
+                selectedIndex = index
+                onTabSelected(index)
+                clickedIndex = index
+            }
+
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -117,12 +142,7 @@ fun MainBottomNavigation(
                     .clickable(
                         interactionSource = interactionSource,
                         indication = null,
-                    ) {
-                        HapticUtil.vibrate(context)
-                        selectedIndex = index
-                        onTabSelected(index)
-                        clickedIndex = index
-                    },
+                    ) { onTabClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -157,6 +177,20 @@ fun MainBottomNavigation(
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(13.dp))
+                }
+
+                // 튜토리얼 하트 오버레이
+                tutorialBit?.let { bit ->
+                    if (currentTutorialIndex == bit) {
+                        ExoTutorialHeart(
+                            tutorialBit = bit,
+                            animationSize = 28.dp,
+                            onTutorialComplete = {
+                                onTutorialComplete(bit)
+                                onTabClick()
+                            }
+                        )
+                    }
                 }
             }
         }

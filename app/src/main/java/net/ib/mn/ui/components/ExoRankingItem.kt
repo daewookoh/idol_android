@@ -35,6 +35,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,6 +56,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import net.ib.mn.R
+import net.ib.mn.tutorial.TutorialBits
+import net.ib.mn.tutorial.TutorialManager
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.NumberFormatUtil
@@ -296,14 +299,15 @@ fun LazyListScope.exoRankingItems(
     onVoteSuccess: (idolId: Int, voteCount: Long) -> Unit = { _, _ -> },
     disableAnimation: Boolean = false,
     expandedItemIds: Set<String> = emptySet(),
-    onExpandedChange: (String, Boolean) -> Unit = { _, _ -> }
+    onExpandedChange: (String, Boolean) -> Unit = { _, _ -> },
+    onTutorialComplete: ((Int) -> Unit)? = null
 ) {
     when (type) {
-        RankingItemType.MAIN -> mainRankingItems(items, onItemClick, onVoteSuccess, disableAnimation, expandedItemIds, onExpandedChange)
+        RankingItemType.MAIN -> mainRankingItems(items, onItemClick, onVoteSuccess, disableAnimation, expandedItemIds, onExpandedChange, onTutorialComplete)
         RankingItemType.DAILY -> dailyRankingItems(items, onItemClick, onVoteSuccess, disableAnimation, expandedItemIds, onExpandedChange)
         RankingItemType.CUMULATIVE -> cumulativeRankingItems(items, onItemClick)
         RankingItemType.HEARTPICK -> heartPickRankingItems(items, onItemClick)
-        else -> mainRankingItems(items, onItemClick, onVoteSuccess, disableAnimation, expandedItemIds, onExpandedChange)
+        else -> mainRankingItems(items, onItemClick, onVoteSuccess, disableAnimation, expandedItemIds, onExpandedChange, onTutorialComplete)
     }
 }
 
@@ -323,7 +327,8 @@ fun LazyListScope.mainRankingItems(
     onVoteSuccess: (idolId: Int, voteCount: Long) -> Unit = { _, _ -> },
     disableAnimation: Boolean = false,
     expandedItemIds: Set<String> = emptySet(),
-    onExpandedChange: (String, Boolean) -> Unit = { _, _ -> }
+    onExpandedChange: (String, Boolean) -> Unit = { _, _ -> },
+    onTutorialComplete: ((Int) -> Unit)? = null
 ) {
     itemsIndexed(
         items = items,
@@ -331,6 +336,9 @@ fun LazyListScope.mainRankingItems(
     ) { index, item ->
         // LocalRankingItemClick 사용 (Composable 컨텍스트 내부)
         val localOnItemClick = LocalRankingItemClick.current
+
+        // 튜토리얼 상태 관찰
+        val currentTutorialIndex by TutorialManager.currentTutorialIndex.collectAsState()
 
         val itemKey = item.itemKey()
         val isExpanded = expandedItemIds.contains(itemKey)
@@ -366,21 +374,36 @@ fun LazyListScope.mainRankingItems(
             ) {
                 Spacer(modifier = Modifier.width(10.dp))
 
-                ExoProfileImage(
-                    imageUrl = item.photoUrl,
-                    type = ProfileImageType.LARGE_CIRCLE,
-                    rank = item.rank,
-                    contentDescription = "프로필 이미지",
-                    modifier = Modifier.clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) { onExpandedChange(itemKey, !isExpanded) },
-                    anniversary = item.anniversary ?: "N",
-                    anniversaryDays = item.anniversaryDays,
-                    miracleCount = item.miracleCount,
-                    fairyCount = item.fairyCount,
-                    angelCount = item.angelCount
-                )
+                // 프로필 이미지 + 튜토리얼 하트 오버레이
+                Box(contentAlignment = Alignment.Center) {
+                    ExoProfileImage(
+                        imageUrl = item.photoUrl,
+                        type = ProfileImageType.LARGE_CIRCLE,
+                        rank = item.rank,
+                        contentDescription = "프로필 이미지",
+                        modifier = Modifier.clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) { onExpandedChange(itemKey, !isExpanded) },
+                        anniversary = item.anniversary ?: "N",
+                        anniversaryDays = item.anniversaryDays,
+                        miracleCount = item.miracleCount,
+                        fairyCount = item.fairyCount,
+                        angelCount = item.angelCount
+                    )
+
+                    // 튜토리얼 하트 오버레이 - 배너 그램 (프로필 이미지 클릭)
+                    if (currentTutorialIndex == TutorialBits.MAIN_BANNER_GRAM) {
+                        ExoTutorialHeart(
+                            tutorialBit = TutorialBits.MAIN_BANNER_GRAM,
+                            animationSize = 28.dp,
+                            onTutorialComplete = {
+                                onTutorialComplete?.invoke(TutorialBits.MAIN_BANNER_GRAM)
+                                onExpandedChange(itemKey, !isExpanded)
+                            }
+                        )
+                    }
+                }
 
                 Column(
                     modifier = Modifier
@@ -398,7 +421,8 @@ fun LazyListScope.mainRankingItems(
                     idolHeart = item.heartCount,
                     onVoteSuccess = { votedHeart ->
                         onVoteSuccess(item.id.toIntOrNull() ?: 0, votedHeart)
-                    }
+                    },
+                    onTutorialComplete = onTutorialComplete
                 )
             }
 

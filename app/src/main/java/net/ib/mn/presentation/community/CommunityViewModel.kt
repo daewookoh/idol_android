@@ -20,8 +20,10 @@ import net.ib.mn.data.repository.WikiRepository
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.FavoritesRepository
 import net.ib.mn.domain.repository.IdolRepository
+import net.ib.mn.tutorial.TutorialRepository
 import net.ib.mn.util.IdolImageUtil
 import net.ib.mn.util.RankingUtil
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
@@ -34,7 +36,8 @@ class CommunityViewModel @Inject constructor(
     private val favoritesRepository: FavoritesRepository,
     private val chartRankingRepository: net.ib.mn.data.repository.ChartRankingRepository,
     val wikiRepository: WikiRepository,
-    private val idolRepository: IdolRepository
+    private val idolRepository: IdolRepository,
+    private val tutorialRepository: TutorialRepository
 ) : ViewModel() {
 
     private val _isUpdatingMost = MutableStateFlow(false)
@@ -311,6 +314,15 @@ class CommunityViewModel @Inject constructor(
             removeFavorite(idolId, onSuccess, onError)
         } else {
             addFavorite(idolId, onSuccess, onError)
+        }
+    }
+
+    /**
+     * 튜토리얼 완료 처리
+     */
+    fun updateTutorial(tutorialIndex: Int) {
+        viewModelScope.launch {
+            tutorialRepository.updateTutorial(tutorialIndex)
         }
     }
 }

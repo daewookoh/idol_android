@@ -14,6 +14,7 @@ import net.ib.mn.data.repository.FriendsRepository
 import net.ib.mn.data.repository.UsersRepository
 import net.ib.mn.data.repository.WebTokenResult
 import net.ib.mn.domain.model.FriendModel
+import net.ib.mn.tutorial.TutorialRepository
 import net.ib.mn.util.LocaleUtil
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -38,6 +39,7 @@ class FriendViewModel @Inject constructor(
     private val friendsRepository: FriendsRepository,
     private val usersRepository: UsersRepository,
     private val preferencesManager: PreferencesManager,
+    private val tutorialRepository: TutorialRepository,
     @ApplicationContext private val context: Context
 ) : BaseViewModel<FriendContract.State, FriendContract.Intent, FriendContract.Effect>() {
 
@@ -330,6 +332,15 @@ class FriendViewModel @Inject constructor(
                     setEffect { FriendContract.Effect.ShowToast(context.getString(R.string.error_abnormal_exception)) }
                 }
             }
+        }
+    }
+
+    /**
+     * 튜토리얼 완료 처리
+     */
+    fun updateTutorial(tutorialIndex: Int) {
+        viewModelScope.launch {
+            tutorialRepository.updateTutorial(tutorialIndex)
         }
     }
 }

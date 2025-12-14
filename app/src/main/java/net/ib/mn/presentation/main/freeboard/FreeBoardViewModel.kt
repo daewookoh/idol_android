@@ -79,13 +79,17 @@ class FreeBoardViewModel @Inject constructor(
 
     private fun loadInitialData() {
         viewModelScope.launch {
-            setState { copy(isLoading = true) }
+            // 기존 데이터가 있으면 isLoading을 설정하지 않음 (깜빡거림 방지)
+            val hasExistingData = uiState.value.articles.isNotEmpty()
 
             try {
                 // 외부에서 idolId가 전달된 경우 (CommunityFanTalkSubPage 등)
                 // 태그 없이 바로 해당 아이돌의 덕질게시판만 로드
                 if (isExternalIdolMode) {
-                    logD(TAG, "loadInitialData: externalIdolMode with idolId=$externalIdolId")
+                    if (!hasExistingData) {
+                        setState { copy(isLoading = true) }
+                    }
+                    logD(TAG, "loadInitialData: externalIdolMode with idolId=$externalIdolId, hasExistingData=$hasExistingData")
                     // 로컬 DB에서 아이돌 정보 가져오기 (다국어 이름 포함)
                     val idolEntity = externalIdolId?.let { idolRepository.getIdolById(it) }
                     logD(TAG, "loadInitialData: idolEntity=${idolEntity?.name}")
@@ -97,8 +101,12 @@ class FreeBoardViewModel @Inject constructor(
                             externalIdol = idolEntity
                         )
                     }
-                    loadArticles()
+                    loadArticles(skipLoadingState = hasExistingData)
                     return@launch
+                }
+
+                if (!hasExistingData) {
+                    setState { copy(isLoading = true) }
                 }
 
                 // 기존 FreeBoardPage 동작
@@ -134,7 +142,7 @@ class FreeBoardViewModel @Inject constructor(
                 }
 
                 // Load articles for initial tag
-                loadArticles()
+                loadArticles(skipLoadingState = hasExistingData)
             } catch (e: Exception) {
                 setState { copy(isLoading = false) }
                 setEffect { FreeBoardContract.Effect.ShowError(e.message ?: "Failed to load tags") }
@@ -142,10 +150,13 @@ class FreeBoardViewModel @Inject constructor(
         }
     }
 
-    private fun loadArticles(isLoadMore: Boolean = false) {
+    private fun loadArticles(isLoadMore: Boolean = false, skipLoadingState: Boolean = false) {
         viewModelScope.launch {
             if (!isLoadMore) {
-                setState { copy(isLoading = true, articles = emptyList(), hasMore = true) }
+                // skipLoadingState가 true면 상태 변경하지 않음 (깜빡거림 방지)
+                if (!skipLoadingState) {
+                    setState { copy(isLoading = true, hasMore = true) }
+                }
                 nextUrl = null
             }
 
@@ -225,40 +236,67 @@ class FreeBoardViewModel @Inject constructor(
                         nextUrl = response.nextUrl
 
                         val existingArticles = uiState.value.articles
-                        val newArticles = if (isLoadMore) {
+                        val existingNotices = uiState.value.notices
+
+                        // 기존 데이터를 Map으로 변환하여 빠른 조회
+                        val existingArticlesMap = existingArticles.associateBy { it.id }
+                        val existingNoticesMap = existingNotices.associateBy { it.id }
+
+                        // 새 articles 병합: 변경된 항목만 새 객체 사용, 동일하면 기존 객체 재사용
+                        val mergedArticles = if (isLoadMore) {
                             existingArticles + response.articles
                         } else {
-                            response.articles
+                            response.articles.map { newArticle ->
+                                val existing = existingArticlesMap[newArticle.id]
+                                // 기존 객체와 동일하면 기존 객체 재사용 (리컴포지션 방지)
+                                if (existing != null && existing == newArticle) existing else newArticle
+                            }
                         }
 
-                        // 공지사항은 첫 로드에만 설정 (loadMore 시에는 유지)
-                        val notices = if (isLoadMore) {
-                            uiState.value.notices
+                        // 공지사항도 동일한 로직 적용
+                        val mergedNotices = if (isLoadMore) {
+                            existingNotices
                         } else {
-                            response.notices
+                            response.notices.map { newNotice ->
+                                val existing = existingNoticesMap[newNotice.id]
+                                if (existing != null && existing == newNotice) existing else newNotice
+                            }
+                        }
+
+                        // 리스트 자체도 동일하면 기존 리스트 재사용
+                        val finalArticles = if (mergedArticles == existingArticles) existingArticles else mergedArticles
+                        val finalNotices = if (mergedNotices == existingNotices) existingNotices else mergedNotices
+
+                        // skipLoadingState이고 데이터가 완전히 동일하면 setState 호출하지 않음
+                        val isDataSame = finalArticles === existingArticles && finalNotices === existingNotices
+                        if (skipLoadingState && isDataSame) {
+                            logD(TAG, "Data unchanged, skipping setState")
+                            return@collect
                         }
 
                         setState {
                             copy(
-                                isLoading = false,
-                                isRefreshing = false,
-                                notices = notices,
-                                articles = newArticles,
+                                isLoading = if (skipLoadingState) isLoading else false,
+                                isRefreshing = if (skipLoadingState) isRefreshing else false,
+                                notices = finalNotices,
+                                articles = finalArticles,
                                 totalCount = response.totalCount,
                                 hasMore = response.nextUrl != null,
-                                isEmpty = newArticles.isEmpty() && notices.isEmpty()
+                                isEmpty = mergedArticles.isEmpty() && mergedNotices.isEmpty()
                             )
                         }
-                        logD(TAG, "State updated: notices=${notices.size}, articles=${newArticles.size}, isEmpty=${newArticles.isEmpty() && notices.isEmpty()}")
+                        logD(TAG, "State updated: notices=${mergedNotices.size}, articles=${mergedArticles.size}, reusedArticles=${finalArticles === existingArticles}")
                     }
                     is ApiResult.Error -> {
                         logE(TAG, "ApiResult.Error: ${result.message}", result.exception)
-                        setState {
-                            copy(
-                                isLoading = false,
-                                isRefreshing = false,
-                                isEmpty = articles.isEmpty()
-                            )
+                        if (!skipLoadingState) {
+                            setState {
+                                copy(
+                                    isLoading = false,
+                                    isRefreshing = false,
+                                    isEmpty = articles.isEmpty()
+                                )
+                            }
                         }
                         setEffect { FreeBoardContract.Effect.ShowError(result.message ?: "Failed to load articles") }
                     }

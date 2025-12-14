@@ -18,6 +18,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -29,6 +31,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.ib.mn.R
+import net.ib.mn.tutorial.TutorialBits
+import net.ib.mn.tutorial.TutorialManager
+import net.ib.mn.ui.components.ExoTutorialHeart
 import net.ib.mn.ui.theme.ExoTypo
 
 /**
@@ -42,8 +47,11 @@ fun MyInfoLinks(
     videoAdHeartCount: Int = 0, // 비디오광고 하트 개수 (TODO: ConfigModel에서 가져오기)
     onVideoAdClick: () -> Unit = {},
     onStoreClick: () -> Unit = {},
-    onFreeChargeClick: () -> Unit = {}
+    onFreeChargeClick: () -> Unit = {},
+    onTutorialComplete: (Int) -> Unit = {}
 ) {
+    val currentTutorialIndex by TutorialManager.currentTutorialIndex.collectAsState()
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -84,23 +92,72 @@ fun MyInfoLinks(
                     )
                 }
             }
+
+            // 튜토리얼 하트 오버레이 - 비디오광고
+            if (currentTutorialIndex == TutorialBits.MY_HEART_VIDEO_AD) {
+                ExoTutorialHeart(
+                    modifier = Modifier.align(Alignment.Center),
+                    tutorialBit = TutorialBits.MY_HEART_VIDEO_AD,
+                    animationSize = 28.dp,
+                    onTutorialComplete = {
+                        onTutorialComplete(TutorialBits.MY_HEART_VIDEO_AD)
+                        onVideoAdClick()
+                    }
+                )
+            }
         }
 
         // 상점
-        MyInfoLinkButton(
+        Box(
             modifier = Modifier.weight(1f),
-            iconResId = R.drawable.icon_my_shop,
-            titleResId = R.string.label_store,
-            onClick = onStoreClick
-        )
+            contentAlignment = Alignment.Center
+        ) {
+            MyInfoLinkButton(
+                modifier = Modifier.fillMaxWidth(),
+                iconResId = R.drawable.icon_my_shop,
+                titleResId = R.string.label_store,
+                onClick = onStoreClick
+            )
+
+            // 튜토리얼 하트 오버레이 - 상점
+            if (currentTutorialIndex == TutorialBits.MY_HEART_HEART_SHOP) {
+                ExoTutorialHeart(
+                    modifier = Modifier.align(Alignment.Center),
+                    tutorialBit = TutorialBits.MY_HEART_HEART_SHOP,
+                    animationSize = 28.dp,
+                    onTutorialComplete = {
+                        onTutorialComplete(TutorialBits.MY_HEART_HEART_SHOP)
+                        onStoreClick()
+                    }
+                )
+            }
+        }
 
         // 무료충전소
-        MyInfoLinkButton(
+        Box(
             modifier = Modifier.weight(1f),
-            iconResId = R.drawable.icon_my_free,
-            titleResId = R.string.btn_free_heart_charge,
-            onClick = onFreeChargeClick
-        )
+            contentAlignment = Alignment.Center
+        ) {
+            MyInfoLinkButton(
+                modifier = Modifier.fillMaxWidth(),
+                iconResId = R.drawable.icon_my_free,
+                titleResId = R.string.btn_free_heart_charge,
+                onClick = onFreeChargeClick
+            )
+
+            // 튜토리얼 하트 오버레이 - 무료충전소
+            if (currentTutorialIndex == TutorialBits.MY_HEART_FREE_HEART) {
+                ExoTutorialHeart(
+                    modifier = Modifier.align(Alignment.Center),
+                    tutorialBit = TutorialBits.MY_HEART_FREE_HEART,
+                    animationSize = 28.dp,
+                    onTutorialComplete = {
+                        onTutorialComplete(TutorialBits.MY_HEART_FREE_HEART)
+                        onFreeChargeClick()
+                    }
+                )
+            }
+        }
     }
 }
 

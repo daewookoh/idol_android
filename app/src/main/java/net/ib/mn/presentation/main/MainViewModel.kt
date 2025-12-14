@@ -21,6 +21,7 @@ import net.ib.mn.data.repository.UserCacheRepository
 import net.ib.mn.data.repository.UsersRepository
 import net.ib.mn.domain.model.ApiResult
 import net.ib.mn.domain.repository.UserRepository
+import net.ib.mn.tutorial.TutorialRepository
 import net.ib.mn.util.Constants
 import net.ib.mn.util.DeviceUtil
 import net.ib.mn.util.logW
@@ -35,6 +36,7 @@ class MainViewModel @Inject constructor(
     private val deviceUtil: DeviceUtil,
     private val idolBroadcastManager: IdolBroadcastManager,
     private val idolRepository: net.ib.mn.domain.repository.IdolRepository,
+    private val tutorialRepository: TutorialRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -108,15 +110,13 @@ class MainViewModel @Inject constructor(
             viewModelScope.launch(Dispatchers.IO) {
                 chartDatabaseRepository.refreshAllChartsFromApi(idolRepository)
             }
-        } else {
         }
     }
 
     /**
      * 앱이 포그라운드에서 백그라운드로 갈 때 호출
      */
-    fun onAppPause() {
-    }
+    fun onAppPause() = Unit
 
     /**
      * 로그아웃 처리.
@@ -136,8 +136,7 @@ class MainViewModel @Inject constructor(
                 // 로그아웃 완료 플래그 설정
                 _logoutCompleted.value = true
 
-            } catch (e: Exception) {
-            }
+            } catch (_: Exception) { }
         }
     }
 
@@ -233,6 +232,18 @@ class MainViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
             }
+        }
+    }
+
+    /**
+     * 튜토리얼 완료 처리
+     * 서버에 완료 요청을 보내고 TutorialManager 상태를 업데이트합니다.
+     *
+     * @param tutorialIndex 완료할 튜토리얼 비트 인덱스
+     */
+    fun updateTutorial(tutorialIndex: Int) {
+        viewModelScope.launch {
+            tutorialRepository.updateTutorial(tutorialIndex)
         }
     }
 

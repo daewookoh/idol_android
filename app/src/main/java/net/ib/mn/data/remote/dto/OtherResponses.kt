@@ -268,22 +268,61 @@ fun MostIdol.toEntity(): net.ib.mn.data.local.entity.IdolEntity {
 // ============================================================
 // /users/status/ - 사용자 상태 (튜토리얼 등)
 // ============================================================
+/**
+ * UserStatus API Response
+ *
+ * API 응답 예시:
+ * {"feed_is_viewable": "Y", "friend_allow": "Y", "gcode": 0, "item_no": 0,
+ *  "new_friends": "Y", "status_message": null, "success": true, "tutorial": 11270003236701}
+ *
+ * 주의: tutorial 필드가 루트 레벨에 있음 (data 객체 안에 있지 않음)
+ */
 data class UserStatusResponse(
     @SerializedName("success")
     val success: Boolean,
 
-    @SerializedName("data")
-    val data: UserStatusData?
-)
+    @SerializedName("tutorial")
+    val tutorial: Long?,  // 튜토리얼 비트마스크 (루트 레벨)
 
-data class UserStatusData(
     @SerializedName("tutorial_completed")
     val tutorialCompleted: Boolean?,
 
     @SerializedName("first_login")
     val firstLogin: Boolean?,
 
-    // NOTE: 추가 필드는 실제 API 스펙 확인 후 추가 (old 프로젝트 참조)
+    @SerializedName("feed_is_viewable")
+    val feedIsViewable: String?,
+
+    @SerializedName("friend_allow")
+    val friendAllow: String?,
+
+    @SerializedName("new_friends")
+    val newFriends: String?,
+
+    @SerializedName("status_message")
+    val statusMessage: String?,
+
+    @SerializedName("gcode")
+    val gcode: Int?,
+
+    @SerializedName("item_no")
+    val itemNo: Int?
+) {
+    /**
+     * 호환성을 위한 data 속성 (기존 코드에서 response.data로 접근하던 부분 지원)
+     */
+    val data: UserStatusData?
+        get() = UserStatusData(
+            tutorialCompleted = tutorialCompleted,
+            firstLogin = firstLogin,
+            tutorial = tutorial
+        )
+}
+
+data class UserStatusData(
+    val tutorialCompleted: Boolean?,
+    val firstLogin: Boolean?,
+    val tutorial: Long?  // 튜토리얼 비트마스크
 )
 
 // ============================================================
@@ -982,4 +1021,31 @@ data class SetStatusRequest(
 
     @SerializedName("new_friends")
     val newFriends: String? = null  // "Y": 뉴프렌즈 신청, "N": 뉴프렌즈 취소
+)
+
+// ============================================================
+// /users/update_tutorial/ - 튜토리얼 완료 처리
+// ============================================================
+/**
+ * 튜토리얼 완료 요청 DTO
+ *
+ * @param tutorialIndex 완료할 튜토리얼의 비트 인덱스
+ */
+data class UpdateTutorialRequest(
+    @SerializedName("tutorial_index")
+    val tutorialIndex: Int
+)
+
+/**
+ * 튜토리얼 완료 응답 DTO
+ *
+ * @param success API 성공 여부
+ * @param tutorial 업데이트된 튜토리얼 비트마스크
+ */
+data class UpdateTutorialResponse(
+    @SerializedName("success")
+    val success: Boolean,
+
+    @SerializedName("tutorial")
+    val tutorial: Long
 )

@@ -114,6 +114,9 @@ import net.ib.mn.presentation.community.burningday.BurningDayDialog
 import net.ib.mn.presentation.community.history.idol.IdolRankingHistoryScreen
 import net.ib.mn.presentation.community.trends.TrendsScreen
 import net.ib.mn.presentation.community.votertop100.VoterTop100Screen
+import net.ib.mn.tutorial.TutorialBits
+import net.ib.mn.tutorial.TutorialManager
+import net.ib.mn.ui.components.ExoTutorialHeart
 
 /**
  * CommunityTab - 커뮤니티 탭 타입
@@ -206,6 +209,9 @@ private fun CommunityScreenContent(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+
+    // 튜토리얼 상태 관찰
+    val currentTutorialIndex by TutorialManager.currentTutorialIndex.collectAsState()
 
     // 아이돌 ID
     val idolId = idolData.id.toIntOrNull()
@@ -425,7 +431,11 @@ private fun CommunityScreenContent(
                             }
                         },
                         onBackClick = onBackClick,
-                        onMoreClick = { showIdolDialog = true }
+                        onMoreClick = { showIdolDialog = true },
+                        currentTutorialIndex = currentTutorialIndex,
+                        onTutorialComplete = { tutorialBit ->
+                            viewModel.updateTutorial(tutorialBit)
+                        }
                     )
 
                     // 탭 레이아웃
@@ -436,6 +446,11 @@ private fun CommunityScreenContent(
                             coroutineScope.launch {
                                 pagerState.animateScrollToPage(index)
                             }
+                        },
+                        tabs = tabs,
+                        currentTutorialIndex = currentTutorialIndex,
+                        onTutorialComplete = { tutorialBit ->
+                            viewModel.updateTutorial(tutorialBit)
                         }
                     )
                 }
@@ -476,6 +491,9 @@ private fun CommunityScreenContent(
                                 articleWriteType = ArticleWriteType.FEED
                                 showArticleWriteScreen = true
                             },
+                            onTutorialComplete = { tutorialIndex ->
+                                viewModel.updateTutorial(tutorialIndex)
+                            },
                             viewModel = feedViewModel
                         )
                         CommunityTab.FAN_TALK -> CommunityFanTalkSubPage(
@@ -490,6 +508,9 @@ private fun CommunityScreenContent(
                                 editingArticle = article
                                 articleWriteType = ArticleWriteType.FAN_TALK
                                 showArticleWriteScreen = true
+                            },
+                            onTutorialComplete = { tutorialIndex ->
+                                viewModel.updateTutorial(tutorialIndex)
                             },
                             viewModel = fanTalkViewModel
                         )
@@ -585,43 +606,67 @@ private fun CommunityScreenContent(
                 else -> R.drawable.btn_write_contents
             }
 
-            Icon(
-                painter = painterResource(fabIcon),
-                contentDescription = when (currentTab) {
-                    CommunityTab.FEED -> "Write Feed"
-                    CommunityTab.FAN_TALK -> "Write Fan Talk"
-                    CommunityTab.CHAT -> "Create Chat Room"
-                    CommunityTab.SCHEDULE -> "Write Schedule"
-                    else -> "Write"
-                },
+            // FAB 클릭 액션 함수
+            val onFabClick: () -> Unit = {
+                when (currentTab) {
+                    CommunityTab.FEED -> {
+                        articleWriteType = ArticleWriteType.FEED
+                        showArticleWriteScreen = true
+                    }
+                    CommunityTab.FAN_TALK -> {
+                        articleWriteType = ArticleWriteType.FAN_TALK
+                        showArticleWriteScreen = true
+                    }
+                    CommunityTab.CHAT -> {
+                        showChatRoomCreateScreen = true
+                    }
+                    CommunityTab.SCHEDULE -> {
+                        showScheduleWriteScreen = true
+                    }
+                    else -> {}
+                }
+            }
+
+            Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 16.dp)
-                    .size(53.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) {
-                        when (currentTab) {
-                            CommunityTab.FEED -> {
-                                articleWriteType = ArticleWriteType.FEED
-                                showArticleWriteScreen = true
-                            }
-                            CommunityTab.FAN_TALK -> {
-                                articleWriteType = ArticleWriteType.FAN_TALK
-                                showArticleWriteScreen = true
-                            }
-                            CommunityTab.CHAT -> {
-                                showChatRoomCreateScreen = true
-                            }
-                            CommunityTab.SCHEDULE -> {
-                                showScheduleWriteScreen = true
-                            }
-                            else -> {}
-                        }
+                    .padding(end = 16.dp, bottom = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(fabIcon),
+                    contentDescription = when (currentTab) {
+                        CommunityTab.FEED -> "Write Feed"
+                        CommunityTab.FAN_TALK -> "Write Fan Talk"
+                        CommunityTab.CHAT -> "Create Chat Room"
+                        CommunityTab.SCHEDULE -> "Write Schedule"
+                        else -> "Write"
                     },
-                tint = Color.Unspecified
-            )
+                    modifier = Modifier
+                        .size(53.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) { onFabClick() },
+                    tint = Color.Unspecified
+                )
+
+                // 튜토리얼 하트: 탭에 따라 다른 튜토리얼 표시
+                val fabTutorialBit = when (currentTab) {
+                    CommunityTab.FAN_TALK -> TutorialBits.COMMUNITY_FAN_TALK_WRITE
+                    else -> TutorialBits.COMMUNITY_WRITE
+                }
+                if (currentTutorialIndex == fabTutorialBit) {
+                    ExoTutorialHeart(
+                        tutorialBit = fabTutorialBit,
+                        animationSize = 32.dp,
+                        onTutorialComplete = {
+                            viewModel.updateTutorial(fabTutorialBit)
+                            onFabClick()
+                        }
+                    )
+                }
+            }
         }
     }
 
@@ -1204,8 +1249,18 @@ data class ChatRoomInfo(
 private fun CommunityTabRow(
     tabTitles: List<String>,
     selectedTabIndex: Int,
-    onTabSelected: (Int) -> Unit
+    onTabSelected: (Int) -> Unit,
+    tabs: List<CommunityTab> = emptyList(),
+    currentTutorialIndex: Int = TutorialBits.NO_TUTORIAL,
+    onTutorialComplete: (Int) -> Unit = {}
 ) {
+    // 탭 타입을 튜토리얼 비트로 매핑
+    fun getTutorialBit(tab: CommunityTab): Int? = when (tab) {
+        CommunityTab.FAN_TALK -> TutorialBits.COMMUNITY_FANTALK
+        CommunityTab.CHAT -> TutorialBits.COMMUNITY_CHAT
+        CommunityTab.SCHEDULE -> TutorialBits.COMMUNITY_SCHEDULE
+        else -> null
+    }
     Column {
         PrimaryScrollableTabRow(
             selectedTabIndex = selectedTabIndex,
@@ -1225,6 +1280,9 @@ private fun CommunityTabRow(
             }
         ) {
             tabTitles.forEachIndexed { index, title ->
+                val tab = tabs.getOrNull(index)
+                val tutorialBit = tab?.let { getTutorialBit(it) }
+
                 Box(
                     modifier = Modifier
                         .wrapContentWidth()
@@ -1243,6 +1301,20 @@ private fun CommunityTabRow(
                             color = if (selectedTabIndex == index) ColorPalette.textDefault else ColorPalette.textDimmed
                         )
                     )
+
+                    // 튜토리얼 하트 오버레이
+                    tutorialBit?.let { bit ->
+                        if (currentTutorialIndex == bit) {
+                            ExoTutorialHeart(
+                                tutorialBit = bit,
+                                animationSize = 28.dp,
+                                onTutorialComplete = {
+                                    onTutorialComplete(bit)
+                                    onTabSelected(index)
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -1267,7 +1339,9 @@ private fun IdolProfile(
     isCollapsed: Boolean = false,
     onProfileImageClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
-    onMoreClick: () -> Unit = {}
+    onMoreClick: () -> Unit = {},
+    currentTutorialIndex: Int = TutorialBits.NO_TUTORIAL,
+    onTutorialComplete: (Int) -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -1315,7 +1389,8 @@ private fun IdolProfile(
                 modifier = Modifier.clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
-                ) { onProfileImageClick() }
+                ) { onProfileImageClick() },
+                contentAlignment = Alignment.Center
             ) {
                 ExoProfileImage(
                     imageUrl = idolData.photoUrl ?: "",
@@ -1327,6 +1402,18 @@ private fun IdolProfile(
                     fairyCount = idolData.fairyCount,
                     angelCount = idolData.angelCount
                 )
+
+                // 튜토리얼 하트: COMMUNITY_WIKI
+                if (currentTutorialIndex == TutorialBits.COMMUNITY_WIKI) {
+                    ExoTutorialHeart(
+                        tutorialBit = TutorialBits.COMMUNITY_WIKI,
+                        animationSize = 28.dp,
+                        onTutorialComplete = {
+                            onTutorialComplete(TutorialBits.COMMUNITY_WIKI)
+                            onProfileImageClick()
+                        }
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(5.dp))
@@ -1359,17 +1446,33 @@ private fun IdolProfile(
         }
 
         // 더보기 버튼 (공통)
-        Icon(
-            painter = painterResource(R.drawable.btn_navigation_view_more),
-            contentDescription = null,
-            tint = Color.Unspecified,
-            modifier = Modifier
-                .padding(end = 16.dp)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { onMoreClick() }
-        )
+        Box(
+            modifier = Modifier.padding(end = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.btn_navigation_view_more),
+                contentDescription = null,
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onMoreClick() }
+            )
+
+            // 튜토리얼 하트: COMMUNITY_MORE
+            if (currentTutorialIndex == TutorialBits.COMMUNITY_MORE) {
+                ExoTutorialHeart(
+                    tutorialBit = TutorialBits.COMMUNITY_MORE,
+                    animationSize = 28.dp,
+                    onTutorialComplete = {
+                        onTutorialComplete(TutorialBits.COMMUNITY_MORE)
+                        onMoreClick()
+                    }
+                )
+            }
+        }
     }
 }
 

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.ib.mn.data.local.PreferencesManager
 import net.ib.mn.data.repository.UserCacheRepository
+import net.ib.mn.tutorial.TutorialRepository
 import net.ib.mn.util.NumberFormatUtil
 import javax.inject.Inject
 
@@ -19,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MyInfoPageViewModel @Inject constructor(
     private val userCacheRepository: UserCacheRepository,
-    private val preferencesManager: PreferencesManager
+    private val preferencesManager: PreferencesManager,
+    private val tutorialRepository: TutorialRepository
 ) : ViewModel() {
 
     companion object {
@@ -223,6 +225,15 @@ class MyInfoPageViewModel @Inject constructor(
             Pair(parts[0], parts.getOrNull(1) ?: "")
         } else {
             Pair(name, "")
+        }
+    }
+
+    /**
+     * 튜토리얼 완료 처리
+     */
+    fun updateTutorial(tutorialIndex: Int) {
+        viewModelScope.launch {
+            tutorialRepository.updateTutorial(tutorialIndex)
         }
     }
 }

@@ -78,9 +78,13 @@ import net.ib.mn.ui.components.ExoDialog
 import net.ib.mn.ui.components.ExoProfileImage
 import net.ib.mn.ui.components.ExoScaffold
 import net.ib.mn.ui.components.ProfileImageType
+import net.ib.mn.tutorial.TutorialBits
+import net.ib.mn.tutorial.TutorialManager
+import net.ib.mn.ui.components.ExoTutorialHeart
 import net.ib.mn.ui.theme.ExoTypo
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.runtime.collectAsState
 
 /**
  * 친구 화면
@@ -181,6 +185,9 @@ fun FriendScreen(
         )
     }
 
+    // 튜토리얼 상태 관찰
+    val currentTutorialIndex by TutorialManager.currentTutorialIndex.collectAsState()
+
     ExoScaffold(
         modifier = modifier,
         topBar = {
@@ -188,16 +195,30 @@ fun FriendScreen(
                 title = stringResource(R.string.friend),
                 onNavigationClick = { navigator.popBackStack() },
                 actions = {
-                    // 뉴프렌즈 (새 친구 추가)
-                    IconButton(
-                        onClick = { navigator.navigate(Screen.FriendAdd) },
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.btn_navigation_friend_add),
-                            contentDescription = "뉴프렌즈",
-                            tint = colorResource(R.color.text_default)
-                        )
+                    // 뉴프렌즈 (새 친구 추가) + 튜토리얼 하트
+                    Box {
+                        IconButton(
+                            onClick = { navigator.navigate(Screen.FriendAdd) },
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.btn_navigation_friend_add),
+                                contentDescription = "뉴프렌즈",
+                                tint = colorResource(R.color.text_default)
+                            )
+                        }
+                        // FRIEND_NEW_FACE 튜토리얼 하트
+                        if (currentTutorialIndex == TutorialBits.FRIEND_NEW_FACE) {
+                            ExoTutorialHeart(
+                                modifier = Modifier.align(Alignment.Center),
+                                tutorialBit = TutorialBits.FRIEND_NEW_FACE,
+                                animationSize = 28.dp,
+                                onTutorialComplete = {
+                                    viewModel.updateTutorial(TutorialBits.FRIEND_NEW_FACE)
+                                    navigator.navigate(Screen.FriendAdd)
+                                }
+                            )
+                        }
                     }
                     // 친구 신청 관리
                     IconButton(
@@ -279,7 +300,7 @@ fun FriendScreen(
                 }
             }
 
-            // 하단 초대 배너 + 툴팁
+            // 하단 초대 배너 + 툴팁 + 튜토리얼 하트
             // old 프로젝트와 동일: 툴팁이 배너 바로 위에 붙음 (constraintBottom_toTopOf="@id/ll_invitation")
             Box(
                 modifier = Modifier.fillMaxWidth()
@@ -299,6 +320,19 @@ fun FriendScreen(
                         modifier = Modifier
                             .align(Alignment.TopCenter)
                             .offset(y = (-32).dp)
+                    )
+                }
+
+                // FRIEND_INVITE 튜토리얼 하트
+                if (currentTutorialIndex == TutorialBits.FRIEND_INVITE) {
+                    ExoTutorialHeart(
+                        modifier = Modifier.align(Alignment.Center),
+                        tutorialBit = TutorialBits.FRIEND_INVITE,
+                        animationSize = 28.dp,
+                        onTutorialComplete = {
+                            viewModel.updateTutorial(TutorialBits.FRIEND_INVITE)
+                            viewModel.sendIntent(FriendContract.Intent.Invite)
+                        }
                     )
                 }
             }

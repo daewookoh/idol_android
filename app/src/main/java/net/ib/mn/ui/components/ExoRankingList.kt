@@ -204,7 +204,8 @@ fun ExoRankingList(
     onVoteSuccess: (Int, Long) -> Unit = { _, _ -> },
     disableAnimation: Boolean = false,
     expandedItemIds: Set<String> = emptySet(),
-    onExpandedChange: (String, Boolean) -> Unit = { _, _ -> }
+    onExpandedChange: (String, Boolean) -> Unit = { _, _ -> },
+    onTutorialComplete: ((Int) -> Unit)? = null
 ) {
     val onRankingItemClick = LocalRankingItemClick.current
     LazyColumn(
@@ -233,7 +234,8 @@ fun ExoRankingList(
             onVoteSuccess = onVoteSuccess,
             disableAnimation = disableAnimation,
             expandedItemIds = expandedItemIds,
-            onExpandedChange = onExpandedChange
+            onExpandedChange = onExpandedChange,
+            onTutorialComplete = onTutorialComplete
         )
     }
 }

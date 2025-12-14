@@ -73,6 +73,7 @@ fun CommunityFeedSubPage(
     onNavigateToPhotoDetail: (ArticleModel, Int) -> Unit = { _, _ -> },
     onNavigateToNoticeDetail: (ArticleModel) -> Unit = {},
     onNavigateToArticleEdit: (ArticleModel) -> Unit = {},  // 수정하기 콜백
+    onTutorialComplete: (Int) -> Unit = {},
     viewModel: CommunityFeedViewModel = hiltViewModel(key = "feed_${idolData.id}"),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
@@ -225,7 +226,8 @@ fun CommunityFeedSubPage(
                                     // ViewModel 직접 업데이트
                                     viewModel.updateArticle(updatedArticle)
                                 },
-                                viewModel = articleViewModel
+                                viewModel = articleViewModel,
+                                onTutorialComplete = onTutorialComplete
                             )
                         }
                     } else {

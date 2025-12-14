@@ -26,6 +26,7 @@ fun CommunityFanTalkSubPage(
     idolData: CommunityViewModel.IdolData,
     onNavigateToArticleDetail: (ArticleModel, externalTabName: String?, onArticleUpdated: (ArticleModel) -> Unit) -> Unit = { _, _, _ -> },
     onNavigateToArticleEdit: (ArticleModel) -> Unit = {},
+    onTutorialComplete: ((Int) -> Unit)? = null,
     viewModel: FreeBoardViewModel = hiltViewModel(key = "fanTalk_${idolData.id}"),
     articleViewModel: ExoArticleViewModel = hiltViewModel()
 ) {
@@ -65,6 +66,7 @@ fun CommunityFanTalkSubPage(
         state = state,
         onIntent = viewModel::sendIntent,
         isExternalIdolMode = viewModel.isExternalIdolMode,
-        articleViewModel = articleViewModel
+        articleViewModel = articleViewModel,
+        onTutorialComplete = onTutorialComplete
     )
 }

@@ -103,6 +103,7 @@ class PreferencesManager @Inject constructor(
 
         // Tutorial Status
         val KEY_TUTORIAL_COMPLETED = booleanPreferencesKey("tutorial_completed")
+        val KEY_TUTORIAL_BITMASK = longPreferencesKey("tutorial_bitmask")  // 튜토리얼 비트마스크 (서버 동기화)
         val KEY_FIRST_LOGIN = booleanPreferencesKey("first_login")
 
         // App Config
@@ -1596,5 +1597,45 @@ class PreferencesManager @Inject constructor(
         return runBlocking {
             context.dataStore.data.first()[KEY_HELP_INFO_THEMEPICK]
         }
+    }
+
+    // ============================================================
+    // Tutorial Bitmask (튜토리얼 하트 시스템)
+    // ============================================================
+
+    /**
+     * 튜토리얼 비트마스크 Flow
+     * 서버에서 받아온 비트마스크를 로컬에 저장하고 실시간 관찰
+     */
+    val tutorialBitmask: Flow<Long> = context.dataStore.data
+        .map { preferences ->
+            preferences[KEY_TUTORIAL_BITMASK] ?: 0L
+        }
+
+    /**
+     * 튜토리얼 비트마스크 저장
+     * 서버 API 응답 후 호출하여 로컬 저장소에 동기화
+     */
+    suspend fun setTutorialBitmask(bitmask: Long) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_TUTORIAL_BITMASK] = bitmask
+        }
+    }
+
+    /**
+     * 튜토리얼 비트마스크 가져오기 (동기)
+     * TutorialManager 초기화 시 사용
+     */
+    fun getTutorialBitmaskSync(): Long {
+        return runBlocking {
+            context.dataStore.data.first()[KEY_TUTORIAL_BITMASK] ?: 0L
+        }
+    }
+
+    /**
+     * 튜토리얼 비트마스크 가져오기 (비동기)
+     */
+    suspend fun getTutorialBitmask(): Long {
+        return context.dataStore.data.first()[KEY_TUTORIAL_BITMASK] ?: 0L
     }
 }

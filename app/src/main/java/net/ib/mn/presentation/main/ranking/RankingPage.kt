@@ -75,6 +75,9 @@ import net.ib.mn.navigation.Screen
 import net.ib.mn.presentation.main.MainViewModel
 import net.ib.mn.presentation.main.ranking.idol_subpage.*
 import net.ib.mn.presentation.webview.WebViewScreen
+import net.ib.mn.tutorial.TutorialBits
+import net.ib.mn.tutorial.TutorialManager
+import net.ib.mn.ui.components.ExoTutorialHeart
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.Constants
@@ -218,7 +221,10 @@ fun RankingPage(
                 showRightGradient = showRightGradient,
                 backgroundColor = backgroundColor,
                 backgroundTransparent = backgroundTransparent,
-                onTabClick = { index -> coroutineScope.launch { subPagerState.animateScrollToPage(index) } }
+                onTabClick = { index -> coroutineScope.launch { subPagerState.animateScrollToPage(index) } },
+                onTutorialComplete = { tutorialIndex ->
+                    mainViewModel.updateTutorial(tutorialIndex)
+                }
             )
         }
 
@@ -358,8 +364,11 @@ private fun RankingTabRow(
     showRightGradient: Boolean,
     backgroundColor: androidx.compose.ui.graphics.Color,
     backgroundTransparent: androidx.compose.ui.graphics.Color,
-    onTabClick: (Int) -> Unit
+    onTabClick: (Int) -> Unit,
+    onTutorialComplete: (Int) -> Unit = {}
 ) {
+    val currentTutorialIndex by TutorialManager.currentTutorialIndex.collectAsState()
+
     Box(modifier = Modifier.fillMaxWidth()) {
         PrimaryScrollableTabRow(
             minTabWidth = 0.dp,
@@ -377,11 +386,21 @@ private fun RankingTabRow(
             }
         ) {
             tabs.forEachIndexed { index, tabName ->
-                val showNewBadge = when (tabDataList.getOrNull(index)?.type) {
+                val tabType = tabDataList.getOrNull(index)?.type
+                val showNewBadge = when (tabType) {
                     "HEARTPICK" -> hasNewHeartPick
                     "ONEPICK" -> hasNewOnePick
                     else -> false
                 }
+
+                // 탭별 튜토리얼 비트 매핑
+                val tutorialBit = when (tabType) {
+                    "MIRACLE" -> TutorialBits.MAIN_MIRACLE
+                    "HEARTPICK" -> TutorialBits.MAIN_HEART_PICK
+                    "ONEPICK" -> TutorialBits.MAIN_ONE_PICK
+                    else -> null
+                }
+
                 Box(
                     modifier = Modifier
                         .wrapContentWidth()
@@ -403,6 +422,21 @@ private fun RankingTabRow(
                             style = ExoTypo.typo8Main,
                             modifier = Modifier.align(Alignment.TopCenter).padding(top = 6.dp)
                         )
+                    }
+
+                    // 튜토리얼 하트 오버레이
+                    tutorialBit?.let { bit ->
+                        if (currentTutorialIndex == bit) {
+                            ExoTutorialHeart(
+                                modifier = Modifier.align(Alignment.Center),
+                                tutorialBit = bit,
+                                animationSize = 28.dp,
+                                onTutorialComplete = {
+                                    onTutorialComplete(bit)
+                                    onTabClick(index)
+                                }
+                            )
+                        }
                     }
                 }
             }

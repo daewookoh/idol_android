@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -63,12 +64,15 @@ import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleFile
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.domain.model.ArticleTranslateState
+import net.ib.mn.tutorial.TutorialBits
+import net.ib.mn.tutorial.TutorialManager
 import net.ib.mn.ui.components.ExoArticleVoteDialog
 import net.ib.mn.ui.components.ExoBottomSheetAction
 import net.ib.mn.ui.components.ExoBottomSheetActionItem
 import net.ib.mn.ui.components.ExoConfirmDialog
 import net.ib.mn.ui.components.ExoErrorDialog
 import net.ib.mn.ui.components.ExoProfileImage
+import net.ib.mn.ui.components.ExoTutorialHeart
 import net.ib.mn.ui.components.ExoVideoPlayer
 import net.ib.mn.ui.components.ExoYouTubePlayer
 import net.ib.mn.ui.components.ProfileImageType
@@ -131,7 +135,8 @@ fun ExoArticleItem(
     onDeleted: ((String) -> Unit)? = null,
     onArticleUpdated: ((ArticleModel) -> Unit)? = null,
     viewModel: ExoArticleViewModel = hiltViewModel(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onTutorialComplete: ((Int) -> Unit)? = null
 ) {
     // ADMIN_NOTICE 타입: 공지사항 UI
     if (type.isAdminNotice) {
@@ -158,6 +163,9 @@ fun ExoArticleItem(
     // FEED: 전체 UI
 
     val context = LocalContext.current
+
+    // 튜토리얼 상태 관찰
+    val currentTutorialIndex by TutorialManager.currentTutorialIndex.collectAsState()
 
     // 로컬 상태 (즉시 UI 업데이트용)
     var localIsLiked by remember { mutableStateOf(article.isUserLike) }
@@ -309,12 +317,36 @@ fun ExoArticleItem(
                                 mostIdolName = mostIdolName
                             )
                         }
-                    }
+                    },
+                    contentAlignment = Alignment.Center
                 ) {
                     ExoProfileImage(
                         imageUrl = profileImageUrl,
                         type = ProfileImageType.SMALL
                     )
+
+                    // 튜토리얼 하트 오버레이 - 유저 프로필
+                    if (currentTutorialIndex == TutorialBits.COMMUNITY_FEED_USER_PROFILE) {
+                        ExoTutorialHeart(
+                            tutorialBit = TutorialBits.COMMUNITY_FEED_USER_PROFILE,
+                            animationSize = 28.dp,
+                            onTutorialComplete = {
+                                onTutorialComplete?.invoke(TutorialBits.COMMUNITY_FEED_USER_PROFILE)
+                                article.user?.let { user ->
+                                    val mostIdolName = user.most?.let { most ->
+                                        LocaleUtil.getLocalizedIdolName(context, most)
+                                    }
+                                    viewModel.navigateToProfile(
+                                        userId = user.id,
+                                        nickname = user.nickname ?: "",
+                                        imageUrl = user.imageUrlCommunity,
+                                        level = user.level,
+                                        mostIdolName = mostIdolName
+                                    )
+                                }
+                            }
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(10.dp))
@@ -625,34 +657,85 @@ fun ExoArticleItem(
             ) {
                 // 하트투표 버튼 (FREE_BOARD 제외)
                 if (!type.isFreeBoard) {
-                    ArticleItemActionButton(
-                        iconRes = R.drawable.icon_community_heart,
-                        label = stringResource(R.string.lable_community_heart_vote),
-                        onClick = { showVoteDialog = true },
-                        modifier = Modifier.weight(1f)
-                    )
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ArticleItemActionButton(
+                            iconRes = R.drawable.icon_community_heart,
+                            label = stringResource(R.string.lable_community_heart_vote),
+                            onClick = { showVoteDialog = true },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        // 튜토리얼 하트 오버레이 - 피드 투표
+                        if (currentTutorialIndex == TutorialBits.COMMUNITY_FEED_VOTE) {
+                            ExoTutorialHeart(
+                                tutorialBit = TutorialBits.COMMUNITY_FEED_VOTE,
+                                animationSize = 28.dp,
+                                onTutorialComplete = {
+                                    onTutorialComplete?.invoke(TutorialBits.COMMUNITY_FEED_VOTE)
+                                    showVoteDialog = true
+                                }
+                            )
+                        }
+                    }
                     ArticleItemVerticalDivider()
                 }
 
                 // 좋아요 버튼 (FEED에서만 색상 표시)
                 val showLikeColorBtn = type == ArticleItemType.FEED && localIsLiked
-                ArticleItemActionButton(
-                    iconRes = if (showLikeColorBtn) R.drawable.icon_board_like_active else R.drawable.icon_board_like,
-                    label = stringResource(R.string.support_sympathy),
-                    onClick = onLikeClick,
+                Box(
                     modifier = Modifier.weight(1f),
-                    tintColor = if (showLikeColorBtn) null else ColorPalette.textDefault
-                )
+                    contentAlignment = Alignment.Center
+                ) {
+                    ArticleItemActionButton(
+                        iconRes = if (showLikeColorBtn) R.drawable.icon_board_like_active else R.drawable.icon_board_like,
+                        label = stringResource(R.string.support_sympathy),
+                        onClick = onLikeClick,
+                        modifier = Modifier.fillMaxWidth(),
+                        tintColor = if (showLikeColorBtn) null else ColorPalette.textDefault
+                    )
+
+                    // 튜토리얼 하트 오버레이 - 피드 좋아요
+                    if (currentTutorialIndex == TutorialBits.COMMUNITY_FEED_LIKES) {
+                        ExoTutorialHeart(
+                            tutorialBit = TutorialBits.COMMUNITY_FEED_LIKES,
+                            animationSize = 28.dp,
+                            onTutorialComplete = {
+                                onTutorialComplete?.invoke(TutorialBits.COMMUNITY_FEED_LIKES)
+                                onLikeClick()
+                            }
+                        )
+                    }
+                }
 
                 // 댓글 버튼
                 ArticleItemVerticalDivider()
-                ArticleItemActionButton(
-                    iconRes = R.drawable.icon_community_comment,
-                    label = stringResource(R.string.lable_community_comment),
-                    onClick = { viewModel.navigateToArticleDetail(article) },
+                Box(
                     modifier = Modifier.weight(1f),
-                    tintColor = ColorPalette.textDefault
-                )
+                    contentAlignment = Alignment.Center
+                ) {
+                    ArticleItemActionButton(
+                        iconRes = R.drawable.icon_community_comment,
+                        label = stringResource(R.string.lable_community_comment),
+                        onClick = { viewModel.navigateToArticleDetail(article) },
+                        modifier = Modifier.fillMaxWidth(),
+                        tintColor = ColorPalette.textDefault
+                    )
+
+                    // 튜토리얼 하트 오버레이 - 피드 댓글
+                    if (currentTutorialIndex == TutorialBits.COMMUNITY_FEED_COMMENTS) {
+                        ExoTutorialHeart(
+                            tutorialBit = TutorialBits.COMMUNITY_FEED_COMMENTS,
+                            animationSize = 28.dp,
+                            onTutorialComplete = {
+                                onTutorialComplete?.invoke(TutorialBits.COMMUNITY_FEED_COMMENTS)
+                                viewModel.navigateToArticleDetail(article)
+                            }
+                        )
+                    }
+                }
             }
         }
 

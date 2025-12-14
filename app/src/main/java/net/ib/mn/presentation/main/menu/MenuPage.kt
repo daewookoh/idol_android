@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +34,9 @@ import net.ib.mn.domain.model.TextMenuType
 import net.ib.mn.presentation.common.InAppBannerSection
 import net.ib.mn.presentation.main.menu.components.MenuIconItem
 import net.ib.mn.presentation.main.menu.components.MenuTextItem
+import net.ib.mn.tutorial.TutorialBits
+import net.ib.mn.tutorial.TutorialManager
+import net.ib.mn.ui.components.ExoTutorialHeart
 
 /**
  * Menu 페이지
@@ -70,6 +76,9 @@ fun MenuPage(
                 }
                 else -> {}
             }
+        },
+        onTutorialComplete = { tutorialIndex ->
+            viewModel.updateTutorial(tutorialIndex)
         }
     )
 }
@@ -82,7 +91,8 @@ private fun MenuContent(
     textMenuItems: List<TextMenuItem>,
     onBannerClick: (String?) -> Unit = {},
     onMenuItemClick: (IconMenuItem) -> Unit = {},
-    onTextMenuItemClick: (TextMenuItem) -> Unit = {}
+    onTextMenuItemClick: (TextMenuItem) -> Unit = {},
+    onTutorialComplete: (Int) -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
 
@@ -112,7 +122,8 @@ private fun MenuContent(
             // 아이콘 메뉴 그리드 (4열)
             IconMenuGrid(
                 items = iconMenuItems,
-                onItemClick = onMenuItemClick
+                onItemClick = onMenuItemClick,
+                onTutorialComplete = onTutorialComplete
             )
 
             // 구분선 (10dp 높이, gray50 배경)
@@ -126,7 +137,8 @@ private fun MenuContent(
             // 텍스트 메뉴 리스트
             TextMenuList(
                 items = textMenuItems,
-                onItemClick = onTextMenuItemClick
+                onItemClick = onTextMenuItemClick,
+                onTutorialComplete = onTutorialComplete
             )
         }
     }
@@ -138,9 +150,22 @@ private fun MenuContent(
 @Composable
 private fun IconMenuGrid(
     items: List<IconMenuItem>,
-    onItemClick: (IconMenuItem) -> Unit
+    onItemClick: (IconMenuItem) -> Unit,
+    onTutorialComplete: (Int) -> Unit = {}
 ) {
     val rows = items.chunked(4)  // 4개씩 잘라서 행으로 만들기
+    val currentTutorialIndex by TutorialManager.currentTutorialIndex.collectAsState()
+
+    // IconMenuType을 TutorialBit으로 매핑
+    fun getTutorialBit(type: IconMenuType): Int? = when (type) {
+        IconMenuType.SUPPORT -> TutorialBits.MENU_SUPPORT
+        IconMenuType.FREE_CHARGE -> TutorialBits.MENU_FREE_HEART
+        IconMenuType.ATTENDANCE -> TutorialBits.MENU_DAILY_STAMP
+        IconMenuType.EVENT -> TutorialBits.MENU_EVENT
+        IconMenuType.STORE -> TutorialBits.MENU_HEART_SHOP
+        IconMenuType.NOTICE -> TutorialBits.MENU_NOTICE
+        else -> null
+    }
 
     Column(
         modifier = Modifier
@@ -153,11 +178,32 @@ private fun IconMenuGrid(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 rowItems.forEach { item ->
-                    Box(modifier = Modifier.weight(1f)) {
+                    val tutorialBit = getTutorialBit(item.type)
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
                         MenuIconItem(
                             item = item,
                             onClick = { onItemClick(item) }
                         )
+
+                        // 튜토리얼 하트 오버레이
+                        tutorialBit?.let { bit ->
+                            if (currentTutorialIndex == bit) {
+                                ExoTutorialHeart(
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                        .offset(y = (-20).dp),
+                                    tutorialBit = bit,
+                                    animationSize = 28.dp,
+                                    onTutorialComplete = {
+                                        onTutorialComplete(bit)
+                                        onItemClick(item)
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
                 // 빈 공간 채우기 (4개 미만인 경우)
@@ -175,14 +221,47 @@ private fun IconMenuGrid(
 @Composable
 private fun TextMenuList(
     items: List<TextMenuItem>,
-    onItemClick: (TextMenuItem) -> Unit
+    onItemClick: (TextMenuItem) -> Unit,
+    onTutorialComplete: (Int) -> Unit = {}
 ) {
+    val currentTutorialIndex by TutorialManager.currentTutorialIndex.collectAsState()
+
+    // TextMenuType을 TutorialBit으로 매핑
+    fun getTutorialBit(type: TextMenuType): Int? = when (type) {
+        TextMenuType.VOTE_CERTIFICATE -> TutorialBits.MENU_CERTIFICATE
+        TextMenuType.INVITE_FRIEND -> TutorialBits.MENU_FRIEND_INVITE
+        TextMenuType.HISTORY -> TutorialBits.MENU_STATS
+        TextMenuType.STORE -> TutorialBits.MENU_HEART_SHOP
+        TextMenuType.NOTICE -> TutorialBits.MENU_NOTICE
+        else -> null
+    }
+
     Column(modifier = Modifier.fillMaxWidth()) {
         items.forEach { item ->
-            MenuTextItem(
-                item = item,
-                onClick = { onItemClick(item) }
-            )
+            val tutorialBit = getTutorialBit(item.type)
+            Box(contentAlignment = Alignment.CenterStart) {
+                MenuTextItem(
+                    item = item,
+                    onClick = { onItemClick(item) }
+                )
+
+                // 튜토리얼 하트 오버레이
+                tutorialBit?.let { bit ->
+                    if (currentTutorialIndex == bit) {
+                        ExoTutorialHeart(
+                            modifier = Modifier
+                                .padding(start = 35.dp)
+                                .align(Alignment.CenterStart),
+                            tutorialBit = bit,
+                            animationSize = 28.dp,
+                            onTutorialComplete = {
+                                onTutorialComplete(bit)
+                                onItemClick(item)
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
 }

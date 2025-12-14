@@ -18,6 +18,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,6 +31,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.ib.mn.R
+import net.ib.mn.tutorial.TutorialBits
+import net.ib.mn.tutorial.TutorialManager
+import net.ib.mn.ui.components.ExoTutorialHeart
 import net.ib.mn.ui.theme.ExoTypo
 
 /**
@@ -43,8 +48,10 @@ fun MyInfoHeart(
     weakHeart: String = "0",
     diaCount: String = "0",
     onInfoClick: () -> Unit = {},
-    onHistoryClick: () -> Unit = {}
+    onHistoryClick: () -> Unit = {},
+    onTutorialComplete: (Int) -> Unit = {}
 ) {
+    val currentTutorialIndex by TutorialManager.currentTutorialIndex.collectAsState()
     // layout_currency
     Box(
         modifier = modifier
@@ -205,6 +212,19 @@ fun MyInfoHeart(
                     text = stringResource(id = R.string.my_info_heart_dia_detail),
                     style = ExoTypo.typo14.copy(color = colorResource(id = R.color.text_gray))
                 )
+
+                // 튜토리얼 하트 오버레이 - 내역 보기
+                if (currentTutorialIndex == TutorialBits.MY_HEART_EARN) {
+                    ExoTutorialHeart(
+                        modifier = Modifier.align(Alignment.Center),
+                        tutorialBit = TutorialBits.MY_HEART_EARN,
+                        animationSize = 28.dp,
+                        onTutorialComplete = {
+                            onTutorialComplete(TutorialBits.MY_HEART_EARN)
+                            onHistoryClick()
+                        }
+                    )
+                }
             }
         }
 

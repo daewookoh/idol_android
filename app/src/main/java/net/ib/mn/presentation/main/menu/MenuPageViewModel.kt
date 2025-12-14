@@ -23,6 +23,7 @@ import net.ib.mn.domain.model.InAppBanner
 import net.ib.mn.domain.model.MenuConfig
 import net.ib.mn.domain.model.TextMenuItem
 import net.ib.mn.domain.model.TextMenuType
+import net.ib.mn.tutorial.TutorialRepository
 import net.ib.mn.util.LocaleUtil
 import net.ib.mn.util.SupportedLanguage
 import org.json.JSONArray
@@ -38,7 +39,8 @@ class MenuPageViewModel @Inject constructor(
     private val preferencesManager: PreferencesManager,
     private val miscApi: MiscApi,
     private val stampsApi: StampsApi,
-    private val usersRepository: UsersRepository
+    private val usersRepository: UsersRepository,
+    private val tutorialRepository: TutorialRepository
 ) : ViewModel() {
 
     private val _iconMenuItems = MutableStateFlow<List<IconMenuItem>>(emptyList())
@@ -302,5 +304,14 @@ class MenuPageViewModel @Inject constructor(
             iconResId = R.drawable.icon_sidemenu_game,
             type = TextMenuType.GAME
         ))
+    }
+
+    /**
+     * 튜토리얼 완료 처리
+     */
+    fun updateTutorial(tutorialIndex: Int) {
+        viewModelScope.launch {
+            tutorialRepository.updateTutorial(tutorialIndex)
+        }
     }
 }

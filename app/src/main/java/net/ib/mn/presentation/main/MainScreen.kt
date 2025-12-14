@@ -286,7 +286,10 @@ fun MainScreen(
                     onFriendsClick = { navigator.navigate(Screen.Friend) },
                     onAttendanceClick = { },
                     onNotificationClick = { },
-                    onSettingClick = { }
+                    onSettingClick = { },
+                    onTutorialComplete = { tutorialIndex ->
+                        viewModel.updateTutorial(tutorialIndex)
+                    }
                 )
             },
             bottomBar = {
@@ -301,6 +304,9 @@ fun MainScreen(
                     onTabSelected = { tab ->
                         selectedTab = tab
                         viewModel.onTabSelected(tab)
+                    },
+                    onTutorialComplete = { tutorialIndex ->
+                        viewModel.updateTutorial(tutorialIndex)
                     }
                 )
             }

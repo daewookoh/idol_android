@@ -26,6 +26,7 @@ import net.ib.mn.domain.usecase.GetUpdateInfoUseCase
 import net.ib.mn.domain.usecase.GetUserSelfUseCase
 import net.ib.mn.domain.usecase.GetUserStatusUseCase
 import net.ib.mn.domain.usecase.UpdateTimezoneUseCase
+import net.ib.mn.tutorial.TutorialManager
 import net.ib.mn.util.Constants
 import javax.inject.Inject
 
@@ -520,6 +521,9 @@ class StartUpViewModel @Inject constructor(
 
     /**
      * UserStatus API 호출 (튜토리얼 상태)
+     *
+     * old 프로젝트의 getUserStatus()와 동일:
+     * - tutorial 필드에서 비트마스크를 받아 TutorialManager 초기화
      */
     private suspend fun loadUserStatus() {
         getUserStatusUseCase().collect { result ->
@@ -527,16 +531,24 @@ class StartUpViewModel @Inject constructor(
                 is ApiResult.Loading -> {}
                 is ApiResult.Success -> {
                     val data = result.data.data
-
+                    net.ib.mn.util.logD("StartUpViewModel", "loadUserStatus success: data=$data")
 
                     // 사용자 상태 DataStore 저장
                     data?.let { statusData ->
+                        net.ib.mn.util.logD("StartUpViewModel", "loadUserStatus statusData: tutorial=${statusData.tutorial}, tutorialCompleted=${statusData.tutorialCompleted}, firstLogin=${statusData.firstLogin}")
                         statusData.tutorialCompleted?.let { preferencesManager.setTutorialCompleted(it) }
                         statusData.firstLogin?.let { preferencesManager.setFirstLogin(it) }
+
+                        // 튜토리얼 비트마스크 초기화 (old 프로젝트와 동일)
+                        val bitmask = statusData.tutorial ?: 0L
+                        net.ib.mn.util.logD("StartUpViewModel", "Initializing TutorialManager with bitmask: $bitmask")
+                        TutorialManager.init(bitmask)
+                        preferencesManager.setTutorialBitmask(bitmask)
 
                     }
                 }
                 is ApiResult.Error -> {
+                    net.ib.mn.util.logD("StartUpViewModel", "loadUserStatus error: ${result.error}")
                 }
             }
         }

@@ -10,11 +10,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -23,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.ib.mn.R
 import net.ib.mn.presentation.main.ranking.idol_subpage.VoteViewModel
+import net.ib.mn.tutorial.TutorialBits
+import net.ib.mn.tutorial.TutorialManager
 import net.ib.mn.ui.theme.ColorPalette
 
 /**
@@ -59,12 +63,16 @@ fun ExoVoteIcon(
     type: String = "DEFAULT",
     onVoteSuccess: ((Long) -> Unit)? = null,
     modifier: Modifier = Modifier,
-    voteViewModel: VoteViewModel = hiltViewModel()
+    voteViewModel: VoteViewModel = hiltViewModel(),
+    onTutorialComplete: ((Int) -> Unit)? = null
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     var showVoteDialog by remember { mutableStateOf(false) }
+
+    // 튜토리얼 상태 관찰
+    val currentTutorialIndex by TutorialManager.currentTutorialIndex.collectAsState()
 
     // 투표 다이얼로그 (다이얼로그 내부에서 투표 처리 및 완료 바텀시트 표시)
     if (showVoteDialog) {
@@ -89,7 +97,10 @@ fun ExoVoteIcon(
     // 타입에 따른 아이콘 렌더링
     when (type) {
         "CIRCLE" -> {
-            Box(modifier=modifier){
+            Box(
+                modifier = modifier,
+                contentAlignment = Alignment.Center
+            ) {
                 Icon(
                     painter = painterResource(R.drawable.btn_ranking_vote_heart),
                     contentDescription = "투표",
@@ -99,11 +110,24 @@ fun ExoVoteIcon(
                             showVoteDialog = true
                         }.background(ColorPalette.background100, CircleShape)
                 )
+
+                // 튜토리얼 하트 오버레이 - 투표 버튼
+                if (currentTutorialIndex == TutorialBits.MAIN_VOTE) {
+                    ExoTutorialHeart(
+                        tutorialBit = TutorialBits.MAIN_VOTE,
+                        animationSize = 28.dp,
+                        onTutorialComplete = {
+                            onTutorialComplete?.invoke(TutorialBits.MAIN_VOTE)
+                            showVoteDialog = true
+                        }
+                    )
+                }
             }
         }
         else -> {
             Box(
-                modifier = modifier.padding(horizontal = 15.dp)
+                modifier = modifier.padding(horizontal = 15.dp),
+                contentAlignment = Alignment.Center
             ) {
                 IconButton(
                     onClick = {
@@ -116,6 +140,18 @@ fun ExoVoteIcon(
                         contentDescription = "투표",
                         tint = ColorPalette.main,
                         modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                // 튜토리얼 하트 오버레이 - 투표 버튼
+                if (currentTutorialIndex == TutorialBits.MAIN_VOTE) {
+                    ExoTutorialHeart(
+                        tutorialBit = TutorialBits.MAIN_VOTE,
+                        animationSize = 28.dp,
+                        onTutorialComplete = {
+                            onTutorialComplete?.invoke(TutorialBits.MAIN_VOTE)
+                            showVoteDialog = true
+                        }
                     )
                 }
             }
