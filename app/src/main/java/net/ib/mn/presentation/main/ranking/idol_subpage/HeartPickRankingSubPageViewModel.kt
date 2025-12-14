@@ -104,7 +104,7 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
 
     private fun processHeartPickData(heartPicks: List<HeartPickModel>) {
         try {
-            val cardDataList = heartPicks.map { heartPick ->
+            val cardDataList = heartPicks.mapIndexed { index, heartPick ->
                 val state = when (heartPick.status) {
                     0 -> HeartPickState.UPCOMING  // 진행예정
                     1 -> HeartPickState.ACTIVE     // 진행중
@@ -160,6 +160,9 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
                 val localizedBannerUrl = IdolImageUtil.getLocalizedBannerUrl(context, heartPick.bannerUrl)
                 val secureUrl = localizedBannerUrl.toSecureUrl()
 
+                // 신규 카드 여부: 첫 번째 아이템이면서 48시간 이내에 시작된 경우
+                val isNew = index == 0 && DateTimeUtil.isWithin48Hours(heartPick.beginAt)
+
                 HeartPickCardData(
                     id = heartPick.id,
                     state = state,
@@ -174,7 +177,7 @@ class HeartPickRankingSubPageViewModel @AssistedInject constructor(
                     periodDate = periodDate,
                     openDate = openDate,
                     openPeriod = openPeriod,
-                    isNew = false
+                    isNew = isNew
                 )
             }
 

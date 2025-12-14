@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -296,9 +297,9 @@ private fun ThemePickUpcomingCard(
                 painter = painterResource(R.drawable.icon_heartpick_new),
                 contentDescription = "New",
                 modifier = Modifier
+                    .size(width = 23.dp, height = 31.dp)
                     .align(Alignment.TopEnd)
-                    .padding(top = 21.dp)
-                    .size(width = 23.dp, height = 31.dp),
+                    .offset(x = 7.dp, y = 18.dp),
                 tint = Color.Unspecified
             )
         }
@@ -397,9 +398,9 @@ private fun ThemePickActiveCard(
                 painter = painterResource(R.drawable.icon_heartpick_new),
                 contentDescription = "New",
                 modifier = Modifier
+                    .size(width = 23.dp, height = 31.dp)
                     .align(Alignment.TopEnd)
-                    .padding(top = 21.dp)
-                    .size(width = 23.dp, height = 31.dp),
+                    .offset(x = 7.dp, y = 18.dp),
                 tint = Color.Unspecified
             )
         }
