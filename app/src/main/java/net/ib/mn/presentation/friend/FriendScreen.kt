@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -253,6 +254,11 @@ fun FriendScreen(
                             sendingHeartIds = state.sendingHeartIds,
                             heartPrefs = heartPrefs,
                             timerTick = timerTick,
+                            showHeartTooltip = showHeartTooltip,
+                            onDismissHeartTooltip = {
+                                showHeartTooltip = false
+                                tooltipPrefs.edit().putBoolean("heart_tooltip_dismissed", true).apply()
+                            },
                             onSendHeart = { friend ->
                                 viewModel.sendIntent(FriendContract.Intent.SendHeart(friend.user.id, friend.user.nickname))
                             },
@@ -270,21 +276,6 @@ fun FriendScreen(
                             }
                         )
                     }
-                }
-
-                // HeartTooltip을 LazyColumn 외부에 배치하여 모든 아이템 위에 표시
-                if (showHeartTooltip && state.friends.isNotEmpty()) {
-                    HeartTooltip(
-                        text = stringResource(R.string.label_tooltip_friend_heart),
-                        onDismiss = {
-                            showHeartTooltip = false
-                            tooltipPrefs.edit().putBoolean("heart_tooltip_dismissed", true).apply()
-                        },
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(end = 68.dp)
-                            .offset(y = if (state.requesters.isNotEmpty()) 130.dp else 60.dp)
-                    )
                 }
             }
 
@@ -307,7 +298,7 @@ fun FriendScreen(
                         },
                         modifier = Modifier
                             .align(Alignment.TopCenter)
-                            .offset(y = (-40).dp)
+                            .offset(y = (-32).dp)
                     )
                 }
             }
@@ -464,6 +455,8 @@ private fun FriendListContent(
     sendingHeartIds: Set<Int>,
     heartPrefs: SharedPreferences,
     timerTick: Long,
+    showHeartTooltip: Boolean,
+    onDismissHeartTooltip: () -> Unit,
     onSendHeart: (FriendModel) -> Unit,
     onSendHeartToAll: () -> Unit,
     onReceiveHeart: () -> Unit,
@@ -491,14 +484,10 @@ private fun FriendListContent(
                 friendCount = friends.size,
                 heartPrefs = heartPrefs,
                 timerTick = timerTick,
+                showHeartTooltip = showHeartTooltip,
+                onDismissHeartTooltip = onDismissHeartTooltip,
                 onReceiveHeart = onReceiveHeart,
                 onSendHeartToAll = onSendHeartToAll
-            )
-
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 10.dp),
-                thickness = 1.dp,
-                color = colorResource(R.color.gray100)
             )
         }
 
@@ -569,6 +558,8 @@ private fun FriendListHeader(
     friendCount: Int,
     heartPrefs: SharedPreferences,
     timerTick: Long,
+    showHeartTooltip: Boolean,
+    onDismissHeartTooltip: () -> Unit,
     onReceiveHeart: () -> Unit,
     onSendHeartToAll: () -> Unit
 ) {
@@ -583,69 +574,92 @@ private fun FriendListHeader(
     val expireTime = lastSendAllTime + cooldownMs
     val showSendAllTimer = lastSendAllTime > 0 && currentTime < expireTime
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(colorResource(R.color.background_100))
-            .padding(horizontal = 10.dp, vertical = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // 친구 목록 (N)
-        Text(
-            text = stringResource(R.string.friend_section_title) + " ($friendCount)",
-            color = colorResource(R.color.gray300),
-            style = ExoTypo.typo13
-        )
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // 하트 받기 버튼
-            IconButton(
-                onClick = onReceiveHeart,
-                modifier = Modifier.size(50.dp)
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(colorResource(R.color.background_100))
+                    .padding(horizontal = 10.dp, vertical = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                AsyncImage(
-                    model = R.drawable.btn_take_heart,
-                    contentDescription = "하트 받기",
-                    modifier = Modifier.size(50.dp)
+                // 친구 목록 (N)
+                Text(
+                    text = stringResource(R.string.friend_section_title) + " ($friendCount)",
+                    color = colorResource(R.color.gray300),
+                    style = ExoTypo.typo13
                 )
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // 하트 받기 버튼
+                    IconButton(
+                        onClick = onReceiveHeart,
+                        modifier = Modifier.size(50.dp)
+                    ) {
+                        AsyncImage(
+                            model = R.drawable.btn_take_heart,
+                            contentDescription = "하트 받기",
+                            modifier = Modifier.size(50.dp)
+                        )
+                    }
+
+                    // 전체 하트 보내기 버튼 또는 타이머
+                    if (showSendAllTimer) {
+                        // 타이머 표시 (old: sectionWaitTimer)
+                        val remainingSeconds = (expireTime - currentTime) / 1000
+                        val timerText = String.format(
+                            java.util.Locale.getDefault(),
+                            "%d:%02d",
+                            remainingSeconds / 60,
+                            remainingSeconds % 60
+                        )
+                        Box(
+                            modifier = Modifier.size(50.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = timerText,
+                                color = colorResource(R.color.main),
+                                style = ExoTypo.typo14Bold
+                            )
+                        }
+                    } else {
+                        IconButton(
+                            onClick = onSendHeartToAll,
+                            modifier = Modifier.size(50.dp)
+                        ) {
+                            AsyncImage(
+                                model = R.drawable.btn_give_heart_all_off,
+                                contentDescription = "전체 하트 보내기",
+                                modifier = Modifier.size(50.dp)
+                            )
+                        }
+                    }
+                }
             }
 
-            // 전체 하트 보내기 버튼 또는 타이머
-            if (showSendAllTimer) {
-                // 타이머 표시 (old: sectionWaitTimer)
-                val remainingSeconds = (expireTime - currentTime) / 1000
-                val timerText = String.format(
-                    java.util.Locale.getDefault(),
-                    "%d:%02d",
-                    remainingSeconds / 60,
-                    remainingSeconds % 60
-                )
-                Box(
-                    modifier = Modifier.size(50.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = timerText,
-                        color = colorResource(R.color.main),
-                        style = ExoTypo.typo14Bold
-                    )
-                }
-            } else {
-                IconButton(
-                    onClick = onSendHeartToAll,
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    AsyncImage(
-                        model = R.drawable.btn_give_heart_all_off,
-                        contentDescription = "전체 하트 보내기",
-                        modifier = Modifier.size(50.dp)
-                    )
-                }
-            }
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 10.dp),
+                thickness = 1.dp,
+                color = colorResource(R.color.gray100)
+            )
+        }
+
+        // HeartTooltip - 하트 받기 버튼 아래에 위치 (zIndex로 divider 위에 표시)
+        if (showHeartTooltip) {
+            HeartTooltip(
+                text = stringResource(R.string.label_tooltip_friend_heart),
+                onDismiss = onDismissHeartTooltip,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 71.dp)
+                    .offset(y = 58.dp)
+                    .zIndex(1f)
+            )
         }
     }
 }
