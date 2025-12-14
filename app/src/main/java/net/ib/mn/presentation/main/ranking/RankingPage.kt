@@ -105,6 +105,7 @@ fun RankingPage(
     var webViewEventId by rememberSaveable { mutableStateOf<Int?>(null) }
     var webViewTitle by rememberSaveable { mutableStateOf("") }
 
+
     // 최애 이동 토스트 상태
     val showMyFavToast by viewModel.showMyFavToast.collectAsState()
     val myFavIdolPosition by viewModel.myFavIdolPosition.collectAsState()
@@ -287,7 +288,7 @@ fun RankingPage(
                         if (showAwardButton) {
                             navigator.navigate(Screen.Awards)
                         } else {
-                            // TODO: WelcomeMissionFragment로 이동
+                            navigator.navigate(Screen.WelcomeMission)
                         }
                     }
                 )
@@ -315,6 +316,7 @@ fun RankingPage(
             )
         }
     }
+
 }
 
 // 탭 라벨 데이터 클래스

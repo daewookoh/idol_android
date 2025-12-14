@@ -25,6 +25,7 @@ import net.ib.mn.presentation.imagepick.live.ImagePickLiveScreen
 import net.ib.mn.presentation.community.history.idol.IdolRankingHistoryScreen
 import net.ib.mn.presentation.community.history.daily.DailyRankingHistoryScreen
 import net.ib.mn.presentation.profile.ProfileScreen
+import net.ib.mn.presentation.welcomemission.WelcomeMissionScreen
 import net.ib.mn.presentation.login.EmailLoginScreen
 import net.ib.mn.presentation.login.LoginScreen
 import net.ib.mn.presentation.login.PasswordResetScreen
@@ -351,6 +352,18 @@ fun NavGraph(
                             mostIdolName = screen.mostIdolName,
                             isMine = screen.isMine,
                             onBackClick = { navigator.popBackStack() }
+                        )
+                    }
+
+                    // WelcomeMission 화면 (웰컴 미션)
+                    is Screen.WelcomeMission -> NavEntry(screen) {
+                        WelcomeMissionScreen(
+                            onBackClick = { navigator.popBackStack() },
+                            onNavigateToSetMost = { navigator.navigate(Screen.Main(initialTab = 1)) },
+                            onNavigateToVoteMost = { navigator.navigate(Screen.Main(initialTab = 0)) },
+                            onNavigateToAddFriend = { navigator.navigate(Screen.FriendAdd) },
+                            onNavigateToPosting = { navigator.navigate(Screen.Main(initialTab = 3)) },
+                            onNavigateToVideoAd = { navigator.navigate(Screen.Main(initialTab = 4)) }
                         )
                     }
                 }

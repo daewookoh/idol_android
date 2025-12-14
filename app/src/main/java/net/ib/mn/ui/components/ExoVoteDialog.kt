@@ -23,7 +23,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -42,8 +41,6 @@ import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -554,129 +551,76 @@ fun VoteCompleteBottomSheet(
         subtitle
     }
 
-    ExoBottomSheet(
-        onDismissRequest = onDismiss,
-        type = ExoBottomSheetType.DESIGN
+    ExoRewardBottomSheet(
+        imageRes = R.drawable.img_popup_vote,
+        onDismiss = onDismiss
     ) {
-        // old: cl_reward_root - paddingTop 10dp, transparent background
-        Box(
+        // old: tv_title - 22sp bold
+        Text(
+            text = title,
+            style = ExoTypo.typo22Bold.copy(color = ColorPalette.textChat),
+            textAlign = TextAlign.Center
+        )
+
+        // old: cl_heart - 보너스 하트 (100개 이상일 때만)
+        if (hasBonusHeart) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text(
+                    text = "+",
+                    style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
+                )
+                Text(
+                    text = bonusHeart.toString(),
+                    style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Image(
+                    painter = painterResource(R.drawable.img_popup_heart),
+                    contentDescription = null,
+                    modifier = Modifier.size(21.dp, 17.dp)
+                )
+            }
+        }
+
+        // old: tv_subtitle - 14sp, marginTop 12dp, marginHorizontal 24dp
+        Text(
+            text = displaySubtitle,
+            style = ExoTypo.typo14.copy(
+                lineHeight = 20.sp,
+                letterSpacing = (-0.3).sp,
+                color = ColorPalette.textDimmed
+            ),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp)
+        )
+
+        // old: tv_confirm - 55dp height, marginTop 26dp, marginHorizontal 24dp, radius 28dp
+        Button(
+            onClick = {
+                if (hasBonusHeart) {
+                    onConfirm()
+                }
+                onDismiss()
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 10.dp)
-        ) {
-            // 콘텐츠 영역 (배경 포함)
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 84.dp)  // 이미지 중앙 (168dp/2)
-                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                    .background(ColorPalette.textWhiteBlack),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // 이미지 나머지 절반 + 18dp margin
-                Spacer(modifier = Modifier.height(84.dp + 18.dp))
-
-                // old: tv_title - 22sp bold
-                Text(
-                    text = title,
-                    style = ExoTypo.typo22Bold.copy(color = ColorPalette.textChat),
-                    textAlign = TextAlign.Center
-                )
-
-                // old: cl_heart - 보너스 하트 (100개 이상일 때만)
-                if (hasBonusHeart) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 8.dp)
-                    ) {
-                        // old: tv_plus
-                        Text(
-                            text = "+",
-                            style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
-                        )
-                        // old: tv_heart
-                        Text(
-                            text = bonusHeart.toString(),
-                            style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
-                        )
-                        // old: iv_heart - 21x17dp, marginStart 2dp
-                        Spacer(modifier = Modifier.width(2.dp))
-                        Image(
-                            painter = painterResource(R.drawable.img_popup_heart),
-                            contentDescription = null,
-                            modifier = Modifier.size(21.dp, 17.dp)
-                        )
-                    }
-                }
-
-                // old: tv_subtitle - 14sp, marginTop 12dp, marginHorizontal 24dp
-                Text(
-                    text = displaySubtitle,
-                    style = ExoTypo.typo14.copy(
-                        lineHeight = 20.sp,
-                        letterSpacing = (-0.3).sp,  // 자간 줄이기
-                        color = ColorPalette.textDimmed
-                    ),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp)
-                )
-
-                // old: tv_confirm - 55dp height, marginTop 26dp, marginHorizontal 24dp, radius 28dp
-                Button(
-                    onClick = {
-                        if (hasBonusHeart) {
-                            onConfirm()  // 인증서 화면 이동
-                        }
-                        onDismiss()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 24.dp, end = 24.dp, top = 26.dp)
-                        .height(55.dp),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ColorPalette.main
-                    )
-                ) {
-                    Text(
-                        text = if (hasBonusHeart)
-                            stringResource(R.string.vote_certificate_popup_button)
-                        else
-                            stringResource(R.string.btn_confirm),
-                        style = ExoTypo.typo16Bold.copy(color = Color.White)
-                    )
-                }
-
-                // old: bottom view - 30dp height
-                Spacer(modifier = Modifier.height(30.dp))
-            }
-
-            // old: img_review - width=0dp(match_parent), height=168dp
-            Image(
-                painter = painterResource(R.drawable.img_popup_vote),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(168.dp)
-                    .align(Alignment.TopCenter)
+                .padding(start = 24.dp, end = 24.dp, top = 26.dp)
+                .height(55.dp),
+            shape = RoundedCornerShape(28.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = ColorPalette.main
             )
-
-            // old: btn_close - 62dp, padding 25dp (icon ~12dp), marginTop 10dp from bg top, marginEnd 10dp
-            // bg top = 84dp, so absolute top = 84dp + 10dp = 94dp
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 94.dp, end = 10.dp)
-                    .size(62.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.btn_popup_close),
-                    contentDescription = "Close",
-                    modifier = Modifier.padding(25.dp),
-                    tint = Color.Unspecified
-                )
-            }
+        ) {
+            Text(
+                text = if (hasBonusHeart)
+                    stringResource(R.string.vote_certificate_popup_button)
+                else
+                    stringResource(R.string.btn_confirm),
+                style = ExoTypo.typo16Bold.copy(color = Color.White)
+            )
         }
     }
 }

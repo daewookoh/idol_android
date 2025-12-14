@@ -125,7 +125,7 @@ private val TextLightBlueDark = Color(0xFF68A9E0)
 private val ToolbarDefaultDark = Color(0xFFdddddd)
 private val TextDefaultOpacity60Dark = Color(0x99dbdbdb)
 private val TextLightOnlyDark = Color(0xFFFFFFFF)
-private val TextHeartVotesDark = Color(0xFFFFFFFF)
+private val TextHeartVotesDark = Color(0xFF121212)
 
 // Gray Colors - Dark
 private val Gray50Dark = Color(0xFF101010)

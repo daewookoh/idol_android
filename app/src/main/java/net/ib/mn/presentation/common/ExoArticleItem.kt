@@ -394,7 +394,8 @@ fun ExoArticleItem(
                     ) {
                         Text(
                             text = createdAt,
-                            style = ExoTypo.typo12
+                            style = ExoTypo.typo12,
+                            color = ColorPalette.textDimmed
                         )
 
                         if (article.isMostOnly == "Y") {
@@ -1069,7 +1070,8 @@ private fun ArticleItemStatItem(
         Spacer(modifier = Modifier.width(3.dp))
         Text(
             text = NumberFormatUtil.formatWithComma(count.toLong()),
-            style = ExoTypo.typo13
+            style = ExoTypo.typo13,
+            color = ColorPalette.textDimmed
         )
     }
 }

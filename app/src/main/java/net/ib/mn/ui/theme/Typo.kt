@@ -20,33 +20,34 @@ val Typography = Typography(
  * 앱 전용 Typography - fontSize와 lineHeight만 지정
  * lineHeight = fontSize + 2
  *
- * typo{size} - 기본 (Medium weight)
+ * typo{size} - 기본 (Normal weight)
  * typo{size}Bold - Bold weight
+ * typo{size}Medium - Medium weight
  * typo{size}Main - Bold + Main 컬러
- * typo{size}Gray - Medium + textGray 컬러
- * typo{size}FixWhite - Medium + fixWhite 컬러
+ * typo{size}Gray - Normal + textGray 컬러
+ * typo{size}FixWhite - Normal + fixWhite 컬러
  */
 object ExoTypo {
     private val defaultLetterSpacing = 0.1.sp
 
-    // 기본 스타일 (Medium weight) - 7sp ~ 24sp
-    val typo7 = TextStyle(fontSize = 7.sp, lineHeight = 9.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo8 = TextStyle(fontSize = 8.sp, lineHeight = 10.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo9 = TextStyle(fontSize = 9.sp, lineHeight = 11.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo10 = TextStyle(fontSize = 10.sp, lineHeight = 12.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo11 = TextStyle(fontSize = 11.sp, lineHeight = 13.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo12 = TextStyle(fontSize = 12.sp, lineHeight = 14.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo13 = TextStyle(fontSize = 13.sp, lineHeight = 15.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo14 = TextStyle(fontSize = 14.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo15 = TextStyle(fontSize = 15.sp, lineHeight = 17.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo16 = TextStyle(fontSize = 16.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo17 = TextStyle(fontSize = 17.sp, lineHeight = 19.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo18 = TextStyle(fontSize = 18.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo19 = TextStyle(fontSize = 19.sp, lineHeight = 21.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo20 = TextStyle(fontSize = 20.sp, lineHeight = 22.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo21 = TextStyle(fontSize = 21.sp, lineHeight = 23.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo22 = TextStyle(fontSize = 22.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
-    val typo24 = TextStyle(fontSize = 24.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, letterSpacing = defaultLetterSpacing)
+    // 기본 스타일 (Normal weight) - 7sp ~ 24sp
+    val typo7 = TextStyle(fontSize = 7.sp, lineHeight = 9.sp, letterSpacing = defaultLetterSpacing)
+    val typo8 = TextStyle(fontSize = 8.sp, lineHeight = 10.sp, letterSpacing = defaultLetterSpacing)
+    val typo9 = TextStyle(fontSize = 9.sp, lineHeight = 11.sp, letterSpacing = defaultLetterSpacing)
+    val typo10 = TextStyle(fontSize = 10.sp, lineHeight = 12.sp, letterSpacing = defaultLetterSpacing)
+    val typo11 = TextStyle(fontSize = 11.sp, lineHeight = 13.sp, letterSpacing = defaultLetterSpacing)
+    val typo12 = TextStyle(fontSize = 12.sp, lineHeight = 14.sp, letterSpacing = defaultLetterSpacing)
+    val typo13 = TextStyle(fontSize = 13.sp, lineHeight = 15.sp, letterSpacing = defaultLetterSpacing)
+    val typo14 = TextStyle(fontSize = 14.sp, lineHeight = 16.sp, letterSpacing = defaultLetterSpacing)
+    val typo15 = TextStyle(fontSize = 15.sp, lineHeight = 17.sp, letterSpacing = defaultLetterSpacing)
+    val typo16 = TextStyle(fontSize = 16.sp, lineHeight = 18.sp, letterSpacing = defaultLetterSpacing)
+    val typo17 = TextStyle(fontSize = 17.sp, lineHeight = 19.sp, letterSpacing = defaultLetterSpacing)
+    val typo18 = TextStyle(fontSize = 18.sp, lineHeight = 20.sp, letterSpacing = defaultLetterSpacing)
+    val typo19 = TextStyle(fontSize = 19.sp, lineHeight = 21.sp, letterSpacing = defaultLetterSpacing)
+    val typo20 = TextStyle(fontSize = 20.sp, lineHeight = 22.sp, letterSpacing = defaultLetterSpacing)
+    val typo21 = TextStyle(fontSize = 21.sp, lineHeight = 23.sp, letterSpacing = defaultLetterSpacing)
+    val typo22 = TextStyle(fontSize = 22.sp, lineHeight = 24.sp, letterSpacing = defaultLetterSpacing)
+    val typo24 = TextStyle(fontSize = 24.sp, lineHeight = 26.sp, letterSpacing = defaultLetterSpacing)
 
     // Bold 스타일 - 기본 스타일에서 fontWeight만 변경
     val typo7Bold = typo7.copy(fontWeight = FontWeight.Bold)
@@ -66,6 +67,25 @@ object ExoTypo {
     val typo21Bold = typo21.copy(fontWeight = FontWeight.Bold)
     val typo22Bold = typo22.copy(fontWeight = FontWeight.Bold)
     val typo24Bold = typo24.copy(fontWeight = FontWeight.Bold)
+
+    // Medium 스타일 - 기본 스타일에서 fontWeight만 변경
+    val typo7Medium = typo7.copy(fontWeight = FontWeight.Medium)
+    val typo8Medium = typo8.copy(fontWeight = FontWeight.Medium)
+    val typo9Medium = typo9.copy(fontWeight = FontWeight.Medium)
+    val typo10Medium = typo10.copy(fontWeight = FontWeight.Medium)
+    val typo11Medium = typo11.copy(fontWeight = FontWeight.Medium)
+    val typo12Medium = typo12.copy(fontWeight = FontWeight.Medium)
+    val typo13Medium = typo13.copy(fontWeight = FontWeight.Medium)
+    val typo14Medium = typo14.copy(fontWeight = FontWeight.Medium)
+    val typo15Medium = typo15.copy(fontWeight = FontWeight.Medium)
+    val typo16Medium = typo16.copy(fontWeight = FontWeight.Medium)
+    val typo17Medium = typo17.copy(fontWeight = FontWeight.Medium)
+    val typo18Medium = typo18.copy(fontWeight = FontWeight.Medium)
+    val typo19Medium = typo19.copy(fontWeight = FontWeight.Medium)
+    val typo20Medium = typo20.copy(fontWeight = FontWeight.Medium)
+    val typo21Medium = typo21.copy(fontWeight = FontWeight.Medium)
+    val typo22Medium = typo22.copy(fontWeight = FontWeight.Medium)
+    val typo24Medium = typo24.copy(fontWeight = FontWeight.Medium)
 
     // Main 스타일 - Bold 스타일에서 color만 추가
     val typo7Main @Composable get() = typo7Bold.copy(color = ColorPalette.main)

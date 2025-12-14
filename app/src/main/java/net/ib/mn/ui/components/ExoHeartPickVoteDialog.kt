@@ -458,114 +458,68 @@ fun HeartPickVoteCompleteBottomSheet(
         NumberFormatUtil.formatWithComma(voteCount)
     )
 
-    ExoBottomSheet(
-        onDismissRequest = onDismiss,
-        type = ExoBottomSheetType.DESIGN
+    ExoRewardBottomSheet(
+        imageRes = R.drawable.img_popup_vote,
+        onDismiss = onDismiss
     ) {
-        Box(
+        // 아이돌 이름
+        Text(
+            text = idolName.replace("_", "\n"),
+            style = ExoTypo.typo22Bold.copy(color = ColorPalette.textChat),
+            textAlign = TextAlign.Center
+        )
+
+        // 보너스 하트 (있을 때만)
+        if (hasBonusHeart) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text(
+                    text = "+",
+                    style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
+                )
+                Text(
+                    text = bonusHeart.toString(),
+                    style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Image(
+                    painter = painterResource(R.drawable.img_popup_heart),
+                    contentDescription = null,
+                    modifier = Modifier.size(21.dp, 17.dp)
+                )
+            }
+        }
+
+        // 투표 완료 메시지
+        Text(
+            text = displaySubtitle,
+            style = ExoTypo.typo14.copy(
+                lineHeight = 20.sp,
+                letterSpacing = (-0.3).sp,
+                color = ColorPalette.textDimmed
+            ),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp)
+        )
+
+        // 공유하기 버튼
+        Button(
+            onClick = onShare,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 10.dp)
-        ) {
-            // 콘텐츠 영역
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 84.dp)
-                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                    .background(ColorPalette.textWhiteBlack),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Spacer(modifier = Modifier.height(84.dp + 18.dp))
-
-                // 아이돌 이름
-                Text(
-                    text = idolName.replace("_", "\n"),
-                    style = ExoTypo.typo22Bold.copy(color = ColorPalette.textChat),
-                    textAlign = TextAlign.Center
-                )
-
-                // 보너스 하트 (있을 때만)
-                if (hasBonusHeart) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 8.dp)
-                    ) {
-                        Text(
-                            text = "+",
-                            style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
-                        )
-                        Text(
-                            text = bonusHeart.toString(),
-                            style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
-                        )
-                        Spacer(modifier = Modifier.width(2.dp))
-                        Image(
-                            painter = painterResource(R.drawable.img_popup_heart),
-                            contentDescription = null,
-                            modifier = Modifier.size(21.dp, 17.dp)
-                        )
-                    }
-                }
-
-                // 투표 완료 메시지
-                Text(
-                    text = displaySubtitle,
-                    style = ExoTypo.typo14.copy(
-                        lineHeight = 20.sp,
-                        letterSpacing = (-0.3).sp,
-                        color = ColorPalette.textDimmed
-                    ),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp)
-                )
-
-                // 공유하기 버튼
-                Button(
-                    onClick = onShare,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 24.dp, end = 24.dp, top = 26.dp)
-                        .height(55.dp),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ColorPalette.main
-                    )
-                ) {
-                    Text(
-                        text = stringResource(R.string.label_share),
-                        style = ExoTypo.typo16Bold.copy(color = Color.White)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(30.dp))
-            }
-
-            // 이미지
-            Image(
-                painter = painterResource(R.drawable.img_popup_vote),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(168.dp)
-                    .align(Alignment.TopCenter)
+                .padding(start = 24.dp, end = 24.dp, top = 26.dp)
+                .height(55.dp),
+            shape = RoundedCornerShape(28.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = ColorPalette.main
             )
-
-            // 닫기 버튼
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 94.dp, end = 10.dp)
-                    .size(62.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.btn_popup_close),
-                    contentDescription = "Close",
-                    modifier = Modifier.padding(25.dp),
-                    tint = Color.Unspecified
-                )
-            }
+        ) {
+            Text(
+                text = stringResource(R.string.label_share),
+                style = ExoTypo.typo16Bold.copy(color = Color.White)
+            )
         }
     }
 }

@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -314,6 +315,96 @@ fun ExoBottomSheetAction(
             }
 
             Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+}
+
+/**
+ * ExoRewardBottomSheet - 보상/완료 바텀시트 공용 컴포넌트
+ *
+ * old 프로젝트의 RewardBottomSheetDialogFragment 패턴을 통일
+ * 투표 완료, 하트박스 보상, 미션 보상 등에서 사용
+ *
+ * 구조:
+ * - 상단 이미지 (168dp, 콘텐츠 위로 겹침)
+ * - 콘텐츠 영역 (둥근 모서리 20dp, 흰색 배경)
+ * - 우측 상단 닫기 버튼
+ *
+ * @param imageRes 상단 이미지 리소스 ID
+ * @param onDismiss 닫기 콜백
+ * @param imageHeight 이미지 높이 (기본값: 168.dp)
+ * @param imageOverlap 이미지가 콘텐츠와 겹치는 높이 (기본값: imageHeight/2)
+ * @param showCloseButton 닫기 버튼 표시 여부 (기본값: true)
+ * @param content 콘텐츠 영역
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExoRewardBottomSheet(
+    imageRes: Int,
+    onDismiss: () -> Unit,
+    imageHeight: Dp = 168.dp,
+    imageOverlap: Dp = 84.dp,
+    showCloseButton: Boolean = true,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    ExoBottomSheet(
+        onDismissRequest = onDismiss,
+        type = ExoBottomSheetType.DESIGN
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp)
+        ) {
+            // 콘텐츠 영역 (배경 포함)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = imageOverlap)
+                    .background(
+                        color = ColorPalette.textWhiteBlack,
+                        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+                    )
+                    .navigationBarsPadding(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // 이미지 나머지 절반 + 18dp margin
+                Spacer(modifier = Modifier.height(imageOverlap + 18.dp))
+
+                // 콘텐츠
+                content()
+
+                // 하단 여백
+                Spacer(modifier = Modifier.height(30.dp))
+            }
+
+            // 상단 이미지
+            androidx.compose.foundation.Image(
+                painter = painterResource(imageRes),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(imageHeight)
+                    .align(Alignment.TopCenter)
+            )
+
+            // 닫기 버튼
+            if (showCloseButton) {
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = imageOverlap + 10.dp, end = 10.dp)
+                        .size(62.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.btn_popup_close),
+                        contentDescription = "Close",
+                        modifier = Modifier.padding(25.dp),
+                        tint = Color.Unspecified
+                    )
+                }
+            }
         }
     }
 }

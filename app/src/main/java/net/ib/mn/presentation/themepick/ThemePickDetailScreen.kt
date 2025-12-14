@@ -274,7 +274,7 @@ fun ThemePickDetailScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = title,
-                            style = ExoTypo.typo20Bold,
+                            style = ExoTypo.typo21Bold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

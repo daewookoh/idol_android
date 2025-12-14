@@ -19,6 +19,7 @@ import net.ib.mn.data.repository.WikiRepository
 import net.ib.mn.data.repository.WikiRepositoryImpl
 import net.ib.mn.data.repository.ItemShopRepositoryImpl
 import net.ib.mn.data.repository.FilesRepositoryImpl
+import net.ib.mn.data.repository.MissionRepositoryImpl
 import net.ib.mn.data.repository.SearchRepositoryImpl
 import net.ib.mn.domain.repository.ChatRepository
 import net.ib.mn.domain.repository.TrendsRepository
@@ -37,6 +38,7 @@ import net.ib.mn.domain.repository.UserRepository
 import net.ib.mn.domain.repository.UtilityRepository
 import net.ib.mn.domain.repository.ItemShopRepository
 import net.ib.mn.domain.repository.FilesRepository
+import net.ib.mn.domain.repository.MissionRepository
 import net.ib.mn.domain.repository.SearchRepository
 import dagger.Binds
 import dagger.Module
@@ -166,4 +168,10 @@ abstract class RepositoryModule {
     abstract fun bindSearchRepository(
         impl: SearchRepositoryImpl
     ): SearchRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMissionRepository(
+        impl: MissionRepositoryImpl
+    ): MissionRepository
 }

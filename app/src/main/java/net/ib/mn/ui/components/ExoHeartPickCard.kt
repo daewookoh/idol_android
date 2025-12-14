@@ -33,9 +33,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -617,7 +614,7 @@ private fun ActiveHeartPickCard(
 
                     Text(
                         text = periodDate,
-                        style = ExoTypo.typo12,
+                        style = ExoTypo.typo13,
                         color = ColorPalette.textDimmed
                     )
                 }
@@ -874,7 +871,7 @@ private fun EndedHeartPickCard(
 
                     Text(
                         text = periodDate,
-                        style = ExoTypo.typo12,
+                        style = ExoTypo.typo13,
                         color = ColorPalette.textDimmed
                     )
                 }

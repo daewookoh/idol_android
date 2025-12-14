@@ -1,13 +1,13 @@
 package net.ib.mn.presentation.friend.request
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import net.ib.mn.R
 import net.ib.mn.base.BaseViewModel
+import net.ib.mn.util.logD
 import net.ib.mn.data.repository.FriendsRepository
 import javax.inject.Inject
 
@@ -146,10 +146,10 @@ class FriendRequestViewModel @Inject constructor(
      * old: CancelFriendsRequestFragment.onItemClicked (btnCancel -> cancelFriendRequest)
      */
     private fun cancelRequest(userId: Int) {
-        Log.d("FriendRequestVM", "cancelRequest called with userId: $userId")
+        logD("FriendRequestVM", "cancelRequest called with userId: $userId")
         viewModelScope.launch {
             val response = friendsRepository.cancelFriendRequest(userId)
-            Log.d("FriendRequestVM", "cancelFriendRequest response: success=${response.success}, message=${response.message}")
+            logD("FriendRequestVM", "cancelFriendRequest response: success=${response.success}, message=${response.message}")
 
             if (response.success) {
                 // 목록에서 해당 유저 제거

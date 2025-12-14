@@ -245,4 +245,10 @@ sealed class Screen {
         val mostIdolName: String? = null,
         val isMine: Boolean = false
     ) : Screen()
+
+    /**
+     * WelcomeMission 화면 - 웰컴 미션
+     */
+    @Serializable
+    data object WelcomeMission : Screen()
 }

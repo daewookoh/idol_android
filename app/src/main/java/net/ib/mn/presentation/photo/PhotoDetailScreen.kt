@@ -84,8 +84,7 @@ import net.ib.mn.R
 import net.ib.mn.domain.model.ArticleFile
 import net.ib.mn.domain.model.ArticleModel
 import net.ib.mn.ad.AdaptiveBanner
-import net.ib.mn.ui.components.ExoBottomSheet
-import net.ib.mn.ui.components.ExoBottomSheetType
+import net.ib.mn.ui.components.ExoRewardBottomSheet
 import net.ib.mn.ui.theme.ColorPalette
 import net.ib.mn.ui.theme.ExoTypo
 import net.ib.mn.util.IdolImageUtil.toSecureUrl
@@ -750,159 +749,103 @@ private fun HeartBoxRewardDialog(
     // heart=0이고 button=true이면 비디오 광고 유도
     val showVideoAdOption = heart == 0 && button && showVideoAdButton
 
-    ExoBottomSheet(
-        onDismissRequest = onDismiss,
-        type = ExoBottomSheetType.DESIGN
+    ExoRewardBottomSheet(
+        imageRes = imageRes,
+        onDismiss = onDismiss,
+        imageOverlap = 109.dp,  // 이미지 중앙 (168dp/2) + 25dp 낮춤
+        showCloseButton = showVideoAdOption
     ) {
-        // old: cl_reward_root - paddingTop 10dp, transparent background
-        Box(
+        // old: tv_reward - 22sp bold
+        val titleText = if (heart == 0) {
+            stringResource(R.string.lable_receive_no_heart)
+        } else {
+            stringResource(R.string.reward_heartbox)
+        }
+
+        Text(
+            text = titleText,
+            style = ExoTypo.typo22Bold.copy(color = ColorPalette.textChat),
+            textAlign = TextAlign.Center
+        )
+
+        // old: cl_heart - 하트 개수 (heart > 0일 때만)
+        if (heart > 0) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text(
+                    text = "+",
+                    style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
+                )
+                Text(
+                    text = numberFormat.format(heart),
+                    style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Image(
+                    painter = painterResource(R.drawable.img_popup_heart),
+                    contentDescription = null,
+                    modifier = Modifier.size(21.dp, 17.dp)
+                )
+            }
+        }
+
+        // old: tv_reward_detail - 14sp, dimmed color
+        val detailText = when {
+            heart >= 1000 -> stringResource(R.string.reward_heartbox1000_sub)
+            showVideoAdOption -> stringResource(R.string.label_see_video_for_heartbox)
+            else -> null
+        }
+
+        if (detailText != null) {
+            Text(
+                text = detailText,
+                style = ExoTypo.typo14.copy(color = ColorPalette.textDimmed),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp)
+            )
+        }
+
+        // old: tv_confirm - 55dp height, marginTop 26dp, marginHorizontal 24dp, radius 28dp
+        val confirmText = if (showVideoAdOption) {
+            stringResource(R.string.receive_more_heart_after_video_ads, "30")
+        } else {
+            stringResource(R.string.confirm)
+        }
+
+        Button(
+            onClick = {
+                if (showVideoAdOption) {
+                    onWatchVideoAd()
+                }
+                onDismiss()
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 10.dp)
-        ) {
-            // 콘텐츠 영역 (배경 포함)
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 109.dp)  // 이미지 중앙 (168dp/2) + 25dp 낮춤
-                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                    .background(ColorPalette.textWhiteBlack)
-                    .navigationBarsPadding(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // 이미지 나머지 절반 + 18dp margin - 25dp
-                Spacer(modifier = Modifier.height(59.dp + 18.dp))
-
-                // old: tv_reward - 22sp bold
-                val titleText = if (heart == 0) {
-                    stringResource(R.string.lable_receive_no_heart)
-                } else {
-                    stringResource(R.string.reward_heartbox)
-                }
-
-                Text(
-                    text = titleText,
-                    style = ExoTypo.typo22Bold.copy(color = ColorPalette.textChat),
-                    textAlign = TextAlign.Center
-                )
-
-                // old: cl_heart - 하트 개수 (heart > 0일 때만)
-                if (heart > 0) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 8.dp)
-                    ) {
-                        // old: tv_plus - 24sp, main color
-                        Text(
-                            text = "+",
-                            style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
-                        )
-                        // old: tv_heart - 24sp, main color
-                        Text(
-                            text = numberFormat.format(heart),
-                            style = ExoTypo.typo24Bold.copy(color = ColorPalette.main)
-                        )
-                        // old: iv_heart - 21x17dp, marginStart 2dp
-                        Spacer(modifier = Modifier.width(2.dp))
-                        Image(
-                            painter = painterResource(R.drawable.img_popup_heart),
-                            contentDescription = null,
-                            modifier = Modifier.size(21.dp, 17.dp)
-                        )
-                    }
-                }
-
-                // old: tv_reward_detail - 14sp, dimmed color
-                // 1000개 이상일 때 또는 heart=0이고 비디오 광고 가능할 때
-                val detailText = when {
-                    heart >= 1000 -> stringResource(R.string.reward_heartbox1000_sub)
-                    showVideoAdOption -> stringResource(R.string.label_see_video_for_heartbox)
-                    else -> null
-                }
-
-                if (detailText != null) {
-                    Text(
-                        text = detailText,
-                        style = ExoTypo.typo14.copy(color = ColorPalette.textDimmed),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp)
-                    )
-                }
-
-                // old: tv_confirm - 55dp height, marginTop 26dp, marginHorizontal 24dp, radius 28dp
-                val confirmText = if (showVideoAdOption) {
-                    stringResource(R.string.receive_more_heart_after_video_ads, "30")
-                } else {
-                    stringResource(R.string.confirm)
-                }
-
-                Button(
-                    onClick = {
-                        if (showVideoAdOption) {
-                            onWatchVideoAd()
-                        }
-                        onDismiss()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 24.dp, end = 24.dp, top = 26.dp)
-                        .height(55.dp),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ColorPalette.main
-                    )
-                ) {
-                    Text(
-                        text = confirmText,
-                        style = ExoTypo.typo16Bold.copy(color = Color.White)
-                    )
-                }
-
-                // 취소 버튼 (비디오 광고 옵션일 때만 - old: tv_cancel)
-                if (showVideoAdOption) {
-                    TextButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.padding(top = 8.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.quit),
-                            style = ExoTypo.typo16Bold.copy(color = ColorPalette.mainLight)
-                        )
-                    }
-                }
-
-                // old: bottom view - 30dp height
-                Spacer(modifier = Modifier.height(30.dp))
-            }
-
-            // old: img_review - width=0dp(match_parent), height=168dp
-            Image(
-                painter = painterResource(id = imageRes),
-                contentDescription = "Heart Box Reward",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(168.dp)
-                    .align(Alignment.TopCenter)
+                .padding(start = 24.dp, end = 24.dp, top = 26.dp)
+                .height(55.dp),
+            shape = RoundedCornerShape(28.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = ColorPalette.main
             )
+        ) {
+            Text(
+                text = confirmText,
+                style = ExoTypo.typo16Bold.copy(color = Color.White)
+            )
+        }
 
-            // old: btn_close - 62dp, padding 25dp (icon ~12dp), marginTop 10dp from bg top, marginEnd 10dp
-            // bg top = 109dp, so absolute top = 109dp + 10dp = 119dp
-            // heart=0이고 button=true일 때만 표시
-            if (showVideoAdOption) {
-                IconButton(
-                    onClick = onDismiss,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = 119.dp, end = 10.dp)
-                        .size(62.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.btn_popup_close),
-                        contentDescription = "Close",
-                        modifier = Modifier.padding(25.dp),
-                        tint = Color.Unspecified
-                    )
-                }
+        // 취소 버튼 (비디오 광고 옵션일 때만 - old: tv_cancel)
+        if (showVideoAdOption) {
+            TextButton(
+                onClick = onDismiss,
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.quit),
+                    style = ExoTypo.typo16Bold.copy(color = ColorPalette.mainLight)
+                )
             }
         }
     }

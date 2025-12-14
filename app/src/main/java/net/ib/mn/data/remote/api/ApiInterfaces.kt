@@ -295,6 +295,33 @@ interface StampsApi {
     suspend fun postStamp(): Response<ResponseBody>
 }
 
+// ============================================================
+// Mission API (웰컴 미션)
+// ============================================================
+interface MissionApi {
+
+    /**
+     * 웰컴 미션 목록 조회
+     * old 프로젝트와 동일: GET missions/welcome/
+     *
+     * @return WelcomeMissionResponse with mission list and all_clear_reward
+     */
+    @GET("missions/welcome/")
+    suspend fun getWelcomeMission(): Response<WelcomeMissionResponse>
+
+    /**
+     * 미션 보상 수령
+     * old 프로젝트와 동일: POST missions/reward/
+     *
+     * @param body ClaimMissionRewardRequest with mission key
+     * @return ClaimMissionRewardResponse with reward data
+     */
+    @POST("missions/reward/")
+    suspend fun claimMissionReward(
+        @Body body: ClaimMissionRewardRequest
+    ): Response<ClaimMissionRewardResponse>
+}
+
 /*
  * ============================================================
  * API 구현 가이드

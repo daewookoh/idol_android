@@ -159,7 +159,11 @@ private fun VoteCountOverlay(
         ) {
             ExoHeartCounter(
                 count = item.heartCount,
-                style = ExoTypo.typo11Bold.copy(fontWeight = FontWeight.Normal, lineHeight = 17.sp)
+                style = ExoTypo.typo11Bold.copy(
+                    fontWeight = FontWeight.Normal,
+                    lineHeight = 17.sp,
+                    color = ColorPalette.textHeartVotes
+                )
             )
         }
     }
@@ -1285,7 +1289,7 @@ fun HeartPickRankingItem(
                     modifier = Modifier.fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // 투표수: 색상바 우측에 배치 (old: text_white_black, bold 없음)
+                    // 투표수: 색상바 우측에 배치 (old: text_heart_votes, bold 없음)
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(progressPercent)
@@ -1296,7 +1300,7 @@ fun HeartPickRankingItem(
                             count = item.heartCount,
                             style = ExoTypo.typo11.copy(
                                 lineHeight = 17.sp,
-                                color = ColorPalette.textWhiteBlack
+                                color = ColorPalette.textHeartVotes
                             ),
                             modifier = Modifier.padding(end = 4.dp)
                         )
@@ -1492,7 +1496,7 @@ private fun HeartPickDetail1stRankingItem(
                                 count = item.heartCount,
                                 style = ExoTypo.typo11.copy(
                                     lineHeight = 17.sp,
-                                    color = ColorPalette.textWhiteBlack
+                                    color = ColorPalette.textHeartVotes
                                 ),
                                 modifier = Modifier.padding(end = 4.dp)
                             )
@@ -1691,7 +1695,7 @@ private fun HeartPickDetailOtherRankingItem(
                     modifier = Modifier.fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // 투표수: 색상바 우측에 배치 (old: text_white_black, bold 없음)
+                    // 투표수: 색상바 우측에 배치 (old: text_heart_votes, bold 없음)
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(progressPercent)
@@ -1702,7 +1706,7 @@ private fun HeartPickDetailOtherRankingItem(
                             count = item.heartCount,
                             style = ExoTypo.typo11.copy(
                                 lineHeight = 17.sp,
-                                color = ColorPalette.textWhiteBlack
+                                color = ColorPalette.textHeartVotes
                             ),
                             modifier = Modifier.padding(end = 4.dp)
                         )
@@ -2148,7 +2152,7 @@ private fun ThemePick1stRankingItem(
                                     count = item.heartCount,
                                     style = ExoTypo.typo11.copy(
                                         lineHeight = 17.sp,
-                                        color = ColorPalette.textWhiteBlack
+                                        color = ColorPalette.textHeartVotes
                                     ),
                                     modifier = Modifier.padding(end = 4.dp)
                                 )
@@ -2348,7 +2352,7 @@ private fun ThemePickOtherRankingItem(
                             count = item.heartCount,
                             style = ExoTypo.typo11.copy(
                                 lineHeight = 17.sp,
-                                color = ColorPalette.textWhiteBlack
+                                color = ColorPalette.textHeartVotes
                             ),
                             modifier = Modifier.padding(end = 4.dp)
                         )

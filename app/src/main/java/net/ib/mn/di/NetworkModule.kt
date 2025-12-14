@@ -20,6 +20,7 @@ import net.ib.mn.data.remote.api.MarketApi
 import net.ib.mn.data.remote.api.MessageApi
 import net.ib.mn.data.remote.api.MiscApi
 import net.ib.mn.data.remote.api.ImagepickApi
+import net.ib.mn.data.remote.api.MissionApi
 import net.ib.mn.data.remote.api.ReportApi
 import net.ib.mn.data.remote.api.ScheduleApi
 import net.ib.mn.data.remote.api.SearchApi
@@ -242,4 +243,9 @@ object NetworkModule {
     @Singleton
     fun provideSearchApi(retrofit: Retrofit): SearchApi =
         retrofit.create(SearchApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideMissionApi(retrofit: Retrofit): MissionApi =
+        retrofit.create(MissionApi::class.java)
 }
