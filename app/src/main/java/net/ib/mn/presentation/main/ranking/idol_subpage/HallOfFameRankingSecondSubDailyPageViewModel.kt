@@ -85,6 +85,14 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
     private val _showNextButton = MutableStateFlow(false)
     val showNextButton: StateFlow<Boolean> = _showNextButton.asStateFlow()
 
+    // 확장된 hofId 목록 (여러 개 동시에 열릴 수 있음, hofId는 item.id로 고유함)
+    private val _expandedHofIds = MutableStateFlow<Set<Int>>(emptySet())
+    val expandedHofIds: StateFlow<Set<Int>> = _expandedHofIds.asStateFlow()
+
+    // 마지막에 열린 hofId (영상 재생 대상)
+    private val _activeVideoHofId = MutableStateFlow<Int?>(null)
+    val activeVideoHofId: StateFlow<Int?> = _activeVideoHofId.asStateFlow()
+
     private var historyList = mutableListOf<HistoryItem>()
 
     // 현재 기간 선택 위치 (0 = 최신, 1 이상 = 과거 달)
@@ -277,6 +285,31 @@ class HallOfFameRankingSecondSubDailyPageViewModel @AssistedInject constructor(
     fun onTabChanged(newChartCode: String) {
         val historyParam = buildHistoryParam()
         loadData(newChartCode, historyParam)
+    }
+
+    /**
+     * 프로필 이미지 클릭 시 호출 (ExoTop3 토글)
+     *
+     * 여러 개 동시에 열릴 수 있고, 마지막에 열린 것만 영상 재생
+     * 이미지 URL은 DailyRankModel에서 직접 가져옴 (날짜별 다른 이미지)
+     *
+     * @param hofId HOF 아이템 ID (item.id, 고유 키)
+     */
+    fun toggleExpanded(hofId: Int) {
+        val currentExpanded = _expandedHofIds.value
+        if (currentExpanded.contains(hofId)) {
+            // 이미 확장된 상태 -> 닫기
+            _expandedHofIds.value = currentExpanded - hofId
+            // 닫힌 것이 활성 영상이었다면, 남은 것 중 하나를 활성화 (없으면 null)
+            if (_activeVideoHofId.value == hofId) {
+                _activeVideoHofId.value = _expandedHofIds.value.lastOrNull()
+            }
+        } else {
+            // 새로운 아이템 확장
+            _expandedHofIds.value = currentExpanded + hofId
+            // 마지막에 열린 것이 활성 영상
+            _activeVideoHofId.value = hofId
+        }
     }
 
     /**

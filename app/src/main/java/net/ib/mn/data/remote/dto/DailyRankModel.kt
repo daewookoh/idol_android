@@ -21,6 +21,19 @@ data class DailyRankModel(
     @SerializedName("resource_uri")
     val resourceUri: String? = null,  // old: "/api/v1/hofs/15013/" 형식
 
+    // trend 관련 필드 (날짜별 top3 이미지용, old 프로젝트 HallModel과 동일)
+    @SerializedName("trend_id")
+    val trendId: String? = null,
+
+    @SerializedName("image_url")
+    val imageUrl: String? = null,
+
+    @SerializedName("image_url2")
+    val imageUrl2: String? = null,
+
+    @SerializedName("image_url3")
+    val imageUrl3: String? = null,
+
     // idol 중첩 객체 (old 프로젝트와 동일)
     @SerializedName("idol")
     val idol: IdolInfo? = null

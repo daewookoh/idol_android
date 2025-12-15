@@ -1781,13 +1781,20 @@ private fun HeartPickDetailOtherRankingItem(
  * old 프로젝트의 hall_item.xml 및 HallOfFameDayAdapter 기반
  *
  * 주요 기능:
- * 1. 프로필 이미지 (40x40dp)
+ * 1. 프로필 이미지 (40x40dp) - 클릭 시 ExoTop3 토글
  * 2. Anniversary badges (생일, 데뷔, 컴백, 기념일)
  * 3. 이름 + 그룹명 + 순위 아이콘 (1/2/3위 왕관)
  * 4. 투표수 + 날짜
+ * 5. ExoTop3 (프로필 클릭 시 토글, 여러 개 동시 열림 가능)
  *
  * @param item 일일 랭킹 아이템 데이터
  * @param cdnUrl CDN 베이스 URL
+ * @param chartCode 차트 코드
+ * @param isExpanded ExoTop3 확장 여부 (UI 표시)
+ * @param isVideoActive 영상 재생 활성화 여부 (마지막에 열린 것만 true)
+ * @param top3ImageUrls Top3 이미지 URL 리스트
+ * @param top3VideoUrls Top3 비디오 URL 리스트
+ * @param onProfileClick 프로필 이미지 클릭 콜백 (ExoTop3 토글)
  * @param onItemClick 아이템 클릭 이벤트
  */
 @Composable
@@ -1795,6 +1802,11 @@ fun HofDailyRankingItem(
     item: net.ib.mn.data.remote.dto.DailyRankModel,
     cdnUrl: String,
     chartCode: String = "",
+    isExpanded: Boolean = false,
+    isVideoActive: Boolean = false,
+    top3ImageUrls: List<String?> = emptyList(),
+    top3VideoUrls: List<String?> = emptyList(),
+    onProfileClick: () -> Unit = {},
     onItemClick: () -> Unit = {}
 ) {
     // LocalHofDailyItemClick 사용
@@ -1837,7 +1849,12 @@ fun HofDailyRankingItem(
                 ExoProfileImage(
                     imageUrl = imageUrl,
                     rank = 0,  // Daily ranking에서는 rank badge 표시 안 함
-                    modifier = Modifier.size(40.dp),
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) { onProfileClick() },
                     contentDescription = "프로필 이미지"
                 )
 
@@ -2015,6 +2032,31 @@ fun HofDailyRankingItem(
                     )
                 }
             }
+        }
+
+        // ExoTop3 (프로필 이미지 클릭 시 토글, 여러 개 동시 열림 가능)
+        // isExpanded: UI 표시 여부
+        // isVideoActive: 영상 재생 여부 (마지막에 열린 것만 true)
+        val onItemClickLocal = LocalRankingItemClick.current
+        if (isExpanded && top3ImageUrls.isNotEmpty()) {
+            val idolId = item.idol?.id ?: 0
+            ExoTop3(
+                id = "hof_daily_${item.id}",
+                idolId = idolId,
+                imageUrls = top3ImageUrls,
+                videoUrls = top3VideoUrls,
+                isVisible = isVideoActive,  // 영상 재생은 마지막에 열린 것만
+                onClick = { _ ->
+                    // 클릭 시 Community로 이동하기 위해 RankingItem 생성
+                    val rankingItem = RankingItem(
+                        id = idolId.toString(),
+                        rank = item.idol?.rank ?: -1,
+                        name = item.idol?.name ?: "",
+                        voteCount = item.heart.toString()
+                    )
+                    onItemClickLocal(rankingItem)
+                }
+            )
         }
 
         // 하단 Divider

@@ -83,6 +83,8 @@ fun HallOfFameRankingSecondSubDailyPage(
     val historyMonth by dataViewModel.historyMonth.collectAsState()
     val showPrevButton by dataViewModel.showPrevButton.collectAsState()
     val showNextButton by dataViewModel.showNextButton.collectAsState()
+    val expandedHofIds by dataViewModel.expandedHofIds.collectAsState()
+    val activeVideoHofId by dataViewModel.activeVideoHofId.collectAsState()
 
     // ExoTabSwitch 선택이 바뀔 때만 새로운 차트 코드로 데이터 로드 (기간 유지)
     // OLD 프로젝트: historyParam = tagArrayList[currentPosition]
@@ -232,10 +234,30 @@ fun HallOfFameRankingSecondSubDailyPage(
                             items = rankingData,
                             key = { item -> item.id }
                         ) { item ->
+                            val hofId = item.id
+                            val isExpanded = expandedHofIds.contains(hofId)
+                            val isVideoActive = activeVideoHofId == hofId
+                            // DailyRankModel에서 직접 이미지 URL 가져옴 (날짜별 다른 이미지)
+                            val top3ImageUrls = listOf(item.imageUrl, item.imageUrl2, item.imageUrl3)
+                            val top3VideoUrls = net.ib.mn.util.IdolImageUtil.getTop3VideoUrls(
+                                imageUrl = item.imageUrl,
+                                imageUrl2 = item.imageUrl2,
+                                imageUrl3 = item.imageUrl3,
+                                top3 = null,
+                                top3ImageVer = null
+                            )
+
                             net.ib.mn.ui.components.HofDailyRankingItem(
                                 item = item,
                                 cdnUrl = cdnUrl,
                                 chartCode = currentChartCode,
+                                isExpanded = isExpanded,
+                                isVideoActive = isVideoActive,
+                                top3ImageUrls = top3ImageUrls,
+                                top3VideoUrls = top3VideoUrls,
+                                onProfileClick = {
+                                    dataViewModel.toggleExpanded(hofId)
+                                },
                                 onItemClick = {
                                 }
                             )
