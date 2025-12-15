@@ -26,6 +26,7 @@ import net.ib.mn.presentation.community.history.idol.IdolRankingHistoryScreen
 import net.ib.mn.presentation.community.history.daily.DailyRankingHistoryScreen
 import net.ib.mn.presentation.profile.ProfileScreen
 import net.ib.mn.presentation.welcomemission.WelcomeMissionScreen
+import net.ib.mn.presentation.mostset.MostSetScreen
 import net.ib.mn.presentation.login.EmailLoginScreen
 import net.ib.mn.presentation.login.LoginScreen
 import net.ib.mn.presentation.login.PasswordResetScreen
@@ -362,6 +363,11 @@ fun NavGraph(
                             onNavigateToPosting = { navigator.navigate(Screen.Main(initialTab = 3)) },
                             onNavigateToVideoAd = { navigator.navigate(Screen.Main(initialTab = 4)) }
                         )
+                    }
+
+                    // MostSet 화면 (최애 설정)
+                    is Screen.MostSet -> NavEntry(screen) {
+                        MostSetScreen()
                     }
                 }
             }

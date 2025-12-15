@@ -59,7 +59,7 @@ fun ExoButton(
     shape: Shape = RoundedCornerShape(10.dp),
     containerColor: Color = ColorPalette.main,
     disabledContainerColor: Color = ColorPalette.gray400,
-    contentColor: Color = ColorPalette.textDefault,
+    contentColor: Color = ColorPalette.textWhiteBlack,
     disabledContentColor: Color = ColorPalette.textDimmed,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     content: @Composable (RowScope.() -> Unit)? = null

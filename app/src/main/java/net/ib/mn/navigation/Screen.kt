@@ -251,4 +251,11 @@ sealed class Screen {
      */
     @Serializable
     data object WelcomeMission : Screen()
+
+    /**
+     * MostSet 화면 - 최애 설정
+     * old 프로젝트의 FavoriteSettingActivity에 해당
+     */
+    @Serializable
+    data object MostSet : Screen()
 }
